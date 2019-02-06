@@ -14,16 +14,16 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::rc::Rc;
 use std::collections::HashMap;
-use std::str::FromStr;
 use std::io::{Error, ErrorKind};
+use std::rc::Rc;
+use std::str::FromStr;
 
 use serde::{Deserialize, Deserializer};
 use serde_derive::Deserialize;
 
-use crate::ui::{Border, Color, LayoutKind, theme::*};
-use crate::util::{Size, Point};
+use crate::ui::{theme::*, Border, Color, LayoutKind};
+use crate::util::{Point, Size};
 
 #[derive(Deserialize, Default, Debug, Clone, Copy)]
 #[serde(deny_unknown_fields)]
@@ -53,7 +53,7 @@ impl RelativeBuilder {
         match to {
             None => {
                 to.replace(from.clone());
-            },
+            }
             Some(to) => {
                 to.x = to.x.or(from.x);
                 to.y = to.y.or(from.y);
@@ -70,7 +70,7 @@ pub struct TextParamsBuilder {
     horizontal_alignment: Option<HorizontalAlignment>,
     vertical_alignment: Option<VerticalAlignment>,
 
-    #[serde(default, deserialize_with="de_color")]
+    #[serde(default, deserialize_with = "de_color")]
     color: Option<Color>,
 
     scale: Option<f32>,
@@ -97,19 +97,26 @@ impl TextParamsBuilder {
         match to {
             None => {
                 to.replace(from.clone());
-            }, Some(to) => {
+            }
+            Some(to) => {
                 to.horizontal_alignment = to.horizontal_alignment.or(from.horizontal_alignment);
                 to.vertical_alignment = to.vertical_alignment.or(from.vertical_alignment);
-                if to.color.is_none() { to.color = from.color.clone(); }
+                if to.color.is_none() {
+                    to.color = from.color.clone();
+                }
                 to.scale = to.scale.or(from.scale);
-                if to.font.is_none() { to.font = from.font.clone(); }
+                if to.font.is_none() {
+                    to.font = from.font.clone();
+                }
             }
         }
     }
 }
 
 fn de_color<'de, D>(deserializer: D) -> Result<Option<Color>, D::Error>
-where D:Deserializer<'de> {
+where
+    D: Deserializer<'de>,
+{
     let input: Option<String> = Option::deserialize(deserializer)?;
 
     Ok(match input {
@@ -178,12 +185,20 @@ impl ThemeBuilder {
         }
     }
 
-    fn expand_from(&mut self, themes: &HashMap<String, ThemeBuilder>,
-                   depth: u32) -> Result<(), Error> {
+    fn expand_from(
+        &mut self,
+        themes: &HashMap<String, ThemeBuilder>,
+        depth: u32,
+    ) -> Result<(), Error> {
         if depth > MAX_FROM_DEPTH {
-            return Err(Error::new(ErrorKind::InvalidInput,
-                                  format!("From reference depth exceeds max of {}. This is most\
-                                          likely caused by a circular reference.", MAX_FROM_DEPTH)));
+            return Err(Error::new(
+                ErrorKind::InvalidInput,
+                format!(
+                    "From reference depth exceeds max of {}. This is most\
+                     likely caused by a circular reference.",
+                    MAX_FROM_DEPTH
+                ),
+            ));
         }
 
         self.expand_self(themes, depth)?;
@@ -195,12 +210,20 @@ impl ThemeBuilder {
         Ok(())
     }
 
-    fn expand_self(&mut self, themes: &HashMap<String, ThemeBuilder>,
-                   depth: u32) -> Result<(), Error> {
+    fn expand_self(
+        &mut self,
+        themes: &HashMap<String, ThemeBuilder>,
+        depth: u32,
+    ) -> Result<(), Error> {
         if depth > MAX_FROM_DEPTH {
-            return Err(Error::new(ErrorKind::InvalidInput,
-                                  format!("From reference depth exceeds max of {}. This is most\
-                                          likely caused by a circular reference.", MAX_FROM_DEPTH)));
+            return Err(Error::new(
+                ErrorKind::InvalidInput,
+                format!(
+                    "From reference depth exceeds max of {}. This is most\
+                     likely caused by a circular reference.",
+                    MAX_FROM_DEPTH
+                ),
+            ));
         }
 
         // recursively expand from definitions for this to
@@ -265,14 +288,20 @@ impl ThemeBuilderSet {
             let new_id = format!("{}.{}", id, child_id);
 
             if self.themes.contains_key(&new_id) {
-                return Err(Error::new(ErrorKind::InvalidInput,
-                                      format!("Computed ID '{}' is already present", new_id)));
+                return Err(Error::new(
+                    ErrorKind::InvalidInput,
+                    format!("Computed ID '{}' is already present", new_id),
+                ));
             }
 
             child.parent_id = Some(id.clone());
             self.themes.insert(new_id.clone(), child);
 
-            self.themes.get_mut(&id).unwrap().children_ids.push(new_id.clone());
+            self.themes
+                .get_mut(&id)
+                .unwrap()
+                .children_ids
+                .push(new_id.clone());
 
             self.flatten_children_recursive(new_id)?;
         }
@@ -291,14 +320,20 @@ impl ThemeBuilderSet {
         Ok(())
     }
 
-    fn find_theme<'a>(themes: &'a HashMap<String, ThemeBuilder>,
-                  id: &str) -> Result<&'a ThemeBuilder, Error> {
+    fn find_theme<'a>(
+        themes: &'a HashMap<String, ThemeBuilder>,
+        id: &str,
+    ) -> Result<&'a ThemeBuilder, Error> {
         let mut parent = themes;
         let mut result = None;
         for part in id.split(".") {
             parent = match parent.get(part) {
-                None => return Err(Error::new(ErrorKind::InvalidInput,
-                                              format!("From ref '{}' is invalid", id))),
+                None => {
+                    return Err(Error::new(
+                        ErrorKind::InvalidInput,
+                        format!("From ref '{}' is invalid", id),
+                    ));
+                }
                 Some(child) => {
                     result = Some(child);
                     &child.children
@@ -307,9 +342,13 @@ impl ThemeBuilderSet {
         }
 
         match result {
-            None => return Err(Error::new(ErrorKind::InvalidInput,
-                                          format!("From ref '{}' is invalid", id))),
-            Some(theme) => Ok(theme)
+            None => {
+                return Err(Error::new(
+                    ErrorKind::InvalidInput,
+                    format!("From ref '{}' is invalid", id),
+                ));
+            }
+            Some(theme) => Ok(theme),
         }
     }
 
@@ -324,28 +363,34 @@ impl ThemeBuilderSet {
         to.position = to.position.or(from.position);
         to.kind = to.kind.or(from.kind);
 
-        if to.text.is_none() { to.text = from.text.clone(); }
-        if to.background.is_none() { to.background = from.background.clone(); }
-        if to.foreground.is_none() { to.foreground = from.foreground.clone(); }
+        if to.text.is_none() {
+            to.text = from.text.clone();
+        }
+        if to.background.is_none() {
+            to.background = from.background.clone();
+        }
+        if to.foreground.is_none() {
+            to.foreground = from.foreground.clone();
+        }
 
         RelativeBuilder::merge(&mut to.relative, &from.relative);
         TextParamsBuilder::merge(&mut to.text_params, &from.text_params);
 
         for (key, value) in from.custom.iter() {
-            to.custom.entry(key.to_string()).or_insert(value.to_string());
+            to.custom
+                .entry(key.to_string())
+                .or_insert(value.to_string());
         }
 
         for (from_id, from_child) in from.children.iter() {
             match to.children.get_mut(from_id) {
                 None => {
                     to.children.insert(from_id.clone(), from_child.clone());
-                },
+                }
                 Some(to_child) => {
                     ThemeBuilderSet::copy_from_theme(to_child, from_child);
                 }
             }
         }
     }
-
 }
-

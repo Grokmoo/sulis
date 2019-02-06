@@ -18,9 +18,9 @@ use std::str::FromStr;
 
 use rlua::{UserData, UserDataMethods};
 
-use sulis_module::{Slot, QuickSlot, ItemKind, ability::AIData};
-use crate::GameState;
 use crate::script::*;
+use crate::GameState;
+use sulis_module::{ability::AIData, ItemKind, QuickSlot, Slot};
 
 /// The inventory of a particular creature, including equipped items
 /// and quickslots.
@@ -97,7 +97,7 @@ macro_rules! try_unwrap {
         let parent = $name.parent.try_unwrap()?;
         let parent = parent.borrow();
         let $v = &parent.actor.inventory();
-    }
+    };
 }
 
 impl UserData for ScriptInventory {
@@ -120,7 +120,8 @@ impl UserData for ScriptInventory {
                 Err(e) => {
                     warn!("{}", e);
                     return Ok(false);
-                }, Ok(slot) => slot,
+                }
+                Ok(slot) => slot,
             };
 
             let has_equipped = entity.borrow().actor.inventory().equipped(slot).is_some();
@@ -137,7 +138,8 @@ impl UserData for ScriptInventory {
                         to: "Slot",
                         message: Some(format!("{}", e)),
                     });
-                }, Ok(slot) => slot,
+                }
+                Ok(slot) => slot,
             };
 
             let entity = entity.borrow();
@@ -149,7 +151,8 @@ impl UserData for ScriptInventory {
                         to: "Item",
                         message: Some(format!("No item equipped in slot '{:?}'", slot)),
                     });
-                }, Some(item) => item,
+                }
+                Some(item) => item,
             };
 
             let item = &item.item;
@@ -163,11 +166,11 @@ impl UserData for ScriptInventory {
                 ItemKind::Armor { kind } => {
                     stats.set("kind", "armor")?;
                     stats.set("armor_kind", format!("{:?}", kind).to_lowercase())?;
-                },
+                }
                 ItemKind::Weapon { kind } => {
                     stats.set("kind", "weapon")?;
                     stats.set("weapon_kind", format!("{:?}", kind).to_lowercase())?;
-                },
+                }
                 ItemKind::Other => stats.set("kind", "other")?,
             }
 
@@ -180,9 +183,13 @@ impl UserData for ScriptInventory {
             let stash = GameState::party_stash();
             let item = match stash.borrow_mut().remove_item(index) {
                 None => {
-                    warn!("Unable to remove item at index '{}' from stash for equip", index);
+                    warn!(
+                        "Unable to remove item at index '{}' from stash for equip",
+                        index
+                    );
                     return Ok(());
-                }, Some(item) => item,
+                }
+                Some(item) => item,
             };
 
             let to_add = entity.borrow_mut().actor.equip(item, None);
@@ -194,13 +201,14 @@ impl UserData for ScriptInventory {
 
         methods.add_method_mut("unequip_item", |_, data, slot: String| {
             let slot = match Slot::from_str(&slot) {
-                Err(_) =>
+                Err(_) => {
                     return Err(rlua::Error::FromLuaConversionError {
                         from: "String",
                         to: "Slot",
                         message: Some(format!("Invalid slot '{}'", slot)),
-                    }),
-                Ok(slot) => slot
+                    });
+                }
+                Ok(slot) => slot,
             };
 
             let parent = data.parent.try_unwrap()?;
@@ -227,20 +235,18 @@ impl UserData for ScriptInventory {
 
             Ok(match inv.equipped(Slot::HeldOff) {
                 None => false,
-                Some(ref item_state) => {
-                    match item_state.item.equippable {
-                        None => false,
-                        Some(ref equippable) => equippable.attack.is_none(),
-                    }
-                }
+                Some(ref item_state) => match item_state.item.equippable {
+                    None => false,
+                    Some(ref equippable) => equippable.attack.is_none(),
+                },
             })
         });
 
         methods.add_method("has_alt_weapons", |_, data, ()| {
             try_unwrap!(data => inv);
 
-            let result = inv.quick(QuickSlot::AltHeldMain).is_some() ||
-                inv.quick(QuickSlot::AltHeldOff).is_some();
+            let result = inv.quick(QuickSlot::AltHeldMain).is_some()
+                || inv.quick(QuickSlot::AltHeldOff).is_some();
             Ok(result)
         });
 
@@ -292,12 +298,13 @@ pub struct ScriptStashItem {
 impl ScriptStashItem {
     pub fn unwrap_index(&self) -> Result<usize> {
         match self.index {
-            None =>
+            None => {
                 return Err(rlua::Error::FromLuaConversionError {
                     from: "ScriptStashItem",
                     to: "Item",
                     message: Some(format!("ScriptStashItem is invalid / does not exist.")),
-                }),
+                });
+            }
             Some(index) => Ok(index),
         }
     }
@@ -305,22 +312,16 @@ impl ScriptStashItem {
 
 impl UserData for ScriptStashItem {
     fn add_methods<'lua, M: UserDataMethods<'lua, Self>>(methods: &mut M) {
-        methods.add_method("is_valid", |_, item, ()| {
-            Ok(item.index.is_some())
-        });
+        methods.add_method("is_valid", |_, item, ()| Ok(item.index.is_some()));
 
-        methods.add_method("id", |_, item, ()| {
-            match item.index {
-                None => Ok(None),
-                Some(index) => {
-                    let stash = GameState::party_stash();
-                    let stash = stash.borrow();
-                    match stash.items().get(index) {
-                        None => Ok(None),
-                        Some((_, item)) => {
-                            Ok(Some(item.item.id.to_string()))
-                        }
-                    }
+        methods.add_method("id", |_, item, ()| match item.index {
+            None => Ok(None),
+            Some(index) => {
+                let stash = GameState::party_stash();
+                let stash = stash.borrow();
+                match stash.items().get(index) {
+                    None => Ok(None),
+                    Some((_, item)) => Ok(Some(item.item.id.to_string())),
                 }
             }
         });

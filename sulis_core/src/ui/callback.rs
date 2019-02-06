@@ -14,13 +14,13 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::rc::Rc;
 use std::cell::RefCell;
+use std::rc::Rc;
 
 use crate::ui::{Widget, WidgetKind};
 
 pub struct Callback {
-    cb: Rc<Fn(&Rc<RefCell<Widget>>, &mut WidgetKind)>
+    cb: Rc<Fn(&Rc<RefCell<Widget>>, &mut WidgetKind)>,
 }
 
 impl Clone for Callback {
@@ -39,32 +39,30 @@ impl Callback {
     }
 
     pub fn new(f: Rc<Fn(&Rc<RefCell<Widget>>, &mut WidgetKind)>) -> Callback {
-        Callback {
-            cb: f,
-        }
+        Callback { cb: f }
     }
 
     pub fn with_widget(f: Rc<Fn(&Rc<RefCell<Widget>>)>) -> Callback {
         Callback {
-            cb: Rc::new(move |widget, _kind| { f(widget) }),
+            cb: Rc::new(move |widget, _kind| f(widget)),
         }
     }
 
     pub fn with(f: Box<Fn()>) -> Callback {
         Callback {
-            cb: Rc::new(move |_w, _k| { f() }),
+            cb: Rc::new(move |_w, _k| f()),
         }
     }
 
     pub fn invalidate_self_layout() -> Callback {
         Callback {
-            cb: Rc::new(|widget, _kind| { widget.borrow_mut().invalidate_layout() }),
+            cb: Rc::new(|widget, _kind| widget.borrow_mut().invalidate_layout()),
         }
     }
 
     pub fn remove_self() -> Callback {
         Callback {
-            cb: Rc::new(|widget, _kind| { widget.borrow_mut().mark_for_removal() }),
+            cb: Rc::new(|widget, _kind| widget.borrow_mut().mark_for_removal()),
         }
     }
 

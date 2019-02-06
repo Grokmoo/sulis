@@ -15,10 +15,10 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::any::Any;
+use std::cell::RefCell;
 use std::fmt::Display;
 use std::rc::Rc;
 use std::slice::Iter;
-use std::cell::RefCell;
 
 use crate::ui::{animation_state, AnimationState, Callback, Widget, WidgetKind};
 use crate::widgets::Button;
@@ -38,15 +38,18 @@ impl<T: Display + Clone + 'static> Entry<T> {
 
 impl<T: Display + Clone + 'static> Entry<T> {
     pub fn new(item: T, callback: Option<Callback>) -> Entry<T> {
-       Entry {
-           item,
-           callback,
-           animation_state: AnimationState::default(),
-       }
+        Entry {
+            item,
+            callback,
+            animation_state: AnimationState::default(),
+        }
     }
 
-    pub fn with_state(item: T, callback: Option<Callback>,
-                      animation_state: AnimationState) -> Entry<T> {
+    pub fn with_state(
+        item: T,
+        callback: Option<Callback>,
+        animation_state: AnimationState,
+    ) -> Entry<T> {
         Entry {
             item,
             callback,
@@ -64,14 +67,12 @@ impl<T: Display + Clone + 'static> Entry<T> {
 }
 
 pub struct ListBox<T: Display + Clone + 'static> {
-    pub (crate) entries: Vec<Entry<T>>,
+    pub(crate) entries: Vec<Entry<T>>,
 }
 
 impl<T: Display + Clone + 'static> ListBox<T> {
     pub fn new(entries: Vec<Entry<T>>) -> Rc<RefCell<ListBox<T>>> {
-        Rc::new(RefCell::new(ListBox {
-            entries,
-        }))
+        Rc::new(RefCell::new(ListBox { entries }))
     }
 
     pub fn iter(&self) -> Iter<Entry<T>> {
@@ -86,17 +87,25 @@ impl<T: Display + Clone + 'static> ListBox<T> {
 pub const NAME: &str = "list_box";
 
 impl<T: Display + Clone> WidgetKind for ListBox<T> {
-    fn get_name(&self) -> &str { NAME }
-    fn as_any(&self) -> &Any { self }
-    fn as_any_mut(&mut self) -> &mut Any { self }
+    fn get_name(&self) -> &str {
+        NAME
+    }
+    fn as_any(&self) -> &Any {
+        self
+    }
+    fn as_any_mut(&mut self) -> &mut Any {
+        self
+    }
 
     fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
-        let mut children: Vec<Rc<RefCell<Widget>>> =
-            Vec::with_capacity(self.entries.len());
+        let mut children: Vec<Rc<RefCell<Widget>>> = Vec::with_capacity(self.entries.len());
 
         for entry in self.entries.iter() {
             let widget = Widget::with_theme(Button::with_text(&entry.item.to_string()), "entry");
-            widget.borrow_mut().state.set_animation_state(&entry.animation_state);
+            widget
+                .borrow_mut()
+                .state
+                .set_animation_state(&entry.animation_state);
             if let Some(ref cb) = entry.callback {
                 widget.borrow_mut().state.add_callback(cb.clone());
             }

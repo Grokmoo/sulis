@@ -14,21 +14,25 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::io::Error;
 use std::any::Any;
 use std::cell::RefCell;
+use std::io::Error;
 use std::rc::Rc;
 
 use sulis_core::config::Config;
-use sulis_core::resource::{ResourceSet, Sprite};
 use sulis_core::io::{DrawList, GraphicsRenderer};
+use sulis_core::resource::{ResourceSet, Sprite};
 use sulis_core::ui::{Callback, Color, Widget, WidgetKind};
-use sulis_core::util::{Point};
-use sulis_module::{Module, area::MAX_AREA_SIZE, area::tile::{Tile, WallKind, WallRules}};
-use sulis_core::widgets::{Button, Label, Spinner, ScrollPane};
+use sulis_core::util::Point;
+use sulis_core::widgets::{Button, Label, ScrollPane, Spinner};
+use sulis_module::{
+    area::tile::{Tile, WallKind, WallRules},
+    area::MAX_AREA_SIZE,
+    Module,
+};
 
-use crate::{AreaModel, EditorMode};
 use crate::terrain_picker::EdgesList;
+use crate::{AreaModel, EditorMode};
 
 const NAME: &str = "wall_picker";
 
@@ -52,7 +56,8 @@ impl WallTiles {
                     None => {
                         warn!("No fill tile found for '{}'", kind.id);
                         None
-                    }, Some(tile) => Some(tile),
+                    }
+                    Some(tile) => Some(tile),
                 }
             }
         };
@@ -95,7 +100,10 @@ pub struct WallPicker {
 impl WallPicker {
     pub fn new() -> Rc<RefCell<WallPicker>> {
         let cursor_sprite = match ResourceSet::sprite(&Config::editor_config().cursor) {
-            Err(_) => panic!("Unable to find cursor sprite '{}'", Config::editor_config().cursor),
+            Err(_) => panic!(
+                "Unable to find cursor sprite '{}'",
+                Config::editor_config().cursor
+            ),
             Ok(sprite) => sprite,
         };
 
@@ -138,8 +146,14 @@ impl WallPicker {
         }
     }
 
-    fn check_add_border_exterior(&self, model: &mut AreaModel, x: i32, y: i32,
-                                 self_elev: u8, tiles: WallTiles) {
+    fn check_add_border_exterior(
+        &self,
+        model: &mut AreaModel,
+        x: i32,
+        y: i32,
+        self_elev: u8,
+        tiles: WallTiles,
+    ) {
         model.add_tile(&tiles.fill_tile, x, y);
 
         let (gh, gw) = (self.grid_height, self.grid_width);
@@ -153,15 +167,23 @@ impl WallPicker {
         let se = self.is_border(model, self_elev, x, y, gw, gh);
         let sw = self.is_border(model, self_elev, x, y, -gw, gh);
 
-        if n && nw && w { model.add_tile(&tiles.edges.outer_nw, x - gw, y - gh); }
+        if n && nw && w {
+            model.add_tile(&tiles.edges.outer_nw, x - gw, y - gh);
+        }
 
-        if n && nw && ne { model.add_tile(&tiles.edges.outer_n, x, y - gh); }
+        if n && nw && ne {
+            model.add_tile(&tiles.edges.outer_n, x, y - gh);
+        }
 
-        if n && ne && e { model.add_tile(&tiles.edges.outer_ne, x + gw, y - gh); }
+        if n && ne && e {
+            model.add_tile(&tiles.edges.outer_ne, x + gw, y - gh);
+        }
 
-        if e && ne && se { model.add_tile(&tiles.edges.outer_e, x + gw, y); }
-        else if e && ne { model.add_tile(&tiles.edges.inner_ne, x + gw, y); }
-        else if e && se {
+        if e && ne && se {
+            model.add_tile(&tiles.edges.outer_e, x + gw, y);
+        } else if e && ne {
+            model.add_tile(&tiles.edges.inner_ne, x + gw, y);
+        } else if e && se {
             model.add_tile(&tiles.edges.inner_se, x + gw, y);
 
             for (i, ext) in tiles.extended.iter().enumerate() {
@@ -170,9 +192,11 @@ impl WallPicker {
             }
         }
 
-        if w && nw && sw { model.add_tile(&tiles.edges.outer_w, x - gw, y); }
-        else if w && nw { model.add_tile(&tiles.edges.inner_nw, x - gw, y); }
-        else if w && sw {
+        if w && nw && sw {
+            model.add_tile(&tiles.edges.outer_w, x - gw, y);
+        } else if w && nw {
+            model.add_tile(&tiles.edges.inner_nw, x - gw, y);
+        } else if w && sw {
             model.add_tile(&tiles.edges.inner_sw, x - gw, y);
             for (i, ext) in tiles.extended.iter().enumerate() {
                 let offset = 1 + i as i32;
@@ -207,8 +231,14 @@ impl WallPicker {
         }
     }
 
-    fn check_add_border_interior(&self, model: &mut AreaModel, x: i32, y: i32,
-                                 self_elev: u8, tiles: WallTiles) {
+    fn check_add_border_interior(
+        &self,
+        model: &mut AreaModel,
+        x: i32,
+        y: i32,
+        self_elev: u8,
+        tiles: WallTiles,
+    ) {
         let (gh, gw) = (self.grid_height, self.grid_width);
 
         let n = self.is_border(model, self_elev, x, y, 0, -gh);
@@ -243,17 +273,31 @@ impl WallPicker {
             return;
         }
 
-        if n && nw && w { model.add_tile(&tiles.edges.outer_nw, x, y); }
+        if n && nw && w {
+            model.add_tile(&tiles.edges.outer_nw, x, y);
+        }
 
-        if n && !w && !e { model.add_tile(&tiles.edges.outer_n, x, y); }
+        if n && !w && !e {
+            model.add_tile(&tiles.edges.outer_n, x, y);
+        }
 
-        if n && ne && e { model.add_tile(&tiles.edges.outer_ne, x, y); }
+        if n && ne && e {
+            model.add_tile(&tiles.edges.outer_ne, x, y);
+        }
 
-        if e && !n && !s { model.add_tile(&tiles.edges.outer_e, x, y); }
-        if w && !n && !s { model.add_tile(&tiles.edges.outer_w, x, y); }
+        if e && !n && !s {
+            model.add_tile(&tiles.edges.outer_e, x, y);
+        }
+        if w && !n && !s {
+            model.add_tile(&tiles.edges.outer_w, x, y);
+        }
 
-        if nw && !n && !w { model.add_tile(&tiles.edges.inner_nw, x, y); }
-        if ne && !n && !e { model.add_tile(&tiles.edges.inner_ne, x, y); }
+        if nw && !n && !w {
+            model.add_tile(&tiles.edges.inner_nw, x, y);
+        }
+        if ne && !n && !e {
+            model.add_tile(&tiles.edges.inner_ne, x, y);
+        }
 
         if sw && !s && !w {
             model.add_tile(&tiles.edges.inner_sw, x, y);
@@ -296,12 +340,20 @@ impl WallPicker {
         }
     }
 
-    fn is_border(&self, model: &AreaModel, self_elev: u8, x: i32, y: i32,
-                 delta_x: i32, delta_y: i32) -> bool {
-
+    fn is_border(
+        &self,
+        model: &AreaModel,
+        self_elev: u8,
+        x: i32,
+        y: i32,
+        delta_x: i32,
+        delta_y: i32,
+    ) -> bool {
         let x = x + delta_x;
         let y = y + delta_y;
-        if x < 0 || x >= MAX_AREA_SIZE || y < 0 || y >= MAX_AREA_SIZE { return false; }
+        if x < 0 || x >= MAX_AREA_SIZE || y < 0 || y >= MAX_AREA_SIZE {
+            return false;
+        }
 
         let (dest_elev, dest_index) = model.wall_at(x, y);
 
@@ -313,8 +365,16 @@ impl WallPicker {
 }
 
 impl EditorMode for WallPicker {
-    fn draw_mode(&mut self, renderer: &mut GraphicsRenderer, _model: &AreaModel, x_offset: f32, y_offset: f32,
-                 scale_x: f32, scale_y: f32, _millis: u32) {
+    fn draw_mode(
+        &mut self,
+        renderer: &mut GraphicsRenderer,
+        _model: &AreaModel,
+        x_offset: f32,
+        y_offset: f32,
+        scale_x: f32,
+        scale_y: f32,
+        _millis: u32,
+    ) {
         let gw = self.grid_width as f32;
         let gh = self.grid_height as f32;
 
@@ -324,7 +384,13 @@ impl EditorMode for WallPicker {
                 for x in 0..self.brush_size {
                     let x = gw * x as f32 + pos.x as f32 + x_offset;
                     let y = gh * y as f32 + pos.y as f32 + y_offset;
-                    draw_list.append(&mut DrawList::from_sprite_f32(&self.cursor_sprite, x, y, gw, gh));
+                    draw_list.append(&mut DrawList::from_sprite_f32(
+                        &self.cursor_sprite,
+                        x,
+                        y,
+                        gw,
+                        gh,
+                    ));
                 }
             }
             draw_list.set_scale(scale_x, scale_y);
@@ -334,7 +400,10 @@ impl EditorMode for WallPicker {
     }
 
     fn cursor_size(&self) -> (i32, i32) {
-        (self.brush_size * self.grid_width, self.brush_size * self.grid_height)
+        (
+            self.brush_size * self.grid_width,
+            self.brush_size * self.grid_height,
+        )
     }
 
     fn mouse_move(&mut self, _model: &mut AreaModel, x: i32, y: i32) {
@@ -355,41 +424,49 @@ impl EditorMode for WallPicker {
         let y_min = if y % 2 == 0 { y } else { y + 1 };
 
         for layer in self.wall_rules.down_layers.iter() {
-            model.remove_tiles_within(layer,
-                                      x_min - 3 * self.grid_width,
-                                      y_min - 3 * self.grid_width,
-                                      (self.brush_size + 6) * self.grid_width,
-                                      (self.brush_size + 6) * self.grid_height);
+            model.remove_tiles_within(
+                layer,
+                x_min - 3 * self.grid_width,
+                y_min - 3 * self.grid_width,
+                (self.brush_size + 6) * self.grid_width,
+                (self.brush_size + 6) * self.grid_height,
+            );
         }
 
         for layer in self.wall_rules.up_layers.iter() {
-            model.remove_tiles_within(layer,
-                                      x_min - 3 * self.grid_width,
-                                      y_min - 3 * self.grid_height,
-                                      (self.brush_size + 6) * self.grid_width,
-                                      (self.brush_size + 6) * self.grid_height);
+            model.remove_tiles_within(
+                layer,
+                x_min - 3 * self.grid_width,
+                y_min - 3 * self.grid_height,
+                (self.brush_size + 6) * self.grid_width,
+                (self.brush_size + 6) * self.grid_height,
+            );
         }
 
         for yi in 0..self.brush_size {
             for xi in 0..self.brush_size {
                 let x = x_min + xi * self.grid_width;
                 let y = y_min + yi * self.grid_height;
-                if x < 0 || x >= MAX_AREA_SIZE || y < 0 || y >= MAX_AREA_SIZE { continue; }
+                if x < 0 || x >= MAX_AREA_SIZE || y < 0 || y >= MAX_AREA_SIZE {
+                    continue;
+                }
 
                 model.set_wall(x, y, self.level as u8, self.cur_wall);
-                for ye in y-1..y + self.grid_height + 1 {
-                    for xe in x-1..x + self.grid_height + 1 {
+                for ye in y - 1..y + self.grid_height + 1 {
+                    for xe in x - 1..x + self.grid_height + 1 {
                         model.set_elevation(2 * self.level as u8, xe, ye);
                     }
                 }
             }
         }
 
-        for yi in -7..self.brush_size+5 {
-            for xi in -5..self.brush_size+5 {
+        for yi in -7..self.brush_size + 5 {
+            for xi in -5..self.brush_size + 5 {
                 let x = x_min + xi * self.grid_width;
                 let y = y_min + yi * self.grid_height;
-                if x < 0 || x >= MAX_AREA_SIZE || y < 0 || y >= MAX_AREA_SIZE { continue; }
+                if x < 0 || x >= MAX_AREA_SIZE || y < 0 || y >= MAX_AREA_SIZE {
+                    continue;
+                }
                 self.check_add_border(model, x, y);
             }
         }
@@ -399,18 +476,28 @@ impl EditorMode for WallPicker {
         let x_min = if x % 2 == 0 { x } else { x + 1 };
         let y_min = if y % 2 == 0 { y } else { y + 1 };
 
-        let iter = self.wall_rules.up_layers.iter().chain(self.wall_rules.down_layers.iter());
+        let iter = self
+            .wall_rules
+            .up_layers
+            .iter()
+            .chain(self.wall_rules.down_layers.iter());
         for layer in iter {
-            model.remove_tiles_within(layer, x_min, y_min,
-                                      self.brush_size * self.grid_width,
-                                      self.brush_size * self.grid_height);
+            model.remove_tiles_within(
+                layer,
+                x_min,
+                y_min,
+                self.brush_size * self.grid_width,
+                self.brush_size * self.grid_height,
+            );
         }
 
         for yi in 0..self.brush_size {
             for xi in 0..self.brush_size {
                 let x = x_min + xi * self.grid_width;
                 let y = y_min + yi * self.grid_height;
-                if x < 0 || x >= MAX_AREA_SIZE || y < 0 || y >= MAX_AREA_SIZE { continue; }
+                if x < 0 || x >= MAX_AREA_SIZE || y < 0 || y >= MAX_AREA_SIZE {
+                    continue;
+                }
 
                 model.set_wall(x, y, 0, None);
                 for ye in y..y + self.grid_height {
@@ -424,23 +511,35 @@ impl EditorMode for WallPicker {
 }
 
 impl WidgetKind for WallPicker {
-    fn get_name(&self) -> &str { NAME }
-    fn as_any(&self) -> &Any { self }
-    fn as_any_mut(&mut self) -> &mut Any { self }
+    fn get_name(&self) -> &str {
+        NAME
+    }
+    fn as_any(&self) -> &Any {
+        self
+    }
+    fn as_any_mut(&mut self) -> &mut Any {
+        self
+    }
 
     fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
-        self.level_widget.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, kind| {
-            let (_, picker) = Widget::parent_mut::<WallPicker>(widget);
-            let spinner = Widget::downcast::<Spinner>(kind);
-            picker.level = spinner.value();
-        })));
+        self.level_widget
+            .borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(|widget, kind| {
+                let (_, picker) = Widget::parent_mut::<WallPicker>(widget);
+                let spinner = Widget::downcast::<Spinner>(kind);
+                picker.level = spinner.value();
+            })));
         let level_label = Widget::with_theme(Label::empty(), "level_label");
 
-        self.brush_size_widget.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, kind| {
-            let (_, picker) = Widget::parent_mut::<WallPicker>(widget);
-            let spinner = Widget::downcast::<Spinner>(kind);
-            picker.brush_size = spinner.value();
-        })));
+        self.brush_size_widget
+            .borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(|widget, kind| {
+                let (_, picker) = Widget::parent_mut::<WallPicker>(widget);
+                let spinner = Widget::downcast::<Spinner>(kind);
+                picker.brush_size = spinner.value();
+            })));
 
         let brush_size_label = Widget::with_theme(Label::empty(), "brush_size_label");
 
@@ -448,11 +547,16 @@ impl WidgetKind for WallPicker {
         let mut all_buttons = Vec::new();
         let scrollpane = ScrollPane::new();
         for (i, wall_kind) in Module::wall_kinds().into_iter().enumerate() {
-            let base_tile_id = format!("{}{}{}", self.wall_rules.prefix, wall_kind.id,
-                                       wall_kind.base_tile);
+            let base_tile_id = format!(
+                "{}{}{}",
+                self.wall_rules.prefix, wall_kind.id, wall_kind.base_tile
+            );
 
             let button = Widget::with_theme(Button::empty(), "wall_button");
-            button.borrow_mut().state.add_text_arg("icon", &base_tile_id);
+            button
+                .borrow_mut()
+                .state
+                .add_text_arg("icon", &base_tile_id);
 
             let no_wall_ref = Rc::clone(&no_wall_button);
             let cb: Callback = Callback::new(Rc::new(move |widget, _| {
@@ -474,17 +578,26 @@ impl WidgetKind for WallPicker {
             scrollpane.borrow().add_to_content(button);
         }
 
-        no_wall_button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-            let (_, picker) = Widget::parent_mut::<WallPicker>(widget);
-            picker.cur_wall = None;
-            for button in all_buttons.iter() {
-                button.borrow_mut().state.set_active(false);
-            }
+        no_wall_button
+            .borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(move |widget, _| {
+                let (_, picker) = Widget::parent_mut::<WallPicker>(widget);
+                picker.cur_wall = None;
+                for button in all_buttons.iter() {
+                    button.borrow_mut().state.set_active(false);
+                }
 
-            widget.borrow_mut().state.set_active(true);
-        })));
+                widget.borrow_mut().state.set_active(true);
+            })));
 
-        vec![self.level_widget.clone(), level_label, self.brush_size_widget.clone(), brush_size_label,
-          no_wall_button, Widget::with_theme(scrollpane, "walls")]
+        vec![
+            self.level_widget.clone(),
+            level_label,
+            self.brush_size_widget.clone(),
+            brush_size_label,
+            no_wall_button,
+            Widget::with_theme(scrollpane, "walls"),
+        ]
     }
 }

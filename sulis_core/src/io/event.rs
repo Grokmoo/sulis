@@ -23,9 +23,7 @@ pub struct Event {
 
 impl Event {
     pub fn new(kind: Kind) -> Event {
-        Event {
-            kind,
-        }
+        Event { kind }
     }
 
     pub fn entered_from(_event: &Event) -> Event {
@@ -45,9 +43,18 @@ impl Event {
 pub enum Kind {
     MousePress(ClickKind),
     MouseRelease(ClickKind),
-    MouseMove { delta_x: f32, delta_y: f32 },
-    MouseDrag { button: ClickKind, delta_x: f32, delta_y: f32 },
-    MouseScroll { scroll: i32 },
+    MouseMove {
+        delta_x: f32,
+        delta_y: f32,
+    },
+    MouseDrag {
+        button: ClickKind,
+        delta_x: f32,
+        delta_y: f32,
+    },
+    MouseScroll {
+        scroll: i32,
+    },
     MouseEnter,
     MouseExit,
     CharTyped(char),

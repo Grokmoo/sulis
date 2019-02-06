@@ -14,21 +14,21 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::rc::Rc;
 use std::cmp;
-use std::slice::Iter;
 use std::collections::HashMap;
+use std::rc::Rc;
+use std::slice::Iter;
 
 use sulis_core::config::{Config, EditorConfig};
 use sulis_core::io::{DrawList, GraphicsRenderer};
-use sulis_core::resource::{Sprite, ResourceSet, read_single_resource, write_to_file};
+use sulis_core::resource::{read_single_resource, write_to_file, ResourceSet, Sprite};
 use sulis_core::ui::{animation_state, LineRenderer};
 use sulis_core::util::{Point, Size};
-use sulis_module::{Actor, Encounter, Module, Prop};
 use sulis_module::area::*;
+use sulis_module::{Actor, Encounter, Module, Prop};
 
-use crate::wall_picker::WallTiles;
 use crate::terrain_picker::TerrainTiles;
+use crate::wall_picker::WallTiles;
 
 pub struct AreaModel {
     pub config: EditorConfig,
@@ -69,14 +69,15 @@ impl AreaModel {
             Err(_) => {
                 warn!("Encounter tile '{}' not found", config.area.encounter_tile);
                 None
-            },
+            }
         };
 
         let font_renderer = match ResourceSet::font(&Config::default_font()) {
             None => {
                 warn!("Font '{}' not found", Config::default_font());
                 None
-            }, Some(font) => Some(LineRenderer::new(&font)),
+            }
+            Some(font) => Some(LineRenderer::new(&font)),
         };
 
         let mut tiles = Vec::new();
@@ -84,7 +85,7 @@ impl AreaModel {
             tiles.push((layer_id.to_string(), Vec::new()));
         }
 
-        let elevation = vec![0;(MAX_AREA_SIZE * MAX_AREA_SIZE) as usize];
+        let elevation = vec![0; (MAX_AREA_SIZE * MAX_AREA_SIZE) as usize];
 
         let terrain_rules = Module::terrain_rules();
         let mut terrain_kinds = Vec::new();
@@ -115,9 +116,9 @@ impl AreaModel {
             tiles,
             elevation,
             terrain_kinds,
-            terrain: vec![None;(MAX_AREA_SIZE * MAX_AREA_SIZE) as usize],
+            terrain: vec![None; (MAX_AREA_SIZE * MAX_AREA_SIZE) as usize],
             wall_kinds,
-            walls: vec![(0, None);(MAX_AREA_SIZE * MAX_AREA_SIZE) as usize],
+            walls: vec![(0, None); (MAX_AREA_SIZE * MAX_AREA_SIZE) as usize],
             actors: Vec::new(),
             props: Vec::new(),
             encounters: Vec::new(),
@@ -132,14 +133,24 @@ impl AreaModel {
             max_vis_distance: 20,
             max_vis_up_one_distance: 6,
             location_kind: LocationKind::Outdoors,
-            on_rest: OnRest::Disabled { message: "<PLACEHOLDER>".to_string() },
+            on_rest: OnRest::Disabled {
+                message: "<PLACEHOLDER>".to_string(),
+            },
         }
     }
 
-    pub fn id(&self) -> &str { &self.id }
-    pub fn name(&self) -> &str { &self.name }
-    pub fn filename(&self) -> &str { &self.filename }
-    pub fn location_kind(&self) -> LocationKind { self.location_kind }
+    pub fn id(&self) -> &str {
+        &self.id
+    }
+    pub fn name(&self) -> &str {
+        &self.name
+    }
+    pub fn filename(&self) -> &str {
+        &self.filename
+    }
+    pub fn location_kind(&self) -> LocationKind {
+        self.location_kind
+    }
 
     pub fn set_id(&mut self, id: &str) {
         self.id = id.to_string();
@@ -158,19 +169,27 @@ impl AreaModel {
     }
 
     pub fn elevation(&self, x: i32, y: i32) -> u8 {
-        if x < 0 || y < 0 { return 0; }
+        if x < 0 || y < 0 {
+            return 0;
+        }
 
         let index = (x + y * MAX_AREA_SIZE) as usize;
-        if index >= (MAX_AREA_SIZE * MAX_AREA_SIZE) as usize { return 0; }
+        if index >= (MAX_AREA_SIZE * MAX_AREA_SIZE) as usize {
+            return 0;
+        }
 
         self.elevation[index]
     }
 
     pub fn set_elevation(&mut self, elev: u8, x: i32, y: i32) {
-        if x < 0 || y < 0 { return; }
+        if x < 0 || y < 0 {
+            return;
+        }
 
         let index = (x + y * MAX_AREA_SIZE) as usize;
-        if index >= (MAX_AREA_SIZE * MAX_AREA_SIZE) as usize { return; }
+        if index >= (MAX_AREA_SIZE * MAX_AREA_SIZE) as usize {
+            return;
+        }
 
         self.elevation[index] = elev;
     }
@@ -208,7 +227,10 @@ impl AreaModel {
     }
 
     pub fn all_tiles(&self) -> impl Iterator<Item = &(Point, Rc<Tile>)> {
-        self.tiles.iter().map(|ref v| &v.1).flat_map(|ref t| t.iter())
+        self.tiles
+            .iter()
+            .map(|ref v| &v.1)
+            .flat_map(|ref t| t.iter())
     }
 
     pub fn add_tile(&mut self, tile: &Option<Rc<Tile>>, x: i32, y: i32) {
@@ -217,15 +239,21 @@ impl AreaModel {
             &Some(ref tile) => tile,
         };
 
-        if x < 0 || y < 0 { return; }
+        if x < 0 || y < 0 {
+            return;
+        }
 
         let index = self.create_layer_if_missing(&tile.layer);
 
         // check if the tile already exists
         for &(p, ref other_tile) in self.tiles[index].1.iter() {
-            if p.x == x && p.y == y && Rc::ptr_eq(other_tile, tile) { return; }
+            if p.x == x && p.y == y && Rc::ptr_eq(other_tile, tile) {
+                return;
+            }
         }
-        self.tiles[index].1.push((Point::new(x, y), Rc::clone(tile)));
+        self.tiles[index]
+            .1
+            .push((Point::new(x, y), Rc::clone(tile)));
     }
 
     pub fn remove_all_tiles(&mut self, x: i32, y: i32, width: i32, height: i32) {
@@ -238,7 +266,9 @@ impl AreaModel {
 
     pub fn remove_tiles_within(&mut self, layer_id: &str, x: i32, y: i32, width: i32, height: i32) {
         for &mut (ref cur_layer_id, ref mut tiles) in self.tiles.iter_mut() {
-            if layer_id != cur_layer_id { continue; }
+            if layer_id != cur_layer_id {
+                continue;
+            }
 
             tiles.retain(|&(pos, ref tile)| {
                 !is_removal(pos, tile.width, tile.height, x, y, width, height)
@@ -246,15 +276,25 @@ impl AreaModel {
         }
     }
 
-    pub fn tiles_within(&mut self, layer_id: &str, x: i32, y: i32,
-                        width: i32, height: i32) -> Vec<(Point, Rc<Tile>)> {
+    pub fn tiles_within(
+        &mut self,
+        layer_id: &str,
+        x: i32,
+        y: i32,
+        width: i32,
+        height: i32,
+    ) -> Vec<(Point, Rc<Tile>)> {
         let mut within = Vec::new();
 
         for &(ref cur_layer_id, ref tiles) in self.tiles.iter() {
-            if layer_id != cur_layer_id { continue; }
+            if layer_id != cur_layer_id {
+                continue;
+            }
 
             for &(pos, ref tile) in tiles {
-                if !is_removal(pos, tile.width, tile.height, x, y, width, height) { continue; }
+                if !is_removal(pos, tile.width, tile.height, x, y, width, height) {
+                    continue;
+                }
 
                 within.push((pos, Rc::clone(tile)));
             }
@@ -269,9 +309,10 @@ impl AreaModel {
                 if point.x + delta_x < 0
                     || point.y + delta_y < 0
                     || point.x + delta_x + tile.width > MAX_AREA_SIZE
-                    || point.y + delta_y + tile.height > MAX_AREA_SIZE {
-                        warn!("Invalid tile shift parameters: {},{}", delta_x, delta_y);
-                        return;
+                    || point.y + delta_y + tile.height > MAX_AREA_SIZE
+                {
+                    warn!("Invalid tile shift parameters: {},{}", delta_x, delta_y);
+                    return;
                 }
             }
         }
@@ -285,23 +326,24 @@ impl AreaModel {
     }
 
     pub fn add_trigger(&mut self, x: i32, y: i32, w: i32, h: i32) {
-        if x < 0 || y < 0 { return; }
+        if x < 0 || y < 0 {
+            return;
+        }
 
         let location = Point::new(x, y);
         let size = Size::new(w, h);
 
         self.triggers.push(TriggerBuilder {
-            kind: TriggerKind::OnPlayerEnter {
-                location,
-                size,
-            },
+            kind: TriggerKind::OnPlayerEnter { location, size },
             on_activate: Vec::new(),
             initially_enabled: true,
         });
     }
 
     pub fn add_encounter(&mut self, encounter: Rc<Encounter>, x: i32, y: i32, w: i32, h: i32) {
-        if x < 0 || y < 0 { return; }
+        if x < 0 || y < 0 {
+            return;
+        }
 
         self.encounters.push(EncounterData {
             encounter,
@@ -312,21 +354,45 @@ impl AreaModel {
     }
 
     pub fn add_actor(&mut self, actor: Rc<Actor>, x: i32, y: i32) {
-        if x < 0 || y < 0 { return; }
+        if x < 0 || y < 0 {
+            return;
+        }
 
         self.actors.push((Point::new(x, y), actor, None));
     }
 
     pub fn remove_actors_within(&mut self, x: i32, y: i32, width: i32, height: i32) {
         self.actors.retain(|&(pos, ref actor, _)| {
-            !is_removal(pos, actor.race.size.width, actor.race.size.height, x, y, width, height)
+            !is_removal(
+                pos,
+                actor.race.size.width,
+                actor.race.size.height,
+                x,
+                y,
+                width,
+                height,
+            )
         });
     }
 
-    pub fn actors_within(&self, x: i32, y: i32, width: i32, height: i32) -> Vec<(Point, Rc<Actor>)> {
+    pub fn actors_within(
+        &self,
+        x: i32,
+        y: i32,
+        width: i32,
+        height: i32,
+    ) -> Vec<(Point, Rc<Actor>)> {
         let mut actors = Vec::new();
         for &(pos, ref actor, _) in self.actors.iter() {
-            if !is_removal(pos, actor.race.size.width, actor.race.size.height, x, y, width, height) {
+            if !is_removal(
+                pos,
+                actor.race.size.width,
+                actor.race.size.height,
+                x,
+                y,
+                width,
+                height,
+            ) {
                 continue;
             }
 
@@ -337,7 +403,9 @@ impl AreaModel {
     }
 
     pub fn add_prop(&mut self, prop: Rc<Prop>, x: i32, y: i32) {
-        if x < 0 || y < 0 { return; }
+        if x < 0 || y < 0 {
+            return;
+        }
 
         let prop_data = PropData {
             prop,
@@ -357,12 +425,14 @@ impl AreaModel {
         });
     }
 
-    pub fn props_within(&self, x: i32, y: i32, width: i32, height: i32) -> Vec<(Point, Rc<Prop>)>{
+    pub fn props_within(&self, x: i32, y: i32, width: i32, height: i32) -> Vec<(Point, Rc<Prop>)> {
         let mut within = Vec::new();
         for prop_data in self.props.iter() {
             let prop = &prop_data.prop;
             let pos = prop_data.location;
-            if !is_removal(pos, prop.size.width, prop.size.height, x, y, width, height) { continue; }
+            if !is_removal(pos, prop.size.width, prop.size.height, x, y, width, height) {
+                continue;
+            }
 
             within.push((pos, Rc::clone(prop)));
         }
@@ -371,13 +441,11 @@ impl AreaModel {
     }
 
     pub fn remove_triggers_within(&mut self, x: i32, y: i32, width: i32, height: i32) {
-        self.triggers.retain(|trig| {
-            match trig.kind {
-                TriggerKind::OnPlayerEnter { location, size } => {
-                    !is_removal(location, size.width, size.height, x, y, width, height)
-                },
-                _ => true,
+        self.triggers.retain(|trig| match trig.kind {
+            TriggerKind::OnPlayerEnter { location, size } => {
+                !is_removal(location, size.width, size.height, x, y, width, height)
             }
+            _ => true,
         });
     }
 
@@ -394,14 +462,19 @@ impl AreaModel {
             None => {
                 warn!("No image with ID {} found.", self.config.transition_image);
                 return None;
-            }, Some(image) => image,
+            }
+            Some(image) => image,
         };
 
         let size = match Module::object_size(&self.config.transition_sizes[0]) {
             None => {
-                warn!("No size with ID '{}' found.", self.config.transition_sizes[0]);
+                warn!(
+                    "No size with ID '{}' found.",
+                    self.config.transition_sizes[0]
+                );
                 return None;
-            }, Some(ref size) => Rc::clone(size),
+            }
+            Some(ref size) => Rc::clone(size),
         };
 
         self.transitions.push(Transition {
@@ -431,14 +504,26 @@ impl AreaModel {
         &mut self.transitions[index]
     }
 
-    pub fn draw(&self, renderer: &mut GraphicsRenderer, x: f32, y: f32, scale_x: f32, scale_y: f32,
-                millis: u32) {
+    pub fn draw(
+        &self,
+        renderer: &mut GraphicsRenderer,
+        x: f32,
+        y: f32,
+        scale_x: f32,
+        scale_y: f32,
+        millis: u32,
+    ) {
         for &(_, ref tiles) in self.tiles.iter() {
             let mut draw_list = DrawList::empty_sprite();
             for &(pos, ref tile) in tiles {
                 let sprite = &tile.image_display;
-                draw_list.append(&mut DrawList::from_sprite_f32(sprite, x + pos.x as f32, y + pos.y as f32,
-                                                                tile.width as f32, tile.height as f32));
+                draw_list.append(&mut DrawList::from_sprite_f32(
+                    sprite,
+                    x + pos.x as f32,
+                    y + pos.y as f32,
+                    tile.width as f32,
+                    tile.height as f32,
+                ));
             }
             if !draw_list.is_empty() {
                 draw_list.set_scale(scale_x, scale_y);
@@ -450,8 +535,13 @@ impl AreaModel {
             let x = prop_data.location.x as f32 + x;
             let y = prop_data.location.y as f32 + y;
             let mut draw_list = DrawList::empty_sprite();
-            prop_data.prop.append_to_draw_list(&mut draw_list, &animation_state::NORMAL,
-                                               x, y, millis);
+            prop_data.prop.append_to_draw_list(
+                &mut draw_list,
+                &animation_state::NORMAL,
+                x,
+                y,
+                millis,
+            );
             draw_list.set_scale(scale_x, scale_y);
             renderer.draw(draw_list);
         }
@@ -459,8 +549,14 @@ impl AreaModel {
         for &(pos, ref actor, _) in self.actors.iter() {
             let w = actor.race.size.width as f32 / 2.0;
             let h = actor.race.size.height as f32 / 2.0;
-            actor.draw(renderer, scale_x, scale_y, pos.x as f32 + x - w,
-                       pos.y as f32 + y - h, millis);
+            actor.draw(
+                renderer,
+                scale_x,
+                scale_y,
+                pos.x as f32 + x - w,
+                pos.y as f32 + y - h,
+                millis,
+            );
         }
 
         let encounter_sprite = match self.encounter_sprite {
@@ -483,15 +579,9 @@ impl AreaModel {
             renderer.draw(draw_list);
 
             let text = match transition.to {
-                ToKind::CurArea { .. } => {
-                    "to Current Area".to_string()
-                },
-                ToKind::Area { ref id, .. } => {
-                    format!("to {}", id)
-                },
-                ToKind::WorldMap => {
-                    "to World Map".to_string()
-                }
+                ToKind::CurArea { .. } => "to Current Area".to_string(),
+                ToKind::Area { ref id, .. } => format!("to {}", id),
+                ToKind::WorldMap => "to World Map".to_string(),
             };
 
             let mut draw_list = font_renderer.get_draw_list(&text, x, y, 1.0);
@@ -543,7 +633,8 @@ impl AreaModel {
                 warn!("Unable to load area from {}", path);
                 warn!("{}", e);
                 return;
-            }, Ok(builder) => builder,
+            }
+            Ok(builder) => builder,
         };
 
         self.id = area_builder.id;
@@ -559,7 +650,9 @@ impl AreaModel {
         let width = area_builder.width as i32;
         let (mut x, mut y) = (0, 0);
         for id in area_builder.terrain {
-            if x + y * MAX_AREA_SIZE >= MAX_AREA_SIZE * MAX_AREA_SIZE { break; }
+            if x + y * MAX_AREA_SIZE >= MAX_AREA_SIZE * MAX_AREA_SIZE {
+                break;
+            }
 
             match id {
                 None => self.terrain[(x + y * MAX_AREA_SIZE) as usize] = None,
@@ -583,7 +676,9 @@ impl AreaModel {
         trace!("Loading walls");
         let (mut x, mut y) = (0, 0);
         for (elev, id) in area_builder.walls {
-            if x + y * MAX_AREA_SIZE >= MAX_AREA_SIZE * MAX_AREA_SIZE { break; }
+            if x + y * MAX_AREA_SIZE >= MAX_AREA_SIZE * MAX_AREA_SIZE {
+                break;
+            }
 
             match id {
                 None => self.walls[(x + y * MAX_AREA_SIZE) as usize] = (elev, None),
@@ -613,7 +708,8 @@ impl AreaModel {
                 None => {
                     warn!("No tile with ID {} found", tile_id);
                     continue;
-                }, Some(tile) => tile,
+                }
+                Some(tile) => tile,
             };
 
             for position in positions {
@@ -636,10 +732,12 @@ impl AreaModel {
                 None => {
                     warn!("No actor with ID {} found", actor_data.id);
                     continue;
-                }, Some(actor) => actor,
+                }
+                Some(actor) => actor,
             };
 
-            self.actors.push((actor_data.location, actor, actor_data.unique_id));
+            self.actors
+                .push((actor_data.location, actor, actor_data.unique_id));
         }
 
         trace!("Loading area encounters.");
@@ -649,7 +747,8 @@ impl AreaModel {
                 None => {
                     warn!("No encounter '{}' found", enc_builder.id);
                     continue;
-                }, Some(encounter) => encounter,
+                }
+                Some(encounter) => encounter,
             };
 
             let enc_data = EncounterData {
@@ -668,7 +767,8 @@ impl AreaModel {
                 None => {
                     warn!("No prop with ID {} found", prop_builder.id);
                     continue;
-                }, Some(prop) => prop,
+                }
+                Some(prop) => prop,
             };
 
             let prop_data = PropData {
@@ -687,16 +787,21 @@ impl AreaModel {
         for transition_builder in area_builder.transitions {
             let image = match ResourceSet::image(&transition_builder.image_display) {
                 None => {
-                    warn!("No image with ID {} found.", transition_builder.image_display);
+                    warn!(
+                        "No image with ID {} found.",
+                        transition_builder.image_display
+                    );
                     continue;
-                }, Some(image) => image,
+                }
+                Some(image) => image,
             };
 
             let size = match Module::object_size(&transition_builder.size) {
                 None => {
                     warn!("No size with ID '{}' found.", transition_builder.size);
                     continue;
-                }, Some(ref size) => Rc::clone(size),
+                }
+                Some(ref size) => Rc::clone(size),
             };
 
             self.transitions.push(Transition {
@@ -716,7 +821,7 @@ impl AreaModel {
         let elev = &area_builder.elevation;
         if elev.len() != area_builder.height * area_builder.width {
             warn!("Invalid elevation array in {}", path);
-            self.elevation = vec![0;(MAX_AREA_SIZE * MAX_AREA_SIZE) as usize];
+            self.elevation = vec![0; (MAX_AREA_SIZE * MAX_AREA_SIZE) as usize];
         } else {
             for y in 0..area_builder.height {
                 for x in 0..area_builder.width {
@@ -745,7 +850,9 @@ impl AreaModel {
                 width = cmp::max(width, position.x + tile.width);
                 height = cmp::max(height, position.y + tile.height);
 
-                if position.x >= MAX_AREA_SIZE || position.y >= MAX_AREA_SIZE { continue; }
+                if position.x >= MAX_AREA_SIZE || position.y >= MAX_AREA_SIZE {
+                    continue;
+                }
                 let tiles_vec = layer_set.entry(tile.id.to_string()).or_insert(Vec::new());
                 tiles_vec.push(vec![position.x as u16, position.y as u16]);
             }
@@ -760,7 +867,8 @@ impl AreaModel {
             actors.push(ActorData {
                 id: actor.id.to_string(),
                 unique_id: unique_id.clone(),
-                location: pos });
+                location: pos,
+            });
         }
 
         trace!("Saving props.");
@@ -816,7 +924,8 @@ impl AreaModel {
                     None => {
                         terrain.push(None);
                         continue;
-                    }, Some(index) => index,
+                    }
+                    Some(index) => index,
                 };
 
                 let tiles = &self.terrain_kinds[index];
@@ -832,7 +941,8 @@ impl AreaModel {
                     (elev, None) => {
                         walls.push((elev, None));
                         continue;
-                    }, (elev, Some(index)) => (elev, index),
+                    }
+                    (elev, Some(index)) => (elev, index),
                 };
 
                 let cur_wall = &self.wall_kinds[index];
@@ -844,7 +954,7 @@ impl AreaModel {
             id: self.id.clone(),
             name: self.name.clone(),
             location_kind: self.location_kind,
-            elevation: elevation,
+            elevation,
             terrain,
             walls,
             layer_set,
@@ -871,8 +981,8 @@ impl AreaModel {
             Err(e) => {
                 error!("Unable to save area state to file {}", filename);
                 error!("{}", e);
-            },
-            Ok(()) => {},
+            }
+            Ok(()) => {}
         }
     }
 
@@ -896,7 +1006,7 @@ fn is_removal(pos: Point, pos_w: i32, pos_h: i32, x: i32, y: i32, w: i32, h: i32
 
     // if one rectangle is above the other
     if pos.y >= y + h || y >= pos.y + pos_h {
-        return false
+        return false;
     }
 
     true

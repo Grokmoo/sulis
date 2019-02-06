@@ -14,15 +14,15 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::io::{Error};
-use std::rc::Rc;
 use std::char;
-use std::path::PathBuf;
 use std::collections::HashMap;
+use std::io::Error;
+use std::path::PathBuf;
+use std::rc::Rc;
 
-use crate::io::Vertex;
-use crate::util::{invalid_data_error, Point, Size, unable_to_create_error};
 use crate::config::Config;
+use crate::io::Vertex;
+use crate::util::{invalid_data_error, unable_to_create_error, Point, Size};
 
 use crate::extern_image::{self, ImageBuffer, Rgba};
 
@@ -68,8 +68,14 @@ impl Font {
     /// Returns the position that the next character in the line should
     /// be drawn at (i.e. pos_x plus x_advance for the font character)
     /// `line_height` scales the drawing, 1.0 for no scaling
-    pub fn get_quad(&self, quads: &mut Vec<Vertex>, c: char,
-                    pos_x: f32, pos_y: f32, line_height: f32) -> f32 {
+    pub fn get_quad(
+        &self,
+        quads: &mut Vec<Vertex>,
+        c: char,
+        pos_x: f32,
+        pos_y: f32,
+        line_height: f32,
+    ) -> f32 {
         let font_char = match self.characters.get(&c) {
             None => return pos_x,
             Some(font_char) => font_char,
@@ -84,15 +90,32 @@ impl Font {
         let x_min = x_char;
         let y_min = ui_height as f32 - y_char;
         let x_max = x_char + scale_factor * font_char.size.width as f32;
-        let y_max = ui_height as f32
-            - (y_char + scale_factor * font_char.size.height as f32);
+        let y_max = ui_height as f32 - (y_char + scale_factor * font_char.size.height as f32);
         quads.append(&mut vec![
-            Vertex { position: [ x_min, y_max ], tex_coords: [tc[0], tc[1]] },
-            Vertex { position: [ x_min, y_min ], tex_coords: [tc[2], tc[3]] },
-            Vertex { position: [ x_max, y_max ], tex_coords: [tc[4], tc[5]] },
-            Vertex { position: [ x_max, y_min ], tex_coords: [tc[6], tc[7]] },
-            Vertex { position: [ x_min, y_min ], tex_coords: [tc[2], tc[3]] },
-            Vertex { position: [ x_max, y_max ], tex_coords: [tc[4], tc[5]] },
+            Vertex {
+                position: [x_min, y_max],
+                tex_coords: [tc[0], tc[1]],
+            },
+            Vertex {
+                position: [x_min, y_min],
+                tex_coords: [tc[2], tc[3]],
+            },
+            Vertex {
+                position: [x_max, y_max],
+                tex_coords: [tc[4], tc[5]],
+            },
+            Vertex {
+                position: [x_max, y_min],
+                tex_coords: [tc[6], tc[7]],
+            },
+            Vertex {
+                position: [x_min, y_min],
+                tex_coords: [tc[2], tc[3]],
+            },
+            Vertex {
+                position: [x_max, y_max],
+                tex_coords: [tc[4], tc[5]],
+            },
         ]);
         pos_x + scale_factor * (font_char.x_advance as f32)
     }
@@ -114,10 +137,13 @@ impl Font {
 
         let image = match image {
             None => {
-                warn!("Unable to read spritesheet source '{}' from any of '{:?}'",
-                      builder.src, builder.source_dirs);
+                warn!(
+                    "Unable to read spritesheet source '{}' from any of '{:?}'",
+                    builder.src, builder.source_dirs
+                );
                 return unable_to_create_error("font", &builder.id);
-            }, Some(img) => img,
+            }
+            Some(img) => img,
         };
 
         let image = image.to_rgba();
@@ -127,8 +153,12 @@ impl Font {
         let mut characters: HashMap<char, FontChar> = HashMap::new();
         for char_builder in builder.characters {
             let id = match char::from_u32(char_builder.id) {
-                None => return invalid_data_error(
-                    &format!("'{}' is not a valid utf8 character.", char_builder.id)),
+                None => {
+                    return invalid_data_error(&format!(
+                        "'{}' is not a valid utf8 character.",
+                        char_builder.id
+                    ));
+                }
                 Some(c) => c,
             };
 
@@ -141,15 +171,15 @@ impl Font {
             let y_min = (image_height - (position.y + size.height) as f32) / image_height;
             let x_max = (position.x + size.width) as f32 / image_width;
             let y_max = (image_height - position.y as f32) / image_height;
-            characters.insert(id, FontChar {
-                size,
-                offset: char_builder.offset,
-                x_advance: char_builder.x_advance,
-                tex_coords: [ x_min, y_min,
-                              x_min, y_max,
-                              x_max, y_min,
-                              x_max, y_max ],
-            });
+            characters.insert(
+                id,
+                FontChar {
+                    size,
+                    offset: char_builder.offset,
+                    x_advance: char_builder.x_advance,
+                    tex_coords: [x_min, y_min, x_min, y_max, x_max, y_min, x_max, y_max],
+                },
+            );
         }
 
         Ok(Rc::new(Font {
@@ -179,5 +209,5 @@ struct FontCharBuilder {
     id: u32,
     xywh: [u32; 4],
     offset: Point,
-    x_advance: u32
+    x_advance: u32,
 }

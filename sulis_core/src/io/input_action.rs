@@ -14,12 +14,12 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::rc::Rc;
 use std::cell::RefCell;
+use std::rc::Rc;
 
-use crate::ui::{Cursor, Widget};
 use crate::io::event::{ClickKind, Kind};
 use crate::io::{keyboard_event::Key, Event};
+use crate::ui::{Cursor, Widget};
 
 #[derive(Debug, Deserialize, Serialize, Copy, Clone, PartialOrd, PartialEq)]
 #[serde(deny_unknown_fields)]
@@ -69,13 +69,13 @@ impl InputAction {
                 } else {
                     InputAction::fire_action(ZoomOut, root);
                 }
-            },
+            }
             CharReceived(c) => {
                 Widget::dispatch_event(root, Event::new(Kind::CharTyped(c)));
-            },
+            }
             RawKey(key) => {
                 Widget::dispatch_event(root, Event::new(Kind::RawKey(key)));
-            },
+            }
             _ => InputAction::fire_action(action, root),
         }
     }

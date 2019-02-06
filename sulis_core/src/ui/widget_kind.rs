@@ -15,15 +15,15 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::any::Any;
-use std::rc::Rc;
 use std::cell::RefCell;
+use std::rc::Rc;
 
-use crate::io::{GraphicsRenderer, InputAction, keyboard_event::Key};
 use crate::io::event::ClickKind;
+use crate::io::{keyboard_event::Key, GraphicsRenderer, InputAction};
 use crate::ui::{animation_state, Cursor, Widget};
 use crate::util::Point;
 
-pub (crate) struct EmptyWidget { }
+pub(crate) struct EmptyWidget {}
 
 impl EmptyWidget {
     pub fn new() -> Rc<RefCell<EmptyWidget>> {
@@ -44,13 +44,22 @@ impl WidgetKind for EmptyWidget {
         false
     }
 
-    fn on_mouse_drag(&mut self, _widget: &Rc<RefCell<Widget>>, _kind: ClickKind,
-                     _delta_x: f32, _delta_y: f32) -> bool {
+    fn on_mouse_drag(
+        &mut self,
+        _widget: &Rc<RefCell<Widget>>,
+        _kind: ClickKind,
+        _delta_x: f32,
+        _delta_y: f32,
+    ) -> bool {
         false
     }
 
-    fn on_mouse_move(&mut self, _widget: &Rc<RefCell<Widget>>,
-                     _delta_x: f32, _delta_y: f32) -> bool {
+    fn on_mouse_move(
+        &mut self,
+        _widget: &Rc<RefCell<Widget>>,
+        _delta_x: f32,
+        _delta_y: f32,
+    ) -> bool {
         true
     }
 
@@ -69,12 +78,18 @@ impl WidgetKind for EmptyWidget {
 /// object which contains the common functionality across all Widgets.
 pub trait WidgetKind {
     /// called every frame
-    fn update(&mut self, _widget: &Rc<RefCell<Widget>>, _millis: u32) { }
+    fn update(&mut self, _widget: &Rc<RefCell<Widget>>, _millis: u32) {}
 
-    fn draw(&mut self, _renderer: &mut GraphicsRenderer, _pixel_size: Point,
-            _widget: &Widget, _millis: u32) { }
+    fn draw(
+        &mut self,
+        _renderer: &mut GraphicsRenderer,
+        _pixel_size: Point,
+        _widget: &Widget,
+        _millis: u32,
+    ) {
+    }
 
-    fn end_draw(&mut self, _renderer: &mut GraphicsRenderer) { }
+    fn end_draw(&mut self, _renderer: &mut GraphicsRenderer) {}
 
     fn layout(&mut self, widget: &mut Widget) {
         widget.do_base_layout();
@@ -90,7 +105,9 @@ pub trait WidgetKind {
     /// focus, it gets character events, allowing the user to type into the widget.  By default,
     /// a widget will receive keyboard focus when clicked and lose it when another widget is
     /// clicked.
-    fn wants_keyboard_focus(&self) -> bool { false }
+    fn wants_keyboard_focus(&self) -> bool {
+        false
+    }
 
     /// This method is called before this WidgetKind is added to its parent widget.
     /// It returns a vector of 'Widget's that will be added as children to the
@@ -106,10 +123,14 @@ pub trait WidgetKind {
     /// when a widget is removed from the tree.  Note that this is called when
     /// the actual removal takes place, not when the widget is first marked
     /// for removal.
-    fn on_remove(&mut self) { }
+    fn on_remove(&mut self) {}
 
     fn super_on_mouse_press(&self, widget: &Rc<RefCell<Widget>>, _kind: ClickKind) {
-        widget.borrow_mut().state.animation_state.add(animation_state::Kind::Pressed);
+        widget
+            .borrow_mut()
+            .state
+            .animation_state
+            .add(animation_state::Kind::Pressed);
 
         if self.wants_keyboard_focus() {
             Widget::grab_keyboard_focus(widget);
@@ -119,13 +140,21 @@ pub trait WidgetKind {
     }
 
     fn super_on_mouse_release(&self, widget: &Rc<RefCell<Widget>>, _kind: ClickKind) {
-        widget.borrow_mut().state.animation_state.remove(animation_state::Kind::Pressed);
+        widget
+            .borrow_mut()
+            .state
+            .animation_state
+            .remove(animation_state::Kind::Pressed);
 
         if !widget.borrow().state.modal_remove_on_click_outside || !widget.borrow().state.is_modal {
             return;
         }
 
-        if !widget.borrow().state.in_bounds(Cursor::get_x(), Cursor::get_y()) {
+        if !widget
+            .borrow()
+            .state
+            .in_bounds(Cursor::get_x(), Cursor::get_y())
+        {
             widget.borrow_mut().mark_for_removal();
         }
     }
@@ -140,13 +169,22 @@ pub trait WidgetKind {
         true
     }
 
-    fn on_mouse_drag(&mut self, _widget: &Rc<RefCell<Widget>>, _kind: ClickKind,
-                     _delta_x: f32, _delta_y: f32) -> bool {
+    fn on_mouse_drag(
+        &mut self,
+        _widget: &Rc<RefCell<Widget>>,
+        _kind: ClickKind,
+        _delta_x: f32,
+        _delta_y: f32,
+    ) -> bool {
         true
     }
 
-    fn on_mouse_move(&mut self, _widget: &Rc<RefCell<Widget>>,
-                     _delta_x: f32, _delta_y: f32) -> bool {
+    fn on_mouse_move(
+        &mut self,
+        _widget: &Rc<RefCell<Widget>>,
+        _delta_x: f32,
+        _delta_y: f32,
+    ) -> bool {
         true
     }
 
@@ -175,17 +213,32 @@ pub trait WidgetKind {
     fn super_on_mouse_enter(&self, widget: &Rc<RefCell<Widget>>) {
         let mut widget = widget.borrow_mut();
         widget.state.set_mouse_inside(true);
-        widget.state.animation_state.add(animation_state::Kind::Hover);
-        trace!("Mouse entered '{}', anim state: '{:?}'",
-               widget.theme_id(), widget.state.animation_state);
+        widget
+            .state
+            .animation_state
+            .add(animation_state::Kind::Hover);
+        trace!(
+            "Mouse entered '{}', anim state: '{:?}'",
+            widget.theme_id(),
+            widget.state.animation_state
+        );
     }
 
     fn super_on_mouse_exit(&self, widget: &Rc<RefCell<Widget>>) {
         let mut widget = widget.borrow_mut();
         widget.state.set_mouse_inside(false);
-        widget.state.animation_state.remove(animation_state::Kind::Hover);
-        widget.state.animation_state.remove(animation_state::Kind::Pressed);
-        trace!("Mouse exited '{}', anim state: '{:?}'",
-               widget.theme_id(), widget.state.animation_state);
+        widget
+            .state
+            .animation_state
+            .remove(animation_state::Kind::Hover);
+        widget
+            .state
+            .animation_state
+            .remove(animation_state::Kind::Pressed);
+        trace!(
+            "Mouse exited '{}', anim state: '{:?}'",
+            widget.theme_id(),
+            widget.state.animation_state
+        );
     }
 }

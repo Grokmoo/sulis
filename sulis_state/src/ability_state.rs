@@ -14,12 +14,12 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::u32;
 use std::rc::Rc;
+use std::u32;
 
+use crate::ChangeListenerList;
 use sulis_core::util::ExtInt;
 use sulis_module::{ability::Duration, Ability, ROUND_TIME_MILLIS};
-use crate::ChangeListenerList;
 
 pub struct AbilityState {
     pub ability: Rc<Ability>,
@@ -73,9 +73,10 @@ impl AbilityState {
             None => panic!(),
             Some(ref active) => match active.duration {
                 Duration::Mode => ExtInt::Infinity,
-                Duration::Permanent | Duration::Instant | Duration::Rounds(_) =>
-                    ExtInt::Int(active.cooldown * ROUND_TIME_MILLIS),
-            }
+                Duration::Permanent | Duration::Instant | Duration::Rounds(_) => {
+                    ExtInt::Int(active.cooldown * ROUND_TIME_MILLIS)
+                }
+            },
         };
         self.cur_duration = 0;
         self.listeners.notify(&self);
@@ -83,7 +84,10 @@ impl AbilityState {
 
     pub fn deactivate(&mut self) {
         if !self.is_active_mode() {
-            warn!("Attempted to deactivate non-mode ability {}", self.ability.id);
+            warn!(
+                "Attempted to deactivate non-mode ability {}",
+                self.ability.id
+            );
             return;
         }
 
@@ -101,9 +105,7 @@ impl AbilityState {
     pub fn remaining_duration_rounds(&self) -> ExtInt {
         match self.remaining_duration {
             ExtInt::Infinity => ExtInt::Infinity,
-            ExtInt::Int(dur) => {
-                ExtInt::Int((dur as f32 / ROUND_TIME_MILLIS as f32).ceil() as u32)
-            }
+            ExtInt::Int(dur) => ExtInt::Int((dur as f32 / ROUND_TIME_MILLIS as f32).ceil() as u32),
         }
     }
 }

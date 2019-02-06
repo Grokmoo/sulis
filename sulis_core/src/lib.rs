@@ -15,12 +15,15 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 pub extern crate serde;
-pub extern crate serde_yaml;
 pub extern crate serde_json;
+pub extern crate serde_yaml;
 
-#[macro_use] extern crate log;
-#[macro_use] extern crate serde_derive;
-#[macro_use] extern crate glium;
+#[macro_use]
+extern crate log;
+#[macro_use]
+extern crate serde_derive;
+#[macro_use]
+extern crate glium;
 pub extern crate image as extern_image;
 
 pub mod config;

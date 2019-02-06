@@ -14,7 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use sulis_module::{Module, Item};
+use sulis_module::{Item, Module};
 
 use std::rc::Rc;
 
@@ -31,9 +31,7 @@ impl PartialEq for ItemState {
 
 impl ItemState {
     pub fn new(item: Rc<Item>) -> ItemState {
-        ItemState {
-            item
-        }
+        ItemState { item }
     }
 
     pub fn from(id: &str) -> Option<ItemState> {

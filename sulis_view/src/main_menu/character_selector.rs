@@ -15,16 +15,16 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::any::Any;
+use std::cell::RefCell;
 use std::rc::Rc;
-use std::cell::{RefCell};
 
 use sulis_core::ui::*;
-use sulis_state::{ActorState, NextGameStep};
+use sulis_core::widgets::{Button, ConfirmationWindow, Label, ScrollPane, TextArea};
 use sulis_module::{Actor, Module};
-use sulis_core::widgets::{Button, ConfirmationWindow, Label, TextArea, ScrollPane};
+use sulis_state::{ActorState, NextGameStep};
 
 use crate::character_window::create_details_text_box;
-use crate::{CharacterBuilder, LoadingScreen, main_menu::MainMenu};
+use crate::{main_menu::MainMenu, CharacterBuilder, LoadingScreen};
 
 pub struct CharacterSelector {
     selected: Option<Rc<Actor>>,
@@ -49,15 +49,19 @@ impl CharacterSelector {
 
     #[must_use]
     fn set_play_enabled(&self, play: &mut WidgetState) -> Rc<RefCell<Widget>> {
-            let max_level = Module::campaign().max_starting_level;
+        let max_level = Module::campaign().max_starting_level;
 
         let invalid_level = Widget::with_theme(TextArea::empty(), "invalid_level_box");
         let (enabled, invalid_vis) = match self.selected {
             None => (false, false),
             Some(ref actor) => {
-                invalid_level.borrow_mut().state
+                invalid_level
+                    .borrow_mut()
+                    .state
                     .add_text_arg("level", &actor.total_level.to_string());
-                invalid_level.borrow_mut().state
+                invalid_level
+                    .borrow_mut()
+                    .state
                     .add_text_arg("max_level", &max_level.to_string());
 
                 let enabled = actor.total_level <= max_level;
@@ -83,12 +87,15 @@ impl WidgetKind for CharacterSelector {
 
         let new_character_button = Widget::with_theme(Button::empty(), "new_character_button");
         let char_selector_widget = Rc::clone(widget);
-        new_character_button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-            let root = Widget::get_root(&widget);
+        new_character_button
+            .borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(move |widget, _| {
+                let root = Widget::get_root(&widget);
 
-            let builder = Widget::with_defaults(CharacterBuilder::new(&char_selector_widget));
-            Widget::add_child_to(&root, builder);
-        })));
+                let builder = Widget::with_defaults(CharacterBuilder::new(&char_selector_widget));
+                Widget::add_child_to(&root, builder);
+            })));
 
         let delete_char_button = Widget::with_theme(Button::empty(), "delete_character_button");
 
@@ -96,28 +103,36 @@ impl WidgetKind for CharacterSelector {
             None => (String::new(), String::new()),
             Some(ref actor) => (actor.name.to_string(), actor.id.to_string()),
         };
-        delete_char_button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-            let root = Widget::get_root(&widget);
+        delete_char_button
+            .borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(move |widget, _| {
+                let root = Widget::get_root(&widget);
 
-            let actor_id = actor_id.clone();
-            let (parent, _) = Widget::parent_mut::<CharacterSelector>(widget);
-            let window = ConfirmationWindow::new(Callback::new(Rc::new(move |widget, _| {
-                Module::delete_character(&actor_id);
-                let (window, _) = Widget::parent::<ConfirmationWindow>(widget);
-                window.borrow_mut().mark_for_removal();
+                let actor_id = actor_id.clone();
+                let (parent, _) = Widget::parent_mut::<CharacterSelector>(widget);
+                let window = ConfirmationWindow::new(Callback::new(Rc::new(move |widget, _| {
+                    Module::delete_character(&actor_id);
+                    let (window, _) = Widget::parent::<ConfirmationWindow>(widget);
+                    window.borrow_mut().mark_for_removal();
 
-                let selector = Widget::kind_mut::<CharacterSelector>(&parent);
-                selector.selected = None;
-                parent.borrow_mut().invalidate_children();
+                    let selector = Widget::kind_mut::<CharacterSelector>(&parent);
+                    selector.selected = None;
+                    parent.borrow_mut().invalidate_children();
+                })));
+                {
+                    let window = window.borrow();
+                    window
+                        .title()
+                        .borrow_mut()
+                        .state
+                        .add_text_arg("name", &actor_name);
+                }
+                let window_widget =
+                    Widget::with_theme(window, "delete_character_confirmation_window");
+                window_widget.borrow_mut().state.set_modal(true);
+                Widget::add_child_to(&root, window_widget);
             })));
-            {
-                let window = window.borrow();
-                window.title().borrow_mut().state.add_text_arg("name", &actor_name);
-            }
-            let window_widget = Widget::with_theme(window, "delete_character_confirmation_window");
-            window_widget.borrow_mut().state.set_modal(true);
-            Widget::add_child_to(&root, window_widget);
-        })));
 
         let to_select = match self.to_select.take() {
             None => "".to_string(),
@@ -137,9 +152,15 @@ impl WidgetKind for CharacterSelector {
                 }
 
                 let actor_button = Widget::with_theme(Button::empty(), "character_button");
-                actor_button.borrow_mut().state.add_text_arg("name", &actor.name);
+                actor_button
+                    .borrow_mut()
+                    .state
+                    .add_text_arg("name", &actor.name);
                 if let Some(ref portrait) = actor.portrait {
-                    actor_button.borrow_mut().state.add_text_arg("portrait", &portrait.id());
+                    actor_button
+                        .borrow_mut()
+                        .state
+                        .add_text_arg("portrait", &portrait.id());
                 }
 
                 if let Some(ref selected) = self.selected {
@@ -148,29 +169,34 @@ impl WidgetKind for CharacterSelector {
                     }
                 }
 
-                actor_button.borrow_mut().state.add_callback(actor_callback(actor));
+                actor_button
+                    .borrow_mut()
+                    .state
+                    .add_callback(actor_callback(actor));
 
                 must_create_character = false;
                 scrollpane.borrow().add_to_content(actor_button);
             }
         }
 
-
         let play_button = Widget::with_theme(Button::empty(), "play_button");
-        play_button.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let (parent, selector) = Widget::parent_mut::<CharacterSelector>(widget);
-            let selected = match selector.selected {
-                None => return,
-                Some(ref selected) => Rc::clone(selected),
-            };
+        play_button
+            .borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(|widget, _| {
+                let (parent, selector) = Widget::parent_mut::<CharacterSelector>(widget);
+                let selected = match selector.selected {
+                    None => return,
+                    Some(ref selected) => Rc::clone(selected),
+                };
 
-            let (root, window) = Widget::parent_mut::<MainMenu>(&parent);
-            window.next_step = Some(NextGameStep::NewCampaign { pc_actor: selected });
+                let (root, window) = Widget::parent_mut::<MainMenu>(&parent);
+                window.next_step = Some(NextGameStep::NewCampaign { pc_actor: selected });
 
-            let loading_screen = Widget::with_defaults(LoadingScreen::new());
-            loading_screen.borrow_mut().state.set_modal(true);
-            Widget::add_child_to(&root, loading_screen);
-        })));
+                let loading_screen = Widget::with_defaults(LoadingScreen::new());
+                loading_screen.borrow_mut().state.set_modal(true);
+                Widget::add_child_to(&root, loading_screen);
+            })));
 
         let details = if let Some(ref actor) = self.selected {
             let mut actor_state = ActorState::new(Rc::clone(actor));
@@ -181,7 +207,10 @@ impl WidgetKind for CharacterSelector {
             Widget::with_theme(TextArea::empty(), "details")
         };
 
-        delete_char_button.borrow_mut().state.set_enabled(self.selected.is_some());
+        delete_char_button
+            .borrow_mut()
+            .state
+            .set_enabled(self.selected.is_some());
         let invalid_level = self.set_play_enabled(&mut play_button.borrow_mut().state);
 
         if self.first_add && must_create_character {
@@ -191,8 +220,16 @@ impl WidgetKind for CharacterSelector {
         }
         self.first_add = false;
 
-        vec![title, chars_title, scroll_widget, new_character_button,
-            delete_char_button, play_button, details, invalid_level]
+        vec![
+            title,
+            chars_title,
+            scroll_widget,
+            new_character_button,
+            delete_char_button,
+            play_button,
+            details,
+            invalid_level,
+        ]
     }
 }
 

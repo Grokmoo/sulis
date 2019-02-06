@@ -14,12 +14,12 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::io::Error;
 use std::rc::Rc;
-use std::io::{Error};
 
 use crate::image::Image;
-use crate::resource::{ResourceSet, Sprite};
 use crate::io::{DrawList, GraphicsRenderer};
+use crate::resource::{ResourceSet, Sprite};
 use crate::ui::AnimationState;
 use crate::util::Size;
 
@@ -43,14 +43,36 @@ impl SimpleImage {
 }
 
 impl Image for SimpleImage {
-    fn draw(&self, renderer: &mut GraphicsRenderer, _state: &AnimationState,
-            x: f32, y: f32, w: f32, h: f32, _millis: u32) {
+    fn draw(
+        &self,
+        renderer: &mut GraphicsRenderer,
+        _state: &AnimationState,
+        x: f32,
+        y: f32,
+        w: f32,
+        h: f32,
+        _millis: u32,
+    ) {
         renderer.draw(DrawList::from_sprite_f32(&self.image_display, x, y, w, h));
     }
 
-    fn append_to_draw_list(&self, draw_list: &mut DrawList, _state: &AnimationState,
-                           x: f32, y: f32, w: f32, h: f32, _millis: u32) {
-        draw_list.append(&mut DrawList::from_sprite_f32(&self.image_display, x, y, w, h));
+    fn append_to_draw_list(
+        &self,
+        draw_list: &mut DrawList,
+        _state: &AnimationState,
+        x: f32,
+        y: f32,
+        w: f32,
+        h: f32,
+        _millis: u32,
+    ) {
+        draw_list.append(&mut DrawList::from_sprite_f32(
+            &self.image_display,
+            x,
+            y,
+            w,
+            h,
+        ));
     }
 
     fn get_width_f32(&self) -> f32 {
@@ -65,13 +87,15 @@ impl Image for SimpleImage {
         &self.size
     }
 
-    fn id(&self) -> String { self.id.clone() }
+    fn id(&self) -> String {
+        self.id.clone()
+    }
 }
 
 #[derive(Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct SimpleImageBuilder {
-    pub (crate) id: String,
-    pub (crate) image_display: String,
-    pub (crate) size: Size,
+    pub(crate) id: String,
+    pub(crate) image_display: String,
+    pub(crate) size: Size,
 }

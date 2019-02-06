@@ -16,11 +16,11 @@
 
 use rlua::{Context, UserData, UserDataMethods};
 
+use crate::animation::particle_generator::Param;
+use crate::animation::Anim;
+use crate::script::{script_particle_generator, CallbackData, Result};
+use crate::GameState;
 use sulis_core::util::ExtInt;
-use crate::{GameState};
-use crate::animation::{Anim};
-use crate::animation::particle_generator::{Param};
-use crate::script::{CallbackData, Result, script_particle_generator};
 
 /// A color animation changing a parent entity's base or secondary
 /// color.  Created normally by `ScriptEntity:create_color_anim`
@@ -62,8 +62,18 @@ impl ScriptColorAnimation {
             completion_callback: None,
             callbacks: Vec::new(),
             duration_millis,
-            color: [Param::fixed(1.0), Param::fixed(1.0), Param::fixed(1.0), Param::fixed(1.0)],
-            color_sec: [Param::fixed(0.0), Param::fixed(0.0), Param::fixed(0.0), Param::fixed(0.0)],
+            color: [
+                Param::fixed(1.0),
+                Param::fixed(1.0),
+                Param::fixed(1.0),
+                Param::fixed(1.0),
+            ],
+            color_sec: [
+                Param::fixed(0.0),
+                Param::fixed(0.0),
+                Param::fixed(0.0),
+                Param::fixed(0.0),
+            ],
         }
     }
 }
@@ -72,14 +82,20 @@ impl UserData for ScriptColorAnimation {
     fn add_methods<'lua, M: UserDataMethods<'lua, Self>>(methods: &mut M) {
         methods.add_method("activate", &activate);
         methods.add_method("param", &script_particle_generator::param);
-        methods.add_method_mut("set_color", |_, gen, (r, g, b, a): (Param, Param, Param, Param)| {
-            gen.color = [r, g, b, a];
-            Ok(())
-        });
-        methods.add_method_mut("set_color_sec", |_, gen, (r, g, b, a): (Param, Param, Param, Param)| {
-            gen.color_sec = [r, g, b, a];
-            Ok(())
-        });
+        methods.add_method_mut(
+            "set_color",
+            |_, gen, (r, g, b, a): (Param, Param, Param, Param)| {
+                gen.color = [r, g, b, a];
+                Ok(())
+            },
+        );
+        methods.add_method_mut(
+            "set_color_sec",
+            |_, gen, (r, g, b, a): (Param, Param, Param, Param)| {
+                gen.color_sec = [r, g, b, a];
+                Ok(())
+            },
+        );
         methods.add_method_mut("set_completion_callback", |_, gen, cb: CallbackData| {
             gen.completion_callback = Some(cb);
             Ok(())
@@ -103,8 +119,12 @@ pub fn create_anim(data: &ScriptColorAnimation) -> Result<Anim> {
     let mgr = GameState::turn_manager();
     let parent = mgr.borrow().entity(data.parent);
 
-    let mut anim = Anim::new_entity_color(&parent, data.duration_millis,
-                                          data.color.clone(), data.color_sec.clone());
+    let mut anim = Anim::new_entity_color(
+        &parent,
+        data.duration_millis,
+        data.color.clone(),
+        data.color_sec.clone(),
+    );
 
     if let Some(ref cb) = data.completion_callback {
         anim.add_completion_callback(Box::new(cb.clone()));
@@ -116,4 +136,3 @@ pub fn create_anim(data: &ScriptColorAnimation) -> Result<Anim> {
 
     Ok(anim)
 }
-

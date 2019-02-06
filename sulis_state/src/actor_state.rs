@@ -14,20 +14,24 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::cell::RefCell;
 use std::cmp;
+use std::collections::HashMap;
 use std::io::Error;
 use std::rc::Rc;
-use std::cell::{RefCell};
-use std::collections::HashMap;
 
-use sulis_core::io::GraphicsRenderer;
-use sulis_core::image::{LayeredImage, Image};
-use sulis_core::util::{invalid_data_error, ExtInt};
-use sulis_module::{AccuracyKind, Attack, AttackKind, BonusList, HitKind, StatList,
-    QuickSlot, Slot, ItemKind, DamageKind, HitFlags, WeaponStyle};
-use sulis_module::{Actor, Module, ActorBuilder, Faction, ImageLayer};
-use crate::{AbilityState, ChangeListenerList, Effect, EntityState, GameState, Inventory, ItemState, PStats};
 use crate::save_state::ActorSaveState;
+use crate::{
+    AbilityState, ChangeListenerList, Effect, EntityState, GameState, Inventory, ItemState, PStats,
+};
+use sulis_core::image::{Image, LayeredImage};
+use sulis_core::io::GraphicsRenderer;
+use sulis_core::util::{invalid_data_error, ExtInt};
+use sulis_module::{
+    AccuracyKind, Attack, AttackKind, BonusList, DamageKind, HitFlags, HitKind, ItemKind,
+    QuickSlot, Slot, StatList, WeaponStyle,
+};
+use sulis_module::{Actor, ActorBuilder, Faction, ImageLayer, Module};
 
 pub struct ActorState {
     pub actor: Rc<Actor>,
@@ -45,25 +49,27 @@ pub struct ActorState {
 impl ActorState {
     pub fn load(mut save: ActorSaveState, base: Option<ActorBuilder>) -> Result<ActorState, Error> {
         let actor = match base {
-            None => {
-                match Module::actor(&save.id) {
-                    None => invalid_data_error(&format!("No actor with id '{}'", save.id)),
-                    Some(actor) => Ok(actor),
-                }?
-            }
-            Some(builder) => {
-                Rc::new(Module::load_actor(builder)?)
-            }
+            None => match Module::actor(&save.id) {
+                None => invalid_data_error(&format!("No actor with id '{}'", save.id)),
+                Some(actor) => Ok(actor),
+            }?,
+            Some(builder) => Rc::new(Module::load_actor(builder)?),
         };
 
         let attrs = actor.attributes;
 
-        let image = LayeredImage::new(actor.image_layers()
-            .get_list(actor.sex, actor.hair_color, actor.skin_color), actor.hue);
+        let image = LayeredImage::new(
+            actor
+                .image_layers()
+                .get_list(actor.sex, actor.hair_color, actor.skin_color),
+            actor.hue,
+        );
 
         let mut ability_states = HashMap::new();
         for ability in actor.abilities.iter() {
-            if ability.ability.active.is_none() { continue; }
+            if ability.ability.active.is_none() {
+                continue;
+            }
 
             let mut ability_state = AbilityState::new(&ability.ability);
 
@@ -80,8 +86,12 @@ impl ActorState {
         // Add any abilities that aren't on the base actor
         for (ability_id, state) in save.ability_states {
             let ability = match Module::ability(&ability_id) {
-                None => return invalid_data_error(&format!("No ability with ID '{}' for actor '{}'",
-                                                    ability_id, actor.id)),
+                None => {
+                    return invalid_data_error(&format!(
+                        "No ability with ID '{}' for actor '{}'",
+                        ability_id, actor.id
+                    ));
+                }
                 Some(ability) => ability,
             };
 
@@ -111,15 +121,20 @@ impl ActorState {
         trace!("Creating new actor state for {}", actor.id);
         let inventory = Inventory::empty();
 
-        let image = LayeredImage::new(actor.image_layers().get_list(actor.sex,
-                                                                    actor.hair_color,
-                                                                    actor.skin_color), actor.hue);
+        let image = LayeredImage::new(
+            actor
+                .image_layers()
+                .get_list(actor.sex, actor.hair_color, actor.skin_color),
+            actor.hue,
+        );
         let attrs = actor.attributes;
 
         let mut ability_states = HashMap::new();
         for ability in actor.abilities.iter() {
             let ability = &ability.ability;
-            if ability.active.is_none() { continue; }
+            if ability.active.is_none() {
+                continue;
+            }
 
             ability_states.insert(ability.id.to_string(), AbilityState::new(ability));
         }
@@ -142,7 +157,10 @@ impl ActorState {
         for (slot, item) in actor.inventory.equipped_iter() {
             let item = ItemState::new(item);
             if !actor_state.can_equip(&item) {
-                warn!("Unable to equip item '{}' for actor '{}'", item.item.id, actor.id);
+                warn!(
+                    "Unable to equip item '{}' for actor '{}'",
+                    item.item.id, actor.id
+                );
             } else {
                 let _ = actor_state.inventory.equip(item, Some(slot));
                 // don't deal with any items which have been unequiped as a result
@@ -152,7 +170,10 @@ impl ActorState {
         for (slot, item) in actor.inventory.quick_iter() {
             let item = ItemState::new(item);
             if !actor_state.inventory.can_set_quick(&item, slot, &actor) {
-                warn!("Unable to set quick item '{}' for actor '{}'", item.item.id, actor.id);
+                warn!(
+                    "Unable to set quick item '{}' for actor '{}'",
+                    item.item.id, actor.id
+                );
             } else {
                 let _ = actor_state.inventory.set_quick(item, slot);
                 // don't deal with any item which has been removed as a result
@@ -166,7 +187,9 @@ impl ActorState {
         let mut change = false;
         for (layer, ref image) in images.iter() {
             if let Some(img) = self.anim_image_layers.get(layer) {
-                if Rc::ptr_eq(img, image) { continue; }
+                if Rc::ptr_eq(img, image) {
+                    continue;
+                }
             }
             change = true;
             self.anim_image_layers.insert(*layer, Rc::clone(image));
@@ -187,13 +210,17 @@ impl ActorState {
         self.compute_stats();
     }
 
-    pub fn is_inventory_locked(&self) -> bool { self.p_stats.is_inventory_locked() }
+    pub fn is_inventory_locked(&self) -> bool {
+        self.p_stats.is_inventory_locked()
+    }
 
     pub fn set_inventory_locked(&mut self, locked: bool) {
         self.p_stats.set_inventory_locked(locked);
     }
 
-    pub fn is_threatened(&self) -> bool { self.p_stats.is_threatened() }
+    pub fn is_threatened(&self) -> bool {
+        self.p_stats.is_threatened()
+    }
 
     pub fn add_threatening(&mut self, index: usize) {
         self.p_stats.add_threatening(index);
@@ -245,13 +272,19 @@ impl ActorState {
     }
 
     pub fn current_uses_per_day(&self, ability_group: &str) -> ExtInt {
-        *self.p_stats.current_group_uses_per_day
-            .get(ability_group).unwrap_or(&ExtInt::Int(0))
+        *self
+            .p_stats
+            .current_group_uses_per_day
+            .get(ability_group)
+            .unwrap_or(&ExtInt::Int(0))
     }
 
     pub fn current_uses_per_encounter(&self, ability_group: &str) -> ExtInt {
-        *self.p_stats.current_group_uses_per_encounter
-            .get(ability_group).unwrap_or(&ExtInt::Int(0))
+        *self
+            .p_stats
+            .current_group_uses_per_encounter
+            .get(ability_group)
+            .unwrap_or(&ExtInt::Int(0))
     }
 
     pub fn ability_state(&mut self, id: &str) -> Option<&mut AbilityState> {
@@ -260,7 +293,9 @@ impl ActorState {
 
     /// Returns true if the parent can swap weapons, false otherwise
     pub fn can_swap_weapons(&self) -> bool {
-        if self.p_stats.is_inventory_locked() { return false; }
+        if self.p_stats.is_inventory_locked() {
+            return false;
+        }
 
         self.p_stats.ap() >= Module::rules().swap_weapons_ap
     }
@@ -277,9 +312,13 @@ impl ActorState {
     /// Returns true if this actor can use the item at some point - not
     /// taking AP into consideration, false otherwise
     pub fn can_use_sometime(&self, item_state: &ItemState) -> bool {
-        if !item_state.item.usable.is_some() { return false; }
+        if !item_state.item.usable.is_some() {
+            return false;
+        }
 
-        if !item_state.item.meets_prereqs(&self.actor) { return false; }
+        if !item_state.item.meets_prereqs(&self.actor) {
+            return false;
+        }
 
         true
     }
@@ -287,18 +326,20 @@ impl ActorState {
     /// Returns true if the specified item can be used now - which includes
     /// having sufficient AP, false otherwise
     pub fn can_use(&self, item_state: &ItemState) -> bool {
-        if !item_state.item.meets_prereqs(&self.actor) { return false; }
+        if !item_state.item.meets_prereqs(&self.actor) {
+            return false;
+        }
 
         match &item_state.item.usable {
             None => false,
-            Some(usable) => {
-                self.p_stats.ap() >= usable.ap
-            }
+            Some(usable) => self.p_stats.ap() >= usable.ap,
         }
     }
 
     fn group_has_uses(&self, group_id: &str) -> bool {
-        if self.current_uses_per_encounter(group_id).greater_than(0) { return true; }
+        if self.current_uses_per_encounter(group_id).greater_than(0) {
+            return true;
+        }
 
         self.current_uses_per_day(group_id).greater_than(0)
     }
@@ -306,16 +347,24 @@ impl ActorState {
     /// Returns true if the ability state for the given ability can be
     /// activated (any active ability) or deactivated (only relevant for modes)
     pub fn can_toggle(&self, id: &str) -> bool {
-        if self.stats.abilities_disabled { return false; }
+        if self.stats.abilities_disabled {
+            return false;
+        }
 
         match self.ability_states.get(id) {
             None => false,
             Some(ref state) => {
-                if self.p_stats.ap() < state.activate_ap() { return false; }
+                if self.p_stats.ap() < state.activate_ap() {
+                    return false;
+                }
 
-                if state.is_active_mode() { return true; }
+                if state.is_active_mode() {
+                    return true;
+                }
 
-                if !self.group_has_uses(&state.group) { return false; }
+                if !self.group_has_uses(&state.group) {
+                    return false;
+                }
 
                 state.is_available()
             }
@@ -323,14 +372,20 @@ impl ActorState {
     }
 
     pub fn can_activate(&self, id: &str) -> bool {
-        if self.stats.abilities_disabled { return false; }
+        if self.stats.abilities_disabled {
+            return false;
+        }
 
         match self.ability_states.get(id) {
             None => false,
             Some(ref state) => {
-                if self.p_stats.ap() < state.activate_ap() { return false; }
+                if self.p_stats.ap() < state.activate_ap() {
+                    return false;
+                }
 
-                if !self.group_has_uses(&state.group) { return false; }
+                if !self.group_has_uses(&state.group) {
+                    return false;
+                }
 
                 state.is_available()
             }
@@ -359,30 +414,38 @@ impl ActorState {
     pub fn activate_ability_state(&mut self, id: &str) {
         let state = match self.ability_states.get_mut(id) {
             None => return,
-            Some(state) => state
+            Some(state) => state,
         };
         state.activate();
 
         let decrement_uses = !self.stats.free_ability_group_use;
 
         if decrement_uses {
-            let per_enc = *self.p_stats.current_group_uses_per_encounter
-                .get(&state.group).unwrap_or(&ExtInt::Int(0));
+            let per_enc = *self
+                .p_stats
+                .current_group_uses_per_encounter
+                .get(&state.group)
+                .unwrap_or(&ExtInt::Int(0));
 
             // take one use from per encounter if available, otherwise take from per day
             if per_enc.is_zero() {
-                let per_day = *self.p_stats.current_group_uses_per_day
-                    .get(&state.group).unwrap_or(&ExtInt::Int(0));
-                self.p_stats.current_group_uses_per_day
+                let per_day = *self
+                    .p_stats
+                    .current_group_uses_per_day
+                    .get(&state.group)
+                    .unwrap_or(&ExtInt::Int(0));
+                self.p_stats
+                    .current_group_uses_per_day
                     .insert(state.group.to_string(), per_day - 1);
             } else {
-                self.p_stats.current_group_uses_per_encounter
+                self.p_stats
+                    .current_group_uses_per_encounter
                     .insert(state.group.to_string(), per_enc - 1);
             }
         }
     }
 
-    pub fn effects_iter<'a>(&'a self) -> impl Iterator<Item=&'a usize> {
+    pub fn effects_iter<'a>(&'a self) -> impl Iterator<Item = &'a usize> {
         self.effects.iter().map(|(index, _)| index)
     }
 
@@ -391,10 +454,15 @@ impl ActorState {
 
         for ability in self.actor.abilities.iter() {
             let ability = &ability.ability;
-            if ability.active.is_none() { continue; }
-            if self.ability_states.contains_key(&ability.id) { continue; }
+            if ability.active.is_none() {
+                continue;
+            }
+            if self.ability_states.contains_key(&ability.id) {
+                continue;
+            }
 
-            self.ability_states.insert(ability.id.to_string(), AbilityState::new(ability));
+            self.ability_states
+                .insert(ability.id.to_string(), AbilityState::new(ability));
         }
 
         let mut to_remove = Vec::new();
@@ -407,7 +475,9 @@ impl ActorState {
                 }
             }
 
-            if !found { to_remove.push(id.clone()); }
+            if !found {
+                to_remove.push(id.clone());
+            }
         }
 
         for id in to_remove {
@@ -417,14 +487,29 @@ impl ActorState {
         self.compute_stats();
     }
 
-    pub fn draw(&self, renderer: &mut GraphicsRenderer, scale_x: f32, scale_y: f32,
-                              x: f32, y: f32, millis: u32) {
+    pub fn draw(
+        &self,
+        renderer: &mut GraphicsRenderer,
+        scale_x: f32,
+        scale_y: f32,
+        x: f32,
+        y: f32,
+        millis: u32,
+    ) {
         self.image.draw(renderer, scale_x, scale_y, x, y, millis);
     }
 
-    pub fn draw_to_texture(&self, renderer: &mut GraphicsRenderer, texture_id: &str, scale_x: f32, scale_y: f32,
-                              x: f32, y: f32) {
-        self.image.draw_to_texture(renderer, texture_id, scale_x, scale_y, x, y);
+    pub fn draw_to_texture(
+        &self,
+        renderer: &mut GraphicsRenderer,
+        texture_id: &str,
+        scale_x: f32,
+        scale_y: f32,
+        x: f32,
+        y: f32,
+    ) {
+        self.image
+            .draw_to_texture(renderer, texture_id, scale_x, scale_y, x, y);
     }
 
     pub fn can_reach(&self, dist: f32) -> bool {
@@ -432,10 +517,16 @@ impl ActorState {
     }
 
     pub(crate) fn can_weapon_attack(&self, _target: &Rc<RefCell<EntityState>>, dist: f32) -> bool {
-        trace!("Checking can attack for '{}'.  Distance to target is {} with attack dist of {}",
-               self.actor.name, dist, self.stats.attack_distance());
+        trace!(
+            "Checking can attack for '{}'.  Distance to target is {} with attack dist of {}",
+            self.actor.name,
+            dist,
+            self.stats.attack_distance()
+        );
 
-        if !self.has_ap_to_attack() { return false; }
+        if !self.has_ap_to_attack() {
+            return false;
+        }
 
         self.can_reach(dist)
     }
@@ -444,14 +535,17 @@ impl ActorState {
         self.p_stats.ap() >= self.stats.attack_cost as u32
     }
 
-    fn is_sneak_attack(parent: &Rc<RefCell<EntityState>>,
-                       target: &Rc<RefCell<EntityState>>) -> bool {
+    fn is_sneak_attack(
+        parent: &Rc<RefCell<EntityState>>,
+        target: &Rc<RefCell<EntityState>>,
+    ) -> bool {
         parent.borrow().actor.stats.hidden && !target.borrow().actor.stats.sneak_attack_immunity
     }
 
-    fn is_flanking(parent: &Rc<RefCell<EntityState>>,
-                   target: &Rc<RefCell<EntityState>>) -> bool {
-        if target.borrow().actor.stats.flanked_immunity { return false; }
+    fn is_flanking(parent: &Rc<RefCell<EntityState>>, target: &Rc<RefCell<EntityState>>) -> bool {
+        if target.borrow().actor.stats.flanked_immunity {
+            return false;
+        }
 
         let mgr = GameState::turn_manager();
         let area = GameState::get_area_state(&parent.borrow().location.area_id).unwrap();
@@ -459,39 +553,65 @@ impl ActorState {
         for entity_index in area.entity_iter() {
             let entity = mgr.borrow().entity(*entity_index);
 
-            if Rc::ptr_eq(&entity, parent) { continue; }
-            if Rc::ptr_eq(&entity, target) { continue; }
+            if Rc::ptr_eq(&entity, parent) {
+                continue;
+            }
+            if Rc::ptr_eq(&entity, target) {
+                continue;
+            }
 
             let entity = entity.borrow();
 
-            if !entity.is_hostile(&target) { continue; }
+            if !entity.is_hostile(&target) {
+                continue;
+            }
 
-            if entity.actor.stats.attack_disabled { continue; }
+            if entity.actor.stats.attack_disabled {
+                continue;
+            }
 
             match entity.actor.inventory.weapon_style() {
                 WeaponStyle::Ranged => continue,
-                WeaponStyle::TwoHanded | WeaponStyle::Single
-                    | WeaponStyle::Shielded | WeaponStyle::DualWielding => (),
+                WeaponStyle::TwoHanded
+                | WeaponStyle::Single
+                | WeaponStyle::Shielded
+                | WeaponStyle::DualWielding => (),
             }
 
-            if !entity.can_reach(&target) { continue; }
+            if !entity.can_reach(&target) {
+                continue;
+            }
 
-            let p_target = (target.borrow().center_x_f32(), target.borrow().center_y_f32());
-            let p_parent = (parent.borrow().center_x_f32(), parent.borrow().center_y_f32());
+            let p_target = (
+                target.borrow().center_x_f32(),
+                target.borrow().center_y_f32(),
+            );
+            let p_parent = (
+                parent.borrow().center_x_f32(),
+                parent.borrow().center_y_f32(),
+            );
             let p_other = (entity.center_x_f32(), entity.center_y_f32());
 
             let p1 = (p_target.0 - p_parent.0, p_target.1 - p_parent.1);
             let p2 = (p_target.0 - p_other.0, p_target.1 - p_other.1);
 
             let mut cos_angle = (p1.0 * p2.0 + p1.1 * p2.1) / (p1.0.hypot(p1.1) * p2.0.hypot(p2.1));
-            if cos_angle > 1.0 { cos_angle = 1.0; }
-            if cos_angle < -1.0 { cos_angle = -1.0; }
+            if cos_angle > 1.0 {
+                cos_angle = 1.0;
+            }
+            if cos_angle < -1.0 {
+                cos_angle = -1.0;
+            }
 
             let angle = cos_angle.acos().to_degrees();
 
-            debug!("Got angle {} between {} and {} attacking {}", angle,
-                   parent.borrow().actor.actor.name, entity.actor.actor.name,
-                   target.borrow().actor.actor.name);
+            debug!(
+                "Got angle {} between {} and {} attacking {}",
+                angle,
+                parent.borrow().actor.actor.name,
+                entity.actor.actor.name,
+                target.borrow().actor.actor.name
+            );
 
             if angle > parent.borrow().actor.stats.flanking_angle as f32 {
                 return true;
@@ -501,14 +621,19 @@ impl ActorState {
         false
     }
 
-    pub fn weapon_attack(parent: &Rc<RefCell<EntityState>>, target: &Rc<RefCell<EntityState>>)
-        -> Vec<(HitKind, HitFlags, Vec<(DamageKind, u32)>)> {
-
+    pub fn weapon_attack(
+        parent: &Rc<RefCell<EntityState>>,
+        target: &Rc<RefCell<EntityState>>,
+    ) -> Vec<(HitKind, HitFlags, Vec<(DamageKind, u32)>)> {
         if target.borrow_mut().actor.hp() <= 0 {
             return vec![(HitKind::Miss, HitFlags::default(), Vec::new())];
         }
 
-        info!("'{}' attacks '{}'", parent.borrow().actor.actor.name, target.borrow().actor.actor.name);
+        info!(
+            "'{}' attacks '{}'",
+            parent.borrow().actor.actor.name,
+            target.borrow().actor.actor.name
+        );
 
         let attacks = parent.borrow().actor.stats.attacks.clone();
 
@@ -523,9 +648,13 @@ impl ActorState {
                 attack
             };
 
-            let (hit_kind, hit_flags, damage) =
-                ActorState::attack_internal(parent, target, &mut attack,
-                                            is_flanking, is_sneak_attack);
+            let (hit_kind, hit_flags, damage) = ActorState::attack_internal(
+                parent,
+                target,
+                &mut attack,
+                is_flanking,
+                is_sneak_attack,
+            );
             result.push((hit_kind, hit_flags, damage));
         }
 
@@ -533,14 +662,20 @@ impl ActorState {
         result
     }
 
-    pub fn attack(parent: &Rc<RefCell<EntityState>>, target: &Rc<RefCell<EntityState>>,
-                  attack: &mut Attack) -> (HitKind, HitFlags, Vec<(DamageKind, u32)>) {
+    pub fn attack(
+        parent: &Rc<RefCell<EntityState>>,
+        target: &Rc<RefCell<EntityState>>,
+        attack: &mut Attack,
+    ) -> (HitKind, HitFlags, Vec<(DamageKind, u32)>) {
         if target.borrow_mut().actor.hp() <= 0 {
             return (HitKind::Miss, HitFlags::default(), Vec::new());
         }
 
-        info!("'{}' attacks '{}'", parent.borrow().actor.actor.name,
-            target.borrow().actor.actor.name);
+        info!(
+            "'{}' attacks '{}'",
+            parent.borrow().actor.actor.name,
+            target.borrow().actor.actor.name
+        );
 
         let is_flanking = ActorState::is_flanking(parent, target);
         let is_sneak_attack = ActorState::is_sneak_attack(parent, target);
@@ -553,20 +688,31 @@ impl ActorState {
         (hit_kind, hit_flags, damage)
     }
 
-    fn attack_internal(parent: &Rc<RefCell<EntityState>>,
-                       target: &Rc<RefCell<EntityState>>,
-                       attack: &mut Attack,
-                       flanking: bool,
-                       sneak_attack: bool) -> (HitKind, HitFlags, Vec<(DamageKind, u32)>) {
+    fn attack_internal(
+        parent: &Rc<RefCell<EntityState>>,
+        target: &Rc<RefCell<EntityState>>,
+        attack: &mut Attack,
+        flanking: bool,
+        sneak_attack: bool,
+    ) -> (HitKind, HitFlags, Vec<(DamageKind, u32)>) {
         let rules = Module::rules();
 
-        let concealment = cmp::max(0, target.borrow().actor.stats.concealment -
-                                   parent.borrow().actor.stats.concealment_ignore);
+        let concealment = cmp::max(
+            0,
+            target.borrow().actor.stats.concealment
+                - parent.borrow().actor.stats.concealment_ignore,
+        );
 
         if !rules.concealment_roll(concealment) {
             debug!("Concealment miss");
-            return (HitKind::Miss, HitFlags { concealment: true, ..Default::default() },
-                Vec::new());
+            return (
+                HitKind::Miss,
+                HitFlags {
+                    concealment: true,
+                    ..Default::default()
+                },
+                Vec::new(),
+            );
         }
 
         let (accuracy_kind, defense) = {
@@ -594,23 +740,24 @@ impl ActorState {
             attack.bonuses.spell_accuracy += rules.hidden_accuracy_bonus;
         }
 
-        let hit_flags = HitFlags { flanking, sneak_attack, concealment: false };
+        let hit_flags = HitFlags {
+            flanking,
+            sneak_attack,
+            concealment: false,
+        };
 
         let (hit_kind, damage_multiplier) = {
             let parent_stats = &parent.borrow().actor.stats;
-            let hit_kind = parent_stats.attack_roll(accuracy_kind, crit_immunity,
-                                                    defense, &attack.bonuses);
+            let hit_kind =
+                parent_stats.attack_roll(accuracy_kind, crit_immunity, defense, &attack.bonuses);
             let damage_multiplier = match hit_kind {
                 HitKind::Miss => {
                     debug!("Miss");
                     return (HitKind::Miss, hit_flags, Vec::new());
-                },
-                HitKind::Graze =>
-                    parent_stats.graze_multiplier + attack.bonuses.graze_multiplier,
-                HitKind::Hit =>
-                    parent_stats.hit_multiplier + attack.bonuses.hit_multiplier,
-                HitKind::Crit =>
-                    parent_stats.crit_multiplier + attack.bonuses.crit_multiplier,
+                }
+                HitKind::Graze => parent_stats.graze_multiplier + attack.bonuses.graze_multiplier,
+                HitKind::Hit => parent_stats.hit_multiplier + attack.bonuses.hit_multiplier,
+                HitKind::Crit => parent_stats.crit_multiplier + attack.bonuses.crit_multiplier,
                 HitKind::Auto => panic!(),
             };
             (hit_kind, damage_multiplier)
@@ -656,7 +803,9 @@ impl ActorState {
 
     pub fn swap_weapon_set(&mut self) {
         let swap_ap = Module::rules().swap_weapons_ap;
-        if self.ap() < swap_ap { return; }
+        if self.ap() < swap_ap {
+            return;
+        }
         self.inventory.swap_weapon_set();
         self.compute_stats();
         self.texture_cache_invalid = true;
@@ -683,20 +832,26 @@ impl ActorState {
     }
 
     pub fn can_equip(&self, item: &ItemState) -> bool {
-        if self.p_stats.is_inventory_locked() { return false; }
+        if self.p_stats.is_inventory_locked() {
+            return false;
+        }
 
         self.inventory.can_equip(&item, &self.stats, &self.actor)
     }
 
     pub fn can_unequip(&self, _slot: Slot) -> bool {
-        if self.p_stats.is_inventory_locked() { return false; }
+        if self.p_stats.is_inventory_locked() {
+            return false;
+        }
 
-        return !GameState::is_combat_active()
+        return !GameState::is_combat_active();
     }
 
     #[must_use]
     pub fn unequip(&mut self, slot: Slot) -> Option<ItemState> {
-        if self.p_stats.is_inventory_locked() { return None; }
+        if self.p_stats.is_inventory_locked() {
+            return None;
+        }
 
         let item = self.inventory.unequip(slot);
         self.compute_stats();
@@ -713,7 +868,9 @@ impl ActorState {
     }
 
     pub fn check_death(parent: &Rc<RefCell<EntityState>>, target: &Rc<RefCell<EntityState>>) {
-        if target.borrow().actor.hp() > 0 { return; }
+        if target.borrow().actor.hp() > 0 {
+            return;
+        }
 
         let area_state = GameState::area_state();
 
@@ -725,7 +882,11 @@ impl ActorState {
             }
         };
 
-        debug!("Adding XP {} to '{}'", reward.xp, parent.borrow().actor.actor.id);
+        debug!(
+            "Adding XP {} to '{}'",
+            reward.xp,
+            parent.borrow().actor.actor.id
+        );
         if parent.borrow().is_party_member() {
             for member in GameState::party().iter() {
                 member.borrow_mut().add_xp(reward.xp);
@@ -741,7 +902,9 @@ impl ActorState {
 
         trace!("Checking for loot drop.");
         let items = loot.generate_with_chance(reward.loot_chance);
-        if items.is_empty() { return; }
+        if items.is_empty() {
+            return;
+        }
 
         trace!("Dropping loot with {} items", items.len());
         let p = target.borrow().location.to_point();
@@ -756,7 +919,9 @@ impl ActorState {
         }
     }
 
-    pub fn is_disabled(&self) -> bool { self.p_stats.is_disabled() }
+    pub fn is_disabled(&self) -> bool {
+        self.p_stats.is_disabled()
+    }
 
     pub fn set_disabled(&mut self, disabled: bool) {
         self.p_stats.set_disabled(disabled);
@@ -827,9 +992,8 @@ impl ActorState {
         }
 
         let start_len = self.effects.len();
-        self.effects.retain(|(index, _)| {
-            all_effects[*index].is_some()
-        });
+        self.effects
+            .retain(|(index, _)| all_effects[*index].is_some());
 
         if start_len != self.effects.len() {
             self.compute_stats();
@@ -837,12 +1001,15 @@ impl ActorState {
     }
 
     pub fn add_effect(&mut self, index: usize, bonuses: BonusList) {
-        info!("Adding effect with index {} to '{}'", index, self.actor.name);
+        info!(
+            "Adding effect with index {} to '{}'",
+            index, self.actor.name
+        );
         self.effects.push((index, bonuses));
         self.compute_stats();
     }
 
-    pub (crate) fn remove_effect(&mut self, index: usize) {
+    pub(crate) fn remove_effect(&mut self, index: usize) {
         self.effects.retain(|(i, _)| *i != index);
         self.compute_stats();
     }
@@ -858,7 +1025,11 @@ impl ActorState {
     }
 
     pub fn init_turn(&mut self) {
-        debug!("Init turn for '{}' with overflow ap of {}", self.actor.name, self.overflow_ap());
+        debug!(
+            "Init turn for '{}' with overflow ap of {}",
+            self.actor.name,
+            self.overflow_ap()
+        );
         self.p_stats.init_turn(&self.stats);
         self.listeners.notify(&self);
     }
@@ -877,11 +1048,13 @@ impl ActorState {
             layers_override.insert(*layer, Rc::clone(image));
         }
 
-        let layers = self.actor.image_layers().get_list_with(self.actor.sex,
-                                                             &self.actor.race,
-                                                             self.actor.hair_color,
-                                                             self.actor.skin_color,
-                                                             layers_override);
+        let layers = self.actor.image_layers().get_list_with(
+            self.actor.sex,
+            &self.actor.race,
+            self.actor.hair_color,
+            self.actor.skin_color,
+            layers_override,
+        );
         self.image = LayeredImage::new(layers, self.actor.hue);
 
         self.stats.add(&self.actor.race.base_stats);
@@ -889,7 +1062,8 @@ impl ActorState {
         for &(ref class, level) in self.actor.levels.iter() {
             self.stats.add_multiple(&class.bonuses_per_level, level);
             for (ref group_id, amount) in class.group_uses_per_encounter(level).iter() {
-                self.stats.add_single_group_uses_per_encounter(group_id, *amount);
+                self.stats
+                    .add_single_group_uses_per_encounter(group_id, *amount);
             }
 
             for (ref group_id, amount) in class.group_uses_per_day(level).iter() {
@@ -935,7 +1109,9 @@ impl ActorState {
         for slot in Slot::iter() {
             if let Some(ref item_state) = self.inventory.equipped(*slot) {
                 match item_state.item.kind {
-                    ItemKind::Armor { kind } => { equipped_armor.insert(*slot, kind); }
+                    ItemKind::Armor { kind } => {
+                        equipped_armor.insert(*slot, kind);
+                    }
                     _ => (),
                 }
             }
@@ -944,7 +1120,13 @@ impl ActorState {
         let weapon_style = self.inventory.weapon_style();
         let is_threatened = self.is_threatened();
 
-        self.stats.finalize(&self.actor, attacks_list, equipped_armor, weapon_style, is_threatened);
+        self.stats.finalize(
+            &self.actor,
+            attacks_list,
+            equipped_armor,
+            weapon_style,
+            is_threatened,
+        );
 
         self.p_stats.recompute_level_up(&self.actor);
 

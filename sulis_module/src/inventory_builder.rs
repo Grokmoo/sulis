@@ -14,10 +14,10 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::rc::Rc;
 use std::collections::HashMap;
+use std::rc::Rc;
 
-use crate::rules::{Slot, QuickSlot};
+use crate::rules::{QuickSlot, Slot};
 use crate::{Item, Module, Race};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -46,7 +46,11 @@ pub struct ItemSaveState {
 
 impl ItemSaveState {
     pub fn new(item: &Rc<Item>) -> ItemSaveState {
-        let adjectives = item.added_adjectives.iter().map(|adj| adj.id.clone()).collect();
+        let adjectives = item
+            .added_adjectives
+            .iter()
+            .map(|adj| adj.id.clone())
+            .collect();
 
         ItemSaveState {
             id: item.original_id.clone(),
@@ -70,15 +74,20 @@ pub struct InventoryBuilder {
 fn equippable_to(item: &Rc<Item>, item_id: &str, slot: Slot) -> bool {
     match &item.equippable {
         None => {
-            warn!("Unequippable item '{}' found in equip slot for inventory", item_id);
+            warn!(
+                "Unequippable item '{}' found in equip slot for inventory",
+                item_id
+            );
             return false;
-        },
+        }
         Some(ref equippable) => {
             if equippable.slot != slot {
                 let alt = equippable.alternate_slot;
                 if alt.is_none() || alt.unwrap() != slot {
-                    warn!("Item '{}' not equippable to slot {:?} in inventory",
-                          item_id, slot);
+                    warn!(
+                        "Item '{}' not equippable to slot {:?} in inventory",
+                        item_id, slot
+                    );
                     return false;
                 }
             }
@@ -88,10 +97,12 @@ fn equippable_to(item: &Rc<Item>, item_id: &str, slot: Slot) -> bool {
 }
 
 impl InventoryBuilder {
-    pub fn new(equipped: HashMap<Slot, ItemSaveState>,
-               quick: HashMap<QuickSlot, ItemSaveState>,
-               pc_starting_coins: i32,
-               pc_starting_items: Vec<ItemListEntrySaveState>) -> InventoryBuilder {
+    pub fn new(
+        equipped: HashMap<Slot, ItemSaveState>,
+        quick: HashMap<QuickSlot, ItemSaveState>,
+        pc_starting_coins: i32,
+        pc_starting_items: Vec<ItemListEntrySaveState>,
+    ) -> InventoryBuilder {
         InventoryBuilder {
             equipped,
             quick,
@@ -113,16 +124,19 @@ impl InventoryBuilder {
     }
 
     /// Iterates over the items in this inventory, validating that they exist
-    pub fn pc_starting_item_iter<'a>(&'a self) -> impl Iterator<Item=(u32, Rc<Item>)> + 'a {
+    pub fn pc_starting_item_iter<'a>(&'a self) -> impl Iterator<Item = (u32, Rc<Item>)> + 'a {
         self.pc_starting_items.iter().filter_map(|entry| {
             let qty = entry.quantity;
             let item = &entry.item;
             match Module::create_get_item(&item.id, &item.adjectives) {
                 None => {
-                    warn!("Item '{}' with adjectives '{:?}' not found in inventory",
-                          item.id, item.adjectives);
+                    warn!(
+                        "Item '{}' with adjectives '{:?}' not found in inventory",
+                        item.id, item.adjectives
+                    );
                     None
-                }, Some(item) => Some((qty, item)),
+                }
+                Some(item) => Some((qty, item)),
             }
         })
     }
@@ -130,18 +144,23 @@ impl InventoryBuilder {
     /// Provides an iterator over all the items in this inventory.
     /// Validates as much as possible that items are valid for the specified slots,
     /// but cannot do validations that depend on the actor.
-    pub fn equipped_iter<'a>(&'a self) -> impl Iterator<Item=(Slot, Rc<Item>)> + 'a {
+    pub fn equipped_iter<'a>(&'a self) -> impl Iterator<Item = (Slot, Rc<Item>)> + 'a {
         self.equipped.iter().filter_map(|(slot, item_save)| {
             let slot = *slot;
             let item = match Module::create_get_item(&item_save.id, &item_save.adjectives) {
                 None => {
-                    warn!("Item '{}' with adjectives '{:?}' not found in equipped",
-                          item_save.id, item_save.adjectives);
+                    warn!(
+                        "Item '{}' with adjectives '{:?}' not found in equipped",
+                        item_save.id, item_save.adjectives
+                    );
                     return None;
-                }, Some(item) => item,
+                }
+                Some(item) => item,
             };
 
-            if !equippable_to(&item, &item_save.id, slot) { return None; }
+            if !equippable_to(&item, &item_save.id, slot) {
+                return None;
+            }
 
             Some((slot, item))
         })
@@ -150,27 +169,36 @@ impl InventoryBuilder {
     /// Provides an iterator over all the quick slot item in this defined inventory.
     /// Validates as much as possible that the items are valid for the slots, but cannot do
     /// any validation that also depends on the actor.
-    pub fn quick_iter<'a>(&'a self) -> impl Iterator<Item=(QuickSlot, Rc<Item>)> + 'a {
+    pub fn quick_iter<'a>(&'a self) -> impl Iterator<Item = (QuickSlot, Rc<Item>)> + 'a {
         self.quick.iter().filter_map(|(slot, item_save)| {
             let slot = *slot;
             let item = match Module::create_get_item(&item_save.id, &item_save.adjectives) {
                 None => {
-                    warn!("Item '{}' with adjectives '{:?}' not found in quick",
-                          item_save.id, item_save.adjectives);
+                    warn!(
+                        "Item '{}' with adjectives '{:?}' not found in quick",
+                        item_save.id, item_save.adjectives
+                    );
                     return None;
-                }, Some(item) => item,
+                }
+                Some(item) => item,
             };
 
             use crate::rules::QuickSlot::*;
             match slot {
                 AltHeldMain => {
-                    if !equippable_to(&item, &item_save.id, Slot::HeldMain) { return None; }
-                },
+                    if !equippable_to(&item, &item_save.id, Slot::HeldMain) {
+                        return None;
+                    }
+                }
                 AltHeldOff => {
-                    if !equippable_to(&item, &item_save.id, Slot::HeldOff) { return None; }
-                },
+                    if !equippable_to(&item, &item_save.id, Slot::HeldOff) {
+                        return None;
+                    }
+                }
                 Usable1 | Usable2 | Usable3 | Usable4 => {
-                    if item.usable.is_none() { return None; }
+                    if item.usable.is_none() {
+                        return None;
+                    }
                 }
             }
 

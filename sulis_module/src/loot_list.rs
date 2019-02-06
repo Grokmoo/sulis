@@ -15,7 +15,7 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::collections::HashMap;
-use std::io::{Error};
+use std::io::Error;
 use std::rc::Rc;
 
 use sulis_core::util::{gen_rand, unable_to_create_error};
@@ -63,10 +63,7 @@ impl LootList {
         let mut generate = Vec::new();
         for (num_items, weight) in builder.generate {
             total_generate_weight += weight;
-            generate.push(Generate {
-                num_items,
-                weight,
-            });
+            generate.push(Generate { num_items, weight });
         }
 
         let mut total_entries_weight = 0;
@@ -101,11 +98,16 @@ impl LootList {
         })
     }
 
-    fn create_sublist_entry(builder_id: &str, id: String,
-                            entry_in: EntryBuilder) -> Result<Entry, Error> {
+    fn create_sublist_entry(
+        builder_id: &str,
+        id: String,
+        entry_in: EntryBuilder,
+    ) -> Result<Entry, Error> {
         if entry_in.adjective1.len() != 0 || entry_in.adjective2.len() != 0 {
-            warn!("Item adjectives may not be specified in loot list sub_list entries: '{}'",
-                  id);
+            warn!(
+                "Item adjectives may not be specified in loot list sub_list entries: '{}'",
+                id
+            );
             return unable_to_create_error("loot_list", &builder_id);
         }
 
@@ -125,8 +127,12 @@ impl LootList {
         })
     }
 
-    fn create_entry(builder_id: &str, module: &Module, id: String,
-                    entry_in: EntryBuilder) -> Result<Entry, Error> {
+    fn create_entry(
+        builder_id: &str,
+        module: &Module,
+        id: String,
+        entry_in: EntryBuilder,
+    ) -> Result<Entry, Error> {
         if let None = module.items.get(&id) {
             warn!("Unable to find item '{}'", id);
             return unable_to_create_error("loot_list", &builder_id);
@@ -141,7 +147,9 @@ impl LootList {
         let mut adjective1_total_weight = 0;
         for (id, weight) in entry_in.adjective1 {
             adjective1_total_weight += weight;
-            if id == "none" { continue; }
+            if id == "none" {
+                continue;
+            }
             if let None = module.item_adjectives.get(&id) {
                 warn!("Unable to find item adjective '{}'", id);
                 return unable_to_create_error("loot_list", &builder_id);
@@ -153,7 +161,9 @@ impl LootList {
         let mut adjective2_total_weight = 0;
         for (id, weight) in entry_in.adjective2 {
             adjective2_total_weight += weight;
-            if id == "none" { continue; }
+            if id == "none" {
+                continue;
+            }
             if let None = module.item_adjectives.get(&id) {
                 warn!("Unable to find item adjective '{}'", id);
                 return unable_to_create_error("loot_list", &builder_id);
@@ -187,8 +197,11 @@ impl LootList {
 
     fn generate_internal(&self, depth: u32) -> Vec<(u32, Rc<Item>)> {
         if depth >= MAX_DEPTH {
-            warn!("Exceeded maximum sub list depth of {}.  \
-                  This is most likely caused by a circular reference.", MAX_DEPTH);
+            warn!(
+                "Exceeded maximum sub list depth of {}.  \
+                 This is most likely caused by a circular reference.",
+                MAX_DEPTH
+            );
             return Vec::new();
         }
 
@@ -215,9 +228,13 @@ impl LootList {
                 let adjectives = self.gen_adjectives(entry);
                 let item = match Module::create_get_item(&entry.id, &adjectives) {
                     None => {
-                        warn!("Unable to create item '{}' with '{:?}'", entry.id, adjectives);
+                        warn!(
+                            "Unable to create item '{}' with '{:?}'",
+                            entry.id, adjectives
+                        );
                         continue;
-                    }, Some(item) => item,
+                    }
+                    Some(item) => item,
                 };
                 items.push((quantity, item));
             }
@@ -226,15 +243,18 @@ impl LootList {
         for entry in self.sub_lists.iter() {
             let sub_list = match Module::loot_list(&entry.id) {
                 None => {
-                    warn!("No loot list with ID '{}' found for sublist of '{}'",
-                          entry.id, self.id);
+                    warn!(
+                        "No loot list with ID '{}' found for sublist of '{}'",
+                        entry.id, self.id
+                    );
                     continue;
-                }, Some(list) => list,
+                }
+                Some(list) => list,
             };
 
             let roll = gen_rand(0, 100);
             if roll < entry.weight {
-                let times  = if entry.quantity[0] == entry.quantity[1] {
+                let times = if entry.quantity[0] == entry.quantity[1] {
                     entry.quantity[0]
                 } else {
                     gen_rand(entry.quantity[0], entry.quantity[1] + 1)
@@ -299,9 +319,13 @@ impl LootList {
                 let adjectives = self.gen_adjectives(entry);
                 let item = match Module::create_get_item(&entry.id, &adjectives) {
                     None => {
-                        warn!("Unable to create item '{}' with '{:?}'", entry.id, adjectives);
+                        warn!(
+                            "Unable to create item '{}' with '{:?}'",
+                            entry.id, adjectives
+                        );
                         continue;
-                    }, Some(item) => item,
+                    }
+                    Some(item) => item,
                 };
                 return Some((quantity, item));
             }
@@ -311,7 +335,9 @@ impl LootList {
     }
 
     fn gen_num_items(&self) -> u32 {
-        if self.total_generate_weight == 0 { return 0; }
+        if self.total_generate_weight == 0 {
+            return 0;
+        }
 
         let roll = gen_rand(0, self.total_generate_weight);
 
@@ -331,7 +357,7 @@ impl LootList {
 #[serde(deny_unknown_fields)]
 struct EntryBuilder {
     weight: u32,
-    quantity: Option<[u32;2]>,
+    quantity: Option<[u32; 2]>,
     #[serde(default)]
     adjective1: HashMap<String, u32>,
     #[serde(default)]

@@ -16,15 +16,15 @@
 
 use std::rc::Rc;
 
-use sulis_core::image::Image;
-use sulis_core::resource::ResourceSet;
 use crate::rules::bonus::{AttackBuilder, AttackKindBuilder, BonusKind, BonusList};
 use crate::rules::{AttackBonuses, Damage, DamageKind, DamageList, StatList, WeaponKind};
+use sulis_core::image::Image;
+use sulis_core::resource::ResourceSet;
 
 use crate::rules::AttackKind::*;
 
 fn add_bonus(bonuses: &mut AttackBonuses, bonus_damage: &mut Vec<Damage>, bonus_kind: &BonusKind) {
-    match bonus_kind{
+    match bonus_kind {
         BonusKind::Damage(damage) => bonus_damage.push(damage.clone()),
         BonusKind::MeleeAccuracy(amount) => bonuses.melee_accuracy += amount,
         BonusKind::RangedAccuracy(amount) => bonuses.ranged_accuracy += amount,
@@ -36,7 +36,10 @@ fn add_bonus(bonuses: &mut AttackBonuses, bonus_damage: &mut Vec<Damage>, bonus_
         BonusKind::HitMultiplier(amount) => bonuses.hit_multiplier += amount,
         BonusKind::GrazeMultiplier(amount) => bonuses.graze_multiplier += amount,
         _ => {
-            warn!("Attack bonus of type '{:?}' will never be applied", bonus_kind);
+            warn!(
+                "Attack bonus of type '{:?}' will never be applied",
+                bonus_kind
+            );
         }
     }
 }
@@ -49,12 +52,18 @@ pub struct Attack {
 }
 
 impl Attack {
-    pub fn special(stats: &StatList, min_damage: u32, max_damage: u32, ap: u32,
-                   damage_kind: DamageKind, attack_kind: AttackKind) -> Attack {
+    pub fn special(
+        stats: &StatList,
+        min_damage: u32,
+        max_damage: u32,
+        ap: u32,
+        damage_kind: DamageKind,
+        attack_kind: AttackKind,
+    ) -> Attack {
         let damage = Damage {
             min: min_damage,
             max: max_damage,
-            ap: ap,
+            ap,
             kind: Some(damage_kind),
         };
 
@@ -69,7 +78,7 @@ impl Attack {
                     if stats.hidden {
                         add_bonus(&mut bonuses, &mut bonus_damage, &bonus.kind);
                     }
-                },
+                }
                 AttackWithDamageKind(kind_to_match) => {
                     if damage_kind == kind_to_match {
                         add_bonus(&mut bonuses, &mut bonus_damage, &bonus.kind);
@@ -122,18 +131,18 @@ impl Attack {
                     if bonus_weapon_kind == weapon_kind {
                         add_bonus(&mut bonuses, &mut bonus_damage, &bonus.kind);
                     }
-                },
+                }
                 AttackWhenHidden => {
                     if stats.hidden {
                         add_bonus(&mut bonuses, &mut bonus_damage, &bonus.kind);
                     }
-                },
+                }
                 AttackWithDamageKind(damage_kind) => {
                     assert!(builder.damage.kind.is_some());
                     if builder.damage.kind.unwrap() == damage_kind {
                         add_bonus(&mut bonuses, &mut bonus_damage, &bonus.kind);
                     }
-                },
+                }
                 _ => unreachable!(),
             }
         }
@@ -141,16 +150,24 @@ impl Attack {
         let damage = DamageList::new(builder.damage, &bonus_damage);
 
         let kind = match builder.kind {
-            AttackKindBuilder::Melee { reach } =>
-                Melee { reach: reach + stats.bonus_reach },
-            AttackKindBuilder::Ranged { range, ref projectile } => {
+            AttackKindBuilder::Melee { reach } => Melee {
+                reach: reach + stats.bonus_reach,
+            },
+            AttackKindBuilder::Ranged {
+                range,
+                ref projectile,
+            } => {
                 let projectile = match ResourceSet::image(projectile) {
                     None => {
                         warn!("No image found for projectile '{}'", projectile);
                         "empty".to_string()
-                    }, Some(_) => projectile.to_string(),
+                    }
+                    Some(_) => projectile.to_string(),
                 };
-                Ranged { range: range + stats.bonus_range, projectile }
+                Ranged {
+                    range: range + stats.bonus_range,
+                    projectile,
+                }
             }
         };
 
@@ -177,9 +194,7 @@ impl Attack {
 
     pub fn get_ranged_projectile(&self) -> Option<Rc<Image>> {
         match self.kind {
-            Ranged { ref projectile, .. } => {
-                ResourceSet::image(projectile)
-            },
+            Ranged { ref projectile, .. } => ResourceSet::image(projectile),
             _ => None,
         }
     }

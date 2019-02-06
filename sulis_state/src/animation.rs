@@ -14,11 +14,11 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::collections::HashMap;
-use std::time::{Duration};
-use std::cmp;
-use std::rc::Rc;
 use std::cell::{Cell, RefCell};
+use std::cmp;
+use std::collections::HashMap;
+use std::rc::Rc;
+use std::time::Duration;
 
 mod anim_save_state;
 pub use self::anim_save_state::AnimSaveState;
@@ -37,14 +37,18 @@ pub mod particle_generator;
 
 pub mod ranged_attack_animation;
 
-use sulis_core::{io::GraphicsRenderer, util::{self, ExtInt}, image::Image};
-use sulis_module::ImageLayer;
-use crate::{ChangeListener, Effect, EntityState, ScriptCallback};
-use self::particle_generator::Param;
 use self::melee_attack_animation::MeleeAttackAnimModel;
-use self::ranged_attack_animation::RangedAttackAnimModel;
 use self::move_animation::MoveAnimModel;
+use self::particle_generator::Param;
 use self::particle_generator::{GeneratorModel, GeneratorState};
+use self::ranged_attack_animation::RangedAttackAnimModel;
+use crate::{ChangeListener, Effect, EntityState, ScriptCallback};
+use sulis_core::{
+    image::Image,
+    io::GraphicsRenderer,
+    util::{self, ExtInt},
+};
+use sulis_module::ImageLayer;
 
 pub struct AnimState {
     no_draw_anims: Vec<Anim>,
@@ -71,8 +75,11 @@ impl AnimState {
     /// Returns two vecs, the first is the list of animations that should be `on_anim_update`,
     /// the second is the list that should be `on_anim_complete`
     #[must_use]
-    pub fn update(&mut self, to_add: Vec<Anim>,
-                  elapsed: u32) -> (Vec<Box<ScriptCallback>>, Vec<Box<ScriptCallback>>) {
+    pub fn update(
+        &mut self,
+        to_add: Vec<Anim>,
+        elapsed: u32,
+    ) -> (Vec<Box<ScriptCallback>>, Vec<Box<ScriptCallback>>) {
         let mut update_cbs = Vec::new();
         let mut complete_cbs = Vec::new();
 
@@ -84,55 +91,86 @@ impl AnimState {
             };
 
             match anim.kind {
-                RangedAttack { .. } =>
-                    self.above_anims.push(anim),
+                RangedAttack { .. } => self.above_anims.push(anim),
                 ParticleGenerator { .. } => {
                     if draw_above {
                         self.above_anims.push(anim);
                     } else {
                         self.below_anims.push(anim);
                     }
-                },
-                Move { .. } =>{
+                }
+                Move { .. } => {
                     if anim.owner.borrow().is_party_member() {
                         self.below_anims.push(anim);
                     } else {
                         self.no_draw_anims.push(anim);
                     }
-                },
+                }
                 _ => self.no_draw_anims.push(anim),
             }
         }
 
-        AnimState::update_vec(&mut self.no_draw_anims, elapsed,
-                              &mut update_cbs, &mut complete_cbs);
-        AnimState::update_vec(&mut self.below_anims, elapsed,
-                              &mut update_cbs, &mut complete_cbs);
-        AnimState::update_vec(&mut self.above_anims, elapsed,
-                              &mut update_cbs, &mut complete_cbs);
+        AnimState::update_vec(
+            &mut self.no_draw_anims,
+            elapsed,
+            &mut update_cbs,
+            &mut complete_cbs,
+        );
+        AnimState::update_vec(
+            &mut self.below_anims,
+            elapsed,
+            &mut update_cbs,
+            &mut complete_cbs,
+        );
+        AnimState::update_vec(
+            &mut self.above_anims,
+            elapsed,
+            &mut update_cbs,
+            &mut complete_cbs,
+        );
 
         (update_cbs, complete_cbs)
     }
 
     pub fn save_anims(&self) -> Vec<AnimSaveState> {
         let mut anims = Vec::new();
-        self.below_anims.iter().for_each(|anim| anims.push(AnimSaveState::new(anim)));
-        self.above_anims.iter().for_each(|anim| anims.push(AnimSaveState::new(anim)));
-        self.no_draw_anims.iter().for_each(|anim| anims.push(AnimSaveState::new(anim)));
+        self.below_anims
+            .iter()
+            .for_each(|anim| anims.push(AnimSaveState::new(anim)));
+        self.above_anims
+            .iter()
+            .for_each(|anim| anims.push(AnimSaveState::new(anim)));
+        self.no_draw_anims
+            .iter()
+            .for_each(|anim| anims.push(AnimSaveState::new(anim)));
 
         anims
     }
 
-    pub fn draw_below_entities(&self, renderer: &mut GraphicsRenderer, offset_x: f32, offset_y: f32,
-                scale_x: f32, scale_y: f32, millis: u32) {
+    pub fn draw_below_entities(
+        &self,
+        renderer: &mut GraphicsRenderer,
+        offset_x: f32,
+        offset_y: f32,
+        scale_x: f32,
+        scale_y: f32,
+        millis: u32,
+    ) {
         // TODO need to only draw animations that are in the current area
         for anim in self.below_anims.iter() {
             anim.draw(renderer, offset_x, offset_y, scale_x, scale_y, millis);
         }
     }
 
-    pub fn draw_above_entities(&self, renderer: &mut GraphicsRenderer, offset_x: f32, offset_y: f32,
-                               scale_x: f32, scale_y: f32, millis: u32) {
+    pub fn draw_above_entities(
+        &self,
+        renderer: &mut GraphicsRenderer,
+        offset_x: f32,
+        offset_y: f32,
+        scale_x: f32,
+        scale_y: f32,
+        millis: u32,
+    ) {
         // TODO only draw anims in the current area
         for anim in self.above_anims.iter() {
             anim.draw(renderer, offset_x, offset_y, scale_x, scale_y, millis);
@@ -140,15 +178,15 @@ impl AnimState {
     }
 
     pub fn has_any_blocking_anims(&self) -> bool {
-        AnimState::has_any_blocking_vec(&self.no_draw_anims) ||
-            AnimState::has_any_blocking_vec(&self.below_anims) ||
-            AnimState::has_any_blocking_vec(&self.above_anims)
+        AnimState::has_any_blocking_vec(&self.no_draw_anims)
+            || AnimState::has_any_blocking_vec(&self.below_anims)
+            || AnimState::has_any_blocking_vec(&self.above_anims)
     }
 
     pub fn has_blocking_anims(&self, entity: &Rc<RefCell<EntityState>>) -> bool {
-        AnimState::has_blocking_vec(&self.no_draw_anims, entity) ||
-            AnimState::has_blocking_vec(&self.below_anims, entity) ||
-            AnimState::has_blocking_vec(&self.above_anims, entity)
+        AnimState::has_blocking_vec(&self.no_draw_anims, entity)
+            || AnimState::has_blocking_vec(&self.below_anims, entity)
+            || AnimState::has_blocking_vec(&self.above_anims, entity)
     }
 
     pub fn clear_blocking_anims(&mut self, entity: &Rc<RefCell<EntityState>>) {
@@ -165,17 +203,23 @@ impl AnimState {
 
     fn has_any_blocking_vec(vec: &Vec<Anim>) -> bool {
         for anim in vec.iter() {
-            if !anim.is_blocking() { continue; }
+            if !anim.is_blocking() {
+                continue;
+            }
 
-            return true
+            return true;
         }
         false
     }
 
     fn has_blocking_vec(vec: &Vec<Anim>, entity: &Rc<RefCell<EntityState>>) -> bool {
         for anim in vec.iter() {
-            if !anim.is_blocking() { continue; }
-            if !Rc::ptr_eq(entity, anim.owner()) { continue; }
+            if !anim.is_blocking() {
+                continue;
+            }
+            if !Rc::ptr_eq(entity, anim.owner()) {
+                continue;
+            }
 
             return true;
         }
@@ -184,8 +228,12 @@ impl AnimState {
 
     fn clear_blocking_vec(vec: &mut Vec<Anim>, entity: &Rc<RefCell<EntityState>>) {
         for anim in vec.iter_mut() {
-            if !anim.is_blocking() { continue; }
-            if !Rc::ptr_eq(entity, anim.owner()) { continue; }
+            if !anim.is_blocking() {
+                continue;
+            }
+            if !Rc::ptr_eq(entity, anim.owner()) {
+                continue;
+            }
 
             anim.mark_for_removal();
             // don't fire any more callbacks for removed anims
@@ -205,14 +253,19 @@ impl AnimState {
         }
     }
 
-    fn update_vec(vec: &mut Vec<Anim>, elapsed: u32, update_cbs: &mut Vec<Box<ScriptCallback>>,
-                  complete_cbs: &mut Vec<Box<ScriptCallback>>) {
+    fn update_vec(
+        vec: &mut Vec<Anim>,
+        elapsed: u32,
+        update_cbs: &mut Vec<Box<ScriptCallback>>,
+        complete_cbs: &mut Vec<Box<ScriptCallback>>,
+    ) {
         let mut i = 0;
         while i < vec.len() {
             let retain = vec[i].update(elapsed);
 
-            if retain { i += 1; }
-            else {
+            if retain {
+                i += 1;
+            } else {
                 vec[i].cleanup_kind();
                 vec[i].get_completion_callbacks(update_cbs, complete_cbs);
                 vec.remove(i);
@@ -232,7 +285,7 @@ pub struct Anim {
     pub(in crate::animation) removal_effect: Option<usize>, // used only for save/load purposes
 }
 
-pub (in crate::animation) enum AnimKind {
+pub(in crate::animation) enum AnimKind {
     /// An animation that does nothing, but blocks the entity for a specified time
     Wait,
 
@@ -241,10 +294,15 @@ pub (in crate::animation) enum AnimKind {
 
     /// An animation that adds or overrides image layers on an entity
     /// while active
-    EntityImageLayer { images: HashMap<ImageLayer, Rc<Image>> },
+    EntityImageLayer {
+        images: HashMap<ImageLayer, Rc<Image>>,
+    },
 
     /// An animation that changes the color of an entity while active
-    EntityColor { color: [Param; 4], color_sec: [Param; 4] },
+    EntityColor {
+        color: [Param; 4],
+        color_sec: [Param; 4],
+    },
 
     /// An animation that changes the size of an entity while active
     EntityScale { scale: Param },
@@ -263,59 +321,120 @@ pub (in crate::animation) enum AnimKind {
 
     /// A particle effect from a script - can also be used for simple
     /// single image animations
-    ParticleGenerator { model: GeneratorModel, state: GeneratorState },
+    ParticleGenerator {
+        model: GeneratorModel,
+        state: GeneratorState,
+    },
 
     /// Animation triggered when an entity is killed
-    EntityDeath { color: [Param; 4], color_sec: [Param; 4] },
+    EntityDeath {
+        color: [Param; 4],
+        color_sec: [Param; 4],
+    },
 }
 
 impl Anim {
     pub fn new_non_blocking_wait(owner: &Rc<RefCell<EntityState>>, duration_millis: u32) -> Anim {
-        Anim::new(owner, ExtInt::Int(duration_millis), AnimKind::NonBlockingWait)
+        Anim::new(
+            owner,
+            ExtInt::Int(duration_millis),
+            AnimKind::NonBlockingWait,
+        )
     }
 
     pub fn new_wait(owner: &Rc<RefCell<EntityState>>, duration_millis: u32) -> Anim {
         Anim::new(owner, ExtInt::Int(duration_millis), AnimKind::Wait)
     }
 
-    pub fn new_entity_image_layer(owner: &Rc<RefCell<EntityState>>, duration_millis: ExtInt,
-                                  images: HashMap<ImageLayer, Rc<Image>>) -> Anim {
-        Anim::new(owner, duration_millis, AnimKind::EntityImageLayer { images })
+    pub fn new_entity_image_layer(
+        owner: &Rc<RefCell<EntityState>>,
+        duration_millis: ExtInt,
+        images: HashMap<ImageLayer, Rc<Image>>,
+    ) -> Anim {
+        Anim::new(
+            owner,
+            duration_millis,
+            AnimKind::EntityImageLayer { images },
+        )
     }
 
-    pub fn new_entity_color(owner: &Rc<RefCell<EntityState>>, duration_millis: ExtInt,
-                            color: [Param; 4], color_sec: [Param; 4]) -> Anim {
-        Anim::new(owner, duration_millis, AnimKind::EntityColor { color, color_sec })
+    pub fn new_entity_color(
+        owner: &Rc<RefCell<EntityState>>,
+        duration_millis: ExtInt,
+        color: [Param; 4],
+        color_sec: [Param; 4],
+    ) -> Anim {
+        Anim::new(
+            owner,
+            duration_millis,
+            AnimKind::EntityColor { color, color_sec },
+        )
     }
 
-    pub fn new_entity_scale(owner: &Rc<RefCell<EntityState>>, duration_millis: ExtInt,
-                            scale: Param) -> Anim {
+    pub fn new_entity_scale(
+        owner: &Rc<RefCell<EntityState>>,
+        duration_millis: ExtInt,
+        scale: Param,
+    ) -> Anim {
         Anim::new(owner, duration_millis, AnimKind::EntityScale { scale })
     }
 
-    pub fn new_entity_subpos(owner: &Rc<RefCell<EntityState>>, duration_millis: ExtInt,
-                             x: Param, y: Param) -> Anim {
+    pub fn new_entity_subpos(
+        owner: &Rc<RefCell<EntityState>>,
+        duration_millis: ExtInt,
+        x: Param,
+        y: Param,
+    ) -> Anim {
         Anim::new(owner, duration_millis, AnimKind::EntitySubpos { x, y })
     }
 
-    pub (in crate::animation) fn new_melee_attack(attacker: &Rc<RefCell<EntityState>>, duration_millis: u32,
-                            model: MeleeAttackAnimModel) -> Anim {
-        Anim::new(attacker, ExtInt::Int(duration_millis), AnimKind::MeleeAttack { model })
+    pub(in crate::animation) fn new_melee_attack(
+        attacker: &Rc<RefCell<EntityState>>,
+        duration_millis: u32,
+        model: MeleeAttackAnimModel,
+    ) -> Anim {
+        Anim::new(
+            attacker,
+            ExtInt::Int(duration_millis),
+            AnimKind::MeleeAttack { model },
+        )
     }
 
-    pub (in crate::animation) fn new_ranged_attack(attacker: &Rc<RefCell<EntityState>>, duration_millis: u32,
-                                            model: RangedAttackAnimModel) -> Anim {
-        Anim::new(attacker, ExtInt::Int(duration_millis), AnimKind::RangedAttack { model })
+    pub(in crate::animation) fn new_ranged_attack(
+        attacker: &Rc<RefCell<EntityState>>,
+        duration_millis: u32,
+        model: RangedAttackAnimModel,
+    ) -> Anim {
+        Anim::new(
+            attacker,
+            ExtInt::Int(duration_millis),
+            AnimKind::RangedAttack { model },
+        )
     }
 
-    pub (in crate::animation) fn new_move(mover: &Rc<RefCell<EntityState>>, duration_millis: u32,
-                                   model: MoveAnimModel) -> Anim {
-        Anim::new(mover, ExtInt::Int(duration_millis), AnimKind::Move { model })
+    pub(in crate::animation) fn new_move(
+        mover: &Rc<RefCell<EntityState>>,
+        duration_millis: u32,
+        model: MoveAnimModel,
+    ) -> Anim {
+        Anim::new(
+            mover,
+            ExtInt::Int(duration_millis),
+            AnimKind::Move { model },
+        )
     }
 
-    pub (in crate::animation) fn new_pgen(owner: &Rc<RefCell<EntityState>>, duration_millis: ExtInt,
-                                   model: GeneratorModel, state: GeneratorState) -> Anim {
-        Anim::new(owner, duration_millis, AnimKind::ParticleGenerator { model, state })
+    pub(in crate::animation) fn new_pgen(
+        owner: &Rc<RefCell<EntityState>>,
+        duration_millis: ExtInt,
+        model: GeneratorModel,
+        state: GeneratorState,
+    ) -> Anim {
+        Anim::new(
+            owner,
+            duration_millis,
+            AnimKind::ParticleGenerator { model, state },
+        )
     }
 
     pub fn new_entity_recover(owner: &Rc<RefCell<EntityState>>) -> Anim {
@@ -324,7 +443,11 @@ impl Anim {
         let vel = Param::with_speed(1.0, -1.0);
         let color = [fixed, fixed, fixed, fixed];
         let color_sec = [vel, vel, vel, Param::fixed(0.0)];
-        Anim::new(owner, duration_millis, AnimKind::EntityColor { color, color_sec })
+        Anim::new(
+            owner,
+            duration_millis,
+            AnimKind::EntityColor { color, color_sec },
+        )
     }
 
     pub fn new_entity_death(owner: &Rc<RefCell<EntityState>>) -> Anim {
@@ -332,14 +455,22 @@ impl Anim {
         let time_f32 = time as f32 / 1000.0;
         let duration_millis = ExtInt::Int(time);
         let alpha = Param::with_jerk(1.0, 0.0, 0.0, -1.0 / time_f32);
-        let color = [Param::fixed(1.0), Param::fixed(0.0), Param::fixed(0.0), alpha];
+        let color = [
+            Param::fixed(1.0),
+            Param::fixed(0.0),
+            Param::fixed(0.0),
+            alpha,
+        ];
         let red = Param::with_accel(0.0, 1.0 / time_f32, -1.0 / time_f32);
         let color_sec = [red, Param::fixed(0.0), Param::fixed(0.0), Param::fixed(0.0)];
-        Anim::new(owner, duration_millis, AnimKind::EntityDeath { color, color_sec })
+        Anim::new(
+            owner,
+            duration_millis,
+            AnimKind::EntityDeath { color, color_sec },
+        )
     }
 
-    fn new(owner: &Rc<RefCell<EntityState>>, duration_millis: ExtInt,
-                              kind: AnimKind) -> Anim {
+    fn new(owner: &Rc<RefCell<EntityState>>, duration_millis: ExtInt, kind: AnimKind) -> Anim {
         Anim {
             kind,
             elapsed: 0,
@@ -357,7 +488,9 @@ impl Anim {
     }
 
     pub fn update(&mut self, millis: u32) -> bool {
-        if self.marked_for_removal.get() { return false; }
+        if self.marked_for_removal.get() {
+            return false;
+        }
 
         let elapsed = self.elapsed + millis;
         self.elapsed = elapsed;
@@ -371,15 +504,20 @@ impl Anim {
             }
         }
 
-        if (self.duration_millis.less_than(elapsed) && self.ok_to_remove()) || self.marked_for_removal.get() {
+        if (self.duration_millis.less_than(elapsed) && self.ok_to_remove())
+            || self.marked_for_removal.get()
+        {
             false
         } else {
             true
         }
     }
 
-    fn get_completion_callbacks(&mut self, update_cbs: &mut Vec<Box<ScriptCallback>>,
-                                complete_cbs: &mut Vec<Box<ScriptCallback>>) {
+    fn get_completion_callbacks(
+        &mut self,
+        update_cbs: &mut Vec<Box<ScriptCallback>>,
+        complete_cbs: &mut Vec<Box<ScriptCallback>>,
+    ) {
         for cb in self.update_callbacks.drain(..) {
             update_cbs.push(cb.1);
         }
@@ -405,23 +543,41 @@ impl Anim {
         match self.kind {
             EntityImageLayer { ref images } => {
                 self.owner.borrow_mut().actor.add_anim_image_layers(images);
-            },
-            EntityColor { ref mut color, ref mut color_sec } =>
-                entity_color_animation::update(color, color_sec, &self.owner, millis),
-            EntityDeath { ref mut color, ref mut color_sec } =>
-                entity_color_animation::update(color, color_sec, &self.owner, millis),
-            EntitySubpos { ref mut x, ref mut y } =>
-                entity_subpos_animation::update(x, y, &self.owner, millis),
-            EntityScale { ref mut scale } =>
-                entity_scale_animation::update(scale, &self.owner, millis),
-            MeleeAttack { ref mut model } =>
-                melee_attack_animation::update(&self.owner, model, frac),
-            RangedAttack { ref mut model } =>
-                ranged_attack_animation::update(&self.owner, model, frac),
-            Move { ref mut model } =>
-                move_animation::update(&self.owner, &self.marked_for_removal, model, millis),
-            ParticleGenerator { ref mut model, ref mut state } =>
-                particle_generator::update(&self.owner, model, state, &self.marked_for_removal, millis),
+            }
+            EntityColor {
+                ref mut color,
+                ref mut color_sec,
+            } => entity_color_animation::update(color, color_sec, &self.owner, millis),
+            EntityDeath {
+                ref mut color,
+                ref mut color_sec,
+            } => entity_color_animation::update(color, color_sec, &self.owner, millis),
+            EntitySubpos {
+                ref mut x,
+                ref mut y,
+            } => entity_subpos_animation::update(x, y, &self.owner, millis),
+            EntityScale { ref mut scale } => {
+                entity_scale_animation::update(scale, &self.owner, millis)
+            }
+            MeleeAttack { ref mut model } => {
+                melee_attack_animation::update(&self.owner, model, frac)
+            }
+            RangedAttack { ref mut model } => {
+                ranged_attack_animation::update(&self.owner, model, frac)
+            }
+            Move { ref mut model } => {
+                move_animation::update(&self.owner, &self.marked_for_removal, model, millis)
+            }
+            ParticleGenerator {
+                ref mut model,
+                ref mut state,
+            } => particle_generator::update(
+                &self.owner,
+                model,
+                state,
+                &self.marked_for_removal,
+                millis,
+            ),
             _ => (),
         }
     }
@@ -430,8 +586,11 @@ impl Anim {
         use self::AnimKind::*;
         match self.kind {
             EntityImageLayer { ref images } => {
-                self.owner.borrow_mut().actor.remove_anim_image_layers(images);
-            },
+                self.owner
+                    .borrow_mut()
+                    .actor
+                    .remove_anim_image_layers(images);
+            }
             EntityColor { .. } => entity_color_animation::cleanup(&self.owner),
             EntitySubpos { .. } => entity_subpos_animation::cleanup(&self.owner),
             EntityScale { .. } => entity_scale_animation::cleanup(&self.owner),
@@ -441,24 +600,42 @@ impl Anim {
             EntityDeath { .. } => {
                 entity_color_animation::cleanup(&self.owner);
                 self.owner.borrow_mut().marked_for_removal = true;
-            },
+            }
             _ => (),
         }
     }
 
-    pub fn draw(&self, renderer: &mut GraphicsRenderer, offset_x: f32, offset_y: f32,
-                          scale_x: f32, scale_y: f32, millis: u32) {
+    pub fn draw(
+        &self,
+        renderer: &mut GraphicsRenderer,
+        offset_x: f32,
+        offset_y: f32,
+        scale_x: f32,
+        scale_y: f32,
+        millis: u32,
+    ) {
         use self::AnimKind::*;
         match self.kind {
-            RangedAttack { ref model } =>
-                ranged_attack_animation::draw(model, renderer, offset_x, offset_y,
-                                              scale_x, scale_y, millis),
-            ParticleGenerator { ref state, ref model } =>
-                particle_generator::draw(state, model, &self.owner, renderer,
-                                         offset_x, offset_y, scale_x, scale_y, millis),
-            Move { ref model } =>
-                move_animation::draw(model, renderer, offset_x, offset_y,
-                                     scale_x, scale_y, millis),
+            RangedAttack { ref model } => ranged_attack_animation::draw(
+                model, renderer, offset_x, offset_y, scale_x, scale_y, millis,
+            ),
+            ParticleGenerator {
+                ref state,
+                ref model,
+            } => particle_generator::draw(
+                state,
+                model,
+                &self.owner,
+                renderer,
+                offset_x,
+                offset_y,
+                scale_x,
+                scale_y,
+                millis,
+            ),
+            Move { ref model } => move_animation::draw(
+                model, renderer, offset_x, offset_y, scale_x, scale_y, millis,
+            ),
             _ => (),
         }
     }
@@ -481,9 +658,12 @@ impl Anim {
 
     pub fn add_removal_listener(&self, effect: &mut Effect) {
         let marked_for_removal = Rc::clone(&self.marked_for_removal);
-        effect.removal_listeners.add(ChangeListener::new("anim", Box::new(move |_| {
-            marked_for_removal.set(true);
-        })));
+        effect.removal_listeners.add(ChangeListener::new(
+            "anim",
+            Box::new(move |_| {
+                marked_for_removal.set(true);
+            }),
+        ));
     }
 
     pub fn get_marked_for_removal(&self) -> Rc<Cell<bool>> {
@@ -509,7 +689,7 @@ impl Anim {
             Move { .. } => true,
             Wait => true,
             NonBlockingWait => false,
-            ParticleGenerator { model, ..} => model.is_blocking,
+            ParticleGenerator { model, .. } => model.is_blocking,
             EntityDeath { .. } => true,
         }
     }
@@ -518,8 +698,7 @@ impl Anim {
 /// Helper function to return the number of frames elapsed for the 'elapsed'
 /// duration.  This is equal to the duration divided by 'frame_time'.  The
 /// value is capped by 'max_index'
-pub fn get_current_frame(elapsed: Duration, frame_time:
-                         u32, max_index: usize) -> usize {
+pub fn get_current_frame(elapsed: Duration, frame_time: u32, max_index: usize) -> usize {
     let millis = util::get_elapsed_millis(elapsed);
 
     let frame_index = (millis / frame_time) as usize;

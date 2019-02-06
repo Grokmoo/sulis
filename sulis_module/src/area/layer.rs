@@ -14,12 +14,12 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::rc::Rc;
 use std::io::Error;
+use std::rc::Rc;
 
+use crate::area::{AreaBuilder, Tile};
 use sulis_core::resource::{ResourceSet, Spritesheet};
 use sulis_core::util::{invalid_data_error, Point};
-use crate::area::{AreaBuilder, Tile};
 
 pub struct Layer {
     pub id: String,
@@ -29,20 +29,23 @@ pub struct Layer {
     passable: Vec<bool>,
     visible: Vec<bool>,
     spritesheet_id: Option<String>,
-    pub (in crate::area) impass_override_tiles: Vec<(Point, Rc<Tile>)>,
+    pub(in crate::area) impass_override_tiles: Vec<(Point, Rc<Tile>)>,
 }
 
 impl Layer {
-    pub fn new(builder: &AreaBuilder, id: String,
-               tiles: Vec<Vec<Rc<Tile>>>) -> Result<Layer, Error> {
+    pub fn new(
+        builder: &AreaBuilder,
+        id: String,
+        tiles: Vec<Vec<Rc<Tile>>>,
+    ) -> Result<Layer, Error> {
         let width = builder.width as i32;
         let height = builder.height as i32;
         let dim = (width * height) as usize;
 
         let mut impass_overrides = Vec::new();
-        let mut display: Vec<Vec<Rc<Tile>>> = vec![Vec::new();dim];
-        let mut passable: Vec<bool> = vec![true;dim];
-        let mut visible: Vec<bool> = vec![true;dim];
+        let mut display: Vec<Vec<Rc<Tile>>> = vec![Vec::new(); dim];
+        let mut passable: Vec<bool> = vec![true; dim];
+        let mut visible: Vec<bool> = vec![true; dim];
         let mut spritesheet_id: Option<String> = None;
 
         trace!("Creating layer '{}' with size: {} x {}", id, width, height);
@@ -52,8 +55,11 @@ impl Layer {
                     None => spritesheet_id = Some(tile.image_display.sheet_id.to_string()),
                     Some(ref id) => {
                         if id != &tile.image_display.sheet_id {
-                            return invalid_data_error(&format!("All tiles in a layer must be from the same \
-                                                           spritesheet: '{}' vs '{}'", id, tile.id));
+                            return invalid_data_error(&format!(
+                                "All tiles in a layer must be from the same \
+                                 spritesheet: '{}' vs '{}'",
+                                id, tile.id
+                            ));
                         }
                     }
                 }
@@ -65,20 +71,25 @@ impl Layer {
 
                 for p in tile.impass.iter() {
                     let index = (base_x + p.x + (base_y + p.y) * width) as usize;
-                    if index >= dim { continue; }
+                    if index >= dim {
+                        continue;
+                    }
                     passable[index] = false;
                 }
 
                 for p in tile.invis.iter() {
                     let p_index = (base_x + p.x + (base_y + p.y) * width) as usize;
-                    if p_index >= dim { continue; }
+                    if p_index >= dim {
+                        continue;
+                    }
                     visible[p_index] = false;
                 }
 
                 if base_x + tile.width > width || base_y + tile.height > height {
-                    return invalid_data_error(
-                        &format!("Tile '{}' at [{}, {}] extends past area boundary.",
-                                 tile.id, base_x, base_y));
+                    return invalid_data_error(&format!(
+                        "Tile '{}' at [{}, {}] extends past area boundary.",
+                        tile.id, base_x, base_y
+                    ));
                 }
 
                 if tile.override_impass {

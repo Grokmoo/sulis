@@ -14,18 +14,18 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::path::{Path, PathBuf};
 use std::fs::{self, File};
-use std::io::{Read, Error};
+use std::io::{Error, Read};
+use std::path::{Path, PathBuf};
 use std::time;
 
 use chrono::prelude::*;
 
-use sulis_core::{config, util::self, serde_json};
-use sulis_core::resource::{read_single_resource_path, write_json_to_file};
-use sulis_core::util::{invalid_data_error};
-use sulis_module::Module;
 use crate::{GameState, SaveState};
+use sulis_core::resource::{read_single_resource_path, write_json_to_file};
+use sulis_core::util::invalid_data_error;
+use sulis_core::{config, serde_json, util};
+use sulis_module::Module;
 
 #[derive(Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -40,7 +40,7 @@ impl SaveFile {
 
         match resource {
             Ok(resource) => Ok(resource),
-            Err(error) => invalid_data_error(&format!("{}", error))
+            Err(error) => invalid_data_error(&format!("{}", error)),
         }
     }
 }
@@ -95,21 +95,26 @@ pub fn create_save() -> Result<(), Error> {
 
     let meta = create_meta_data(utc.format("%c").to_string());
 
-    info!("  Filename and meta data creation complete in {} secs",
-          util::format_elapsed_secs(start_time.elapsed()));
+    info!(
+        "  Filename and meta data creation complete in {} secs",
+        util::format_elapsed_secs(start_time.elapsed())
+    );
 
     let state = SaveState::create();
 
-    let save = SaveFile {
-        meta,
-        state,
-    };
+    let save = SaveFile { meta, state };
 
-    info!("  Save data created in {} secs", util::format_elapsed_secs(start_time.elapsed()));
+    info!(
+        "  Save data created in {} secs",
+        util::format_elapsed_secs(start_time.elapsed())
+    );
 
     let result = write_json_to_file(path.as_path(), &save);
 
-    info!("  Save to disk complete in {} secs", util::format_elapsed_secs(start_time.elapsed()));
+    info!(
+        "  Save to disk complete in {} secs",
+        util::format_elapsed_secs(start_time.elapsed())
+    );
 
     result
 }
@@ -131,7 +136,9 @@ fn create_meta_data(datetime: String) -> SaveFileMetaData {
 
 pub fn has_available_save_files() -> bool {
     let dir = get_save_dir();
-    if !dir.is_dir() { return false; }
+    if !dir.is_dir() {
+        return false;
+    }
 
     let dir_entries = match fs::read_dir(dir) {
         Err(_) => return false,
@@ -145,14 +152,18 @@ pub fn has_available_save_files() -> bool {
         };
 
         let path = entry.path();
-        if !path.is_file() { continue; }
+        if !path.is_file() {
+            continue;
+        }
 
         let extension = match path.extension() {
             None => continue,
             Some(ext) => ext.to_string_lossy(),
         };
 
-        if extension != "json" { continue; }
+        if extension != "json" {
+            continue;
+        }
 
         return true;
     }
@@ -175,17 +186,18 @@ fn create_error_meta(path: PathBuf, error: Error) -> SaveFileMetaData {
             warn!("Unable to get metadata for invalid save file at {:?}", path);
             warn!("{}", e);
             Utc::now()
-        },
-        Ok(meta) => {
-            match meta.created() {
-                Err(e) => {
-                    warn!("Unable to get creation time for invalid save file at {:?}", path);
-                    warn!("{}", e);
-                    Utc::now()
-                },
-                Ok(time) => DateTime::from(time)
-            }
         }
+        Ok(meta) => match meta.created() {
+            Err(e) => {
+                warn!(
+                    "Unable to get creation time for invalid save file at {:?}",
+                    path
+                );
+                warn!("{}", e);
+                Utc::now()
+            }
+            Ok(time) => DateTime::from(time),
+        },
     };
 
     let datetime = time.format("%c").to_string();
@@ -216,14 +228,18 @@ pub fn get_available_save_files() -> Result<Vec<SaveFileMetaData>, Error> {
         let entry = entry?;
 
         let path = entry.path();
-        if !path.is_file() { continue; }
+        if !path.is_file() {
+            continue;
+        }
 
         let extension = match path.extension() {
             None => continue,
             Some(ext) => ext.to_string_lossy(),
         };
 
-        if extension != "json" { continue; }
+        if extension != "json" {
+            continue;
+        }
 
         let path_buf = path.to_path_buf();
 
@@ -257,11 +273,9 @@ fn time_modified(data: &SaveFileMetaData) -> time::SystemTime {
     let metadata = fs::metadata(data.path.as_path());
 
     match metadata {
-        Ok(metadata) => {
-            match metadata.modified() {
-                Ok(time) => time,
-                Err(_) => time::UNIX_EPOCH,
-            }
+        Ok(metadata) => match metadata.modified() {
+            Ok(time) => time,
+            Err(_) => time::UNIX_EPOCH,
         },
         Err(_) => time::UNIX_EPOCH,
     }

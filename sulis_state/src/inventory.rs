@@ -14,16 +14,18 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::io::Error;
-use std::slice::Iter;
-use std::rc::Rc;
 use std::collections::HashMap;
+use std::io::Error;
+use std::rc::Rc;
+use std::slice::Iter;
 
+use crate::ItemState;
 use sulis_core::image::Image;
 use sulis_core::util::invalid_data_error;
-use sulis_module::{Actor, ImageLayer, Module, ItemSaveState, StatList, Slot, ItemKind,
-    WeaponStyle, bonus::AttackKindBuilder, QuickSlot};
-use crate::{ItemState};
+use sulis_module::{
+    bonus::AttackKindBuilder, Actor, ImageLayer, ItemKind, ItemSaveState, Module, QuickSlot, Slot,
+    StatList, WeaponStyle,
+};
 
 #[derive(Clone)]
 pub struct Inventory {
@@ -39,12 +41,17 @@ impl Inventory {
         }
     }
 
-    pub fn load(&mut self, equipped: Vec<Option<ItemSaveState>>,
-                quick: Vec<Option<ItemSaveState>>) -> Result<(), Error> {
+    pub fn load(
+        &mut self,
+        equipped: Vec<Option<ItemSaveState>>,
+        quick: Vec<Option<ItemSaveState>>,
+    ) -> Result<(), Error> {
         for (slot_index, slot) in Slot::iter().enumerate() {
             let slot = *slot;
 
-            if slot_index > equipped.len() { break; }
+            if slot_index > equipped.len() {
+                break;
+            }
             let item = match &equipped[slot_index] {
                 None => continue,
                 Some(item) => item,
@@ -57,9 +64,9 @@ impl Inventory {
 
             {
                 let equippable = match item_state.item.equippable {
-                    None =>
-                        invalid_data_error(&format!("Item in slot '{:?}' is not equippable",
-                            slot)),
+                    None => {
+                        invalid_data_error(&format!("Item in slot '{:?}' is not equippable", slot))
+                    }
                     Some(ref equip) => Ok(equip),
                 }?;
 
@@ -70,8 +77,10 @@ impl Inventory {
                     };
 
                     if !ok {
-                        return invalid_data_error(
-                            &format!("item in slot '{:?}' invalid equip type", slot));
+                        return invalid_data_error(&format!(
+                            "item in slot '{:?}' invalid equip type",
+                            slot
+                        ));
                     }
                 }
             }
@@ -82,7 +91,9 @@ impl Inventory {
         for (quick_index, quick_slot) in QuickSlot::iter().enumerate() {
             let quick_slot = *quick_slot;
 
-            if quick_index > quick.len() { break; }
+            if quick_index > quick.len() {
+                break;
+            }
             let item = match &quick[quick_index] {
                 None => continue,
                 Some(item) => item,
@@ -99,54 +110,53 @@ impl Inventory {
         Ok(())
     }
 
-    fn weapon_style_internal(&self, main: Option<&ItemState>,
-                             off: Option<&ItemState>) -> WeaponStyle {
+    fn weapon_style_internal(
+        &self,
+        main: Option<&ItemState>,
+        off: Option<&ItemState>,
+    ) -> WeaponStyle {
         match off {
             None => (),
-            Some(ref item_state) => {
-                match item_state.item.kind {
-                    ItemKind::Armor { .. } => return WeaponStyle::Shielded,
-                    ItemKind::Weapon { .. } => {
-                        match main {
-                            None => return WeaponStyle::Single,
-                            Some(_) => return WeaponStyle::DualWielding,
-                        }
-                    }
-                    ItemKind::Other => (),
-                }
-            }
+            Some(ref item_state) => match item_state.item.kind {
+                ItemKind::Armor { .. } => return WeaponStyle::Shielded,
+                ItemKind::Weapon { .. } => match main {
+                    None => return WeaponStyle::Single,
+                    Some(_) => return WeaponStyle::DualWielding,
+                },
+                ItemKind::Other => (),
+            },
         }
 
         match main {
             None => return WeaponStyle::Single,
-            Some(ref item_state) => {
-                match &item_state.item.equippable {
-                    Some(ref equippable) => {
-                        match equippable.attack {
-                            Some(ref attack_builder) => {
-                                if let AttackKindBuilder::Ranged { .. } = attack_builder.kind {
-                                    return WeaponStyle::Ranged;
-                                }
-                            },
-                            _ => (),
+            Some(ref item_state) => match &item_state.item.equippable {
+                Some(ref equippable) => {
+                    match equippable.attack {
+                        Some(ref attack_builder) => {
+                            if let AttackKindBuilder::Ranged { .. } = attack_builder.kind {
+                                return WeaponStyle::Ranged;
+                            }
                         }
+                        _ => (),
+                    }
 
-                        match equippable.blocks_slot {
-                            Some(Slot::HeldOff) => return WeaponStyle::TwoHanded,
-                            _ => (),
-                        }
+                    match equippable.blocks_slot {
+                        Some(Slot::HeldOff) => return WeaponStyle::TwoHanded,
+                        _ => (),
+                    }
 
-                        WeaponStyle::Single
-                    },
-                    None => unreachable!(),
+                    WeaponStyle::Single
                 }
-            }
+                None => unreachable!(),
+            },
         }
     }
 
     pub fn alt_weapon_style(&self) -> WeaponStyle {
-        self.weapon_style_internal(self.quick(QuickSlot::AltHeldMain),
-                                   self.quick(QuickSlot::AltHeldOff))
+        self.weapon_style_internal(
+            self.quick(QuickSlot::AltHeldMain),
+            self.quick(QuickSlot::AltHeldOff),
+        )
     }
 
     pub fn weapon_style(&self) -> WeaponStyle {
@@ -202,18 +212,26 @@ impl Inventory {
 
     /// Returns true if the given item can be set to the given quick slot,
     /// false otherwise
-    pub fn can_set_quick(&mut self, item_state: &ItemState,
-                         slot: QuickSlot, actor: &Rc<Actor>) -> bool {
+    pub fn can_set_quick(
+        &mut self,
+        item_state: &ItemState,
+        slot: QuickSlot,
+        actor: &Rc<Actor>,
+    ) -> bool {
         use sulis_module::QuickSlot::*;
         match slot {
             Usable1 | Usable2 | Usable3 | Usable4 => {
-                if !item_state.item.meets_prereqs(actor) { return false; }
-                if item_state.item.usable.is_none() { return false; }
-            },
+                if !item_state.item.meets_prereqs(actor) {
+                    return false;
+                }
+                if item_state.item.usable.is_none() {
+                    return false;
+                }
+            }
             AltHeldMain | AltHeldOff => {
                 // TODO validate - this code path is only being used
                 // when loading actors from a file
-            },
+            }
         }
 
         true
@@ -228,15 +246,27 @@ impl Inventory {
 
     /// Returns true if the given item can be equipped - use ActorState::can_equip as it
     /// checks all conditions including these
-    pub(crate) fn can_equip(&self, item_state: &ItemState,
-                            stats: &StatList, actor: &Rc<Actor>) -> bool {
-        if !item_state.item.meets_prereqs(actor) { return false; }
-        if !has_proficiency(item_state, stats) { return false; }
+    pub(crate) fn can_equip(
+        &self,
+        item_state: &ItemState,
+        stats: &StatList,
+        actor: &Rc<Actor>,
+    ) -> bool {
+        if !item_state.item.meets_prereqs(actor) {
+            return false;
+        }
+        if !has_proficiency(item_state, stats) {
+            return false;
+        }
 
-        if item_state.item.equippable.is_none() { return false; }
+        if item_state.item.equippable.is_none() {
+            return false;
+        }
 
         let slot = item_state.item.equippable.as_ref().unwrap().slot;
-        if actor.race.is_disabled(slot) { return false; }
+        if actor.race.is_disabled(slot) {
+            return false;
+        }
 
         true
     }
@@ -245,19 +275,22 @@ impl Inventory {
     /// with `can_equip` first.  Returns a vec of any items that were unequipped as
     /// a result of equipping this item
     #[must_use]
-    pub fn equip(&mut self, item_state: ItemState,
-                 preferred_slot: Option<Slot>) -> Vec<ItemState> {
+    pub fn equip(&mut self, item_state: ItemState, preferred_slot: Option<Slot>) -> Vec<ItemState> {
         let mut unequipped = Vec::new();
 
         let (slot, alt_slot, blocked_slot) = match &item_state.item.equippable {
             None => {
-                warn!("Attempted to equip invalid item '{}'.  This is a bug.",
-                      item_state.item.id);
+                warn!(
+                    "Attempted to equip invalid item '{}'.  This is a bug.",
+                    item_state.item.id
+                );
                 return Vec::new();
-            },
-            Some(ref equippable) => {
-                (equippable.slot, equippable.alternate_slot, equippable.blocks_slot)
             }
+            Some(ref equippable) => (
+                equippable.slot,
+                equippable.alternate_slot,
+                equippable.blocks_slot,
+            ),
         };
 
         // determine the blocking slots that will need to be removed for both
@@ -285,46 +318,75 @@ impl Inventory {
 
         // now determine whether to go with primary or alt based on how many
         // items need to be removed from each.  prefer primary in a tie
-        let slot_to_use = self.determine_slot_to_equip(slot, alt_slot, preferred_slot,
-                                                       to_remove_primary, to_remove_alt);
+        let slot_to_use = self.determine_slot_to_equip(
+            slot,
+            alt_slot,
+            preferred_slot,
+            to_remove_primary,
+            to_remove_alt,
+        );
 
         if let Some(slot) = to_remove_primary {
-            if let Some(item) = self.unequip(slot) { unequipped.push(item); }
+            if let Some(item) = self.unequip(slot) {
+                unequipped.push(item);
+            }
         }
 
-        if let Some(item) = self.unequip(slot_to_use) { unequipped.push(item); }
+        if let Some(item) = self.unequip(slot_to_use) {
+            unequipped.push(item);
+        }
 
         if let Some(blocked_slot) = blocked_slot {
-            if let Some(item) = self.unequip(blocked_slot) { unequipped.push(item); }
+            if let Some(item) = self.unequip(blocked_slot) {
+                unequipped.push(item);
+            }
         }
 
-        debug!("Equipping item '{}' into '{:?}'", item_state.item.id, slot_to_use);
+        debug!(
+            "Equipping item '{}' into '{:?}'",
+            item_state.item.id, slot_to_use
+        );
         self.equipped.insert(slot_to_use, item_state);
 
         debug!("Unequip: {:?}", unequipped);
         unequipped
     }
 
-    fn determine_slot_to_equip(&self, slot: Slot, alt_slot: Option<Slot>,
-                               preferred_slot: Option<Slot>,
-                               to_remove_primary: Option<Slot>,
-                               to_remove_alt: Option<Slot>) -> Slot {
+    fn determine_slot_to_equip(
+        &self,
+        slot: Slot,
+        alt_slot: Option<Slot>,
+        preferred_slot: Option<Slot>,
+        to_remove_primary: Option<Slot>,
+        to_remove_alt: Option<Slot>,
+    ) -> Slot {
         let alt_slot = match alt_slot {
             None => return slot,
             Some(slot) => slot,
         };
 
         if let Some(preferred_slot) = preferred_slot {
-            if preferred_slot == slot { return slot; }
-            else if preferred_slot == alt_slot { return alt_slot; }
+            if preferred_slot == slot {
+                return slot;
+            } else if preferred_slot == alt_slot {
+                return alt_slot;
+            }
         }
 
         let mut alt_count = 0;
         let mut primary_count = 0;
-        if to_remove_primary.is_some() { primary_count += 1; }
-        if self.equipped.get(&slot).is_some() { primary_count += 1; }
-        if to_remove_alt.is_some() { alt_count += 1; }
-        if self.equipped.get(&alt_slot).is_some() { alt_count += 1; }
+        if to_remove_primary.is_some() {
+            primary_count += 1;
+        }
+        if self.equipped.get(&slot).is_some() {
+            primary_count += 1;
+        }
+        if to_remove_alt.is_some() {
+            alt_count += 1;
+        }
+        if self.equipped.get(&alt_slot).is_some() {
+            alt_count += 1;
+        }
 
         if alt_count < primary_count {
             alt_slot
@@ -396,7 +458,7 @@ impl<'a> Iterator for EquippedIterator<'a> {
 
             match self.inventory.equipped.get(&slot) {
                 None => (),
-                Some(item_state) => return Some(item_state)
+                Some(item_state) => return Some(item_state),
             }
         }
     }

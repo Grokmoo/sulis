@@ -14,18 +14,18 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::collections::HashMap;
-use std::rc::Rc;
-use std::io::Error;
-use std::hash::{Hash, Hasher};
 use std::cmp::Ordering;
+use std::collections::HashMap;
+use std::hash::{Hash, Hasher};
+use std::io::Error;
+use std::rc::Rc;
 
+use crate::rules::Time;
 use sulis_core::image::Image;
 use sulis_core::resource::ResourceSet;
 use sulis_core::util::{unable_to_create_error, Point};
-use crate::rules::Time;
 
-use crate::{Conversation, Module, on_trigger};
+use crate::{on_trigger, Conversation, Module};
 
 pub struct WorldMap {
     pub size: (f32, f32),
@@ -99,12 +99,15 @@ pub struct Campaign {
 
 impl Campaign {
     pub fn new(builder: CampaignBuilder) -> Result<Campaign, Error> {
-
         let backstory_conversation = match Module::conversation(&builder.backstory_conversation) {
             None => {
-                warn!("Backstory conversation '{}' not found", &builder.backstory_conversation);
+                warn!(
+                    "Backstory conversation '{}' not found",
+                    &builder.backstory_conversation
+                );
                 return unable_to_create_error("module", &builder.name);
-            }, Some(convo) => convo,
+            }
+            Some(convo) => convo,
         };
 
         let mut locations = Vec::new();
@@ -113,7 +116,8 @@ impl Campaign {
                 None => {
                     warn!("Invalid image for '{}': '{}'", id, location.icon);
                     return unable_to_create_error("module", &builder.name);
-                }, Some(img) => img,
+                }
+                Some(img) => img,
             };
 
             locations.push(WorldMapLocation {
@@ -146,7 +150,7 @@ impl Campaign {
                 size: builder.world_map.size,
                 offset: builder.world_map.offset,
                 locations,
-            }
+            },
         })
     }
 }
@@ -176,9 +180,9 @@ pub struct WorldMapLocationBuilder {
     pub position: (f32, f32),
     pub icon: String,
 
-    #[serde(default="bool_true")]
+    #[serde(default = "bool_true")]
     pub initially_enabled: bool,
-    #[serde(default="bool_true")]
+    #[serde(default = "bool_true")]
     pub initially_visible: bool,
 
     pub linked_area: Option<String>,
@@ -189,7 +193,9 @@ pub struct WorldMapLocationBuilder {
     pub travel_times: HashMap<String, u32>,
 }
 
-fn bool_true() -> bool { true }
+fn bool_true() -> bool {
+    true
+}
 
 #[derive(Deserialize, Debug)]
 #[serde(deny_unknown_fields)]

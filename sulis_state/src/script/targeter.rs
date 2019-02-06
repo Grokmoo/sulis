@@ -20,7 +20,7 @@ use sulis_module::{Module, OnTrigger};
 
 use crate::script::area_targeter::Shape;
 use crate::script::{AreaTargeter, Result, ScriptEntity, ScriptEntitySet, ScriptItemKind};
-use crate::{GameState};
+use crate::GameState;
 
 #[derive(Clone)]
 pub enum Kind {
@@ -174,15 +174,21 @@ impl UserData for TargeterData {
             targeter.on_target_select_func = func;
             Ok(())
         });
-        methods.add_method_mut("set_callback_custom_target", |_, targeter, target: ScriptEntity| {
-            let index = target.try_unwrap_index()?;
-            targeter.on_target_select_custom_target = Some(index);
-            Ok(())
-        });
-        methods.add_method_mut("add_all_selectable", |_, targeter, selectable: ScriptEntitySet| {
-            targeter.selectable.append(&mut selectable.indices.clone());
-            Ok(())
-        });
+        methods.add_method_mut(
+            "set_callback_custom_target",
+            |_, targeter, target: ScriptEntity| {
+                let index = target.try_unwrap_index()?;
+                targeter.on_target_select_custom_target = Some(index);
+                Ok(())
+            },
+        );
+        methods.add_method_mut(
+            "add_all_selectable",
+            |_, targeter, selectable: ScriptEntitySet| {
+                targeter.selectable.append(&mut selectable.indices.clone());
+                Ok(())
+            },
+        );
         methods.add_method_mut("add_selectable", |_, targeter, target: ScriptEntity| {
             let index = target.try_unwrap_index()?;
             targeter.selectable.push(Some(index));
@@ -197,45 +203,60 @@ impl UserData for TargeterData {
             Ok(())
         });
 
-        methods.add_method_mut("impass_blocks_affected_points", |_, targeter, blocks: bool| {
-            targeter.impass_blocks_affected_points = blocks;
-            Ok(())
-        });
+        methods.add_method_mut(
+            "impass_blocks_affected_points",
+            |_, targeter, blocks: bool| {
+                targeter.impass_blocks_affected_points = blocks;
+                Ok(())
+            },
+        );
 
-        methods.add_method_mut("invis_blocks_affected_points", |_, targeter, blocks: bool| {
-            targeter.invis_blocks_affected_points = blocks;
-            Ok(())
-        });
+        methods.add_method_mut(
+            "invis_blocks_affected_points",
+            |_, targeter, blocks: bool| {
+                targeter.invis_blocks_affected_points = blocks;
+                Ok(())
+            },
+        );
 
-        methods.add_method_mut("allow_affected_points_impass", |_, targeter, allow: bool| {
-            targeter.allow_affected_points_impass = allow;
-            Ok(())
-        });
+        methods.add_method_mut(
+            "allow_affected_points_impass",
+            |_, targeter, allow: bool| {
+                targeter.allow_affected_points_impass = allow;
+                Ok(())
+            },
+        );
 
         methods.add_method_mut("allow_affected_points_invis", |_, targeter, allow: bool| {
             targeter.allow_affected_points_invis = allow;
             Ok(())
         });
 
-        methods.add_method_mut("set_free_select_must_be_passable", |_, targeter, val: String| {
-            match Module::object_size(&val) {
-                None => {
-                    warn!("No object size '{}' found", val);
-                    return Err(rlua::Error::FromLuaConversionError {
-                        from: "String",
-                        to: "ObjectSize",
-                        message: Some("Size must be the ID of a valid object size".to_string())
-                    });
-                },
-                Some(_) => (),
-            }
-            targeter.free_select_must_be_passable = Some(val);
-            Ok(())
-        });
-        methods.add_method_mut("add_all_effectable", |_, targeter, targets: ScriptEntitySet| {
-            targeter.effectable.append(&mut targets.indices.clone());
-            Ok(())
-        });
+        methods.add_method_mut(
+            "set_free_select_must_be_passable",
+            |_, targeter, val: String| {
+                match Module::object_size(&val) {
+                    None => {
+                        warn!("No object size '{}' found", val);
+                        return Err(rlua::Error::FromLuaConversionError {
+                            from: "String",
+                            to: "ObjectSize",
+                            message: Some("Size must be the ID of a valid object size".to_string()),
+                        });
+                    }
+                    Some(_) => (),
+                }
+                targeter.free_select_must_be_passable = Some(val);
+                Ok(())
+            },
+        );
+        methods.add_method_mut(
+            "add_all_effectable",
+            |_, targeter, targets: ScriptEntitySet| {
+                targeter.effectable.append(&mut targets.indices.clone());
+                Ok(())
+            },
+        );
         methods.add_method_mut("add_effectable", |_, targeter, target: ScriptEntity| {
             let index = target.try_unwrap_index()?;
             targeter.effectable.push(Some(index));
@@ -245,43 +266,59 @@ impl UserData for TargeterData {
             targeter.max_effectable = Some(max);
             Ok(())
         });
-        methods.add_method_mut("set_shape_circle", |_, targeter, (radius, min_radius):
-                               (f32, Option<f32>)| {
-            let min_radius = min_radius.unwrap_or(0.0);
-            targeter.shape = Shape::Circle { min_radius, radius };
-            Ok(())
-        });
-        methods.add_method_mut("set_shape_line", |_, targeter, (size, origin_x, origin_y, length):
-                               (String, i32, i32, i32)| {
-            match Module::object_size(&size) {
-                None => {
-                    warn!("No object size '{}' found", size);
-                    return Err(rlua::Error::FromLuaConversionError {
-                        from: "String",
-                        to: "ObjectSize",
-                        message: Some("Size must be the ID of a valid object size".to_string())
-                    });
-                }, Some(_) => (),
-            }
-            targeter.shape = Shape::Line { size, origin_x, origin_y, length };
-            Ok(())
-        });
-        methods.add_method_mut("set_shape_line_segment",
-                               |_, targeter, (size, origin_x, origin_y): (String, i32, i32)| {
-            match Module::object_size(&size) {
-                None => {
-                    warn!("No object size '{}' found", size);
-                    return Err(rlua::Error::FromLuaConversionError {
-                        from: "String",
-                        to: "ObjectSize",
-                        message: Some("Size must be the ID of a valid object size".to_string())
-                    });
-                },
-                Some(_) => (),
-            }
-            targeter.shape = Shape::LineSegment { size, origin_x, origin_y };
-            Ok(())
-        });
+        methods.add_method_mut(
+            "set_shape_circle",
+            |_, targeter, (radius, min_radius): (f32, Option<f32>)| {
+                let min_radius = min_radius.unwrap_or(0.0);
+                targeter.shape = Shape::Circle { min_radius, radius };
+                Ok(())
+            },
+        );
+        methods.add_method_mut(
+            "set_shape_line",
+            |_, targeter, (size, origin_x, origin_y, length): (String, i32, i32, i32)| {
+                match Module::object_size(&size) {
+                    None => {
+                        warn!("No object size '{}' found", size);
+                        return Err(rlua::Error::FromLuaConversionError {
+                            from: "String",
+                            to: "ObjectSize",
+                            message: Some("Size must be the ID of a valid object size".to_string()),
+                        });
+                    }
+                    Some(_) => (),
+                }
+                targeter.shape = Shape::Line {
+                    size,
+                    origin_x,
+                    origin_y,
+                    length,
+                };
+                Ok(())
+            },
+        );
+        methods.add_method_mut(
+            "set_shape_line_segment",
+            |_, targeter, (size, origin_x, origin_y): (String, i32, i32)| {
+                match Module::object_size(&size) {
+                    None => {
+                        warn!("No object size '{}' found", size);
+                        return Err(rlua::Error::FromLuaConversionError {
+                            from: "String",
+                            to: "ObjectSize",
+                            message: Some("Size must be the ID of a valid object size".to_string()),
+                        });
+                    }
+                    Some(_) => (),
+                }
+                targeter.shape = Shape::LineSegment {
+                    size,
+                    origin_x,
+                    origin_y,
+                };
+                Ok(())
+            },
+        );
         methods.add_method_mut("set_shape_object_size", |_, targeter, size: String| {
             match Module::object_size(&size) {
                 None => {
@@ -289,9 +326,9 @@ impl UserData for TargeterData {
                     return Err(rlua::Error::FromLuaConversionError {
                         from: "String",
                         to: "ObjectSize",
-                        message: Some("Size must be the ID of a valid object size".to_string())
+                        message: Some("Size must be the ID of a valid object size".to_string()),
                     });
-                },
+                }
                 Some(_) => (),
             }
             targeter.shape = Shape::ObjectSize { size };
@@ -310,7 +347,8 @@ fn activate(_lua: Context, data: &TargeterData, _args: ()) -> Result<()> {
     info!("Activating targeter");
 
     let parent = ScriptEntity::new(data.parent).try_unwrap()?;
-    if parent.borrow().is_party_member() && data.free_select.is_none() && data.selectable.is_empty() {
+    if parent.borrow().is_party_member() && data.free_select.is_none() && data.selectable.is_empty()
+    {
         let cb = OnTrigger::SayLine("No valid targets".to_string());
 
         GameState::add_ui_callback(vec![cb], &parent, &parent);

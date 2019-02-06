@@ -15,16 +15,16 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::collections::{HashMap, HashSet};
-use std::io::{Error};
+use std::io::Error;
 use std::rc::Rc;
 
+use sulis_core::resource::{ResourceSet, Sprite};
 use sulis_core::util::{invalid_data_error, unable_to_create_error, Point};
-use sulis_core::resource::{Sprite, ResourceSet};
 
 #[derive(Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct UniformSet {
-    pub size: [usize;2],
+    pub size: [usize; 2],
     pub layer: String,
     pub sprite_prefix: String,
     pub impass: Vec<Vec<usize>>,
@@ -35,7 +35,7 @@ pub struct UniformSet {
 #[derive(Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct NonUniformSet {
-    pub size: [usize;2],
+    pub size: [usize; 2],
     pub layer: String,
     pub sprite_prefix: String,
     pub tiles: HashMap<String, ImpassInvis>,
@@ -51,7 +51,7 @@ pub struct ImpassInvis {
 #[derive(Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct TileBuilder {
-    pub size: [usize;2],
+    pub size: [usize; 2],
     pub layer: String,
     pub sprite: String,
     pub impass: Option<Vec<Vec<usize>>>,
@@ -163,7 +163,7 @@ impl Tileset {
             for tile_id in uniform.tiles.iter() {
                 let id = format!("{}{}", prefix, tile_id);
                 let tile = TileBuilder {
-                    size: size,
+                    size,
                     layer: layer.to_string(),
                     sprite: id.to_string(),
                     impass: impass.clone(),
@@ -186,7 +186,7 @@ impl Tileset {
             for (tile_id, impass_invis) in non_uniform.tiles.iter() {
                 let id = format!("{}{}", prefix, tile_id);
                 let tile = TileBuilder {
-                    size: size,
+                    size,
                     layer: layer.to_string(),
                     sprite: id.to_string(),
                     impass: impass_invis.impass.clone(),
@@ -245,7 +245,9 @@ impl Tile {
             for x in 0..width {
                 for y in 0..height {
                     let p = Point::new(x as i32, y as i32);
-                    if pass_points.contains(&p) { continue; }
+                    if pass_points.contains(&p) {
+                        continue;
+                    }
 
                     impass_points.push(p);
                 }
@@ -267,7 +269,9 @@ impl Tile {
             for x in 0..width {
                 for y in 0..height {
                     let p = Point::new(x as i32, y as i32);
-                    if vis_points.contains(&p) { continue; }
+                    if vis_points.contains(&p) {
+                        continue;
+                    }
 
                     invis_points.push(p);
                 }
@@ -289,7 +293,12 @@ impl Tile {
     }
 }
 
-pub fn verify_point(kind: &str, width: usize, height: usize, p: Vec<usize>) -> Result<(i32, i32), Error> {
+pub fn verify_point(
+    kind: &str,
+    width: usize,
+    height: usize,
+    p: Vec<usize>,
+) -> Result<(i32, i32), Error> {
     if p.len() != 2 {
         return invalid_data_error(&format!("{} point array length is not equal to 2", kind));
     }
@@ -297,8 +306,10 @@ pub fn verify_point(kind: &str, width: usize, height: usize, p: Vec<usize>) -> R
     let x = p[0];
     let y = p[1];
     if x > width || y >= height {
-        return invalid_data_error(&format!("{} point has coordiantes greater than size {},{}",
-                                           kind, width, height));
+        return invalid_data_error(&format!(
+            "{} point has coordiantes greater than size {},{}",
+            kind, width, height
+        ));
     }
     Ok((x as i32, y as i32))
 }

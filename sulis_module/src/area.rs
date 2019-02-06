@@ -27,18 +27,18 @@ pub mod tile;
 pub use self::tile::Tile;
 pub use self::tile::Tileset;
 
-use std::collections::{HashSet, HashMap};
+use std::collections::{HashMap, HashSet};
 use std::io::{Error, ErrorKind};
 use std::rc::Rc;
 
-use serde::{Deserialize, Deserializer, Serializer};
 use serde::ser::{SerializeMap, SerializeStruct};
+use serde::{Deserialize, Deserializer, Serializer};
 
 use sulis_core::image::Image;
 use sulis_core::resource::{ResourceSet, Sprite};
-use sulis_core::util::{Point, Size, unable_to_create_error};
+use sulis_core::util::{unable_to_create_error, Point, Size};
 
-use crate::{Encounter, Module, ObjectSize, OnTrigger, Prop, ItemListEntrySaveState};
+use crate::{Encounter, ItemListEntrySaveState, Module, ObjectSize, OnTrigger, Prop};
 
 pub const MAX_AREA_SIZE: i32 = 128;
 
@@ -151,9 +151,12 @@ impl Area {
         for (index, t_builder) in builder.transitions.into_iter().enumerate() {
             let image = match ResourceSet::image(&t_builder.image_display) {
                 None => {
-                    warn!("Image '{}' not found for transition.", t_builder.image_display);
+                    warn!(
+                        "Image '{}' not found for transition.",
+                        t_builder.image_display
+                    );
                     continue;
-                },
+                }
                 Some(image) => image,
             };
 
@@ -161,7 +164,8 @@ impl Area {
                 None => {
                     warn!("Size '{}' not found for transition.", t_builder.size);
                     continue;
-                }, Some(ref size) => Rc::clone(size),
+                }
+                Some(ref size) => Rc::clone(size),
             };
 
             let p = t_builder.from;
@@ -175,8 +179,10 @@ impl Area {
                 continue;
             }
 
-            debug!("Created transition to '{:?}' at {},{}", t_builder.to,
-                   t_builder.from.x, t_builder.from.y);
+            debug!(
+                "Created transition to '{:?}' at {},{}",
+                t_builder.to, t_builder.from.x, t_builder.from.y
+            );
 
             let transition = Transition {
                 from: t_builder.from,
@@ -204,19 +210,20 @@ impl Area {
                 None => {
                     warn!("No encounter '{}' found", &encounter_builder.id);
                     return unable_to_create_error("area", &builder.id);
-                }, Some(encounter) => Rc::clone(encounter),
+                }
+                Some(encounter) => Rc::clone(encounter),
             };
 
             let mut encounter_triggers = Vec::new();
             for (index, trigger) in triggers.iter().enumerate() {
                 match trigger.kind {
-                    TriggerKind::OnEncounterCleared { encounter_location } |
-                        TriggerKind::OnEncounterActivated { encounter_location } => {
+                    TriggerKind::OnEncounterCleared { encounter_location }
+                    | TriggerKind::OnEncounterActivated { encounter_location } => {
                         if encounter_location == encounter_builder.location {
                             encounter_triggers.push(index);
                             used_triggers.insert(index);
                         }
-                    },
+                    }
                     _ => (),
                 }
             }
@@ -231,12 +238,15 @@ impl Area {
 
         for (index, trigger) in triggers.iter().enumerate() {
             match trigger.kind {
-                TriggerKind::OnEncounterCleared { encounter_location } |
-                    TriggerKind::OnEncounterActivated { encounter_location } => {
+                TriggerKind::OnEncounterCleared { encounter_location }
+                | TriggerKind::OnEncounterActivated { encounter_location } => {
                     if !used_triggers.contains(&index) {
-                        warn!("Invalid encounter trigger at point {:?}", encounter_location);
+                        warn!(
+                            "Invalid encounter trigger at point {:?}",
+                            encounter_location
+                        );
                     }
-                },
+                }
                 _ => (),
             }
         }
@@ -249,8 +259,8 @@ impl Area {
             name: builder.name,
             width: builder.width as i32,
             height: builder.height as i32,
-            layer_set: layer_set,
-            path_grids: path_grids,
+            layer_set,
+            path_grids,
             actors: builder.actors,
             encounters,
             props,
@@ -260,7 +270,8 @@ impl Area {
             triggers,
             vis_dist: builder.max_vis_distance,
             vis_dist_squared: builder.max_vis_distance * builder.max_vis_distance,
-            vis_dist_up_one_squared: builder.max_vis_up_one_distance * builder.max_vis_up_one_distance,
+            vis_dist_up_one_squared: builder.max_vis_up_one_distance
+                * builder.max_vis_up_one_distance,
             world_map_location: builder.world_map_location,
             on_rest: builder.on_rest,
             location_kind: builder.location_kind,
@@ -268,8 +279,12 @@ impl Area {
     }
 
     pub fn coords_valid(&self, x: i32, y: i32) -> bool {
-        if x < 0 || y < 0 { return false; }
-        if x >= self.width || y >= self.height { return false; }
+        if x < 0 || y < 0 {
+            return false;
+        }
+        if x >= self.width || y >= self.height {
+            return false;
+        }
 
         true
     }
@@ -302,16 +317,16 @@ pub struct AreaBuilder {
     pub transitions: Vec<TransitionBuilder>,
     pub triggers: Vec<TriggerBuilder>,
 
-    #[serde(serialize_with="ser_terrain", deserialize_with="de_terrain")]
+    #[serde(serialize_with = "ser_terrain", deserialize_with = "de_terrain")]
     pub terrain: Vec<Option<String>>,
 
-    #[serde(serialize_with="ser_walls", deserialize_with="de_walls")]
+    #[serde(serialize_with = "ser_walls", deserialize_with = "de_walls")]
     pub walls: Vec<(u8, Option<String>)>,
 
-    #[serde(serialize_with="ser_layer_set", deserialize_with="de_layer_set")]
+    #[serde(serialize_with = "ser_layer_set", deserialize_with = "de_layer_set")]
     pub layer_set: HashMap<String, Vec<Vec<u16>>>,
 
-    #[serde(serialize_with="as_base64", deserialize_with="from_base64")]
+    #[serde(serialize_with = "as_base64", deserialize_with = "from_base64")]
     pub elevation: Vec<u8>,
 }
 
@@ -322,8 +337,11 @@ struct U8WithKinds {
     entries: String,
 }
 
-fn entry_index<'a>(map: &mut HashMap<&'a str, u8>, index: &mut u8,
-               entry: &'a Option<String>) -> Result<u8, Error> {
+fn entry_index<'a>(
+    map: &mut HashMap<&'a str, u8>,
+    index: &mut u8,
+    entry: &'a Option<String>,
+) -> Result<u8, Error> {
     Ok(match entry {
         None => 255,
         Some(ref id) => {
@@ -334,8 +352,10 @@ fn entry_index<'a>(map: &mut HashMap<&'a str, u8>, index: &mut u8,
             });
 
             if *index > 254 {
-                return Err(Error::new(ErrorKind::InvalidInput,
-                                      "Can only serialize up to 255 wall kinds"));
+                return Err(Error::new(
+                    ErrorKind::InvalidInput,
+                    "Can only serialize up to 255 wall kinds",
+                ));
             }
 
             *index
@@ -343,9 +363,15 @@ fn entry_index<'a>(map: &mut HashMap<&'a str, u8>, index: &mut u8,
     })
 }
 
-fn serialize_u8_with_kinds<'a, S>(kinds: HashMap<&str, u8>, name: &'static str,
-    vec: Vec<u8>, serializer: S) -> Result<S::Ok, S::Error> where S:Serializer {
-
+fn serialize_u8_with_kinds<'a, S>(
+    kinds: HashMap<&str, u8>,
+    name: &'static str,
+    vec: Vec<u8>,
+    serializer: S,
+) -> Result<S::Ok, S::Error>
+where
+    S: Serializer,
+{
     let mut kinds: Vec<_> = kinds.into_iter().collect();
     kinds.sort_by_key(|k| k.1);
     let kinds = kinds.into_iter().map(|k| k.0).collect::<Vec<&str>>();
@@ -357,8 +383,9 @@ fn serialize_u8_with_kinds<'a, S>(kinds: HashMap<&str, u8>, name: &'static str,
 }
 
 fn de_terrain<'de, D>(deserializer: D) -> Result<Vec<Option<String>>, D::Error>
-    where D:Deserializer<'de> {
-
+where
+    D: Deserializer<'de>,
+{
     let input = U8WithKinds::deserialize(deserializer)?;
     use sulis_core::serde::de::Error;
     let vec_u8 = base64::decode(&input.entries).map_err(|err| Error::custom(err.to_string()))?;
@@ -366,7 +393,7 @@ fn de_terrain<'de, D>(deserializer: D) -> Result<Vec<Option<String>>, D::Error>
     let mut out = Vec::new();
     for entry in vec_u8 {
         let index = entry as usize;
-        if index== 255 {
+        if index == 255 {
             out.push(None);
         } else if index >= input.kinds.len() {
             return Err(Error::custom("Invalid base64 encoding in terrain index."));
@@ -378,9 +405,10 @@ fn de_terrain<'de, D>(deserializer: D) -> Result<Vec<Option<String>>, D::Error>
     Ok(out)
 }
 
-fn ser_terrain<S>(input: &Vec<Option<String>>,
-                  serializer: S) -> Result<S::Ok, S::Error> where S:Serializer {
-
+fn ser_terrain<S>(input: &Vec<Option<String>>, serializer: S) -> Result<S::Ok, S::Error>
+where
+    S: Serializer,
+{
     let mut kinds: HashMap<&str, u8> = HashMap::new();
     let mut terrain: Vec<u8> = Vec::new();
 
@@ -397,8 +425,9 @@ fn ser_terrain<S>(input: &Vec<Option<String>>,
 }
 
 fn de_walls<'de, D>(deserializer: D) -> Result<Vec<(u8, Option<String>)>, D::Error>
-    where D:Deserializer<'de> {
-
+where
+    D: Deserializer<'de>,
+{
     let input = U8WithKinds::deserialize(deserializer)?;
     use sulis_core::serde::de::Error;
     let vec_u8 = base64::decode(&input.entries).map_err(|err| Error::custom(err.to_string()))?;
@@ -406,7 +435,9 @@ fn de_walls<'de, D>(deserializer: D) -> Result<Vec<(u8, Option<String>)>, D::Err
     let mut out = Vec::new();
     let mut i = 0;
     loop {
-        if i + 2 > vec_u8.len() { return Err(Error::custom("Invalid base64 encoding in walls")); }
+        if i + 2 > vec_u8.len() {
+            return Err(Error::custom("Invalid base64 encoding in walls"));
+        }
 
         let elev = vec_u8[i + 1];
         let index = vec_u8[i] as usize;
@@ -420,14 +451,18 @@ fn de_walls<'de, D>(deserializer: D) -> Result<Vec<(u8, Option<String>)>, D::Err
         }
 
         i += 2;
-        if i == vec_u8.len() { break; }
+        if i == vec_u8.len() {
+            break;
+        }
     }
 
     Ok(out)
 }
 
-fn ser_walls<S>(input: &Vec<(u8, Option<String>)>,
-                serializer: S) -> Result<S::Ok, S::Error> where S: Serializer {
+fn ser_walls<S>(input: &Vec<(u8, Option<String>)>, serializer: S) -> Result<S::Ok, S::Error>
+where
+    S: Serializer,
+{
     let mut kinds: HashMap<&str, u8> = HashMap::new();
     let mut walls: Vec<u8> = Vec::new();
 
@@ -444,8 +479,13 @@ fn ser_walls<S>(input: &Vec<(u8, Option<String>)>,
     serialize_u8_with_kinds(kinds, "walls", walls, serializer)
 }
 
-fn ser_layer_set<S>(input: &HashMap<String, Vec<Vec<u16>>>,
-                    serializer: S) -> Result<S::Ok, S::Error> where S: Serializer {
+fn ser_layer_set<S>(
+    input: &HashMap<String, Vec<Vec<u16>>>,
+    serializer: S,
+) -> Result<S::Ok, S::Error>
+where
+    S: Serializer,
+{
     let mut map = serializer.serialize_map(Some(input.len()))?;
     for (key, vec) in input.iter() {
         let mut out: Vec<u8> = Vec::new();
@@ -462,8 +502,9 @@ fn ser_layer_set<S>(input: &HashMap<String, Vec<Vec<u16>>>,
 }
 
 fn de_layer_set<'de, D>(deserializer: D) -> Result<HashMap<String, Vec<Vec<u16>>>, D::Error>
-    where D: Deserializer<'de> {
-
+where
+    D: Deserializer<'de>,
+{
     let input: HashMap<String, String> = HashMap::deserialize(deserializer)?;
 
     let mut result: HashMap<String, Vec<Vec<u16>>> = HashMap::new();
@@ -481,7 +522,9 @@ fn de_layer_set<'de, D>(deserializer: D) -> Result<HashMap<String, Vec<Vec<u16>>
             let y = vec_u8[i + 2] as u16 * 256 + vec_u8[i + 3] as u16;
             result_vec.push(vec![x, y]);
 
-            if i + 4 == vec_u8.len() { break; }
+            if i + 4 == vec_u8.len() {
+                break;
+            }
 
             i += 4;
         }
@@ -491,13 +534,19 @@ fn de_layer_set<'de, D>(deserializer: D) -> Result<HashMap<String, Vec<Vec<u16>>
     Ok(result)
 }
 
-fn from_base64<'de, D>(deserializer: D) -> Result<Vec<u8>, D::Error> where D: Deserializer<'de> {
+fn from_base64<'de, D>(deserializer: D) -> Result<Vec<u8>, D::Error>
+where
+    D: Deserializer<'de>,
+{
     use sulis_core::serde::de::Error;
     let s = String::deserialize(deserializer)?;
     base64::decode(&s).map_err(|err| Error::custom(err.to_string()))
 }
 
-fn as_base64<S>(input: &[u8], serializer: S) -> Result<S::Ok, S::Error> where S: Serializer {
+fn as_base64<S>(input: &[u8], serializer: S) -> Result<S::Ok, S::Error>
+where
+    S: Serializer,
+{
     serializer.serialize_str(&base64::encode(input))
 }
 
@@ -510,9 +559,9 @@ pub enum LocationKind {
 }
 
 impl LocationKind {
-    pub fn iter() -> impl Iterator<Item=&'static LocationKind> {
+    pub fn iter() -> impl Iterator<Item = &'static LocationKind> {
         use crate::area::LocationKind::*;
-        [ Outdoors, Indoors, Underground].into_iter()
+        [Outdoors, Indoors, Underground].into_iter()
     }
 }
 

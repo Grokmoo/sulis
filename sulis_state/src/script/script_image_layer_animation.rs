@@ -14,16 +14,16 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::str::FromStr;
 use std::collections::HashMap;
+use std::str::FromStr;
 
 use rlua::{Context, UserData, UserDataMethods};
 
-use sulis_core::{util::ExtInt, resource::ResourceSet};
-use sulis_module::{ImageLayer};
-use crate::{GameState};
-use crate::animation::{Anim};
+use crate::animation::Anim;
 use crate::script::{CallbackData, Result};
+use crate::GameState;
+use sulis_core::{resource::ResourceSet, util::ExtInt};
+use sulis_module::ImageLayer;
 
 /// An animation that adds one or more ImageLayers to the parent creature
 /// for rendering.  These override any racial or inventory image layers, with
@@ -117,12 +117,13 @@ pub fn create_anim(data: &ScriptImageLayerAnimation) -> Result<Anim> {
     let mut images = HashMap::new();
     for (layer, ref image_id) in data.images.iter() {
         match ResourceSet::image(image_id) {
-            None =>
+            None => {
                 return Err(rlua::Error::FromLuaConversionError {
                     from: "String",
                     to: "Image",
                     message: Some(format!("No image with ID '{}'", image_id)),
-                }),
+                });
+            }
             Some(image) => images.insert(*layer, image),
         };
     }
@@ -139,4 +140,3 @@ pub fn create_anim(data: &ScriptImageLayerAnimation) -> Result<Anim> {
 
     Ok(anim)
 }
-

@@ -17,10 +17,14 @@
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use crate::{EntityState};
 use crate::animation::particle_generator::Param;
+use crate::EntityState;
 
-pub (in crate::animation) fn update(scale: &mut Param, owner: &Rc<RefCell<EntityState>>, millis: u32) {
+pub(in crate::animation) fn update(
+    scale: &mut Param,
+    owner: &Rc<RefCell<EntityState>>,
+    millis: u32,
+) {
     let secs = millis as f32 / 1000.0;
     let v_term = secs;
     let a_term = secs * secs;
@@ -31,6 +35,6 @@ pub (in crate::animation) fn update(scale: &mut Param, owner: &Rc<RefCell<Entity
     owner.borrow_mut().scale = scale.value;
 }
 
-pub (in crate::animation) fn cleanup(owner: &Rc<RefCell<EntityState>>) {
+pub(in crate::animation) fn cleanup(owner: &Rc<RefCell<EntityState>>) {
     owner.borrow_mut().scale = 1.0;
 }

@@ -15,16 +15,16 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::any::Any;
-use std::rc::Rc;
 use std::cell::RefCell;
+use std::rc::Rc;
 
 use sulis_core::io::event;
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_core::widgets::{Button, Label, TextArea};
-use sulis_module::{Ability, Conversation, Module, conversation::Response, OnTrigger};
+use sulis_module::{conversation::Response, Ability, Conversation, Module, OnTrigger};
 
-use crate::{CharacterBuilder};
 use crate::character_builder::BuilderPane;
+use crate::CharacterBuilder;
 
 pub const NAME: &str = "backstory_selector_pane";
 
@@ -113,17 +113,20 @@ impl WidgetKind for BackstorySelectorPane {
         }
 
         let start_over = Widget::with_theme(Button::empty(), "start_over");
-        start_over.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let (parent, pane) = Widget::parent_mut::<BackstorySelectorPane>(widget);
-            pane.cur_node = get_initial_node(&pane.convo);
-            pane.abilities.clear();
-            pane.set_next_enabled(&parent);
+        start_over
+            .borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(|widget, _| {
+                let (parent, pane) = Widget::parent_mut::<BackstorySelectorPane>(widget);
+                pane.cur_node = get_initial_node(&pane.convo);
+                pane.abilities.clear();
+                pane.set_next_enabled(&parent);
 
-            parent.borrow_mut().invalidate_children();
-        })));
+                parent.borrow_mut().invalidate_children();
+            })));
 
         vec![title, node_widget, responses, start_over]
-   }
+    }
 }
 
 struct ResponseButton {
@@ -156,12 +159,11 @@ impl WidgetKind for ResponseButton {
 
         for trigger in self.on_select.iter() {
             match trigger {
-                OnTrigger::PlayerAbility(ability_id) => {
-                    match Module::ability(ability_id) {
-                        None => {
-                            warn!("No ability found for '{}' in backstory", ability_id);
-                        }, Some(ability) => pane.abilities.push(ability),
+                OnTrigger::PlayerAbility(ability_id) => match Module::ability(ability_id) {
+                    None => {
+                        warn!("No ability found for '{}' in backstory", ability_id);
                     }
+                    Some(ability) => pane.abilities.push(ability),
                 },
                 _ => {
                     warn!("Unsupported OnTrigger variant '{:?}' in backstory", trigger);
@@ -172,7 +174,8 @@ impl WidgetKind for ResponseButton {
         match self.to {
             None => {
                 pane.complete = true;
-            }, Some(ref to) => {
+            }
+            Some(ref to) => {
                 pane.cur_node = to.to_string();
             }
         }

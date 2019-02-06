@@ -20,13 +20,13 @@ use std::rc::Rc;
 
 use log::{error, info};
 
-use sulis_core::ui::{self, Cursor};
-use sulis_core::resource::{ResourceSet};
 use sulis_core::io::IO;
+use sulis_core::resource::ResourceSet;
+use sulis_core::ui::{self, Cursor};
 use sulis_core::util::{self, ActiveResources};
 use sulis_module::{Actor, Module};
 use sulis_state::{GameState, NextGameStep, SaveState};
-use sulis_view::{RootView, main_menu};
+use sulis_view::{main_menu, RootView};
 
 fn init() -> Box<IO> {
     // CONFIG will be lazily initialized here; if it fails it
@@ -65,7 +65,8 @@ fn load_resources() {
             error!("{}", e);
             util::error_and_exit("Fatal error reading resources.");
             unreachable!();
-        }, Ok(yaml) => yaml,
+        }
+        Ok(yaml) => yaml,
     };
 
     if dirs.len() > 1 {
@@ -73,7 +74,8 @@ fn load_resources() {
         match Module::load_resources(yaml, dirs) {
             Err(e) => {
                 error!("{}", e);
-            }, Ok(()) => (),
+            }
+            Ok(()) => (),
         }
     }
 }
@@ -98,7 +100,7 @@ fn main_menu(io: &mut Box<IO>) -> NextGameStep {
 fn new_campaign(io: &mut Box<IO>, pc_actor: Rc<Actor>) -> NextGameStep {
     info!("Initializing game state.");
     if let Err(e) = GameState::init(pc_actor) {
-        error!("{}",  e);
+        error!("{}", e);
         util::error_and_exit("There was a fatal error creating the game state.");
     };
 
@@ -146,14 +148,17 @@ fn main() {
             MainMenuReloadResources => {
                 load_resources();
                 main_menu(&mut io)
-            },
-            LoadModuleAndNewCampaign { pc_actor, module_dir } => {
+            }
+            LoadModuleAndNewCampaign {
+                pc_actor,
+                module_dir,
+            } => {
                 let mut active = ActiveResources::read();
                 active.campaign = Some(module_dir);
                 active.write();
                 load_resources();
                 new_campaign(&mut io, pc_actor)
-            },
+            }
             RecreateIO => {
                 io = create_io();
                 main_menu(&mut io)

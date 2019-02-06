@@ -15,10 +15,10 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::any::Any;
-use std::rc::Rc;
 use std::cell::RefCell;
+use std::rc::Rc;
 
-use sulis_core::ui::{Callback, Widget, WidgetKind, animation_state};
+use sulis_core::ui::{animation_state, Callback, Widget, WidgetKind};
 use sulis_core::widgets::{Button, TextArea};
 use sulis_module::{Module, Time};
 use sulis_state::GameState;
@@ -59,7 +59,7 @@ impl WidgetKind for WorldMapWindow {
         widget.do_children_layout();
 
         {
-            let state= &self.content.borrow().state;
+            let state = &self.content.borrow().state;
             let (start_x, start_y) = state.inner_position().as_tuple();
             let (w, h) = state.inner_size().as_tuple();
 
@@ -84,10 +84,13 @@ impl WidgetKind for WorldMapWindow {
         let bg = Widget::empty("bg");
 
         let close = Widget::with_theme(Button::empty(), "close");
-        close.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let (parent, _) = Widget::parent::<WorldMapWindow>(widget);
-            parent.borrow_mut().mark_for_removal();
-        })));
+        close
+            .borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(|widget, _| {
+                let (parent, _) = Widget::parent::<WorldMapWindow>(widget);
+                parent.borrow_mut().mark_for_removal();
+            })));
 
         let labels = Widget::with_theme(TextArea::empty(), "labels");
 
@@ -119,8 +122,10 @@ impl WidgetKind for WorldMapWindow {
 
                 state.set_active(is_active);
 
-                let (is_enabled, is_visible) =
-                    (map_state.is_enabled(&location.id), map_state.is_visible(&location.id));
+                let (is_enabled, is_visible) = (
+                    map_state.is_enabled(&location.id),
+                    map_state.is_visible(&location.id),
+                );
                 state.set_enabled(is_enabled);
                 state.set_visible(is_visible);
 
@@ -129,36 +134,52 @@ impl WidgetKind for WorldMapWindow {
                 }
 
                 let label = Widget::with_theme(TextArea::empty(), "label");
-                label.borrow_mut().state.add_text_arg("name", &location.name);
+                label
+                    .borrow_mut()
+                    .state
+                    .add_text_arg("name", &location.name);
                 label.borrow_mut().state.set_visible(is_visible);
 
-                (self.transition_enabled && is_enabled && is_visible && !is_active, label)
+                (
+                    self.transition_enabled && is_enabled && is_visible && !is_active,
+                    label,
+                )
             };
 
             if add_callback {
-                let mut travel_time = Time { day: 0, hour: 0, round: 0, millis: 0 };
+                let mut travel_time = Time {
+                    day: 0,
+                    hour: 0,
+                    round: 0,
+                    millis: 0,
+                };
                 if let Some(cur_location) = &cur_location_id {
                     if let Some(hours) = location.travel_times.get(cur_location) {
                         travel_time.hour = *hours;
                         Module::rules().canonicalize_time(&mut travel_time);
 
-                        label.borrow_mut().state.add_text_arg("travel_time",
-                                                              &travel_time.to_string());
+                        label
+                            .borrow_mut()
+                            .state
+                            .add_text_arg("travel_time", &travel_time.to_string());
                     }
                 }
 
                 let (x, y) = (location.linked_area_pos.x, location.linked_area_pos.y);
                 let area_id = location.linked_area.clone();
-                button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-                    let area_id = match area_id {
-                        None => return,
-                        Some(ref id) => id.clone(),
-                    };
+                button
+                    .borrow_mut()
+                    .state
+                    .add_callback(Callback::new(Rc::new(move |widget, _| {
+                        let area_id = match area_id {
+                            None => return,
+                            Some(ref id) => id.clone(),
+                        };
 
-                    GameState::transition(&Some(area_id), x, y, travel_time);
-                    let root = Widget::get_root(&widget);
-                    root.borrow_mut().invalidate_children();
-                })));
+                        GameState::transition(&Some(area_id), x, y, travel_time);
+                        let root = Widget::get_root(&widget);
+                        root.borrow_mut().invalidate_children();
+                    })));
             }
 
             let entry = Entry {

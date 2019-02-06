@@ -14,18 +14,19 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::time::{Instant, Duration};
+use std::cell::{Cell, RefCell};
 use std::collections::HashMap;
 use std::rc::Rc;
-use std::cell::{Cell, RefCell};
+use std::time::{Duration, Instant};
 
-use rlua::{self, ToLuaMulti, FromLuaMulti, ToLua};
+use rlua::{self, FromLuaMulti, ToLua, ToLuaMulti};
 
+use crate::script::{
+    Result, ScriptAbility, ScriptEntity, ScriptEntitySet, ScriptItem, ScriptItemKind, ScriptState,
+};
+use crate::{ai, EntityState};
 use sulis_core::util::Point;
 use sulis_module::{Ability, Item, Module};
-use crate::{ai, EntityState};
-use crate::script::{Result, ScriptState, ScriptEntity, ScriptEntitySet,
-    ScriptItem, ScriptAbility, ScriptItemKind};
 
 thread_local! {
     static SCRIPT_CACHE: RefCell<HashMap<String, Rc<ScriptState>>> = RefCell::new(HashMap::new());
@@ -47,7 +48,10 @@ pub fn setup() -> Result<()> {
         Ok(())
     })?;
 
-    info!("Setup scripts in {:.3} millis", get_elapsed_millis(start.elapsed()));
+    info!(
+        "Setup scripts in {:.3} millis",
+        get_elapsed_millis(start.elapsed())
+    );
     Ok(())
 }
 
@@ -56,8 +60,10 @@ pub fn set_report_enabled(enabled: bool) {
 }
 
 pub fn exec_func<Args, Ret>(id: &str, func: &str, args: Args) -> Result<Ret>
-    where Args: for<'a> ToLuaMulti<'a>, Ret: for<'a> FromLuaMulti<'a> {
-
+where
+    Args: for<'a> ToLuaMulti<'a>,
+    Ret: for<'a> FromLuaMulti<'a>,
+{
     let state = SCRIPT_CACHE.with(|cache| {
         let cache = cache.borrow();
 
@@ -84,26 +90,40 @@ pub fn ai_script(parent: &Rc<RefCell<EntityState>>, func: &str) -> Result<ai::St
     exec_func(&script, func, parent)
 }
 
-pub fn entity_script<T>(parent: &Rc<RefCell<EntityState>>, targets: ScriptEntitySet,
-                        arg: Option<T>, func: &str) -> Result<()>
-where T: for<'a> ToLua<'a> + Send {
-
+pub fn entity_script<T>(
+    parent: &Rc<RefCell<EntityState>>,
+    targets: ScriptEntitySet,
+    arg: Option<T>,
+    func: &str,
+) -> Result<()>
+where
+    T: for<'a> ToLua<'a> + Send,
+{
     let script = get_script_id_from_entity(parent)?;
     let parent = ScriptEntity::from(parent);
     exec_func(&script, func, (parent, targets, arg))
 }
 
-pub fn item_on_activate(parent: &Rc<RefCell<EntityState>>,
-                        kind: ScriptItemKind) -> Result<()> {
+pub fn item_on_activate(parent: &Rc<RefCell<EntityState>>, kind: ScriptItemKind) -> Result<()> {
     let t: Option<usize> = None;
-    item_script(parent, kind, ScriptEntitySet::new(parent, &Vec::new()),
-    t, "on_activate")
+    item_script(
+        parent,
+        kind,
+        ScriptEntitySet::new(parent, &Vec::new()),
+        t,
+        "on_activate",
+    )
 }
 
-pub fn item_on_target_select(parent: &Rc<RefCell<EntityState>>, kind: ScriptItemKind,
-                             targets: Vec<Option<Rc<RefCell<EntityState>>>>,
-                             selected_point: Point, affected_points: Vec<Point>, func: &str,
-                             custom_target: Option<Rc<RefCell<EntityState>>>) -> Result<()> {
+pub fn item_on_target_select(
+    parent: &Rc<RefCell<EntityState>>,
+    kind: ScriptItemKind,
+    targets: Vec<Option<Rc<RefCell<EntityState>>>>,
+    selected_point: Point,
+    affected_points: Vec<Point>,
+    func: &str,
+    custom_target: Option<Rc<RefCell<EntityState>>>,
+) -> Result<()> {
     let mut targets = ScriptEntitySet::new(parent, &targets);
     targets.selected_point = Some((selected_point.x, selected_point.y));
     let arg = match custom_target {
@@ -118,10 +138,16 @@ pub fn item_on_target_select(parent: &Rc<RefCell<EntityState>>, kind: ScriptItem
 /// is assumed that the item exists on the parent at the specified `item_index`.  If it Some,
 /// this is not assumed, but the specified index is still set on the item that is passed into
 /// the script state.
-pub fn item_script<T>(parent: &Rc<RefCell<EntityState>>, kind: ScriptItemKind,
-                      targets: ScriptEntitySet, arg: Option<T>, func: &str) -> Result<()>
-where T: for<'a> ToLua<'a> + Send {
-
+pub fn item_script<T>(
+    parent: &Rc<RefCell<EntityState>>,
+    kind: ScriptItemKind,
+    targets: ScriptEntitySet,
+    arg: Option<T>,
+    func: &str,
+) -> Result<()>
+where
+    T: for<'a> ToLua<'a> + Send,
+{
     let item = ScriptItem::new(parent, kind)?;
     let item_src = item.try_item()?;
     let script = get_item_script_id(&item_src)?;
@@ -130,17 +156,26 @@ where T: for<'a> ToLua<'a> + Send {
     exec_func(&script, func, (parent, item, targets, arg))
 }
 
-pub fn ability_on_activate(parent: &Rc<RefCell<EntityState>>,
-                           ability: &Rc<Ability>) -> Result<()> {
+pub fn ability_on_activate(parent: &Rc<RefCell<EntityState>>, ability: &Rc<Ability>) -> Result<()> {
     let t: Option<usize> = None;
-    ability_script(parent, ability, ScriptEntitySet::new(parent, &Vec::new()),
-    t, "on_activate")
+    ability_script(
+        parent,
+        ability,
+        ScriptEntitySet::new(parent, &Vec::new()),
+        t,
+        "on_activate",
+    )
 }
 
-pub fn ability_on_target_select(parent: &Rc<RefCell<EntityState>>, ability: &Rc<Ability>,
-                                targets: Vec<Option<Rc<RefCell<EntityState>>>>,
-                                selected_point: Point, affected_points: Vec<Point>, func: &str,
-                                custom_target: Option<Rc<RefCell<EntityState>>>) -> Result<()> {
+pub fn ability_on_target_select(
+    parent: &Rc<RefCell<EntityState>>,
+    ability: &Rc<Ability>,
+    targets: Vec<Option<Rc<RefCell<EntityState>>>>,
+    selected_point: Point,
+    affected_points: Vec<Point>,
+    func: &str,
+    custom_target: Option<Rc<RefCell<EntityState>>>,
+) -> Result<()> {
     let mut targets = ScriptEntitySet::new(parent, &targets);
     targets.selected_point = Some((selected_point.x, selected_point.y));
     let arg = match custom_target {
@@ -151,10 +186,16 @@ pub fn ability_on_target_select(parent: &Rc<RefCell<EntityState>>, ability: &Rc<
     ability_script(parent, ability, targets, arg, func)
 }
 
-pub fn ability_script<T>(parent: &Rc<RefCell<EntityState>>, ability: &Rc<Ability>,
-                         targets: ScriptEntitySet, arg: Option<T>,
-                         func: &str) -> Result<()> where T: for<'a> ToLua<'a> + Send {
-
+pub fn ability_script<T>(
+    parent: &Rc<RefCell<EntityState>>,
+    ability: &Rc<Ability>,
+    targets: ScriptEntitySet,
+    arg: Option<T>,
+    func: &str,
+) -> Result<()>
+where
+    T: for<'a> ToLua<'a> + Send,
+{
     let script = get_ability_script_id(ability)?;
     let parent = ScriptEntity::from(parent);
     let ability = ScriptAbility::from(ability);
@@ -162,8 +203,9 @@ pub fn ability_script<T>(parent: &Rc<RefCell<EntityState>>, ability: &Rc<Ability
 }
 
 pub fn trigger_script<Args>(script_id: &str, func: &str, args: Args) -> Result<()>
-    where Args: for<'a> ToLuaMulti<'a> {
-
+where
+    Args: for<'a> ToLuaMulti<'a>,
+{
     exec_func(script_id, func, args)
 }
 
@@ -171,13 +213,12 @@ fn get_script_id_from_entity(entity: &Rc<RefCell<EntityState>>) -> Result<String
     let entity = entity.borrow();
     let id = entity.unique_id();
     match &entity.actor.actor.ai {
-        None => {
-            Err(rlua::Error::ToLuaConversionError {
-                from: "Entity",
-                to: "Script",
-                message: Some(format!("Script called for entity '{}' with no AI", id)),
-            })
-        }, Some(ai) => Ok(ai.script.to_string()),
+        None => Err(rlua::Error::ToLuaConversionError {
+            from: "Entity",
+            to: "Script",
+            message: Some(format!("Script called for entity '{}' with no AI", id)),
+        }),
+        Some(ai) => Ok(ai.script.to_string()),
     }
 }
 
@@ -210,11 +251,10 @@ fn get_script_from_id(id: &str) -> Result<String> {
             to: "Script",
             message: Some(format!("No script found with id '{}'", id)),
         }),
-        Some(script) => Ok(script)
+        Some(script) => Ok(script),
     }
 }
 
 fn get_elapsed_millis(elapsed: Duration) -> f64 {
-    (elapsed.as_secs() as f64) * 1000.0 +
-        (elapsed.subsec_nanos() as f64) / 1_000_000.0
+    (elapsed.as_secs() as f64) * 1000.0 + (elapsed.subsec_nanos() as f64) / 1_000_000.0
 }

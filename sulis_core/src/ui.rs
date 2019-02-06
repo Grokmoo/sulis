@@ -58,14 +58,14 @@ pub mod widget;
 pub use self::widget::Widget;
 
 mod widget_kind;
+pub(crate) use self::widget_kind::EmptyWidget;
 pub use self::widget_kind::WidgetKind;
-pub (crate) use self::widget_kind::EmptyWidget;
 
 mod widget_state;
 pub use self::widget_state::WidgetState;
 
-use std::rc::Rc;
 use std::cell::RefCell;
+use std::rc::Rc;
 
 use crate::util::{Point, Size};
 
@@ -103,12 +103,22 @@ impl Scrollable {
         }
     }
 
-    pub fn compute_max(&mut self, widget: &Widget, area_width: i32, area_height: i32,
-                    scale_x: f32, scale_y: f32) {
+    pub fn compute_max(
+        &mut self,
+        widget: &Widget,
+        area_width: i32,
+        area_height: i32,
+        scale_x: f32,
+        scale_y: f32,
+    ) {
         self.max_x = area_width as f32 - widget.state.inner_width() as f32 / scale_x;
         self.max_y = area_height as f32 - widget.state.inner_height() as f32 / scale_y;
-        if self.max_x < 0.0 { self.max_x = 0.0; }
-        if self.max_y < 0.0 { self.max_y = 0.0; }
+        if self.max_x < 0.0 {
+            self.max_x = 0.0;
+        }
+        if self.max_y < 0.0 {
+            self.max_y = 0.0;
+        }
     }
 
     pub fn change(&mut self, delta_x: f32, delta_y: f32) {
@@ -125,16 +135,26 @@ impl Scrollable {
     }
 
     pub fn bound(&self, mut x: f32, mut y: f32) -> (f32, f32) {
-        if x < 0.0 { x = 0.0; }
-        else if x > self.max_x { x = self.max_x; }
+        if x < 0.0 {
+            x = 0.0;
+        } else if x > self.max_x {
+            x = self.max_x;
+        }
 
-        if y < 0.0 { y = 0.0; }
-        else if y > self.max_y { y = self.max_y; }
+        if y < 0.0 {
+            y = 0.0;
+        } else if y > self.max_y {
+            y = self.max_y;
+        }
 
         (x, y)
     }
 
-    pub fn x(&self) -> f32 { self.x }
+    pub fn x(&self) -> f32 {
+        self.x
+    }
 
-    pub fn y(&self) -> f32 { self.y }
+    pub fn y(&self) -> f32 {
+        self.y
+    }
 }

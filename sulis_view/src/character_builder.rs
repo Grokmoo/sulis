@@ -41,20 +41,22 @@ use self::level_up_finish_pane::LevelUpFinishPane;
 mod race_selector_pane;
 use self::race_selector_pane::RaceSelectorPane;
 
-use std::collections::HashMap;
 use std::any::Any;
-use std::rc::Rc;
 use std::cell::RefCell;
+use std::collections::HashMap;
+use std::rc::Rc;
 
 use sulis_core::ui::{Callback, Color, Widget, WidgetKind};
-use sulis_core::widgets::{Button};
+use sulis_core::widgets::Button;
 use sulis_module::actor::Sex;
-use sulis_module::{Ability, ActorBuilder, Class, Faction, ImageLayer, InventoryBuilder, Module,
-    Race, AttributeList};
-use sulis_state::{EntityState};
+use sulis_module::{
+    Ability, ActorBuilder, AttributeList, Class, Faction, ImageLayer, InventoryBuilder, Module,
+    Race,
+};
+use sulis_state::EntityState;
 
-use crate::main_menu::CharacterSelector;
 use crate::character_window::{get_character_export_filename, write_character_to_file};
+use crate::main_menu::CharacterSelector;
 
 pub const NAME: &str = "character_builder";
 
@@ -67,14 +69,13 @@ trait BuilderPane {
 }
 
 pub struct CharacterBuilder {
-    pub (in crate::character_builder) next: Rc<RefCell<Widget>>,
-    pub (in crate::character_builder) prev: Rc<RefCell<Widget>>,
-    pub (in crate::character_builder) finish: Rc<RefCell<Widget>>,
+    pub(in crate::character_builder) next: Rc<RefCell<Widget>>,
+    pub(in crate::character_builder) prev: Rc<RefCell<Widget>>,
+    pub(in crate::character_builder) finish: Rc<RefCell<Widget>>,
     builder_panes: Vec<Rc<RefCell<BuilderPane>>>,
     builder_pane_index: usize,
     // we rely on the builder panes in the above vec having the same
     // index in the children vec of this widget
-
     builder_set: Rc<BuilderSet>,
 
     pub race: Option<Rc<Race>>,
@@ -105,30 +106,37 @@ impl CharacterBuilder {
 
     fn with(builder_set: Rc<BuilderSet>) -> Rc<RefCell<CharacterBuilder>> {
         let next = Widget::with_theme(Button::empty(), "next");
-        next.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let (parent, builder) = Widget::parent_mut::<CharacterBuilder>(widget);
-            let cur_pane = Rc::clone(&builder.builder_panes[builder.builder_pane_index]);
-            cur_pane.borrow_mut().next(builder, Rc::clone(&parent));
-        })));
+        next.borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(|widget, _| {
+                let (parent, builder) = Widget::parent_mut::<CharacterBuilder>(widget);
+                let cur_pane = Rc::clone(&builder.builder_panes[builder.builder_pane_index]);
+                cur_pane.borrow_mut().next(builder, Rc::clone(&parent));
+            })));
 
         let prev = Widget::with_theme(Button::empty(), "previous");
-        prev.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let (parent, builder) = Widget::parent_mut::<CharacterBuilder>(widget);
-            let cur_pane = Rc::clone(&builder.builder_panes[builder.builder_pane_index]);
-            cur_pane.borrow_mut().prev(builder, Rc::clone(&parent));
-        })));
+        prev.borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(|widget, _| {
+                let (parent, builder) = Widget::parent_mut::<CharacterBuilder>(widget);
+                let cur_pane = Rc::clone(&builder.builder_panes[builder.builder_pane_index]);
+                cur_pane.borrow_mut().prev(builder, Rc::clone(&parent));
+            })));
 
         let finish = Widget::with_theme(Button::empty(), "finish");
-        finish.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let (parent, builder) = Widget::parent_mut::<CharacterBuilder>(widget);
-            parent.borrow_mut().mark_for_removal();
+        finish
+            .borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(|widget, _| {
+                let (parent, builder) = Widget::parent_mut::<CharacterBuilder>(widget);
+                parent.borrow_mut().mark_for_removal();
 
-            let cur_pane = Rc::clone(&builder.builder_panes[builder.builder_pane_index]);
-            cur_pane.borrow_mut().next(builder, Rc::clone(&parent));
+                let cur_pane = Rc::clone(&builder.builder_panes[builder.builder_pane_index]);
+                cur_pane.borrow_mut().next(builder, Rc::clone(&parent));
 
-            let builder_set = Rc::clone(&builder.builder_set);
-            builder_set.finish(builder, &parent);
-        })));
+                let builder_set = Rc::clone(&builder.builder_set);
+                builder_set.finish(builder, &parent);
+            })));
 
         Rc::new(RefCell::new(CharacterBuilder {
             builder_set,
@@ -173,22 +181,35 @@ impl CharacterBuilder {
 }
 
 impl WidgetKind for CharacterBuilder {
-    fn get_name(&self) -> &str { NAME }
-    fn as_any(&self) -> &Any { self }
-    fn as_any_mut(&mut self) -> &mut Any { self }
+    fn get_name(&self) -> &str {
+        NAME
+    }
+    fn as_any(&self) -> &Any {
+        self
+    }
+    fn as_any_mut(&mut self) -> &mut Any {
+        self
+    }
 
     fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let close = Widget::with_theme(Button::empty(), "close");
-        close.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let (parent, _) = Widget::parent::<CharacterBuilder>(widget);
-            parent.borrow_mut().mark_for_removal();
-        })));
+        close
+            .borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(|widget, _| {
+                let (parent, _) = Widget::parent::<CharacterBuilder>(widget);
+                parent.borrow_mut().mark_for_removal();
+            })));
 
         let builder_set = Rc::clone(&self.builder_set);
         let mut children = builder_set.on_add(self, widget);
 
-        children.append(&mut vec![close, Rc::clone(&self.next),
-            Rc::clone(&self.prev), Rc::clone(&self.finish)]);
+        children.append(&mut vec![
+            close,
+            Rc::clone(&self.next),
+            Rc::clone(&self.prev),
+            Rc::clone(&self.finish),
+        ]);
         children
     }
 }
@@ -198,8 +219,11 @@ struct CharacterCreator {
 }
 
 impl BuilderSet for CharacterCreator {
-    fn on_add(&self, builder: &mut CharacterBuilder,
-              _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+    fn on_add(
+        &self,
+        builder: &mut CharacterBuilder,
+        _widget: &Rc<RefCell<Widget>>,
+    ) -> Vec<Rc<RefCell<Widget>>> {
         let class_choices = Module::rules().selectable_classes.clone();
 
         let race_selector_pane = RaceSelectorPane::new();
@@ -225,9 +249,17 @@ impl BuilderSet for CharacterCreator {
         builder.builder_panes.push(attribute_selector_pane.clone());
         builder.builder_panes.push(cosmetic_selector_pane.clone());
         builder.builder_panes.push(backstory_selector_pane.clone());
-        race_selector_pane.borrow_mut().on_selected(builder, Rc::clone(&race_sel_widget));
+        race_selector_pane
+            .borrow_mut()
+            .on_selected(builder, Rc::clone(&race_sel_widget));
 
-        vec![race_sel_widget, class_sel_widget, attr_sel_widget, cosmetic_sel_widget, backstory_sel_widget]
+        vec![
+            race_sel_widget,
+            class_sel_widget,
+            attr_sel_widget,
+            cosmetic_sel_widget,
+            backstory_sel_widget,
+        ]
     }
 
     fn finish(&self, builder: &mut CharacterBuilder, _widget: &Rc<RefCell<Widget>>) {
@@ -236,7 +268,8 @@ impl BuilderSet for CharacterCreator {
                 warn!("{}", e);
                 warn!("Unable to save character '{}'", builder.name);
                 return;
-            }, Ok(filename) => filename,
+            }
+            Ok(filename) => filename,
         };
 
         if builder.race.is_none() || builder.class.is_none() || builder.attributes.is_none() {
@@ -280,7 +313,7 @@ impl BuilderSet for CharacterCreator {
             levels,
             xp: None,
             reward: None,
-            abilities: abilities,
+            abilities,
             ai: None,
         };
 
@@ -288,19 +321,24 @@ impl BuilderSet for CharacterCreator {
             Err(e) => {
                 error!("Unable to write actor to file {}", filename);
                 error!("{}", e);
-            },
+            }
             Ok(()) => (),
         }
 
-        self.character_selector_widget.borrow_mut().invalidate_children();
+        self.character_selector_widget
+            .borrow_mut()
+            .invalidate_children();
         let char_sel = Widget::kind_mut::<CharacterSelector>(&self.character_selector_widget);
         char_sel.set_to_select(id);
     }
 }
 
 pub trait BuilderSet {
-    fn on_add(&self, builder: &mut CharacterBuilder,
-              widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>>;
+    fn on_add(
+        &self,
+        builder: &mut CharacterBuilder,
+        widget: &Rc<RefCell<Widget>>,
+    ) -> Vec<Rc<RefCell<Widget>>>;
 
     fn finish(&self, builder: &mut CharacterBuilder, widget: &Rc<RefCell<Widget>>);
 }

@@ -14,12 +14,12 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::rc::Rc;
 use std::collections::HashMap;
 use std::io::Error;
+use std::rc::Rc;
 
-use sulis_core::util::{unable_to_create_error, ExtInt};
 use crate::rules::{AttributeList, BonusList};
+use sulis_core::util::{unable_to_create_error, ExtInt};
 
 use crate::{Ability, AbilityList, InventoryBuilder, Module};
 
@@ -66,7 +66,8 @@ impl Class {
                     None => {
                         warn!("Unable to find ability list '{}'", ability_list_id);
                         return unable_to_create_error("class", &builder.id);
-                    }, Some(ref ability_list) => Rc::clone(ability_list),
+                    }
+                    Some(ref ability_list) => Rc::clone(ability_list),
                 };
 
                 ability_choices.push(ability_list);
@@ -95,7 +96,8 @@ impl Class {
                 None => {
                     warn!("Unable to find ability '{}'", ability_id);
                     return unable_to_create_error("class", &builder.id);
-                }, Some(ref ability) => Rc::clone(ability),
+                }
+                Some(ref ability) => Rc::clone(ability),
             };
 
             abilities.push(ability);

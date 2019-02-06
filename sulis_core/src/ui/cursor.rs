@@ -17,10 +17,10 @@
 use std::cell::RefCell;
 use std::rc::Rc;
 
+use crate::config::Config;
 use crate::image::Image;
 use crate::io::event::ClickKind;
 use crate::io::{event, Event, GraphicsRenderer};
-use crate::config::Config;
 use crate::resource::ResourceSet;
 use crate::ui::{animation_state, AnimationState, Widget};
 
@@ -65,13 +65,21 @@ impl Cursor {
                 None => {
                     warn!("No cursor image found!");
                     return;
-                }, Some(ref image) => image,
+                }
+                Some(ref image) => image,
             };
 
             let w = image.get_width_f32();
             let h = image.get_height_f32();
-            image.draw(renderer, &cursor.state, cursor.xf - w / 2.0,
-                                     cursor.yf - h / 2.0, w, h, millis);
+            image.draw(
+                renderer,
+                &cursor.state,
+                cursor.xf - w / 2.0,
+                cursor.yf - h / 2.0,
+                w,
+                h,
+                millis,
+            );
         });
     }
 
@@ -104,17 +112,22 @@ impl Cursor {
 
         trace!("Cursor move by {}, {}", x, y);
 
-        let event = Event::new(event::Kind::MouseMove { delta_x: x, delta_y: y });
+        let event = Event::new(event::Kind::MouseMove {
+            delta_x: x,
+            delta_y: y,
+        });
         Widget::dispatch_event(&root, event);
 
         match Cursor::button_down() {
             Some(kind) => {
                 trace!("Cursor {:?} drag.", kind);
                 let event = Event::new(event::Kind::MouseDrag {
-                    button: kind, delta_x: x, delta_y: y
+                    button: kind,
+                    delta_x: x,
+                    delta_y: y,
                 });
                 Widget::dispatch_event(&root, event);
-            },
+            }
             None => (),
         }
     }

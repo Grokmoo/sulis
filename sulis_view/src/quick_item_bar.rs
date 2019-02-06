@@ -15,14 +15,17 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::any::Any;
-use std::rc::Rc;
 use std::cell::RefCell;
+use std::rc::Rc;
 
+use crate::{
+    item_button::{clear_quickslot_cb, use_item_cb},
+    ItemButton,
+};
 use sulis_core::ui::{animation_state, Callback, Widget, WidgetKind};
+use sulis_core::widgets::{Button, Label};
 use sulis_module::QuickSlot;
-use sulis_state::{ChangeListener, EntityState, GameState, script::ScriptItemKind};
-use sulis_core::widgets::{Label, Button};
-use crate::{item_button::{clear_quickslot_cb, use_item_cb}, ItemButton};
+use sulis_state::{script::ScriptItemKind, ChangeListener, EntityState, GameState};
 
 pub const NAME: &str = "quick_item_bar";
 
@@ -41,34 +44,49 @@ impl QuickItemBar {
 impl WidgetKind for QuickItemBar {
     widget_kind!(NAME);
 
-    fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>>  {
+    fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         {
             let mut entity = self.entity.borrow_mut();
-            entity.actor.listeners.add(ChangeListener::invalidate(NAME, widget));
+            entity
+                .actor
+                .listeners
+                .add(ChangeListener::invalidate(NAME, widget));
         }
 
         let stash = GameState::party_stash();
-        stash.borrow_mut().listeners.add(ChangeListener::invalidate(NAME, widget));
+        stash
+            .borrow_mut()
+            .listeners
+            .add(ChangeListener::invalidate(NAME, widget));
 
         let widget_ref = Rc::clone(widget);
-        GameState::add_party_listener(ChangeListener::new(NAME, Box::new(move |entity| {
-            let entity = match entity {
-                None => return,
-                Some(entity) => entity,
-            };
-            let bar = Widget::kind_mut::<QuickItemBar>(&widget_ref);
-            bar.entity = Rc::clone(entity);
-            widget_ref.borrow_mut().invalidate_children();
-        })));
+        GameState::add_party_listener(ChangeListener::new(
+            NAME,
+            Box::new(move |entity| {
+                let entity = match entity {
+                    None => return,
+                    Some(entity) => entity,
+                };
+                let bar = Widget::kind_mut::<QuickItemBar>(&widget_ref);
+                bar.entity = Rc::clone(entity);
+                widget_ref.borrow_mut().invalidate_children();
+            }),
+        ));
 
         let title = Widget::with_theme(Label::empty(), "title");
 
         let swap_weapons = Widget::with_theme(Button::empty(), "swap_weapons");
-        swap_weapons.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let (_, bar) = Widget::parent_mut::<QuickItemBar>(widget);
-            bar.entity.borrow_mut().actor.swap_weapon_set();
-        })));
-        swap_weapons.borrow_mut().state.set_enabled(self.entity.borrow().actor.can_swap_weapons());
+        swap_weapons
+            .borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(|widget, _| {
+                let (_, bar) = Widget::parent_mut::<QuickItemBar>(widget);
+                bar.entity.borrow_mut().actor.swap_weapon_set();
+            })));
+        swap_weapons
+            .borrow_mut()
+            .state
+            .set_enabled(self.entity.borrow().actor.can_swap_weapons());
 
         let usable1 = create_button(&self.entity, QuickSlot::Usable1, "usable1");
         let usable2 = create_button(&self.entity, QuickSlot::Usable2, "usable2");
@@ -79,8 +97,11 @@ impl WidgetKind for QuickItemBar {
     }
 }
 
-fn create_button(entity: &Rc<RefCell<EntityState>>, slot: QuickSlot,
-                 theme_id: &str) -> Rc<RefCell<Widget>> {
+fn create_button(
+    entity: &Rc<RefCell<EntityState>>,
+    slot: QuickSlot,
+    theme_id: &str,
+) -> Rc<RefCell<Widget>> {
     let stash = GameState::party_stash();
     let actor = &entity.borrow().actor;
     match actor.inventory().quick(slot) {
@@ -88,18 +109,30 @@ fn create_button(entity: &Rc<RefCell<EntityState>>, slot: QuickSlot,
             let button = Widget::empty(theme_id);
             button.borrow_mut().state.set_enabled(false);
             button
-        }, Some(item_state) => {
+        }
+        Some(item_state) => {
             let quantity = 1 + stash.borrow().items().get_quantity(&item_state);
             let kind = ScriptItemKind::Quick(slot);
             let button = ItemButton::quick(entity, quantity, &item_state.item, slot);
-            button.borrow_mut().add_action("Use", use_item_cb(entity, kind), true);
-            button.borrow_mut().add_action("Clear Slot", clear_quickslot_cb(entity, slot), false);
+            button
+                .borrow_mut()
+                .add_action("Use", use_item_cb(entity, kind), true);
+            button
+                .borrow_mut()
+                .add_action("Clear Slot", clear_quickslot_cb(entity, slot), false);
             let widget = Widget::with_theme(button.clone(), theme_id);
             if actor.can_use_quick(slot) {
-                widget.borrow_mut().state.animation_state.remove(animation_state::Kind::Custom1);
+                widget
+                    .borrow_mut()
+                    .state
+                    .animation_state
+                    .remove(animation_state::Kind::Custom1);
             } else {
-                widget.borrow_mut().state.animation_state.add(animation_state::Kind::Custom1);
-
+                widget
+                    .borrow_mut()
+                    .state
+                    .animation_state
+                    .add(animation_state::Kind::Custom1);
             }
             widget
         }

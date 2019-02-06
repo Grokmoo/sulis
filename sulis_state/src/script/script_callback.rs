@@ -14,18 +14,21 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::rc::Rc;
 use std::cell::RefCell;
-use std::collections::{HashMap};
+use std::collections::HashMap;
 use std::io::Error;
-use std::result::{self};
+use std::rc::Rc;
+use std::result;
 
 use rlua::{UserData, UserDataMethods};
 
-use sulis_core::util::invalid_data_error;
-use sulis_module::{Module, on_trigger::Kind, HitKind, DamageKind};
-use crate::script::{Result, script_entity, ScriptEntity, ScriptEntitySet, ScriptActiveSurface, ScriptItemKind, ScriptMenuSelection, ScriptAppliedEffect};
+use crate::script::{
+    script_entity, Result, ScriptActiveSurface, ScriptAppliedEffect, ScriptEntity, ScriptEntitySet,
+    ScriptItemKind, ScriptMenuSelection,
+};
 use crate::{EntityState, GameState, Script};
+use sulis_core::util::invalid_data_error;
+use sulis_module::{on_trigger::Kind, DamageKind, HitKind, Module};
 
 pub fn fire_on_removed(cbs: Vec<Rc<CallbackData>>) {
     for cb in cbs {
@@ -110,36 +113,51 @@ pub enum FuncKind {
 /// A trait representing a callback that will fire a script when called.  In lua scripts,
 /// `CallbackData` is constructed to use this trait.
 pub trait ScriptCallback {
-    fn on_effect_applied(&self, _effect: ScriptAppliedEffect) { }
+    fn on_effect_applied(&self, _effect: ScriptAppliedEffect) {}
 
-    fn on_menu_select(&self, _value: ScriptMenuSelection) { }
+    fn on_menu_select(&self, _value: ScriptMenuSelection) {}
 
-    fn on_removed(&self) { }
+    fn on_removed(&self) {}
 
-    fn on_damaged(&self, _targets: &ScriptEntitySet, _hit_kind: HitKind,
-                  _damage: Vec<(DamageKind, u32)>) { }
+    fn on_damaged(
+        &self,
+        _targets: &ScriptEntitySet,
+        _hit_kind: HitKind,
+        _damage: Vec<(DamageKind, u32)>,
+    ) {
+    }
 
-    fn after_defense(&self, _targets: &ScriptEntitySet, _hit_kind: HitKind,
-                     _damage: Vec<(DamageKind, u32)>) { }
+    fn after_defense(
+        &self,
+        _targets: &ScriptEntitySet,
+        _hit_kind: HitKind,
+        _damage: Vec<(DamageKind, u32)>,
+    ) {
+    }
 
-    fn before_defense(&self, _targets: &ScriptEntitySet) { }
+    fn before_defense(&self, _targets: &ScriptEntitySet) {}
 
-    fn before_attack(&self, _targets: &ScriptEntitySet) { }
+    fn before_attack(&self, _targets: &ScriptEntitySet) {}
 
-    fn after_attack(&self, _targets: &ScriptEntitySet, _hit_kind: HitKind,
-                    _damage: Vec<(DamageKind, u32)>) { }
+    fn after_attack(
+        &self,
+        _targets: &ScriptEntitySet,
+        _hit_kind: HitKind,
+        _damage: Vec<(DamageKind, u32)>,
+    ) {
+    }
 
-    fn on_anim_complete(&self) { }
+    fn on_anim_complete(&self) {}
 
-    fn on_anim_update(&self) { }
+    fn on_anim_update(&self) {}
 
-    fn on_round_elapsed(&self) { }
+    fn on_round_elapsed(&self) {}
 
-    fn on_moved(&self) { }
+    fn on_moved(&self) {}
 
-    fn on_surface_round_elapsed(&self) { }
+    fn on_surface_round_elapsed(&self) {}
 
-    fn on_moved_in_surface(&self, _target: usize) { }
+    fn on_moved_in_surface(&self, _target: usize) {}
 }
 
 /// A callback that can be passed to various functions to be executed later.
@@ -208,13 +226,15 @@ impl CallbackData {
         }
     }
 
-    pub fn update_entity_refs_on_load(&mut self, entities: &HashMap<usize,
-                                      Rc<RefCell<EntityState>>>) -> result::Result<(), Error> {
-
+    pub fn update_entity_refs_on_load(
+        &mut self,
+        entities: &HashMap<usize, Rc<RefCell<EntityState>>>,
+    ) -> result::Result<(), Error> {
         match entities.get(&self.parent) {
             None => {
                 return invalid_data_error(&format!("Invalid parent {} for callback", self.parent));
-            }, Some(ref entity) => self.parent = entity.borrow().index(),
+            }
+            Some(ref entity) => self.parent = entity.borrow().index(),
         }
 
         if let Some(ref mut targets) = &mut self.targets {
@@ -279,7 +299,9 @@ impl CallbackData {
     }
 
     fn create_targets_if_missing(&mut self) {
-        if self.targets.is_some() { return; }
+        if self.targets.is_some() {
+            return;
+        }
 
         self.targets = Some(ScriptEntitySet::with_parent(self.parent));
     }
@@ -315,13 +337,18 @@ impl CallbackData {
             Kind::Ability(ref id) => {
                 let ability = Module::ability(id).unwrap();
                 Script::ability(&parent, &ability, targets, &func);
-            },
+            }
             Kind::Item(id) => {
-                Script::item(&parent, ScriptItemKind::WithID(id.to_string()), targets, &func);
-            },
+                Script::item(
+                    &parent,
+                    ScriptItemKind::WithID(id.to_string()),
+                    targets,
+                    &func,
+                );
+            }
             Kind::Entity => {
                 Script::entity(&parent, targets, &func);
-            },
+            }
             Kind::Script(script) => {
                 Script::trigger(&script, &func, ScriptEntity::from(&parent));
             }
@@ -329,7 +356,9 @@ impl CallbackData {
     }
 
     fn exec_script_with_arg<T>(&self, targets: ScriptEntitySet, arg: T, func_kind: FuncKind)
-        where T: rlua::UserData + Send + 'static {
+    where
+        T: rlua::UserData + Send + 'static,
+    {
         let func = match self.funcs.get(&func_kind) {
             None => return,
             Some(ref func) => func.to_string(),
@@ -342,22 +371,32 @@ impl CallbackData {
             Kind::Ability(ref id) => {
                 let ability = Module::ability(id).unwrap();
                 Script::ability_with_arg(&parent, &ability, targets, arg, &func);
-            },
+            }
             Kind::Item(id) => {
-                Script::item_with_arg(&parent,
-                    ScriptItemKind::WithID(id.to_string()), targets, arg, &func);
-            },
+                Script::item_with_arg(
+                    &parent,
+                    ScriptItemKind::WithID(id.to_string()),
+                    targets,
+                    arg,
+                    &func,
+                );
+            }
             Kind::Entity => {
                 Script::entity_with_arg(&parent, targets, arg, &func);
-            },
+            }
             Kind::Script(script) => {
                 Script::trigger(&script, &func, (ScriptEntity::from(&parent), arg));
             }
         }
     }
 
-    fn exec_script_with_attack_data(&self, targets: ScriptEntitySet, hit_kind: HitKind,
-                                    damage: Vec<(DamageKind, u32)>, func_kind: FuncKind) {
+    fn exec_script_with_attack_data(
+        &self,
+        targets: ScriptEntitySet,
+        hit_kind: HitKind,
+        damage: Vec<(DamageKind, u32)>,
+        func_kind: FuncKind,
+    ) {
         let func = match self.funcs.get(&func_kind) {
             None => return,
             Some(ref func) => func.to_string(),
@@ -369,19 +408,32 @@ impl CallbackData {
         match &self.kind {
             Kind::Ability(ref id) => {
                 let ability = Module::ability(id).unwrap();
-                Script::ability_with_attack_data(&parent, &ability, targets,
-                                                 hit_kind, damage, &func);
-            },
+                Script::ability_with_attack_data(
+                    &parent, &ability, targets, hit_kind, damage, &func,
+                );
+            }
             Kind::Item(id) => {
-                Script::item_with_attack_data(&parent,
-                    ScriptItemKind::WithID(id.to_string()), targets, hit_kind, damage, &func);
-            },
+                Script::item_with_attack_data(
+                    &parent,
+                    ScriptItemKind::WithID(id.to_string()),
+                    targets,
+                    hit_kind,
+                    damage,
+                    &func,
+                );
+            }
             Kind::Entity => {
                 Script::entity_with_attack_data(&parent, targets, hit_kind, damage, &func);
-            },
+            }
             Kind::Script(script) => {
-                Script::trigger(&script, &func,
-                    (ScriptEntity::from(&parent), ScriptHitKind::new(hit_kind, damage)));
+                Script::trigger(
+                    &script,
+                    &func,
+                    (
+                        ScriptEntity::from(&parent),
+                        ScriptHitKind::new(hit_kind, damage),
+                    ),
+                );
             }
         }
     }
@@ -389,7 +441,11 @@ impl CallbackData {
 
 impl ScriptCallback for CallbackData {
     fn on_effect_applied(&self, effect: ScriptAppliedEffect) {
-        self.exec_script_with_arg(self.get_or_create_targets(), effect, FuncKind::OnEffectApplied);
+        self.exec_script_with_arg(
+            self.get_or_create_targets(),
+            effect,
+            FuncKind::OnEffectApplied,
+        );
     }
 
     fn on_menu_select(&self, value: ScriptMenuSelection) {
@@ -427,7 +483,9 @@ impl ScriptCallback for CallbackData {
     /// when called, this computes the current target set and sends it to
     /// the lua function based on the surface state
     fn on_surface_round_elapsed(&self) {
-        if self.funcs.get(&FuncKind::OnSurfaceRoundElapsed).is_none() { return; }
+        if self.funcs.get(&FuncKind::OnSurfaceRoundElapsed).is_none() {
+            return;
+        }
 
         let targets = match compute_surface_targets(self.effect, self.parent, None) {
             Some(targets) => targets,
@@ -440,7 +498,9 @@ impl ScriptCallback for CallbackData {
     }
 
     fn on_moved_in_surface(&self, target: usize) {
-        if self.funcs.get(&FuncKind::OnMovedInSurface).is_none() { return; }
+        if self.funcs.get(&FuncKind::OnMovedInSurface).is_none() {
+            return;
+        }
 
         let targets = match compute_surface_targets(self.effect, self.parent, Some(target)) {
             Some(targets) => targets,
@@ -453,31 +513,59 @@ impl ScriptCallback for CallbackData {
         self.exec_standard_script(targets, FuncKind::OnMovedInSurface);
     }
 
-    fn after_defense(&self, targets: &ScriptEntitySet, hit_kind: HitKind,
-                     damage: Vec<(DamageKind, u32)>) {
-        self.exec_script_with_attack_data(self.get_targets(targets), hit_kind, damage,
-            FuncKind::AfterDefense);
+    fn after_defense(
+        &self,
+        targets: &ScriptEntitySet,
+        hit_kind: HitKind,
+        damage: Vec<(DamageKind, u32)>,
+    ) {
+        self.exec_script_with_attack_data(
+            self.get_targets(targets),
+            hit_kind,
+            damage,
+            FuncKind::AfterDefense,
+        );
     }
 
-    fn after_attack(&self, targets: &ScriptEntitySet, hit_kind: HitKind,
-                    damage: Vec<(DamageKind, u32)>) {
-        self.exec_script_with_attack_data(self.get_targets(targets), hit_kind, damage,
-            FuncKind::AfterAttack);
+    fn after_attack(
+        &self,
+        targets: &ScriptEntitySet,
+        hit_kind: HitKind,
+        damage: Vec<(DamageKind, u32)>,
+    ) {
+        self.exec_script_with_attack_data(
+            self.get_targets(targets),
+            hit_kind,
+            damage,
+            FuncKind::AfterAttack,
+        );
     }
 
-    fn on_damaged(&self, targets: &ScriptEntitySet, hit_kind: HitKind,
-                  damage: Vec<(DamageKind, u32)>) {
-        self.exec_script_with_attack_data(self.get_targets(targets), hit_kind, damage,
-            FuncKind::OnDamaged);
+    fn on_damaged(
+        &self,
+        targets: &ScriptEntitySet,
+        hit_kind: HitKind,
+        damage: Vec<(DamageKind, u32)>,
+    ) {
+        self.exec_script_with_attack_data(
+            self.get_targets(targets),
+            hit_kind,
+            damage,
+            FuncKind::OnDamaged,
+        );
     }
 }
 
-fn compute_surface_targets(effect: Option<usize>, parent: usize, target: Option<usize>) -> Option<ScriptEntitySet> {
+fn compute_surface_targets(
+    effect: Option<usize>,
+    parent: usize,
+    target: Option<usize>,
+) -> Option<ScriptEntitySet> {
     let effect = match effect {
         None => {
             warn!("Surface effect is not set");
             return None;
-        },
+        }
         Some(index) => index,
     };
 
@@ -490,7 +578,7 @@ fn compute_surface_targets(effect: Option<usize>, parent: usize, target: Option<
         None => {
             warn!("Invalid effect for surface");
             return None;
-        },
+        }
         Some(effect) => effect,
     };
 
@@ -498,7 +586,8 @@ fn compute_surface_targets(effect: Option<usize>, parent: usize, target: Option<
         None => {
             warn!("Attempted to exec on_surface_round_elapsed on non-surface");
             return None;
-        }, Some((area_id, points)) => {
+        }
+        Some((area_id, points)) => {
             targets.affected_points = points.iter().map(|p| (p.x, p.y)).collect();
 
             let area = GameState::get_area_state(area_id).unwrap();
@@ -553,34 +642,48 @@ impl UserData for CallbackData {
             Ok(())
         });
 
-        methods.add_method_mut("set_on_effect_applied_fn",
-                               |_, cb, func: String| cb.add_func(FuncKind::OnEffectApplied, func));
-        methods.add_method_mut("set_on_menu_select_fn",
-                               |_, cb, func: String| cb.add_func(FuncKind::OnMenuSelect, func));
-        methods.add_method_mut("set_on_removed_fn",
-                               |_, cb, func: String| cb.add_func(FuncKind::OnRemoved, func));
-        methods.add_method_mut("set_on_damaged_fn",
-                               |_, cb, func: String| cb.add_func(FuncKind::OnDamaged, func));
-        methods.add_method_mut("set_before_attack_fn",
-                               |_, cb, func: String| cb.add_func(FuncKind::BeforeAttack, func));
-        methods.add_method_mut("set_after_attack_fn",
-                               |_, cb, func: String| cb.add_func(FuncKind::AfterAttack, func));
-        methods.add_method_mut("set_before_defense_fn",
-                               |_, cb, func: String| cb.add_func(FuncKind::BeforeDefense, func));
-        methods.add_method_mut("set_after_defense_fn",
-                               |_, cb, func: String| cb.add_func(FuncKind::AfterDefense, func));
-        methods.add_method_mut("set_on_anim_update_fn",
-                               |_, cb, func: String| cb.add_func(FuncKind::OnAnimUpdate, func));
-        methods.add_method_mut("set_on_anim_complete_fn",
-                               |_, cb, func: String| cb.add_func(FuncKind::OnAnimComplete, func));
-        methods.add_method_mut("set_on_round_elapsed_fn",
-                               |_, cb, func: String| cb.add_func(FuncKind::OnRoundElapsed, func));
-        methods.add_method_mut("set_on_moved_fn",
-                               |_, cb, func: String| cb.add_func(FuncKind::OnMoved, func));
-        methods.add_method_mut("set_on_surface_round_elapsed_fn",
-                               |_, cb, func: String| cb.add_func(FuncKind::OnSurfaceRoundElapsed, func));
-        methods.add_method_mut("set_on_moved_in_surface_fn",
-                               |_, cb, func: String| cb.add_func(FuncKind::OnMovedInSurface, func));
+        methods.add_method_mut("set_on_effect_applied_fn", |_, cb, func: String| {
+            cb.add_func(FuncKind::OnEffectApplied, func)
+        });
+        methods.add_method_mut("set_on_menu_select_fn", |_, cb, func: String| {
+            cb.add_func(FuncKind::OnMenuSelect, func)
+        });
+        methods.add_method_mut("set_on_removed_fn", |_, cb, func: String| {
+            cb.add_func(FuncKind::OnRemoved, func)
+        });
+        methods.add_method_mut("set_on_damaged_fn", |_, cb, func: String| {
+            cb.add_func(FuncKind::OnDamaged, func)
+        });
+        methods.add_method_mut("set_before_attack_fn", |_, cb, func: String| {
+            cb.add_func(FuncKind::BeforeAttack, func)
+        });
+        methods.add_method_mut("set_after_attack_fn", |_, cb, func: String| {
+            cb.add_func(FuncKind::AfterAttack, func)
+        });
+        methods.add_method_mut("set_before_defense_fn", |_, cb, func: String| {
+            cb.add_func(FuncKind::BeforeDefense, func)
+        });
+        methods.add_method_mut("set_after_defense_fn", |_, cb, func: String| {
+            cb.add_func(FuncKind::AfterDefense, func)
+        });
+        methods.add_method_mut("set_on_anim_update_fn", |_, cb, func: String| {
+            cb.add_func(FuncKind::OnAnimUpdate, func)
+        });
+        methods.add_method_mut("set_on_anim_complete_fn", |_, cb, func: String| {
+            cb.add_func(FuncKind::OnAnimComplete, func)
+        });
+        methods.add_method_mut("set_on_round_elapsed_fn", |_, cb, func: String| {
+            cb.add_func(FuncKind::OnRoundElapsed, func)
+        });
+        methods.add_method_mut("set_on_moved_fn", |_, cb, func: String| {
+            cb.add_func(FuncKind::OnMoved, func)
+        });
+        methods.add_method_mut("set_on_surface_round_elapsed_fn", |_, cb, func: String| {
+            cb.add_func(FuncKind::OnSurfaceRoundElapsed, func)
+        });
+        methods.add_method_mut("set_on_moved_in_surface_fn", |_, cb, func: String| {
+            cb.add_func(FuncKind::OnMovedInSurface, func)
+        });
     }
 }
 
@@ -644,7 +747,10 @@ impl ScriptHitKind {
         let mut entries = Vec::new();
         for (kind, amount) in damage {
             total_damage += amount;
-            entries.push(DamageEntry { kind: kind.to_str(), amount });
+            entries.push(DamageEntry {
+                kind: kind.to_str(),
+                amount,
+            });
         }
 
         ScriptHitKind {
@@ -669,13 +775,13 @@ impl UserData for ScriptHitKind {
         methods.add_method("damage_of_type", |_, hit, kind: String| {
             let mut total = 0;
             for entry in hit.entries.iter() {
-                if entry.kind != &kind { continue; }
+                if entry.kind != &kind {
+                    continue;
+                }
                 total += entry.amount;
             }
             Ok(total)
         });
-        methods.add_method("kind", |_, hit, ()| {
-            Ok(format!("{:?}", hit.kind))
-        });
+        methods.add_method("kind", |_, hit, ()| Ok(format!("{:?}", hit.kind)));
     }
 }

@@ -14,14 +14,14 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::cell::{Cell, RefCell};
+use std::collections::{vec_deque::Iter, HashMap, HashSet, VecDeque};
 use std::rc::Rc;
-use std::cell::{RefCell, Cell};
-use std::collections::{HashSet, HashMap, VecDeque, vec_deque::Iter};
 
-use sulis_core::util::{gen_rand, Point};
-use sulis_module::{Faction, Module, Time, ROUND_TIME_MILLIS};
 use crate::script::{CallbackData, FuncKind};
 use crate::{AreaState, ChangeListener, ChangeListenerList, Effect, EntityState, GameState};
+use sulis_core::util::{gen_rand, Point};
+use sulis_module::{Faction, Module, Time, ROUND_TIME_MILLIS};
 
 fn add_campaign_elapsed_callback(cbs: &mut Vec<Rc<CallbackData>>) {
     let script_data = match Module::campaign().on_round_elapsed_script {
@@ -32,7 +32,8 @@ fn add_campaign_elapsed_callback(cbs: &mut Vec<Rc<CallbackData>>) {
     let player = GameState::player();
 
     let mut cb = CallbackData::new_trigger(player.borrow().index(), script_data.id);
-    cb.add_func(FuncKind::OnRoundElapsed, script_data.func).unwrap();
+    cb.add_func(FuncKind::OnRoundElapsed, script_data.func)
+        .unwrap();
 
     cbs.push(Rc::new(cb));
 }
@@ -66,7 +67,7 @@ pub struct TurnManager {
     pub(crate) ai_groups: HashMap<usize, EncounterRef>,
     pub(crate) cur_ai_group_index: usize,
 
-    total_elapsed_millis: usize
+    total_elapsed_millis: usize,
 }
 
 impl Default for TurnManager {
@@ -89,7 +90,9 @@ impl Default for TurnManager {
 }
 
 impl TurnManager {
-    pub fn total_elapsed_millis(&self) -> usize { self.total_elapsed_millis }
+    pub fn total_elapsed_millis(&self) -> usize {
+        self.total_elapsed_millis
+    }
 
     pub fn current_round(&self) -> u32 {
         (self.total_elapsed_millis / ROUND_TIME_MILLIS as usize) as u32
@@ -106,7 +109,12 @@ impl TurnManager {
         let round = total_rounds % rules.rounds_per_hour;
         let millis = (self.total_elapsed_millis % ROUND_TIME_MILLIS as usize) as u32;
 
-        Time { day, hour, round, millis }
+        Time {
+            day,
+            hour,
+            round,
+            millis,
+        }
     }
 
     pub fn add_time(&mut self, time: Time) {
@@ -148,7 +156,9 @@ impl TurnManager {
     }
 
     pub fn effect_mut_checked(&mut self, index: usize) -> Option<&mut Effect> {
-        if index >= self.effects.len() { return None; }
+        if index >= self.effects.len() {
+            return None;
+        }
 
         self.effects[index].as_mut()
     }
@@ -162,25 +172,38 @@ impl TurnManager {
     }
 
     pub fn effect_checked(&self, index: usize) -> Option<&Effect> {
-        if index >= self.effects.len() { return None; }
+        if index >= self.effects.len() {
+            return None;
+        }
 
         self.effects[index].as_ref()
     }
 
     pub fn effect_iter(&self) -> EffectIterator {
-        EffectIterator { mgr: &self, index: 0 }
+        EffectIterator {
+            mgr: &self,
+            index: 0,
+        }
     }
 
     pub fn active_iter(&self) -> ActiveEntityIterator {
-        ActiveEntityIterator { mgr: &self, entry_iter: self.order.iter() }
+        ActiveEntityIterator {
+            mgr: &self,
+            entry_iter: self.order.iter(),
+        }
     }
 
     pub fn entity_iter(&self) -> EntityIterator {
-        EntityIterator { mgr: &self, index: 0 }
+        EntityIterator {
+            mgr: &self,
+            index: 0,
+        }
     }
 
     pub fn has_entity(&self, index: usize) -> bool {
-        if index >= self.entities.len() { return false; }
+        if index >= self.entities.len() {
+            return false;
+        }
 
         self.entities[index].is_some()
     }
@@ -189,15 +212,20 @@ impl TurnManager {
         let value = self.cur_ai_group_index;
 
         self.cur_ai_group_index += 1;
-        self.ai_groups.insert(value, EncounterRef {
-            area_id: area_id.to_string(),
-            encounter_index: enc_index,
-        });
+        self.ai_groups.insert(
+            value,
+            EncounterRef {
+                area_id: area_id.to_string(),
+                encounter_index: enc_index,
+            },
+        );
         value
     }
 
     pub fn entity_checked(&self, index: usize) -> Option<Rc<RefCell<EntityState>>> {
-        if index >= self.entities.len() { return None; }
+        if index >= self.entities.len() {
+            return None;
+        }
         self.entities[index].clone()
     }
 
@@ -233,7 +261,10 @@ impl TurnManager {
     }
 
     #[must_use]
-    pub fn update(&mut self, elapsed_millis: u32) -> (Vec<Rc<CallbackData>>, Vec<Rc<CallbackData>>) {
+    pub fn update(
+        &mut self,
+        elapsed_millis: u32,
+    ) -> (Vec<Rc<CallbackData>>, Vec<Rc<CallbackData>>) {
         // need to do an additional copy to satisfy the borrow checker here
         let to_remove: Vec<usize> = self.effects_remove_next_update.drain(..).collect();
 
@@ -243,10 +274,16 @@ impl TurnManager {
         }
 
         let mut turn_cbs = Vec::new();
-        let elapsed_millis = if !self.combat_active { elapsed_millis } else { 0 };
+        let elapsed_millis = if !self.combat_active {
+            elapsed_millis
+        } else {
+            0
+        };
 
         let new_round = self.add_millis(elapsed_millis);
-        if new_round { add_campaign_elapsed_callback(&mut turn_cbs); }
+        if new_round {
+            add_campaign_elapsed_callback(&mut turn_cbs);
+        }
 
         // removal just replaces some with none, so we can safely iterate
         for index in 0..self.effects.len() {
@@ -273,7 +310,11 @@ impl TurnManager {
     }
 
     #[must_use]
-    fn update_effect(&mut self, index: usize, elapsed_millis: u32) -> (bool, Vec<Rc<CallbackData>>) {
+    fn update_effect(
+        &mut self,
+        index: usize,
+        elapsed_millis: u32,
+    ) -> (bool, Vec<Rc<CallbackData>>) {
         let effect = match self.effects[index] {
             None => return (false, Vec::new()),
             Some(ref mut effect) => effect,
@@ -284,8 +325,12 @@ impl TurnManager {
     }
 
     #[must_use]
-    fn update_entity(&mut self, index: usize, elapsed_millis: u32,
-                     new_round: bool) -> (bool, Option<Rc<CallbackData>>) {
+    fn update_entity(
+        &mut self,
+        index: usize,
+        elapsed_millis: u32,
+        new_round: bool,
+    ) -> (bool, Option<Rc<CallbackData>>) {
         let entity = match self.entities[index].as_ref() {
             None => return (false, None),
             Some(entity) => entity,
@@ -314,7 +359,8 @@ impl TurnManager {
                 } else {
                     GameState::clear_selected_party_member();
                 }
-            }, None => unreachable!(),
+            }
+            None => unreachable!(),
         }
 
         self.listeners.notify(&self);
@@ -323,11 +369,9 @@ impl TurnManager {
 
     fn init_turn_for_current_entity(&mut self) {
         let current = match self.order.front() {
-            Some(Entry::Entity(index)) => {
-                match self.entities[*index] {
-                    None => unreachable!(),
-                    Some(ref entity) => entity,
-                }
+            Some(Entry::Entity(index)) => match self.entities[*index] {
+                None => unreachable!(),
+                Some(ref entity) => entity,
             },
             _ => unreachable!(),
         };
@@ -344,14 +388,14 @@ impl TurnManager {
     }
 
     pub fn current(&self) -> Option<Rc<RefCell<EntityState>>> {
-        if !self.combat_active { return None; }
+        if !self.combat_active {
+            return None;
+        }
 
         match self.order.front() {
-            Some(Entry::Entity(index)) => {
-                match self.entities[*index] {
-                    None => unreachable!(),
-                    Some(ref entity) => Some(Rc::clone(entity)),
-                }
+            Some(Entry::Entity(index)) => match self.entities[*index] {
+                None => unreachable!(),
+                Some(ref entity) => Some(Rc::clone(entity)),
             },
             _ => None,
         }
@@ -363,7 +407,9 @@ impl TurnManager {
         let mut current_ended = false;
 
         loop {
-            if current_ended && self.current_is_active_entity() { break; }
+            if current_ended && self.current_is_active_entity() {
+                break;
+            }
 
             let front = match self.order.pop_front() {
                 None => unreachable!(),
@@ -374,9 +420,12 @@ impl TurnManager {
                 Entry::Effect(index) => {
                     let (removal, mut effect_cbs) = self.update_effect(index, ROUND_TIME_MILLIS);
                     cbs.append(&mut effect_cbs);
-                    if removal { self.queue_remove_effect(index); }
-                    else { self.order.push_back(Entry::Effect(index)); }
-                },
+                    if removal {
+                        self.queue_remove_effect(index);
+                    } else {
+                        self.order.push_back(Entry::Effect(index));
+                    }
+                }
                 Entry::Entity(index) => {
                     if let Some(entity) = &self.entities[index] {
                         entity.borrow_mut().actor.end_turn();
@@ -416,8 +465,14 @@ impl TurnManager {
         }
     }
 
-    pub fn check_ai_activation(&mut self, mover: &Rc<RefCell<EntityState>>, area_state: &mut AreaState) {
-        if mover.borrow().actor.stats.hidden { return; }
+    pub fn check_ai_activation(
+        &mut self,
+        mover: &Rc<RefCell<EntityState>>,
+        area_state: &mut AreaState,
+    ) {
+        if mover.borrow().actor.stats.hidden {
+            return;
+        }
 
         let mut groups_to_activate: HashSet<usize> = HashSet::new();
         let mut state_changed = false;
@@ -428,16 +483,28 @@ impl TurnManager {
                 Some(ref entity) => entity,
             };
 
-            if Rc::ptr_eq(mover, entity) { continue; }
+            if Rc::ptr_eq(mover, entity) {
+                continue;
+            }
 
             let mut entity = entity.borrow_mut();
-            if entity.actor.is_dead() { continue; }
-            if !entity.is_hostile(mover) { continue; }
-            if !entity.location.is_in(&area_state) { continue; }
-            if entity.actor.actor.ai.is_none() && !entity.is_party_member() { continue; }
+            if entity.actor.is_dead() {
+                continue;
+            }
+            if !entity.is_hostile(mover) {
+                continue;
+            }
+            if !entity.location.is_in(&area_state) {
+                continue;
+            }
+            if entity.actor.actor.ai.is_none() && !entity.is_party_member() {
+                continue;
+            }
 
             let mover = mover.borrow();
-            if !area_state.has_visibility(&mover, &entity) && !area_state.has_visibility(&entity, &mover) {
+            if !area_state.has_visibility(&mover, &entity)
+                && !area_state.has_visibility(&entity, &mover)
+            {
                 continue;
             }
 
@@ -445,7 +512,9 @@ impl TurnManager {
             state_changed = true;
         }
 
-        if !state_changed { return; }
+        if !state_changed {
+            return;
+        }
 
         self.activate_entity_ai(&mut mover.borrow_mut(), &mut groups_to_activate);
 
@@ -456,8 +525,12 @@ impl TurnManager {
             };
 
             let mut entity = entity.borrow_mut();
-            if entity.is_ai_active() { continue; }
-            if !entity.location.is_in(&area_state) { continue; }
+            if entity.is_ai_active() {
+                continue;
+            }
+            if !entity.location.is_in(&area_state) {
+                continue;
+            }
 
             match entity.ai_group() {
                 None => continue,
@@ -475,14 +548,18 @@ impl TurnManager {
                 area_state.fire_on_encounter_activated(enc_ref.encounter_index, &mover);
             } else {
                 let area_state = GameState::get_area_state(&enc_ref.area_id).unwrap();
-                area_state.borrow_mut().fire_on_encounter_activated(enc_ref.encounter_index, &mover);
+                area_state
+                    .borrow_mut()
+                    .fire_on_encounter_activated(enc_ref.encounter_index, &mover);
             }
         }
 
         if !self.combat_active {
             self.set_combat_active(true);
             loop {
-                if self.current_is_active_entity() { break; }
+                if self.current_is_active_entity() {
+                    break;
+                }
                 let front = self.order.pop_front().unwrap();
                 self.order.push_back(front);
             }
@@ -494,8 +571,12 @@ impl TurnManager {
     }
 
     fn activate_entity_ai(&self, entity: &mut EntityState, groups: &mut HashSet<usize>) {
-        if entity.is_party_member() { return; }
-        if entity.is_ai_active() { return; }
+        if entity.is_party_member() {
+            return;
+        }
+        if entity.is_ai_active() {
+            return;
+        }
 
         trace!("Activate AI for {}", entity.actor.actor.name);
         entity.set_ai_active(true);
@@ -510,7 +591,9 @@ impl TurnManager {
     }
 
     fn set_combat_active(&mut self, active: bool) {
-        if active == self.combat_active { return; }
+        if active == self.combat_active {
+            return;
+        }
 
         info!("Setting combat mode active = {}", active);
         self.combat_active = active;
@@ -532,7 +615,9 @@ impl TurnManager {
 
             entity.set_ai_active(false);
 
-            if !entity.is_party_member() { continue; }
+            if !entity.is_party_member() {
+                continue;
+            }
 
             entity.actor.end_encounter();
         }
@@ -554,22 +639,26 @@ impl TurnManager {
             index -= 1;
             match entry {
                 Entry::Entity(entity_index) => {
-                    let base = self.entities[*entity_index].as_ref()
-                        .unwrap().borrow().actor.stats.initiative;
+                    let base = self.entities[*entity_index]
+                        .as_ref()
+                        .unwrap()
+                        .borrow()
+                        .actor
+                        .stats
+                        .initiative;
                     last_initiative = base + gen_rand(0, initiative_roll_max);
-                    initiative[index] = 2* last_initiative;
-                },
+                    initiative[index] = 2 * last_initiative;
+                }
                 Entry::Effect(_) => {
                     // this effect should come just before the associated entity
                     initiative[index] = 2 * last_initiative - 1;
-                },
+                }
                 Entry::TurnChange => (),
             }
         }
 
-
         let mut entries: Vec<_> = self.order.drain(..).zip(initiative).collect();
-        entries.sort_by_key(|&(_, initiative)| { initiative });
+        entries.sort_by_key(|&(_, initiative)| initiative);
 
         for (entry, _) in entries {
             match entry {
@@ -596,26 +685,41 @@ impl TurnManager {
         self.entities_move_callback_next_update.insert(entity_index);
     }
 
-    pub(crate) fn increment_surface_squares_moved(&mut self, entity_index: usize, surface_index: usize) {
+    pub(crate) fn increment_surface_squares_moved(
+        &mut self,
+        entity_index: usize,
+        surface_index: usize,
+    ) {
         let surface = self.effect_mut(surface_index);
         surface.increment_squares_moved(entity_index);
     }
 
-    pub (crate) fn add_to_surface(&mut self, entity_index: usize, surface_index: usize) {
+    pub(crate) fn add_to_surface(&mut self, entity_index: usize, surface_index: usize) {
         let entity = self.entity(entity_index);
         let surface = self.effect_mut(surface_index);
-        info!("Add '{}' from surface {}", entity.borrow().actor.actor.name, surface_index);
-        entity.borrow_mut().actor.add_effect(surface_index, surface.bonuses().clone());
+        info!(
+            "Add '{}' from surface {}",
+            entity.borrow().actor.actor.name,
+            surface_index
+        );
+        entity
+            .borrow_mut()
+            .actor
+            .add_effect(surface_index, surface.bonuses().clone());
         surface.increment_squares_moved(entity_index);
     }
 
-    pub (crate) fn remove_from_surface(&mut self, entity_index: usize, surface_index: usize) {
+    pub(crate) fn remove_from_surface(&mut self, entity_index: usize, surface_index: usize) {
         let entity = match self.entity_checked(entity_index) {
             None => return,
             Some(entity) => entity,
         };
         assert!(self.effects[surface_index].is_some());
-        info!("Remove '{}' from surface {}", entity.borrow().actor.actor.name, surface_index);
+        info!(
+            "Remove '{}' from surface {}",
+            entity.borrow().actor.actor.name,
+            surface_index
+        );
         entity.borrow_mut().actor.remove_effect(surface_index);
     }
 
@@ -643,7 +747,11 @@ impl TurnManager {
 
         if !is_dead {
             self.order.push_back(Entry::Entity(index));
-            debug!("Added entity with unique id '{}' at {} to turn timer", entity.borrow().unique_id(), index);
+            debug!(
+                "Added entity with unique id '{}' at {} to turn timer",
+                entity.borrow().unique_id(),
+                index
+            );
         }
 
         entity.borrow_mut().set_index(index);
@@ -653,11 +761,18 @@ impl TurnManager {
         index
     }
 
-    fn add_effect_internal(&mut self, mut effect: Effect, cbs: Vec<CallbackData>,
-                           removal_markers: Vec<Rc<Cell<bool>>>) -> usize {
-        effect.removal_listeners.add(ChangeListener::new("anim", Box::new(move |_| {
-            removal_markers.iter().for_each(|m| m.set(true));
-        })));
+    fn add_effect_internal(
+        &mut self,
+        mut effect: Effect,
+        cbs: Vec<CallbackData>,
+        removal_markers: Vec<Rc<Cell<bool>>>,
+    ) -> usize {
+        effect.removal_listeners.add(ChangeListener::new(
+            "anim",
+            Box::new(move |_| {
+                removal_markers.iter().for_each(|m| m.set(true));
+            }),
+        ));
 
         let index = self.effects.len();
         for mut cb in cbs {
@@ -678,9 +793,14 @@ impl TurnManager {
         self.effects.len()
     }
 
-    pub fn add_surface(&mut self, effect: Effect, area_state: &Rc<RefCell<AreaState>>,
-                       points: Vec<Point>, cbs: Vec<CallbackData>,
-                       removal_markers: Vec<Rc<Cell<bool>>>) -> usize {
+    pub fn add_surface(
+        &mut self,
+        effect: Effect,
+        area_state: &Rc<RefCell<AreaState>>,
+        points: Vec<Point>,
+        cbs: Vec<CallbackData>,
+        removal_markers: Vec<Rc<Cell<bool>>>,
+    ) -> usize {
         let index = self.add_effect_internal(effect, cbs, removal_markers);
         self.surfaces.push(index);
         let entities = area_state.borrow_mut().add_surface(index, points);
@@ -692,8 +812,13 @@ impl TurnManager {
         index
     }
 
-    pub fn add_effect(&mut self, effect: Effect, entity: &Rc<RefCell<EntityState>>,
-                      cbs: Vec<CallbackData>, removal_markers: Vec<Rc<Cell<bool>>>) -> usize {
+    pub fn add_effect(
+        &mut self,
+        effect: Effect,
+        entity: &Rc<RefCell<EntityState>>,
+        cbs: Vec<CallbackData>,
+        removal_markers: Vec<Rc<Cell<bool>>>,
+    ) -> usize {
         let index = self.add_effect_internal(effect, cbs, removal_markers);
 
         let bonuses = self.effect(index).bonuses().clone();
@@ -710,11 +835,14 @@ impl TurnManager {
             Some(ref mut effect) => match effect {
                 None => unreachable!(),
                 Some(ref mut effect) => {
-                    effect.removal_listeners.add(ChangeListener::new("anim", Box::new(move |_| {
-                        marked.iter().for_each(|m| m.set(true));
-                    })));
+                    effect.removal_listeners.add(ChangeListener::new(
+                        "anim",
+                        Box::new(move |_| {
+                            marked.iter().for_each(|m| m.set(true));
+                        }),
+                    ));
                 }
-            }
+            },
         }
     }
 
@@ -743,12 +871,10 @@ impl TurnManager {
             self.remove_from_surface(entity, index);
         }
         self.effects[index] = None;
-        self.order.retain(|e| {
-            match e {
-                Entry::Effect(i) => *i != index,
-                Entry::Entity(_) => true,
-                Entry::TurnChange => true,
-            }
+        self.order.retain(|e| match e {
+            Entry::Effect(i) => *i != index,
+            Entry::Entity(_) => true,
+            Entry::TurnChange => true,
         });
 
         self.surfaces.retain(|e| *e != index);
@@ -756,7 +882,7 @@ impl TurnManager {
         cbs
     }
 
-    fn check_encounter_cleared(&self, entity: &Rc<RefCell<EntityState>>) -> Option<usize>{
+    fn check_encounter_cleared(&self, entity: &Rc<RefCell<EntityState>>) -> Option<usize> {
         let ai_group = match entity.borrow().ai_group() {
             None => return None,
             Some(index) => index,
@@ -765,11 +891,16 @@ impl TurnManager {
         debug!("Check encounter cleared: {}", ai_group);
         for other in self.entity_iter() {
             let other = other.borrow();
-            if other.actor.hp() <= 0 { continue; }
+            if other.actor.hp() <= 0 {
+                continue;
+            }
             if let Some(index) = other.ai_group() {
                 if index == ai_group {
-                    debug!("  Found blocking entity '{}' with {}",
-                           other.actor.actor.id, other.actor.hp());
+                    debug!(
+                        "  Found blocking entity '{}' with {}",
+                        other.actor.actor.id,
+                        other.actor.hp()
+                    );
                     return None;
                 }
             }
@@ -807,23 +938,19 @@ impl TurnManager {
             }
         }
 
-        self.order.retain(|e| {
-            match e {
-                Entry::Entity(i) => *i != index,
-                Entry::Effect(i) => !effects_to_remove.contains(i),
-                Entry::TurnChange => true,
-            }
+        self.order.retain(|e| match e {
+            Entry::Entity(i) => *i != index,
+            Entry::Effect(i) => !effects_to_remove.contains(i),
+            Entry::TurnChange => true,
         });
 
-        if self.order.iter().all(|e| {
-            match e {
-                Entry::Effect(_) => true,
-                Entry::Entity(index) => {
-                    let entity = self.entities[*index].as_ref().unwrap().borrow();
-                    !entity.is_ai_active() || entity.actor.faction() != Faction::Hostile
-                },
-                Entry::TurnChange => true,
+        if self.order.iter().all(|e| match e {
+            Entry::Effect(_) => true,
+            Entry::Entity(index) => {
+                let entity = self.entities[*index].as_ref().unwrap().borrow();
+                !entity.is_ai_active() || entity.actor.faction() != Faction::Hostile
             }
+            Entry::TurnChange => true,
         }) {
             self.set_combat_active(false);
         }
@@ -831,7 +958,9 @@ impl TurnManager {
         if let Some(ai_group) = self.check_encounter_cleared(&entity) {
             let enc_ref = self.ai_groups.get(&ai_group).unwrap().clone();
             let area_state = GameState::get_area_state(&enc_ref.area_id).unwrap();
-            area_state.borrow_mut().fire_on_encounter_cleared(enc_ref.encounter_index, &entity);
+            area_state
+                .borrow_mut()
+                .fire_on_encounter_cleared(enc_ref.encounter_index, &entity);
         }
 
         self.listeners.notify(&self);
@@ -846,7 +975,9 @@ pub struct ActiveEntityIterator<'a> {
 impl<'a> Iterator for ActiveEntityIterator<'a> {
     type Item = &'a Rc<RefCell<EntityState>>;
     fn next(&mut self) -> Option<&'a Rc<RefCell<EntityState>>> {
-        if !self.mgr.is_combat_active() { return None; }
+        if !self.mgr.is_combat_active() {
+            return None;
+        }
 
         loop {
             match self.entry_iter.next() {
@@ -858,9 +989,9 @@ impl<'a> Iterator for ActiveEntityIterator<'a> {
                         if entity.borrow().is_party_member() || entity.borrow().is_ai_active() {
                             return Some(entity);
                         }
-                    },
+                    }
                     Entry::TurnChange => (),
-                }
+                },
             }
         }
     }
@@ -882,8 +1013,8 @@ impl<'a> Iterator for EntityIterator<'a> {
                 None => return None,
                 Some(e) => match e {
                     &None => continue,
-                    &Some(ref entity) => return Some(Rc::clone(entity))
-                }
+                    &Some(ref entity) => return Some(Rc::clone(entity)),
+                },
             }
         }
     }
@@ -906,8 +1037,8 @@ impl<'a> Iterator for EffectIterator<'a> {
                 None => return None,
                 Some(e) => match e {
                     None => continue,
-                    Some(e) => return Some(e)
-                }
+                    Some(e) => return Some(e),
+                },
             };
         }
     }

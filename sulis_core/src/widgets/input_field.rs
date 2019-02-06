@@ -15,13 +15,13 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::any::Any;
-use std::rc::Rc;
 use std::cell::RefCell;
+use std::rc::Rc;
 
-use crate::resource::ResourceSet;
 use crate::image::Image;
-use crate::ui::{Callback, LineRenderer, Widget, WidgetKind};
 use crate::io::{GraphicsRenderer, InputAction};
+use crate::resource::ResourceSet;
+use crate::ui::{Callback, LineRenderer, Widget, WidgetKind};
 use crate::util::Point;
 use crate::widgets::Label;
 
@@ -60,7 +60,10 @@ impl InputField {
         self.ignore_next = true;
     }
 
-    pub fn set_key_press_callback(&mut self, cb: Rc<Fn(&Rc<RefCell<Widget>>, &mut InputField, InputAction)>) {
+    pub fn set_key_press_callback(
+        &mut self,
+        cb: Rc<Fn(&Rc<RefCell<Widget>>, &mut InputField, InputAction)>,
+    ) {
         self.key_press_callback = Some(cb);
     }
 
@@ -86,11 +89,19 @@ impl InputField {
 }
 
 impl WidgetKind for InputField {
-    fn get_name(&self) -> &str { NAME }
-    fn as_any(&self) -> &Any { self }
-    fn as_any_mut(&mut self) -> &mut Any { self }
+    fn get_name(&self) -> &str {
+        NAME
+    }
+    fn as_any(&self) -> &Any {
+        self
+    }
+    fn as_any_mut(&mut self) -> &mut Any {
+        self
+    }
 
-    fn wants_keyboard_focus(&self) -> bool { true }
+    fn wants_keyboard_focus(&self) -> bool {
+        true
+    }
 
     fn update(&mut self, widget: &Rc<RefCell<Widget>>, _millis: u32) {
         if self.initializing {
@@ -129,9 +140,10 @@ impl WidgetKind for InputField {
         match c {
             '\u{8}' => {
                 self.text.pop();
-            }, _ => {
-                if self.label.borrow().text_draw_end_x >
-                    widget.borrow().state.inner_right() as f32 {
+            }
+            _ => {
+                if self.label.borrow().text_draw_end_x > widget.borrow().state.inner_right() as f32
+                {
                     return true;
                 }
 
@@ -163,16 +175,25 @@ impl WidgetKind for InputField {
         true
     }
 
-    fn draw(&mut self, renderer: &mut GraphicsRenderer, pixel_size: Point,
-            widget: &Widget, millis: u32) {
-        self.label.borrow_mut().draw(renderer, pixel_size, widget, millis);
+    fn draw(
+        &mut self,
+        renderer: &mut GraphicsRenderer,
+        pixel_size: Point,
+        widget: &Widget,
+        millis: u32,
+    ) {
+        self.label
+            .borrow_mut()
+            .draw(renderer, pixel_size, widget, millis);
 
-        if !widget.state.has_keyboard_focus() { return; }
+        if !widget.state.has_keyboard_focus() {
+            return;
+        }
 
         if let Some(ref carat) = self.carat {
             let x = self.label.borrow().text_draw_end_x + self.carat_offset;
-            let y = widget.state.inner_top() as f32 +
-                (widget.state.inner_height() as f32 - self.carat_height) / 2.0;
+            let y = widget.state.inner_top() as f32
+                + (widget.state.inner_height() as f32 - self.carat_height) / 2.0;
             let w = self.carat_width;
             let h = self.carat_height;
             carat.draw(renderer, &widget.state.animation_state, x, y, w, h, millis);

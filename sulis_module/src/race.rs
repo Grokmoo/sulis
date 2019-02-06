@@ -14,20 +14,20 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::collections::HashMap;
+use std::fmt;
 use std::io::Error;
 use std::rc::Rc;
-use std::fmt;
-use std::collections::HashMap;
 
-use sulis_core::ui::Color;
+use crate::rules::{bonus::AttackBuilder, BonusList, Slot};
 use sulis_core::image::Image;
-use sulis_core::resource::{ResourceSet};
+use sulis_core::resource::ResourceSet;
+use sulis_core::ui::Color;
 use sulis_core::util::{gen_rand, unable_to_create_error, Point};
-use crate::rules::{BonusList, bonus::AttackBuilder, Slot};
 
-use crate::actor::{Sex};
+use crate::actor::Sex;
 
-use crate::{ObjectSize, ImageLayer, ImageLayerSet, Module, Prop};
+use crate::{ImageLayer, ImageLayerSet, Module, ObjectSize, Prop};
 
 #[derive(Debug)]
 pub struct Race {
@@ -56,7 +56,7 @@ pub struct Race {
 }
 
 impl fmt::Display for Race {
-   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{}", self.id)
     }
 }
@@ -73,7 +73,8 @@ impl Race {
             None => {
                 warn!("No match found for size '{}'", builder.size);
                 return unable_to_create_error("race", &builder.id);
-            }, Some(size) => Rc::clone(size)
+            }
+            Some(size) => Rc::clone(size),
         };
 
         let mut offsets = HashMap::new();
@@ -107,7 +108,7 @@ impl Race {
                     None => {
                         warn!("No image found with id '{}'", image_id);
                         return unable_to_create_error("race", &builder.id);
-                    },
+                    }
                     Some(image) => images.push(image),
                 }
             }
@@ -116,14 +117,13 @@ impl Race {
 
         let pc_death_prop = match builder.pc_death_prop {
             None => None,
-            Some(id) => {
-                match module.props.get(&id) {
-                    None => {
-                        warn!("No prop found with id '{}' for pc_death_prop", id);
-                        return unable_to_create_error("race", &builder.id);
-                    }, Some(prop) => Some(Rc::clone(prop)),
+            Some(id) => match module.props.get(&id) {
+                None => {
+                    warn!("No prop found with id '{}' for pc_death_prop", id);
+                    return unable_to_create_error("race", &builder.id);
                 }
-            }
+                Some(prop) => Some(Rc::clone(prop)),
+            },
         };
 
         Ok(Race {
@@ -157,9 +157,13 @@ impl Race {
             Sex::Female => &self.female_random_names,
         };
 
-        if names.is_empty() { return ""; }
+        if names.is_empty() {
+            return "";
+        }
 
-        if names.len() == 1 { return &names[0] }
+        if names.len() == 1 {
+            return &names[0];
+        }
 
         let index = gen_rand(0, names.len());
         &names[index]
@@ -196,7 +200,9 @@ impl Race {
 
     pub fn is_disabled(&self, slot: Slot) -> bool {
         for disabled in self.disabled_slots.iter() {
-            if *disabled == slot { return true; }
+            if *disabled == slot {
+                return true;
+            }
         }
         false
     }

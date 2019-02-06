@@ -18,10 +18,10 @@ use std::any::Any;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use sulis_core::io::{GraphicsRenderer, InputAction};
 use sulis_core::io::event::ClickKind;
+use sulis_core::io::{GraphicsRenderer, InputAction};
 use sulis_core::ui::{compute_area_scaling, Cursor, Scrollable, Widget, WidgetKind};
-use sulis_core::util::{Point};
+use sulis_core::util::Point;
 use sulis_module::area::MAX_AREA_SIZE;
 
 use crate::{AreaModel, EditorMode};
@@ -30,7 +30,7 @@ const NAME: &str = "area_editor";
 
 pub struct AreaEditor {
     cur_editor: Option<Rc<RefCell<dyn EditorMode>>>,
-    pub (crate) model: AreaModel,
+    pub(crate) model: AreaModel,
 
     scroll: Scrollable,
     scale: (f32, f32),
@@ -68,12 +68,16 @@ impl AreaEditor {
         x -= width as f32 / 2.0;
         y -= height as f32 / 2.0;
 
-        ((x + self.scroll.x()).round() as i32, (y + self.scroll.y()).round() as i32)
+        (
+            (x + self.scroll.x()).round() as i32,
+            (y + self.scroll.y()).round() as i32,
+        )
     }
 
-    fn get_event_data(&self, widget: &Rc<RefCell<Widget>>)
-        -> Option<(Rc<RefCell<dyn EditorMode>>, i32, i32)> {
-
+    fn get_event_data(
+        &self,
+        widget: &Rc<RefCell<Widget>>,
+    ) -> Option<(Rc<RefCell<dyn EditorMode>>, i32, i32)> {
         let editor = match self.cur_editor {
             None => return None,
             Some(ref editor) => editor,
@@ -86,14 +90,25 @@ impl AreaEditor {
 }
 
 impl WidgetKind for AreaEditor {
-    fn get_name(&self) -> &str { NAME }
+    fn get_name(&self) -> &str {
+        NAME
+    }
 
-    fn as_any(&self) -> &Any { self }
+    fn as_any(&self) -> &Any {
+        self
+    }
 
-    fn as_any_mut(&mut self) -> &mut Any { self }
+    fn as_any_mut(&mut self) -> &mut Any {
+        self
+    }
 
-    fn draw(&mut self, renderer: &mut GraphicsRenderer, pixel_size: Point,
-                          widget: &Widget, millis: u32) {
+    fn draw(
+        &mut self,
+        renderer: &mut GraphicsRenderer,
+        pixel_size: Point,
+        widget: &Widget,
+        millis: u32,
+    ) {
         self.scale = compute_area_scaling(pixel_size);
         let (scale_x, scale_y) = self.scale;
 
@@ -101,13 +116,26 @@ impl WidgetKind for AreaEditor {
         // TODO fix this hack
         let p = Point::new(p.x / 4, p.y / 4);
 
-        self.model.draw(renderer, p.x as f32 - self.scroll.x(), p.y as f32 - self.scroll.y(),
-            scale_x, scale_y, millis);
+        self.model.draw(
+            renderer,
+            p.x as f32 - self.scroll.x(),
+            p.y as f32 - self.scroll.y(),
+            scale_x,
+            scale_y,
+            millis,
+        );
 
         if let Some(ref editor) = self.cur_editor {
             let mut editor = editor.borrow_mut();
-            editor.draw_mode(renderer, &self.model, p.x as f32 - self.scroll.x(), p.y as f32 - self.scroll.y(),
-            scale_x, scale_y, millis);
+            editor.draw_mode(
+                renderer,
+                &self.model,
+                p.x as f32 - self.scroll.x(),
+                p.y as f32 - self.scroll.y(),
+                scale_x,
+                scale_y,
+                millis,
+            );
         }
     }
 
@@ -149,11 +177,21 @@ impl WidgetKind for AreaEditor {
         true
     }
 
-    fn on_mouse_drag(&mut self, widget: &Rc<RefCell<Widget>>, kind: ClickKind,
-                     delta_x: f32, delta_y: f32) -> bool {
+    fn on_mouse_drag(
+        &mut self,
+        widget: &Rc<RefCell<Widget>>,
+        kind: ClickKind,
+        delta_x: f32,
+        delta_y: f32,
+    ) -> bool {
         if let ClickKind::Middle = kind {
-            self.scroll.compute_max(&*widget.borrow(),
-                MAX_AREA_SIZE, MAX_AREA_SIZE, self.scale.0, self.scale.1);
+            self.scroll.compute_max(
+                &*widget.borrow(),
+                MAX_AREA_SIZE,
+                MAX_AREA_SIZE,
+                self.scale.0,
+                self.scale.1,
+            );
             self.scroll.change(delta_x, delta_y);
             return true;
         }
@@ -167,8 +205,10 @@ impl WidgetKind for AreaEditor {
         match self.last_click_position {
             None => (),
             Some(p) => {
-                if p.x == x && p.y == y { return true; }
-            },
+                if p.x == x && p.y == y {
+                    return true;
+                }
+            }
         }
 
         self.last_click_position = Some(Point::new(x, y));
@@ -181,8 +221,12 @@ impl WidgetKind for AreaEditor {
         true
     }
 
-    fn on_mouse_move(&mut self, widget: &Rc<RefCell<Widget>>,
-                     _delta_x: f32, _delta_y: f32) -> bool {
+    fn on_mouse_move(
+        &mut self,
+        widget: &Rc<RefCell<Widget>>,
+        _delta_x: f32,
+        _delta_y: f32,
+    ) -> bool {
         let (editor, x, y) = match self.get_event_data(widget) {
             None => return true,
             Some(value) => value,

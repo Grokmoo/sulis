@@ -14,15 +14,15 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::collections::HashMap;
 use std::cell::RefCell;
-use std::rc::Rc;
+use std::collections::HashMap;
 use std::io::Error;
+use std::rc::Rc;
 
+use crate::script::{script_callback::FuncKind, CallbackData};
+use crate::{save_state::EffectSaveState, ChangeListenerList, EntityState};
 use sulis_core::util::{ExtInt, Point};
 use sulis_module::{BonusList, ROUND_TIME_MILLIS};
-use crate::script::{CallbackData, script_callback::FuncKind};
-use crate::{ChangeListenerList, save_state::EffectSaveState, EntityState};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(deny_unknown_fields)]
@@ -63,8 +63,11 @@ pub struct Effect {
 }
 
 impl Effect {
-    pub fn load(data: EffectSaveState, new_index: usize,
-                entities: &HashMap<usize, Rc<RefCell<EntityState>>>) -> Result<Effect, Error> {
+    pub fn load(
+        data: EffectSaveState,
+        new_index: usize,
+        entities: &HashMap<usize, Rc<RefCell<EntityState>>>,
+    ) -> Result<Effect, Error> {
         let mut callbacks = Vec::new();
         for mut cb in data.callbacks {
             cb.update_entity_refs_on_load(entities)?;
@@ -90,8 +93,13 @@ impl Effect {
         })
     }
 
-    pub fn new(name: &str, tag: &str, duration: ExtInt, bonuses: BonusList,
-               deactivate_with_ability: Option<String>) -> Effect {
+    pub fn new(
+        name: &str,
+        tag: &str,
+        duration: ExtInt,
+        bonuses: BonusList,
+        deactivate_with_ability: Option<String>,
+    ) -> Effect {
         Effect {
             name: name.to_string(),
             tag: tag.to_string(),
@@ -127,7 +135,12 @@ impl Effect {
         }
     }
 
-    pub fn set_surface_for_area(&mut self, area: &str, points: &Vec<Point>, squares_to_fire_on_moved: u32) {
+    pub fn set_surface_for_area(
+        &mut self,
+        area: &str,
+        points: &Vec<Point>,
+        squares_to_fire_on_moved: u32,
+    ) {
         let area_id = area.to_string();
         self.surface = Some(Surface {
             area_id,
@@ -201,7 +214,7 @@ impl Effect {
         if cur_mod != self.cur_duration / ROUND_TIME_MILLIS {
             self.listeners.notify(&self);
 
-            return self.callbacks.clone()
+            return self.callbacks.clone();
         }
 
         Vec::new()
@@ -237,9 +250,7 @@ impl Effect {
     pub fn total_duration_rounds(&self) -> ExtInt {
         match self.total_duration {
             ExtInt::Infinity => ExtInt::Infinity,
-            ExtInt::Int(dur) => {
-                ExtInt::Int((dur as f32 / ROUND_TIME_MILLIS as f32).ceil() as u32)
-            }
+            ExtInt::Int(dur) => ExtInt::Int((dur as f32 / ROUND_TIME_MILLIS as f32).ceil() as u32),
         }
     }
 
@@ -247,9 +258,7 @@ impl Effect {
         let remaining_duration = self.total_duration - self.cur_duration;
         match remaining_duration {
             ExtInt::Infinity => ExtInt::Infinity,
-            ExtInt::Int(dur) => {
-                ExtInt::Int((dur as f32 / ROUND_TIME_MILLIS as f32).ceil() as u32)
-            }
+            ExtInt::Int(dur) => ExtInt::Int((dur as f32 / ROUND_TIME_MILLIS as f32).ceil() as u32),
         }
     }
 }

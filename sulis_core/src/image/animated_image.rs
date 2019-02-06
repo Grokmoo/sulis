@@ -14,9 +14,9 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::rc::Rc;
-use std::io::{Error};
 use std::collections::HashMap;
+use std::io::Error;
+use std::rc::Rc;
 
 use crate::image::Image;
 use crate::io::{DrawList, GraphicsRenderer};
@@ -31,8 +31,10 @@ pub struct AnimatedImage {
 }
 
 impl AnimatedImage {
-    pub fn new(builder: AnimatedImageBuilder,
-               images: &HashMap<String, Rc<Image>>) -> Result<Rc<Image>, Error> {
+    pub fn new(
+        builder: AnimatedImageBuilder,
+        images: &HashMap<String, Rc<Image>>,
+    ) -> Result<Rc<Image>, Error> {
         let mut images_vec = Vec::new();
 
         if builder.states.is_empty() {
@@ -45,8 +47,13 @@ impl AnimatedImage {
             let state = AnimationState::parse(&state_str)?;
 
             let image = match images.get(&image_id) {
-                None => return invalid_data_error(&format!("Unable to locate sub \
-                                                           image '{}'", image_id)),
+                None => {
+                    return invalid_data_error(&format!(
+                        "Unable to locate sub \
+                         image '{}'",
+                        image_id
+                    ));
+                }
                 Some(ref image) => Rc::clone(image),
             };
 
@@ -54,8 +61,10 @@ impl AnimatedImage {
                 None => size = Some(*image.get_size()),
                 Some(ref size) => {
                     if *size != *image.get_size() {
-                        return invalid_data_error(&format!("All images in an animated image \
-                                                           must have the same size."));
+                        return invalid_data_error(&format!(
+                            "All images in an animated image \
+                             must have the same size."
+                        ));
                     }
                 }
             }
@@ -63,9 +72,7 @@ impl AnimatedImage {
             images_vec.push((state, image));
         }
 
-        images_vec.sort_unstable_by(|a, b| {
-            a.0.cmp(&b.0)
-        });
+        images_vec.sort_unstable_by(|a, b| a.0.cmp(&b.0));
         // images_vec.sort_unstable_by_key(|&(ref state, _)| state);
 
         Ok(Rc::new(AnimatedImage {
@@ -81,14 +88,30 @@ impl Image for AnimatedImage {
         self.id.clone()
     }
 
-    fn draw(&self, renderer: &mut GraphicsRenderer, state: &AnimationState,
-            x: f32, y: f32, w: f32, h: f32, millis: u32) {
+    fn draw(
+        &self,
+        renderer: &mut GraphicsRenderer,
+        state: &AnimationState,
+        x: f32,
+        y: f32,
+        w: f32,
+        h: f32,
+        millis: u32,
+    ) {
         AnimationState::find_match_in_vec(state, &self.images)
             .draw(renderer, state, x, y, w, h, millis);
     }
 
-    fn append_to_draw_list(&self, draw_list: &mut DrawList, state: &AnimationState,
-                           x: f32, y: f32, w: f32, h: f32, millis: u32) {
+    fn append_to_draw_list(
+        &self,
+        draw_list: &mut DrawList,
+        state: &AnimationState,
+        x: f32,
+        y: f32,
+        w: f32,
+        h: f32,
+        millis: u32,
+    ) {
         AnimationState::find_match_in_vec(state, &self.images)
             .append_to_draw_list(draw_list, state, x, y, w, h, millis);
     }

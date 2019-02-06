@@ -14,8 +14,10 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-#[macro_use] extern crate log;
-#[macro_use] extern crate serde_derive;
+#[macro_use]
+extern crate log;
+#[macro_use]
+extern crate serde_derive;
 
 pub mod ability;
 pub use self::ability::Ability;
@@ -25,9 +27,9 @@ pub use self::ability_list::AbilityList;
 
 pub mod actor;
 pub use self::actor::Actor;
-pub use self::actor::Sex;
 pub use self::actor::ActorBuilder;
 pub use self::actor::Faction;
+pub use self::actor::Sex;
 
 pub mod ai;
 pub use self::ai::AITemplate;
@@ -49,8 +51,8 @@ pub use self::object_size::ObjectSize;
 pub use self::object_size::ObjectSizeIterator;
 
 pub mod on_trigger;
-pub use self::on_trigger::OnTrigger;
 pub use self::on_trigger::MerchantData;
+pub use self::on_trigger::OnTrigger;
 
 pub mod encounter;
 pub use self::encounter::Encounter;
@@ -67,12 +69,12 @@ pub use self::image_layer::ImageLayerSet;
 
 pub mod inventory_builder;
 pub use self::inventory_builder::InventoryBuilder;
-pub use self::inventory_builder::ItemSaveState;
 pub use self::inventory_builder::ItemListEntrySaveState;
+pub use self::inventory_builder::ItemSaveState;
 
 pub mod item;
-pub use self::item::Item;
 pub use self::item::Equippable;
+pub use self::item::Item;
 pub use self::item::Usable;
 
 pub mod item_adjective;
@@ -98,41 +100,45 @@ pub mod race;
 pub use self::race::Race;
 
 pub mod rules;
-pub use self::rules::{Rules, Armor, Attack, AttackKind, AccuracyKind, Attribute, AttributeList,
-    Bonus, BonusKind, BonusList, AttackBonuses, Damage, DamageKind, DamageList, Resistance,
-    StatList, ROUND_TIME_MILLIS, Time, Slot, QuickSlot, ItemKind, HitFlags, HitKind,
-    WeaponStyle, WeaponKind, ArmorKind};
 pub use self::rules::bonus;
+pub use self::rules::{
+    AccuracyKind, Armor, ArmorKind, Attack, AttackBonuses, AttackKind, Attribute, AttributeList,
+    Bonus, BonusKind, BonusList, Damage, DamageKind, DamageList, HitFlags, HitKind, ItemKind,
+    QuickSlot, Resistance, Rules, Slot, StatList, Time, WeaponKind, WeaponStyle, ROUND_TIME_MILLIS,
+};
 
-use std::collections::HashMap;
-use std::rc::Rc;
-use std::io::Error;
 use std::cell::RefCell;
-use std::fmt::{self, Display};
-use std::path::{PathBuf};
-use std::fs;
+use std::collections::HashMap;
 use std::ffi::OsStr;
+use std::fmt::{self, Display};
+use std::fs;
+use std::io::Error;
+use std::path::PathBuf;
+use std::rc::Rc;
 
 use sulis_core::config::{self, Config};
-use sulis_core::serde_yaml;
-use sulis_core::util::{invalid_data_error};
 use sulis_core::resource::*;
+use sulis_core::serde_yaml;
+use sulis_core::util::invalid_data_error;
 
-use self::area::Tile;
 use self::ability::AbilityBuilder;
 use self::ability_list::AbilityListBuilder;
+use self::area::AreaBuilder;
+use self::area::Tile;
+use self::area::{
+    tile::{TerrainKind, TerrainRules, WallKind, WallRules},
+    Tileset,
+};
+use self::campaign::CampaignBuilder;
+use self::class::ClassBuilder;
 use self::conversation::ConversationBuilder;
 use self::cutscene::CutsceneBuilder;
-use self::area::AreaBuilder;
-use self::class::ClassBuilder;
-use self::campaign::CampaignBuilder;
 use self::encounter::EncounterBuilder;
 use self::item::ItemBuilder;
 use self::loot_list::LootListBuilder;
+use self::object_size::ObjectSizeBuilder;
 use self::prop::PropBuilder;
 use self::race::RaceBuilder;
-use self::object_size::ObjectSizeBuilder;
-use self::area::{Tileset, tile::{TerrainRules, TerrainKind, WallRules, WallKind}};
 
 thread_local! {
     static MODULE: RefCell<Module> = RefCell::new(Module::default());
@@ -189,7 +195,7 @@ impl ModuleInfo {
             None => CampaignGroup {
                 id: campaign.id.to_string(),
                 name: campaign.name.to_string(),
-                position: 0
+                position: 0,
             },
             Some(group) => group,
         };
@@ -260,7 +266,8 @@ impl Module {
         match std::fs::remove_file(path.as_path()) {
             Err(e) => {
                 warn!("Unable to delete file {:?}: {}", path, e);
-            }, Ok(()) => (),
+            }
+            Ok(()) => (),
         }
     }
 
@@ -288,28 +295,43 @@ impl Module {
             trace!("Found entry {:?}", entry);
             let entry = match entry {
                 Ok(entry) => entry,
-                Err(e) => { warn!("Error reading entry: {}", e); continue; }
+                Err(e) => {
+                    warn!("Error reading entry: {}", e);
+                    continue;
+                }
             };
 
-            if !entry.path().is_file() { continue; }
+            if !entry.path().is_file() {
+                continue;
+            }
 
-            let extension: String = OsStr::to_str(entry.path().extension()
-                                                  .unwrap_or(OsStr::new(""))).unwrap_or("").to_string();
+            let extension: String =
+                OsStr::to_str(entry.path().extension().unwrap_or(OsStr::new("")))
+                    .unwrap_or("")
+                    .to_string();
 
-            if extension != "yml" { continue; }
+            if extension != "yml" {
+                continue;
+            }
 
             let mut path = entry.path().to_path_buf();
             path.set_extension("");
-            let actor_builder: ActorBuilder = match read_single_resource(&path
-                                                        .to_string_lossy().to_string()) {
-                Ok(entry) => entry,
-                Err(e) => { warn!("Error reading actor: {}", e); continue; }
-            };
+            let actor_builder: ActorBuilder =
+                match read_single_resource(&path.to_string_lossy().to_string()) {
+                    Ok(entry) => entry,
+                    Err(e) => {
+                        warn!("Error reading actor: {}", e);
+                        continue;
+                    }
+                };
 
             let actor = MODULE.with(|module| {
                 let module = module.borrow();
                 match Actor::new(actor_builder, &module) {
-                    Err(e) => { warn!("Error reading actor: {}", e); None },
+                    Err(e) => {
+                        warn!("Error reading actor: {}", e);
+                        None
+                    }
                     Ok(actor) => Some(actor),
                 }
             });
@@ -347,13 +369,18 @@ impl Module {
                                 } else {
                                     false
                                 }
-                            }) { continue; }
+                            }) {
+                                continue;
+                            }
                         }
                     }
 
                     if campaign_yaml.is_some() {
-                        return invalid_data_error(&format!("Multiple potential campaign files \
-                            detected at top level: '{}'", id));
+                        return invalid_data_error(&format!(
+                            "Multiple potential campaign files \
+                             detected at top level: '{}'",
+                            id
+                        ));
                     }
                     campaign_yaml = Some(yaml);
                 }
@@ -399,14 +426,20 @@ impl Module {
             module.root_dir = Some(dirs[1].to_string());
 
             for (id, adj) in builder_set.item_adjectives {
-                trace!("Inserting resource of type item_adjective with key {} \
-                    into resource set.", id);
+                trace!(
+                    "Inserting resource of type item_adjective with key {} \
+                     into resource set.",
+                    id
+                );
                 module.item_adjectives.insert(id, Rc::new(adj));
             }
 
             for (id, quest) in builder_set.quests {
-                trace!("Inserting resource of type quest with key {} \
-                    into module.", id);
+                trace!(
+                    "Inserting resource of type quest with key {} \
+                     into module.",
+                    id
+                );
                 module.quests.insert(id, Rc::new(quest));
             }
 
@@ -423,7 +456,12 @@ impl Module {
                 module.wall_kinds = tiles_list.wall_kinds;
 
                 for (id, tile_builder) in tiles_list.tiles {
-                    insert_if_ok("tile", id.to_string(), Tile::new(id, tile_builder), &mut module.tiles);
+                    insert_if_ok(
+                        "tile",
+                        id.to_string(),
+                        Tile::new(id, tile_builder),
+                        &mut module.tiles,
+                    );
                 }
             }
 
@@ -432,11 +470,21 @@ impl Module {
             }
 
             for (id, builder) in builder_set.ability_builders {
-                insert_if_ok("ability", id, Ability::new(builder, &module), &mut module.abilities);
+                insert_if_ok(
+                    "ability",
+                    id,
+                    Ability::new(builder, &module),
+                    &mut module.abilities,
+                );
             }
 
             for (id, builder) in builder_set.ability_list_builders {
-                insert_if_ok("ability_list", id, AbilityList::new(builder, &module), &mut module.ability_lists);
+                insert_if_ok(
+                    "ability_list",
+                    id,
+                    AbilityList::new(builder, &module),
+                    &mut module.ability_lists,
+                );
             }
 
             for (id, builder) in builder_set.item_builders.into_iter() {
@@ -444,7 +492,12 @@ impl Module {
             }
 
             for (id, builder) in builder_set.loot_builders.into_iter() {
-                insert_if_ok("loot list", id, LootList::new(builder, &module), &mut module.loot_lists);
+                insert_if_ok(
+                    "loot list",
+                    id,
+                    LootList::new(builder, &module),
+                    &mut module.loot_lists,
+                );
             }
 
             for (id, builder) in builder_set.prop_builders {
@@ -456,27 +509,52 @@ impl Module {
             }
 
             for (id, builder) in builder_set.class_builders.into_iter() {
-                insert_if_ok("class", id, Class::new(builder, &module), &mut module.classes);
+                insert_if_ok(
+                    "class",
+                    id,
+                    Class::new(builder, &module),
+                    &mut module.classes,
+                );
             }
 
             for (id, builder) in builder_set.conversation_builders.into_iter() {
-                insert_if_ok("conversation", id, Conversation::new(builder, &module), &mut module.conversations);
+                insert_if_ok(
+                    "conversation",
+                    id,
+                    Conversation::new(builder, &module),
+                    &mut module.conversations,
+                );
             }
 
             for (id, builder) in builder_set.actor_builders.into_iter() {
-                insert_if_ok("actor", id, Actor::new(builder, &module), &mut module.actors);
+                insert_if_ok(
+                    "actor",
+                    id,
+                    Actor::new(builder, &module),
+                    &mut module.actors,
+                );
             }
 
             for (id, builder) in builder_set.encounter_builders.into_iter() {
-                insert_if_ok("encounter", id, Encounter::new(builder, &module), &mut module.encounters);
+                insert_if_ok(
+                    "encounter",
+                    id,
+                    Encounter::new(builder, &module),
+                    &mut module.encounters,
+                );
             }
 
             for (id, builder) in builder_set.cutscene_builders {
-                insert_if_ok("cutscene", id, Cutscene::new(builder, &module), &mut module.cutscenes);
+                insert_if_ok(
+                    "cutscene",
+                    id,
+                    Cutscene::new(builder, &module),
+                    &mut module.cutscenes,
+                );
             }
 
             for (id, builder) in builder_set.area_builders {
-                 insert_if_ok("area", id, Area::new(builder, &module), &mut module.areas);
+                insert_if_ok("area", id, Area::new(builder, &module), &mut module.areas);
             }
         });
 
@@ -484,7 +562,7 @@ impl Module {
 
         MODULE.with(move |m| {
             let mut m = m.borrow_mut();
-            m.campaign= Some(Rc::new(campaign));
+            m.campaign = Some(Rc::new(campaign));
             m.init = true;
         });
 
@@ -492,16 +570,14 @@ impl Module {
     }
 
     pub fn module_dir() -> Option<String> {
-        MODULE.with(|m| {
-            match m.borrow().root_dir {
-                None => None,
-                Some(ref dir) => Some(dir.to_string()),
-            }
+        MODULE.with(|m| match m.borrow().root_dir {
+            None => None,
+            Some(ref dir) => Some(dir.to_string()),
         })
     }
 
     pub fn is_initialized() -> bool {
-        MODULE.with(|m| { m.borrow_mut().init })
+        MODULE.with(|m| m.borrow_mut().init)
     }
 
     pub fn load_actor(builder: ActorBuilder) -> Result<Actor, Error> {
@@ -551,7 +627,9 @@ impl Module {
     }
 
     pub fn create_get_item(id: &str, adjectives: &Vec<String>) -> Option<Rc<Item>> {
-        if adjectives.len() == 0 { return Module::item(id); }
+        if adjectives.len() == 0 {
+            return Module::item(id);
+        }
 
         MODULE.with(|m| {
             let mut module = m.borrow_mut();
@@ -581,7 +659,11 @@ impl Module {
                 adjs.push(adjective);
             }
 
-            let item = Rc::new(Item::clone_with_adjectives(&base_item, adjs, new_id.clone()));
+            let item = Rc::new(Item::clone_with_adjectives(
+                &base_item,
+                adjs,
+                new_id.clone(),
+            ));
 
             module.items.insert(new_id, Rc::clone(&item));
             Some(item)
@@ -613,7 +695,7 @@ impl Module {
             let module = r.borrow();
             match module.scripts.get(id) {
                 None => None,
-                Some(ref script) => Some(script.to_string())
+                Some(ref script) => Some(script.to_string()),
             }
         })
     }
@@ -630,7 +712,13 @@ impl Module {
     }
 
     pub fn all_object_sizes() -> Vec<Rc<ObjectSize>> {
-        MODULE.with(|r| r.borrow().sizes.iter().map(|ref s| Rc::clone(s.1)).collect())
+        MODULE.with(|r| {
+            r.borrow()
+                .sizes
+                .iter()
+                .map(|ref s| Rc::clone(s.1))
+                .collect()
+        })
     }
 
     pub fn all_classes() -> Vec<Rc<Class>> {

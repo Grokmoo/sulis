@@ -15,23 +15,22 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::any::Any;
-use std::rc::Rc;
 use std::cell::RefCell;
+use std::rc::Rc;
 
-use sulis_core::io::GraphicsRenderer;
 use sulis_core::io::event::ClickKind;
+use sulis_core::io::GraphicsRenderer;
 use sulis_core::ui::{Widget, WidgetKind};
 use sulis_core::util::Point;
 use sulis_state::{ChangeListener, EntityState, GameState};
 
 pub const NAME: &str = "initiative_ticker";
 
-pub struct InitiativeTicker {
-}
+pub struct InitiativeTicker {}
 
 impl InitiativeTicker {
     pub fn new() -> Rc<RefCell<InitiativeTicker>> {
-        Rc::new(RefCell::new(InitiativeTicker { }))
+        Rc::new(RefCell::new(InitiativeTicker {}))
     }
 }
 
@@ -40,7 +39,7 @@ impl WidgetKind for InitiativeTicker {
 
     fn on_mouse_enter(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
         self.super_on_mouse_enter(widget);
-        false 
+        false
     }
 
     fn on_mouse_press(&mut self, widget: &Rc<RefCell<Widget>>, kind: ClickKind) -> bool {
@@ -53,8 +52,13 @@ impl WidgetKind for InitiativeTicker {
         false
     }
 
-    fn on_mouse_drag(&mut self, _widget: &Rc<RefCell<Widget>>, _kind: ClickKind,
-                     _delta_x: f32, _delta_y: f32) -> bool {
+    fn on_mouse_drag(
+        &mut self,
+        _widget: &Rc<RefCell<Widget>>,
+        _kind: ClickKind,
+        _delta_x: f32,
+        _delta_y: f32,
+    ) -> bool {
         false
     }
 
@@ -62,7 +66,9 @@ impl WidgetKind for InitiativeTicker {
         widget.borrow_mut().state.set_enabled(false);
 
         let mgr = GameState::turn_manager();
-        mgr.borrow_mut().listeners.add(ChangeListener::invalidate(NAME, widget));
+        mgr.borrow_mut()
+            .listeners
+            .add(ChangeListener::invalidate(NAME, widget));
 
         let pane = Widget::empty("pane");
         let mut first = true;
@@ -95,8 +101,13 @@ impl TickerLabel {
 impl WidgetKind for TickerLabel {
     widget_kind!(NAME);
 
-    fn draw(&mut self, renderer: &mut GraphicsRenderer, _pixel_size: Point,
-            widget: &Widget, _millis: u32) {
+    fn draw(
+        &mut self,
+        renderer: &mut GraphicsRenderer,
+        _pixel_size: Point,
+        widget: &Widget,
+        _millis: u32,
+    ) {
         let entity = self.entity.borrow();
 
         let x = widget.state.inner_left() as f32;
@@ -112,6 +123,8 @@ impl WidgetKind for TickerLabel {
         let cx = x + (inner_width - s) / 2.0 - 2.0 + entity.actor.actor.race.ticker_offset.0;
         let cy = y + (inner_height - s) / 2.0 - 2.0 + entity.actor.actor.race.ticker_offset.1;
 
-        self.entity.borrow().draw_no_pos(renderer, s, s, cx / s, cy / s, 1.0);
+        self.entity
+            .borrow()
+            .draw_no_pos(renderer, s, s, cx / s, cy / s, 1.0);
     }
 }

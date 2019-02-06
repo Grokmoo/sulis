@@ -16,10 +16,10 @@
 
 use std::ptr;
 
-use sulis_core::config::Config;
-use sulis_core::ui::Color;
-use sulis_core::io::{DrawList, GraphicsRenderer};
 use crate::{EntityState, GameState};
+use sulis_core::config::Config;
+use sulis_core::io::{DrawList, GraphicsRenderer};
+use sulis_core::ui::Color;
 
 const BORDER_SIZE: i32 = 2;
 const BORDER_SIZE_F: f32 = BORDER_SIZE as f32;
@@ -39,8 +39,13 @@ pub struct EntityTextureSlot {
 impl EntityTextureSlot {
     pub fn redraw_entity(&self, entity: &EntityState, renderer: &mut GraphicsRenderer) {
         let scale = self.slot_size as i32;
-        renderer.clear_texture_region(&self.texture_id, self.x * scale, self.y * scale,
-                                      (self.x + self.w) * scale, (self.y + self.h) * scale);
+        renderer.clear_texture_region(
+            &self.texture_id,
+            self.x * scale,
+            self.y * scale,
+            (self.x + self.w) * scale,
+            (self.y + self.h) * scale,
+        );
 
         let min_x = self.x as f32 + BORDER_SIZE_F;
         let min_y = self.y as f32 + BORDER_SIZE_F;
@@ -48,16 +53,31 @@ impl EntityTextureSlot {
         let scale_x = ui_x as f32 / self.slots_dim as f32;
         let scale_y = ui_y as f32 / self.slots_dim as f32;
 
-        entity.actor.draw_to_texture(renderer, &self.texture_id, scale_x, scale_y, min_x, min_y);
+        entity
+            .actor
+            .draw_to_texture(renderer, &self.texture_id, scale_x, scale_y, min_x, min_y);
     }
 
-    pub fn draw(&self, renderer: &mut GraphicsRenderer, x: f32, y: f32, offset_x: f32,
-                     offset_y: f32, scale_x: f32, scale_y: f32, color: Color, color_sec: Color) {
-        let mut list = DrawList::from_texture_id(&self.texture_id, &self.tex_coords,
-                                                 x - BORDER_SIZE_F - offset_x,
-                                                 y - BORDER_SIZE_F - offset_y,
-                                                 self.w as f32 + offset_x * 2.0,
-                                                 self.h as f32 + offset_y * 2.0);
+    pub fn draw(
+        &self,
+        renderer: &mut GraphicsRenderer,
+        x: f32,
+        y: f32,
+        offset_x: f32,
+        offset_y: f32,
+        scale_x: f32,
+        scale_y: f32,
+        color: Color,
+        color_sec: Color,
+    ) {
+        let mut list = DrawList::from_texture_id(
+            &self.texture_id,
+            &self.tex_coords,
+            x - BORDER_SIZE_F - offset_x,
+            y - BORDER_SIZE_F - offset_y,
+            self.w as f32 + offset_x * 2.0,
+            self.h as f32 + offset_y * 2.0,
+        );
 
         list.set_scale(scale_x, scale_y);
         list.set_color(color);
@@ -80,14 +100,17 @@ pub struct EntityTextureCache {
 impl EntityTextureCache {
     pub fn new(texture_id: &'static str, size: u32, slot_size: u32) -> EntityTextureCache {
         let slots_dim = (size / slot_size) as usize;
-        info!("Creating entity texture cache with {} slots dimension", slots_dim);
+        info!(
+            "Creating entity texture cache with {} slots dimension",
+            slots_dim
+        );
 
         EntityTextureCache {
             // size,
             slot_size,
             slots_dim,
             texture_id,
-            slots: vec![false;slots_dim*slots_dim],
+            slots: vec![false; slots_dim * slots_dim],
             entity_slots: Vec::new(),
         }
     }
@@ -107,7 +130,11 @@ impl EntityTextureCache {
 
     /// Adds the specified entity to the cache, finding a slot for the entity and drawing
     /// the entity in that slot.  the returned index is a handle to the slot used by the entity
-    pub fn add_entity(&mut self, entity: &EntityState, renderer: &mut GraphicsRenderer) -> EntityTextureSlot {
+    pub fn add_entity(
+        &mut self,
+        entity: &EntityState,
+        renderer: &mut GraphicsRenderer,
+    ) -> EntityTextureSlot {
         let width = entity.size.width + BORDER_SIZE * 2;
         let height = entity.size.height + BORDER_SIZE * 2;
 
@@ -116,12 +143,16 @@ impl EntityTextureCache {
         let x = slot.x as f32 + BORDER_SIZE_F;
         let y = slot.y as f32 + BORDER_SIZE_F;
 
-        info!("Drawing entity '{}' to slot {} at {},{}", entity.actor.actor.id,
-               slot_index, x, y);
+        info!(
+            "Drawing entity '{}' to slot {} at {},{}",
+            entity.actor.actor.id, slot_index, x, y
+        );
         let (ui_x, ui_y) = Config::ui_size();
         let scale_x = ui_x as f32 / self.slots_dim as f32;
         let scale_y = ui_y as f32 / self.slots_dim as f32;
-        entity.actor.draw_to_texture(renderer, &self.texture_id, scale_x, scale_y, x, y);
+        entity
+            .actor
+            .draw_to_texture(renderer, &self.texture_id, scale_x, scale_y, x, y);
 
         slot.clone()
     }
@@ -138,13 +169,24 @@ impl EntityTextureCache {
                 let x_max = (x as f32 + width as f32) / dim;
                 let y_min = (dim - height as f32 - y as f32) / dim;
                 let y_max = (dim - y as f32) / dim;
-                let tex_coords = [ x_min, y_max, x_min, y_min, x_max, y_max, x_max, y_min ];
-                trace!("Pushing slot with tex coords: {:?}, dims: {},{}", tex_coords, width, height);
+                let tex_coords = [x_min, y_max, x_min, y_min, x_max, y_max, x_max, y_min];
+                trace!(
+                    "Pushing slot with tex coords: {:?}, dims: {},{}",
+                    tex_coords,
+                    width,
+                    height
+                );
                 self.entity_slots.push(EntityTextureSlot {
-                    x, y, w: width, h: height, tex_coords, texture_id: self.texture_id,
-                    slots_dim: self.slots_dim, slot_size: self.slot_size,
+                    x,
+                    y,
+                    w: width,
+                    h: height,
+                    tex_coords,
+                    texture_id: self.texture_id,
+                    slots_dim: self.slots_dim,
+                    slot_size: self.slot_size,
                 });
-                return self.entity_slots.len() - 1
+                return self.entity_slots.len() - 1;
             }
         }
 

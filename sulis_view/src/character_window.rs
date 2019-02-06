@@ -14,26 +14,28 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::io::Error;
 use std::any::Any;
-use std::rc::Rc;
-use std::fs;
 use std::cell::RefCell;
+use std::fs;
+use std::io::Error;
+use std::rc::Rc;
 
 use chrono::prelude::*;
 
 use sulis_core::config;
 use sulis_core::resource::write_to_file;
-use sulis_core::util::ExtInt;
-use sulis_core::widgets::{Button, TextArea, ScrollPane};
 use sulis_core::ui::{Callback, Widget, WidgetKind, WidgetState};
-use sulis_module::{Attribute, DamageKind, Slot, QuickSlot, ActorBuilder, Module, InventoryBuilder,
-    ItemSaveState, ItemListEntrySaveState};
-use sulis_state::{ActorState, Effect, GameState, ChangeListener, EntityState};
+use sulis_core::util::ExtInt;
+use sulis_core::widgets::{Button, ScrollPane, TextArea};
+use sulis_module::{
+    ActorBuilder, Attribute, DamageKind, InventoryBuilder, ItemListEntrySaveState, ItemSaveState,
+    Module, QuickSlot, Slot,
+};
+use sulis_state::{ActorState, ChangeListener, Effect, EntityState, GameState};
 
-use crate::CharacterBuilder;
 use crate::ability_pane::add_ability_text_args;
-use crate::item_button::{add_bonus_text_args};
+use crate::item_button::add_bonus_text_args;
+use crate::CharacterBuilder;
 
 pub const NAME: &str = "character_window";
 
@@ -71,81 +73,125 @@ impl WidgetKind for CharacterWindow {
     }
 
     fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
-        self.character.borrow_mut().actor.listeners.add(
-            ChangeListener::invalidate(NAME, widget));
+        self.character
+            .borrow_mut()
+            .actor
+            .listeners
+            .add(ChangeListener::invalidate(NAME, widget));
 
         let widget_ref = Rc::clone(widget);
-        GameState::add_party_listener(ChangeListener::new(NAME, Box::new(move |entity| {
-            let entity = match entity {
-                Some(entity) => entity,
-                None => return,
-            };
-            let window = Widget::kind_mut::<CharacterWindow>(&widget_ref);
-            window.character = Rc::clone(entity);
-            widget_ref.borrow_mut().invalidate_children();
-        })));
+        GameState::add_party_listener(ChangeListener::new(
+            NAME,
+            Box::new(move |entity| {
+                let entity = match entity {
+                    Some(entity) => entity,
+                    None => return,
+                };
+                let window = Widget::kind_mut::<CharacterWindow>(&widget_ref);
+                window.character = Rc::clone(entity);
+                widget_ref.borrow_mut().invalidate_children();
+            }),
+        ));
 
         let close = Widget::with_theme(Button::empty(), "close");
-        close.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let (parent, _) = Widget::parent::<CharacterWindow>(widget);
-            parent.borrow_mut().mark_for_removal();
-        })));
+        close
+            .borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(|widget, _| {
+                let (parent, _) = Widget::parent::<CharacterWindow>(widget);
+                parent.borrow_mut().mark_for_removal();
+            })));
 
         let char_ref = Rc::clone(&self.character);
         let level_up = Widget::with_theme(Button::empty(), "level_up");
         level_up.borrow_mut().state.set_visible(false);
-        level_up.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-            let root = Widget::get_root(&widget);
-            let window = Widget::with_defaults(CharacterBuilder::level_up(Rc::clone(&char_ref)));
-            window.borrow_mut().state.set_modal(true);
-            Widget::add_child_to(&root, window);
-        })));
-        level_up.borrow_mut().state.set_enabled(!GameState::is_combat_active());
+        level_up
+            .borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(move |widget, _| {
+                let root = Widget::get_root(&widget);
+                let window =
+                    Widget::with_defaults(CharacterBuilder::level_up(Rc::clone(&char_ref)));
+                window.borrow_mut().state.set_modal(true);
+                Widget::add_child_to(&root, window);
+            })));
+        level_up
+            .borrow_mut()
+            .state
+            .set_enabled(!GameState::is_combat_active());
 
         let export = Widget::with_theme(Button::empty(), "export");
         let pc = GameState::player();
-        export.borrow_mut().state.set_visible(Rc::ptr_eq(&pc, &self.character));
-        export.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-            widget.borrow_mut().state.set_enabled(false);
-            export_character(&pc.borrow().actor);
-        })));
+        export
+            .borrow_mut()
+            .state
+            .set_visible(Rc::ptr_eq(&pc, &self.character));
+        export
+            .borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(move |widget, _| {
+                widget.borrow_mut().state.set_enabled(false);
+                export_character(&pc.borrow().actor);
+            })));
 
         let char_pane = Widget::with_theme(Button::empty(), "char_pane_button");
-        char_pane.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let (parent, window) = Widget::parent_mut::<CharacterWindow>(widget);
-            window.active_pane = ActivePane::Character;
-            parent.borrow_mut().invalidate_children();
-        })));
+        char_pane
+            .borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(|widget, _| {
+                let (parent, window) = Widget::parent_mut::<CharacterWindow>(widget);
+                window.active_pane = ActivePane::Character;
+                parent.borrow_mut().invalidate_children();
+            })));
 
         let abilities_pane = Widget::with_theme(Button::empty(), "abilities_pane_button");
-        abilities_pane.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let (parent, window) = Widget::parent_mut::<CharacterWindow>(widget);
-            window.active_pane = ActivePane::Ability;
-            parent.borrow_mut().invalidate_children();
-        })));
+        abilities_pane
+            .borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(|widget, _| {
+                let (parent, window) = Widget::parent_mut::<CharacterWindow>(widget);
+                window.active_pane = ActivePane::Ability;
+                parent.borrow_mut().invalidate_children();
+            })));
 
         let effects_pane = Widget::with_theme(Button::empty(), "effects_pane_button");
-        effects_pane.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let (parent, window) = Widget::parent_mut::<CharacterWindow>(widget);
-            window.active_pane = ActivePane::Effect;
-            parent.borrow_mut().invalidate_children();
-        })));
+        effects_pane
+            .borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(|widget, _| {
+                let (parent, window) = Widget::parent_mut::<CharacterWindow>(widget);
+                window.active_pane = ActivePane::Effect;
+                parent.borrow_mut().invalidate_children();
+            })));
 
         let cur_pane = match self.active_pane {
             ActivePane::Character => {
                 char_pane.borrow_mut().state.set_active(true);
-                level_up.borrow_mut().state.set_visible(self.character.borrow_mut().actor.has_level_up());
+                level_up
+                    .borrow_mut()
+                    .state
+                    .set_visible(self.character.borrow_mut().actor.has_level_up());
                 create_details_text_box(&self.character.borrow().actor)
-            }, ActivePane::Ability => {
+            }
+            ActivePane::Ability => {
                 abilities_pane.borrow_mut().state.set_active(true);
                 create_abilities_pane(&self.character.borrow().actor)
-            }, ActivePane::Effect => {
+            }
+            ActivePane::Effect => {
                 effects_pane.borrow_mut().state.set_active(true);
                 create_effects_pane(&mut self.character.borrow_mut().actor)
             }
         };
 
-        vec![close, cur_pane, level_up, export, char_pane, abilities_pane, effects_pane]
+        vec![
+            close,
+            cur_pane,
+            level_up,
+            export,
+            char_pane,
+            abilities_pane,
+            effects_pane,
+        ]
     }
 }
 
@@ -153,15 +199,21 @@ pub fn get_inventory(pc: &ActorState) -> InventoryBuilder {
     let coins = GameState::party_coins();
 
     let stash = GameState::party_stash();
-    let items = stash.borrow().items().iter().map(|(qty, item)|
-        ItemListEntrySaveState::new(*qty, &item.item)).collect();
+    let items = stash
+        .borrow()
+        .items()
+        .iter()
+        .map(|(qty, item)| ItemListEntrySaveState::new(*qty, &item.item))
+        .collect();
 
-    let equipped = Slot::iter().map(|slot| (*slot, pc.inventory().equipped(*slot)))
+    let equipped = Slot::iter()
+        .map(|slot| (*slot, pc.inventory().equipped(*slot)))
         .filter(|(_, item)| item.is_some())
         .map(|(slot, item)| (slot, ItemSaveState::new(&item.unwrap().item)))
         .collect();
 
-    let quick = QuickSlot::iter().map(|slot| (*slot, pc.inventory().quick(*slot)))
+    let quick = QuickSlot::iter()
+        .map(|slot| (*slot, pc.inventory().quick(*slot)))
         .filter(|(_, item)| item.is_some())
         .map(|(slot, item)| (slot, ItemSaveState::new(&item.unwrap().item)))
         .collect();
@@ -175,7 +227,8 @@ fn export_character(pc: &ActorState) {
             warn!("{}", e);
             warn!("Unable to export character '{}'", pc.actor.name);
             return;
-        }, Ok(filename) => filename,
+        }
+        Ok(filename) => filename,
     };
 
     let portrait = match pc.actor.portrait {
@@ -183,8 +236,17 @@ fn export_character(pc: &ActorState) {
         Some(ref img) => Some(img.id().to_string()),
     };
 
-    let abilities = pc.actor.abilities.iter().map(|a| a.ability.id.to_string()).collect();
-    let levels = pc.actor.levels.iter().map(|(class, level)| (class.id.to_string(), *level))
+    let abilities = pc
+        .actor
+        .abilities
+        .iter()
+        .map(|a| a.ability.id.to_string())
+        .collect();
+    let levels = pc
+        .actor
+        .levels
+        .iter()
+        .map(|(class, level)| (class.id.to_string(), *level))
         .collect();
 
     let inventory = get_inventory(&pc);
@@ -214,7 +276,8 @@ fn export_character(pc: &ActorState) {
         Err(e) => {
             warn!("{}", e);
             warn!("Unable to write character '{}' to file", pc.actor.name);
-        }, Ok(()) => (),
+        }
+        Ok(()) => (),
     }
 }
 
@@ -233,7 +296,10 @@ pub fn get_character_export_filename(name: &str) -> Result<(String, String), Err
     let filename = format!("{}/{}.yml", dir.to_string_lossy(), id);
 
     if let Err(e) = fs::create_dir_all(dir) {
-        error!("Unable to create characters directory '{}'", dir.to_string_lossy());
+        error!(
+            "Unable to create characters directory '{}'",
+            dir.to_string_lossy()
+        );
         return Err(e);
     }
 
@@ -254,16 +320,25 @@ pub fn create_abilities_pane(pc: &ActorState) -> Rc<RefCell<Widget>> {
         let level = ability.level;
         let ability = &ability.ability;
         let button = Widget::with_theme(Button::empty(), "ability_button");
-        button.borrow_mut().state.add_text_arg("icon", &ability.icon.id());
+        button
+            .borrow_mut()
+            .state
+            .add_text_arg("icon", &ability.icon.id());
 
         let ability_ref = Rc::clone(&ability);
         let details_widget_ref = Rc::clone(&details_widget);
         let details_ref = Rc::clone(&details);
-        button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |_, _| {
-            add_ability_text_args(&mut details_ref.borrow_mut().state, &ability_ref);
-            details_ref.borrow_mut().state.add_text_arg("owned_level", &(level + 1).to_string());
-            details_widget_ref.borrow_mut().invalidate_layout();
-        })));
+        button
+            .borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(move |_, _| {
+                add_ability_text_args(&mut details_ref.borrow_mut().state, &ability_ref);
+                details_ref
+                    .borrow_mut()
+                    .state
+                    .add_text_arg("owned_level", &(level + 1).to_string());
+                details_widget_ref.borrow_mut().invalidate_layout();
+            })));
 
         scrollpane.borrow().add_to_content(button);
     }
@@ -286,10 +361,13 @@ pub fn create_effects_pane(pc: &mut ActorState) -> Rc<RefCell<Widget>> {
         add_effect_text_args(effect, &mut widget.borrow_mut().state);
 
         let widget_ref = Rc::clone(&widget);
-        effect.listeners.add(ChangeListener::new("effects", Box::new(move |effect| {
-            add_effect_text_args(effect, &mut widget_ref.borrow_mut().state);
-            widget_ref.borrow_mut().invalidate_layout();
-        })));
+        effect.listeners.add(ChangeListener::new(
+            "effects",
+            Box::new(move |effect| {
+                add_effect_text_args(effect, &mut widget_ref.borrow_mut().state);
+                widget_ref.borrow_mut().invalidate_layout();
+            }),
+        ));
 
         scrollpane.borrow().add_to_content(widget);
     }
@@ -302,17 +380,23 @@ fn add_effect_text_args(effect: &Effect, widget_state: &mut WidgetState) {
     match effect.remaining_duration_rounds() {
         ExtInt::Infinity => widget_state.add_text_arg("active_mode", "true"),
         ExtInt::Int(_) => {
-            widget_state.add_text_arg("total_duration",
-                                      &effect.total_duration_rounds().to_string());
-            widget_state.add_text_arg("remaining_duration",
-                                      &effect.remaining_duration_rounds().to_string());
+            widget_state.add_text_arg(
+                "total_duration",
+                &effect.total_duration_rounds().to_string(),
+            );
+            widget_state.add_text_arg(
+                "remaining_duration",
+                &effect.remaining_duration_rounds().to_string(),
+            );
         }
     }
     add_bonus_text_args(&effect.bonuses(), widget_state);
 }
 
 fn add_if_nonzero(state: &mut WidgetState, index: usize, name: &str, value: f32) {
-    if value == 0.0 { return; }
+    if value == 0.0 {
+        return;
+    }
 
     state.add_text_arg(&format!("{}_{}", index, name), &value.to_string());
 }
@@ -333,7 +417,10 @@ pub fn create_details_text_box(pc: &ActorState) -> Rc<RefCell<Widget>> {
         }
 
         for attribute in Attribute::iter() {
-            state.add_text_arg(attribute.short_name(), &stats.attributes.get(*attribute).to_string())
+            state.add_text_arg(
+                attribute.short_name(),
+                &stats.attributes.get(*attribute).to_string(),
+            )
         }
 
         let mut index = 0;
@@ -345,24 +432,75 @@ pub fn create_details_text_box(pc: &ActorState) -> Rc<RefCell<Widget>> {
         }
 
         for (index, attack) in stats.attacks.iter().enumerate() {
-            state.add_text_arg(&format!("{}_damage_min", index)
-                               , &attack.damage.min().to_string());
-            state.add_text_arg(&format!("{}_damage_max", index)
-                               , &attack.damage.max().to_string());
+            state.add_text_arg(
+                &format!("{}_damage_min", index),
+                &attack.damage.min().to_string(),
+            );
+            state.add_text_arg(
+                &format!("{}_damage_max", index),
+                &attack.damage.max().to_string(),
+            );
             if attack.damage.ap() > 0 {
-                state.add_text_arg(&format!("{}_armor_penetration", index)
-                                   , &attack.damage.ap().to_string());
+                state.add_text_arg(
+                    &format!("{}_armor_penetration", index),
+                    &attack.damage.ap().to_string(),
+                );
             }
 
-            add_if_nonzero(state, index, "spell_accuracy", attack.bonuses.spell_accuracy as f32);
-            add_if_nonzero(state, index, "ranged_accuracy", attack.bonuses.ranged_accuracy as f32);
-            add_if_nonzero(state, index, "melee_accuracy", attack.bonuses.melee_accuracy as f32);
-            add_if_nonzero(state, index, "crit_chance", attack.bonuses.crit_chance as f32);
-            add_if_nonzero(state, index, "hit_threshold", attack.bonuses.hit_threshold as f32);
-            add_if_nonzero(state, index, "graze_threshold", attack.bonuses.graze_threshold as f32);
-            add_if_nonzero(state, index, "crit_multiplier", attack.bonuses.crit_multiplier);
-            add_if_nonzero(state, index, "hit_multiplier", attack.bonuses.hit_multiplier);
-            add_if_nonzero(state, index, "graze_multiplier", attack.bonuses.graze_multiplier);
+            add_if_nonzero(
+                state,
+                index,
+                "spell_accuracy",
+                attack.bonuses.spell_accuracy as f32,
+            );
+            add_if_nonzero(
+                state,
+                index,
+                "ranged_accuracy",
+                attack.bonuses.ranged_accuracy as f32,
+            );
+            add_if_nonzero(
+                state,
+                index,
+                "melee_accuracy",
+                attack.bonuses.melee_accuracy as f32,
+            );
+            add_if_nonzero(
+                state,
+                index,
+                "crit_chance",
+                attack.bonuses.crit_chance as f32,
+            );
+            add_if_nonzero(
+                state,
+                index,
+                "hit_threshold",
+                attack.bonuses.hit_threshold as f32,
+            );
+            add_if_nonzero(
+                state,
+                index,
+                "graze_threshold",
+                attack.bonuses.graze_threshold as f32,
+            );
+            add_if_nonzero(
+                state,
+                index,
+                "crit_multiplier",
+                attack.bonuses.crit_multiplier,
+            );
+            add_if_nonzero(
+                state,
+                index,
+                "hit_multiplier",
+                attack.bonuses.hit_multiplier,
+            );
+            add_if_nonzero(
+                state,
+                index,
+                "graze_multiplier",
+                attack.bonuses.graze_multiplier,
+            );
         }
 
         state.add_text_arg("reach", &stats.attack_distance().to_string());
@@ -371,7 +509,12 @@ pub fn create_details_text_box(pc: &ActorState) -> Rc<RefCell<Widget>> {
         state.add_text_arg("cur_ap", &pc.ap().to_string());
 
         state.add_text_arg("cur_xp", &pc.xp().to_string());
-        state.add_text_arg("next_xp", &rules.get_xp_for_next_level(pc.actor.total_level).to_string());
+        state.add_text_arg(
+            "next_xp",
+            &rules
+                .get_xp_for_next_level(pc.actor.total_level)
+                .to_string(),
+        );
 
         state.add_text_arg("initiative", &stats.initiative.to_string());
         state.add_text_arg("flanking_angle", &stats.flanking_angle.to_string());
@@ -379,18 +522,26 @@ pub fn create_details_text_box(pc: &ActorState) -> Rc<RefCell<Widget>> {
 
         state.add_text_arg("armor", &stats.armor.base().to_string());
         for kind in DamageKind::iter() {
-            if !stats.armor.differs_from_base(*kind) { continue; }
+            if !stats.armor.differs_from_base(*kind) {
+                continue;
+            }
 
-            state.add_text_arg(&format!("armor_{}", kind).to_lowercase(),
-                &stats.armor.amount(*kind).to_string());
+            state.add_text_arg(
+                &format!("armor_{}", kind).to_lowercase(),
+                &stats.armor.amount(*kind).to_string(),
+            );
         }
 
         for kind in DamageKind::iter() {
             let amount = stats.resistance.amount(*kind);
-            if amount == 0 { continue; }
+            if amount == 0 {
+                continue;
+            }
 
-            state.add_text_arg(&format!("resistance_{}", kind).to_lowercase(),
-                &amount.to_string());
+            state.add_text_arg(
+                &format!("resistance_{}", kind).to_lowercase(),
+                &amount.to_string(),
+            );
         }
 
         state.add_text_arg("melee_accuracy", &stats.melee_accuracy.to_string());
@@ -407,7 +558,10 @@ pub fn create_details_text_box(pc: &ActorState) -> Rc<RefCell<Widget>> {
         state.add_text_arg("graze_threshold", &stats.graze_threshold.to_string());
         state.add_text_arg("crit_multiplier", &format!("{:.2}", stats.crit_multiplier));
         state.add_text_arg("hit_multiplier", &format!("{:.2}", stats.hit_multiplier));
-        state.add_text_arg("graze_multiplier", &format!("{:.2}", stats.graze_multiplier));
+        state.add_text_arg(
+            "graze_multiplier",
+            &format!("{:.2}", stats.graze_multiplier),
+        );
         state.add_text_arg("movement_rate", &format!("{:.2}", stats.movement_rate));
     }
     details

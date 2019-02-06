@@ -14,21 +14,22 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::io::Error;
-use std::{ptr};
-use std::rc::Rc;
-use std::time;
 use std::cell::{Ref, RefCell};
 use std::collections::HashSet;
+use std::io::Error;
+use std::ptr;
+use std::rc::Rc;
+use std::time;
 
-use sulis_core::util::{self, gen_rand, invalid_data_error, Point};
-use sulis_core::config::Config;
-use sulis_module::{Actor, Area, LootList, Module, ObjectSize, prop, Prop, HitFlags, HitKind,
-    DamageKind, Time};
-use sulis_module::area::{EncounterData, PropData, Transition, TriggerKind};
+use crate::save_state::AreaSaveState;
 use crate::script::AreaTargeter;
-use crate::save_state::{AreaSaveState};
 use crate::*;
+use sulis_core::config::Config;
+use sulis_core::util::{self, gen_rand, invalid_data_error, Point};
+use sulis_module::area::{EncounterData, PropData, Transition, TriggerKind};
+use sulis_module::{
+    prop, Actor, Area, DamageKind, HitFlags, HitKind, LootList, Module, ObjectSize, Prop, Time,
+};
 
 pub struct TriggerState {
     pub(crate) fired: bool,
@@ -42,8 +43,7 @@ pub enum PCVisRedraw {
     Not,
 }
 
-impl PCVisRedraw {
-}
+impl PCVisRedraw {}
 
 pub struct AreaState {
     pub area: Rc<Area>,
@@ -84,13 +84,13 @@ impl PartialEq for AreaState {
 impl AreaState {
     pub fn new(area: Rc<Area>) -> AreaState {
         let dim = (area.width * area.height) as usize;
-        let entity_grid = vec![Vec::new();dim];
-        let surface_grid = vec![Vec::new();dim];
-        let transition_grid = vec![None;dim];
-        let prop_grid = vec![None;dim];
-        let trigger_grid = vec![None;dim];
-        let pc_vis = vec![false;dim];
-        let pc_explored = vec![false;dim];
+        let entity_grid = vec![Vec::new(); dim];
+        let surface_grid = vec![Vec::new(); dim];
+        let transition_grid = vec![None; dim];
+        let prop_grid = vec![None; dim];
+        let trigger_grid = vec![None; dim];
+        let pc_vis = vec![false; dim];
+        let pc_explored = vec![false; dim];
 
         info!("Initializing area state for '{}'", area.name);
         AreaState {
@@ -104,8 +104,8 @@ impl AreaState {
             surface_grid,
             prop_grid,
             trigger_grid,
-            prop_vis_grid: vec![true;dim],
-            prop_pass_grid: vec![true;dim],
+            prop_vis_grid: vec![true; dim],
+            prop_pass_grid: vec![true; dim],
             pc_vis,
             pc_explored,
             pc_vis_redraw: PCVisRedraw::Not,
@@ -131,7 +131,9 @@ impl AreaState {
             for i in 0..64 {
                 if buf % 2 == 1 {
                     let pc_exp_index = i + index * 64;
-                    if pc_exp_index > area_state.pc_explored.len() { break; }
+                    if pc_exp_index > area_state.pc_explored.len() {
+                        break;
+                    }
                     area_state.pc_explored[pc_exp_index] = true;
                 }
                 buf = buf / 2;
@@ -155,7 +157,9 @@ impl AreaState {
             };
 
             let index = area_state.add_prop(&prop_data, location, false)?;
-            area_state.props[index].as_mut().unwrap()
+            area_state.props[index]
+                .as_mut()
+                .unwrap()
                 .load_interactive(prop_save_state.interactive)?;
 
             area_state.update_prop_vis_pass_grid(index);
@@ -176,16 +180,22 @@ impl AreaState {
         area_state.add_transitions_from_area();
 
         for merchant_save in save.merchants {
-            area_state.merchants.push(MerchantState::load(merchant_save)?);
+            area_state
+                .merchants
+                .push(MerchantState::load(merchant_save)?);
         }
 
         Ok(area_state)
     }
 
     fn pc_vis_partial_redraw(&mut self, x: i32, y: i32) {
-        match self.pc_vis_redraw{
-            PCVisRedraw::Not =>
-                self.pc_vis_redraw = PCVisRedraw::Partial { delta_x: x, delta_y: y },
+        match self.pc_vis_redraw {
+            PCVisRedraw::Not => {
+                self.pc_vis_redraw = PCVisRedraw::Partial {
+                    delta_x: x,
+                    delta_y: y,
+                }
+            }
             _ => (),
         }
     }
@@ -236,10 +246,12 @@ impl AreaState {
         for actor_data in area.actors.iter() {
             let actor = match Module::actor(&actor_data.id) {
                 None => {
-                    warn!("No actor with id '{}' found when initializing area '{}'",
-                              actor_data.id, self.area.id);
+                    warn!(
+                        "No actor with id '{}' found when initializing area '{}'",
+                        actor_data.id, self.area.id
+                    );
                     continue;
-                },
+                }
                 Some(actor_data) => actor_data,
             };
 
@@ -265,7 +277,8 @@ impl AreaState {
                 Err(e) => {
                     warn!("Unable to add prop at {:?}", &prop_data.location);
                     warn!("{}", e);
-                }, Ok(_) => (),
+                }
+                Ok(_) => (),
             }
         }
 
@@ -282,14 +295,22 @@ impl AreaState {
 
         for (enc_index, enc_data) in area.encounters.iter().enumerate() {
             let encounter = &enc_data.encounter;
-            if !encounter.auto_spawn { continue; }
+            if !encounter.auto_spawn {
+                continue;
+            }
 
             self.spawn_encounter(enc_index, enc_data, true);
         }
     }
 
-    pub fn get_or_create_merchant(&mut self, id: &str, loot_list: &Rc<LootList>, buy_frac: f32,
-                                  sell_frac: f32, refresh_time: Time) -> &mut MerchantState {
+    pub fn get_or_create_merchant(
+        &mut self,
+        id: &str,
+        loot_list: &Rc<LootList>,
+        buy_frac: f32,
+        sell_frac: f32,
+        refresh_time: Time,
+    ) -> &mut MerchantState {
         let mut index = None;
         for (i, merchant) in self.merchants.iter().enumerate() {
             if merchant.id == id {
@@ -302,12 +323,11 @@ impl AreaState {
             Some(i) => {
                 self.merchants[i].check_refresh();
                 &mut self.merchants[i]
-            },
+            }
             None => {
                 info!("Creating merchant '{}'", id);
                 let len = self.merchants.len();
-                let merchant = MerchantState::new(id, loot_list, buy_frac,
-                                                  sell_frac, refresh_time);
+                let merchant = MerchantState::new(id, loot_list, buy_frac, sell_frac, refresh_time);
                 self.merchants.push(merchant);
                 &mut self.merchants[len]
             }
@@ -321,7 +341,7 @@ impl AreaState {
         }
     }
 
-    pub (crate) fn set_targeter(&mut self, targeter: AreaTargeter) {
+    pub(crate) fn set_targeter(&mut self, targeter: AreaTargeter) {
         self.targeter = Some(Rc::new(RefCell::new(targeter)));
     }
 
@@ -338,8 +358,10 @@ impl AreaState {
             debug!("Adding transition '{}' at '{:?}'", index, transition.from);
             for y in 0..transition.size.height {
                 for x in 0..transition.size.width {
-                    self.transition_grid[(transition.from.x + x +
-                        (transition.from.y + y) * self.area.width) as usize] = Some(index);
+                    self.transition_grid[(transition.from.x
+                        + x
+                        + (transition.from.y + y) * self.area.width)
+                        as usize] = Some(index);
                 }
             }
         }
@@ -372,14 +394,16 @@ impl AreaState {
         let player = GameState::player();
         for trigger_index in self.area.encounters[index].triggers.iter() {
             let trigger = &self.area.triggers[*trigger_index];
-            if self.triggers[*trigger_index].fired { continue; }
+            if self.triggers[*trigger_index].fired {
+                continue;
+            }
             self.triggers[*trigger_index].fired = true;
 
             match trigger.kind {
                 TriggerKind::OnEncounterActivated { .. } => {
                     info!("    Calling OnEncounterActivated");
                     GameState::add_ui_callback(trigger.on_activate.clone(), &player, target);
-                },
+                }
                 _ => (),
             }
         }
@@ -397,7 +421,7 @@ impl AreaState {
                 TriggerKind::OnEncounterCleared { .. } => {
                     info!("    Calling OnEncounterCleared");
                     GameState::add_ui_callback(trigger.on_activate.clone(), &player, target);
-                },
+                }
                 _ => (),
             }
         }
@@ -407,37 +431,50 @@ impl AreaState {
         let area = Rc::clone(&self.area);
 
         for (enc_index, enc_data) in area.encounters.iter().enumerate() {
-            if enc_data.location.x != x || enc_data.location.y != y { continue; }
+            if enc_data.location.x != x || enc_data.location.y != y {
+                continue;
+            }
 
             // this method is called by script, still spawn in debug mode
             self.spawn_encounter(enc_index, enc_data, false);
-            return true
+            return true;
         }
 
         false
     }
 
-    pub fn spawn_encounter(&mut self, enc_index: usize, enc_data: &EncounterData,
-                           respect_debug: bool) {
+    pub fn spawn_encounter(
+        &mut self,
+        enc_index: usize,
+        enc_data: &EncounterData,
+        respect_debug: bool,
+    ) {
         let mgr = GameState::turn_manager();
         let ai_group = mgr.borrow_mut().get_next_ai_group(&self.area.id, enc_index);
-        if respect_debug && !Config::debug().encounter_spawning { return; }
+        if respect_debug && !Config::debug().encounter_spawning {
+            return;
+        }
         let encounter = &enc_data.encounter;
         let actors = encounter.gen_actors();
         for (actor, unique_id) in actors {
             let location = match self.gen_location(&actor, &enc_data) {
                 None => {
-                    warn!("Unable to generate location for encounter '{}' at {},{}",
-                          encounter.id, enc_data.location.x, enc_data.location.y);
+                    warn!(
+                        "Unable to generate location for encounter '{}' at {},{}",
+                        encounter.id, enc_data.location.x, enc_data.location.y
+                    );
                     continue;
-                }, Some(location) => location,
+                }
+                Some(location) => location,
             };
 
             match self.add_actor(actor, location, unique_id, false, Some(ai_group)) {
                 Ok(_) => (),
                 Err(e) => {
-                    warn!("Error adding actor for spawned encounter: '{}' at {},{}",
-                          e, enc_data.location.x, enc_data.location.y);
+                    warn!(
+                        "Error adding actor for spawned encounter: '{}' at {},{}",
+                        e, enc_data.location.x, enc_data.location.y
+                    );
                 }
             }
         }
@@ -445,7 +482,9 @@ impl AreaState {
 
     fn gen_location(&self, actor: &Rc<Actor>, data: &EncounterData) -> Option<Location> {
         let available = self.get_available_locations(actor, data);
-        if available.is_empty() { return None; }
+        if available.is_empty() {
+            return None;
+        }
 
         let roll = gen_rand(0, available.len());
 
@@ -464,9 +503,17 @@ impl AreaState {
 
         for y in min_y..max_y {
             for x in min_x..max_x {
-                if !self.area.coords_valid(x, y) { continue; }
+                if !self.area.coords_valid(x, y) {
+                    continue;
+                }
 
-                if !self.area.get_path_grid(&actor.race.size.id).is_passable(x, y) { continue; }
+                if !self
+                    .area
+                    .get_path_grid(&actor.race.size.id)
+                    .is_passable(x, y)
+                {
+                    continue;
+                }
 
                 let mut impass = false;
                 for y in y..(y + actor.race.size.height) {
@@ -479,7 +526,9 @@ impl AreaState {
                     }
                 }
 
-                if impass { continue; }
+                if impass {
+                    continue;
+                }
 
                 locations.push(Point::new(x, y));
             }
@@ -489,43 +538,68 @@ impl AreaState {
     }
 
     pub fn is_terrain_passable(&self, size: &str, x: i32, y: i32) -> bool {
-        if !self.area.coords_valid(x, y) { return false; }
+        if !self.area.coords_valid(x, y) {
+            return false;
+        }
 
-        if !self.area.get_path_grid(size).is_passable(x, y) { return false; }
+        if !self.area.get_path_grid(size).is_passable(x, y) {
+            return false;
+        }
 
         true
     }
 
     pub fn is_passable_size(&self, size: &Rc<ObjectSize>, x: i32, y: i32) -> bool {
-        if !self.is_terrain_passable(&size.id, x, y) { return false; }
+        if !self.is_terrain_passable(&size.id, x, y) {
+            return false;
+        }
 
-        size.points(x, y).all(|p| self.point_size_passable(p.x, p.y))
+        size.points(x, y)
+            .all(|p| self.point_size_passable(p.x, p.y))
     }
 
-    pub fn is_passable(&self, requester: &Ref<EntityState>, entities_to_ignore: &Vec<usize>,
-                       new_x: i32, new_y: i32) -> bool {
-        if !self.is_terrain_passable(&requester.size(), new_x, new_y) { return false; }
+    pub fn is_passable(
+        &self,
+        requester: &Ref<EntityState>,
+        entities_to_ignore: &Vec<usize>,
+        new_x: i32,
+        new_y: i32,
+    ) -> bool {
+        if !self.is_terrain_passable(&requester.size(), new_x, new_y) {
+            return false;
+        }
 
-        requester.points(new_x, new_y)
-           .all(|p| self.point_entities_passable(entities_to_ignore, p.x, p.y))
+        requester
+            .points(new_x, new_y)
+            .all(|p| self.point_entities_passable(entities_to_ignore, p.x, p.y))
     }
 
     pub fn prop_index_valid(&self, index: usize) -> bool {
-        if index >= self.props.len() { return false; }
+        if index >= self.props.len() {
+            return false;
+        }
 
         self.props[index].is_some()
     }
 
     pub fn prop_index_at(&self, x: i32, y: i32) -> Option<usize> {
-        if !self.area.coords_valid(x, y) { return None; }
+        if !self.area.coords_valid(x, y) {
+            return None;
+        }
 
         let x = x as usize;
         let y = y as usize;
         self.prop_grid[x + y * self.area.width as usize]
     }
 
-    pub fn add_prop_at(&mut self, prop: &Rc<Prop>, x: i32, y: i32,
-                       enabled: bool, hover_text: Option<String>) {
+    pub fn add_prop_at(
+        &mut self,
+        prop: &Rc<Prop>,
+        x: i32,
+        y: i32,
+        enabled: bool,
+        hover_text: Option<String>,
+    ) {
         let location = Location::new(x, y, &self.area);
         let prop_data = PropData {
             prop: Rc::clone(prop),
@@ -539,7 +613,8 @@ impl AreaState {
             Err(e) => {
                 warn!("Unable to add prop at {},{}", x, y);
                 warn!("{}", e);
-            }, Ok(_) => (),
+            }
+            Ok(_) => (),
         }
     }
 
@@ -551,9 +626,12 @@ impl AreaState {
 
         let prop = match Module::prop(&Module::rules().loot_drop_prop) {
             None => {
-                warn!("Unable to generate prop for item drop as the loot_drop_prop does not exist.");
+                warn!(
+                    "Unable to generate prop for item drop as the loot_drop_prop does not exist."
+                );
                 return;
-            }, Some(prop) => prop,
+            }
+            Some(prop) => prop,
         };
 
         let location = Location::new(x, y, &self.area);
@@ -569,7 +647,8 @@ impl AreaState {
             Err(e) => {
                 warn!("Unable to add temp container at {},{}", x, y);
                 warn!("{}", e);
-            }, Ok(_) => (),
+            }
+            Ok(_) => (),
         }
     }
 
@@ -605,7 +684,9 @@ impl AreaState {
         {
             let state = self.get_prop_mut(index);
             state.toggle_active();
-            if !state.is_door() { return; }
+            if !state.is_door() {
+                return;
+            }
         }
 
         self.update_prop_vis_pass_grid(index);
@@ -622,7 +703,9 @@ impl AreaState {
         let prop_ref = self.props[index].as_mut();
         let state = prop_ref.unwrap();
 
-        if !state.is_door() { return; }
+        if !state.is_door() {
+            return;
+        }
 
         let width = self.area.width;
         let start_x = state.location.x;
@@ -639,26 +722,36 @@ impl AreaState {
             }
         } else {
             match state.prop.interactive {
-                prop::Interactive::Door { ref closed_invis, ref closed_impass, .. } => {
+                prop::Interactive::Door {
+                    ref closed_invis,
+                    ref closed_impass,
+                    ..
+                } => {
                     for p in closed_invis.iter() {
-                        self.prop_vis_grid[(p.x + start_x + (p.y + start_y) * width) as usize] = false;
+                        self.prop_vis_grid[(p.x + start_x + (p.y + start_y) * width) as usize] =
+                            false;
                     }
 
                     for p in closed_impass.iter() {
-                        self.prop_pass_grid[(p.x + start_x + (p.y + start_y) * width) as usize] = false;
+                        self.prop_pass_grid[(p.x + start_x + (p.y + start_y) * width) as usize] =
+                            false;
                     }
-                },
+                }
                 _ => (),
             }
         }
     }
 
     pub fn get_entity_at(&self, x: i32, y: i32) -> Option<Rc<RefCell<EntityState>>> {
-        if !self.area.coords_valid(x, y) { return None; }
+        if !self.area.coords_valid(x, y) {
+            return None;
+        }
 
         let index = {
             let vec = &self.entity_grid[(x + y * self.area.width) as usize];
-            if vec.is_empty() { return None; }
+            if vec.is_empty() {
+                return None;
+            }
             vec[0]
         };
 
@@ -668,7 +761,9 @@ impl AreaState {
     }
 
     pub fn get_transition_at(&self, x: i32, y: i32) -> Option<&Transition> {
-        if !self.area.coords_valid(x, y) { return None; }
+        if !self.area.coords_valid(x, y) {
+            return None;
+        }
 
         let index = match self.transition_grid[(x + y * self.area.width) as usize] {
             None => return None,
@@ -682,13 +777,23 @@ impl AreaState {
         has_visibility(&self.area, &self.prop_vis_grid, parent, target)
     }
 
-    pub fn compute_pc_visibility(&mut self, entity: &Rc<RefCell<EntityState>>, delta_x: i32, delta_y: i32) {
-
+    pub fn compute_pc_visibility(
+        &mut self,
+        entity: &Rc<RefCell<EntityState>>,
+        delta_x: i32,
+        delta_y: i32,
+    ) {
         let start_time = time::Instant::now();
 
-        let props_vis = calculate_los(&mut self.pc_explored, &self.area, &self.prop_vis_grid,
-                      &self.prop_grid,
-                      &mut entity.borrow_mut(), delta_x, delta_y);
+        let props_vis = calculate_los(
+            &mut self.pc_explored,
+            &self.area,
+            &self.prop_vis_grid,
+            &self.prop_grid,
+            &mut entity.borrow_mut(),
+            delta_x,
+            delta_y,
+        );
 
         // set explored to true for any partially visible props
         for prop_index in props_vis {
@@ -699,13 +804,14 @@ impl AreaState {
             }
         }
 
-        trace!("Visibility compute time: {}", util::format_elapsed_secs(start_time.elapsed()));
+        trace!(
+            "Visibility compute time: {}",
+            util::format_elapsed_secs(start_time.elapsed())
+        );
     }
 
     pub fn update_view_visibility(&mut self) {
-        unsafe {
-            ptr::write_bytes(self.pc_vis.as_mut_ptr(), 0, self.pc_vis.len())
-        }
+        unsafe { ptr::write_bytes(self.pc_vis.as_mut_ptr(), 0, self.pc_vis.len()) }
 
         for entity in GameState::party().iter() {
             let entity = entity.borrow();
@@ -719,7 +825,7 @@ impl AreaState {
         }
     }
 
-    pub fn set_trigger_enabled_at(&mut self, x: i32, y: i32, enabled: bool) -> bool{
+    pub fn set_trigger_enabled_at(&mut self, x: i32, y: i32, enabled: bool) -> bool {
         if !self.area.coords_valid(x, y) {
             warn!("Invalid coords to enable trigger at {},{}", x, y);
             return false;
@@ -744,10 +850,16 @@ impl AreaState {
             }
         };
 
-        if !self.triggers[index].enabled || self.triggers[index].fired { return; }
+        if !self.triggers[index].enabled || self.triggers[index].fired {
+            return;
+        }
 
         self.triggers[index].fired = true;
-        GameState::add_ui_callback(self.area.triggers[index].on_activate.clone(), entity, entity);
+        GameState::add_ui_callback(
+            self.area.triggers[index].on_activate.clone(),
+            entity,
+            entity,
+        );
     }
 
     /// whether the pc has current visibility to the specified coordinations
@@ -763,38 +875,55 @@ impl AreaState {
     }
 
     fn point_size_passable(&self, x: i32, y: i32) -> bool {
-        if !self.area.coords_valid(x, y) { return false; }
+        if !self.area.coords_valid(x, y) {
+            return false;
+        }
 
         let index = (x + y * self.area.width) as usize;
-        if !self.prop_pass_grid[index] { return false; }
+        if !self.prop_pass_grid[index] {
+            return false;
+        }
 
         let grid_index = &self.entity_grid[index];
 
         grid_index.is_empty()
     }
 
-    fn point_entities_passable(&self, entities_to_ignore: &Vec<usize>,
-                               x: i32, y: i32) -> bool {
-        if !self.area.coords_valid(x, y) { return false; }
+    fn point_entities_passable(&self, entities_to_ignore: &Vec<usize>, x: i32, y: i32) -> bool {
+        if !self.area.coords_valid(x, y) {
+            return false;
+        }
 
         let index = (x + y * self.area.width) as usize;
-        if !self.prop_pass_grid[index] { return false; }
+        if !self.prop_pass_grid[index] {
+            return false;
+        }
 
         let grid = &self.entity_grid[index];
 
         for index in grid.iter() {
-            if !entities_to_ignore.contains(index) { return false; }
+            if !entities_to_ignore.contains(index) {
+                return false;
+            }
         }
         true
     }
 
-    pub(crate) fn add_prop(&mut self, prop_data: &PropData, location: Location, temporary: bool) -> Result<usize, Error> {
+    pub(crate) fn add_prop(
+        &mut self,
+        prop_data: &PropData,
+        location: Location,
+        temporary: bool,
+    ) -> Result<usize, Error> {
         let prop = &prop_data.prop;
 
         if !self.area.coords_valid(location.x, location.y) {
             return invalid_data_error(&format!("Prop location outside area bounds"));
         }
-        if !self.area.coords_valid(location.x + prop.size.width, location.y + prop.size.height) {
+        if !self
+            .area
+            .coords_valid(location.x + prop.size.width, location.y + prop.size.height)
+        {
             return invalid_data_error(&format!("Prop location outside area bounds"));
         }
 
@@ -834,7 +963,8 @@ impl AreaState {
                             break;
                         }
                     }
-                }, _ => (),
+                }
+                _ => (),
             }
         }
 
@@ -866,13 +996,21 @@ impl AreaState {
         self.props[index] = None;
     }
 
-    pub(crate) fn add_actor(&mut self, actor: Rc<Actor>, location: Location, unique_id: Option<String>,
-                            is_pc: bool, ai_group: Option<usize>) -> Result<usize, Error> {
-        let entity = Rc::new(RefCell::new(EntityState::new(actor,
-                                                           unique_id,
-                                                           location.clone(),
-                                                           is_pc,
-                                                           ai_group)));
+    pub(crate) fn add_actor(
+        &mut self,
+        actor: Rc<Actor>,
+        location: Location,
+        unique_id: Option<String>,
+        is_pc: bool,
+        ai_group: Option<usize>,
+    ) -> Result<usize, Error> {
+        let entity = Rc::new(RefCell::new(EntityState::new(
+            actor,
+            unique_id,
+            location.clone(),
+            is_pc,
+            ai_group,
+        )));
         match self.add_entity(&entity, location) {
             Ok(index) => Ok(index),
             Err(e) => {
@@ -918,7 +1056,10 @@ impl AreaState {
         let mut entities = HashSet::new();
         for p in points {
             if !self.area.coords_valid(p.x, p.y) {
-                warn!("Attempted to add surface with invalid coordinate {},{}", p.x, p.y);
+                warn!(
+                    "Attempted to add surface with invalid coordinate {},{}",
+                    p.x, p.y
+                );
                 continue;
             }
 
@@ -932,8 +1073,12 @@ impl AreaState {
         entities
     }
 
-    pub(crate) fn load_entity(&mut self, entity: &Rc<RefCell<EntityState>>,
-                              location: Location, is_dead: bool) -> Result<usize, Error> {
+    pub(crate) fn load_entity(
+        &mut self,
+        entity: &Rc<RefCell<EntityState>>,
+        location: Location,
+        is_dead: bool,
+    ) -> Result<usize, Error> {
         let mgr = GameState::turn_manager();
         let index = mgr.borrow_mut().add_entity(&entity, is_dead);
 
@@ -944,25 +1089,35 @@ impl AreaState {
         }
     }
 
-    pub(crate) fn add_entity(&mut self, entity: &Rc<RefCell<EntityState>>,
-                                location: Location) -> Result<usize, Error> {
-
+    pub(crate) fn add_entity(
+        &mut self,
+        entity: &Rc<RefCell<EntityState>>,
+        location: Location,
+    ) -> Result<usize, Error> {
         let result = self.load_entity(entity, location, false);
         entity.borrow_mut().actor.init_day();
         result
     }
 
-    fn compute_threatened(&self, mover: &Rc<RefCell<EntityState>>,
-                          mgr: &TurnManager, removal: bool) {
+    fn compute_threatened(
+        &self,
+        mover: &Rc<RefCell<EntityState>>,
+        mgr: &TurnManager,
+        removal: bool,
+    ) {
         let mut mover = mover.borrow_mut();
         let mover_index = mover.index();
         for index in self.entities.iter() {
             let index = *index;
-            if index == mover_index { continue; }
+            if index == mover_index {
+                continue;
+            }
 
             let entity = mgr.entity(index);
 
-            if !mover.is_hostile(&entity) { continue; }
+            if !mover.is_hostile(&entity) {
+                continue;
+            }
 
             let mut entity = entity.borrow_mut();
 
@@ -982,16 +1137,26 @@ impl AreaState {
     }
 
     fn is_threat(&self, att: &mut EntityState, def: &mut EntityState) -> bool {
-        if !att.actor.stats.attack_is_melee() { return false; }
-        if att.actor.stats.attack_disabled { return false; }
-        if att.actor.is_dead() { return false; }
+        if !att.actor.stats.attack_is_melee() {
+            return false;
+        }
+        if att.actor.stats.attack_disabled {
+            return false;
+        }
+        if att.actor.is_dead() {
+            return false;
+        }
 
         let dist = att.dist(def.location.to_point(), &def.size);
         att.actor.can_reach(dist)
     }
 
-    pub(crate) fn transition_entity_to(&mut self, entity: &Rc<RefCell<EntityState>>, index: usize,
-                                location: Location) -> Result<usize, Error> {
+    pub(crate) fn transition_entity_to(
+        &mut self,
+        entity: &Rc<RefCell<EntityState>>,
+        index: usize,
+        location: Location,
+    ) -> Result<usize, Error> {
         let x = location.x;
         let y = location.y;
 
@@ -1001,8 +1166,13 @@ impl AreaState {
 
         let entities_to_ignore = vec![entity.borrow().index()];
         if !self.is_passable(&entity.borrow(), &entities_to_ignore, x, y) {
-            info!("Entity location in '{}' is not passable: {},{} for '{}'", &self.area.id,
-                  x, y, &entity.borrow().actor.actor.id);
+            info!(
+                "Entity location in '{}' is not passable: {},{} for '{}'",
+                &self.area.id,
+                x,
+                y,
+                &entity.borrow().actor.actor.id
+            );
         }
 
         entity.borrow_mut().actor.compute_stats();
@@ -1027,10 +1197,18 @@ impl AreaState {
         Ok(index)
     }
 
-    pub fn move_entity(&mut self, entity: &Rc<RefCell<EntityState>>, x: i32, y: i32, squares: u32) -> bool {
+    pub fn move_entity(
+        &mut self,
+        entity: &Rc<RefCell<EntityState>>,
+        x: i32,
+        y: i32,
+        squares: u32,
+    ) -> bool {
         let old_x = entity.borrow().location.x;
         let old_y = entity.borrow().location.y;
-        if !entity.borrow_mut().move_to(x, y, squares) { return false; }
+        if !entity.borrow_mut().move_to(x, y, squares) {
+            return false;
+        }
 
         let mgr = GameState::turn_manager();
 
@@ -1039,8 +1217,13 @@ impl AreaState {
         true
     }
 
-    fn update_entity_position(&mut self, entity: &Rc<RefCell<EntityState>>,
-                                           old_x: i32, old_y: i32, mgr: &mut TurnManager) {
+    fn update_entity_position(
+        &mut self,
+        entity: &Rc<RefCell<EntityState>>,
+        old_x: i32,
+        old_y: i32,
+        mgr: &mut TurnManager,
+    ) {
         let entity_index = entity.borrow().index();
         let old_surfaces = self.clear_entity_points(&entity.borrow(), old_x, old_y);
         let new_surfaces = self.add_entity_points(&entity.borrow());
@@ -1111,7 +1294,10 @@ impl AreaState {
     }
 
     pub fn prop_iter<'a>(&'a self) -> PropIterator {
-        PropIterator { area_state: &self, index: 0 }
+        PropIterator {
+            area_state: &self,
+            index: 0,
+        }
     }
 
     pub fn get_prop<'a>(&'a self, index: usize) -> &'a PropState {
@@ -1127,7 +1313,7 @@ impl AreaState {
         self.props.len()
     }
 
-    pub (crate) fn update(&mut self) {
+    pub(crate) fn update(&mut self) {
         let len = self.props.len();
         for index in 0..len {
             {
@@ -1136,7 +1322,9 @@ impl AreaState {
                     Some(ref prop) => prop,
                 };
 
-                if !prop.is_marked_for_removal() { continue; }
+                if !prop.is_marked_for_removal() {
+                    continue;
+                }
             }
 
             self.remove_prop(index);
@@ -1147,7 +1335,7 @@ impl AreaState {
 
         let remove_targeter = match self.targeter {
             None => false,
-            Some(ref targeter) => targeter.borrow().cancel()
+            Some(ref targeter) => targeter.borrow().cancel(),
         };
 
         if remove_targeter {
@@ -1158,7 +1346,9 @@ impl AreaState {
     pub fn bump_party_overlap(&mut self, mgr: &mut TurnManager) {
         debug!("Combat initiated.  Checking for party overlap");
         let party = GameState::party();
-        if party.len() < 2 { return; }
+        if party.len() < 2 {
+            return;
+        }
 
         let mut bb = Vec::new();
         for member in party.iter() {
@@ -1194,22 +1384,35 @@ impl AreaState {
             let (old_x, old_y) = (member.borrow().location.x, member.borrow().location.y);
             let (x, y) = match self.find_bump_position(member, old_x, old_y) {
                 None => {
-                    warn!("Unable to bump '{}' to avoid party overlap",
-                          member.borrow().actor.actor.name);
+                    warn!(
+                        "Unable to bump '{}' to avoid party overlap",
+                        member.borrow().actor.actor.name
+                    );
                     continue;
-                }, Some((x, y)) => (x, y),
+                }
+                Some((x, y)) => (x, y),
             };
 
-            info!("Bumping '{}' from {},{} to {},{}", member.borrow().actor.actor.name,
-                old_x, old_y, x, y);
+            info!(
+                "Bumping '{}' from {},{} to {},{}",
+                member.borrow().actor.actor.name,
+                old_x,
+                old_y,
+                x,
+                y
+            );
             member.borrow_mut().location.move_to(x, y);
             self.update_entity_position(member, old_x, old_y, mgr);
             // TODO add subpos animation so move is smooth
         }
     }
 
-    fn find_bump_position(&self, entity: &Rc<RefCell<EntityState>>,
-                          cur_x: i32, cur_y: i32) -> Option<(i32, i32)> {
+    fn find_bump_position(
+        &self,
+        entity: &Rc<RefCell<EntityState>>,
+        cur_x: i32,
+        cur_y: i32,
+    ) -> Option<(i32, i32)> {
         let to_ignore = vec![entity.borrow().index()];
         for radius in 1..=3 {
             for y in -radius..=radius {
@@ -1224,12 +1427,19 @@ impl AreaState {
     }
 
     #[must_use]
-    pub fn remove_entity(&mut self, entity: &Rc<RefCell<EntityState>>,
-                         mgr: &TurnManager) -> HashSet<usize> {
+    pub fn remove_entity(
+        &mut self,
+        entity: &Rc<RefCell<EntityState>>,
+        mgr: &TurnManager,
+    ) -> HashSet<usize> {
         let (index, surfaces) = {
             let entity = entity.borrow();
             let index = entity.index();
-            trace!("Removing entity '{}' with index '{}'", entity.actor.actor.name, index);
+            trace!(
+                "Removing entity '{}' with index '{}'",
+                entity.actor.actor.name,
+                index
+            );
             let x = entity.location.x;
             let y = entity.location.y;
             (index, self.clear_entity_points(&entity, x, y))
@@ -1244,17 +1454,22 @@ impl AreaState {
 
     fn find_prop_index_to_add(&mut self) -> usize {
         for (index, item) in self.props.iter().enumerate() {
-            if item.is_none() { return index; }
+            if item.is_none() {
+                return index;
+            }
         }
 
         self.props.push(None);
         self.props.len() - 1
     }
 
-    pub fn add_damage_feedback_text(&mut self, target: &Rc<RefCell<EntityState>>,
-                                    hit_kind: HitKind, hit_flags: HitFlags,
-                                    damage: Vec<(DamageKind, u32)>) {
-
+    pub fn add_damage_feedback_text(
+        &mut self,
+        target: &Rc<RefCell<EntityState>>,
+        hit_kind: HitKind,
+        hit_flags: HitFlags,
+        damage: Vec<(DamageKind, u32)>,
+    ) {
         let mut add_space = false;
         let mut output = String::new();
         if hit_flags.sneak_attack {
@@ -1266,12 +1481,16 @@ impl AreaState {
         }
 
         if hit_flags.concealment {
-            if add_space { output.push_str(" "); }
+            if add_space {
+                output.push_str(" ");
+            }
             output.push_str("Concealment!");
             add_space = true;
         }
 
-        if add_space { output.push_str(" "); }
+        if add_space {
+            output.push_str(" ");
+        }
         output.push_str(match hit_kind {
             HitKind::Miss => "Miss",
             HitKind::Graze => "Graze",
@@ -1292,7 +1511,9 @@ impl AreaState {
             self.add_feedback_text(output, target, color);
         } else {
             for (kind, amount) in damage {
-                if add_space { output.push_str(" "); }
+                if add_space {
+                    output.push_str(" ");
+                }
 
                 let color = area_feedback_text::ColorKind::Damage { kind };
                 output.push_str(&format!("{}", amount));
@@ -1306,11 +1527,17 @@ impl AreaState {
         }
     }
 
-    pub fn add_feedback_text(&mut self, text: String, target: &Rc<RefCell<EntityState>>,
-                             color_kind: area_feedback_text::ColorKind) {
+    pub fn add_feedback_text(
+        &mut self,
+        text: String,
+        target: &Rc<RefCell<EntityState>>,
+        color_kind: area_feedback_text::ColorKind,
+    ) {
         let move_rate = 3.0;
 
-        if text.trim().is_empty() { return; }
+        if text.trim().is_empty() {
+            return;
+        }
 
         let mut area_pos = target.borrow().location.to_point();
         loop {
@@ -1326,15 +1553,20 @@ impl AreaState {
                 }
             }
 
-            if area_pos_valid { break; }
-            if area_pos.y == 0 { break; }
+            if area_pos_valid {
+                break;
+            }
+            if area_pos.y == 0 {
+                break;
+            }
         }
         let width = target.borrow().size.width as f32;
         let pos_x = area_pos.x as f32 + width / 2.0;
         let pos_y = area_pos.y as f32 - 1.5;
 
-        self.feedback_text.push(AreaFeedbackText::new(area_pos, text, pos_x, pos_y,
-                                                      color_kind, move_rate));
+        self.feedback_text.push(AreaFeedbackText::new(
+            area_pos, text, pos_x, pos_y, color_kind, move_rate,
+        ));
     }
 
     pub fn feedback_text_iter(&mut self) -> impl Iterator<Item = &mut AreaFeedbackText> {
@@ -1363,7 +1595,7 @@ impl<'a> Iterator for PropIterator<'a> {
                 Some(prop) => match prop {
                     &None => continue,
                     &Some(ref prop) => return Some(prop),
-                }
+                },
             }
         }
     }

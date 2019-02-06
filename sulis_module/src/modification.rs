@@ -15,11 +15,11 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::fmt::{self, Display};
-use std::path::{PathBuf};
 use std::io::Error;
+use std::path::PathBuf;
 
 use sulis_core::config::{self, Config};
-use sulis_core::resource::{subdirs, read_single_resource};
+use sulis_core::resource::{read_single_resource, subdirs};
 
 pub fn get_available_modifications() -> Vec<ModificationInfo> {
     let root_dir = Config::resources_config().mods_directory;

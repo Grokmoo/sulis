@@ -33,16 +33,16 @@ pub mod save_or_revert_options_window;
 pub use self::save_or_revert_options_window::SaveOrRevertOptionsWindow;
 
 use std::any::Any;
+use std::cell::RefCell;
 use std::rc::Rc;
-use std::cell::{RefCell};
 
 use sulis_core::config::Config;
-use sulis_core::io::{InputAction, MainLoopUpdater, DisplayConfiguration};
+use sulis_core::io::{DisplayConfiguration, InputAction, MainLoopUpdater};
 use sulis_core::ui::*;
 use sulis_core::util;
 use sulis_core::widgets::{Button, ConfirmationWindow, Label};
-use sulis_module::{Module, modification};
-use sulis_state::{NextGameStep, save_file};
+use sulis_module::{modification, Module};
+use sulis_state::{save_file, NextGameStep};
 
 use crate::{CharacterBuilder, LoadWindow};
 
@@ -59,7 +59,7 @@ impl LoopUpdater {
 }
 
 impl MainLoopUpdater for LoopUpdater {
-    fn update(&self, _root: &Rc<RefCell<Widget>>, _millis: u32) { }
+    fn update(&self, _root: &Rc<RefCell<Widget>>, _millis: u32) {}
 
     fn is_exit(&self) -> bool {
         self.view.borrow().is_exit()
@@ -125,10 +125,11 @@ impl WidgetKind for MainMenu {
                         let (_, selector) = Widget::parent_mut::<MainMenu>(widget);
                         selector.next_step = Some(NextGameStep::Exit);
                     }))),
-                    "exit_confirmation_window");
+                    "exit_confirmation_window",
+                );
                 exit_window.borrow_mut().state.set_modal(true);
                 Widget::add_child_to(&widget, exit_window);
-            },
+            }
             _ => return false,
         }
 
@@ -145,90 +146,113 @@ impl WidgetKind for MainMenu {
         let module_title = Widget::with_theme(Label::empty(), "module_title");
         if Module::is_initialized() {
             let campaign = Module::campaign();
-            module_title.borrow_mut().state.add_text_arg("module", &campaign.name);
+            module_title
+                .borrow_mut()
+                .state
+                .add_text_arg("module", &campaign.name);
             if let Some(group) = &campaign.group {
-                module_title.borrow_mut().state.add_text_arg("group", &group.name);
+                module_title
+                    .borrow_mut()
+                    .state
+                    .add_text_arg("group", &group.name);
             }
         }
 
         let menu_pane = Widget::empty("menu_pane");
 
         let new = Widget::with_theme(Button::empty(), "new");
-        new.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let (parent, starter) = Widget::parent_mut::<MainMenu>(widget);
+        new.borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(|widget, _| {
+                let (parent, starter) = Widget::parent_mut::<MainMenu>(widget);
 
-            parent.borrow_mut().invalidate_children();
-            starter.mode = Mode::New;
-            starter.content = Widget::with_defaults(CharacterSelector::new(parent.clone()));
-        })));
+                parent.borrow_mut().invalidate_children();
+                starter.mode = Mode::New;
+                starter.content = Widget::with_defaults(CharacterSelector::new(parent.clone()));
+            })));
 
         let load = Widget::with_theme(Button::empty(), "load");
-        load.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let (parent, starter) = Widget::parent_mut::<MainMenu>(widget);
+        load.borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(|widget, _| {
+                let (parent, starter) = Widget::parent_mut::<MainMenu>(widget);
 
-            starter.mode = Mode::Load;
-            let load_window = LoadWindow::new(true);
-            {
-                let window = load_window.borrow();
-                window.cancel.borrow_mut().state.set_visible(false);
-            }
-            starter.content = Widget::with_defaults(load_window);
+                starter.mode = Mode::Load;
+                let load_window = LoadWindow::new(true);
+                {
+                    let window = load_window.borrow();
+                    window.cancel.borrow_mut().state.set_visible(false);
+                }
+                starter.content = Widget::with_defaults(load_window);
 
-            parent.borrow_mut().invalidate_children();
-        })));
+                parent.borrow_mut().invalidate_children();
+            })));
 
         let mods = Widget::with_theme(Button::empty(), "mods");
-        mods.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let (parent, view) = Widget::parent_mut::<MainMenu>(widget);
+        mods.borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(|widget, _| {
+                let (parent, view) = Widget::parent_mut::<MainMenu>(widget);
 
-            let mods_list = modification::get_available_modifications();
+                let mods_list = modification::get_available_modifications();
 
-            parent.borrow_mut().invalidate_children();
-            view.mode = Mode::Mods;
-            view.content = Widget::with_defaults(ModsSelector::new(mods_list));
-        })));
+                parent.borrow_mut().invalidate_children();
+                view.mode = Mode::Mods;
+                view.content = Widget::with_defaults(ModsSelector::new(mods_list));
+            })));
 
         let module = Widget::with_theme(Button::empty(), "module");
-        module.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let (parent, window) = Widget::parent_mut::<MainMenu>(widget);
+        module
+            .borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(|widget, _| {
+                let (parent, window) = Widget::parent_mut::<MainMenu>(widget);
 
-            window.mode = Mode::Module;
-            let modules_list = Module::get_available_modules();
-            if modules_list.len() == 0 {
-                util::error_and_exit("No valid modules found.");
-            }
-            let module_selector = ModuleSelector::new(modules_list);
-            window.content = Widget::with_defaults(module_selector);
+                window.mode = Mode::Module;
+                let modules_list = Module::get_available_modules();
+                if modules_list.len() == 0 {
+                    util::error_and_exit("No valid modules found.");
+                }
+                let module_selector = ModuleSelector::new(modules_list);
+                window.content = Widget::with_defaults(module_selector);
 
-            parent.borrow_mut().invalidate_children();
-        })));
+                parent.borrow_mut().invalidate_children();
+            })));
 
         let options = Widget::with_theme(Button::empty(), "options");
-        options.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let (parent, window) = Widget::parent_mut::<MainMenu>(widget);
-            window.mode = Mode::Options;
-            let configs = window.display_configurations.clone();
+        options
+            .borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(|widget, _| {
+                let (parent, window) = Widget::parent_mut::<MainMenu>(widget);
+                window.mode = Mode::Options;
+                let configs = window.display_configurations.clone();
 
-            window.content = Widget::with_defaults(Options::new(configs));
+                window.content = Widget::with_defaults(Options::new(configs));
 
-            parent.borrow_mut().invalidate_children();
-        })));
+                parent.borrow_mut().invalidate_children();
+            })));
 
         let links = Widget::with_theme(Button::empty(), "links");
-        links.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let (parent, window) = Widget::parent_mut::<MainMenu>(widget);
-            window.mode = Mode::Links;
+        links
+            .borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(|widget, _| {
+                let (parent, window) = Widget::parent_mut::<MainMenu>(widget);
+                window.mode = Mode::Links;
 
-            window.content = Widget::with_defaults(LinksPane::new());
+                window.content = Widget::with_defaults(LinksPane::new());
 
-            parent.borrow_mut().invalidate_children();
-        })));
+                parent.borrow_mut().invalidate_children();
+            })));
 
         let exit = Widget::with_theme(Button::empty(), "exit");
-        exit.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let (_, window) = Widget::parent_mut::<MainMenu>(widget);
-            window.next_step = Some(NextGameStep::Exit);
-        })));
+        exit.borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(|widget, _| {
+                let (_, window) = Widget::parent_mut::<MainMenu>(widget);
+                window.next_step = Some(NextGameStep::Exit);
+            })));
 
         match self.mode {
             Mode::New => new.borrow_mut().state.set_active(true),
@@ -248,9 +272,18 @@ impl WidgetKind for MainMenu {
             load.borrow_mut().state.set_enabled(false);
         }
 
-        Widget::add_children_to(&menu_pane, vec![module, new, load, mods, options, links, exit]);
+        Widget::add_children_to(
+            &menu_pane,
+            vec![module, new, load, mods, options, links, exit],
+        );
 
-        let mut children = vec![background, title, module_title, menu_pane, self.content.clone()];
+        let mut children = vec![
+            background,
+            title,
+            module_title,
+            menu_pane,
+            self.content.clone(),
+        ];
 
         if let Some(builder) = self.char_builder_to_add.take() {
             children.push(Widget::with_defaults(builder));

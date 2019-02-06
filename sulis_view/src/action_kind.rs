@@ -17,25 +17,41 @@
 use std::cell::RefCell;
 use std::rc::Rc;
 
+use crate::{dialog_window, RootView};
 use sulis_core::ui::{animation_state, Widget};
 use sulis_core::util::Point;
-use sulis_module::{Faction, Module, ObjectSize, area::ToKind, Time};
-use sulis_state::{MOVE_TO_THRESHOLD, EntityState, GameState, ScriptCallback, AreaState, PropState};
-use crate::{dialog_window, RootView};
+use sulis_module::{area::ToKind, Faction, Module, ObjectSize, Time};
+use sulis_state::{
+    AreaState, EntityState, GameState, PropState, ScriptCallback, MOVE_TO_THRESHOLD,
+};
 
 pub fn get_action(x_f32: f32, y_f32: f32) -> Box<ActionKind> {
     let (x, y) = (x_f32 as i32, y_f32 as i32);
     let area_state = GameState::area_state();
-    if !area_state.borrow().area.coords_valid(x, y) { return Box::new(InvalidAction {}); }
-    if !area_state.borrow().is_pc_explored(x, y) { return Box::new(InvalidAction {}); }
+    if !area_state.borrow().area.coords_valid(x, y) {
+        return Box::new(InvalidAction {});
+    }
+    if !area_state.borrow().is_pc_explored(x, y) {
+        return Box::new(InvalidAction {});
+    }
 
-    if let Some(action) = SelectAction::create_if_valid(x_f32, y_f32) { return action; }
-    if let Some(action) = AttackAction::create_if_valid(x, y) { return action; }
-    if let Some(action) = DialogAction::create_if_valid(x, y) { return action; }
+    if let Some(action) = SelectAction::create_if_valid(x_f32, y_f32) {
+        return action;
+    }
+    if let Some(action) = AttackAction::create_if_valid(x, y) {
+        return action;
+    }
+    if let Some(action) = DialogAction::create_if_valid(x, y) {
+        return action;
+    }
 
-    if let Some(action) = get_prop_or_transition_action(x, y) { return action; }
+    if let Some(action) = get_prop_or_transition_action(x, y) {
+        return action;
+    }
 
-    if let Some(action) = MoveAction::create_if_valid(x as f32, y as f32, None) { return action; }
+    if let Some(action) = MoveAction::create_if_valid(x as f32, y as f32, None) {
+        return action;
+    }
 
     Box::new(InvalidAction {})
 }
@@ -93,7 +109,9 @@ impl SelectAction {
         let target = match area_state.get_entity_at(x as i32, y as i32) {
             None => return None,
             Some(ref entity) => {
-                if !entity.borrow().is_party_member() { return None; }
+                if !entity.borrow().is_party_member() {
+                    return None;
+                }
                 Rc::clone(entity)
             }
         };
@@ -104,13 +122,11 @@ impl SelectAction {
             Some(_) => (),
         }
 
-        Some(Box::new(SelectAction {
-            target,
-        }))
+        Some(Box::new(SelectAction { target }))
     }
 }
 
-impl ActionKind for SelectAction{
+impl ActionKind for SelectAction {
     fn cursor_state(&self) -> animation_state::Kind {
         animation_state::Kind::MouseSelect
     }
@@ -134,15 +150,21 @@ struct DialogAction {
 
 impl DialogAction {
     fn create_if_valid(x: i32, y: i32) -> Option<Box<ActionKind>> {
-        if GameState::is_combat_active() { return None; }
+        if GameState::is_combat_active() {
+            return None;
+        }
 
         let area_state = GameState::area_state();
         let area_state = area_state.borrow();
         let target = match area_state.get_entity_at(x, y) {
             None => return None,
             Some(ref entity) => {
-                if entity.borrow().is_party_member() { return None; }
-                if entity.borrow().actor.actor.conversation.is_none() { return None; }
+                if entity.borrow().is_party_member() {
+                    return None;
+                }
+                if entity.borrow().actor.actor.conversation.is_none() {
+                    return None;
+                }
                 Rc::clone(entity)
             }
         };
@@ -160,9 +182,14 @@ impl DialogAction {
                 target: Rc::clone(&target),
                 pc: Rc::clone(&pc),
             });
-            return MoveThenAction::create_if_valid(&pc, target.borrow().location.to_point(),
-                &target.borrow().size, max_dist, cb_action,
-                animation_state::Kind::MouseDialog);
+            return MoveThenAction::create_if_valid(
+                &pc,
+                target.borrow().location.to_point(),
+                &target.borrow().size,
+                max_dist,
+                cb_action,
+                animation_state::Kind::MouseDialog,
+            );
         }
     }
 }
@@ -185,7 +212,8 @@ impl ActionKind for DialogAction {
             None => {
                 warn!("Attempted to fire conversation action with entity with no convo");
                 return;
-            }, Some(ref convo) => Rc::clone(convo),
+            }
+            Some(ref convo) => Rc::clone(convo),
         };
 
         dialog_window::show_convo(convo, &self.pc, &self.target, widget);
@@ -198,7 +226,9 @@ struct DoorPropAction {
 
 impl DoorPropAction {
     fn create_if_valid(index: usize, prop_state: &PropState) -> Option<Box<ActionKind>> {
-        if !prop_state.is_door() || !prop_state.is_enabled() { return None; }
+        if !prop_state.is_door() || !prop_state.is_enabled() {
+            return None;
+        }
 
         let max_dist = Module::rules().max_prop_distance;
         let pc = match GameState::selected().first() {
@@ -207,8 +237,14 @@ impl DoorPropAction {
         };
         if pc.borrow().dist_to_prop(prop_state) > max_dist {
             let cb_action = Box::new(DoorPropAction { index });
-            return MoveThenAction::create_if_valid(&pc, prop_state.location.to_point(),
-                &prop_state.prop.size, max_dist, cb_action, animation_state::Kind::MouseInteract);
+            return MoveThenAction::create_if_valid(
+                &pc,
+                prop_state.location.to_point(),
+                &prop_state.prop.size,
+                max_dist,
+                cb_action,
+                animation_state::Kind::MouseInteract,
+            );
         }
 
         Some(Box::new(DoorPropAction { index }))
@@ -216,7 +252,9 @@ impl DoorPropAction {
 }
 
 impl ActionKind for DoorPropAction {
-    fn cursor_state(&self) -> animation_state::Kind { animation_state::Kind::MouseInteract }
+    fn cursor_state(&self) -> animation_state::Kind {
+        animation_state::Kind::MouseInteract
+    }
 
     fn get_hover_info(&self) -> Option<(Rc<ObjectSize>, i32, i32)> {
         let area_state = GameState::area_state();
@@ -239,9 +277,13 @@ struct LootPropAction {
 
 impl LootPropAction {
     fn create_if_valid(index: usize, prop_state: &PropState) -> Option<Box<ActionKind>> {
-        if GameState::is_combat_active() { return None; }
+        if GameState::is_combat_active() {
+            return None;
+        }
 
-        if !prop_state.is_container() || !prop_state.is_enabled() { return None; }
+        if !prop_state.is_container() || !prop_state.is_enabled() {
+            return None;
+        }
 
         let max_dist = Module::rules().max_prop_distance;
         let pc = match GameState::selected().first() {
@@ -250,8 +292,14 @@ impl LootPropAction {
         };
         if pc.borrow().dist_to_prop(prop_state) > max_dist {
             let cb_action = Box::new(LootPropAction { index });
-            return MoveThenAction::create_if_valid(&pc, prop_state.location.to_point(),
-                &prop_state.prop.size, max_dist, cb_action, animation_state::Kind::MouseLoot);
+            return MoveThenAction::create_if_valid(
+                &pc,
+                prop_state.location.to_point(),
+                &prop_state.prop.size,
+                max_dist,
+                cb_action,
+                animation_state::Kind::MouseLoot,
+            );
         }
 
         Some(Box::new(LootPropAction { index }))
@@ -259,7 +307,9 @@ impl LootPropAction {
 }
 
 impl ActionKind for LootPropAction {
-    fn cursor_state(&self) -> animation_state::Kind { animation_state::Kind::MouseLoot }
+    fn cursor_state(&self) -> animation_state::Kind {
+        animation_state::Kind::MouseLoot
+    }
 
     fn get_hover_info(&self) -> Option<(Rc<ObjectSize>, i32, i32)> {
         let area_state = GameState::area_state();
@@ -291,7 +341,9 @@ struct TransitionAction {
 
 impl TransitionAction {
     fn create_if_valid(x: i32, y: i32, area_state: &AreaState) -> Option<Box<ActionKind>> {
-        if GameState::is_combat_active() { return None; }
+        if GameState::is_combat_active() {
+            return None;
+        }
 
         let transition = area_state.get_transition_at(x, y);
         let transition = match transition {
@@ -311,8 +363,14 @@ impl TransitionAction {
             Some(pc) => Rc::clone(pc),
         };
         if pc.borrow().dist_to_transition(transition) > max_dist {
-            return MoveThenAction::create_if_valid(&pc, transition.from,
-                &transition.size, max_dist, cb_action, animation_state::Kind::MouseTravel);
+            return MoveThenAction::create_if_valid(
+                &pc,
+                transition.from,
+                &transition.size,
+                max_dist,
+                cb_action,
+                animation_state::Kind::MouseTravel,
+            );
         }
 
         Some(cb_action)
@@ -320,7 +378,9 @@ impl TransitionAction {
 }
 
 impl ActionKind for TransitionAction {
-    fn cursor_state(&self) -> animation_state::Kind { animation_state::Kind::MouseTravel }
+    fn cursor_state(&self) -> animation_state::Kind {
+        animation_state::Kind::MouseTravel
+    }
 
     fn get_hover_info(&self) -> Option<(Rc<ObjectSize>, i32, i32)> {
         let area_state = GameState::area_state();
@@ -330,21 +390,30 @@ impl ActionKind for TransitionAction {
             None => return None,
             Some(ref transition) => transition,
         };
-        Some((Rc::clone(&transition.size), transition.from.x, transition.from.y))
+        Some((
+            Rc::clone(&transition.size),
+            transition.from.x,
+            transition.from.y,
+        ))
     }
 
     fn fire_action(&mut self, widget: &Rc<RefCell<Widget>>) {
         trace!("Firing transition callback.");
-        let time = Time { day: 0, hour: 0, round: 0, millis: 0 };
+        let time = Time {
+            day: 0,
+            hour: 0,
+            round: 0,
+            millis: 0,
+        };
         match self.to {
             ToKind::Area { ref id, x, y } => {
                 GameState::transition(&Some(id.to_string()), x, y, time);
                 let root = Widget::get_root(widget);
                 root.borrow_mut().invalidate_children();
-            },
+            }
             ToKind::CurArea { x, y } => {
                 GameState::transition(&None, x, y, time);
-            },
+            }
             ToKind::WorldMap => {
                 let (root, view) = Widget::parent_mut::<RootView>(widget);
                 view.set_map_window(&root, true, true);
@@ -362,9 +431,15 @@ fn get_attack_target(area_state: &AreaState, x: i32, y: i32) -> Option<Rc<RefCel
     match area_state.get_entity_at(x, y) {
         None => None,
         Some(ref entity) => {
-            if entity.borrow().actor.hp() <= 0 { return None; }
-            if entity.borrow().is_party_member() { return None; }
-            if entity.borrow().actor.faction() != Faction::Hostile { return None; }
+            if entity.borrow().actor.hp() <= 0 {
+                return None;
+            }
+            if entity.borrow().is_party_member() {
+                return None;
+            }
+            if entity.borrow().actor.faction() != Faction::Hostile {
+                return None;
+            }
             Some(Rc::clone(entity))
         }
     }
@@ -383,24 +458,33 @@ impl AttackAction {
             Some(pc) => Rc::clone(pc),
         };
 
-        if !pc.borrow().actor.has_ap_to_attack() { return None; }
+        if !pc.borrow().actor.has_ap_to_attack() {
+            return None;
+        }
 
         if pc.borrow().can_attack(&target, &area_state) {
             Some(Box::new(AttackAction { pc, target }))
         } else {
             let cb_action = Box::new(AttackAction {
                 pc: Rc::clone(&pc),
-                target: Rc::clone(&target)
+                target: Rc::clone(&target),
             });
-            return MoveThenAction::create_if_valid(&pc, target.borrow().location.to_point(),
-                &target.borrow().size, pc.borrow().actor.stats.attack_distance(), cb_action,
-                animation_state::Kind::MouseAttack);
+            return MoveThenAction::create_if_valid(
+                &pc,
+                target.borrow().location.to_point(),
+                &target.borrow().size,
+                pc.borrow().actor.stats.attack_distance(),
+                cb_action,
+                animation_state::Kind::MouseAttack,
+            );
         }
     }
 }
 
 impl ActionKind for AttackAction {
-    fn cursor_state(&self) -> animation_state::Kind { animation_state::Kind::MouseAttack }
+    fn cursor_state(&self) -> animation_state::Kind {
+        animation_state::Kind::MouseAttack
+    }
 
     fn get_hover_info(&self) -> Option<(Rc<ObjectSize>, i32, i32)> {
         let size = Rc::clone(&self.target.borrow().size);
@@ -411,7 +495,11 @@ impl ActionKind for AttackAction {
     fn fire_action(&mut self, _widget: &Rc<RefCell<Widget>>) {
         trace!("Firing attack action.");
         let area_state = GameState::area_state();
-        if !self.pc.borrow().can_attack(&self.target, &area_state.borrow()) {
+        if !self
+            .pc
+            .borrow()
+            .can_attack(&self.target, &area_state.borrow())
+        {
             return;
         }
 
@@ -437,12 +525,14 @@ struct MoveThenAction {
 }
 
 impl MoveThenAction {
-    fn create_if_valid(pc: &Rc<RefCell<EntityState>>,
-                       pos: Point,
-                       size: &Rc<ObjectSize>,
-                       dist: f32,
-                       cb_action: Box<ActionKind>,
-                       cursor_state: animation_state::Kind) -> Option<Box<ActionKind>> {
+    fn create_if_valid(
+        pc: &Rc<RefCell<EntityState>>,
+        pos: Point,
+        size: &Rc<ObjectSize>,
+        dist: f32,
+        cb_action: Box<ActionKind>,
+        cursor_state: animation_state::Kind,
+    ) -> Option<Box<ActionKind>> {
         let (px, py) = (pos.x as f32, pos.y as f32);
 
         let x = px + (size.width / 2) as f32;
@@ -457,7 +547,7 @@ impl MoveThenAction {
         Some(Box::new(MoveThenAction {
             move_action,
             cb_action: Some(cb_action),
-            cursor_state
+            cursor_state,
         }))
     }
 }
@@ -485,7 +575,7 @@ impl ActionKind for MoveThenAction {
     fn get_hover_info(&self) -> Option<(Rc<ObjectSize>, i32, i32)> {
         match self.cb_action {
             None => None,
-            Some(ref action) => action.get_hover_info()
+            Some(ref action) => action.get_hover_info(),
         }
     }
 }
@@ -501,7 +591,10 @@ fn entities_to_ignore() -> Vec<usize> {
     if GameState::is_combat_active() {
         Vec::new()
     } else {
-        GameState::party().iter().map(|e| e.borrow().index()).collect()
+        GameState::party()
+            .iter()
+            .map(|e| e.borrow().index())
+            .collect()
     }
 }
 
@@ -534,7 +627,13 @@ impl MoveAction {
             return None;
         }
 
-        Some(MoveAction { selected, x, y, dist, cb: None })
+        Some(MoveAction {
+            selected,
+            x,
+            y,
+            dist,
+            cb: None,
+        })
     }
 
     fn create_if_valid(x: f32, y: f32, dist: Option<f32>) -> Option<Box<ActionKind>> {
@@ -546,14 +645,21 @@ impl MoveAction {
 
     fn move_one(&mut self) {
         let cb = self.cb.take();
-        GameState::move_towards_point(&self.selected[0], entities_to_ignore(),
-            self.x, self.y, self.dist, cb);
+        GameState::move_towards_point(
+            &self.selected[0],
+            entities_to_ignore(),
+            self.x,
+            self.y,
+            self.dist,
+            cb,
+        );
     }
 
     fn move_all(&mut self) {
         let formation = GameState::party_formation();
-        formation.borrow().move_group(&self.selected, entities_to_ignore(),
-                                      self.x, self.y);
+        formation
+            .borrow()
+            .move_group(&self.selected, entities_to_ignore(), self.x, self.y);
     }
 }
 
@@ -573,7 +679,6 @@ impl ActionKind for MoveAction {
         } else {
             self.move_all();
         }
-
     }
 
     fn get_hover_info(&self) -> Option<(Rc<ObjectSize>, i32, i32)> {
@@ -584,14 +689,16 @@ impl ActionKind for MoveAction {
     }
 }
 
-struct InvalidAction { }
+struct InvalidAction {}
 
 impl ActionKind for InvalidAction {
     fn cursor_state(&self) -> animation_state::Kind {
         animation_state::Kind::MouseInvalid
     }
 
-    fn fire_action(&mut self, _widget: &Rc<RefCell<Widget>>) { }
+    fn fire_action(&mut self, _widget: &Rc<RefCell<Widget>>) {}
 
-    fn get_hover_info(&self) -> Option<(Rc<ObjectSize>, i32, i32)> { None }
+    fn get_hover_info(&self) -> Option<(Rc<ObjectSize>, i32, i32)> {
+        None
+    }
 }

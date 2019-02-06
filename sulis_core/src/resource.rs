@@ -15,38 +15,40 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 mod resource_builder_set;
-pub use self::resource_builder_set::{read_single_resource, read_single_resource_path,
-    read_to_string, write_to_file, write_json_to_file, read_builder, read_builders};
+pub use self::resource_builder_set::{
+    read_builder, read_builders, read_single_resource, read_single_resource_path, read_to_string,
+    write_json_to_file, write_to_file,
+};
 
 mod spritesheet;
-pub use self::spritesheet::Spritesheet;
 pub use self::spritesheet::Sprite;
+pub use self::spritesheet::Spritesheet;
 
 mod font;
 pub use self::font::Font;
 
 pub mod yaml_resource_set;
-pub use self::yaml_resource_set::YamlResourceSet;
 pub use self::yaml_resource_set::YamlResourceKind;
+pub use self::yaml_resource_set::YamlResourceSet;
 
-use std::collections::HashMap;
-use std::rc::Rc;
 use std::cell::RefCell;
-use std::path::Path;
-use std::io::{Error, ErrorKind};
+use std::collections::HashMap;
 use std::fmt::Display;
-use std::hash::Hash;
 use std::fs;
+use std::hash::Hash;
+use std::io::{Error, ErrorKind};
+use std::path::Path;
 use std::path::PathBuf;
+use std::rc::Rc;
 
-use serde::{Deserialize, Deserializer, de::self};
+use serde::{de, Deserialize, Deserializer};
 use serde_yaml;
 
 use crate::config::Config;
+use crate::image::{AnimatedImage, ComposedImage, EmptyImage, Image, SimpleImage, TimerImage};
 use crate::resource::resource_builder_set::ResourceBuilderSet;
-use crate::image::{Image, EmptyImage, SimpleImage, AnimatedImage, ComposedImage, TimerImage};
+use crate::ui::{Theme, ThemeSet};
 use crate::util::invalid_data_error;
-use crate::ui::{ThemeSet, Theme};
 
 thread_local! {
     static RESOURCE_SET: RefCell<ResourceSet> = RefCell::new(ResourceSet::default());
@@ -54,17 +56,20 @@ thread_local! {
 
 #[derive(Default)]
 pub struct ResourceSet {
-    pub (crate) themes: ThemeSet,
-    pub (crate) images: HashMap<String, Rc<Image>>,
-    pub (crate) spritesheets: HashMap<String, Rc<Spritesheet>>,
-    pub (crate) fonts: HashMap<String, Rc<Font>>,
+    pub(crate) themes: ThemeSet,
+    pub(crate) images: HashMap<String, Rc<Image>>,
+    pub(crate) spritesheets: HashMap<String, Rc<Spritesheet>>,
+    pub(crate) fonts: HashMap<String, Rc<Font>>,
 }
 
 impl ResourceSet {
     pub fn load_resources(mut dirs: Vec<String>) -> Result<YamlResourceSet, Error> {
         if dirs.len() == 0 {
-            return Err(Error::new(ErrorKind::InvalidInput, "Must specify at least \
-                                  a root data directory to load resources"));
+            return Err(Error::new(
+                ErrorKind::InvalidInput,
+                "Must specify at least \
+                 a root data directory to load resources",
+            ));
         }
 
         let root = dirs.remove(0);
@@ -80,8 +85,13 @@ impl ResourceSet {
         let file_val = serde_yaml::Value::String(yaml_resource_set::FILE_VAL_STR.to_string());
         for (key, map) in yaml.resources.iter() {
             for (id, map) in map.iter() {
-                trace!("{:?}: {}, dirs: {:?}, files: {:?}", key, id, map.get(&dir_val),
-                    map.get(&file_val));
+                trace!(
+                    "{:?}: {}, dirs: {:?}, files: {:?}",
+                    key,
+                    id,
+                    map.get(&dir_val),
+                    map.get(&file_val)
+                );
             }
         }
 
@@ -103,21 +113,26 @@ impl ResourceSet {
             set.themes = builder_set.theme_builder.create_theme_set()?;
 
             for (id, sheet) in builder_set.spritesheet_builders {
-                insert_if_ok_boxed("spritesheet", id, Spritesheet::new(sheet, &mut set),
-                    &mut set.spritesheets);
+                insert_if_ok_boxed(
+                    "spritesheet",
+                    id,
+                    Spritesheet::new(sheet, &mut set),
+                    &mut set.spritesheets,
+                );
             }
 
             for (id, font) in builder_set.font_builders {
-                insert_if_ok_boxed("font", id, Font::new(font),
-                &mut set.fonts);
+                insert_if_ok_boxed("font", id, Font::new(font), &mut set.fonts);
             }
 
             if !set.fonts.contains_key(&Config::default_font()) {
-                return invalid_data_error(&format!("Default font '{}' is not defined.",
-                                                   Config::default_font()));
+                return invalid_data_error(&format!(
+                    "Default font '{}' is not defined.",
+                    Config::default_font()
+                ));
             }
 
-            let empty = Rc::new(EmptyImage { });
+            let empty = Rc::new(EmptyImage {});
             set.images.insert(empty.id(), empty);
 
             for (id, image) in builder_set.simple_builders {
@@ -125,15 +140,30 @@ impl ResourceSet {
             }
 
             for (id, image) in builder_set.composed_builders {
-                insert_if_ok_boxed("image", id, ComposedImage::new(image, &mut set), &mut set.images);
+                insert_if_ok_boxed(
+                    "image",
+                    id,
+                    ComposedImage::new(image, &mut set),
+                    &mut set.images,
+                );
             }
 
             for (id, image) in builder_set.timer_builders {
-                insert_if_ok_boxed("image", id, TimerImage::new(image, &set.images), &mut set.images);
+                insert_if_ok_boxed(
+                    "image",
+                    id,
+                    TimerImage::new(image, &set.images),
+                    &mut set.images,
+                );
             }
 
             for (id, image) in builder_set.animated_builders {
-                insert_if_ok_boxed("image", id, AnimatedImage::new(image, &set.images), &mut set.images);
+                insert_if_ok_boxed(
+                    "image",
+                    id,
+                    AnimatedImage::new(image, &set.images),
+                    &mut set.images,
+                );
             }
 
             Ok(())
@@ -141,24 +171,25 @@ impl ResourceSet {
     }
 
     pub fn image_else_empty(id: &str) -> Rc<Image> {
-        RESOURCE_SET.with(|r| {
-            match get_resource(id, &r.borrow().images) {
-                None => {
-                    warn!("No image with id '{}' found", id);
-                    get_resource("empty", &r.borrow().images).unwrap()
-                }, Some(ref image) => {
-                    Rc::clone(image)
-                }
+        RESOURCE_SET.with(|r| match get_resource(id, &r.borrow().images) {
+            None => {
+                warn!("No image with id '{}' found", id);
+                get_resource("empty", &r.borrow().images).unwrap()
             }
+            Some(ref image) => Rc::clone(image),
         })
     }
 
     pub fn empty_image() -> Rc<Image> {
-        RESOURCE_SET.with(|r| get_resource("empty", &r.borrow().images)).unwrap()
+        RESOURCE_SET
+            .with(|r| get_resource("empty", &r.borrow().images))
+            .unwrap()
     }
 
     pub fn default_font() -> Rc<Font> {
-        RESOURCE_SET.with(|r| get_resource(&Config::default_font(), &r.borrow().fonts)).unwrap()
+        RESOURCE_SET
+            .with(|r| get_resource(&Config::default_font(), &r.borrow().fonts))
+            .unwrap()
     }
 
     pub fn spritesheet(id: &str) -> Option<Rc<Spritesheet>> {
@@ -196,8 +227,10 @@ impl ResourceSet {
     /// Parses the `id` string to get a sprite from a spritesheet.  The string
     /// must be of the form {SPRITE_SHEET_ID}/{SPRITE_ID}
     pub fn sprite_internal(&self, id: &str) -> Result<Rc<Sprite>, Error> {
-        let format_error = invalid_data_error("Image display must be \
-                                              of format {SHEET_ID}/{SPRITE_ID}");
+        let format_error = invalid_data_error(
+            "Image display must be \
+             of format {SHEET_ID}/{SPRITE_ID}",
+        );
 
         let split_index = match id.find('/') {
             None => return format_error,
@@ -211,15 +244,22 @@ impl ResourceSet {
         let sprite_id = &sprite_id[1..];
 
         let sheet = match self.spritesheets.get(spritesheet_id) {
-            None => return invalid_data_error(&format!("Unable to locate spritesheet '{}'",
-                                                       spritesheet_id)),
+            None => {
+                return invalid_data_error(&format!(
+                    "Unable to locate spritesheet '{}'",
+                    spritesheet_id
+                ));
+            }
             Some(sheet) => sheet,
         };
 
         let sprite = match sheet.sprites.get(sprite_id) {
-            None => return invalid_data_error(
-                &format!("Unable to locate sprite '{}' in spritesheet '{}'",
-                         sprite_id, spritesheet_id)),
+            None => {
+                return invalid_data_error(&format!(
+                    "Unable to locate sprite '{}' in spritesheet '{}'",
+                    sprite_id, spritesheet_id
+                ));
+            }
             Some(ref sprite) => Rc::clone(sprite),
         };
 
@@ -240,25 +280,41 @@ pub fn get_resource<V: ?Sized>(id: &str, map: &HashMap<String, Rc<V>>) -> Option
     }
 }
 
-pub fn insert_if_ok<K: Eq + Hash + Display, V>(type_str: &str,
-    key: K, val: Result<V, Error>, map: &mut HashMap<K, Rc<V>>) {
-
-    trace!("Inserting resource of type {} with key {} into resource set.",
-           type_str, key);
+pub fn insert_if_ok<K: Eq + Hash + Display, V>(
+    type_str: &str,
+    key: K,
+    val: Result<V, Error>,
+    map: &mut HashMap<K, Rc<V>>,
+) {
+    trace!(
+        "Inserting resource of type {} with key {} into resource set.",
+        type_str,
+        key
+    );
     match val {
         Err(e) => warn_on_insert(type_str, key, e),
-        Ok(v) => { (*map).insert(key, Rc::new(v)); }
+        Ok(v) => {
+            (*map).insert(key, Rc::new(v));
+        }
     };
 }
 
-fn insert_if_ok_boxed<K: Eq + Hash + Display, V: ?Sized>(type_str: &str,
-    key: K, val: Result<Rc<V>, Error>, map: &mut HashMap<K, Rc<V>>) {
-
-    trace!("Inserting resource of type {} with key {} into resource set.",
-           type_str, key);
+fn insert_if_ok_boxed<K: Eq + Hash + Display, V: ?Sized>(
+    type_str: &str,
+    key: K,
+    val: Result<Rc<V>, Error>,
+    map: &mut HashMap<K, Rc<V>>,
+) {
+    trace!(
+        "Inserting resource of type {} with key {} into resource set.",
+        type_str,
+        key
+    );
     match val {
         Err(e) => warn_on_insert(type_str, key, e),
-        Ok(v) => { (*map).insert(key, Rc::clone(&v)); },
+        Ok(v) => {
+            (*map).insert(key, Rc::clone(&v));
+        }
     };
 }
 
@@ -275,7 +331,9 @@ pub fn subdirs<P: AsRef<Path>>(path: P) -> Result<Vec<PathBuf>, Error> {
     for entry in dir_entries {
         let entry = entry?;
 
-        if !entry.path().is_dir() { continue; }
+        if !entry.path().is_dir() {
+            continue;
+        }
 
         result.push(entry.path());
     }
@@ -284,11 +342,15 @@ pub fn subdirs<P: AsRef<Path>>(path: P) -> Result<Vec<PathBuf>, Error> {
 }
 
 pub fn deserialize_image<'de, D>(deserializer: D) -> Result<Rc<Image>, D::Error>
-    where D: Deserializer<'de> {
-
+where
+    D: Deserializer<'de>,
+{
     let id = String::deserialize(deserializer)?;
     match ResourceSet::image(&id) {
-        None => Err(de::Error::custom(format!("No image with ID '{}' found", id))),
+        None => Err(de::Error::custom(format!(
+            "No image with ID '{}' found",
+            id
+        ))),
         Some(image) => Ok(image),
     }
 }

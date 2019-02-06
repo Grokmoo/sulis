@@ -15,15 +15,15 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::any::Any;
-use std::rc::Rc;
 use std::cell::RefCell;
+use std::rc::Rc;
 
-use crate::widget_kind;
-use crate::ui::theme::{self, HorizontalAlignment, VerticalAlignment};
-use crate::ui::{LineRenderer, Widget, WidgetKind};
 use crate::io::event::ClickKind;
 use crate::io::GraphicsRenderer;
+use crate::ui::theme::{self, HorizontalAlignment, VerticalAlignment};
+use crate::ui::{LineRenderer, Widget, WidgetKind};
 use crate::util::Point;
+use crate::widget_kind;
 use crate::widgets::TextArea;
 
 pub struct Label {
@@ -58,16 +58,12 @@ impl Label {
         let w = widget.state.inner_width() as f32;
         let h = widget.state.inner_height() as f32;
 
-        let len = if width > w {
-            w
-        } else {
-            width
-        };
+        let len = if width > w { w } else { width };
 
         let x = match widget.state.text_params.horizontal_alignment {
             HorizontalAlignment::Left => x,
             HorizontalAlignment::Center => (x + (w - len) / 2.0),
-            HorizontalAlignment::Right => x +w - len,
+            HorizontalAlignment::Right => x + w - len,
         };
 
         let y = match widget.state.text_params.vertical_alignment {
@@ -93,8 +89,13 @@ impl WidgetKind for Label {
         false
     }
 
-    fn on_mouse_drag(&mut self, _widget: &Rc<RefCell<Widget>>, _kind: ClickKind,
-                     _delta_x: f32, _delta_y: f32) -> bool {
+    fn on_mouse_drag(
+        &mut self,
+        _widget: &Rc<RefCell<Widget>>,
+        _kind: ClickKind,
+        _delta_x: f32,
+        _delta_y: f32,
+    ) -> bool {
         false
     }
 
@@ -110,7 +111,9 @@ impl WidgetKind for Label {
 
     // TODO refactor tooltip code into a common case somewhere
     fn on_mouse_move(&mut self, widget: &Rc<RefCell<Widget>>, _dx: f32, _dy: f32) -> bool {
-        if self.tooltip.is_empty() { return false; }
+        if self.tooltip.is_empty() {
+            return false;
+        }
 
         let tooltip = Widget::with_theme(TextArea::empty(), "tooltip");
         tooltip.borrow_mut().state.add_text_arg("0", &self.tooltip);
@@ -141,8 +144,13 @@ impl WidgetKind for Label {
         }
     }
 
-    fn draw(&mut self, renderer: &mut GraphicsRenderer, _pixel_size: Point,
-            widget: &Widget, _millis: u32) {
+    fn draw(
+        &mut self,
+        renderer: &mut GraphicsRenderer,
+        _pixel_size: Point,
+        widget: &Widget,
+        _millis: u32,
+    ) {
         let font_rend = match &widget.state.text_renderer {
             &None => return,
             &Some(ref renderer) => renderer,

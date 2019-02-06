@@ -16,9 +16,9 @@
 
 use rlua::{UserData, UserDataMethods};
 
-use sulis_module::on_trigger::{self, OnTrigger, ScriptMenuChoice};
 use crate::script::{script_callback::FuncKind, CallbackData};
 use crate::GameState;
+use sulis_module::on_trigger::{self, OnTrigger, ScriptMenuChoice};
 
 /// A user interface menu being created by a script.  Normally created
 /// by `game:create_menu()`
@@ -49,23 +49,31 @@ impl ScriptMenu {
 
 impl UserData for ScriptMenu {
     fn add_methods<'lua, M: UserDataMethods<'lua, Self>>(methods: &mut M) {
-        methods.add_method_mut("add_choice", |_, menu, (text, value): (String, Option<String>)| {
-            let value = match value {
-                None => text.clone(),
-                Some(value) => value,
-            };
+        methods.add_method_mut(
+            "add_choice",
+            |_, menu, (text, value): (String, Option<String>)| {
+                let value = match value {
+                    None => text.clone(),
+                    Some(value) => value,
+                };
 
-            menu.choices.push(ScriptMenuChoice { display: text, value });
-            Ok(())
-        });
+                menu.choices.push(ScriptMenuChoice {
+                    display: text,
+                    value,
+                });
+                Ok(())
+            },
+        );
 
         methods.add_method("show", |_, menu, ()| {
             let func = match menu.callback.get_func(FuncKind::OnMenuSelect) {
-                None => return Err(rlua::Error::FromLuaConversionError {
-                    from: "CallbackData",
-                    to: "Menu",
-                    message: Some("OnMenuSelect must be specified for callback".to_string())
-                }),
+                None => {
+                    return Err(rlua::Error::FromLuaConversionError {
+                        from: "CallbackData",
+                        to: "Menu",
+                        message: Some("OnMenuSelect must be specified for callback".to_string()),
+                    });
+                }
                 Some(func) => func,
             };
 

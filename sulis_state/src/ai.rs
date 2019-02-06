@@ -14,14 +14,14 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::rc::Rc;
 use std::cell::RefCell;
+use std::rc::Rc;
 
 use rlua;
 
-use sulis_core::config::Config;
 use crate::script::script_callback;
 use crate::{animation::Anim, EntityState, GameState, Script};
+use sulis_core::config::Config;
 
 pub struct AI {
     ai: Option<EntityAI>,
@@ -37,7 +37,9 @@ impl AI {
     }
 
     pub fn update(&mut self, entity: Rc<RefCell<EntityState>>) {
-        if GameState::is_modal_locked() { return; }
+        if GameState::is_modal_locked() {
+            return;
+        }
 
         if entity.borrow().is_party_member() {
             self.ai = None;
@@ -50,23 +52,30 @@ impl AI {
         };
 
         if assign {
-            debug!("Initialize round AI for '{}'", entity.borrow().actor.actor.name);
+            debug!(
+                "Initialize round AI for '{}'",
+                entity.borrow().actor.actor.name
+            );
             self.ai = Some(EntityAI::new(&entity));
             self.next_state = State::Wait(20);
         }
 
         if let Some(ref mut ai) = self.ai {
-            if GameState::has_blocking_animations(&ai.entity) { return; }
+            if GameState::has_blocking_animations(&ai.entity) {
+                return;
+            }
 
             self.next_state = match self.next_state {
-                State::Run => {
-                    ai.run_script()
-                }, State::Wait(time) => {
+                State::Run => ai.run_script(),
+                State::Wait(time) => {
                     ai.wait(time);
                     State::Run
-                },
+                }
                 State::End => {
-                    debug!("AI for '{}' is ending.", ai.entity.borrow().actor.actor.name);
+                    debug!(
+                        "AI for '{}' is ending.",
+                        ai.entity.borrow().actor.actor.name
+                    );
                     let turn_mgr = GameState::turn_manager();
                     let cbs = turn_mgr.borrow_mut().next();
                     script_callback::fire_round_elapsed(cbs);
@@ -102,14 +111,19 @@ impl EntityAI {
     }
 
     fn wait(&self, time: u32) {
-        debug!("AI for '{}' is waiting.", self.entity.borrow().actor.actor.name);
+        debug!(
+            "AI for '{}' is waiting.",
+            self.entity.borrow().actor.actor.name
+        );
         let wait_time = Config::animation_base_time_millis() * time;
         let anim = Anim::new_wait(&self.entity, wait_time);
         GameState::add_animation(anim);
     }
 
     fn run_script(&mut self) -> State {
-        if self.actions_taken_this_turn == MAX_ACTIONS { return State::End }
+        if self.actions_taken_this_turn == MAX_ACTIONS {
+            return State::End;
+        }
 
         if self.entity.borrow().actor.actor.ai.is_none() {
             return State::End;

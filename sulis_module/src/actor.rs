@@ -14,20 +14,22 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::io::{Error};
-use std::rc::Rc;
-use std::fmt;
 use std::collections::HashMap;
+use std::fmt;
+use std::io::Error;
+use std::rc::Rc;
 
-use sulis_core::io::GraphicsRenderer;
-use sulis_core::image::{Image, LayeredImage};
-use sulis_core::resource::{ResourceSet};
-use sulis_core::ui::{Color};
-use sulis_core::util::{unable_to_create_error};
 use crate::rules::AttributeList;
+use sulis_core::image::{Image, LayeredImage};
+use sulis_core::io::GraphicsRenderer;
+use sulis_core::resource::ResourceSet;
+use sulis_core::ui::Color;
+use sulis_core::util::unable_to_create_error;
 
-use crate::{Ability, AITemplate, Class, Conversation, ImageLayer, ImageLayerSet, InventoryBuilder,
-    LootList, Module, Race};
+use crate::{
+    AITemplate, Ability, Class, Conversation, ImageLayer, ImageLayerSet, InventoryBuilder,
+    LootList, Module, Race,
+};
 
 #[derive(Deserialize, Serialize, Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[serde(deny_unknown_fields)]
@@ -37,8 +39,8 @@ pub enum Faction {
     Neutral,
 }
 
-impl Faction{
-    pub fn iter() -> impl Iterator<Item=&'static Faction> {
+impl Faction {
+    pub fn iter() -> impl Iterator<Item = &'static Faction> {
         [Faction::Friendly, Faction::Hostile, Faction::Neutral].iter()
     }
 
@@ -83,7 +85,7 @@ pub enum Sex {
 }
 
 impl Sex {
-    pub fn iter() -> impl Iterator<Item=&'static Sex> {
+    pub fn iter() -> impl Iterator<Item = &'static Sex> {
         [Sex::Male, Sex::Female].iter()
     }
 }
@@ -130,10 +132,14 @@ impl PartialEq for Actor {
 }
 
 impl Actor {
-    pub fn from(other: &Actor, class_to_add: Option<(Rc<Class>, u32)>, xp: u32,
-                abilities_to_add: Vec<Rc<Ability>>, abilities_to_remove: Vec<String>,
-                inventory: InventoryBuilder) -> Actor {
-
+    pub fn from(
+        other: &Actor,
+        class_to_add: Option<(Rc<Class>, u32)>,
+        xp: u32,
+        abilities_to_add: Vec<Rc<Ability>>,
+        abilities_to_remove: Vec<String>,
+        inventory: InventoryBuilder,
+    ) -> Actor {
         let mut levels = other.levels.clone();
         let mut total_level = other.total_level;
         if let Some((class_to_add, amount)) = class_to_add {
@@ -205,19 +211,19 @@ impl Actor {
             None => {
                 warn!("No match found for race '{}'", builder.race);
                 return unable_to_create_error("actor", &builder.id);
-            }, Some(race) => Rc::clone(race)
+            }
+            Some(race) => Rc::clone(race),
         };
 
         let conversation = match builder.conversation {
             None => None,
-            Some(ref convo_id) => {
-                Some(match resources.conversations.get(convo_id) {
-                    None => {
-                        warn!("No match found for conversation '{}'", convo_id);
-                        return unable_to_create_error("actor", &builder.id);
-                    }, Some(convo) => Rc::clone(convo),
-                })
-            }
+            Some(ref convo_id) => Some(match resources.conversations.get(convo_id) {
+                None => {
+                    warn!("No match found for conversation '{}'", convo_id);
+                    return unable_to_create_error("actor", &builder.id);
+                }
+                Some(convo) => Rc::clone(convo),
+            }),
         };
 
         let sex = match builder.sex {
@@ -232,7 +238,8 @@ impl Actor {
                 None => {
                     warn!("No match for class '{}'", class_id);
                     return unable_to_create_error("actor", &builder.id);
-                }, Some(class) => Rc::clone(class)
+                }
+                Some(class) => Rc::clone(class),
             };
 
             total_level += level;
@@ -245,11 +252,13 @@ impl Actor {
                 None => {
                     warn!("Unable to find image for portrait '{}'", image);
                     return unable_to_create_error("actor", &builder.id);
-                }, Some(image) => Some(image),
-            }
+                }
+                Some(image) => Some(image),
+            },
         };
 
-        let image_layers = ImageLayerSet::merge(race.default_images(), sex, builder.images.clone())?;
+        let image_layers =
+            ImageLayerSet::merge(race.default_images(), sex, builder.images.clone())?;
         let images_list = image_layers.get_list(sex, builder.hair_color, builder.skin_color);
         let image = LayeredImage::new(images_list, builder.hue);
 
@@ -259,14 +268,13 @@ impl Actor {
                 let xp = reward.xp;
                 let loot = match reward.loot {
                     None => None,
-                    Some(id) => {
-                        Some(match resources.loot_lists.get(&id) {
-                            None => {
-                                warn!("No loot list found with id '{}'", id);
-                                return unable_to_create_error("actor", &builder.id);
-                            }, Some(list) => Rc::clone(list),
-                        })
-                    }
+                    Some(id) => Some(match resources.loot_lists.get(&id) {
+                        None => {
+                            warn!("No loot list found with id '{}'", id);
+                            return unable_to_create_error("actor", &builder.id);
+                        }
+                        Some(list) => Rc::clone(list),
+                    }),
                 };
 
                 Some(Reward {
@@ -283,7 +291,8 @@ impl Actor {
                 None => {
                     warn!("No ability found for '{}'", ability_id);
                     return unable_to_create_error("actor", &builder.id);
-                }, Some(ref ability) => Rc::clone(ability),
+                }
+                Some(ref ability) => Rc::clone(ability),
             };
 
             let mut upgrade = false;
@@ -302,14 +311,13 @@ impl Actor {
 
         let ai = match builder.ai {
             None => None,
-            Some(id) => {
-                match resources.ai_templates.get(&id) {
-                    None => {
-                        warn!("No AI template found with id '{}'", id);
-                        return unable_to_create_error("actor", &builder.id);
-                    }, Some(ref ai) => Some(Rc::clone(ai)),
+            Some(id) => match resources.ai_templates.get(&id) {
+                None => {
+                    warn!("No AI template found with id '{}'", id);
+                    return unable_to_create_error("actor", &builder.id);
                 }
-            }
+                Some(ref ai) => Some(Rc::clone(ai)),
+            },
         };
 
         Ok(Actor {
@@ -343,7 +351,9 @@ impl Actor {
 
     pub fn levels(&self, other_class: &Rc<Class>) -> u32 {
         for &(ref class, level) in self.levels.iter() {
-            if class == other_class { return level; }
+            if class == other_class {
+                return level;
+            }
         }
 
         0
@@ -371,7 +381,9 @@ impl Actor {
 
     pub fn has_ability(&self, other: &Rc<Ability>) -> bool {
         for ability in self.abilities.iter() {
-            if Rc::ptr_eq(&ability.ability, other) { return true; }
+            if Rc::ptr_eq(&ability.ability, other) {
+                return true;
+            }
         }
 
         false
@@ -385,8 +397,15 @@ impl Actor {
         &self.image_layers
     }
 
-    pub fn draw(&self, renderer: &mut GraphicsRenderer, scale_x: f32, scale_y: f32,
-                x: f32, y: f32, millis: u32) {
+    pub fn draw(
+        &self,
+        renderer: &mut GraphicsRenderer,
+        scale_x: f32,
+        scale_y: f32,
+        x: f32,
+        y: f32,
+        millis: u32,
+    ) {
         self.image.draw(renderer, scale_x, scale_y, x, y, millis);
     }
 }
@@ -406,7 +425,7 @@ pub struct ActorBuilder {
     pub name: String,
     pub race: String,
     pub sex: Option<Sex>,
-    #[serde(skip_serializing_if="Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub portrait: Option<String>,
     pub attributes: AttributeList,
     pub conversation: Option<String>,
@@ -414,19 +433,19 @@ pub struct ActorBuilder {
     pub images: HashMap<ImageLayer, String>,
     pub hue: Option<f32>,
 
-    #[serde(skip_serializing_if="Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub hair_color: Option<Color>,
 
-    #[serde(skip_serializing_if="Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub skin_color: Option<Color>,
     #[serde(default)]
     pub inventory: InventoryBuilder,
     pub levels: HashMap<String, u32>,
 
-    #[serde(skip_serializing_if="Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub xp: Option<u32>,
 
-    #[serde(skip_serializing_if="Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub reward: Option<RewardBuilder>,
     pub abilities: Vec<String>,
     pub ai: Option<String>,

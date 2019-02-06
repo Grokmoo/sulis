@@ -15,14 +15,14 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::any::Any;
-use std::rc::Rc;
 use std::cell::RefCell;
 use std::cmp;
+use std::rc::Rc;
 
-use crate::widget_kind;
-use crate::io::{InputAction, GraphicsRenderer};
+use crate::io::{GraphicsRenderer, InputAction};
 use crate::ui::{Callback, Widget, WidgetKind};
 use crate::util::{Point, Size};
+use crate::widget_kind;
 
 use crate::widgets::{Button, TextArea};
 
@@ -76,8 +76,13 @@ fn disable_text_area_limit_recursive(parent: &Rc<RefCell<Widget>>) {
 impl WidgetKind for ScrollPane {
     widget_kind!["scrollpane"];
 
-    fn draw(&mut self, renderer: &mut GraphicsRenderer, _pixel_size: Point,
-            widget: &Widget, _millis: u32) {
+    fn draw(
+        &mut self,
+        renderer: &mut GraphicsRenderer,
+        _pixel_size: Point,
+        widget: &Widget,
+        _millis: u32,
+    ) {
         let x = widget.state.inner_left();
         let y = widget.state.inner_top();
         let width = widget.state.inner_width();
@@ -92,7 +97,9 @@ impl WidgetKind for ScrollPane {
             _ => return false,
         };
 
-        self.scrollbar.borrow_mut().update_children_position(&self.content, delta);
+        self.scrollbar
+            .borrow_mut()
+            .update_children_position(&self.content, delta);
 
         true
     }
@@ -109,7 +116,10 @@ impl WidgetKind for ScrollPane {
         widget.state.set_position(x, y);
 
         let (sx, sy) = self.scrollbar_widget.borrow().state.position().as_tuple();
-        self.scrollbar_widget.borrow_mut().state.set_position(sx, sy + scroll);
+        self.scrollbar_widget
+            .borrow_mut()
+            .state
+            .set_position(sx, sy + scroll);
 
         if self.content_height == 0 {
             self.content_height = self.content.borrow().state.height();
@@ -117,7 +127,10 @@ impl WidgetKind for ScrollPane {
         }
 
         let w = self.content.borrow().state.width();
-        self.content.borrow_mut().state.set_size(Size::new(w, self.content_height + scroll));
+        self.content
+            .borrow_mut()
+            .state
+            .set_size(Size::new(w, self.content_height + scroll));
     }
 
     fn end_draw(&mut self, renderer: &mut GraphicsRenderer) {
@@ -171,8 +184,11 @@ impl Scrollbar {
 
         self.cur_y += dir * self.delta as i32;
 
-        if self.cur_y < self.min_y { self.cur_y = self.min_y }
-        else if self.cur_y > self.max_y { self.cur_y = self.max_y }
+        if self.cur_y < self.min_y {
+            self.cur_y = self.min_y
+        } else if self.cur_y > self.max_y {
+            self.cur_y = self.max_y
+        }
 
         let pane = Widget::direct_parent(&self.widget);
         pane.borrow_mut().invalidate_layout();
@@ -185,13 +201,18 @@ impl Scrollbar {
         for i in 0..len {
             let child = Rc::clone(&widget.borrow().children[i]);
 
-            max_y = cmp::max(max_y, child.borrow().state.top() + child.borrow().state.height());
+            max_y = cmp::max(
+                max_y,
+                child.borrow().state.top() + child.borrow().state.height(),
+            );
         }
 
         self.max_y = max_y - self.content_height + widget.borrow().state.border().vertical()
             - widget.borrow().state.top();
 
-        if self.max_y < self.min_y { self.max_y = self.min_y }
+        if self.max_y < self.min_y {
+            self.max_y = self.min_y
+        }
     }
 }
 
@@ -210,9 +231,14 @@ impl WidgetKind for Scrollbar {
 
         self.delta = widget.theme.get_custom_or_default("scroll_delta", 1);
 
-        self.up.borrow_mut().state.set_enabled(self.cur_y != self.min_y);
-        self.down.borrow_mut().state.set_enabled(self.cur_y != self.max_y);
-
+        self.up
+            .borrow_mut()
+            .state
+            .set_enabled(self.cur_y != self.min_y);
+        self.down
+            .borrow_mut()
+            .state
+            .set_enabled(self.cur_y != self.max_y);
 
         let widget_height = self.content_height as f32;
         let thumb_frac = widget_height / ((self.max_y as f32 - self.min_y as f32) + widget_height);
@@ -220,16 +246,21 @@ impl WidgetKind for Scrollbar {
         self.thumb.borrow_mut().state.set_enabled(false);
         widget.state.set_visible(thumb_frac < 1.0);
 
-        let inner_height = widget.state.inner_height() - self.up.borrow().state.height() -
-            self.down.borrow().state.height();
+        let inner_height = widget.state.inner_height()
+            - self.up.borrow().state.height()
+            - self.down.borrow().state.height();
         let thumb_height = (thumb_frac * inner_height as f32).round() as i32;
         let thumb_width = self.thumb.borrow().state.width();
-        self.thumb.borrow_mut().state.set_size(Size::new(thumb_width, thumb_height));
+        self.thumb
+            .borrow_mut()
+            .state
+            .set_size(Size::new(thumb_width, thumb_height));
 
         let thumb_x = self.thumb.borrow().state.left();
         let thumb_base_y = self.up.borrow().state.top() + self.up.borrow().state.height();
 
-        let thumb_pos_frac = (self.cur_y as f32 - self.min_y as f32) / (self.max_y as f32 - self.min_y as f32);
+        let thumb_pos_frac =
+            (self.cur_y as f32 - self.min_y as f32) / (self.max_y as f32 - self.min_y as f32);
         let thumb_max_y = self.down.borrow().state.top() - thumb_height - thumb_base_y;
 
         let thumb_y = thumb_base_y + (thumb_pos_frac * thumb_max_y as f32).round() as i32;
@@ -239,17 +270,27 @@ impl WidgetKind for Scrollbar {
 
     fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let widget_ref = Rc::clone(&self.widget);
-        self.up.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-            let (_, kind) = Widget::parent_mut::<Scrollbar>(&widget);
-            kind.update_children_position(&widget_ref, -1);
-        })));
+        self.up
+            .borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(move |widget, _| {
+                let (_, kind) = Widget::parent_mut::<Scrollbar>(&widget);
+                kind.update_children_position(&widget_ref, -1);
+            })));
 
         let widget_ref = Rc::clone(&self.widget);
-        self.down.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-            let (_, kind) = Widget::parent_mut::<Scrollbar>(&widget);
-            kind.update_children_position(&widget_ref, 1);
-        })));
+        self.down
+            .borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(move |widget, _| {
+                let (_, kind) = Widget::parent_mut::<Scrollbar>(&widget);
+                kind.update_children_position(&widget_ref, 1);
+            })));
 
-        vec![Rc::clone(&self.up), Rc::clone(&self.down), Rc::clone(&self.thumb)]
+        vec![
+            Rc::clone(&self.up),
+            Rc::clone(&self.down),
+            Rc::clone(&self.thumb),
+        ]
     }
 }

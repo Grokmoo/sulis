@@ -14,23 +14,28 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::time;
+use std::cell::{Cell, RefCell};
 use std::collections::HashMap;
 use std::io::{Error, ErrorKind};
 use std::rc::Rc;
-use std::cell::{Cell, RefCell};
+use std::time;
 
 use sulis_core::config::Config;
-use sulis_core::util::{self, Point, invalid_data_error, ExtInt};
-use sulis_core::io::{GraphicsRenderer};
-use sulis_module::{Actor, Module, ObjectSize, OnTrigger, area::{Trigger, TriggerKind}, Time};
+use sulis_core::io::GraphicsRenderer;
+use sulis_core::util::{self, invalid_data_error, ExtInt, Point};
 use sulis_module::on_trigger::QuestEntryState;
+use sulis_module::{
+    area::{Trigger, TriggerKind},
+    Actor, Module, ObjectSize, OnTrigger, Time,
+};
 
-use crate::{AI, AreaState, ChangeListener, ChangeListenerList, Effect,
-    EntityState, Location, Formation, ItemList, ItemState, PartyStash, QuestStateSet,
-    PathFinder, SaveState, UICallback, MOVE_TO_THRESHOLD, TurnManager, WorldMapState};
-use crate::script::{script_cache, script_callback, ScriptCallback, Script, ScriptEntity};
-use crate::animation::{self, Anim, AnimState, AnimSaveState, particle_generator::Param};
+use crate::animation::{self, particle_generator::Param, Anim, AnimSaveState, AnimState};
+use crate::script::{script_cache, script_callback, Script, ScriptCallback, ScriptEntity};
+use crate::{
+    AreaState, ChangeListener, ChangeListenerList, Effect, EntityState, Formation, ItemList,
+    ItemState, Location, PartyStash, PathFinder, QuestStateSet, SaveState, TurnManager, UICallback,
+    WorldMapState, AI, MOVE_TO_THRESHOLD,
+};
 
 thread_local! {
     static TURN_MANAGER: Rc<RefCell<TurnManager>> = Rc::new(RefCell::new(TurnManager::default()));
@@ -87,8 +92,10 @@ impl GameState {
 
             let area_state = match areas.get(&save_state.current_area) {
                 Some(ref area) => Ok(Rc::clone(area)),
-                None => invalid_data_error(&format!("Unable to load current area '{}'",
-                                                    save_state.current_area)),
+                None => invalid_data_error(&format!(
+                    "Unable to load current area '{}'",
+                    save_state.current_area
+                )),
             }?;
 
             let path_finder = PathFinder::new(&area_state.borrow().area);
@@ -125,7 +132,9 @@ impl GameState {
 
                 let is_dead = entity.borrow().actor.is_dead();
                 let location = entity.borrow().location.clone();
-                area_state.borrow_mut().load_entity(entity, location, is_dead)?;
+                area_state
+                    .borrow_mut()
+                    .load_entity(entity, location, is_dead)?;
             }
 
             let mut effects = HashMap::new();
@@ -150,16 +159,18 @@ impl GameState {
                 let mut effect = Effect::load(effect_save, new_index, &entities)?;
                 if let Some(index) = effect.entity {
                     let entity = match entities.get(&index) {
-                        None =>
-                            return invalid_data_error(&format!("Invalid effect entity {}", index)),
+                        None => {
+                            return invalid_data_error(&format!("Invalid effect entity {}", index));
+                        }
                         Some(ref entity) => Rc::clone(entity),
                     };
 
                     // the index has changed with the load
                     effect.entity = Some(entity.borrow().index());
 
-                    let new_idx = mgr.borrow_mut().add_effect(effect, &entity,
-                                                                Vec::new(), Vec::new());
+                    let new_idx =
+                        mgr.borrow_mut()
+                            .add_effect(effect, &entity, Vec::new(), Vec::new());
                     assert!(new_index == new_idx);
                     effects.insert(old_index, new_index);
                     continue;
@@ -167,13 +178,22 @@ impl GameState {
 
                 if let Some(surface) = effect.surface.clone() {
                     let area = match areas.get(&surface.area_id) {
-                        None => return invalid_data_error(
-                            &format!("Invalid area ID '{}'", surface.area_id)),
+                        None => {
+                            return invalid_data_error(&format!(
+                                "Invalid area ID '{}'",
+                                surface.area_id
+                            ));
+                        }
                         Some(area) => area,
                     };
 
-                    let new_idx = mgr.borrow_mut().add_surface(effect, area, surface.points,
-                                                                 Vec::new(), Vec::new());
+                    let new_idx = mgr.borrow_mut().add_surface(
+                        effect,
+                        area,
+                        surface.points,
+                        Vec::new(),
+                        Vec::new(),
+                    );
                     assert!(new_index == new_idx);
                     effects.insert(old_index, new_index);
                 }
@@ -259,11 +279,23 @@ impl GameState {
         let pc = GameState::player();
         let area_state = GameState::area_state();
         area_state.borrow_mut().update_view_visibility();
-        area_state.borrow_mut().push_scroll_to_callback(Rc::clone(&pc));
+        area_state
+            .borrow_mut()
+            .push_scroll_to_callback(Rc::clone(&pc));
         area_state.borrow_mut().on_load_fired = true;
         let area_state = area_state.borrow();
-        GameState::add_ui_callbacks_of_kind(&area_state.area.triggers, TriggerKind::OnCampaignStart, &pc, &pc);
-        GameState::add_ui_callbacks_of_kind(&area_state.area.triggers, TriggerKind::OnAreaLoad, &pc, &pc);
+        GameState::add_ui_callbacks_of_kind(
+            &area_state.area.triggers,
+            TriggerKind::OnCampaignStart,
+            &pc,
+            &pc,
+        );
+        GameState::add_ui_callbacks_of_kind(
+            &area_state.area.triggers,
+            TriggerKind::OnAreaLoad,
+            &pc,
+            &pc,
+        );
 
         Ok(())
     }
@@ -276,24 +308,32 @@ impl GameState {
             party_stash.add_quantity(qty, item_state);
         }
 
-        let campaign= Module::campaign();
+        let campaign = Module::campaign();
 
         let area_state = GameState::setup_area_state(&campaign.starting_area)?;
 
-        debug!("Setting up PC {}, with {:?}", &pc.name, &campaign.starting_location);
+        debug!(
+            "Setting up PC {}, with {:?}",
+            &pc.name, &campaign.starting_location
+        );
         let location = Location::from_point(&campaign.starting_location, &area_state.borrow().area);
 
         if !location.coords_valid(location.x, location.y) {
             error!("Starting location coordinates must be valid for the starting area.");
-            return Err(Error::new(ErrorKind::InvalidData,
-                                  "Unable to create starting location."));
+            return Err(Error::new(
+                ErrorKind::InvalidData,
+                "Unable to create starting location.",
+            ));
         }
 
-        let index = match area_state.borrow_mut().add_actor(pc, location, None, true, None) {
+        let index = match area_state
+            .borrow_mut()
+            .add_actor(pc, location, None, true, None)
+        {
             Err(_) => {
                 error!("Player character starting location must be within bounds and passable.");
                 return invalid_data_error("Unable to add player character at starting location");
-            },
+            }
             Ok(index) => index,
         };
 
@@ -316,8 +356,8 @@ impl GameState {
         Ok(GameState {
             user_zoom: 1.0,
             areas,
-            area_state: area_state,
-            path_finder: path_finder,
+            area_state,
+            path_finder,
             selected,
             party,
             party_formation: Rc::new(RefCell::new(Formation::default())),
@@ -413,8 +453,11 @@ impl GameState {
             let mut state = state.borrow_mut();
             let state = state.as_mut().unwrap();
 
-            if zoom > MAX_ZOOM { zoom = MAX_ZOOM; }
-            else if zoom < MIN_ZOOM { zoom = MIN_ZOOM; }
+            if zoom > MAX_ZOOM {
+                zoom = MAX_ZOOM;
+            } else if zoom < MIN_ZOOM {
+                zoom = MIN_ZOOM;
+            }
 
             state.user_zoom = zoom;
         });
@@ -439,7 +482,10 @@ impl GameState {
     pub fn select_party_members(mut members: Vec<Rc<RefCell<EntityState>>>) {
         for member in members.iter() {
             if !member.borrow().is_party_member() {
-                warn!("Attempted to select non-party member {}", member.borrow().actor.actor.id);
+                warn!(
+                    "Attempted to select non-party member {}",
+                    member.borrow().actor.actor.id
+                );
             }
         }
 
@@ -472,10 +518,18 @@ impl GameState {
         let time = 200;
         let time_f32 = time as f32 / 1000.0;
         let duration = ExtInt::Int(time);
-        let color = [Param::with_jerk(0.0, 1.0 / time_f32, 0.0, -1.0 / time_f32),
-            Param::fixed(1.0), Param::fixed(1.0), Param::fixed(1.0)];
-        let color_sec = [Param::with_jerk(0.0, 0.7 / time_f32, 0.0, -0.7 / time_f32),
-            Param::fixed(0.0), Param::fixed(0.0), Param::fixed(0.0)];
+        let color = [
+            Param::with_jerk(0.0, 1.0 / time_f32, 0.0, -1.0 / time_f32),
+            Param::fixed(1.0),
+            Param::fixed(1.0),
+            Param::fixed(1.0),
+        ];
+        let color_sec = [
+            Param::with_jerk(0.0, 0.7 / time_f32, 0.0, -0.7 / time_f32),
+            Param::fixed(0.0),
+            Param::fixed(0.0),
+            Param::fixed(0.0),
+        ];
         let anim = Anim::new_entity_color(entity, duration, color, color_sec);
         GameState::add_animation(anim);
     }
@@ -523,13 +577,16 @@ impl GameState {
             let area_state = GameState::get_area_state(&location.area_id).unwrap();
             let index = member.borrow().index();
             let mut area_state = area_state.borrow_mut();
-            area_state.remove_matching_prop(location.x, location.y,
-                                            &member.borrow().actor.actor.name);
+            area_state.remove_matching_prop(
+                location.x,
+                location.y,
+                &member.borrow().actor.actor.name,
+            );
             match area_state.transition_entity_to(&member, index, location) {
                 Err(e) => {
                     warn!("Error re-adding disabled party member:");
                     warn!("{}", e);
-                },
+                }
                 Ok(_) => (),
             }
             let mgr = GameState::turn_manager();
@@ -545,8 +602,12 @@ impl GameState {
         for member in GameState::party().iter() {
             {
                 let member = member.borrow();
-                if !member.actor.is_dead() { continue; }
-                if member.actor.is_disabled() { continue; }
+                if !member.actor.is_dead() {
+                    continue;
+                }
+                if member.actor.is_disabled() {
+                    continue;
+                }
             }
 
             let script = &Module::campaign().on_party_death_script;
@@ -564,7 +625,9 @@ impl GameState {
                 let y = member.location.y;
                 let name = member.actor.actor.name.to_string();
                 let enabled = member.actor.is_disabled();
-                area_state.borrow_mut().add_prop_at(&prop, x, y, enabled, Some(name));
+                area_state
+                    .borrow_mut()
+                    .add_prop_at(&prop, x, y, enabled, Some(name));
             }
             notify = true;
         }
@@ -575,7 +638,9 @@ impl GameState {
 
             let pc = Rc::clone(&state.party[0]); // don't ever remove the PC
             state.party.retain(|e| {
-                if Rc::ptr_eq(&e, &pc) { return true; }
+                if Rc::ptr_eq(&e, &pc) {
+                    return true;
+                }
                 let actor = &e.borrow().actor;
                 !actor.is_dead() || actor.is_disabled()
             });
@@ -613,7 +678,9 @@ impl GameState {
 
     pub fn has_party_member(id: &str) -> bool {
         for entity in GameState::party() {
-            if &entity.borrow().actor.actor.id == id { return true; }
+            if &entity.borrow().actor.actor.id == id {
+                return true;
+            }
         }
 
         false
@@ -631,7 +698,10 @@ impl GameState {
             let state = state.as_mut().unwrap();
 
             entity.borrow_mut().add_to_party(show_portrait);
-            state.area_state.borrow_mut().compute_pc_visibility(&entity, 0, 0);
+            state
+                .area_state
+                .borrow_mut()
+                .compute_pc_visibility(&entity, 0, 0);
             state.party.push(Rc::clone(&entity));
 
             let entity = match state.selected.first() {
@@ -695,16 +765,19 @@ impl GameState {
                         STATE.with(|state| {
                             let mut state = state.borrow_mut();
                             let state = state.as_mut().unwrap();
-                            state.areas.insert(area_id.to_string(), Rc::clone(&area_state));
+                            state
+                                .areas
+                                .insert(area_id.to_string(), Rc::clone(&area_state));
                         });
 
                         area_state
-                    }, Err(e) => {
+                    }
+                    Err(e) => {
                         error!("Unable to transition to '{}'", &area_id);
                         error!("{}", e);
                         return;
                     }
-                }
+                },
             };
 
             if !GameState::check_location(&p, &area_state) {
@@ -752,13 +825,23 @@ impl GameState {
         for entity in GameState::party() {
             entity.borrow_mut().clear_pc_vis();
             let mut cur_location = base_location.clone();
-            GameState::find_transition_location(&mut cur_location, &entity.borrow().size,
-            &area_state.borrow());
-            info!("Transitioning {} to {},{}", entity.borrow().actor.actor.name,
-            cur_location.x, cur_location.y);
+            GameState::find_transition_location(
+                &mut cur_location,
+                &entity.borrow().size,
+                &area_state.borrow(),
+            );
+            info!(
+                "Transitioning {} to {},{}",
+                entity.borrow().actor.actor.name,
+                cur_location.x,
+                cur_location.y
+            );
             let index = entity.borrow().index();
 
-            match area_state.borrow_mut().transition_entity_to(&entity, index, cur_location) {
+            match area_state
+                .borrow_mut()
+                .transition_entity_to(&entity, index, cur_location)
+            {
                 Ok(_) => (),
                 Err(e) => {
                     warn!("Unable to add party member");
@@ -767,24 +850,34 @@ impl GameState {
             }
         }
 
-        area_state.borrow_mut().push_scroll_to_callback(Rc::clone(&pc));
+        area_state
+            .borrow_mut()
+            .push_scroll_to_callback(Rc::clone(&pc));
 
         let mut area_state = area_state.borrow_mut();
         area_state.update_view_visibility();
         if !area_state.on_load_fired {
             area_state.on_load_fired = true;
-            GameState::add_ui_callbacks_of_kind(&area_state.area.triggers, TriggerKind::OnAreaLoad, &pc, &pc);
+            GameState::add_ui_callbacks_of_kind(
+                &area_state.area.triggers,
+                TriggerKind::OnAreaLoad,
+                &pc,
+                &pc,
+            );
         }
     }
 
-    fn find_transition_location(location: &mut Location, size: &Rc<ObjectSize>,
-                                area_state: &AreaState) {
+    fn find_transition_location(
+        location: &mut Location,
+        size: &Rc<ObjectSize>,
+        area_state: &AreaState,
+    ) {
         let (base_x, base_y) = (location.x, location.y);
         let mut search_size = 0;
         while search_size < 10 {
             // TODO this does a lot of unneccesary checking
-            for y in -search_size..search_size+1 {
-                for x in -search_size..search_size+1 {
+            for y in -search_size..search_size + 1 {
+                for x in -search_size..search_size + 1 {
                     if area_state.is_passable_size(size, base_x + x, base_y + y) {
                         location.x = base_x + x;
                         location.y = base_y + y;
@@ -802,8 +895,10 @@ impl GameState {
     fn check_location(p: &Point, area_state: &Rc<RefCell<AreaState>>) -> bool {
         let location = Location::from_point(p, &area_state.borrow().area);
         if !location.coords_valid(location.x, location.y) {
-            error!("Location coordinates {},{} are not valid for area {}",
-                   location.x, location.y, location.area_id);
+            error!(
+                "Location coordinates {},{} are not valid for area {}",
+                location.x, location.y, location.area_id
+            );
             return false;
         }
 
@@ -827,8 +922,11 @@ impl GameState {
         Ok(area_state)
     }
 
-    pub fn add_ui_callback(cb: Vec<OnTrigger>, parent: &Rc<RefCell<EntityState>>,
-                           target: &Rc<RefCell<EntityState>>) {
+    pub fn add_ui_callback(
+        cb: Vec<OnTrigger>,
+        parent: &Rc<RefCell<EntityState>>,
+        target: &Rc<RefCell<EntityState>>,
+    ) {
         STATE.with(|s| {
             let mut state = s.borrow_mut();
             let state = state.as_mut().unwrap();
@@ -842,8 +940,12 @@ impl GameState {
         })
     }
 
-    pub fn add_ui_callbacks_of_kind(callbacks: &Vec<Trigger>, kind: TriggerKind,
-                                    parent: &Rc<RefCell<EntityState>>, target: &Rc<RefCell<EntityState>>) {
+    pub fn add_ui_callbacks_of_kind(
+        callbacks: &Vec<Trigger>,
+        kind: TriggerKind,
+        parent: &Rc<RefCell<EntityState>>,
+        target: &Rc<RefCell<EntityState>>,
+    ) {
         STATE.with(|s| {
             let mut state = s.borrow_mut();
             let state = state.as_mut().unwrap();
@@ -862,17 +964,15 @@ impl GameState {
     }
 
     pub fn is_modal_locked() -> bool {
-        MODAL_LOCKED.with(|c| { c.get() })
+        MODAL_LOCKED.with(|c| c.get())
     }
 
     pub fn set_modal_locked(locked: bool) {
-        MODAL_LOCKED.with(|c| { c.set(locked) })
+        MODAL_LOCKED.with(|c| c.set(locked))
     }
 
     fn check_clear_anims() -> bool {
-        CLEAR_ANIMS.with(|c| {
-            c.replace(false)
-        })
+        CLEAR_ANIMS.with(|c| c.replace(false))
     }
 
     pub fn set_clear_anims() {
@@ -881,16 +981,20 @@ impl GameState {
 
     pub fn area_state_ids() -> Vec<String> {
         STATE.with(|s| {
-            s.borrow().as_ref().unwrap().areas.keys().map(|k| k.to_string()).collect()
+            s.borrow()
+                .as_ref()
+                .unwrap()
+                .areas
+                .keys()
+                .map(|k| k.to_string())
+                .collect()
         })
     }
 
     pub fn get_area_state(id: &str) -> Option<Rc<RefCell<AreaState>>> {
-        STATE.with(|s| {
-            match s.borrow().as_ref().unwrap().areas.get(id) {
-                None => None,
-                Some(area_state) => Some(Rc::clone(&area_state)),
-            }
+        STATE.with(|s| match s.borrow().as_ref().unwrap().areas.get(id) {
+            None => None,
+            Some(area_state) => Some(Rc::clone(&area_state)),
         })
     }
 
@@ -914,11 +1018,11 @@ impl GameState {
             to_add
         });
 
-        let (update_cbs, complete_cbs) = ANIMATIONS.with(|a| {
-            a.borrow_mut().update(to_add, millis)
-        });
+        let (update_cbs, complete_cbs) = ANIMATIONS.with(|a| a.borrow_mut().update(to_add, millis));
         update_cbs.into_iter().for_each(|cb| cb.on_anim_update());
-        complete_cbs.into_iter().for_each(|cb| cb.on_anim_complete());
+        complete_cbs
+            .into_iter()
+            .for_each(|cb| cb.on_anim_complete());
 
         let mgr = GameState::turn_manager();
         let (turn_cbs, removal_cbs) = mgr.borrow_mut().update(millis);
@@ -965,14 +1069,32 @@ impl GameState {
         ui_cb
     }
 
-    pub fn draw_above_entities(renderer: &mut GraphicsRenderer, offset_x: f32, offset_y: f32,
-                              scale_x: f32, scale_y: f32, millis: u32) {
-        ANIMATIONS.with(|a| a.borrow().draw_above_entities(renderer, offset_x, offset_y, scale_x, scale_y, millis));
+    pub fn draw_above_entities(
+        renderer: &mut GraphicsRenderer,
+        offset_x: f32,
+        offset_y: f32,
+        scale_x: f32,
+        scale_y: f32,
+        millis: u32,
+    ) {
+        ANIMATIONS.with(|a| {
+            a.borrow()
+                .draw_above_entities(renderer, offset_x, offset_y, scale_x, scale_y, millis)
+        });
     }
 
-    pub fn draw_below_entities(renderer: &mut GraphicsRenderer, offset_x: f32, offset_y: f32,
-                              scale_x: f32, scale_y: f32, millis: u32) {
-        ANIMATIONS.with(|a| a.borrow().draw_below_entities(renderer, offset_x, offset_y, scale_x, scale_y, millis));
+    pub fn draw_below_entities(
+        renderer: &mut GraphicsRenderer,
+        offset_x: f32,
+        offset_y: f32,
+        scale_x: f32,
+        scale_y: f32,
+        millis: u32,
+    ) {
+        ANIMATIONS.with(|a| {
+            a.borrow()
+                .draw_below_entities(renderer, offset_x, offset_y, scale_x, scale_y, millis)
+        });
     }
 
     pub fn has_any_blocking_animations() -> bool {
@@ -984,11 +1106,11 @@ impl GameState {
     }
 
     pub fn remove_blocking_animations(entity: &Rc<RefCell<EntityState>>) {
-        ANIMATIONS.with(|a| a.borrow_mut().clear_blocking_anims(entity) );
+        ANIMATIONS.with(|a| a.borrow_mut().clear_blocking_anims(entity));
     }
 
     pub fn remove_all_blocking_animations() {
-        ANIMATIONS.with(|a| a.borrow_mut().clear_all_blocking_anims() );
+        ANIMATIONS.with(|a| a.borrow_mut().clear_all_blocking_anims());
     }
 
     pub fn add_animation(anim: Anim) {
@@ -1028,12 +1150,16 @@ impl GameState {
         false
     }
 
-    fn get_target(entity: &Rc<RefCell<EntityState>>,
-                  target: &Rc<RefCell<EntityState>>) -> (f32, f32, f32) {
+    fn get_target(
+        entity: &Rc<RefCell<EntityState>>,
+        target: &Rc<RefCell<EntityState>>,
+    ) -> (f32, f32, f32) {
         let (target_x, target_y) = {
             let target = target.borrow();
-            (target.location.x as f32 + (target.size.width / 2) as f32,
-             target.location.y as f32 + (target.size.height / 2) as f32)
+            (
+                target.location.x as f32 + (target.size.width / 2) as f32,
+                target.location.y as f32 + (target.size.height / 2) as f32,
+            )
         };
 
         let sizes = (entity.borrow().size.diagonal + target.borrow().size.diagonal) / 2.0;
@@ -1045,18 +1171,27 @@ impl GameState {
             range = vis_dist;
         }
 
-        trace!("Getting move target at {}, {} within {}", target_x, target_y, range);
+        trace!(
+            "Getting move target at {}, {} within {}",
+            target_x,
+            target_y,
+            range
+        );
         (target_x, target_y, range)
     }
 
-    pub fn can_move_towards(entity: &Rc<RefCell<EntityState>>,
-                            target: &Rc<RefCell<EntityState>>) -> bool {
+    pub fn can_move_towards(
+        entity: &Rc<RefCell<EntityState>>,
+        target: &Rc<RefCell<EntityState>>,
+    ) -> bool {
         let (x, y, dist) = GameState::get_target(entity, target);
         GameState::can_move_towards_point(entity, Vec::new(), x, y, dist)
     }
 
-    pub fn move_towards(entity: &Rc<RefCell<EntityState>>,
-                        target: &Rc<RefCell<EntityState>>) -> bool {
+    pub fn move_towards(
+        entity: &Rc<RefCell<EntityState>>,
+        target: &Rc<RefCell<EntityState>>,
+    ) -> bool {
         let (x, y, dist) = GameState::get_target(entity, target);
         GameState::move_towards_point(entity, Vec::new(), x, y, dist, None)
     }
@@ -1066,12 +1201,27 @@ impl GameState {
     }
 
     pub fn move_to(entity: &Rc<RefCell<EntityState>>, x: i32, y: i32) -> bool {
-        GameState::move_towards_point(entity, Vec::new(), x as f32, y as f32, MOVE_TO_THRESHOLD, None)
+        GameState::move_towards_point(
+            entity,
+            Vec::new(),
+            x as f32,
+            y as f32,
+            MOVE_TO_THRESHOLD,
+            None,
+        )
     }
 
-    pub fn move_towards_point(entity: &Rc<RefCell<EntityState>>, entities_to_ignore: Vec<usize>,
-                              x: f32, y: f32, dist: f32, cb: Option<Box<ScriptCallback>>) -> bool {
-        if entity.borrow().actor.stats.move_disabled { return false; }
+    pub fn move_towards_point(
+        entity: &Rc<RefCell<EntityState>>,
+        entities_to_ignore: Vec<usize>,
+        x: f32,
+        y: f32,
+        dist: f32,
+        cb: Option<Box<ScriptCallback>>,
+    ) -> bool {
+        if entity.borrow().actor.stats.move_disabled {
+            return false;
+        }
 
         // if entity cannot move even 1 square
         if entity.borrow().actor.ap() < entity.borrow().actor.get_move_ap_cost(1) {
@@ -1081,21 +1231,36 @@ impl GameState {
         let anim = STATE.with(|s| {
             let mut state = s.borrow_mut();
             let state = state.as_mut().unwrap();
-            debug!("Moving '{}' to {},{}", entity.borrow().actor.actor.name, x, y);
+            debug!(
+                "Moving '{}' to {},{}",
+                entity.borrow().actor.actor.name,
+                x,
+                y
+            );
 
             let start_time = time::Instant::now();
             let path = {
                 let area_state = state.area_state.borrow();
-                match state.path_finder.find(&area_state, entity.borrow(),
-                                             entities_to_ignore, true, x, y, dist) {
+                match state.path_finder.find(
+                    &area_state,
+                    entity.borrow(),
+                    entities_to_ignore,
+                    true,
+                    x,
+                    y,
+                    dist,
+                ) {
                     None => return None,
                     Some(path) => path,
                 }
             };
-            debug!("Path finding complete in {} secs",
-                  util::format_elapsed_secs(start_time.elapsed()));
+            debug!(
+                "Path finding complete in {} secs",
+                util::format_elapsed_secs(start_time.elapsed())
+            );
 
-            let mut anim = animation::move_animation::new(entity, path, Config::animation_base_time_millis());
+            let mut anim =
+                animation::move_animation::new(entity, path, Config::animation_base_time_millis());
             if let Some(cb) = cb {
                 anim.add_completion_callback(cb);
             }
@@ -1112,9 +1277,16 @@ impl GameState {
         }
     }
 
-    pub fn can_move_towards_point(entity: &Rc<RefCell<EntityState>>, entities_to_ignore: Vec<usize>,
-                                  x: f32, y: f32, dist: f32) -> bool {
-        if entity.borrow().actor.stats.move_disabled { return false; }
+    pub fn can_move_towards_point(
+        entity: &Rc<RefCell<EntityState>>,
+        entities_to_ignore: Vec<usize>,
+        x: f32,
+        y: f32,
+        dist: f32,
+    ) -> bool {
+        if entity.borrow().actor.stats.move_disabled {
+            return false;
+        }
 
         // if entity cannot move even 1 square
         if entity.borrow().actor.ap() < entity.borrow().actor.get_move_ap_cost(1) {
@@ -1127,13 +1299,22 @@ impl GameState {
             let area_state = state.area_state.borrow();
 
             let start_time = time::Instant::now();
-            let val = match state.path_finder.find(&area_state, entity.borrow(),
-                                                   entities_to_ignore, false, x, y, dist) {
+            let val = match state.path_finder.find(
+                &area_state,
+                entity.borrow(),
+                entities_to_ignore,
+                false,
+                x,
+                y,
+                dist,
+            ) {
                 None => false,
                 Some(_) => true,
             };
-            trace!("Path finding complete in {} secs",
-                  util::format_elapsed_secs(start_time.elapsed()));
+            trace!(
+                "Path finding complete in {} secs",
+                util::format_elapsed_secs(start_time.elapsed())
+            );
 
             val
         })

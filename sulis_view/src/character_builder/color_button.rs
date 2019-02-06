@@ -15,13 +15,13 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::any::Any;
-use std::rc::Rc;
 use std::cell::RefCell;
+use std::rc::Rc;
 
 use sulis_core::image::Image;
+use sulis_core::io::{event, DrawList, GraphicsRenderer};
 use sulis_core::resource::ResourceSet;
 use sulis_core::ui::{Color, Widget, WidgetKind};
-use sulis_core::io::{DrawList, event, GraphicsRenderer};
 use sulis_core::util::Point;
 
 pub struct ColorButton {
@@ -31,19 +31,22 @@ pub struct ColorButton {
 
 impl ColorButton {
     pub fn new(color: Color) -> Rc<RefCell<ColorButton>> {
-        Rc::new(RefCell::new(ColorButton {
-            color,
-            icon: None,
-        }))
+        Rc::new(RefCell::new(ColorButton { color, icon: None }))
     }
 }
 
 impl WidgetKind for ColorButton {
-    fn get_name(&self) -> &str { "color_button" }
+    fn get_name(&self) -> &str {
+        "color_button"
+    }
 
-    fn as_any(&self) -> &Any { self }
+    fn as_any(&self) -> &Any {
+        self
+    }
 
-    fn as_any_mut(&mut self) -> &mut Any { self }
+    fn as_any_mut(&mut self) -> &mut Any {
+        self
+    }
 
     fn layout(&mut self, widget: &mut Widget) {
         widget.do_base_layout();
@@ -53,8 +56,13 @@ impl WidgetKind for ColorButton {
         }
     }
 
-    fn draw(&mut self, renderer: &mut GraphicsRenderer, _pixel_size: Point,
-                          widget: &Widget, millis: u32) {
+    fn draw(
+        &mut self,
+        renderer: &mut GraphicsRenderer,
+        _pixel_size: Point,
+        widget: &Widget,
+        millis: u32,
+    ) {
         let icon = match self.icon {
             None => return,
             Some(ref icon) => icon,
@@ -63,8 +71,15 @@ impl WidgetKind for ColorButton {
         let (x, y) = widget.state.inner_position().as_tuple();
         let (w, h) = widget.state.inner_size().as_tuple();
         let mut draw_list = DrawList::empty_sprite();
-        icon.append_to_draw_list(&mut draw_list, &widget.state.animation_state,
-                                 x as f32, y as f32, w as f32, h as f32, millis);
+        icon.append_to_draw_list(
+            &mut draw_list,
+            &widget.state.animation_state,
+            x as f32,
+            y as f32,
+            w as f32,
+            h as f32,
+            millis,
+        );
         draw_list.set_color(self.color);
         renderer.draw(draw_list);
     }

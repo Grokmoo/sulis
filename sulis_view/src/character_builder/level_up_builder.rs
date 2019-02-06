@@ -14,10 +14,10 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::rc::Rc;
 use std::cell::RefCell;
+use std::rc::Rc;
 
-use sulis_core::ui::{Widget};
+use sulis_core::ui::Widget;
 use sulis_module::Actor;
 use sulis_state::EntityState;
 
@@ -28,8 +28,11 @@ pub struct LevelUpBuilder {
 }
 
 impl BuilderSet for LevelUpBuilder {
-    fn on_add(&self, builder: &mut CharacterBuilder,
-              _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+    fn on_add(
+        &self,
+        builder: &mut CharacterBuilder,
+        _widget: &Rc<RefCell<Widget>>,
+    ) -> Vec<Rc<RefCell<Widget>>> {
         let mut children = Vec::new();
 
         let choices = vec![self.pc.borrow().actor.actor.base_class().id.to_string()];
@@ -52,9 +55,18 @@ impl BuilderSet for LevelUpBuilder {
 
         let actor = &self.pc.borrow().actor.actor;
         let level = actor.total_level + 1;
-        for (index, ability_list) in actor.base_class().ability_choices(level).into_iter().enumerate() {
-            let pane = AbilitySelectorPane::new(ability_list, index, Rc::clone(&self.pc),
-                actor.abilities.clone());
+        for (index, ability_list) in actor
+            .base_class()
+            .ability_choices(level)
+            .into_iter()
+            .enumerate()
+        {
+            let pane = AbilitySelectorPane::new(
+                ability_list,
+                index,
+                Rc::clone(&self.pc),
+                actor.abilities.clone(),
+            );
             let widget = Widget::with_defaults(pane.clone());
             widget.borrow_mut().state.set_visible(false);
 
@@ -65,7 +77,9 @@ impl BuilderSet for LevelUpBuilder {
         builder.builder_panes.push(level_up_finish_pane.clone());
         children.push(level_up_finish_widget);
 
-        class_selector_pane_ref.borrow_mut().on_selected(builder, Rc::clone(&class_sel_widget_ref));
+        class_selector_pane_ref
+            .borrow_mut()
+            .on_selected(builder, Rc::clone(&class_sel_widget_ref));
         children
     }
 
@@ -78,8 +92,14 @@ impl BuilderSet for LevelUpBuilder {
         let mut pc = self.pc.borrow_mut();
         let state = &mut pc.actor;
 
-        let new_actor = Actor::from(&state.actor, Some((class, 1)), state.xp(),
-            builder.abilities.clone(), Vec::new(), state.actor.inventory.clone());
+        let new_actor = Actor::from(
+            &state.actor,
+            Some((class, 1)),
+            state.xp(),
+            builder.abilities.clone(),
+            Vec::new(),
+            state.actor.inventory.clone(),
+        );
         state.replace_actor(new_actor);
         state.init_day();
     }

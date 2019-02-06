@@ -14,8 +14,10 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-#[macro_use] extern crate sulis_core;
-#[macro_use] extern crate log;
+#[macro_use]
+extern crate sulis_core;
+#[macro_use]
+extern crate log;
 
 mod abilities_bar;
 pub use self::abilities_bar::AbilitiesBar;
@@ -115,20 +117,21 @@ pub use self::window_fade::WindowFade;
 mod world_map_window;
 pub use self::world_map_window::WorldMapWindow;
 
-use std::time::Instant;
 use std::any::Any;
-use std::rc::Rc;
 use std::cell::RefCell;
+use std::rc::Rc;
+use std::time::Instant;
 
 use sulis_core::config::Config;
 use sulis_core::io::{InputAction, MainLoopUpdater};
-use sulis_core::ui::{Callback, Widget, WidgetKind, Cursor};
+use sulis_core::ui::{Callback, Cursor, Widget, WidgetKind};
 use sulis_core::util;
-use sulis_module::{Module, area::OnRest};
-use sulis_state::{ChangeListener, EntityState, GameState, NextGameStep, Script,
-    save_file::create_save, script::script_callback, area_feedback_text::ColorKind,
-    script::ScriptEntity};
 use sulis_core::widgets::{Button, ConfirmationWindow, Label};
+use sulis_module::{area::OnRest, Module};
+use sulis_state::{
+    area_feedback_text::ColorKind, save_file::create_save, script::script_callback,
+    script::ScriptEntity, ChangeListener, EntityState, GameState, NextGameStep, Script,
+};
 
 const NAME: &str = "game";
 
@@ -171,7 +174,10 @@ pub struct RootView {
 
 impl RootView {
     pub fn area_view(&self) -> (Rc<RefCell<AreaView>>, Rc<RefCell<Widget>>) {
-        (Rc::clone(&self.area_view), Rc::clone(&self.area_view_widget))
+        (
+            Rc::clone(&self.area_view),
+            Rc::clone(&self.area_view_widget),
+        )
     }
 
     pub fn next_step(&mut self) -> Option<NextGameStep> {
@@ -222,8 +228,12 @@ impl RootView {
         }
     }
 
-    pub fn set_merchant_window(&mut self, widget: &Rc<RefCell<Widget>>,
-                               desired_state: bool, merchant_id: &str) {
+    pub fn set_merchant_window(
+        &mut self,
+        widget: &Rc<RefCell<Widget>>,
+        desired_state: bool,
+        merchant_id: &str,
+    ) {
         self.set_window(widget, self::merchant_window::NAME, desired_state, &|| {
             match GameState::selected().first() {
                 None => None,
@@ -234,8 +244,12 @@ impl RootView {
         self.set_inventory_window(widget, desired_state);
     }
 
-    pub fn set_prop_window(&mut self, widget: &Rc<RefCell<Widget>>,
-                              desired_state: bool, prop_index: usize) {
+    pub fn set_prop_window(
+        &mut self,
+        widget: &Rc<RefCell<Widget>>,
+        desired_state: bool,
+        prop_index: usize,
+    ) {
         self.set_window(widget, self::prop_window::NAME, desired_state, &|| {
             match GameState::selected().first() {
                 None => None,
@@ -265,7 +279,10 @@ impl RootView {
     }
 
     pub fn set_console_window(&mut self, _widget: &Rc<RefCell<Widget>>, desired_state: bool) {
-        self.console_widget.borrow_mut().state.set_visible(desired_state);
+        self.console_widget
+            .borrow_mut()
+            .state
+            .set_visible(desired_state);
         if desired_state {
             self.console.borrow().grab_keyboard();
         }
@@ -283,15 +300,24 @@ impl RootView {
         });
     }
 
-    pub fn set_map_window(&mut self, widget: &Rc<RefCell<Widget>>,
-                          desired_state: bool, transition_enabled: bool) {
+    pub fn set_map_window(
+        &mut self,
+        widget: &Rc<RefCell<Widget>>,
+        desired_state: bool,
+        transition_enabled: bool,
+    ) {
         self.set_window(widget, self::world_map_window::NAME, desired_state, &|| {
             Some(WorldMapWindow::new(transition_enabled))
         });
     }
 
-    fn set_window(&mut self, widget: &Rc<RefCell<Widget>>, name: &str, desired_state: bool,
-                     cb: &Fn() -> Option<Rc<RefCell<WidgetKind>>>) {
+    fn set_window(
+        &mut self,
+        widget: &Rc<RefCell<Widget>>,
+        name: &str,
+        desired_state: bool,
+        cb: &Fn() -> Option<Rc<RefCell<WidgetKind>>>,
+    ) {
         match Widget::get_child_with_name(widget, name) {
             None => {
                 if desired_state {
@@ -302,7 +328,8 @@ impl RootView {
                     let window = Widget::with_defaults(widget_kind);
                     Widget::add_child_to(&widget, window);
                 }
-            }, Some(ref window) => {
+            }
+            Some(ref window) => {
                 if !desired_state {
                     window.borrow_mut().mark_for_removal();
                 }
@@ -423,20 +450,28 @@ impl WidgetKind for RootView {
                 let child = Rc::clone(&root.borrow().children[i]);
                 {
                     let child = child.borrow();
-                    if !child.state.is_enabled() || !child.state.visible { continue; }
+                    if !child.state.is_enabled() || !child.state.visible {
+                        continue;
+                    }
 
-                    if !child.state.in_bounds(cx, cy) { continue; }
+                    if !child.state.in_bounds(cx, cy) {
+                        continue;
+                    }
                 }
 
                 if Rc::ptr_eq(&child, &self.area_view_widget) {
-                    self.area_view.borrow_mut().update_cursor_and_hover(&self.area_view_widget);
+                    self.area_view
+                        .borrow_mut()
+                        .update_cursor_and_hover(&self.area_view_widget);
                     area_view_updated = true;
                 }
                 break;
             }
         }
 
-        if !area_view_updated { self.area_view.borrow_mut().clear_area_mouseover(); }
+        if !area_view_updated {
+            self.area_view.borrow_mut().clear_area_mouseover();
+        }
 
         if Config::edge_scrolling() {
             if cx == Config::ui_width() - 1 {
@@ -490,85 +525,128 @@ impl WidgetKind for RootView {
             let portrait_pane = Widget::with_defaults(PortraitPane::new());
 
             let formations = Widget::with_theme(Button::empty(), "formations_button");
-            formations.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-                let (root, view) = Widget::parent_mut::<RootView>(widget);
-                view.toggle_formation_window(&root);
-            })));
+            formations
+                .borrow_mut()
+                .state
+                .add_callback(Callback::new(Rc::new(|widget, _| {
+                    let (root, view) = Widget::parent_mut::<RootView>(widget);
+                    view.toggle_formation_window(&root);
+                })));
 
             let select_all = Widget::with_theme(Button::empty(), "select_all_button");
-            select_all.borrow_mut().state.add_callback(Callback::new(Rc::new(|_, _| {
-                GameState::select_party_members(GameState::party());
-            })));
+            select_all
+                .borrow_mut()
+                .state
+                .add_callback(Callback::new(Rc::new(|_, _| {
+                    GameState::select_party_members(GameState::party());
+                })));
 
             let rest = Widget::with_theme(Button::empty(), "rest_button");
-            rest.borrow_mut().state.add_callback(Callback::new(Rc::new(|_, _| {
-                let area_state = GameState::area_state();
-                let area = Rc::clone(&area_state.borrow().area);
+            rest.borrow_mut()
+                .state
+                .add_callback(Callback::new(Rc::new(|_, _| {
+                    let area_state = GameState::area_state();
+                    let area = Rc::clone(&area_state.borrow().area);
 
-                let target = GameState::player();
-                match area.on_rest {
-                    OnRest::Disabled { ref message } => {
-                        area_state.borrow_mut().add_feedback_text(message.to_string(),
-                            &target, ColorKind::Info);
-                    },
-                    OnRest::FireScript { ref id, ref func } => {
-                        Script::trigger(id, func, ScriptEntity::from(&target));
+                    let target = GameState::player();
+                    match area.on_rest {
+                        OnRest::Disabled { ref message } => {
+                            area_state.borrow_mut().add_feedback_text(
+                                message.to_string(),
+                                &target,
+                                ColorKind::Info,
+                            );
+                        }
+                        OnRest::FireScript { ref id, ref func } => {
+                            Script::trigger(id, func, ScriptEntity::from(&target));
+                        }
                     }
-                }
-            })));
+                })));
 
             let navi_pane = Widget::empty("navi_pane");
 
             let end_turn_button = Widget::with_theme(Button::empty(), "end_turn_button");
-            end_turn_button.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-                let (_, view) = Widget::parent_mut::<RootView>(widget);
-                view.end_turn();
-            })));
-            end_turn_button.borrow_mut().state.set_enabled(GameState::is_pc_current());
+            end_turn_button
+                .borrow_mut()
+                .state
+                .add_callback(Callback::new(Rc::new(|widget, _| {
+                    let (_, view) = Widget::parent_mut::<RootView>(widget);
+                    view.end_turn();
+                })));
+            end_turn_button
+                .borrow_mut()
+                .state
+                .set_enabled(GameState::is_pc_current());
 
             let end_turn_button_ref = Rc::clone(&end_turn_button);
             let mgr = GameState::turn_manager();
-            mgr.borrow_mut().listeners.add(
-                ChangeListener::new(NAME, Box::new(move |timer| {
+            mgr.borrow_mut().listeners.add(ChangeListener::new(
+                NAME,
+                Box::new(move |timer| {
                     let enabled = match timer.current() {
                         None => false,
                         Some(entity) => entity.borrow().is_party_member(),
                     };
                     end_turn_button_ref.borrow_mut().state.set_enabled(enabled);
-                })));
+                }),
+            ));
 
             let inv_button = Widget::with_theme(Button::empty(), "inventory_button");
-            inv_button.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-                let (root, view) = Widget::parent_mut::<RootView>(widget);
-                view.toggle_inventory_window(&root);
-            })));
+            inv_button
+                .borrow_mut()
+                .state
+                .add_callback(Callback::new(Rc::new(|widget, _| {
+                    let (root, view) = Widget::parent_mut::<RootView>(widget);
+                    view.toggle_inventory_window(&root);
+                })));
 
             let cha_button = Widget::with_theme(Button::empty(), "character_button");
-            cha_button.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-                let (root, view) = Widget::parent_mut::<RootView>(widget);
-                view.toggle_character_window(&root);
-            })));
+            cha_button
+                .borrow_mut()
+                .state
+                .add_callback(Callback::new(Rc::new(|widget, _| {
+                    let (root, view) = Widget::parent_mut::<RootView>(widget);
+                    view.toggle_character_window(&root);
+                })));
 
             let map_button = Widget::with_theme(Button::empty(), "map_button");
-            map_button.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-                let (root, view) = Widget::parent_mut::<RootView>(widget);
-                view.toggle_map_window(&root);
-            })));
+            map_button
+                .borrow_mut()
+                .state
+                .add_callback(Callback::new(Rc::new(|widget, _| {
+                    let (root, view) = Widget::parent_mut::<RootView>(widget);
+                    view.toggle_map_window(&root);
+                })));
 
             let log_button = Widget::with_theme(Button::empty(), "journal_button");
-            log_button.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-                let (root, view) = Widget::parent_mut::<RootView>(widget);
-                view.toggle_quest_window(&root);
-            })));
+            log_button
+                .borrow_mut()
+                .state
+                .add_callback(Callback::new(Rc::new(|widget, _| {
+                    let (root, view) = Widget::parent_mut::<RootView>(widget);
+                    view.toggle_quest_window(&root);
+                })));
 
             let men_button = Widget::with_theme(Button::empty(), "menu_button");
-            men_button.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-                let (root, view) = Widget::parent_mut::<RootView>(widget);
-                view.show_menu(&root);
-            })));
+            men_button
+                .borrow_mut()
+                .state
+                .add_callback(Callback::new(Rc::new(|widget, _| {
+                    let (root, view) = Widget::parent_mut::<RootView>(widget);
+                    view.show_menu(&root);
+                })));
 
-            Widget::add_children_to(&navi_pane, vec![end_turn_button, inv_button,
-                                    cha_button, map_button, log_button, men_button]);
+            Widget::add_children_to(
+                &navi_pane,
+                vec![
+                    end_turn_button,
+                    inv_button,
+                    cha_button,
+                    map_button,
+                    log_button,
+                    men_button,
+                ],
+            );
 
             let mut selected = GameState::selected();
             let entity = if selected.is_empty() {
@@ -585,60 +663,103 @@ impl WidgetKind for RootView {
             let time = mgr.borrow().current_time();
             let rules = Module::rules();
             let hour = rules.get_hour_name(time.hour);
-            time_label.borrow_mut().state.add_text_arg("day", &time.day.to_string());
+            time_label
+                .borrow_mut()
+                .state
+                .add_text_arg("day", &time.day.to_string());
             time_label.borrow_mut().state.add_text_arg("hour", hour);
-            time_label.borrow_mut().state.add_text_arg("round", &time.round.to_string());
+            time_label
+                .borrow_mut()
+                .state
+                .add_text_arg("round", &time.round.to_string());
 
             let time_label_ref = Rc::clone(&time_label);
-            mgr.borrow_mut().time_listeners.add(ChangeListener::new(NAME, Box::new(move |time| {
-                let rules = Module::rules();
-                let hour = rules.get_hour_name(time.hour);
-                time_label_ref.borrow_mut().state.add_text_arg("day", &time.day.to_string());
-                time_label_ref.borrow_mut().state.add_text_arg("hour", hour);
-                time_label_ref.borrow_mut().state.add_text_arg("round", &time.round.to_string());
-                time_label_ref.borrow_mut().invalidate_layout();
-            })));
+            mgr.borrow_mut().time_listeners.add(ChangeListener::new(
+                NAME,
+                Box::new(move |time| {
+                    let rules = Module::rules();
+                    let hour = rules.get_hour_name(time.hour);
+                    time_label_ref
+                        .borrow_mut()
+                        .state
+                        .add_text_arg("day", &time.day.to_string());
+                    time_label_ref.borrow_mut().state.add_text_arg("hour", hour);
+                    time_label_ref
+                        .borrow_mut()
+                        .state
+                        .add_text_arg("round", &time.round.to_string());
+                    time_label_ref.borrow_mut().invalidate_layout();
+                }),
+            ));
 
-            Widget::add_children_to(&bot_pane, vec![abilities, quick_items, navi_pane,
-                                    portrait_pane, select_all, formations, rest, time_label]);
+            Widget::add_children_to(
+                &bot_pane,
+                vec![
+                    abilities,
+                    quick_items,
+                    navi_pane,
+                    portrait_pane,
+                    select_all,
+                    formations,
+                    rest,
+                    time_label,
+                ],
+            );
         }
 
         let widget_ref = Rc::clone(widget);
-        GameState::add_party_death_listener(ChangeListener::new(NAME, Box::new(move |party| {
-            if !is_defeated(party) { return; }
+        GameState::add_party_death_listener(ChangeListener::new(
+            NAME,
+            Box::new(move |party| {
+                if !is_defeated(party) {
+                    return;
+                }
 
-            // set player to disabled, even though they are actually dead
-            // this prevents this callback from being called over and over
-            party[0].borrow_mut().actor.set_disabled(true);
+                // set player to disabled, even though they are actually dead
+                // this prevents this callback from being called over and over
+                party[0].borrow_mut().actor.set_disabled(true);
 
-            let menu_cb = Callback::new(Rc::new(|widget, _| {
-                let (_, view) = Widget::parent_mut::<RootView>(widget);
-                view.next_step = Some(NextGameStep::MainMenu);
-            }));
-            let menu = Widget::with_defaults(GameOverWindow::new(menu_cb, String::new()));
-            Widget::add_child_to(&widget_ref, menu);
-        })));
+                let menu_cb = Callback::new(Rc::new(|widget, _| {
+                    let (_, view) = Widget::parent_mut::<RootView>(widget);
+                    view.next_step = Some(NextGameStep::MainMenu);
+                }));
+                let menu = Widget::with_defaults(GameOverWindow::new(menu_cb, String::new()));
+                Widget::add_child_to(&widget_ref, menu);
+            }),
+        ));
 
         let ap_bar = Widget::with_defaults(ApBar::new(GameState::player()));
 
         let ticker = Widget::with_defaults(InitiativeTicker::new());
 
         // area widget must be the first entry in the children list
-        vec![Rc::clone(&self.area_view_widget), bot_pane, ap_bar, ticker, self.status.clone(),
-            Rc::clone(&self.console_widget)]
+        vec![
+            Rc::clone(&self.area_view_widget),
+            bot_pane,
+            ap_bar,
+            ticker,
+            self.status.clone(),
+            Rc::clone(&self.console_widget),
+        ]
     }
 }
 
 fn is_defeated(party: &[Rc<RefCell<EntityState>>]) -> bool {
-    if party.len() == 0 { return true; }
+    if party.len() == 0 {
+        return true;
+    }
 
     {
         let player = &party[0].borrow().actor;
-        if player.is_dead() && !player.is_disabled() { return true; }
+        if player.is_dead() && !player.is_disabled() {
+            return true;
+        }
     }
 
     for member in party.iter() {
-        if !member.borrow().actor.is_dead() { return false; }
+        if !member.borrow().actor.is_dead() {
+            return false;
+        }
     }
 
     true
@@ -655,7 +776,7 @@ impl PortraitPane {
 impl WidgetKind for PortraitPane {
     widget_kind!("portrait_pane");
 
-    fn on_remove(&mut self) { }
+    fn on_remove(&mut self) {}
 
     fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         GameState::add_party_listener(ChangeListener::invalidate("portrait_pane", &widget));
@@ -664,7 +785,9 @@ impl WidgetKind for PortraitPane {
 
         let selected = GameState::selected();
         for entity in GameState::party() {
-            if !entity.borrow().show_portrait() { continue; }
+            if !entity.borrow().show_portrait() {
+                continue;
+            }
 
             let mut is_selected = false;
             for sel in selected.iter() {

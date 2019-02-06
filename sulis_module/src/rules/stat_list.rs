@@ -17,12 +17,14 @@
 use std::collections::HashMap;
 use std::rc::Rc;
 
-use sulis_core::image::Image;
-use sulis_core::util::{ExtInt, gen_rand};
-use crate::{Actor, Module};
-use crate::rules::{AccuracyKind, Armor, AttributeList, Attack, Damage,
-    HitKind, WeaponKind, ArmorKind, Slot, WeaponStyle, Resistance};
 use crate::rules::bonus::{AttackBonuses, AttackBuilder, Bonus, BonusKind, BonusList};
+use crate::rules::{
+    AccuracyKind, Armor, ArmorKind, Attack, AttributeList, Damage, HitKind, Resistance, Slot,
+    WeaponKind, WeaponStyle,
+};
+use crate::{Actor, Module};
+use sulis_core::image::Image;
+use sulis_core::util::{gen_rand, ExtInt};
 
 #[derive(Clone)]
 pub struct StatList {
@@ -142,11 +144,17 @@ impl StatList {
     }
 
     pub fn uses_per_day(&self, ability_group: &str) -> ExtInt {
-        *self.group_uses_per_day.get(ability_group).unwrap_or(&ExtInt::Int(0))
+        *self
+            .group_uses_per_day
+            .get(ability_group)
+            .unwrap_or(&ExtInt::Int(0))
     }
 
     pub fn uses_per_encounter(&self, ability_group: &str) -> ExtInt {
-        *self.group_uses_per_encounter.get(ability_group).unwrap_or(&ExtInt::Int(0))
+        *self
+            .group_uses_per_encounter
+            .get(ability_group)
+            .unwrap_or(&ExtInt::Int(0))
     }
 
     pub fn has_armor_proficiency(&self, prof: ArmorKind) -> bool {
@@ -157,17 +165,27 @@ impl StatList {
         self.weapon_proficiencies.contains(&prof)
     }
 
-    pub fn attack_roll(&self, accuracy_kind: AccuracyKind, crit_immunity: bool,
-                       defense: i32, bonuses: &AttackBonuses) -> HitKind {
+    pub fn attack_roll(
+        &self,
+        accuracy_kind: AccuracyKind,
+        crit_immunity: bool,
+        defense: i32,
+        bonuses: &AttackBonuses,
+    ) -> HitKind {
         let accuracy = match accuracy_kind {
             AccuracyKind::Melee => self.melee_accuracy + bonuses.melee_accuracy,
             AccuracyKind::Ranged => self.ranged_accuracy + bonuses.ranged_accuracy,
             AccuracyKind::Spell => self.spell_accuracy + bonuses.spell_accuracy,
         };
         let roll = gen_rand(1, 101);
-        debug!("Attack roll: {} with accuracy {} against {}", roll, accuracy, defense);
+        debug!(
+            "Attack roll: {} with accuracy {} against {}",
+            roll, accuracy, defense
+        );
 
-        if roll + accuracy < defense { return HitKind::Miss; }
+        if roll + accuracy < defense {
+            return HitKind::Miss;
+        }
 
         let result = roll + accuracy - defense;
 
@@ -189,19 +207,25 @@ impl StatList {
     }
 
     pub fn attack_is_melee(&self) -> bool {
-        if self.attacks.is_empty() { return false; }
+        if self.attacks.is_empty() {
+            return false;
+        }
 
         self.attacks[0].is_melee()
     }
 
     pub fn attack_is_ranged(&self) -> bool {
-        if self.attacks.is_empty() { return false; }
+        if self.attacks.is_empty() {
+            return false;
+        }
 
         self.attacks[0].is_ranged()
     }
 
     pub fn get_ranged_projectile(&self) -> Option<Rc<Image>> {
-        if !self.attack_is_ranged() { return None; }
+        if !self.attack_is_ranged() {
+            return None;
+        }
 
         self.attacks[0].get_ranged_projectile()
     }
@@ -213,15 +237,23 @@ impl StatList {
     }
 
     pub fn add_single_group_uses_per_day(&mut self, group_id: &str, uses: ExtInt) {
-        let cur_uses = *self.group_uses_per_day.get(group_id).unwrap_or(&ExtInt::Int(0));
+        let cur_uses = *self
+            .group_uses_per_day
+            .get(group_id)
+            .unwrap_or(&ExtInt::Int(0));
         let new_uses = cur_uses + uses;
-        self.group_uses_per_day.insert(group_id.to_string(), new_uses);
+        self.group_uses_per_day
+            .insert(group_id.to_string(), new_uses);
     }
 
     pub fn add_single_group_uses_per_encounter(&mut self, group_id: &str, uses: ExtInt) {
-        let cur_uses = *self.group_uses_per_encounter.get(group_id).unwrap_or(&ExtInt::Int(0));
+        let cur_uses = *self
+            .group_uses_per_encounter
+            .get(group_id)
+            .unwrap_or(&ExtInt::Int(0));
         let new_uses = cur_uses + uses;
-        self.group_uses_per_encounter.insert(group_id.to_string(), new_uses);
+        self.group_uses_per_encounter
+            .insert(group_id.to_string(), new_uses);
     }
 
     /// Adds the bonuses from the specified BonusList to this stat list.
@@ -233,18 +265,22 @@ impl StatList {
     /// Note that non-numeric bonuses are only added once regardless of the value of
     /// times
     pub fn add_multiple(&mut self, bonuses: &BonusList, times: u32) {
-        if times == 0 { return; }
+        if times == 0 {
+            return;
+        }
 
         // TODO handle add multiple for weapon and attack bonuses
         for bonus in bonuses.iter() {
             use crate::rules::bonus::Contingent::*;
             match bonus.when {
                 Always => self.add_bonus(&bonus.kind, times),
-                AttackWithWeapon(_) | AttackWhenHidden | AttackWithDamageKind(_) =>
-                    self.attack_bonuses.push(bonus.clone()),
+                AttackWithWeapon(_) | AttackWhenHidden | AttackWithDamageKind(_) => {
+                    self.attack_bonuses.push(bonus.clone())
+                }
                 AttackWhenFlanking => self.flanking_bonuses.add(bonus.clone()),
-                WeaponEquipped(_) | ArmorEquipped {..} | WeaponStyle(_) | Threatened =>
-                    self.contingent_bonuses.add(bonus.clone()),
+                WeaponEquipped(_) | ArmorEquipped { .. } | WeaponStyle(_) | Threatened => {
+                    self.contingent_bonuses.add(bonus.clone())
+                }
             }
         }
     }
@@ -255,7 +291,9 @@ impl StatList {
 
         use crate::rules::bonus::BonusKind::*;
         match bonus {
-            AbilityActionPointCost(amount) => self.bonus_ability_action_point_cost += amount * times_i32,
+            AbilityActionPointCost(amount) => {
+                self.bonus_ability_action_point_cost += amount * times_i32
+            }
             Attribute { attribute, amount } => self.attributes.add(*attribute, *amount),
             ActionPoints(amount) => self.bonus_ap += amount * times_i32,
             Armor(amount) => self.armor.add_base(amount * times_i32),
@@ -266,12 +304,12 @@ impl StatList {
                 if !self.armor_proficiencies.contains(kind) {
                     self.armor_proficiencies.push(*kind);
                 }
-            },
+            }
             WeaponProficiency(kind) => {
                 if !self.weapon_proficiencies.contains(kind) {
                     self.weapon_proficiencies.push(*kind);
                 }
-            },
+            }
             Reach(amount) => self.bonus_reach += amount * times_f32,
             Range(amount) => self.bonus_range += amount * times_f32,
             Initiative(amount) => self.initiative += amount * times_i32,
@@ -303,18 +341,21 @@ impl StatList {
             FlankedImmunity => self.flanked_immunity = true,
             SneakAttackImmunity => self.sneak_attack_immunity = true,
             CritImmunity => self.crit_immunity = true,
-            GroupUsesPerEncounter { group, amount } =>
-                self.add_single_group_uses_per_encounter(group, *amount),
-            GroupUsesPerDay { group, amount } =>
-                self.add_single_group_uses_per_day(group, *amount),
+            GroupUsesPerEncounter { group, amount } => {
+                self.add_single_group_uses_per_encounter(group, *amount)
+            }
+            GroupUsesPerDay { group, amount } => self.add_single_group_uses_per_day(group, *amount),
         }
     }
 
-    pub fn finalize<'a>(&mut self, actor: &'a Actor,
-                    mut attacks: Vec<(&'a AttackBuilder, WeaponKind)>,
-                    equipped_armor: HashMap<Slot, ArmorKind>,
-                    weapon_style: WeaponStyle,
-                    threatened: bool) {
+    pub fn finalize<'a>(
+        &mut self,
+        actor: &'a Actor,
+        mut attacks: Vec<(&'a AttackBuilder, WeaponKind)>,
+        equipped_armor: HashMap<Slot, ArmorKind>,
+        weapon_style: WeaponStyle,
+        threatened: bool,
+    ) {
         let rules = Module::rules();
 
         // clone here to avoid problem with add_bonus needing mutable borrow,
@@ -323,27 +364,34 @@ impl StatList {
         for bonus in contingent.iter() {
             use crate::rules::bonus::Contingent::*;
             match bonus.when {
-                Always | AttackWithWeapon(_) | AttackWhenHidden |
-                    AttackWhenFlanking | AttackWithDamageKind(_) => unreachable!(),
+                Always
+                | AttackWithWeapon(_)
+                | AttackWhenHidden
+                | AttackWhenFlanking
+                | AttackWithDamageKind(_) => unreachable!(),
                 WeaponEquipped(weapon_kind) => {
                     for (_, attack_weapon_kind) in attacks.iter() {
-                        if weapon_kind == *attack_weapon_kind { self.add_bonus(&bonus.kind, 1); }
+                        if weapon_kind == *attack_weapon_kind {
+                            self.add_bonus(&bonus.kind, 1);
+                        }
                     }
-                },
+                }
                 ArmorEquipped { kind, slot } => {
                     if let Some(armor_kind) = equipped_armor.get(&slot) {
                         if *armor_kind == kind {
                             self.add_bonus(&bonus.kind, 1);
                         }
                     }
-                },
+                }
                 WeaponStyle(style) => {
                     if weapon_style == style {
                         self.add_bonus(&bonus.kind, 1);
                     }
-                },
+                }
                 Threatened => {
-                    if threatened { self.add_bonus(&bonus.kind, 1); }
+                    if threatened {
+                        self.add_bonus(&bonus.kind, 1);
+                    }
                 }
             }
         }
@@ -395,11 +443,7 @@ impl StatList {
         self.will += wis_bonus * 2;
         self.max_hp += (actor.total_level as i32 * end_bonus) / 3;
 
-        let damage_stat_bonus = if is_melee {
-            str_bonus
-        } else {
-            dex_bonus
-        } as f32;
+        let damage_stat_bonus = if is_melee { str_bonus } else { dex_bonus } as f32;
 
         self.graze_multiplier += 0.02 * damage_stat_bonus;
         self.hit_multiplier += 0.04 * damage_stat_bonus;
@@ -432,4 +476,3 @@ impl StatList {
         self.attack_cost += rules.attack_ap as i32;
     }
 }
-

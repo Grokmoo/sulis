@@ -16,11 +16,11 @@
 
 use rlua::{Context, UserData, UserDataMethods};
 
+use crate::animation::particle_generator::Param;
+use crate::animation::Anim;
+use crate::script::{script_particle_generator, CallbackData, Result};
+use crate::GameState;
 use sulis_core::util::ExtInt;
-use crate::{GameState};
-use crate::animation::{Anim};
-use crate::animation::particle_generator::{Param};
-use crate::script::{CallbackData, Result, script_particle_generator};
 
 /// An animation that changes the size of an entity.
 /// Normally created via `ScriptEntity:create_scale_anim`.
@@ -108,4 +108,3 @@ pub fn create_anim(data: &ScriptScaleAnimation) -> Result<Anim> {
 
     Ok(anim)
 }
-

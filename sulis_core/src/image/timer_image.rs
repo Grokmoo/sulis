@@ -15,8 +15,8 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::collections::HashMap;
+use std::io::Error;
 use std::rc::Rc;
-use std::io::{Error};
 
 use crate::image::Image;
 use crate::io::{DrawList, GraphicsRenderer};
@@ -32,8 +32,10 @@ pub struct TimerImage {
 }
 
 impl TimerImage {
-    pub fn new(builder: TimerImageBuilder,
-               images: &HashMap<String, Rc<Image>>) -> Result<Rc<Image>, Error> {
+    pub fn new(
+        builder: TimerImageBuilder,
+        images: &HashMap<String, Rc<Image>>,
+    ) -> Result<Rc<Image>, Error> {
         let mut frames: Vec<Rc<Image>> = Vec::new();
 
         if builder.frames.is_empty() {
@@ -43,7 +45,9 @@ impl TimerImage {
         let mut size: Option<Size> = None;
         for id in builder.frames {
             let image = match images.get(&id) {
-                None => return invalid_data_error(&format!("Unable to locate image for frame {}", id)),
+                None => {
+                    return invalid_data_error(&format!("Unable to locate image for frame {}", id));
+                }
                 Some(image) => image,
             };
 
@@ -51,8 +55,10 @@ impl TimerImage {
                 None => size = Some(*image.get_size()),
                 Some(size) => {
                     if size != *image.get_size() {
-                        return invalid_data_error(&format!("All frames in a timer image must have the\
-                                                           same size."));
+                        return invalid_data_error(&format!(
+                            "All frames in a timer image must have the\
+                             same size."
+                        ));
                     }
                 }
             }
@@ -78,16 +84,36 @@ impl TimerImage {
 }
 
 impl Image for TimerImage {
-    fn id(&self) -> String { self.id.clone() }
-
-    fn draw(&self, renderer: &mut GraphicsRenderer, state: &AnimationState,
-            x: f32, y: f32, w: f32, h: f32, millis: u32) {
-        self.get_cur_frame(millis).draw(renderer, state, x, y, w, h, millis);
+    fn id(&self) -> String {
+        self.id.clone()
     }
 
-    fn append_to_draw_list(&self, draw_list: &mut DrawList, state: &AnimationState,
-                           x: f32, y: f32, w: f32, h: f32, millis: u32) {
-        self.get_cur_frame(millis).append_to_draw_list(draw_list, state, x, y, w, h, millis);
+    fn draw(
+        &self,
+        renderer: &mut GraphicsRenderer,
+        state: &AnimationState,
+        x: f32,
+        y: f32,
+        w: f32,
+        h: f32,
+        millis: u32,
+    ) {
+        self.get_cur_frame(millis)
+            .draw(renderer, state, x, y, w, h, millis);
+    }
+
+    fn append_to_draw_list(
+        &self,
+        draw_list: &mut DrawList,
+        state: &AnimationState,
+        x: f32,
+        y: f32,
+        w: f32,
+        h: f32,
+        millis: u32,
+    ) {
+        self.get_cur_frame(millis)
+            .append_to_draw_list(draw_list, state, x, y, w, h, millis);
     }
 
     fn get_width_f32(&self) -> f32 {

@@ -14,16 +14,16 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::rc::Rc;
-use std::option::Option;
 use std::collections::HashMap;
+use std::option::Option;
+use std::rc::Rc;
 
-use crate::ui::{animation_state, AnimationState, Border, Callback, FontRenderer, Size};
 use crate::ui::theme::TextParams;
+use crate::ui::{animation_state, AnimationState, Border, Callback, FontRenderer, Size};
 
-use crate::util::Point;
 use crate::image::Image;
 use crate::resource::Font;
+use crate::util::Point;
 
 pub struct WidgetState {
     pub visible: bool,
@@ -42,8 +42,8 @@ pub struct WidgetState {
     pub modal_remove_on_click_outside: bool,
     pub is_mouse_over: bool,
     text_args: HashMap<String, String>,
-    pub (in crate::ui) callback: Option<Callback>,
-    pub (in crate::ui) has_keyboard_focus: bool,
+    pub(in crate::ui) callback: Option<Callback>,
+    pub(in crate::ui) has_keyboard_focus: bool,
 }
 
 impl WidgetState {
@@ -112,7 +112,9 @@ impl WidgetState {
     }
 
     pub fn is_enabled(&self) -> bool {
-        !self.animation_state.contains(animation_state::Kind::Disabled)
+        !self
+            .animation_state
+            .contains(animation_state::Kind::Disabled)
     }
 
     pub fn add_callback(&mut self, callback: Callback) {
@@ -123,12 +125,22 @@ impl WidgetState {
         self.is_modal = modal;
     }
 
-    pub fn border(&self) -> Border { self.border }
-    pub fn position(&self) -> Point { self.position }
-    pub fn size(&self) -> Size { self.size }
+    pub fn border(&self) -> Border {
+        self.border
+    }
+    pub fn position(&self) -> Point {
+        self.position
+    }
+    pub fn size(&self) -> Size {
+        self.size
+    }
 
-    pub fn width(&self) -> i32 { self.size.width }
-    pub fn height(&self) -> i32 { self.size.height }
+    pub fn width(&self) -> i32 {
+        self.size.width
+    }
+    pub fn height(&self) -> i32 {
+        self.size.height
+    }
 
     pub fn inner_position(&self) -> Point {
         Point::new(self.inner_left(), self.inner_top())
@@ -138,18 +150,38 @@ impl WidgetState {
         Size::new(self.inner_width(), self.inner_height())
     }
 
-    pub fn left(&self) -> i32 { self.position.x }
-    pub fn top(&self) -> i32 { self.position.y }
-    pub fn right(&self) -> i32 { self.position.x + self.size.width }
-    pub fn bottom(&self) -> i32 { self.position.y + self.size.height }
+    pub fn left(&self) -> i32 {
+        self.position.x
+    }
+    pub fn top(&self) -> i32 {
+        self.position.y
+    }
+    pub fn right(&self) -> i32 {
+        self.position.x + self.size.width
+    }
+    pub fn bottom(&self) -> i32 {
+        self.position.y + self.size.height
+    }
 
-    pub fn inner_width(&self) -> i32 { self.size.width - self.border.horizontal() }
-    pub fn inner_height(&self) -> i32 { self.size.height - self.border.vertical() }
+    pub fn inner_width(&self) -> i32 {
+        self.size.width - self.border.horizontal()
+    }
+    pub fn inner_height(&self) -> i32 {
+        self.size.height - self.border.vertical()
+    }
 
-    pub fn inner_left(&self) -> i32 { self.position.x + self.border.left }
-    pub fn inner_top(&self) -> i32 { self.position.y + self.border.top }
-    pub fn inner_right(&self) -> i32 { self.right() - self.border.right }
-    pub fn inner_bottom(&self) -> i32 { self.bottom() - self.border.bottom }
+    pub fn inner_left(&self) -> i32 {
+        self.position.x + self.border.left
+    }
+    pub fn inner_top(&self) -> i32 {
+        self.position.y + self.border.top
+    }
+    pub fn inner_right(&self) -> i32 {
+        self.right() - self.border.right
+    }
+    pub fn inner_bottom(&self) -> i32 {
+        self.bottom() - self.border.bottom
+    }
 
     /// Adds a text argument to the list of text args stored in this
     /// state.  When building the output text for the owning widget,
@@ -197,7 +229,8 @@ impl WidgetState {
     }
 
     pub fn in_bounds(&self, x: i32, y: i32) -> bool {
-        self.size.in_bounds(x - self.position.x, y - self.position.y)
+        self.size
+            .in_bounds(x - self.position.x, y - self.position.y)
     }
 
     pub fn set_border(&mut self, border: Border) {
@@ -211,7 +244,8 @@ impl WidgetState {
     pub fn set_position_centered(&mut self, x: i32, y: i32) {
         self.position = Point::new(
             x - (self.size.width - 1) / 2,
-            y - (self.size.height - 1) / 2);
+            y - (self.size.height - 1) / 2,
+        );
     }
 
     pub fn set_position(&mut self, x: i32, y: i32) {
@@ -222,7 +256,9 @@ impl WidgetState {
     //// size to be centered on this widget.  This is useful when
     //// centering a widget on a larger parent widget.
     pub fn get_centered_position(&self, width: i32, height: i32) -> Point {
-        Point::new(self.inner_left() + (self.size.width - width) / 2,
-            self.inner_top() + (self.size.height - height) / 2)
+        Point::new(
+            self.inner_left() + (self.size.width - width) / 2,
+            self.inner_top() + (self.size.height - height) / 2,
+        )
     }
 }

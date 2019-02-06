@@ -14,14 +14,19 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::rc::Rc;
 use crate::io::{DrawList, GraphicsRenderer, Vertex};
 use crate::resource::Font;
 use crate::ui::WidgetState;
+use std::rc::Rc;
 
 pub trait FontRenderer {
-    fn render(&self, renderer: &mut GraphicsRenderer,
-              pos_x: f32, pos_y: f32, widget_state: &WidgetState);
+    fn render(
+        &self,
+        renderer: &mut GraphicsRenderer,
+        pos_x: f32,
+        pos_y: f32,
+        widget_state: &WidgetState,
+    );
 
     fn get_font(&self) -> &Rc<Font>;
 }
@@ -48,8 +53,13 @@ impl LineRenderer {
 }
 
 impl FontRenderer for LineRenderer {
-    fn render(&self, renderer: &mut GraphicsRenderer, pos_x: f32, pos_y: f32,
-              widget_state: &WidgetState) {
+    fn render(
+        &self,
+        renderer: &mut GraphicsRenderer,
+        pos_x: f32,
+        pos_y: f32,
+        widget_state: &WidgetState,
+    ) {
         let text = &widget_state.text;
         let defaults = &widget_state.text_params;
 

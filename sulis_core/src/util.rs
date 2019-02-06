@@ -20,36 +20,40 @@ pub use self::point::Point;
 pub mod size;
 pub use self::size::Size;
 
+use std::cell::RefCell;
 use std::cmp::Ordering;
 use std::f32;
-use std::ops::*;
 use std::fmt;
-use std::rc::Rc;
-use std::cell::RefCell;
+use std::fs;
 use std::io::{Error, ErrorKind};
-use std::{thread, time};
-use std::time::Duration;
+use std::ops::*;
 use std::panic;
 use std::path::PathBuf;
-use std::fs;
+use std::rc::Rc;
+use std::time::Duration;
+use std::{thread, time};
 
 use backtrace::Backtrace;
-use flexi_logger::{Duplicate, Logger, opt_format};
-use rand::{self, Rng, distributions::uniform::SampleUniform};
+use flexi_logger::{opt_format, Duplicate, Logger};
+use rand::{self, distributions::uniform::SampleUniform, Rng};
 use serde_yaml;
 
-use crate::resource::write_to_file;
 use crate::config::{self, Config};
+use crate::io::{MainLoopUpdater, IO};
+use crate::resource::write_to_file;
 use crate::ui::Widget;
-use crate::io::{IO, MainLoopUpdater};
 
 const MAX_ULPS: i32 = 100;
 const MAX_DIFF: f32 = std::f32::EPSILON;
 
 pub fn approx_eq(a: f32, b: f32) -> bool {
-    if (a - b).abs() <= MAX_DIFF { return true; }
+    if (a - b).abs() <= MAX_DIFF {
+        return true;
+    }
 
-    if a.signum() != b.signum() { return false; }
+    if a.signum() != b.signum() {
+        return false;
+    }
 
     let a_int: i32 = unsafe { std::mem::transmute(a) };
     let b_int: i32 = unsafe { std::mem::transmute(b) };
@@ -143,18 +147,14 @@ pub enum ExtInt {
 impl Ord for ExtInt {
     fn cmp(&self, other: &ExtInt) -> Ordering {
         match self {
-            ExtInt::Int(val) => {
-                match other {
-                    ExtInt::Int(other) => val.cmp(&other),
-                    ExtInt::Infinity => Ordering::Less,
-                }
+            ExtInt::Int(val) => match other {
+                ExtInt::Int(other) => val.cmp(&other),
+                ExtInt::Infinity => Ordering::Less,
             },
-            ExtInt::Infinity => {
-                match other {
-                    ExtInt::Int(_) => Ordering::Greater,
-                    ExtInt::Infinity => Ordering::Equal,
-                }
-            }
+            ExtInt::Infinity => match other {
+                ExtInt::Int(_) => Ordering::Greater,
+                ExtInt::Infinity => Ordering::Equal,
+            },
         }
     }
 }
@@ -249,9 +249,12 @@ impl Sub<u32> for ExtInt {
     fn sub(self, other: u32) -> ExtInt {
         match self {
             ExtInt::Int(amount) => {
-                if other > amount { ExtInt::Int(0) }
-                else { ExtInt::Int(amount - other) }
-            },
+                if other > amount {
+                    ExtInt::Int(0)
+                } else {
+                    ExtInt::Int(amount - other)
+                }
+            }
             ExtInt::Infinity => ExtInt::Infinity,
         }
     }
@@ -262,14 +265,16 @@ pub fn invalid_data_error<T>(str: &str) -> Result<T, Error> {
 }
 
 pub fn unable_to_create_error<T>(kind: &str, id: &str) -> Result<T, Error> {
-    Err(Error::new(ErrorKind::InvalidData, format!("Unable to create {} '{}'", kind, id)))
+    Err(Error::new(
+        ErrorKind::InvalidData,
+        format!("Unable to create {} '{}'", kind, id),
+    ))
 }
 
 /// Helper function to return the number of milliseconds elapsed in
 /// the given duration.
 pub fn get_elapsed_millis(elapsed: Duration) -> u32 {
-    (elapsed.as_secs() as u32) * 1_000 +
-        elapsed.subsec_nanos() / 1_000_000
+    (elapsed.as_secs() as u32) * 1_000 + elapsed.subsec_nanos() / 1_000_000
 }
 
 /// Helper function to return a string representation of the elapsed time
@@ -291,8 +296,11 @@ pub fn error_and_exit(error: &str) {
     ::std::process::exit(1)
 }
 
-pub fn main_loop(io: &mut Box<IO>, root: Rc<RefCell<Widget>>,
-             updater: Box<MainLoopUpdater>) -> Result<(), Error> {
+pub fn main_loop(
+    io: &mut Box<IO>,
+    root: Rc<RefCell<Widget>>,
+    updater: Box<MainLoopUpdater>,
+) -> Result<(), Error> {
     let fpms = (1000.0 / (Config::frame_rate() as f32)) as u64;
     let frame_time = time::Duration::from_millis(fpms);
     trace!("Computed {} frames per milli.", fpms);
@@ -334,8 +342,14 @@ pub fn main_loop(io: &mut Box<IO>, root: Rc<RefCell<Widget>>,
     }
 
     let secs = render_time.as_secs() as f64 + render_time.subsec_nanos() as f64 * 1e-9;
-    info!("Rendered {} frames with total render time {:.4} seconds", frames, secs);
-    info!("Average frame render time: {:.2} milliseconds", 1000.0 * secs / frames as f64);
+    info!(
+        "Rendered {} frames with total render time {:.4} seconds",
+        frames, secs
+    );
+    info!(
+        "Average frame render time: {:.2} milliseconds",
+        1000.0 * secs / frames as f64
+    );
 
     Ok(())
 }
@@ -362,19 +376,18 @@ pub fn setup_logger() {
         logger = logger.suppress_timestamp();
     }
 
-    logger.start()
-        .unwrap_or_else(|e| {
-            eprintln!("{}", e);
-            eprintln!("There was a fatal error initializing logging to 'log/'");
-            eprintln!("Exiting...");
-            ::std::process::exit(1);
-        });
+    logger.start().unwrap_or_else(|e| {
+        eprintln!("{}", e);
+        eprintln!("There was a fatal error initializing logging to 'log/'");
+        eprintln!("Exiting...");
+        ::std::process::exit(1);
+    });
 
     panic::set_hook(Box::new(|p| {
         error!("Thread main panic.  Exiting.");
         warn!("with payload: {:?}", p.payload());
         if let Some(loc) = p.location() {
-           warn!("at {:?}", loc);
+            warn!("at {:?}", loc);
         }
 
         let bt = Backtrace::new();

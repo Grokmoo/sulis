@@ -19,10 +19,10 @@ use rlua::{self, Context, UserData, UserDataMethods};
 use sulis_core::resource::ResourceSet;
 use sulis_core::util::ExtInt;
 
-use crate::{GameState};
-use crate::animation::{Anim, self};
-use crate::animation::particle_generator::{Dist, Param, DistParam, DistParam2D, GeneratorModel};
+use crate::animation::particle_generator::{Dist, DistParam, DistParam2D, GeneratorModel, Param};
+use crate::animation::{self, Anim};
 use crate::script::{CallbackData, Result};
+use crate::GameState;
 
 /// A flexible animation type, which can be used to create particle effects, simple
 /// frame based animations, or anything in between.
@@ -152,7 +152,11 @@ impl ScriptParticleGenerator {
         }
     }
 
-    pub fn new_anim(parent: usize, image: String, duration_millis: ExtInt) -> ScriptParticleGenerator {
+    pub fn new_anim(
+        parent: usize,
+        image: String,
+        duration_millis: ExtInt,
+    ) -> ScriptParticleGenerator {
         let mut pgen = ScriptParticleGenerator::new(parent, image, duration_millis);
         pgen.model.initial_overflow = 1.0;
         pgen.model.gen_rate = Param::fixed(0.0);
@@ -170,11 +174,18 @@ impl UserData for ScriptParticleGenerator {
         methods.add_method("param", &param);
         methods.add_method("dist_param", &dist_param);
         methods.add_method("zero_dist", |_, _, _: ()| Ok(Dist::create_fixed(0.0)));
-        methods.add_method("fixed_dist", |_, _, value: f32| Ok(Dist::create_fixed(value)));
-        methods.add_method("uniform_dist", |_, _, (min, max): (f32, f32)| Ok(Dist::create_uniform(min, max)));
-        methods.add_method("angular_dist", |_, _, (min_a, max_a, min_s, max_s): (f32, f32, f32, f32)| {
-            Ok(Dist::create_angular(min_a, max_a, min_s, max_s))
+        methods.add_method("fixed_dist", |_, _, value: f32| {
+            Ok(Dist::create_fixed(value))
         });
+        methods.add_method("uniform_dist", |_, _, (min, max): (f32, f32)| {
+            Ok(Dist::create_uniform(min, max))
+        });
+        methods.add_method(
+            "angular_dist",
+            |_, _, (min_a, max_a, min_s, max_s): (f32, f32, f32, f32)| {
+                Ok(Dist::create_angular(min_a, max_a, min_s, max_s))
+            },
+        );
         methods.add_method_mut("set_blocking", |_, gen, block: bool| {
             gen.model.is_blocking = block;
             Ok(())
@@ -207,15 +218,18 @@ impl UserData for ScriptParticleGenerator {
             gen.model.rotation = Some(rotation);
             Ok(())
         });
-        methods.add_method_mut("set_color", |_, gen, (r, g, b, a): (Param, Param, Param, Option<Param>)| {
-            gen.model.red = r;
-            gen.model.green = g;
-            gen.model.blue = b;
-            if let Some(a) = a {
-                gen.model.alpha = a;
-            }
-            Ok(())
-        });
+        methods.add_method_mut(
+            "set_color",
+            |_, gen, (r, g, b, a): (Param, Param, Param, Option<Param>)| {
+                gen.model.red = r;
+                gen.model.green = g;
+                gen.model.blue = b;
+                if let Some(a) = a {
+                    gen.model.alpha = a;
+                }
+                Ok(())
+            },
+        );
         methods.add_method_mut("set_alpha", |_, gen, a: Param| {
             gen.model.alpha = a;
             Ok(())
@@ -228,40 +242,75 @@ impl UserData for ScriptParticleGenerator {
             gen.callbacks.push((time, cb));
             Ok(())
         });
-        methods.add_method_mut("set_particle_position_dist", |_, gen, (x, y): (DistParam, Option<DistParam>)| {
-            gen.model.particle_position_dist = Some(DistParam2D::new(x, y));
-           Ok(())
-        });
+        methods.add_method_mut(
+            "set_particle_position_dist",
+            |_, gen, (x, y): (DistParam, Option<DistParam>)| {
+                gen.model.particle_position_dist = Some(DistParam2D::new(x, y));
+                Ok(())
+            },
+        );
         methods.add_method_mut("set_particle_duration_dist", |_, gen, value: Dist| {
             gen.model.particle_duration_dist = Some(value);
             Ok(())
         });
-        methods.add_method_mut("set_particle_size_dist", |_, gen, (width, height): (Dist, Dist)| {
-            gen.model.particle_size_dist = Some((width, height));
-            Ok(())
-        });
-        methods.add_method_mut("set_particle_frame_time_offset_dist", |_, gen, value: Dist| {
-            gen.model.particle_frame_time_offset_dist = Some(value);
-            Ok(())
-        });
+        methods.add_method_mut(
+            "set_particle_size_dist",
+            |_, gen, (width, height): (Dist, Dist)| {
+                gen.model.particle_size_dist = Some((width, height));
+                Ok(())
+            },
+        );
+        methods.add_method_mut(
+            "set_particle_frame_time_offset_dist",
+            |_, gen, value: Dist| {
+                gen.model.particle_frame_time_offset_dist = Some(value);
+                Ok(())
+            },
+        );
     }
 }
 
-fn dist_param(_lua: Context, _: &ScriptParticleGenerator,
-              (value, dt, d2t, d3t) : (Dist, Option<Dist>, Option<Dist>, Option<Dist>)) -> Result<DistParam> {
+fn dist_param(
+    _lua: Context,
+    _: &ScriptParticleGenerator,
+    (value, dt, d2t, d3t): (Dist, Option<Dist>, Option<Dist>, Option<Dist>),
+) -> Result<DistParam> {
     if dt.is_none() {
-        Ok(DistParam::new(value, Dist::create_fixed(0.0), Dist::create_fixed(0.0), Dist::create_fixed(0.0)))
+        Ok(DistParam::new(
+            value,
+            Dist::create_fixed(0.0),
+            Dist::create_fixed(0.0),
+            Dist::create_fixed(0.0),
+        ))
     } else if d2t.is_none() {
-        Ok(DistParam::new(value, dt.unwrap(), Dist::create_fixed(0.0), Dist::create_fixed(0.0)))
+        Ok(DistParam::new(
+            value,
+            dt.unwrap(),
+            Dist::create_fixed(0.0),
+            Dist::create_fixed(0.0),
+        ))
     } else if d3t.is_none() {
-        Ok(DistParam::new(value, dt.unwrap(), d2t.unwrap(), Dist::create_fixed(0.0)))
+        Ok(DistParam::new(
+            value,
+            dt.unwrap(),
+            d2t.unwrap(),
+            Dist::create_fixed(0.0),
+        ))
     } else {
-        Ok(DistParam::new(value, dt.unwrap(), d2t.unwrap(), d3t.unwrap()))
+        Ok(DistParam::new(
+            value,
+            dt.unwrap(),
+            d2t.unwrap(),
+            d3t.unwrap(),
+        ))
     }
 }
 
-pub fn param<T>(_lua: Context, _: &T,
-         (value, dt, d2t, d3t): (f32, Option<f32>, Option<f32>, Option<f32>)) -> Result<Param> {
+pub fn param<T>(
+    _lua: Context,
+    _: &T,
+    (value, dt, d2t, d3t): (f32, Option<f32>, Option<f32>, Option<f32>),
+) -> Result<Param> {
     if dt.is_none() {
         Ok(Param::fixed(value))
     } else if d2t.is_none() {
@@ -269,7 +318,12 @@ pub fn param<T>(_lua: Context, _: &T,
     } else if d3t.is_none() {
         Ok(Param::with_accel(value, dt.unwrap(), d2t.unwrap()))
     } else {
-        Ok(Param::with_jerk(value, dt.unwrap(), d2t.unwrap(), d3t.unwrap()))
+        Ok(Param::with_jerk(
+            value,
+            dt.unwrap(),
+            d2t.unwrap(),
+            d3t.unwrap(),
+        ))
     }
 }
 
@@ -297,7 +351,10 @@ pub fn create_pgen(gen: &ScriptParticleGenerator, model: GeneratorModel) -> Resu
     let image = match ResourceSet::image(&gen.image) {
         Some(image) => image,
         None => {
-            warn!("Unable to locate image '{}' for particle generator", gen.image);
+            warn!(
+                "Unable to locate image '{}' for particle generator",
+                gen.image
+            );
             return Err(rlua::Error::FromLuaConversionError {
                 from: "ScriptParticleGenerator",
                 to: "ParticleGenerator",

@@ -14,18 +14,22 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::cmp;
 use std::any::Any;
-use std::rc::Rc;
 use std::cell::RefCell;
+use std::cmp;
 use std::collections::HashSet;
+use std::rc::Rc;
 
 use sulis_core::io::event;
-use sulis_core::ui::{animation_state, Widget, WidgetKind, Callback};
-use sulis_core::util::{Size, ExtInt};
-use sulis_module::{actor::OwnedAbility, Ability, Module, ability::{AbilityGroup, Duration}};
+use sulis_core::ui::{animation_state, Callback, Widget, WidgetKind};
+use sulis_core::util::{ExtInt, Size};
+use sulis_core::widgets::{Button, Label, TextArea};
+use sulis_module::{
+    ability::{AbilityGroup, Duration},
+    actor::OwnedAbility,
+    Ability, Module,
+};
 use sulis_state::{ChangeListener, EntityState, GameState, Script};
-use sulis_core::widgets::{Label, TextArea, Button};
 
 pub const NAME: &str = "abilities_bar";
 
@@ -66,37 +70,47 @@ impl WidgetKind for AbilitiesBar {
         widget.do_children_layout();
     }
 
-    fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>>  {
+    fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         {
             let mut entity = self.entity.borrow_mut();
-            entity.actor.listeners.add(ChangeListener::invalidate(NAME, widget));
+            entity
+                .actor
+                .listeners
+                .add(ChangeListener::invalidate(NAME, widget));
         }
 
         let widget_ref = Rc::clone(widget);
-        GameState::add_party_listener(ChangeListener::new(NAME, Box::new(move |entity| {
-            let entity = match entity {
-                None => return,
-                Some(entity) => entity,
-            };
-            let bar = Widget::kind_mut::<AbilitiesBar>(&widget_ref);
-            bar.entity = Rc::clone(entity);
-            widget_ref.borrow_mut().invalidate_children();
-        })));
+        GameState::add_party_listener(ChangeListener::new(
+            NAME,
+            Box::new(move |entity| {
+                let entity = match entity {
+                    None => return,
+                    Some(entity) => entity,
+                };
+                let bar = Widget::kind_mut::<AbilitiesBar>(&widget_ref);
+                bar.entity = Rc::clone(entity);
+                widget_ref.borrow_mut().invalidate_children();
+            }),
+        ));
 
         self.group_panes.clear();
         let mut children = Vec::new();
         let abilities = self.entity.borrow().actor.actor.abilities.clone();
 
-        let collapsed_group_ids: HashSet<String> = self.entity.borrow()
-            .collapsed_groups().into_iter().collect();
+        let collapsed_group_ids: HashSet<String> = self
+            .entity
+            .borrow()
+            .collapsed_groups()
+            .into_iter()
+            .collect();
 
         let mut collapsed_groups = Vec::new();
         let mut groups = Vec::new();
         for (index, group_id) in Module::rules().ability_groups.iter().enumerate() {
             let stats = &self.entity.borrow().actor.stats;
             if !stats.uses_per_encounter(group_id).is_zero()
-                || !stats.uses_per_day(group_id).is_zero() {
-
+                || !stats.uses_per_day(group_id).is_zero()
+            {
                 if !collapsed_group_ids.contains(group_id) {
                     groups.push(AbilityGroup { index });
                 } else {
@@ -121,7 +135,9 @@ impl WidgetKind for AbilitiesBar {
         for group in groups {
             let group_pane = GroupPane::new(group, &self.entity, &abilities, collapse_enabled);
 
-            if group_pane.borrow().abilities.is_empty() { continue; }
+            if group_pane.borrow().abilities.is_empty() {
+                continue;
+            }
 
             let group_widget = Widget::with_defaults(group_pane);
             self.group_panes.push(Rc::clone(&group_widget));
@@ -139,8 +155,10 @@ struct CollapsedGroupPane {
 }
 
 impl CollapsedGroupPane {
-    fn new(group: AbilityGroup,
-           entity: &Rc<RefCell<EntityState>>) -> Rc<RefCell<CollapsedGroupPane>> {
+    fn new(
+        group: AbilityGroup,
+        entity: &Rc<RefCell<EntityState>>,
+    ) -> Rc<RefCell<CollapsedGroupPane>> {
         Rc::new(RefCell::new(CollapsedGroupPane {
             group: group.name(),
             entity: Rc::clone(entity),
@@ -153,41 +171,70 @@ impl WidgetKind for CollapsedGroupPane {
     widget_kind!("collapsed_group_pane");
 
     fn layout(&mut self, widget: &mut Widget) {
-        self.description.borrow_mut().state.add_text_arg("current_uses_per_encounter",
-            &self.entity.borrow().actor.current_uses_per_encounter(&self.group).to_string());
+        self.description.borrow_mut().state.add_text_arg(
+            "current_uses_per_encounter",
+            &self
+                .entity
+                .borrow()
+                .actor
+                .current_uses_per_encounter(&self.group)
+                .to_string(),
+        );
 
-        self.description.borrow_mut().state.add_text_arg("current_uses_per_day",
-            &self.entity.borrow().actor.current_uses_per_day(&self.group).to_string());
+        self.description.borrow_mut().state.add_text_arg(
+            "current_uses_per_day",
+            &self
+                .entity
+                .borrow()
+                .actor
+                .current_uses_per_day(&self.group)
+                .to_string(),
+        );
 
         widget.do_base_layout();
     }
 
-    fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>>  {
+    fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         self.description.borrow_mut().state.clear_text_args();
 
-        let total_uses = self.entity.borrow().actor.stats.uses_per_encounter(&self.group);
+        let total_uses = self
+            .entity
+            .borrow()
+            .actor
+            .stats
+            .uses_per_encounter(&self.group);
         if !total_uses.is_infinite() && !total_uses.is_zero() {
-            self.description.borrow_mut().state.add_text_arg("total_uses_per_encounter",
-                &total_uses.to_string());
+            self.description
+                .borrow_mut()
+                .state
+                .add_text_arg("total_uses_per_encounter", &total_uses.to_string());
         }
 
         let total_uses = self.entity.borrow().actor.stats.uses_per_day(&self.group);
         if !total_uses.is_infinite() && !total_uses.is_zero() {
-            self.description.borrow_mut().state.add_text_arg("total_uses_per_day",
-                &total_uses.to_string());
+            self.description
+                .borrow_mut()
+                .state
+                .add_text_arg("total_uses_per_day", &total_uses.to_string());
         }
 
-        self.description.borrow_mut().state.add_text_arg("group", &self.group);
+        self.description
+            .borrow_mut()
+            .state
+            .add_text_arg("group", &self.group);
 
         let change_size = Widget::with_theme(Button::empty(), "change_size");
         let group = self.group.clone();
         let entity = Rc::clone(&self.entity);
-        change_size.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-            entity.borrow_mut().remove_collapsed_group(&group);
+        change_size
+            .borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(move |widget, _| {
+                entity.borrow_mut().remove_collapsed_group(&group);
 
-            let (parent, _) = Widget::parent::<AbilitiesBar>(widget);
-            parent.borrow_mut().invalidate_children();
-        })));
+                let (parent, _) = Widget::parent::<AbilitiesBar>(widget);
+                parent.borrow_mut().invalidate_children();
+            })));
 
         vec![self.description.clone(), change_size]
     }
@@ -205,8 +252,12 @@ struct GroupPane {
 }
 
 impl GroupPane {
-    fn new(group: AbilityGroup, entity: &Rc<RefCell<EntityState>>,
-           abilities: &Vec<OwnedAbility>, collapse_enabled: bool) -> Rc<RefCell<GroupPane>> {
+    fn new(
+        group: AbilityGroup,
+        entity: &Rc<RefCell<EntityState>>,
+        abilities: &Vec<OwnedAbility>,
+        collapse_enabled: bool,
+    ) -> Rc<RefCell<GroupPane>> {
         let mut abilities_to_add = Vec::new();
         for ability in abilities.iter() {
             let active = match ability.ability.active {
@@ -261,45 +312,84 @@ impl WidgetKind for GroupPane {
     widget_kind!("group_pane");
 
     fn layout(&mut self, widget: &mut Widget) {
-        self.description.borrow_mut().state.add_text_arg("current_uses_per_encounter",
-            &self.entity.borrow().actor.current_uses_per_encounter(&self.group).to_string());
+        self.description.borrow_mut().state.add_text_arg(
+            "current_uses_per_encounter",
+            &self
+                .entity
+                .borrow()
+                .actor
+                .current_uses_per_encounter(&self.group)
+                .to_string(),
+        );
 
-        self.description.borrow_mut().state.add_text_arg("current_uses_per_day",
-            &self.entity.borrow().actor.current_uses_per_day(&self.group).to_string());
+        self.description.borrow_mut().state.add_text_arg(
+            "current_uses_per_day",
+            &self
+                .entity
+                .borrow()
+                .actor
+                .current_uses_per_day(&self.group)
+                .to_string(),
+        );
 
         widget.do_base_layout();
     }
 
     fn on_remove(&mut self) {
         for ability in self.abilities.iter() {
-            if let Some(ref mut state) = self.entity.borrow_mut().actor.ability_state(&ability.ability.id) {
+            if let Some(ref mut state) = self
+                .entity
+                .borrow_mut()
+                .actor
+                .ability_state(&ability.ability.id)
+            {
                 state.listeners.remove(&ability.ability.id);
             }
         }
     }
 
-    fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>>  {
+    fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         for ability in self.abilities.iter() {
-            if let Some(ref mut state) = self.entity.borrow_mut().actor.ability_state(&ability.ability.id) {
-                state.listeners.add(ChangeListener::invalidate_layout(&ability.ability.id, widget));
+            if let Some(ref mut state) = self
+                .entity
+                .borrow_mut()
+                .actor
+                .ability_state(&ability.ability.id)
+            {
+                state.listeners.add(ChangeListener::invalidate_layout(
+                    &ability.ability.id,
+                    widget,
+                ));
             }
         }
 
         self.description.borrow_mut().state.clear_text_args();
 
-        let total_uses = self.entity.borrow().actor.stats.uses_per_encounter(&self.group);
+        let total_uses = self
+            .entity
+            .borrow()
+            .actor
+            .stats
+            .uses_per_encounter(&self.group);
         if !total_uses.is_infinite() && !total_uses.is_zero() {
-            self.description.borrow_mut().state.add_text_arg("total_uses_per_encounter",
-                &total_uses.to_string());
+            self.description
+                .borrow_mut()
+                .state
+                .add_text_arg("total_uses_per_encounter", &total_uses.to_string());
         }
 
         let total_uses = self.entity.borrow().actor.stats.uses_per_day(&self.group);
         if !total_uses.is_infinite() && !total_uses.is_zero() {
-            self.description.borrow_mut().state.add_text_arg("total_uses_per_day",
-                &total_uses.to_string());
+            self.description
+                .borrow_mut()
+                .state
+                .add_text_arg("total_uses_per_day", &total_uses.to_string());
         }
 
-        self.description.borrow_mut().state.add_text_arg("group", &self.group);
+        self.description
+            .borrow_mut()
+            .state
+            .add_text_arg("group", &self.group);
 
         let abilities_pane = Widget::empty("abilities_pane");
         for ability in self.abilities.iter() {
@@ -310,15 +400,21 @@ impl WidgetKind for GroupPane {
         }
 
         let change_size = Widget::with_theme(Button::empty(), "change_size");
-        change_size.borrow_mut().state.set_enabled(self.collapse_enabled);
+        change_size
+            .borrow_mut()
+            .state
+            .set_enabled(self.collapse_enabled);
         let group = self.group.clone();
         let entity = Rc::clone(&self.entity);
-        change_size.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-            entity.borrow_mut().add_collapsed_group(group.clone());
+        change_size
+            .borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(move |widget, _| {
+                entity.borrow_mut().add_collapsed_group(group.clone());
 
-            let (parent, _) = Widget::parent::<AbilitiesBar>(widget);
-            parent.borrow_mut().invalidate_children();
-        })));
+                let (parent, _) = Widget::parent::<AbilitiesBar>(widget);
+                parent.borrow_mut().invalidate_children();
+            })));
 
         vec![self.description.clone(), change_size, abilities_pane]
     }
@@ -345,28 +441,43 @@ impl WidgetKind for AbilityButton {
         widget.do_base_layout();
 
         if self.entity.borrow().actor.can_toggle(&self.ability.id) {
-            widget.state.animation_state.remove(animation_state::Kind::Custom1);
+            widget
+                .state
+                .animation_state
+                .remove(animation_state::Kind::Custom1);
         } else {
-            widget.state.animation_state.add(animation_state::Kind::Custom1);
+            widget
+                .state
+                .animation_state
+                .add(animation_state::Kind::Custom1);
         }
 
-        if let Some(ref mut state) = self.entity.borrow_mut().actor.ability_state(&self.ability.id) {
+        if let Some(ref mut state) = self
+            .entity
+            .borrow_mut()
+            .actor
+            .ability_state(&self.ability.id)
+        {
             widget.children[1].borrow_mut().state.clear_text_args();
             let child = &mut widget.children[1].borrow_mut().state;
             match state.remaining_duration_rounds() {
                 ExtInt::Infinity => child.add_text_arg("duration", "Active"),
                 ExtInt::Int(rounds) => {
-                    if rounds != 0 { child.add_text_arg("duration", &rounds.to_string()); }
+                    if rounds != 0 {
+                        child.add_text_arg("duration", &rounds.to_string());
+                    }
                 }
             }
         }
     }
 
-    fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>>  {
+    fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let duration_label = Widget::with_theme(Label::empty(), "duration_label");
         duration_label.borrow_mut().state.set_enabled(false);
         let icon = Widget::empty("icon");
-        icon.borrow_mut().state.add_text_arg("icon", &self.ability.icon.id());
+        icon.borrow_mut()
+            .state
+            .add_text_arg("icon", &self.ability.icon.id());
         icon.borrow_mut().state.set_enabled(false);
 
         vec![icon, duration_label]
@@ -379,28 +490,40 @@ impl WidgetKind for AbilityButton {
             hover.state.disable();
 
             hover.state.add_text_arg("name", &self.ability.name);
-            hover.state.add_text_arg("description", &self.ability.description);
+            hover
+                .state
+                .add_text_arg("description", &self.ability.description);
             if let Some(ref active) = self.ability.active {
                 let ap = active.ap / Module::rules().display_ap;
                 hover.state.add_text_arg("activate_ap", &ap.to_string());
 
                 match active.duration {
-                    Duration::Rounds(rounds) => hover.state.add_text_arg("duration", &rounds.to_string()),
+                    Duration::Rounds(rounds) => {
+                        hover.state.add_text_arg("duration", &rounds.to_string())
+                    }
                     Duration::Mode => hover.state.add_text_arg("mode", "true"),
                     Duration::Instant => hover.state.add_text_arg("instant", "true"),
                     Duration::Permanent => hover.state.add_text_arg("permanent", "true"),
                 }
 
                 if active.cooldown != 0 {
-                    hover.state.add_text_arg("cooldown", &active.cooldown.to_string());
+                    hover
+                        .state
+                        .add_text_arg("cooldown", &active.cooldown.to_string());
                 }
 
-                hover.state.add_text_arg("short_description", &active.short_description);
+                hover
+                    .state
+                    .add_text_arg("short_description", &active.short_description);
             }
         }
 
-        Widget::set_mouse_over_widget(&widget, hover, widget.borrow().state.inner_right(),
-            widget.borrow().state.inner_top());
+        Widget::set_mouse_over_widget(
+            &widget,
+            hover,
+            widget.borrow().state.inner_right(),
+            widget.borrow().state.inner_top(),
+        );
 
         true
     }
@@ -411,7 +534,10 @@ impl WidgetKind for AbilityButton {
         if self.entity.borrow().actor.can_activate(&self.ability.id) {
             Script::ability_on_activate(&self.entity, &self.ability);
         } else if self.entity.borrow().actor.can_toggle(&self.ability.id) {
-            self.entity.borrow_mut().actor.deactivate_ability_state(&self.ability.id);
+            self.entity
+                .borrow_mut()
+                .actor
+                .deactivate_ability_state(&self.ability.id);
         }
 
         true

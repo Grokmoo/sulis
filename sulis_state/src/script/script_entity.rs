@@ -14,21 +14,23 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::str::FromStr;
-use std::{self, f32, u32};
-use std::rc::Rc;
 use std::cell::RefCell;
 use std::collections::HashMap;
+use std::rc::Rc;
+use std::str::FromStr;
+use std::{self, f32, u32};
 
 use rlua::{self, Context, UserData, UserDataMethods};
 
-use sulis_core::util::{ExtInt};
+use crate::{ai, animation, script::*, MOVE_TO_THRESHOLD};
+use crate::{area_feedback_text::ColorKind, ActorState, EntityState, GameState, Location};
 use sulis_core::config::Config;
 use sulis_core::resource::ResourceSet;
-use sulis_module::{ImageLayer, Faction, Actor, InventoryBuilder, Attribute, AttackKind,
-    DamageKind, Attack, HitKind, HitFlags};
-use crate::{ActorState, EntityState, GameState, Location, area_feedback_text::ColorKind};
-use crate::{ai, animation::{self}, script::*, MOVE_TO_THRESHOLD};
+use sulis_core::util::ExtInt;
+use sulis_module::{
+    Actor, Attack, AttackKind, Attribute, DamageKind, Faction, HitFlags, HitKind, ImageLayer,
+    InventoryBuilder,
+};
 
 /// Represents a single entity for Lua scripts.  Also can represent an invalid,
 /// non-existant entity in some cases.  Many script functions pass a parent
@@ -417,7 +419,9 @@ impl ScriptEntity {
     }
 
     pub fn from(entity: &Rc<RefCell<EntityState>>) -> ScriptEntity {
-        ScriptEntity { index: Some(entity.borrow().index()) }
+        ScriptEntity {
+            index: Some(entity.borrow().index()),
+        }
     }
 
     pub fn check_not_equal(&self, other: &ScriptEntity) -> Result<()> {
@@ -426,7 +430,7 @@ impl ScriptEntity {
             Err(rlua::Error::FromLuaConversionError {
                 from: "ScriptEntity",
                 to: "ScriptEntity",
-                message: Some("Parent and target must not match".to_string())
+                message: Some("Parent and target must not match".to_string()),
             })
         } else {
             Ok(())
@@ -438,7 +442,7 @@ impl ScriptEntity {
             None => Err(rlua::Error::FromLuaConversionError {
                 from: "ScriptEntity",
                 to: "EntityState",
-                message: Some("ScriptEntity does not have a valid index".to_string())
+                message: Some("ScriptEntity does not have a valid index".to_string()),
             }),
             Some(index) => Ok(index),
         }
@@ -449,7 +453,7 @@ impl ScriptEntity {
             None => Err(rlua::Error::FromLuaConversionError {
                 from: "ScriptEntity",
                 to: "EntityState",
-                message: Some("ScriptEntity does not have a valid index".to_string())
+                message: Some("ScriptEntity does not have a valid index".to_string()),
             }),
             Some(index) => {
                 let mgr = GameState::turn_manager();
@@ -458,7 +462,9 @@ impl ScriptEntity {
                     None => Err(rlua::Error::FromLuaConversionError {
                         from: "ScriptEntity",
                         to: "EntityState",
-                        message: Some("ScriptEntity refers to an entity that no longer exists.".to_string())
+                        message: Some(
+                            "ScriptEntity refers to an entity that no longer exists.".to_string(),
+                        ),
                     }),
                     Some(entity) => Ok(entity),
                 }
@@ -469,13 +475,9 @@ impl ScriptEntity {
 
 impl UserData for ScriptEntity {
     fn add_methods<'lua, M: UserDataMethods<'lua, Self>>(methods: &mut M) {
-        methods.add_method("state_end", |_, _, ()| {
-            Ok(ai::State::End)
-        });
+        methods.add_method("state_end", |_, _, ()| Ok(ai::State::End));
 
-        methods.add_method("state_wait", |_, _, time: u32| {
-            Ok(ai::State::Wait(time))
-        });
+        methods.add_method("state_wait", |_, _, time: u32| Ok(ai::State::Wait(time)));
 
         methods.add_method("vis_dist", |_, entity, ()| {
             let parent = entity.try_unwrap()?;
@@ -497,8 +499,14 @@ impl UserData for ScriptEntity {
             let actor = {
                 let old_actor = &entity.borrow().actor.actor;
                 let xp = entity.borrow().actor.xp();
-                Actor::from(old_actor, None, xp, Vec::new(), vec![ability],
-                    InventoryBuilder::default())
+                Actor::from(
+                    old_actor,
+                    None,
+                    xp,
+                    Vec::new(),
+                    vec![ability],
+                    InventoryBuilder::default(),
+                )
             };
 
             entity.borrow_mut().actor.replace_actor(actor);
@@ -513,14 +521,21 @@ impl UserData for ScriptEntity {
                 None => {
                     warn!("Invalid ability '{}' in script", ability);
                     return Ok(());
-                }, Some(ability) => ability,
+                }
+                Some(ability) => ability,
             };
 
             let actor = {
                 let old_actor = &entity.borrow().actor.actor;
                 let xp = entity.borrow().actor.xp();
-                Actor::from(old_actor, None, xp, vec![ability], Vec::new(),
-                            InventoryBuilder::default())
+                Actor::from(
+                    old_actor,
+                    None,
+                    xp,
+                    vec![ability],
+                    Vec::new(),
+                    InventoryBuilder::default(),
+                )
             };
 
             entity.borrow_mut().actor.replace_actor(actor);
@@ -534,14 +549,21 @@ impl UserData for ScriptEntity {
                 None => {
                     warn!("Invalid class '{}' in script", class);
                     return Ok(());
-                }, Some(class) => class,
+                }
+                Some(class) => class,
             };
 
             let actor = {
                 let old_actor = &entity.borrow().actor.actor;
                 let xp = entity.borrow().actor.xp();
-                Actor::from(old_actor, Some((class, levels)), xp, Vec::new(), Vec::new(),
-                    InventoryBuilder::default())
+                Actor::from(
+                    old_actor,
+                    Some((class, levels)),
+                    xp,
+                    Vec::new(),
+                    Vec::new(),
+                    InventoryBuilder::default(),
+                )
             };
 
             entity.borrow_mut().actor.replace_actor(actor);
@@ -579,7 +601,8 @@ impl UserData for ScriptEntity {
             let mgr = GameState::turn_manager();
             let area_state = GameState::area_state();
 
-            mgr.borrow_mut().check_ai_activation(&entity, &mut area_state.borrow_mut());
+            mgr.borrow_mut()
+                .check_ai_activation(&entity, &mut area_state.borrow_mut());
 
             Ok(())
         });
@@ -596,16 +619,19 @@ impl UserData for ScriptEntity {
             Ok(())
         });
 
-        methods.add_method("set_flag", |_, entity, (flag, val): (String, Option<String>)| {
-            let entity = entity.try_unwrap()?;
-            let val = match &val {
-                None => "true",
-                Some(val) => val,
-            };
+        methods.add_method(
+            "set_flag",
+            |_, entity, (flag, val): (String, Option<String>)| {
+                let entity = entity.try_unwrap()?;
+                let val = match &val {
+                    None => "true",
+                    Some(val) => val,
+                };
 
-            entity.borrow_mut().set_custom_flag(&flag, val);
-            Ok(())
-        });
+                entity.borrow_mut().set_custom_flag(&flag, val);
+                Ok(())
+            },
+        );
 
         methods.add_method("clear_flag", |_, entity, flag: String| {
             let entity = entity.try_unwrap()?;
@@ -645,28 +671,37 @@ impl UserData for ScriptEntity {
             Ok(is_member)
         });
 
-        methods.add_method("use_ability", |_, entity, (ability, allow_invalid): (ScriptAbility, Option<bool>)| {
-            let allow_invalid = allow_invalid.unwrap_or(false);
+        methods.add_method(
+            "use_ability",
+            |_, entity, (ability, allow_invalid): (ScriptAbility, Option<bool>)| {
+                let allow_invalid = allow_invalid.unwrap_or(false);
 
-            let parent = entity.try_unwrap()?;
-            if !allow_invalid {
-                if !parent.borrow().actor.can_toggle(&ability.id) { return Ok(false); }
-            }
-            Script::ability_on_activate(&parent, &ability.to_ability());
-            Ok(true)
-        });
+                let parent = entity.try_unwrap()?;
+                if !allow_invalid {
+                    if !parent.borrow().actor.can_toggle(&ability.id) {
+                        return Ok(false);
+                    }
+                }
+                Script::ability_on_activate(&parent, &ability.to_ability());
+                Ok(true)
+            },
+        );
 
         methods.add_method("use_item", |_, entity, item: ScriptUsableItem| {
             let slot = item.slot;
             let parent = entity.try_unwrap()?;
-            if !parent.borrow().actor.can_use_quick(slot) { return Ok(false); }
+            if !parent.borrow().actor.can_use_quick(slot) {
+                return Ok(false);
+            }
             Script::item_on_activate(&parent, ScriptItemKind::Quick(slot));
             Ok(true)
         });
 
         methods.add_method("swap_weapons", |_, entity, ()| {
             let parent = entity.try_unwrap()?;
-            if !parent.borrow().actor.can_swap_weapons() { return Ok(false); }
+            if !parent.borrow().actor.can_swap_weapons() {
+                return Ok(false);
+            }
 
             parent.borrow_mut().actor.swap_weapon_set();
             Ok(true)
@@ -688,7 +723,9 @@ impl UserData for ScriptEntity {
             let mut result = Vec::new();
             for effect_index in entity.actor.effects_iter() {
                 let effect = mgr.effect(*effect_index);
-                if effect.tag != tag { continue; }
+                if effect.tag != tag {
+                    continue;
+                }
 
                 let sae = ScriptAppliedEffect::new(effect, *effect_index);
                 result.push(sae);
@@ -705,7 +742,9 @@ impl UserData for ScriptEntity {
 
             for effect_index in entity.actor.effects_iter() {
                 let effect = mgr.effect(*effect_index);
-                if effect.tag == tag { return Ok(true); }
+                if effect.tag == tag {
+                    return Ok(true);
+                }
             }
 
             Ok(false)
@@ -728,19 +767,24 @@ impl UserData for ScriptEntity {
             Ok(())
         });
 
-        methods.add_method("create_surface", |_, _, (name, points, duration):
-            (String, Vec<HashMap<String, i32>>, Option<u32>)| {
-            let duration = match duration {
-                None => ExtInt::Infinity,
-                Some(dur) => ExtInt::Int(dur),
-            };
-            let points: Vec<(i32, i32)> = points.into_iter().map(|p| {
-                let x = p.get("x").unwrap();
-                let y = p.get("y").unwrap();
-                (*x, *y)
-            }).collect();
-            Ok(ScriptEffect::new_surface(points, &name, duration))
-        });
+        methods.add_method(
+            "create_surface",
+            |_, _, (name, points, duration): (String, Vec<HashMap<String, i32>>, Option<u32>)| {
+                let duration = match duration {
+                    None => ExtInt::Infinity,
+                    Some(dur) => ExtInt::Int(dur),
+                };
+                let points: Vec<(i32, i32)> = points
+                    .into_iter()
+                    .map(|p| {
+                        let x = p.get("x").unwrap();
+                        let y = p.get("y").unwrap();
+                        (*x, *y)
+                    })
+                    .collect();
+                Ok(ScriptEffect::new_surface(points, &name, duration))
+            },
+        );
 
         methods.add_method("create_effect", |_, entity, args: (String, Option<u32>)| {
             let duration = match args.1 {
@@ -752,25 +796,31 @@ impl UserData for ScriptEntity {
             Ok(ScriptEffect::new_entity(index, &ability, duration))
         });
 
-        methods.add_method("create_image_layer_anim", |_, entity, duration_secs: Option<f32>| {
-            let index = entity.try_unwrap_index()?;
-            let duration = match duration_secs {
-                None => ExtInt::Infinity,
-                Some(amount) => ExtInt::Int((amount * 1000.0) as u32),
-            };
+        methods.add_method(
+            "create_image_layer_anim",
+            |_, entity, duration_secs: Option<f32>| {
+                let index = entity.try_unwrap_index()?;
+                let duration = match duration_secs {
+                    None => ExtInt::Infinity,
+                    Some(amount) => ExtInt::Int((amount * 1000.0) as u32),
+                };
 
-            Ok(ScriptImageLayerAnimation::new(index, duration))
-        });
+                Ok(ScriptImageLayerAnimation::new(index, duration))
+            },
+        );
 
-        methods.add_method("create_scale_anim", |_, entity, duration_secs: Option<f32>| {
-            let index = entity.try_unwrap_index()?;
-            let duration = match duration_secs {
-                None => ExtInt::Infinity,
-                Some(amount) => ExtInt::Int((amount * 1000.0) as u32),
-            };
+        methods.add_method(
+            "create_scale_anim",
+            |_, entity, duration_secs: Option<f32>| {
+                let index = entity.try_unwrap_index()?;
+                let duration = match duration_secs {
+                    None => ExtInt::Infinity,
+                    Some(amount) => ExtInt::Int((amount * 1000.0) as u32),
+                };
 
-            Ok(ScriptScaleAnimation::new(index, duration))
-        });
+                Ok(ScriptScaleAnimation::new(index, duration))
+            },
+        );
 
         methods.add_method("create_subpos_anim", |_, entity, duration_secs: f32| {
             let index = entity.try_unwrap_index()?;
@@ -778,40 +828,53 @@ impl UserData for ScriptEntity {
             Ok(ScriptSubposAnimation::new(index, duration))
         });
 
-        methods.add_method("create_color_anim", |_, entity, duration_secs: Option<f32>| {
-            let index = entity.try_unwrap_index()?;
-            let duration = match duration_secs {
-                None => ExtInt::Infinity,
-                Some(amount) => ExtInt::Int((amount * 1000.0) as u32),
-            };
-            Ok(ScriptColorAnimation::new(index, duration))
-        });
+        methods.add_method(
+            "create_color_anim",
+            |_, entity, duration_secs: Option<f32>| {
+                let index = entity.try_unwrap_index()?;
+                let duration = match duration_secs {
+                    None => ExtInt::Infinity,
+                    Some(amount) => ExtInt::Int((amount * 1000.0) as u32),
+                };
+                Ok(ScriptColorAnimation::new(index, duration))
+            },
+        );
 
-        methods.add_method("create_particle_generator", |_, entity, args: (String, Option<f32>)| {
-            let sprite = args.0;
-            let index = entity.try_unwrap_index()?;
-            let duration = match args.1 {
-                None => ExtInt::Infinity,
-                Some(amount) => ExtInt::Int((amount * 1000.0) as u32),
-            };
-            Ok(ScriptParticleGenerator::new(index, sprite, duration))
-        });
+        methods.add_method(
+            "create_particle_generator",
+            |_, entity, args: (String, Option<f32>)| {
+                let sprite = args.0;
+                let index = entity.try_unwrap_index()?;
+                let duration = match args.1 {
+                    None => ExtInt::Infinity,
+                    Some(amount) => ExtInt::Int((amount * 1000.0) as u32),
+                };
+                Ok(ScriptParticleGenerator::new(index, sprite, duration))
+            },
+        );
 
         methods.add_method("wait_anim", |_, entity, duration: f32| {
             let index = entity.try_unwrap_index()?;
             let image = ResourceSet::empty_image();
             let duration = ExtInt::Int((duration * 1000.0) as u32);
-            Ok(ScriptParticleGenerator::new_anim(index, image.id(), duration))
+            Ok(ScriptParticleGenerator::new_anim(
+                index,
+                image.id(),
+                duration,
+            ))
         });
 
-        methods.add_method("create_anim", |_, entity, (image, duration): (String, Option<f32>)| {
-            let duration = match duration {
-                None => ExtInt::Infinity,
-                Some(amount) => ExtInt::Int((amount * 1000.0) as u32),
-            };
-            let index = entity.try_unwrap_index()?;
-            Ok(ScriptParticleGenerator::new_anim(index, image, duration))
-        });
+        methods.add_method(
+            "create_anim",
+            |_, entity, (image, duration): (String, Option<f32>)| {
+                let duration = match duration {
+                    None => ExtInt::Infinity,
+                    Some(amount) => ExtInt::Int((amount * 1000.0) as u32),
+                };
+                let index = entity.try_unwrap_index()?;
+                Ok(ScriptParticleGenerator::new_anim(index, image, duration))
+            },
+        );
 
         methods.add_method("create_targeter", |_, entity, ability: ScriptAbility| {
             let index = entity.try_unwrap_index()?;
@@ -823,36 +886,57 @@ impl UserData for ScriptEntity {
             Ok(TargeterData::new_item(index, item.kind()))
         });
 
-        methods.add_method("move_towards_entity", |_, entity, (dest, dist):
-                           (ScriptEntity, Option<f32>)| {
-            let parent = entity.try_unwrap()?;
-            let target = dest.try_unwrap()?;
+        methods.add_method(
+            "move_towards_entity",
+            |_, entity, (dest, dist): (ScriptEntity, Option<f32>)| {
+                let parent = entity.try_unwrap()?;
+                let target = dest.try_unwrap()?;
 
-            if let Some(dist) = dist {
-                let (x, y) = {
-                    let target = target.borrow();
-                    (target.location.x as f32 + (target.size.width / 2) as f32,
-                     target.location.y as f32 + (target.size.height / 2) as f32)
-                };
-                Ok(GameState::move_towards_point(&parent, Vec::new(), x, y, dist, None))
-            } else {
-                Ok(GameState::move_towards(&parent, &target))
-            }
-        });
+                if let Some(dist) = dist {
+                    let (x, y) = {
+                        let target = target.borrow();
+                        (
+                            target.location.x as f32 + (target.size.width / 2) as f32,
+                            target.location.y as f32 + (target.size.height / 2) as f32,
+                        )
+                    };
+                    Ok(GameState::move_towards_point(
+                        &parent,
+                        Vec::new(),
+                        x,
+                        y,
+                        dist,
+                        None,
+                    ))
+                } else {
+                    Ok(GameState::move_towards(&parent, &target))
+                }
+            },
+        );
 
-        methods.add_method("move_towards_point", |_, entity, (x, y, dist):
-                           (f32, f32, Option<f32>)| {
+        methods.add_method(
+            "move_towards_point",
+            |_, entity, (x, y, dist): (f32, f32, Option<f32>)| {
+                let parent = entity.try_unwrap()?;
 
-            let parent = entity.try_unwrap()?;
-
-            let dist = dist.unwrap_or(MOVE_TO_THRESHOLD);
-            Ok(GameState::move_towards_point(&parent, Vec::new(), x, y, dist, None))
-        });
+                let dist = dist.unwrap_or(MOVE_TO_THRESHOLD);
+                Ok(GameState::move_towards_point(
+                    &parent,
+                    Vec::new(),
+                    x,
+                    y,
+                    dist,
+                    None,
+                ))
+            },
+        );
 
         methods.add_method("has_ap_to_attack", |_, entity, ()| {
             let parent = entity.try_unwrap()?;
             let result = parent.borrow().actor.has_ap_to_attack();
-            if parent.borrow().actor.stats.attack_disabled { return Ok(false); }
+            if parent.borrow().actor.stats.attack_disabled {
+                return Ok(false);
+            }
             Ok(result)
         });
 
@@ -886,20 +970,26 @@ impl UserData for ScriptEntity {
 
             let area_state = GameState::area_state();
             if !entity.borrow().location.is_in(&area_state.borrow()) {
-                let old_area_state = GameState::get_area_state(
-                    &entity.borrow().location.area_id).unwrap();
+                let old_area_state =
+                    GameState::get_area_state(&entity.borrow().location.area_id).unwrap();
 
-                let surfaces = old_area_state.borrow_mut().remove_entity(&entity, &mgr.borrow());
+                let surfaces = old_area_state
+                    .borrow_mut()
+                    .remove_entity(&entity, &mgr.borrow());
                 for surface in surfaces {
                     mgr.borrow_mut().remove_from_surface(entity_index, surface);
                 }
 
                 let new_loc = Location::new(x, y, &area_state.borrow().area);
-                match area_state.borrow_mut().transition_entity_to(&entity, entity_index, new_loc) {
+                match area_state
+                    .borrow_mut()
+                    .transition_entity_to(&entity, entity_index, new_loc)
+                {
                     Err(e) => {
                         warn!("Unable to move entity using script function");
                         warn!("{}", e);
-                    }, Ok(_) => (),
+                    }
+                    Ok(_) => (),
                 }
             } else {
                 let mut area_state = area_state.borrow_mut();
@@ -926,8 +1016,9 @@ impl UserData for ScriptEntity {
 
                 total_damage.append(&mut damage.clone());
 
-                area_state.borrow_mut().add_damage_feedback_text(&target, hit_kind,
-                                                                 hit_flags, damage);
+                area_state
+                    .borrow_mut()
+                    .add_damage_feedback_text(&target, hit_kind, hit_flags, damage);
             }
 
             let hit_kind = ScriptHitKind::new(total_hit_kind, total_damage);
@@ -981,34 +1072,55 @@ impl UserData for ScriptEntity {
             Ok(())
         });
 
-        methods.add_method("special_attack", |_, entity,
-            (target, attack_kind, accuracy_kind, min_damage, max_damage, ap, damage_kind):
-            (ScriptEntity, String, String, Option<f32>, Option<f32>, Option<f32>, Option<String>)| {
-            let target = target.try_unwrap()?;
-            let parent = entity.try_unwrap()?;
+        methods.add_method(
+            "special_attack",
+            |_,
+             entity,
+             (target, attack_kind, accuracy_kind, min_damage, max_damage, ap, damage_kind): (
+                ScriptEntity,
+                String,
+                String,
+                Option<f32>,
+                Option<f32>,
+                Option<f32>,
+                Option<String>,
+            )| {
+                let target = target.try_unwrap()?;
+                let parent = entity.try_unwrap()?;
 
-            let damage_kind = match damage_kind {
-                None => DamageKind::Raw,
-                Some(ref kind) => DamageKind::from_str(kind),
-            };
-            let attack_kind = AttackKind::from_str(&attack_kind, &accuracy_kind);
+                let damage_kind = match damage_kind {
+                    None => DamageKind::Raw,
+                    Some(ref kind) => DamageKind::from_str(kind),
+                };
+                let attack_kind = AttackKind::from_str(&attack_kind, &accuracy_kind);
 
-            let min_damage = min_damage.unwrap_or(0.0) as u32;
-            let max_damage = max_damage.unwrap_or(0.0) as u32;
-            let ap = ap.unwrap_or(0.0) as u32;
+                let min_damage = min_damage.unwrap_or(0.0) as u32;
+                let max_damage = max_damage.unwrap_or(0.0) as u32;
+                let ap = ap.unwrap_or(0.0) as u32;
 
-            let mut attack = Attack::special(&parent.borrow().actor.stats,
-                min_damage, max_damage, ap, damage_kind, attack_kind);
+                let mut attack = Attack::special(
+                    &parent.borrow().actor.stats,
+                    min_damage,
+                    max_damage,
+                    ap,
+                    damage_kind,
+                    attack_kind,
+                );
 
-            let (hit_kind, hit_flags, damage) =
-                ActorState::attack(&parent, &target, &mut attack);
+                let (hit_kind, hit_flags, damage) =
+                    ActorState::attack(&parent, &target, &mut attack);
 
-            let area_state = GameState::area_state();
-            area_state.borrow_mut().add_damage_feedback_text(&target, hit_kind,
-                                                             hit_flags, damage.clone());
-            let hit_kind = ScriptHitKind::new(hit_kind, damage);
-            Ok(hit_kind)
-        });
+                let area_state = GameState::area_state();
+                area_state.borrow_mut().add_damage_feedback_text(
+                    &target,
+                    hit_kind,
+                    hit_flags,
+                    damage.clone(),
+                );
+                let hit_kind = ScriptHitKind::new(hit_kind, damage);
+                Ok(hit_kind)
+            },
+        );
 
         methods.add_method("remove", |_, entity, ()| {
             let parent = entity.try_unwrap()?;
@@ -1016,40 +1128,63 @@ impl UserData for ScriptEntity {
             Ok(())
         });
 
-        methods.add_method("take_damage", |_, entity, (attacker, min_damage, max_damage, damage_kind, ap):
-                           (ScriptEntity, f32, f32, String, Option<u32>)| {
-            let rules = Module::rules();
-            let parent = entity.try_unwrap()?;
-            let attacker = attacker.try_unwrap()?;
-            let damage_kind = DamageKind::from_str(&damage_kind);
+        methods.add_method(
+            "take_damage",
+            |_,
+             entity,
+             (attacker, min_damage, max_damage, damage_kind, ap): (
+                ScriptEntity,
+                f32,
+                f32,
+                String,
+                Option<u32>,
+            )| {
+                let rules = Module::rules();
+                let parent = entity.try_unwrap()?;
+                let attacker = attacker.try_unwrap()?;
+                let damage_kind = DamageKind::from_str(&damage_kind);
 
-            let min_damage = min_damage as u32;
-            let max_damage = max_damage as u32;
-            let damage = {
-                let parent = &parent.borrow().actor.stats;
-                let attack = Attack::special(parent, min_damage, max_damage, ap.unwrap_or(0),
-                    damage_kind, AttackKind::Dummy);
-                let damage = &attack.damage;
-                rules.roll_damage(damage, &parent.armor, &parent.resistance, 1.0)
-            };
+                let min_damage = min_damage as u32;
+                let max_damage = max_damage as u32;
+                let damage = {
+                    let parent = &parent.borrow().actor.stats;
+                    let attack = Attack::special(
+                        parent,
+                        min_damage,
+                        max_damage,
+                        ap.unwrap_or(0),
+                        damage_kind,
+                        AttackKind::Dummy,
+                    );
+                    let damage = &attack.damage;
+                    rules.roll_damage(damage, &parent.armor, &parent.resistance, 1.0)
+                };
 
-            if !damage.is_empty() {
-                EntityState::remove_hp(&parent, &attacker, HitKind::Hit, damage.clone());
-            }
+                if !damage.is_empty() {
+                    EntityState::remove_hp(&parent, &attacker, HitKind::Hit, damage.clone());
+                }
 
-            let area_state = GameState::area_state();
-            area_state.borrow_mut().add_damage_feedback_text(&parent, HitKind::Auto,
-                                                             HitFlags::default(), damage);
-            Ok(())
-        });
+                let area_state = GameState::area_state();
+                area_state.borrow_mut().add_damage_feedback_text(
+                    &parent,
+                    HitKind::Auto,
+                    HitFlags::default(),
+                    damage,
+                );
+                Ok(())
+            },
+        );
 
         methods.add_method("heal_damage", |_, entity, amount: f32| {
             let amount = amount as u32;
             let parent = entity.try_unwrap()?;
             parent.borrow_mut().actor.add_hp(amount);
             let area_state = GameState::area_state();
-            area_state.borrow_mut().add_feedback_text(format!("{}", amount), &parent,
-                ColorKind::Heal);
+            area_state.borrow_mut().add_feedback_text(
+                format!("{}", amount),
+                &parent,
+                ColorKind::Heal,
+            );
 
             Ok(())
         });
@@ -1110,11 +1245,13 @@ impl UserData for ScriptEntity {
 
         methods.add_method("get_ability", |_, entity, id: String| {
             let ability = match Module::ability(&id) {
-                None => return Err(rlua::Error::FromLuaConversionError {
-                    from: "String",
-                    to: "ScriptAbility",
-                    message: Some(format!("Ability '{}' does not exist", id))
-                }),
+                None => {
+                    return Err(rlua::Error::FromLuaConversionError {
+                        from: "String",
+                        to: "ScriptAbility",
+                        message: Some(format!("Ability '{}' does not exist", id)),
+                    });
+                }
                 Some(ability) => ability,
             };
             if ability.active.is_none() {
@@ -1146,7 +1283,9 @@ impl UserData for ScriptEntity {
             let entity = entity.try_unwrap()?;
             let entity = entity.borrow();
             for (_, ref state) in entity.actor.ability_states.iter() {
-                if state.is_active_mode() { return Ok(true); }
+                if state.is_active_mode() {
+                    return Ok(true);
+                }
             }
             Ok(false)
         });
@@ -1161,17 +1300,25 @@ impl UserData for ScriptEntity {
 
         methods.add_method("image_layer_offset", |_, entity, layer: String| {
             let layer = match ImageLayer::from_str(&layer) {
-                Err(e) => return Err(rlua::Error::FromLuaConversionError {
-                    from: "String",
-                    to: "ImageLayer",
-                    message: Some(e.to_string())
-                }),
+                Err(e) => {
+                    return Err(rlua::Error::FromLuaConversionError {
+                        from: "String",
+                        to: "ImageLayer",
+                        message: Some(e.to_string()),
+                    });
+                }
                 Ok(layer) => layer,
             };
 
             let entity = entity.try_unwrap()?;
-            let offset = entity.borrow().actor.actor.race
-                .get_image_layer_offset(layer).unwrap_or(&(0.0, 0.0)).clone();
+            let offset = entity
+                .borrow()
+                .actor
+                .actor
+                .race
+                .get_image_layer_offset(layer)
+                .unwrap_or(&(0.0, 0.0))
+                .clone();
             let mut table: HashMap<&str, f32> = HashMap::new();
             table.insert("x", offset.0);
             table.insert("y", offset.1);
@@ -1197,7 +1344,7 @@ impl UserData for ScriptEntity {
             let entity = entity.borrow();
             Ok(entity.size.height)
         });
-        methods.add_method("location", |lua, entity,  ()| {
+        methods.add_method("location", |lua, entity, ()| {
             let entity = entity.try_unwrap()?;
             let location = lua.create_table()?;
             {
@@ -1225,15 +1372,15 @@ impl UserData for ScriptEntity {
         });
         methods.add_method("center_x", |_, entity, ()| {
             let entity = entity.try_unwrap()?;
-            let x = entity.borrow().location.x as f32
-                + entity.borrow().size.width as f32 / 2.0 - 0.5;
+            let x =
+                entity.borrow().location.x as f32 + entity.borrow().size.width as f32 / 2.0 - 0.5;
             Ok(x)
         });
 
         methods.add_method("center_y", |_, entity, ()| {
             let entity = entity.try_unwrap()?;
-            let y = entity.borrow().location.y as f32
-                + entity.borrow().size.height as f32 / 2.0 - 0.5;
+            let y =
+                entity.borrow().location.y as f32 + entity.borrow().size.height as f32 / 2.0 - 0.5;
             Ok(y)
         });
 
@@ -1261,27 +1408,35 @@ impl UserData for ScriptEntity {
 
 pub fn unwrap_point(point: HashMap<String, i32>) -> Result<(i32, i32)> {
     let x = match point.get("x") {
-        None => return Err(rlua::Error::FromLuaConversionError {
-            from: "ScriptPoint",
-            to: "Point",
-            message: Some("Point must have x and y coordinates".to_string())
-        }),
+        None => {
+            return Err(rlua::Error::FromLuaConversionError {
+                from: "ScriptPoint",
+                to: "Point",
+                message: Some("Point must have x and y coordinates".to_string()),
+            });
+        }
         Some(x) => *x,
     };
 
     let y = match point.get("y") {
-        None => return Err(rlua::Error::FromLuaConversionError {
-            from: "ScriptPoint",
-            to: "Point",
-            message: Some("Point must have x and y coordinates".to_string())
-        }),
+        None => {
+            return Err(rlua::Error::FromLuaConversionError {
+                from: "ScriptPoint",
+                to: "Point",
+                message: Some("Point must have x and y coordinates".to_string()),
+            });
+        }
         Some(y) => *y,
     };
 
     Ok((x, y))
 }
 
-fn create_stats_table<'a>(lua: Context<'a>, parent: &ScriptEntity, _args: ()) -> Result<rlua::Table<'a>> {
+fn create_stats_table<'a>(
+    lua: Context<'a>,
+    parent: &ScriptEntity,
+    _args: (),
+) -> Result<rlua::Table<'a>> {
     let rules = Module::rules();
 
     let parent = parent.try_unwrap()?;
@@ -1302,12 +1457,30 @@ fn create_stats_table<'a>(lua: Context<'a>, parent: &ScriptEntity, _args: ()) ->
 
     {
         use self::Attribute::*;
-        stats.set("strength_bonus", src.attributes.bonus(Strength, rules.base_attribute))?;
-        stats.set("dexterity_bonus", src.attributes.bonus(Dexterity, rules.base_attribute))?;
-        stats.set("endurance_bonus", src.attributes.bonus(Endurance, rules.base_attribute))?;
-        stats.set("perception_bonus", src.attributes.bonus(Perception, rules.base_attribute))?;
-        stats.set("intellect_bonus", src.attributes.bonus(Intellect, rules.base_attribute))?;
-        stats.set("wisdom_bonus", src.attributes.bonus(Wisdom, rules.base_attribute))?;
+        stats.set(
+            "strength_bonus",
+            src.attributes.bonus(Strength, rules.base_attribute),
+        )?;
+        stats.set(
+            "dexterity_bonus",
+            src.attributes.bonus(Dexterity, rules.base_attribute),
+        )?;
+        stats.set(
+            "endurance_bonus",
+            src.attributes.bonus(Endurance, rules.base_attribute),
+        )?;
+        stats.set(
+            "perception_bonus",
+            src.attributes.bonus(Perception, rules.base_attribute),
+        )?;
+        stats.set(
+            "intellect_bonus",
+            src.attributes.bonus(Intellect, rules.base_attribute),
+        )?;
+        stats.set(
+            "wisdom_bonus",
+            src.attributes.bonus(Wisdom, rules.base_attribute),
+        )?;
     }
 
     stats.set("base_armor", src.armor.base())?;
@@ -1337,7 +1510,10 @@ fn create_stats_table<'a>(lua: Context<'a>, parent: &ScriptEntity, _args: ()) ->
     stats.set("reflex", src.reflex)?;
     stats.set("will", src.will)?;
 
-    stats.set("attack_distance", src.attack_distance() + parent.size.diagonal / 2.0)?;
+    stats.set(
+        "attack_distance",
+        src.attack_distance() + parent.size.diagonal / 2.0,
+    )?;
     stats.set("attack_is_melee", src.attack_is_melee())?;
     stats.set("attack_is_ranged", src.attack_is_ranged())?;
 
@@ -1382,8 +1558,12 @@ fn targets(_lua: Context, parent: &ScriptEntity, _args: ()) -> Result<ScriptEnti
         }
 
         let entity = entity.borrow();
-        if entity.actor.is_dead() { continue; }
-        if !entity.location.is_in_area_id(&area_id) { continue; }
+        if entity.actor.is_dead() {
+            continue;
+        }
+        if !entity.location.is_in_area_id(&area_id) {
+            continue;
+        }
 
         indices.push(Some(entity.index()));
     }

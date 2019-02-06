@@ -19,8 +19,8 @@ use std::str::FromStr;
 
 use crate::io::Vertex;
 use crate::resource::{Font, ResourceSet};
-use crate::ui::{self, Color, WidgetState};
 use crate::ui::theme::TextParams;
+use crate::ui::{self, Color, WidgetState};
 
 #[derive(Debug, PartialEq, Copy, Clone)]
 enum MarkupKind {
@@ -84,29 +84,34 @@ impl Markup {
         for c in text.chars() {
             use self::MarkupKind::*;
             match markup_kind {
-                None => markup_kind = match c {
-                    'r' => Some(Right),
-                    'a' => Some(Center),
-                    'c' => Some(Color),
-                    's' => Some(Scale),
-                    'x' => Some(PosX),
-                    'y' => Some(PosY),
-                    'i' => Some(Image),
-                    'f' => Some(Font),
-                    '?' => Some(If),
-                    '!' => Some(IfNot),
-                    _ => None,
-                }, Some(kind) => match c {
+                None => {
+                    markup_kind = match c {
+                        'r' => Some(Right),
+                        'a' => Some(Center),
+                        'c' => Some(Color),
+                        's' => Some(Scale),
+                        'x' => Some(PosX),
+                        'y' => Some(PosY),
+                        'i' => Some(Image),
+                        'f' => Some(Font),
+                        '?' => Some(If),
+                        '!' => Some(IfNot),
+                        _ => None,
+                    }
+                }
+                Some(kind) => match c {
                     '=' | ' ' => {
                         // skip
-                    }, ';' => {
+                    }
+                    ';' => {
                         markup.parse_buf(&cur_buf, kind, widget_state);
                         cur_buf.clear();
                         markup_kind = None;
-                    }, _ => {
+                    }
+                    _ => {
                         cur_buf.push(c);
                     }
-                }
+                },
             }
         }
 
@@ -117,9 +122,12 @@ impl Markup {
     }
 
     pub fn add_quad_and_advance(&self, quads: &mut Vec<Vertex>, c: char, x: f32, y: f32) -> f32 {
-        if self.ignore { return x; }
+        if self.ignore {
+            return x;
+        }
 
-        self.font.get_quad(quads, c, x, y - self.y_offset(), self.scale)
+        self.font
+            .get_quad(quads, c, x, y - self.y_offset(), self.scale)
     }
 
     fn y_offset(&self) -> f32 {
@@ -152,8 +160,7 @@ fn get_float(buf: &str) -> f32 {
         Err(_) => {
             warn!("Unable to parse float from format string '{}'", buf);
             1.0
-        },
+        }
         Ok(val) => val,
     }
 }
-

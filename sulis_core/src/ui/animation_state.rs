@@ -152,15 +152,13 @@ impl AnimationState {
     /// `Kind::Normal`
     pub fn default() -> AnimationState {
         AnimationState {
-            kinds: vec![Kind::Normal]
+            kinds: vec![Kind::Normal],
         }
     }
 
     /// Creates a new AnimationState containing only the given `kind`
     pub fn with(kind: Kind) -> AnimationState {
-        AnimationState {
-            kinds: vec![kind]
-        }
+        AnimationState { kinds: vec![kind] }
     }
 
     /// Creates an animation state by parsing the given string.  The string
@@ -180,33 +178,43 @@ impl AnimationState {
         for split in data.split('+').map(|s| s.trim()) {
             match Kind::find(split) {
                 Some(kind) => AnimationState::validate_push(kind, &mut kinds)?,
-                None => return Err(Error::new(
+                None => {
+                    return Err(Error::new(
                         ErrorKind::InvalidData,
-                        format!("Unable to parse animation state from '{}'", data))),
+                        format!("Unable to parse animation state from '{}'", data),
+                    ));
+                }
             };
         }
 
         if kinds.len() == 0 {
-            return Err(Error::new(ErrorKind::InvalidData, "Empty AnimationState string"));
+            return Err(Error::new(
+                ErrorKind::InvalidData,
+                "Empty AnimationState string",
+            ));
         }
 
-        return Ok(AnimationState {
-            kinds,
-        })
+        return Ok(AnimationState { kinds });
     }
 
     fn validate_push(kind: Kind, kinds: &mut Vec<Kind>) -> Result<(), Error> {
         if kinds.contains(&kind) {
-            return Err(Error::new(ErrorKind::InvalidData,
-                                  format!("Duplicate key '{:?}'", kind)));
+            return Err(Error::new(
+                ErrorKind::InvalidData,
+                format!("Duplicate key '{:?}'", kind),
+            ));
         }
 
         if kind == Kind::Normal && kinds.len() > 0 {
-            return Err(Error::new(ErrorKind::InvalidData,
-                                  "Normal state cannot be present with others."));
+            return Err(Error::new(
+                ErrorKind::InvalidData,
+                "Normal state cannot be present with others.",
+            ));
         } else if kinds.contains(&Kind::Normal) {
-            return Err(Error::new(ErrorKind::InvalidData,
-                                  "Normal state cannot be present with others."));
+            return Err(Error::new(
+                ErrorKind::InvalidData,
+                "Normal state cannot be present with others.",
+            ));
         }
 
         kinds.push(kind);
@@ -219,9 +227,10 @@ impl AnimationState {
     /// what fraction of its kinds match the desired state kind, and what fraction
     /// of the desired state's kinds match the animation state's kind.  The state
     /// with the highest rank is chosen and the associated `T` is returned.
-    pub fn find_match_in_vec<'a, T>(desired_state: &'a AnimationState,
-                             choices: &'a Vec<(AnimationState, T)>) -> &'a T {
-
+    pub fn find_match_in_vec<'a, T>(
+        desired_state: &'a AnimationState,
+        choices: &'a Vec<(AnimationState, T)>,
+    ) -> &'a T {
         // TODO each animation state is sorted, so we can do this with a single
         // lock step loop instead of double loop
         let num_desired_kinds = desired_state.kinds.len() as f32;
@@ -230,7 +239,9 @@ impl AnimationState {
         for (index, &(ref state, _)) in choices.iter().enumerate() {
             let mut cur_rank = 0.0;
             for kind in desired_state.kinds.iter() {
-                if state.contains(*kind) { cur_rank += 1.0; }
+                if state.contains(*kind) {
+                    cur_rank += 1.0;
+                }
             }
 
             cur_rank = cur_rank / num_desired_kinds + cur_rank / (state.kinds.len() as f32);
@@ -238,7 +249,9 @@ impl AnimationState {
                 best_index = index;
                 best_rank = cur_rank;
 
-                if best_rank > 1.99 { break; }
+                if best_rank > 1.99 {
+                    break;
+                }
             }
         }
 

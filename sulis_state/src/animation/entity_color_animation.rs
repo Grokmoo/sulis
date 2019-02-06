@@ -19,11 +19,15 @@ use std::rc::Rc;
 
 use sulis_core::ui::{color, Color};
 
-use crate::{EntityState};
 use crate::animation::particle_generator::Param;
+use crate::EntityState;
 
-pub (in crate::animation) fn update(color: &mut [Param; 4], color_sec: &mut [Param; 4],
-                             owner: &Rc<RefCell<EntityState>>, millis: u32) {
+pub(in crate::animation) fn update(
+    color: &mut [Param; 4],
+    color_sec: &mut [Param; 4],
+    owner: &Rc<RefCell<EntityState>>,
+    millis: u32,
+) {
     let secs = millis as f32 / 1000.0;
 
     let v_term = secs;
@@ -35,15 +39,23 @@ pub (in crate::animation) fn update(color: &mut [Param; 4], color_sec: &mut [Par
         color_sec[index].update(v_term, a_term, j_term);
     }
 
-    let color = Color::new(color[0].value, color[1].value, color[2].value,
-                           color[3].value);
-    let color_sec = Color::new(color_sec[0].value, color_sec[1].value,
-                               color_sec[2].value, color_sec[3].value);
+    let color = Color::new(
+        color[0].value,
+        color[1].value,
+        color[2].value,
+        color[3].value,
+    );
+    let color_sec = Color::new(
+        color_sec[0].value,
+        color_sec[1].value,
+        color_sec[2].value,
+        color_sec[3].value,
+    );
     owner.borrow_mut().color = color;
     owner.borrow_mut().color_sec = color_sec;
 }
 
-pub (in crate::animation) fn cleanup(owner: &Rc<RefCell<EntityState>>) {
+pub(in crate::animation) fn cleanup(owner: &Rc<RefCell<EntityState>>) {
     owner.borrow_mut().color = color::WHITE;
     owner.borrow_mut().color_sec = Color::new(0.0, 0.0, 0.0, 0.0);
 }

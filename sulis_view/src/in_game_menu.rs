@@ -15,12 +15,12 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::any::Any;
-use std::rc::Rc;
 use std::cell::RefCell;
+use std::rc::Rc;
 
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_core::widgets::{Button, ConfirmationWindow};
-use sulis_state::{GameState};
+use sulis_state::GameState;
 
 use crate::{LoadWindow, RootView};
 
@@ -33,7 +33,10 @@ pub struct InGameMenu {
 
 impl InGameMenu {
     pub fn new(exit_callback: Callback, menu_callback: Callback) -> Rc<RefCell<InGameMenu>> {
-        Rc::new(RefCell::new(InGameMenu { exit_callback, menu_callback }))
+        Rc::new(RefCell::new(InGameMenu {
+            exit_callback,
+            menu_callback,
+        }))
     }
 }
 
@@ -44,51 +47,69 @@ impl WidgetKind for InGameMenu {
         widget.borrow_mut().state.set_modal(true);
 
         let back = Widget::with_theme(Button::empty(), "back");
-        back.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let (parent, _) = Widget::parent::<InGameMenu>(widget);
-            parent.borrow_mut().mark_for_removal();
-        })));
+        back.borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(|widget, _| {
+                let (parent, _) = Widget::parent::<InGameMenu>(widget);
+                parent.borrow_mut().mark_for_removal();
+            })));
 
         let save = Widget::with_theme(Button::empty(), "save");
-        save.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let (parent, _) = Widget::parent::<InGameMenu>(widget);
-            parent.borrow_mut().mark_for_removal();
+        save.borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(|widget, _| {
+                let (parent, _) = Widget::parent::<InGameMenu>(widget);
+                parent.borrow_mut().mark_for_removal();
 
-            let (_, view) = Widget::parent_mut::<RootView>(&parent);
-            view.save();
-        })));
-        save.borrow_mut().state.set_enabled(!GameState::is_combat_active());
+                let (_, view) = Widget::parent_mut::<RootView>(&parent);
+                view.save();
+            })));
+        save.borrow_mut()
+            .state
+            .set_enabled(!GameState::is_combat_active());
 
         let load = Widget::with_theme(Button::empty(), "load");
-        load.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let (parent, _) = Widget::parent::<InGameMenu>(widget);
-            parent.borrow_mut().mark_for_removal();
+        load.borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(|widget, _| {
+                let (parent, _) = Widget::parent::<InGameMenu>(widget);
+                parent.borrow_mut().mark_for_removal();
 
-            let root = Widget::get_root(widget);
-            let window = Widget::with_defaults(LoadWindow::new(false));
-            window.borrow_mut().state.set_modal(true);
-            Widget::add_child_to(&root, window);
-        })));
+                let root = Widget::get_root(widget);
+                let window = Widget::with_defaults(LoadWindow::new(false));
+                window.borrow_mut().state.set_modal(true);
+                Widget::add_child_to(&root, window);
+            })));
 
         let menu = Widget::with_theme(Button::empty(), "menu");
         let menu_cb = self.menu_callback.clone();
-        menu.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-            let window = Widget::with_theme(ConfirmationWindow::new(menu_cb.clone()), "menu_confirmation");
-            window.borrow_mut().state.set_modal(true);
+        menu.borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(move |widget, _| {
+                let window = Widget::with_theme(
+                    ConfirmationWindow::new(menu_cb.clone()),
+                    "menu_confirmation",
+                );
+                window.borrow_mut().state.set_modal(true);
 
-            let root = Widget::get_root(widget);
-            Widget::add_child_to(&root, window);
-        })));
+                let root = Widget::get_root(widget);
+                Widget::add_child_to(&root, window);
+            })));
 
         let exit = Widget::with_theme(Button::empty(), "exit");
         let exit_cb = self.exit_callback.clone();
-        exit.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-            let root = Widget::get_root(widget);
+        exit.borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(move |widget, _| {
+                let root = Widget::get_root(widget);
 
-            let window = Widget::with_theme(ConfirmationWindow::new(exit_cb.clone()), "exit_confirmation");
-            window.borrow_mut().state.set_modal(true);
-            Widget::add_child_to(&root, window);
-        })));
+                let window = Widget::with_theme(
+                    ConfirmationWindow::new(exit_cb.clone()),
+                    "exit_confirmation",
+                );
+                window.borrow_mut().state.set_modal(true);
+                Widget::add_child_to(&root, window);
+            })));
 
         vec![back, save, load, menu, exit]
     }

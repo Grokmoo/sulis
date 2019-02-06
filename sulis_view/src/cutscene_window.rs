@@ -15,12 +15,12 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::any::Any;
-use std::rc::Rc;
 use std::cell::RefCell;
+use std::rc::Rc;
 
-use sulis_module::{Cutscene};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_core::widgets::{Button, TextArea};
+use sulis_module::Cutscene;
 use sulis_state::GameState;
 
 pub const NAME: &str = "cutscene_window";
@@ -34,7 +34,7 @@ impl CutsceneWindow {
     pub fn new(cutscene: Rc<Cutscene>) -> Rc<RefCell<CutsceneWindow>> {
         Rc::new(RefCell::new(CutsceneWindow {
             cutscene,
-            frame_index: 0
+            frame_index: 0,
         }))
     }
 }
@@ -56,25 +56,32 @@ impl WidgetKind for CutsceneWindow {
                 widget.borrow_mut().mark_for_removal();
                 add_on_end_cbs(&self.cutscene);
                 return Vec::new();
-            }, Some(ref frame) => frame,
+            }
+            Some(ref frame) => frame,
         };
 
         let close = Widget::with_theme(Button::empty(), "close");
 
         let cutscene = Rc::clone(&self.cutscene);
-        close.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-            let (parent, _) = Widget::parent_mut::<CutsceneWindow>(widget);
-            parent.borrow_mut().mark_for_removal();
+        close
+            .borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(move |widget, _| {
+                let (parent, _) = Widget::parent_mut::<CutsceneWindow>(widget);
+                parent.borrow_mut().mark_for_removal();
 
-            add_on_end_cbs(&cutscene);
-        })));
+                add_on_end_cbs(&cutscene);
+            })));
 
         let next_button = Widget::with_theme(Button::empty(), "next_button");
-        next_button.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let (parent, window) = Widget::parent_mut::<CutsceneWindow>(widget);
-            window.frame_index += 1;
-            parent.borrow_mut().invalidate_children();
-        })));
+        next_button
+            .borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(|widget, _| {
+                let (parent, window) = Widget::parent_mut::<CutsceneWindow>(widget);
+                window.frame_index += 1;
+                parent.borrow_mut().invalidate_children();
+            })));
 
         let text_area = Widget::with_defaults(TextArea::empty());
 

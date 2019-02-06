@@ -19,12 +19,12 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 use sulis_core::config::Config;
-use sulis_core::resource::{ResourceSet, Sprite};
 use sulis_core::io::{DrawList, GraphicsRenderer};
+use sulis_core::resource::{ResourceSet, Sprite};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_core::util::Point;
+use sulis_core::widgets::{Button, Label, ScrollPane, Spinner};
 use sulis_module::{Encounter, Module};
-use sulis_core::widgets::{Button, Label, Spinner, ScrollPane};
 
 use crate::{AreaModel, EditorMode};
 
@@ -48,7 +48,7 @@ impl EncounterPicker {
             Err(_) => {
                 warn!("Encounter tile '{}' not found", enc_tile);
                 None
-            },
+            }
         };
 
         Rc::new(RefCell::new(EncounterPicker {
@@ -62,9 +62,16 @@ impl EncounterPicker {
 }
 
 impl EditorMode for EncounterPicker {
-    fn draw_mode(&mut self, renderer: &mut GraphicsRenderer, _model: &AreaModel, x: f32, y: f32,
-            scale_x: f32, scale_y: f32, _millis: u32) {
-
+    fn draw_mode(
+        &mut self,
+        renderer: &mut GraphicsRenderer,
+        _model: &AreaModel,
+        x: f32,
+        y: f32,
+        scale_x: f32,
+        scale_y: f32,
+        _millis: u32,
+    ) {
         match self.cur_encounter {
             None => return,
             Some(ref encounter) => encounter,
@@ -104,42 +111,56 @@ impl EditorMode for EncounterPicker {
     }
 
     fn right_click(&mut self, model: &mut AreaModel, x: i32, y: i32) {
-        if self.cur_encounter.is_none() { return; }
+        if self.cur_encounter.is_none() {
+            return;
+        }
 
         model.remove_encounters_within(x, y, self.cur_width, self.cur_height);
     }
 }
 
 impl WidgetKind for EncounterPicker {
-    fn get_name(&self) -> &str { NAME }
+    fn get_name(&self) -> &str {
+        NAME
+    }
 
-    fn as_any(&self) -> &Any { self }
+    fn as_any(&self) -> &Any {
+        self
+    }
 
-    fn as_any_mut(&mut self) -> &mut Any { self }
+    fn as_any_mut(&mut self) -> &mut Any {
+        self
+    }
 
     fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let width = Widget::with_theme(Spinner::new(self.cur_width, 1, 50), "width");
-        width.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, kind| {
-            let (_, picker) = Widget::parent_mut::<EncounterPicker>(widget);
+        width
+            .borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(|widget, kind| {
+                let (_, picker) = Widget::parent_mut::<EncounterPicker>(widget);
 
-            let spinner = match kind.as_any().downcast_ref::<Spinner>() {
-                None => panic!("Unable to downcast to spinner"),
-                Some(widget) => widget,
-            };
+                let spinner = match kind.as_any().downcast_ref::<Spinner>() {
+                    None => panic!("Unable to downcast to spinner"),
+                    Some(widget) => widget,
+                };
 
-            picker.cur_width = spinner.value();
-        })));
+                picker.cur_width = spinner.value();
+            })));
         let height = Widget::with_theme(Spinner::new(self.cur_height, 1, 50), "height");
-        height.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, kind| {
-            let (_, picker) = Widget::parent_mut::<EncounterPicker>(widget);
+        height
+            .borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(|widget, kind| {
+                let (_, picker) = Widget::parent_mut::<EncounterPicker>(widget);
 
-            let spinner = match kind.as_any().downcast_ref::<Spinner>() {
-                None => panic!("Unable to downcast to spinner"),
-                Some(widget) => widget,
-            };
+                let spinner = match kind.as_any().downcast_ref::<Spinner>() {
+                    None => panic!("Unable to downcast to spinner"),
+                    Some(widget) => widget,
+                };
 
-            picker.cur_height = spinner.value();
-        })));
+                picker.cur_height = spinner.value();
+            })));
 
         let size_label = Widget::with_theme(Label::empty(), "size_label");
 
@@ -150,26 +171,37 @@ impl WidgetKind for EncounterPicker {
 
             for encounter in all_encounters {
                 let button = Widget::with_theme(Button::empty(), "encounter_button");
-                button.borrow_mut().state.add_text_arg("name", &encounter.id);
-                button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-                    let parent = Widget::direct_parent(widget);
-                    let cur_state = widget.borrow_mut().state.is_active();
-                    if !cur_state {
-                        trace!("Set active encounter: {}", widget.borrow().state.text);
-                        for child in parent.borrow().children.iter() {
-                            child.borrow_mut().state.set_active(false);
+                button
+                    .borrow_mut()
+                    .state
+                    .add_text_arg("name", &encounter.id);
+                button
+                    .borrow_mut()
+                    .state
+                    .add_callback(Callback::new(Rc::new(move |widget, _| {
+                        let parent = Widget::direct_parent(widget);
+                        let cur_state = widget.borrow_mut().state.is_active();
+                        if !cur_state {
+                            trace!("Set active encounter: {}", widget.borrow().state.text);
+                            for child in parent.borrow().children.iter() {
+                                child.borrow_mut().state.set_active(false);
+                            }
+                            widget.borrow_mut().state.set_active(true);
                         }
-                        widget.borrow_mut().state.set_active(true);
-                    }
 
-                    let (_, picker) = Widget::parent_mut::<EncounterPicker>(&parent);
-                    picker.cur_encounter = Some(Rc::clone(&encounter));
-                })));
+                        let (_, picker) = Widget::parent_mut::<EncounterPicker>(&parent);
+                        picker.cur_encounter = Some(Rc::clone(&encounter));
+                    })));
 
                 scrollpane.borrow().add_to_content(button);
             }
         }
 
-        vec![width, height, size_label, Widget::with_theme(scrollpane, "encounters")]
+        vec![
+            width,
+            height,
+            size_label,
+            Widget::with_theme(scrollpane, "encounters"),
+        ]
     }
 }

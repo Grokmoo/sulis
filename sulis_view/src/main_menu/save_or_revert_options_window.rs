@@ -15,10 +15,10 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::any::Any;
-use std::rc::Rc;
 use std::cell::RefCell;
+use std::rc::Rc;
 
-use crate::{Button, Label, main_menu::MainMenu};
+use crate::{main_menu::MainMenu, Button, Label};
 use sulis_core::config::{self, Config};
 use sulis_core::resource::write_to_file;
 use sulis_core::ui::{Callback, Widget, WidgetKind};
@@ -86,16 +86,22 @@ impl WidgetKind for SaveOrRevertOptionsWindow {
     fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let title = Widget::with_theme(Label::empty(), "title");
         let accept = Widget::with_theme(Button::empty(), "accept");
-        accept.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let (parent, confirm) = Widget::parent_mut::<SaveOrRevertOptionsWindow>(widget);
-            confirm.accept(&parent);
-        })));
+        accept
+            .borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(|widget, _| {
+                let (parent, confirm) = Widget::parent_mut::<SaveOrRevertOptionsWindow>(widget);
+                confirm.accept(&parent);
+            })));
 
         let revert = Widget::with_theme(Button::empty(), "revert");
-        revert.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let (parent, confirm) = Widget::parent_mut::<SaveOrRevertOptionsWindow>(widget);
-            confirm.revert(&parent);
-        })));
+        revert
+            .borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(|widget, _| {
+                let (parent, confirm) = Widget::parent_mut::<SaveOrRevertOptionsWindow>(widget);
+                confirm.revert(&parent);
+            })));
 
         vec![title, Rc::clone(&self.timer), accept, revert]
     }

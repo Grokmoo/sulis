@@ -15,16 +15,16 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std;
+use std::cell::RefCell;
 use std::rc::Rc;
-use std::cell::{RefCell};
 
 use rlua::{self, UserData, UserDataMethods};
 
-use sulis_core::config::Config;
-use sulis_module::{Module, OnTrigger, Faction, Time};
-use sulis_module::on_trigger::{self, QuestEntryState};
-use crate::{EntityState, ItemState, GameState, animation::Anim, Location, AreaState};
 use crate::script::*;
+use crate::{animation::Anim, AreaState, EntityState, GameState, ItemState, Location};
+use sulis_core::config::Config;
+use sulis_module::on_trigger::{self, QuestEntryState};
+use sulis_module::{Faction, Module, OnTrigger, Time};
 
 /// The ScriptInterface, accessible in all Lua scripts as the global `game`.
 /// The following methods are available on this object (documentation WIP):
@@ -322,7 +322,7 @@ use crate::script::*;
 /// the player is forced to load to continue.  The player is moved to the exact coordinates,
 /// whereas other party members are moved to nearby coordinates.
 ///
-pub struct ScriptInterface { }
+pub struct ScriptInterface {}
 
 impl UserData for ScriptInterface {
     fn add_methods<'lua, M: UserDataMethods<'lua, Self>>(methods: &mut M) {
@@ -332,16 +332,23 @@ impl UserData for ScriptInterface {
             Ok(round)
         });
 
-        methods.add_method("add_time", |_, _, (day, hour, round)
-                           : (u32, Option<u32>, Option<u32>)| {
-            let hour = hour.unwrap_or(0);
-            let round = round.unwrap_or(0);
-            let time = Time { day, hour, round, millis: 0 };
+        methods.add_method(
+            "add_time",
+            |_, _, (day, hour, round): (u32, Option<u32>, Option<u32>)| {
+                let hour = hour.unwrap_or(0);
+                let round = round.unwrap_or(0);
+                let time = Time {
+                    day,
+                    hour,
+                    round,
+                    millis: 0,
+                };
 
-            let mgr = GameState::turn_manager();
-            mgr.borrow_mut().add_time(time);
-            Ok(())
-        });
+                let mgr = GameState::turn_manager();
+                mgr.borrow_mut().add_time(time);
+                Ok(())
+            },
+        );
 
         methods.add_method("current_time", |lua, _, ()| {
             let mgr = GameState::turn_manager();
@@ -378,7 +385,11 @@ impl UserData for ScriptInterface {
             let targeter = get_targeter()?;
             let targeter = targeter.borrow_mut();
             let parent = targeter.parent();
-            let affected = targeter.cur_affected().iter().map(|e| Some(Rc::clone(e))).collect();
+            let affected = targeter
+                .cur_affected()
+                .iter()
+                .map(|e| Some(Rc::clone(e)))
+                .collect();
             Ok(ScriptEntitySet::new(&parent, &affected))
         });
 
@@ -403,7 +414,8 @@ impl UserData for ScriptInterface {
             let entity = entity.try_unwrap()?;
             let area = GameState::get_area_state(&entity.borrow().location.area_id).unwrap();
             let mgr = GameState::turn_manager();
-            mgr.borrow_mut().check_ai_activation(&entity, &mut area.borrow_mut());
+            mgr.borrow_mut()
+                .check_ai_activation(&entity, &mut area.borrow_mut());
             Ok(())
         });
 
@@ -421,26 +433,29 @@ impl UserData for ScriptInterface {
             Ok(())
         });
 
-        methods.add_method("create_menu", |_, _, (title, cb): (String, CallbackData)| {
-            let menu = ScriptMenu::new(title, cb); Ok(menu)
-        });
+        methods.add_method(
+            "create_menu",
+            |_, _, (title, cb): (String, CallbackData)| {
+                let menu = ScriptMenu::new(title, cb);
+                Ok(menu)
+            },
+        );
 
-        methods.add_method("show_confirm", |_, _, (msg, accept, cancel, id, func):
-                           (String, String, String, String, String)| {
-            let pc = GameState::player();
-            let data = on_trigger::DialogData {
-                message: msg,
-                accept_text: accept,
-                cancel_text: cancel,
-                on_accept: Some(on_trigger::ScriptData {
-                    id,
-                    func
-                }),
-            };
-            let cb = OnTrigger::ShowConfirm(data);
-            GameState::add_ui_callback(vec![cb], &pc, &pc);
-            Ok(())
-        });
+        methods.add_method(
+            "show_confirm",
+            |_, _, (msg, accept, cancel, id, func): (String, String, String, String, String)| {
+                let pc = GameState::player();
+                let data = on_trigger::DialogData {
+                    message: msg,
+                    accept_text: accept,
+                    cancel_text: cancel,
+                    on_accept: Some(on_trigger::ScriptData { id, func }),
+                };
+                let cb = OnTrigger::ShowConfirm(data);
+                GameState::add_ui_callback(vec![cb], &pc, &pc);
+                Ok(())
+            },
+        );
 
         methods.add_method("warn", |_, _, val: String| {
             warn!("[LUA WARN]: {}", val);
@@ -462,9 +477,7 @@ impl UserData for ScriptInterface {
             Ok(secs)
         });
 
-        methods.add_method("atan2", |_, _, (x, y): (f32, f32)| {
-            Ok(y.atan2(x))
-        });
+        methods.add_method("atan2", |_, _, (x, y): (f32, f32)| Ok(y.atan2(x)));
 
         methods.add_method("block_ui", |_, _, time: f32| {
             let pc = GameState::player();
@@ -473,49 +486,63 @@ impl UserData for ScriptInterface {
             Ok(())
         });
 
-        methods.add_method("run_script_delayed", |_, _, (script, func, delay): (String, String, f32)| {
-            let player = GameState::player();
-            let parent = player.borrow().index();
-            let mut cb_data = CallbackData::new_trigger(parent, script);
-            cb_data.add_func(FuncKind::OnAnimComplete, func)?;
+        methods.add_method(
+            "run_script_delayed",
+            |_, _, (script, func, delay): (String, String, f32)| {
+                let player = GameState::player();
+                let parent = player.borrow().index();
+                let mut cb_data = CallbackData::new_trigger(parent, script);
+                cb_data.add_func(FuncKind::OnAnimComplete, func)?;
 
-            let mut anim = Anim::new_non_blocking_wait(&player, (delay * 1000.0) as u32);
-            anim.add_completion_callback(Box::new(cb_data));
+                let mut anim = Anim::new_non_blocking_wait(&player, (delay * 1000.0) as u32);
+                anim.add_completion_callback(Box::new(cb_data));
 
-            GameState::add_animation(anim);
-            Ok(())
-        });
+                GameState::add_animation(anim);
+                Ok(())
+            },
+        );
 
-        methods.add_method("create_callback", |_, _, (parent, script):
-                           (ScriptEntity, String)| {
-            let index = parent.try_unwrap_index()?;
-            let cb_data = CallbackData::new_trigger(index, script);
-            Ok(cb_data)
-        });
+        methods.add_method(
+            "create_callback",
+            |_, _, (parent, script): (ScriptEntity, String)| {
+                let index = parent.try_unwrap_index()?;
+                let cb_data = CallbackData::new_trigger(index, script);
+                Ok(cb_data)
+            },
+        );
 
-        methods.add_method("set_quest_state", |_, _, (quest, state): (String, String)| {
-            let state = QuestEntryState::from_str(&state);
-            if let None = Module::quest(&quest) {
-                warn!("Set quest state for invalid quest '{}'", quest);
-            }
-            GameState::set_quest_state(quest, state);
-            Ok(())
-        });
+        methods.add_method(
+            "set_quest_state",
+            |_, _, (quest, state): (String, String)| {
+                let state = QuestEntryState::from_str(&state);
+                if let None = Module::quest(&quest) {
+                    warn!("Set quest state for invalid quest '{}'", quest);
+                }
+                GameState::set_quest_state(quest, state);
+                Ok(())
+            },
+        );
 
-        methods.add_method("set_quest_entry_state", |_, _, (quest, entry, state): (String, String, String)| {
-            let state = QuestEntryState::from_str(&state);
-            match Module::quest(&quest) {
-                None => warn!("Set quest entry state for invalid quest '{}'", quest),
-                Some(ref quest) => {
-                    if !quest.entries.contains_key(&entry) {
-                        warn!("Set quest entry state for invalid entry '{}' in '{:?}'", entry, quest);
+        methods.add_method(
+            "set_quest_entry_state",
+            |_, _, (quest, entry, state): (String, String, String)| {
+                let state = QuestEntryState::from_str(&state);
+                match Module::quest(&quest) {
+                    None => warn!("Set quest entry state for invalid quest '{}'", quest),
+                    Some(ref quest) => {
+                        if !quest.entries.contains_key(&entry) {
+                            warn!(
+                                "Set quest entry state for invalid entry '{}' in '{:?}'",
+                                entry, quest
+                            );
+                        }
                     }
                 }
-            }
 
-            GameState::set_quest_entry_state(quest, entry, state);
-            Ok(())
-        });
+                GameState::set_quest_entry_state(quest, entry, state);
+                Ok(())
+            },
+        );
 
         methods.add_method("get_quest_state", |_, _, quest: String| {
             if let None = Module::quest(&quest) {
@@ -524,175 +551,221 @@ impl UserData for ScriptInterface {
             Ok(format!("{:?}", GameState::get_quest_state(quest)))
         });
 
-        methods.add_method("get_quest_entry_state", |_, _, (quest, entry): (String, String)| {
-            match Module::quest(&quest) {
-                None => warn!("Requested entry state for invalid quest '{}'", quest),
-                Some(ref quest) => {
-                    if !quest.entries.contains_key(&entry) {
-                        warn!("Requested entry state for invalid entry '{}' in '{:?}'", entry, quest);
+        methods.add_method(
+            "get_quest_entry_state",
+            |_, _, (quest, entry): (String, String)| {
+                match Module::quest(&quest) {
+                    None => warn!("Requested entry state for invalid quest '{}'", quest),
+                    Some(ref quest) => {
+                        if !quest.entries.contains_key(&entry) {
+                            warn!(
+                                "Requested entry state for invalid entry '{}' in '{:?}'",
+                                entry, quest
+                            );
+                        }
                     }
                 }
-            }
-            Ok(format!("{:?}", GameState::get_quest_entry_state(quest, entry)))
-        });
-
-        methods.add_method("set_world_map_location_visible",
-                           |_, _, (location, vis): (String, bool)| {
-            GameState::set_world_map_location_visible(&location, vis);
-            Ok(())
-        });
-
-        methods.add_method("set_world_map_location_enabled",
-                           |_, _, (location, en): (String, bool)| {
-            GameState::set_world_map_location_enabled(&location, en);
-            Ok(())
-        });
-
-        methods.add_method("is_passable", |_, _, (entity, x, y): (ScriptEntity, i32, i32)| {
-            let area_state = GameState::area_state();
-            let area_state = area_state.borrow();
-            let entity = entity.try_unwrap()?;
-            let entity = entity.borrow();
-            let entities_to_ignore = vec![entity.index()];
-            Ok(area_state.is_passable(&entity, &entities_to_ignore, x, y))
-        }
+                Ok(format!(
+                    "{:?}",
+                    GameState::get_quest_entry_state(quest, entry)
+                ))
+            },
         );
 
-        methods.add_method("spawn_actor_at", |_, _, (id, x, y, faction):
-                           (String, i32, i32, Option<String>)| {
-            let actor = match Module::actor(&id) {
-                None => {
-                    warn!("Unable to spawn actor '{}': not found", id);
+        methods.add_method(
+            "set_world_map_location_visible",
+            |_, _, (location, vis): (String, bool)| {
+                GameState::set_world_map_location_visible(&location, vis);
+                Ok(())
+            },
+        );
+
+        methods.add_method(
+            "set_world_map_location_enabled",
+            |_, _, (location, en): (String, bool)| {
+                GameState::set_world_map_location_enabled(&location, en);
+                Ok(())
+            },
+        );
+
+        methods.add_method(
+            "is_passable",
+            |_, _, (entity, x, y): (ScriptEntity, i32, i32)| {
+                let area_state = GameState::area_state();
+                let area_state = area_state.borrow();
+                let entity = entity.try_unwrap()?;
+                let entity = entity.borrow();
+                let entities_to_ignore = vec![entity.index()];
+                Ok(area_state.is_passable(&entity, &entities_to_ignore, x, y))
+            },
+        );
+
+        methods.add_method(
+            "spawn_actor_at",
+            |_, _, (id, x, y, faction): (String, i32, i32, Option<String>)| {
+                let actor = match Module::actor(&id) {
+                    None => {
+                        warn!("Unable to spawn actor '{}': not found", id);
+                        return Ok(ScriptEntity::invalid());
+                    }
+                    Some(actor) => actor,
+                };
+
+                let size = Rc::clone(&actor.race.size);
+
+                let area_state = GameState::area_state();
+
+                if !area_state.borrow().is_passable_size(&size, x, y) {
+                    info!(
+                        "Unable to spawn actor '{}' at {},{}: not passable",
+                        id, x, y
+                    );
                     return Ok(ScriptEntity::invalid());
-                }, Some(actor) => actor,
-            };
-
-            let size = Rc::clone(&actor.race.size);
-
-            let area_state = GameState::area_state();
-
-            if !area_state.borrow().is_passable_size(&size, x, y) {
-                info!("Unable to spawn actor '{}' at {},{}: not passable",
-                      id, x, y);
-                return Ok(ScriptEntity::invalid())
-            }
-
-            let location = Location::new(x, y, &area_state.borrow().area);
-            let result = match area_state.borrow_mut()
-                .add_actor(actor, location, None, false, None) {
-                Ok(index) => ScriptEntity::new(index),
-                Err(e) => {
-                    warn!("Error spawning actor in area: {}", e);
-                    return Ok(ScriptEntity::invalid())
                 }
-            };
 
-            let entity = result.try_unwrap()?;
-            if let Some(faction) = faction {
-                match Faction::from_str(&faction) {
-                    None => warn!("Invalid faction '{}' in script", faction),
-                    Some(faction) => entity.borrow_mut().actor.set_faction(faction),
+                let location = Location::new(x, y, &area_state.borrow().area);
+                let result = match area_state
+                    .borrow_mut()
+                    .add_actor(actor, location, None, false, None)
+                {
+                    Ok(index) => ScriptEntity::new(index),
+                    Err(e) => {
+                        warn!("Error spawning actor in area: {}", e);
+                        return Ok(ScriptEntity::invalid());
+                    }
+                };
+
+                let entity = result.try_unwrap()?;
+                if let Some(faction) = faction {
+                    match Faction::from_str(&faction) {
+                        None => warn!("Invalid faction '{}' in script", faction),
+                        Some(faction) => entity.borrow_mut().actor.set_faction(faction),
+                    }
                 }
-            }
 
-            let mgr = GameState::turn_manager();
-            mgr.borrow_mut().check_ai_activation(&entity, &mut area_state.borrow_mut());
-            mgr.borrow_mut().check_ai_activation_for_party(&mut area_state.borrow_mut());
+                let mgr = GameState::turn_manager();
+                mgr.borrow_mut()
+                    .check_ai_activation(&entity, &mut area_state.borrow_mut());
+                mgr.borrow_mut()
+                    .check_ai_activation_for_party(&mut area_state.borrow_mut());
 
-            Ok(result)
-        });
+                Ok(result)
+            },
+        );
 
-        methods.add_method("spawn_encounter_at", |_, _, (x, y, id): (i32, i32, Option<String>)| {
-            let area_state = get_area(id)?;
-            let mut area_state = area_state.borrow_mut();
+        methods.add_method(
+            "spawn_encounter_at",
+            |_, _, (x, y, id): (i32, i32, Option<String>)| {
+                let area_state = get_area(id)?;
+                let mut area_state = area_state.borrow_mut();
 
-            if !area_state.spawn_encounter_at(x, y) {
-                warn!("Unable to find encounter for script spawn at {},{}", x, y);
-            }
+                if !area_state.spawn_encounter_at(x, y) {
+                    warn!("Unable to find encounter for script spawn at {},{}", x, y);
+                }
 
-            let mgr = GameState::turn_manager();
-            mgr.borrow_mut().check_ai_activation_for_party(&mut area_state);
+                let mgr = GameState::turn_manager();
+                mgr.borrow_mut()
+                    .check_ai_activation_for_party(&mut area_state);
 
-            Ok(())
-        });
+                Ok(())
+            },
+        );
 
-        methods.add_method("enable_trigger_at", |_, _, (x, y, id): (i32, i32, Option<String>)| {
-            let area_state = get_area(id)?;
-            let mut area_state = area_state.borrow_mut();
-            if !area_state.set_trigger_enabled_at(x, y, true) {
-                warn!("Unable to find trigger at {},{}", x, y);
-            }
-            Ok(())
-        });
+        methods.add_method(
+            "enable_trigger_at",
+            |_, _, (x, y, id): (i32, i32, Option<String>)| {
+                let area_state = get_area(id)?;
+                let mut area_state = area_state.borrow_mut();
+                if !area_state.set_trigger_enabled_at(x, y, true) {
+                    warn!("Unable to find trigger at {},{}", x, y);
+                }
+                Ok(())
+            },
+        );
 
-        methods.add_method("disable_trigger_at", |_, _, (x, y, id): (i32, i32, Option<String>)| {
-            let area_state = get_area(id)?;
-            let mut area_state = area_state.borrow_mut();
-            if !area_state.set_trigger_enabled_at(x, y, false) {
-                warn!("Unable to find trigger at {},{}", x, y);
-            }
-            Ok(())
-        });
+        methods.add_method(
+            "disable_trigger_at",
+            |_, _, (x, y, id): (i32, i32, Option<String>)| {
+                let area_state = get_area(id)?;
+                let mut area_state = area_state.borrow_mut();
+                if !area_state.set_trigger_enabled_at(x, y, false) {
+                    warn!("Unable to find trigger at {},{}", x, y);
+                }
+                Ok(())
+            },
+        );
 
-        methods.add_method("enable_prop_at", |_, _, (x, y, id): (i32, i32, Option<String>)| {
-            let area_state = get_area(id)?;
-            let mut area_state = area_state.borrow_mut();
-            if !area_state.set_prop_enabled_at(x, y, true) {
-                warn!("Unable to find prop at {},{}", x, y);
-            }
-            Ok(())
-        });
-
-        methods.add_method("disable_prop_at", |_, _, (x, y, id): (i32, i32, Option<String>)| {
-            let area_state = get_area(id)?;
-            let mut area_state = area_state.borrow_mut();
-            if !area_state.set_prop_enabled_at(x, y, false) {
-                warn!("Unable to find prop at {},{}", x, y);
-            }
-            Ok(())
-        });
-
-        methods.add_method("toggle_prop_at", |_, _, (x, y, id): (i32, i32, Option<String>)| {
-            let area_state = get_area(id)?;
-            let mut area_state = area_state.borrow_mut();
-            let index = match area_state.prop_index_at(x, y) {
-                None => {
+        methods.add_method(
+            "enable_prop_at",
+            |_, _, (x, y, id): (i32, i32, Option<String>)| {
+                let area_state = get_area(id)?;
+                let mut area_state = area_state.borrow_mut();
+                if !area_state.set_prop_enabled_at(x, y, true) {
                     warn!("Unable to find prop at {},{}", x, y);
-                    return Ok(());
-                }, Some(prop) => prop,
-            };
-            area_state.toggle_prop_active(index);
-
-            Ok(())
-        });
-
-        methods.add_method("say_line", |_, _, (line, target): (String, Option<ScriptEntity>)| {
-            let pc = GameState::player();
-            let target = match target {
-                None => Rc::clone(&pc),
-                Some(ref entity) => {
-                    entity.try_unwrap()?
                 }
-            };
+                Ok(())
+            },
+        );
 
-            let cb = OnTrigger::SayLine(line);
-            GameState::add_ui_callback(vec![cb], &pc, &target);
-            Ok(())
-        });
-
-        methods.add_method("start_conversation", |_, _, (id, target): (String, Option<ScriptEntity>)| {
-            let pc = GameState::player();
-            let target = match target {
-                None => Rc::clone(&pc),
-                Some(ref entity) => {
-                    entity.try_unwrap()?
+        methods.add_method(
+            "disable_prop_at",
+            |_, _, (x, y, id): (i32, i32, Option<String>)| {
+                let area_state = get_area(id)?;
+                let mut area_state = area_state.borrow_mut();
+                if !area_state.set_prop_enabled_at(x, y, false) {
+                    warn!("Unable to find prop at {},{}", x, y);
                 }
-            };
+                Ok(())
+            },
+        );
 
-            let cb = OnTrigger::StartConversation(id);
-            GameState::add_ui_callback(vec![cb], &pc, &target);
-            Ok(())
-        });
+        methods.add_method(
+            "toggle_prop_at",
+            |_, _, (x, y, id): (i32, i32, Option<String>)| {
+                let area_state = get_area(id)?;
+                let mut area_state = area_state.borrow_mut();
+                let index = match area_state.prop_index_at(x, y) {
+                    None => {
+                        warn!("Unable to find prop at {},{}", x, y);
+                        return Ok(());
+                    }
+                    Some(prop) => prop,
+                };
+                area_state.toggle_prop_active(index);
+
+                Ok(())
+            },
+        );
+
+        methods.add_method(
+            "say_line",
+            |_, _, (line, target): (String, Option<ScriptEntity>)| {
+                let pc = GameState::player();
+                let target = match target {
+                    None => Rc::clone(&pc),
+                    Some(ref entity) => entity.try_unwrap()?,
+                };
+
+                let cb = OnTrigger::SayLine(line);
+                GameState::add_ui_callback(vec![cb], &pc, &target);
+                Ok(())
+            },
+        );
+
+        methods.add_method(
+            "start_conversation",
+            |_, _, (id, target): (String, Option<ScriptEntity>)| {
+                let pc = GameState::player();
+                let target = match target {
+                    None => Rc::clone(&pc),
+                    Some(ref entity) => entity.try_unwrap()?,
+                };
+
+                let cb = OnTrigger::StartConversation(id);
+                GameState::add_ui_callback(vec![cb], &pc, &target);
+                Ok(())
+            },
+        );
 
         methods.add_method("show_game_over_window", |_, _, text: String| {
             let pc = GameState::player();
@@ -754,22 +827,26 @@ impl UserData for ScriptInterface {
             Ok(GameState::has_party_member(&id))
         });
 
-        methods.add_method("add_party_member", |_, _, (id, show_portrait):
-                           (String, Option<bool>)| {
-            let show_portrait = show_portrait.unwrap_or(true);
-            let entity = match entity_with_id(id) {
-                Some(entity) => entity,
-                None => return Err(rlua::Error::ToLuaConversionError {
-                    from: "ID",
-                    to: "ScriptENtity",
-                    message: Some("Entity with specified id does not exist".to_string())
-                })
-            };
+        methods.add_method(
+            "add_party_member",
+            |_, _, (id, show_portrait): (String, Option<bool>)| {
+                let show_portrait = show_portrait.unwrap_or(true);
+                let entity = match entity_with_id(id) {
+                    Some(entity) => entity,
+                    None => {
+                        return Err(rlua::Error::ToLuaConversionError {
+                            from: "ID",
+                            to: "ScriptENtity",
+                            message: Some("Entity with specified id does not exist".to_string()),
+                        });
+                    }
+                };
 
-            GameState::add_party_member(entity, show_portrait);
+                GameState::add_party_member(entity, show_portrait);
 
-            Ok(())
-        });
+                Ok(())
+            },
+        );
 
         methods.add_method("remove_party_member", |_, _, id: String| {
             for member in GameState::party() {
@@ -866,26 +943,37 @@ impl UserData for ScriptInterface {
             Ok(())
         });
 
-        methods.add_method("transition_party_to", |_, _, (x, y, area): (i32, i32, Option<String>)| {
-            GameState::transition(&area, x, y, Time {
-                day: 0, hour: 0, round: 0, millis: 0});
-            Ok(())
-        });
+        methods.add_method(
+            "transition_party_to",
+            |_, _, (x, y, area): (i32, i32, Option<String>)| {
+                GameState::transition(
+                    &area,
+                    x,
+                    y,
+                    Time {
+                        day: 0,
+                        hour: 0,
+                        round: 0,
+                        millis: 0,
+                    },
+                );
+                Ok(())
+            },
+        );
     }
 }
 
 fn get_area(id: Option<String>) -> Result<Rc<RefCell<AreaState>>> {
     match id {
-        None => {
-            Ok(GameState::area_state())
-        }, Some(id) => {
-            GameState::get_area_state(&id).ok_or(rlua::Error::FromLuaConversionError {
-                from: "String",
-                to: "AreaState",
-                message: Some(format!("The area '{}' does not exist or is not loaded.",
-                                      id)),
-            })
-        }
+        None => Ok(GameState::area_state()),
+        Some(id) => GameState::get_area_state(&id).ok_or(rlua::Error::FromLuaConversionError {
+            from: "String",
+            to: "AreaState",
+            message: Some(format!(
+                "The area '{}' does not exist or is not loaded.",
+                id
+            )),
+        }),
     }
 }
 
@@ -910,10 +998,12 @@ pub fn entity_with_id(id: String) -> Option<Rc<RefCell<EntityState>>> {
     for entity in mgr.borrow().entity_iter() {
         {
             let entity = entity.borrow();
-            if entity.unique_id() != &id { continue; }
+            if entity.unique_id() != &id {
+                continue;
+            }
         }
 
-        return Some(entity)
+        return Some(entity);
     }
 
     None

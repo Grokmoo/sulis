@@ -14,15 +14,15 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::time::{Instant};
 use std::any::Any;
-use std::rc::Rc;
 use std::cell::RefCell;
+use std::rc::Rc;
+use std::time::Instant;
 
-use crate::widget_kind;
-use crate::ui::{LineRenderer, Widget, WidgetKind, theme};
 use crate::io::{event, GraphicsRenderer};
+use crate::ui::{theme, LineRenderer, Widget, WidgetKind};
 use crate::util::{self, Point};
+use crate::widget_kind;
 use crate::widgets::{Label, TextArea};
 
 pub struct Button {
@@ -62,14 +62,18 @@ impl WidgetKind for Button {
     widget_kind!["button"];
 
     fn update(&mut self, widget: &Rc<RefCell<Widget>>, _millis: u32) {
-        if self.repeat_time == 0 { return; }
+        if self.repeat_time == 0 {
+            return;
+        }
 
         let start_time = match self.mouse_pressed_time {
             None => return,
             Some(time) => time,
         };
 
-        if util::get_elapsed_millis(start_time.elapsed()) < self.repeat_init_time { return; }
+        if util::get_elapsed_millis(start_time.elapsed()) < self.repeat_init_time {
+            return;
+        }
 
         let millis = match self.last_repeat_time {
             None => self.repeat_time,
@@ -102,15 +106,24 @@ impl WidgetKind for Button {
         }
     }
 
-    fn draw(&mut self, renderer: &mut GraphicsRenderer, pixel_size: Point,
-            widget: &Widget, millis: u32) {
-        self.label.borrow_mut().draw(renderer, pixel_size, widget, millis);
+    fn draw(
+        &mut self,
+        renderer: &mut GraphicsRenderer,
+        pixel_size: Point,
+        widget: &Widget,
+        millis: u32,
+    ) {
+        self.label
+            .borrow_mut()
+            .draw(renderer, pixel_size, widget, millis);
     }
 
     // TODO refactor tooltip code into a common case somewhere - can probably
     // also include item button, ability button
     fn on_mouse_move(&mut self, widget: &Rc<RefCell<Widget>>, _dx: f32, _dy: f32) -> bool {
-        if self.tooltip.is_empty() { return false; }
+        if self.tooltip.is_empty() {
+            return false;
+        }
 
         let tooltip = Widget::with_theme(TextArea::empty(), "tooltip");
         tooltip.borrow_mut().state.add_text_arg("0", &self.tooltip);

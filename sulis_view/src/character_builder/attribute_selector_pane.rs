@@ -17,15 +17,15 @@
 use std::collections::HashMap;
 
 use std::any::Any;
-use std::rc::Rc;
 use std::cell::RefCell;
+use std::rc::Rc;
 
 use sulis_core::ui::{Callback, Widget, WidgetKind};
-use sulis_module::{Class, Module, Race, Attribute, AttributeList, BonusKind};
 use sulis_core::widgets::{Button, Label, Spinner, TextArea};
+use sulis_module::{Attribute, AttributeList, BonusKind, Class, Module, Race};
 
-use crate::CharacterBuilder;
 use crate::character_builder::BuilderPane;
+use crate::CharacterBuilder;
 
 pub const NAME: &str = "attribute_selector_pane";
 
@@ -68,7 +68,11 @@ impl AttributeSelectorPane {
         self.calculate_available();
 
         let (_, builder) = Widget::parent_mut::<CharacterBuilder>(widget);
-        builder.next.borrow_mut().state.set_enabled(self.available == 0 && self.selected_kit.is_some());
+        builder
+            .next
+            .borrow_mut()
+            .state
+            .set_enabled(self.available == 0 && self.selected_kit.is_some());
     }
 }
 
@@ -78,14 +82,18 @@ impl BuilderPane for AttributeSelectorPane {
         self.selected_race = builder.race.clone();
 
         if let Some(ref class) = self.selected_class {
-        self.selected_kit = Some(0);
-        self.attrs = class.kits[0].default_attributes.clone();
+            self.selected_kit = Some(0);
+            self.attrs = class.kits[0].default_attributes.clone();
         }
 
         builder.attributes = None;
         builder.prev.borrow_mut().state.set_enabled(true);
         self.calculate_available();
-        builder.next.borrow_mut().state.set_enabled(self.available == 0 && self.selected_kit.is_some());
+        builder
+            .next
+            .borrow_mut()
+            .state
+            .set_enabled(self.available == 0 && self.selected_kit.is_some());
         widget.borrow_mut().invalidate_children();
     }
 
@@ -114,9 +122,15 @@ impl BuilderPane for AttributeSelectorPane {
 }
 
 impl WidgetKind for AttributeSelectorPane {
-    fn get_name(&self) -> &str { NAME }
-    fn as_any(&self) -> &Any { self }
-    fn as_any_mut(&mut self) -> &mut Any { self }
+    fn get_name(&self) -> &str {
+        NAME
+    }
+    fn as_any(&self) -> &Any {
+        self
+    }
+    fn as_any_mut(&mut self) -> &mut Any {
+        self
+    }
 
     fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let rules = Module::rules();
@@ -138,19 +152,28 @@ impl WidgetKind for AttributeSelectorPane {
         let kits_pane = Widget::empty("kits_pane");
         for (index, ref kit) in class.kits.iter().enumerate() {
             let kit_button = Widget::with_theme(Button::empty(), "kit_button");
-            kit_button.borrow_mut().state.add_text_arg("name", &kit.name);
+            kit_button
+                .borrow_mut()
+                .state
+                .add_text_arg("name", &kit.name);
             if let Some(selected_index) = self.selected_kit {
-                kit_button.borrow_mut().state.set_active(selected_index == index);
+                kit_button
+                    .borrow_mut()
+                    .state
+                    .set_active(selected_index == index);
             }
             let class_ref = Rc::clone(class);
-            kit_button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-                let (parent, pane) = Widget::parent_mut::<AttributeSelectorPane>(widget);
-                pane.selected_kit = Some(index);
-                pane.attrs = class_ref.kits[index].default_attributes.clone();
-                pane.set_next_enabled(&parent);
+            kit_button
+                .borrow_mut()
+                .state
+                .add_callback(Callback::new(Rc::new(move |widget, _| {
+                    let (parent, pane) = Widget::parent_mut::<AttributeSelectorPane>(widget);
+                    pane.selected_kit = Some(index);
+                    pane.attrs = class_ref.kits[index].default_attributes.clone();
+                    pane.set_next_enabled(&parent);
 
-                parent.borrow_mut().invalidate_children();
-            })));
+                    parent.borrow_mut().invalidate_children();
+                })));
             Widget::add_child_to(&kits_pane, kit_button);
         }
         children.push(kits_pane);
@@ -161,8 +184,14 @@ impl WidgetKind for AttributeSelectorPane {
         };
 
         let kit_area = Widget::with_theme(TextArea::empty(), "kit_area");
-        kit_area.borrow_mut().state.add_text_arg("description", &selected_kit.description);
-        kit_area.borrow_mut().state.add_text_arg("name", &selected_kit.name);
+        kit_area
+            .borrow_mut()
+            .state
+            .add_text_arg("description", &selected_kit.description);
+        kit_area
+            .borrow_mut()
+            .state
+            .add_text_arg("name", &selected_kit.name);
         children.push(kit_area);
 
         let mut attr_bonuses: HashMap<Attribute, i32> = HashMap::new();
@@ -170,7 +199,8 @@ impl WidgetKind for AttributeSelectorPane {
             match bonus.kind {
                 BonusKind::Attribute { attribute, amount } => {
                     attr_bonuses.insert(attribute, amount as i32);
-                }, _ => (),
+                }
+                _ => (),
             }
         }
 
@@ -184,14 +214,17 @@ impl WidgetKind for AttributeSelectorPane {
 
             let spinner = Spinner::new(value, rules.builder_min_attribute, max);
             let widget = Widget::with_theme(spinner, &format!("{}_spinner", attr.short_name()));
-            widget.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, kind| {
-                let value = Widget::downcast_mut::<Spinner>(kind).value();
+            widget
+                .borrow_mut()
+                .state
+                .add_callback(Callback::new(Rc::new(move |widget, kind| {
+                    let value = Widget::downcast_mut::<Spinner>(kind).value();
 
-                let (parent, pane) = Widget::parent_mut::<AttributeSelectorPane>(widget);
-                parent.borrow_mut().invalidate_children();
-                pane.attrs.set(*attr, value as u8);
-                pane.set_next_enabled(&parent);
-            })));
+                    let (parent, pane) = Widget::parent_mut::<AttributeSelectorPane>(widget);
+                    parent.borrow_mut().invalidate_children();
+                    pane.attrs.set(*attr, value as u8);
+                    pane.set_next_enabled(&parent);
+                })));
             children.push(widget);
 
             let label = Widget::with_theme(Label::empty(), &format!("{}_label", attr.short_name()));
@@ -199,21 +232,33 @@ impl WidgetKind for AttributeSelectorPane {
 
             let bonus = Widget::with_theme(Label::empty(), &format!("{}_bonus", attr.short_name()));
             let bonus_value = *attr_bonuses.get(attr).unwrap_or(&0);
-            bonus.borrow_mut().state.add_text_arg("value", &bonus_value.to_string());
+            bonus
+                .borrow_mut()
+                .state
+                .add_text_arg("value", &bonus_value.to_string());
             children.push(bonus);
 
             let total_value = bonus_value as i32 + value;
             let total = Widget::with_theme(Label::empty(), &format!("{}_total", attr.short_name()));
-            total.borrow_mut().state.add_text_arg("value", &total_value.to_string());
+            total
+                .borrow_mut()
+                .state
+                .add_text_arg("value", &total_value.to_string());
             children.push(total);
         }
 
         let points_label = Widget::with_theme(Label::empty(), "points_label");
-        points_label.borrow_mut().state.add_text_arg("points", &self.available.to_string());
+        points_label
+            .borrow_mut()
+            .state
+            .add_text_arg("points", &self.available.to_string());
         children.push(points_label);
 
         let amount_label = Widget::with_theme(Label::empty(), "amount_label");
-        amount_label.borrow_mut().state.add_text_arg("points", &self.available.to_string());
+        amount_label
+            .borrow_mut()
+            .state
+            .add_text_arg("points", &self.available.to_string());
         children.push(amount_label);
 
         children

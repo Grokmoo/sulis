@@ -15,14 +15,17 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::any::Any;
-use std::rc::Rc;
 use std::cell::RefCell;
+use std::rc::Rc;
 
 use sulis_core::config::{Config, EditorConfig};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_core::util::Point;
-use sulis_module::{Module, area::{ToKind, MAX_AREA_SIZE}};
-use sulis_core::widgets::{Button, InputField, Label, list_box, ListBox, Spinner};
+use sulis_core::widgets::{list_box, Button, InputField, Label, ListBox, Spinner};
+use sulis_module::{
+    area::{ToKind, MAX_AREA_SIZE},
+    Module,
+};
 
 use crate::AreaEditor;
 
@@ -36,8 +39,10 @@ pub struct TransitionWindow {
 }
 
 impl TransitionWindow {
-    pub fn new(area_editor: Rc<RefCell<AreaEditor>>,
-               top_bar: Rc<RefCell<Widget>>) -> Rc<RefCell<TransitionWindow>> {
+    pub fn new(
+        area_editor: Rc<RefCell<AreaEditor>>,
+        top_bar: Rc<RefCell<Widget>>,
+    ) -> Rc<RefCell<TransitionWindow>> {
         Rc::new(RefCell::new(TransitionWindow {
             area_editor,
             top_bar,
@@ -48,11 +53,17 @@ impl TransitionWindow {
 }
 
 impl WidgetKind for TransitionWindow {
-    fn get_name(&self) -> &str { NAME }
+    fn get_name(&self) -> &str {
+        NAME
+    }
 
-    fn as_any(&self) -> &Any { self }
+    fn as_any(&self) -> &Any {
+        self
+    }
 
-    fn as_any_mut(&mut self) -> &mut Any { self }
+    fn as_any_mut(&mut self) -> &mut Any {
+        self
+    }
 
     fn on_remove(&mut self) {
         self.top_bar.borrow_mut().state.set_enabled(true);
@@ -63,10 +74,13 @@ impl WidgetKind for TransitionWindow {
         let mut widgets: Vec<Rc<RefCell<Widget>>> = Vec::new();
 
         let close = Widget::with_theme(Button::empty(), "close");
-        close.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let (parent, _) = Widget::parent::<TransitionWindow>(widget);
-            parent.borrow_mut().mark_for_removal();
-        })));
+        close
+            .borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(|widget, _| {
+                let (parent, _) = Widget::parent::<TransitionWindow>(widget);
+                parent.borrow_mut().mark_for_removal();
+            })));
         widgets.push(close);
 
         if let Some(index) = self.selected_transition {
@@ -102,14 +116,17 @@ impl WidgetKind for TransitionWindow {
                     button.borrow_mut().state.set_active(true);
                 }
 
-                button.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-                    let parent = Widget::direct_parent(widget);
+                button
+                    .borrow_mut()
+                    .state
+                    .add_callback(Callback::new(Rc::new(|widget, _| {
+                        let parent = Widget::direct_parent(widget);
 
-                    for child in parent.borrow().children.iter() {
-                        child.borrow_mut().state.set_active(false);
-                    }
-                    widget.borrow_mut().state.set_active(true);
-                })));
+                        for child in parent.borrow().children.iter() {
+                            child.borrow_mut().state.set_active(false);
+                        }
+                        widget.borrow_mut().state.set_active(true);
+                    })));
 
                 Widget::add_child_to(&sizes, button);
             }
@@ -127,18 +144,24 @@ impl WidgetKind for TransitionWindow {
             let delete = Widget::with_theme(Button::empty(), "delete_button");
 
             let area_editor_ref = Rc::clone(&self.area_editor);
-            delete.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-                let (parent, window) = Widget::parent_mut::<TransitionWindow>(widget);
-                parent.borrow_mut().invalidate_children();
+            delete
+                .borrow_mut()
+                .state
+                .add_callback(Callback::new(Rc::new(move |widget, _| {
+                    let (parent, window) = Widget::parent_mut::<TransitionWindow>(widget);
+                    parent.borrow_mut().invalidate_children();
 
-                let cur_index = match window.selected_transition {
-                    Some(index) => index,
-                    None => return,
-                };
+                    let cur_index = match window.selected_transition {
+                        Some(index) => index,
+                        None => return,
+                    };
 
-                area_editor_ref.borrow_mut().model.delete_transition(cur_index);
-                window.selected_transition = None;
-            })));
+                    area_editor_ref
+                        .borrow_mut()
+                        .model
+                        .delete_transition(cur_index);
+                    window.selected_transition = None;
+                })));
 
             let cur_area_button = Widget::with_theme(Button::empty(), "cur_area_button");
             let area_button = Widget::with_theme(Button::empty(), "area_button");
@@ -150,79 +173,108 @@ impl WidgetKind for TransitionWindow {
                 ToKind::WorldMap => world_map_button.borrow_mut().state.set_active(true),
             }
 
-            let refs = vec![Rc::clone(&cur_area_button), Rc::clone(&area_button),
-                Rc::clone(&world_map_button)];
+            let refs = vec![
+                Rc::clone(&cur_area_button),
+                Rc::clone(&area_button),
+                Rc::clone(&world_map_button),
+            ];
             let refs_clone = refs.clone();
             for widget in refs {
                 let widget_refs = refs_clone.clone();
-                widget.borrow_mut().state.add_callback(Callback::new(Rc::new(move | widget, _| {
-                    for widget in widget_refs.iter() {
-                        widget.borrow_mut().state.set_active(false);
-                    }
-                    widget.borrow_mut().state.set_active(true);
-                })));
+                widget
+                    .borrow_mut()
+                    .state
+                    .add_callback(Callback::new(Rc::new(move |widget, _| {
+                        for widget in widget_refs.iter() {
+                            widget.borrow_mut().state.set_active(false);
+                        }
+                        widget.borrow_mut().state.set_active(true);
+                    })));
             }
 
             let area_editor_ref = Rc::clone(&self.area_editor);
             let world_map_ref = Rc::clone(&world_map_button);
             let area_ref = Rc::clone(&area_button);
             let cur_area_ref = Rc::clone(&cur_area_button);
-            apply.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-                let to_area_str = to_area_ref.borrow().state.text.to_string();
-                let hover_text_str = hover_text_ref.borrow().state.text.to_string();
+            apply
+                .borrow_mut()
+                .state
+                .add_callback(Callback::new(Rc::new(move |widget, _| {
+                    let to_area_str = to_area_ref.borrow().state.text.to_string();
+                    let hover_text_str = hover_text_ref.borrow().state.text.to_string();
 
-                let from = Point::new(from_x_ref.borrow().value(), from_y_ref.borrow().value());
-                let to = Point::new(to_x_ref.borrow().value(), to_y_ref.borrow().value());
+                    let from = Point::new(from_x_ref.borrow().value(), from_y_ref.borrow().value());
+                    let to = Point::new(to_x_ref.borrow().value(), to_y_ref.borrow().value());
 
-                let (parent, window) = Widget::parent_mut::<TransitionWindow>(widget);
-                parent.borrow_mut().invalidate_children();
-                let cur_index = match window.selected_transition {
-                    Some(index) => index,
-                    None => return,
-                };
+                    let (parent, window) = Widget::parent_mut::<TransitionWindow>(widget);
+                    parent.borrow_mut().invalidate_children();
+                    let cur_index = match window.selected_transition {
+                        Some(index) => index,
+                        None => return,
+                    };
 
-                let mut area_editor = area_editor_ref.borrow_mut();
-                let transition = area_editor.model.transition_mut(cur_index);
-                transition.from = from;
-                transition.hover_text = hover_text_str;
+                    let mut area_editor = area_editor_ref.borrow_mut();
+                    let transition = area_editor.model.transition_mut(cur_index);
+                    transition.from = from;
+                    transition.hover_text = hover_text_str;
 
-                if world_map_ref.borrow().state.is_active() {
-                    transition.to = ToKind::WorldMap;
-                } else if area_ref.borrow().state.is_active() {
-                    transition.to = ToKind::Area { id: to_area_str, x: to.x, y: to.y };
-                } else if cur_area_ref.borrow().state.is_active() {
-                    transition.to = ToKind::CurArea { x: to.x, y: to.y };
-                }
-
-                for child in sizes_ref.borrow().children.iter() {
-                    let child = child.borrow();
-                    if child.state.is_active() {
-                        let size_id = match child.state.get_text_arg("size") {
-                            None => panic!("size text arg not set"),
-                            Some(id) => id,
+                    if world_map_ref.borrow().state.is_active() {
+                        transition.to = ToKind::WorldMap;
+                    } else if area_ref.borrow().state.is_active() {
+                        transition.to = ToKind::Area {
+                            id: to_area_str,
+                            x: to.x,
+                            y: to.y,
                         };
-                        let size = match Module::object_size(size_id) {
-                            None => {
-                                warn!("Transition size '{}' does not exist", size_id);
-                                break;
-                            }, Some(size) => size,
-                        };
-                        transition.size = size;
+                    } else if cur_area_ref.borrow().state.is_active() {
+                        transition.to = ToKind::CurArea { x: to.x, y: to.y };
                     }
-                }
-            })));
+
+                    for child in sizes_ref.borrow().children.iter() {
+                        let child = child.borrow();
+                        if child.state.is_active() {
+                            let size_id = match child.state.get_text_arg("size") {
+                                None => panic!("size text arg not set"),
+                                Some(id) => id,
+                            };
+                            let size = match Module::object_size(size_id) {
+                                None => {
+                                    warn!("Transition size '{}' does not exist", size_id);
+                                    break;
+                                }
+                                Some(size) => size,
+                            };
+                            transition.size = size;
+                        }
+                    }
+                })));
 
             widgets.append(&mut vec![cur_area_button, area_button, world_map_button]);
-            widgets.append(&mut vec![to_area, from_label, to_label, to_area_label, apply, delete]);
+            widgets.append(&mut vec![
+                to_area,
+                from_label,
+                to_label,
+                to_area_label,
+                apply,
+                delete,
+            ]);
             widgets.append(&mut vec![hover_text, hover_text_label, sizes]);
-            widgets.append(&mut vec![Widget::with_theme(to_x, "to_x"),
+            widgets.append(&mut vec![
+                Widget::with_theme(to_x, "to_x"),
                 Widget::with_theme(to_y, "to_y"),
                 Widget::with_theme(from_x, "from_x"),
-                Widget::with_theme(from_y, "from_y")]);
+                Widget::with_theme(from_y, "from_y"),
+            ]);
         }
 
         let mut entries: Vec<list_box::Entry<String>> = Vec::new();
-        for (index, ref transition) in self.area_editor.borrow().model.transitions_iter().enumerate() {
+        for (index, ref transition) in self
+            .area_editor
+            .borrow()
+            .model
+            .transitions_iter()
+            .enumerate()
+        {
             let cb = Callback::new(Rc::new(move |widget, _| {
                 let (parent, window) = Widget::parent_mut::<TransitionWindow>(widget);
                 parent.borrow_mut().invalidate_children();
@@ -252,17 +304,19 @@ impl WidgetKind for TransitionWindow {
         let new = Widget::with_theme(Button::empty(), "new_button");
 
         let area_editor_ref = Rc::clone(&self.area_editor);
-        new.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-            let (parent, window) = Widget::parent_mut::<TransitionWindow>(widget);
-            parent.borrow_mut().invalidate_children();
+        new.borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(move |widget, _| {
+                let (parent, window) = Widget::parent_mut::<TransitionWindow>(widget);
+                parent.borrow_mut().invalidate_children();
 
-            let index = match area_editor_ref.borrow_mut().model.new_transition() {
-                None => return,
-                Some(index) => index,
-            };
+                let index = match area_editor_ref.borrow_mut().model.new_transition() {
+                    None => return,
+                    Some(index) => index,
+                };
 
-            window.selected_transition = Some(index);
-        })));
+                window.selected_transition = Some(index);
+            })));
         widgets.push(new);
 
         widgets

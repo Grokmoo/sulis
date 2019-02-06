@@ -29,5 +29,4 @@ pub struct Quest {
 #[serde(deny_unknown_fields)]
 pub struct QuestEntry {
     pub description: String,
-
 }

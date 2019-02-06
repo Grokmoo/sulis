@@ -14,12 +14,15 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::ops;
 use std::cmp;
+use std::ops;
 
 use crate::ui::Border;
 
-pub static ZERO_SIZE: Size = Size { width: 0, height: 0 };
+pub static ZERO_SIZE: Size = Size {
+    width: 0,
+    height: 0,
+};
 
 #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
@@ -30,10 +33,7 @@ pub struct Size {
 
 impl Size {
     pub fn new(width: i32, height: i32) -> Size {
-        Size {
-            width,
-            height,
-        }
+        Size { width, height }
     }
 
     pub fn from_tuple(vals: (i32, i32)) -> Size {
@@ -60,7 +60,6 @@ impl Size {
 
     pub fn product(&self) -> i32 {
         self.width * self.height
-
     }
 
     pub fn mult_mut(&mut self, val: i32) {

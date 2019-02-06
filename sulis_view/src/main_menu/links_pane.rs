@@ -15,21 +15,19 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::any::Any;
+use std::cell::RefCell;
 use std::rc::Rc;
-use std::cell::{RefCell};
 
 use open;
 
-use sulis_core::ui::{Widget, WidgetKind, Callback};
+use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_core::widgets::{Button, Label};
 
-pub struct LinksPane {
-}
+pub struct LinksPane {}
 
 impl LinksPane {
     pub fn new() -> Rc<RefCell<LinksPane>> {
-        Rc::new(RefCell::new(LinksPane {
-        }))
+        Rc::new(RefCell::new(LinksPane {}))
     }
 }
 
@@ -40,24 +38,36 @@ impl WidgetKind for LinksPane {
         let title = Widget::with_theme(Label::empty(), "title");
 
         let credits = Widget::with_theme(Button::empty(), "credits");
-        credits.borrow_mut().state.add_callback(Callback::new(Rc::new(|_, _| {
-            open_link("https://github.com/Grokmoo/sulis/blob/master/docs/attribution.csv");
-        })));
+        credits
+            .borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(|_, _| {
+                open_link("https://github.com/Grokmoo/sulis/blob/master/docs/attribution.csv");
+            })));
 
         let github = Widget::with_theme(Button::empty(), "github");
-        github.borrow_mut().state.add_callback(Callback::new(Rc::new(|_, _| {
-            open_link("https://github.com/Grokmoo/sulis");
-        })));
+        github
+            .borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(|_, _| {
+                open_link("https://github.com/Grokmoo/sulis");
+            })));
 
         let changes = Widget::with_theme(Button::empty(), "changes");
-        changes.borrow_mut().state.add_callback(Callback::new(Rc::new(|_, _| {
-            open_link("https://github.com/Grokmoo/sulis/blob/master/Changelog.md");
-        })));
+        changes
+            .borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(|_, _| {
+                open_link("https://github.com/Grokmoo/sulis/blob/master/Changelog.md");
+            })));
 
         let website = Widget::with_theme(Button::empty(), "website");
-        website.borrow_mut().state.add_callback(Callback::new(Rc::new(|_, _| {
-            open_link("https://www.sulisgame.com");
-        })));
+        website
+            .borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(|_, _| {
+                open_link("https://www.sulisgame.com");
+            })));
 
         vec![title, credits, github, changes, website]
     }

@@ -21,8 +21,8 @@ use std::rc::Rc;
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::ui::{animation_state, Callback, Color, Widget, WidgetKind};
 use sulis_core::util::Point;
-use sulis_module::{Prop, Module};
 use sulis_core::widgets::{Button, ScrollPane};
+use sulis_module::{Module, Prop};
 
 use crate::{AreaModel, EditorMode};
 
@@ -45,9 +45,16 @@ impl PropPicker {
 }
 
 impl EditorMode for PropPicker {
-    fn draw_mode(&mut self, renderer: &mut GraphicsRenderer, _model: &AreaModel, x: f32, y: f32,
-            scale_x: f32, scale_y: f32, millis: u32) {
-
+    fn draw_mode(
+        &mut self,
+        renderer: &mut GraphicsRenderer,
+        _model: &AreaModel,
+        x: f32,
+        y: f32,
+        scale_x: f32,
+        scale_y: f32,
+        millis: u32,
+    ) {
         for &(pos, ref prop) in self.removal_props.iter() {
             let x = x + pos.x as f32;
             let y = y + pos.y as f32;
@@ -116,11 +123,17 @@ impl EditorMode for PropPicker {
 }
 
 impl WidgetKind for PropPicker {
-    fn get_name(&self) -> &str { NAME }
+    fn get_name(&self) -> &str {
+        NAME
+    }
 
-    fn as_any(&self) -> &Any { self }
+    fn as_any(&self) -> &Any {
+        self
+    }
 
-    fn as_any_mut(&mut self) -> &mut Any { self }
+    fn as_any_mut(&mut self) -> &mut Any {
+        self
+    }
 
     fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let mut all_props = Module::all_props();
@@ -130,20 +143,23 @@ impl WidgetKind for PropPicker {
         for prop in all_props {
             let button = Widget::with_theme(Button::empty(), "prop_button");
             button.borrow_mut().state.add_text_arg("name", &prop.id);
-            button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-                let parent = Widget::direct_parent(widget);
-                let cur_state = widget.borrow_mut().state.is_active();
-                if !cur_state {
-                    trace!("Set active prop: {}", widget.borrow().state.text);
-                    for child in parent.borrow().children.iter() {
-                        child.borrow_mut().state.set_active(false);
+            button
+                .borrow_mut()
+                .state
+                .add_callback(Callback::new(Rc::new(move |widget, _| {
+                    let parent = Widget::direct_parent(widget);
+                    let cur_state = widget.borrow_mut().state.is_active();
+                    if !cur_state {
+                        trace!("Set active prop: {}", widget.borrow().state.text);
+                        for child in parent.borrow().children.iter() {
+                            child.borrow_mut().state.set_active(false);
+                        }
+                        widget.borrow_mut().state.set_active(true);
                     }
-                    widget.borrow_mut().state.set_active(true);
-                }
 
-                let (_, prop_picker) = Widget::parent_mut::<PropPicker>(&parent);
-                prop_picker.cur_prop = Some(Rc::clone(&prop));
-            })));
+                    let (_, prop_picker) = Widget::parent_mut::<PropPicker>(&parent);
+                    prop_picker.cur_prop = Some(Rc::clone(&prop));
+                })));
 
             scrollpane.borrow().add_to_content(button);
         }

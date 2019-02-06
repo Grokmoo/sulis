@@ -65,24 +65,25 @@ use crate::vis_picker::VisPicker;
 mod wall_picker;
 use crate::wall_picker::WallPicker;
 
-#[macro_use] extern crate log;
+#[macro_use]
+extern crate log;
 
 use std::any::Any;
-use std::rc::Rc;
 use std::cell::RefCell;
+use std::rc::Rc;
 
 use sulis_core::io::{GraphicsRenderer, InputAction, MainLoopUpdater};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
-use sulis_core::widgets::{Button, ConfirmationWindow, DropDown, list_box};
+use sulis_core::widgets::{list_box, Button, ConfirmationWindow, DropDown};
 
 thread_local! {
     static EXIT: RefCell<bool> = RefCell::new(false);
 }
 
-pub struct EditorMainLoopUpdater { }
+pub struct EditorMainLoopUpdater {}
 
 impl MainLoopUpdater for EditorMainLoopUpdater {
-    fn update(&self, _root: &Rc<RefCell<Widget>>, _millis: u32) { }
+    fn update(&self, _root: &Rc<RefCell<Widget>>, _millis: u32) {}
 
     fn is_exit(&self) -> bool {
         EXIT.with(|exit| *exit.borrow())
@@ -90,8 +91,16 @@ impl MainLoopUpdater for EditorMainLoopUpdater {
 }
 
 pub trait EditorMode: WidgetKind {
-    fn draw_mode(&mut self, renderer: &mut GraphicsRenderer, model: &AreaModel, x: f32, y: f32,
-                 scale_x: f32, scale_y: f32, millis: u32);
+    fn draw_mode(
+        &mut self,
+        renderer: &mut GraphicsRenderer,
+        model: &AreaModel,
+        x: f32,
+        y: f32,
+        scale_x: f32,
+        scale_y: f32,
+        millis: u32,
+    );
 
     fn cursor_size(&self) -> (i32, i32);
 
@@ -101,37 +110,45 @@ pub trait EditorMode: WidgetKind {
 
     fn right_click(&mut self, model: &mut AreaModel, x: i32, y: i32);
 
-    fn mouse_scroll(&mut self, _model: &mut AreaModel, _delta: i32) { }
+    fn mouse_scroll(&mut self, _model: &mut AreaModel, _delta: i32) {}
 }
 
 const NAME: &str = "editor";
 
-pub struct EditorView { }
+pub struct EditorView {}
 
 impl EditorView {
     pub fn new() -> Rc<RefCell<EditorView>> {
-        Rc::new(RefCell::new(EditorView { }))
+        Rc::new(RefCell::new(EditorView {}))
     }
 }
 
 impl WidgetKind for EditorView {
-    fn get_name(&self) -> &str { NAME }
+    fn get_name(&self) -> &str {
+        NAME
+    }
 
-    fn as_any(&self) -> &Any { self }
+    fn as_any(&self) -> &Any {
+        self
+    }
 
-    fn as_any_mut(&mut self) -> &mut Any { self }
+    fn as_any_mut(&mut self) -> &mut Any {
+        self
+    }
 
     fn on_key_press(&mut self, widget: &Rc<RefCell<Widget>>, key: InputAction) -> bool {
         use crate::InputAction::*;
         match key {
             ShowMenu => {
-                let exit_window = Widget::with_theme(ConfirmationWindow::new(Callback::with(
-                            Box::new(|| { EXIT.with(|exit| *exit.borrow_mut() = true); }))),
-                            "exit_confirmation_window");
+                let exit_window = Widget::with_theme(
+                    ConfirmationWindow::new(Callback::with(Box::new(|| {
+                        EXIT.with(|exit| *exit.borrow_mut() = true);
+                    }))),
+                    "exit_confirmation_window",
+                );
                 exit_window.borrow_mut().state.set_modal(true);
                 Widget::add_child_to(&widget, exit_window);
-
-            },
+            }
             _ => return false,
         }
 
@@ -148,51 +165,63 @@ impl WidgetKind for EditorView {
             let mut entries: Vec<list_box::Entry<String>> = Vec::new();
 
             let area_editor_kind_ref = Rc::clone(&area_editor_kind);
-            let new = list_box::Entry::new("New".to_string(),
-            Some(Callback::with_widget(Rc::new(move |widget| {
-                area_editor_kind_ref.borrow_mut().clear_area();
-                let parent = Widget::direct_parent(widget);
-                parent.borrow_mut().mark_for_removal();
-            }))));
+            let new = list_box::Entry::new(
+                "New".to_string(),
+                Some(Callback::with_widget(Rc::new(move |widget| {
+                    area_editor_kind_ref.borrow_mut().clear_area();
+                    let parent = Widget::direct_parent(widget);
+                    parent.borrow_mut().mark_for_removal();
+                }))),
+            );
             entries.push(new);
 
             let area_editor_kind_ref = Rc::clone(&area_editor_kind);
-            let save = list_box::Entry::new("Save".to_string(),
-            Some(Callback::with_widget(Rc::new(move |widget| {
-                let root = Widget::get_root(widget);
-                let save_window = Widget::with_defaults(
-                    SaveWindow::new(Rc::clone(&area_editor_kind_ref)));
-                Widget::add_child_to(&root, save_window);
+            let save = list_box::Entry::new(
+                "Save".to_string(),
+                Some(Callback::with_widget(Rc::new(move |widget| {
+                    let root = Widget::get_root(widget);
+                    let save_window =
+                        Widget::with_defaults(SaveWindow::new(Rc::clone(&area_editor_kind_ref)));
+                    Widget::add_child_to(&root, save_window);
 
-                let parent = Widget::direct_parent(widget);
-                parent.borrow_mut().mark_for_removal();
-            }))));
+                    let parent = Widget::direct_parent(widget);
+                    parent.borrow_mut().mark_for_removal();
+                }))),
+            );
             entries.push(save);
 
             let area_editor_kind_ref = Rc::clone(&area_editor_kind);
-            let load = list_box::Entry::new("Load".to_string(),
-            Some(Callback::with_widget(Rc::new(move |widget| {
-                let root = Widget::get_root(widget);
-                let load_window = Widget::with_defaults(LoadWindow::new(Rc::clone(&area_editor_kind_ref)));
-                Widget::add_child_to(&root, load_window);
+            let load = list_box::Entry::new(
+                "Load".to_string(),
+                Some(Callback::with_widget(Rc::new(move |widget| {
+                    let root = Widget::get_root(widget);
+                    let load_window =
+                        Widget::with_defaults(LoadWindow::new(Rc::clone(&area_editor_kind_ref)));
+                    Widget::add_child_to(&root, load_window);
 
-                let parent = Widget::direct_parent(widget);
-                parent.borrow_mut().mark_for_removal();
-            }))));
+                    let parent = Widget::direct_parent(widget);
+                    parent.borrow_mut().mark_for_removal();
+                }))),
+            );
             entries.push(load);
 
-            let quit = list_box::Entry::new("Quit".to_string(),
-            Some(Callback::with_widget(Rc::new(move |widget| {
-                let root = Widget::get_root(widget);
-                let exit_window = Widget::with_theme(ConfirmationWindow::new(Callback::with(
-                            Box::new(|| { EXIT.with(|exit| *exit.borrow_mut() = true); }))),
-                            "exit_confirmation_window");
-                exit_window.borrow_mut().state.set_modal(true);
-                Widget::add_child_to(&root, exit_window);
+            let quit = list_box::Entry::new(
+                "Quit".to_string(),
+                Some(Callback::with_widget(Rc::new(move |widget| {
+                    let root = Widget::get_root(widget);
+                    let exit_window = Widget::with_theme(
+                        ConfirmationWindow::new(Callback::with(Box::new(|| {
+                            EXIT.with(|exit| *exit.borrow_mut() = true);
+                        }))),
+                        "exit_confirmation_window",
+                    );
+                    exit_window.borrow_mut().state.set_modal(true);
+                    Widget::add_child_to(&root, exit_window);
 
-                let parent = Widget::direct_parent(widget);
-                parent.borrow_mut().mark_for_removal();
-            }))));
+                    let parent = Widget::direct_parent(widget);
+                    parent.borrow_mut().mark_for_removal();
+                }))),
+            );
             entries.push(quit);
 
             let drop_down = DropDown::new(entries, "menu_list");
@@ -202,30 +231,42 @@ impl WidgetKind for EditorView {
 
             let top_bar_ref = Rc::clone(&top_bar);
             let area_editor_kind_ref = Rc::clone(&area_editor_kind);
-            transitions.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-                let root = Widget::get_root(widget);
-                let transition_window = Widget::with_defaults(
-                    TransitionWindow::new(Rc::clone(&area_editor_kind_ref), Rc::clone(&top_bar_ref)));
-                Widget::add_child_to(&root, transition_window);
-            })));
+            transitions
+                .borrow_mut()
+                .state
+                .add_callback(Callback::new(Rc::new(move |widget, _| {
+                    let root = Widget::get_root(widget);
+                    let transition_window = Widget::with_defaults(TransitionWindow::new(
+                        Rc::clone(&area_editor_kind_ref),
+                        Rc::clone(&top_bar_ref),
+                    ));
+                    Widget::add_child_to(&root, transition_window);
+                })));
 
             let area_editor_kind_ref = Rc::clone(&area_editor_kind);
             let shift_tiles = Widget::with_theme(Button::empty(), "shift_tiles");
-            shift_tiles.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-                let root = Widget::get_root(widget);
-                let shift_tiles_window = Widget::with_defaults(
-                    ShiftTilesWindow::new(Rc::clone(&area_editor_kind_ref)));
-                shift_tiles_window.borrow_mut().state.set_modal(true);
-                Widget::add_child_to(&root, shift_tiles_window);
-            })));
+            shift_tiles
+                .borrow_mut()
+                .state
+                .add_callback(Callback::new(Rc::new(move |widget, _| {
+                    let root = Widget::get_root(widget);
+                    let shift_tiles_window = Widget::with_defaults(ShiftTilesWindow::new(
+                        Rc::clone(&area_editor_kind_ref),
+                    ));
+                    shift_tiles_window.borrow_mut().state.set_modal(true);
+                    Widget::add_child_to(&root, shift_tiles_window);
+                })));
 
             let actor_creator = Widget::with_theme(Button::empty(), "actor_creator");
-            actor_creator.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-                let root = Widget::get_root(widget);
-                let window = Widget::with_defaults(ActorCreatorWindow::new());
-                window.borrow_mut().state.set_modal(true);
-                Widget::add_child_to(&root, window);
-            })));
+            actor_creator
+                .borrow_mut()
+                .state
+                .add_callback(Callback::new(Rc::new(move |widget, _| {
+                    let root = Widget::get_root(widget);
+                    let window = Widget::with_defaults(ActorCreatorWindow::new());
+                    window.borrow_mut().state.set_modal(true);
+                    Widget::add_child_to(&root, window);
+                })));
 
             Widget::add_child_to(&top_bar, menu);
             Widget::add_child_to(&top_bar, transitions);
@@ -259,13 +300,31 @@ impl WidgetKind for EditorView {
             picker.borrow_mut().state.set_visible(false);
         }
 
-        let picker_kinds: Vec<Rc<RefCell<EditorMode>>> =
-            vec![tile_picker_kind, terrain_picker_kind, wall_picker_kind, actor_picker_kind,
-                prop_picker_kind, elev_picker_kind, encounter_picker_kind, trigger_picker_kind,
-                pass_picker_kind, vis_picker_kind];
+        let picker_kinds: Vec<Rc<RefCell<EditorMode>>> = vec![
+            tile_picker_kind,
+            terrain_picker_kind,
+            wall_picker_kind,
+            actor_picker_kind,
+            prop_picker_kind,
+            elev_picker_kind,
+            encounter_picker_kind,
+            trigger_picker_kind,
+            pass_picker_kind,
+            vis_picker_kind,
+        ];
 
-        let names = vec!["Tiles", "Terrain", "Walls", "Actors", "Props",
-            "Elevation", "Encounters", "Triggers", "Passability", "Visibility"];
+        let names = vec![
+            "Tiles",
+            "Terrain",
+            "Walls",
+            "Actors",
+            "Props",
+            "Elevation",
+            "Encounters",
+            "Triggers",
+            "Passability",
+            "Visibility",
+        ];
 
         // Any new pickers need to be added in all 3 places
         assert!(names.len() == picker_kinds.len());
@@ -276,15 +335,22 @@ impl WidgetKind for EditorView {
             let pickers_ref = pickers.clone();
             let picker_kinds_ref = picker_kinds.clone();
             let area_editor_ref = Rc::clone(&area_editor_kind);
-            entries.push(list_box::Entry::new(name.to_string(), Some(Callback::new(Rc::new(move |widget, _| {
-                pickers_ref.iter().for_each(|p| p.borrow_mut().state.set_visible(false));
-                pickers_ref[index].borrow_mut().state.set_visible(true);
-                pickers_ref[index].borrow_mut().invalidate_children();
-                area_editor_ref.borrow_mut().set_editor(picker_kinds_ref[index].clone());
+            entries.push(list_box::Entry::new(
+                name.to_string(),
+                Some(Callback::new(Rc::new(move |widget, _| {
+                    pickers_ref
+                        .iter()
+                        .for_each(|p| p.borrow_mut().state.set_visible(false));
+                    pickers_ref[index].borrow_mut().state.set_visible(true);
+                    pickers_ref[index].borrow_mut().invalidate_children();
+                    area_editor_ref
+                        .borrow_mut()
+                        .set_editor(picker_kinds_ref[index].clone());
 
-                let parent = Widget::direct_parent(widget);
-                parent.borrow_mut().mark_for_removal();
-            })))));
+                    let parent = Widget::direct_parent(widget);
+                    parent.borrow_mut().mark_for_removal();
+                }))),
+            ));
         }
         let drop_down = DropDown::new(entries, "modes_list");
         let modes = Widget::with_theme(drop_down, "modes");

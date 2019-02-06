@@ -50,7 +50,9 @@ impl Armor {
     }
 
     pub fn add_kind(&mut self, kind: DamageKind, amount: i32) {
-        if kind == DamageKind::Raw { return; }
+        if kind == DamageKind::Raw {
+            return;
+        }
 
         let index = kind.index();
         if self.kinds[index] as i32 + amount < 0 {
@@ -63,9 +65,11 @@ impl Armor {
     /// Returns the amount of armor that this Armor value
     /// applies to the specified damage kind.
     pub fn amount(&self, check_kind: DamageKind) -> u32 {
-        if check_kind == DamageKind::Raw { return 0; }
+        if check_kind == DamageKind::Raw {
+            return 0;
+        }
 
-        return self.kinds[check_kind.index()]
+        return self.kinds[check_kind.index()];
     }
 
     pub fn base(&self) -> u32 {
@@ -73,18 +77,24 @@ impl Armor {
     }
 
     pub fn is_empty(&self) -> bool {
-        if self.base > 0 { return false; }
+        if self.base > 0 {
+            return false;
+        }
 
         for val in self.kinds.iter() {
-            if *val > 0 { return false; }
+            if *val > 0 {
+                return false;
+            }
         }
 
         true
     }
 
     pub fn differs_from_base(&self, kind: DamageKind) -> bool {
-        if kind == DamageKind::Raw { return true; }
+        if kind == DamageKind::Raw {
+            return true;
+        }
 
-        return self.kinds[kind.index()] != self.base
+        return self.kinds[kind.index()] != self.base;
     }
 }

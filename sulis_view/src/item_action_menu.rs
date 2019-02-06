@@ -15,11 +15,11 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::any::Any;
-use std::rc::Rc;
 use std::cell::RefCell;
+use std::rc::Rc;
 
 use sulis_core::ui::{Callback, Widget, WidgetKind};
-use sulis_core::widgets::{Label, list_box, ListBox};
+use sulis_core::widgets::{list_box, Label, ListBox};
 
 pub const NAME: &str = "item_action_menu";
 

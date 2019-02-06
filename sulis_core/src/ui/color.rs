@@ -39,7 +39,9 @@ impl Default for Color {
     }
 }
 
-fn float_one() -> f32 { 1.0 }
+fn float_one() -> f32 {
+    1.0
+}
 
 fn get_component(text: &str, max: f32) -> f32 {
     let component = i32::from_str_radix(&text, 16);
@@ -47,16 +49,14 @@ fn get_component(text: &str, max: f32) -> f32 {
         Err(_) => {
             warn!("Unable to parse color component from '{}'", text);
             1.0
-        },
-        Ok(c) => {
-            c as f32 / max
         }
+        Ok(c) => c as f32 / max,
     }
 }
 
 impl Color {
     pub fn new(r: f32, g: f32, b: f32, a: f32) -> Color {
-        Color {r, g, b, a}
+        Color { r, g, b, a }
     }
 
     pub fn from_string(text: &str) -> Color {
@@ -97,19 +97,71 @@ impl FromStr for Color {
 
             Ok(Color { r, g, b, a })
         } else {
-            Err(Error::new(ErrorKind::InvalidInput,
-                           format!("Unable to parse color from string '{}'", text)))
+            Err(Error::new(
+                ErrorKind::InvalidInput,
+                format!("Unable to parse color from string '{}'", text),
+            ))
         }
     }
 }
 
-pub const WHITE: Color = Color { r: 1.0, g: 1.0, b: 1.0, a: 1.0 };
-pub const LIGHT_GRAY: Color = Color { r: 0.75, g: 0.75, b: 0.75, a: 1.0 };
-pub const GRAY: Color = Color { r: 0.5, g: 0.5, b: 0.5, a: 1.0 };
-pub const BLACK: Color = Color { r: 0.0, g: 0.0, b: 0.0, a: 1.0 };
-pub const RED: Color = Color { r: 1.0, g: 0.0, b: 0.0, a: 1.0 };
-pub const BLUE: Color = Color { r: 0.0, g: 0.0, b: 1.0, a: 1.0 };
-pub const GREEN: Color = Color { r: 0.0, g: 1.0, b: 0.0, a: 1.0 };
-pub const YELLOW: Color = Color { r: 1.0, g: 1.0, b: 0.0, a: 1.0 };
-pub const PURPLE: Color = Color { r: 1.0, g: 0.0, b: 1.0, a: 1.0 };
-pub const CYAN: Color = Color { r: 0.0, g: 1.0, b: 1.0, a: 1.0 };
+pub const WHITE: Color = Color {
+    r: 1.0,
+    g: 1.0,
+    b: 1.0,
+    a: 1.0,
+};
+pub const LIGHT_GRAY: Color = Color {
+    r: 0.75,
+    g: 0.75,
+    b: 0.75,
+    a: 1.0,
+};
+pub const GRAY: Color = Color {
+    r: 0.5,
+    g: 0.5,
+    b: 0.5,
+    a: 1.0,
+};
+pub const BLACK: Color = Color {
+    r: 0.0,
+    g: 0.0,
+    b: 0.0,
+    a: 1.0,
+};
+pub const RED: Color = Color {
+    r: 1.0,
+    g: 0.0,
+    b: 0.0,
+    a: 1.0,
+};
+pub const BLUE: Color = Color {
+    r: 0.0,
+    g: 0.0,
+    b: 1.0,
+    a: 1.0,
+};
+pub const GREEN: Color = Color {
+    r: 0.0,
+    g: 1.0,
+    b: 0.0,
+    a: 1.0,
+};
+pub const YELLOW: Color = Color {
+    r: 1.0,
+    g: 1.0,
+    b: 0.0,
+    a: 1.0,
+};
+pub const PURPLE: Color = Color {
+    r: 1.0,
+    g: 0.0,
+    b: 1.0,
+    a: 1.0,
+};
+pub const CYAN: Color = Color {
+    r: 0.0,
+    g: 1.0,
+    b: 1.0,
+    a: 1.0,
+};

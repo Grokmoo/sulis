@@ -15,8 +15,8 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::any::Any;
-use std::rc::Rc;
 use std::cell::RefCell;
+use std::rc::Rc;
 
 use crate::ui::{Callback, Widget, WidgetKind};
 use crate::widgets::{Button, Label};
@@ -67,36 +67,55 @@ impl Spinner {
 }
 
 impl WidgetKind for Spinner {
-    fn get_name(&self) -> &str { NAME }
-    fn as_any(&self) -> &Any { self }
-    fn as_any_mut(&mut self) -> &mut Any { self }
+    fn get_name(&self) -> &str {
+        NAME
+    }
+    fn as_any(&self) -> &Any {
+        self
+    }
+    fn as_any_mut(&mut self) -> &mut Any {
+        self
+    }
 
     fn layout(&mut self, widget: &mut Widget) {
-        self.label.borrow_mut().state.add_text_arg("value", &self.value.to_string());
+        self.label
+            .borrow_mut()
+            .state
+            .add_text_arg("value", &self.value.to_string());
 
         widget.do_base_layout();
     }
 
     fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
-        self.down.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let (parent, spinner) = Widget::parent_mut::<Spinner>(widget);
-            if spinner.value > spinner.min {
-                spinner.value -= 1;
-            }
+        self.down
+            .borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(|widget, _| {
+                let (parent, spinner) = Widget::parent_mut::<Spinner>(widget);
+                if spinner.value > spinner.min {
+                    spinner.value -= 1;
+                }
 
-            parent.borrow_mut().invalidate_layout();
-            Widget::fire_callback(&parent, &mut *spinner);
-        })));
+                parent.borrow_mut().invalidate_layout();
+                Widget::fire_callback(&parent, &mut *spinner);
+            })));
 
-        self.up.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let (parent, spinner) = Widget::parent_mut::<Spinner>(widget);
-            if spinner.value < spinner.max {
-                spinner.value += 1;
-            }
-            parent.borrow_mut().invalidate_layout();
-            Widget::fire_callback(&parent, &mut *spinner);
-        })));
+        self.up
+            .borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(|widget, _| {
+                let (parent, spinner) = Widget::parent_mut::<Spinner>(widget);
+                if spinner.value < spinner.max {
+                    spinner.value += 1;
+                }
+                parent.borrow_mut().invalidate_layout();
+                Widget::fire_callback(&parent, &mut *spinner);
+            })));
 
-        vec![Rc::clone(&self.down), Rc::clone(&self.up), Rc::clone(&self.label)]
+        vec![
+            Rc::clone(&self.down),
+            Rc::clone(&self.up),
+            Rc::clone(&self.label),
+        ]
     }
 }

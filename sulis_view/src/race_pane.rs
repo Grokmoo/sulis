@@ -15,14 +15,14 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::any::Any;
-use std::rc::Rc;
 use std::cell::RefCell;
+use std::rc::Rc;
 
 use sulis_core::ui::{Widget, WidgetKind};
-use sulis_core::widgets::{TextArea};
+use sulis_core::widgets::TextArea;
 use sulis_module::Race;
 
-use crate::item_button::{add_bonus_text_args, add_attack_text_args};
+use crate::item_button::{add_attack_text_args, add_bonus_text_args};
 
 pub const NAME: &str = "race_pane";
 
@@ -32,15 +32,11 @@ pub struct RacePane {
 
 impl RacePane {
     pub fn empty() -> Rc<RefCell<RacePane>> {
-        Rc::new(RefCell::new(RacePane {
-            race: None,
-        }))
+        Rc::new(RefCell::new(RacePane { race: None }))
     }
 
     pub fn new(race: Rc<Race>) -> Rc<RefCell<RacePane>> {
-        Rc::new(RefCell::new(RacePane {
-            race: Some(race),
-        }))
+        Rc::new(RefCell::new(RacePane { race: Some(race) }))
     }
 
     pub fn clear_race(&mut self) {
@@ -53,9 +49,15 @@ impl RacePane {
 }
 
 impl WidgetKind for RacePane {
-    fn get_name(&self) -> &str { NAME }
-    fn as_any(&self) -> &Any { self }
-    fn as_any_mut(&mut self) -> &mut Any { self }
+    fn get_name(&self) -> &str {
+        NAME
+    }
+    fn as_any(&self) -> &Any {
+        self
+    }
+    fn as_any_mut(&mut self) -> &mut Any {
+        self
+    }
 
     fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let race = match self.race {

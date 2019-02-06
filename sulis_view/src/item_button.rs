@@ -14,27 +14,45 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::fmt::Display;
 use std::any::Any;
-use std::rc::Rc;
 use std::cell::RefCell;
+use std::fmt::Display;
+use std::rc::Rc;
 
+use crate::{ItemActionMenu, MerchantWindow, PropWindow, RootView};
 use sulis_core::io::event;
 use sulis_core::ui::{Callback, Widget, WidgetKind, WidgetState};
-use sulis_module::bonus::{AttackBuilder, AttackKindBuilder, Contingent};
-use sulis_module::{Bonus, BonusList, Armor, DamageKind, QuickSlot, Slot};
-use sulis_module::{ability, Item, item::{format_item_value, format_item_weight}, Module, PrereqList};
-use sulis_state::{EntityState, Script, GameState, ItemState, inventory::has_proficiency};
-use sulis_state::script::ScriptItemKind;
 use sulis_core::widgets::{Label, TextArea};
-use crate::{ItemActionMenu, MerchantWindow, PropWindow, RootView};
+use sulis_module::bonus::{AttackBuilder, AttackKindBuilder, Contingent};
+use sulis_module::{
+    ability,
+    item::{format_item_value, format_item_weight},
+    Item, Module, PrereqList,
+};
+use sulis_module::{Armor, Bonus, BonusList, DamageKind, QuickSlot, Slot};
+use sulis_state::script::ScriptItemKind;
+use sulis_state::{inventory::has_proficiency, EntityState, GameState, ItemState, Script};
 
 enum Kind {
-    Prop { prop_index: usize, item_index: usize },
-    Merchant { id: String, item_index: usize },
-    Inventory { item_index: usize },
-    Equipped { player: Rc<RefCell<EntityState>>, slot: Slot },
-    Quick { player: Rc<RefCell<EntityState>>, quick: QuickSlot },
+    Prop {
+        prop_index: usize,
+        item_index: usize,
+    },
+    Merchant {
+        id: String,
+        item_index: usize,
+    },
+    Inventory {
+        item_index: usize,
+    },
+    Equipped {
+        player: Rc<RefCell<EntityState>>,
+        slot: Slot,
+    },
+    Quick {
+        player: Rc<RefCell<EntityState>>,
+        quick: QuickSlot,
+    },
 }
 
 struct ButtonAction {
@@ -56,33 +74,59 @@ pub struct ItemButton {
 const ITEM_BUTTON_NAME: &str = "item_button";
 
 impl ItemButton {
-    pub fn inventory(item: &Rc<Item>, quantity: u32,
-                     item_index: usize) -> Rc<RefCell<ItemButton>> {
+    pub fn inventory(item: &Rc<Item>, quantity: u32, item_index: usize) -> Rc<RefCell<ItemButton>> {
         ItemButton::new(item, quantity, Kind::Inventory { item_index })
     }
 
-    pub fn equipped(player: &Rc<RefCell<EntityState>>, item: &Rc<Item>,
-                    slot: Slot) -> Rc<RefCell<ItemButton>> {
+    pub fn equipped(
+        player: &Rc<RefCell<EntityState>>,
+        item: &Rc<Item>,
+        slot: Slot,
+    ) -> Rc<RefCell<ItemButton>> {
         let player = Rc::clone(player);
         ItemButton::new(item, 1, Kind::Equipped { player, slot })
     }
 
-    pub fn quick(player: &Rc<RefCell<EntityState>>, quantity: u32, item: &Rc<Item>,
-                 quick: QuickSlot) -> Rc<RefCell<ItemButton>> {
+    pub fn quick(
+        player: &Rc<RefCell<EntityState>>,
+        quantity: u32,
+        item: &Rc<Item>,
+        quick: QuickSlot,
+    ) -> Rc<RefCell<ItemButton>> {
         let player = Rc::clone(player);
         ItemButton::new(item, quantity, Kind::Quick { player, quick })
     }
 
-    pub fn prop(item: &Rc<Item>, quantity: u32, item_index: usize,
-                prop_index: usize) -> Rc<RefCell<ItemButton>> {
-        ItemButton::new(item, quantity,
-                        Kind::Prop { prop_index, item_index })
+    pub fn prop(
+        item: &Rc<Item>,
+        quantity: u32,
+        item_index: usize,
+        prop_index: usize,
+    ) -> Rc<RefCell<ItemButton>> {
+        ItemButton::new(
+            item,
+            quantity,
+            Kind::Prop {
+                prop_index,
+                item_index,
+            },
+        )
     }
 
-    pub fn merchant(item: &Rc<Item>, quantity: u32, item_index: usize,
-                    merchant_id: &str) -> Rc<RefCell<ItemButton>> {
-        ItemButton::new(item, quantity,
-                        Kind::Merchant { id: merchant_id.to_string(), item_index })
+    pub fn merchant(
+        item: &Rc<Item>,
+        quantity: u32,
+        item_index: usize,
+        merchant_id: &str,
+    ) -> Rc<RefCell<ItemButton>> {
+        ItemButton::new(
+            item,
+            quantity,
+            Kind::Merchant {
+                id: merchant_id.to_string(),
+                item_index,
+            },
+        )
     }
 
     fn new(item: &Rc<Item>, quantity: u32, kind: Kind) -> Rc<RefCell<ItemButton>> {
@@ -110,7 +154,11 @@ impl ItemButton {
 
     fn remove_item_window(&mut self) {
         if self.item_window.is_some() {
-            self.item_window.as_ref().unwrap().borrow_mut().mark_for_removal();
+            self.item_window
+                .as_ref()
+                .unwrap()
+                .borrow_mut()
+                .mark_for_removal();
             self.item_window = None;
         }
     }
@@ -124,35 +172,40 @@ impl ItemButton {
                 let stash = stash.borrow();
                 match stash.items().get(item_index) {
                     None => None,
-                    Some(&(_, ref item_state)) => Some(item_state.clone())
+                    Some(&(_, ref item_state)) => Some(item_state.clone()),
                 }
-            },
+            }
             Kind::Quick { ref player, quick } => {
                 let pc = player.borrow();
                 match pc.actor.inventory().quick(quick) {
                     None => None,
-                    Some(item_state) => Some(item_state.clone())
+                    Some(item_state) => Some(item_state.clone()),
                 }
-            },
+            }
             Kind::Equipped { ref player, slot } => {
                 let pc = player.borrow();
                 match pc.actor.inventory().equipped(slot) {
                     None => None,
-                    Some(item_state) => Some(item_state.clone())
+                    Some(item_state) => Some(item_state.clone()),
                 }
-            }, Kind::Prop { prop_index, item_index } => {
-                if !area_state.prop_index_valid(prop_index) { return None; }
+            }
+            Kind::Prop {
+                prop_index,
+                item_index,
+            } => {
+                if !area_state.prop_index_valid(prop_index) {
+                    return None;
+                }
 
                 match area_state.get_prop(prop_index).items() {
                     None => None,
-                    Some(ref items) => {
-                        match items.get(item_index) {
-                            None => None,
-                            Some(&(_, ref item_state)) => Some(item_state.clone())
-                        }
-                    }
+                    Some(ref items) => match items.get(item_index) {
+                        None => None,
+                        Some(&(_, ref item_state)) => Some(item_state.clone()),
+                    },
                 }
-            }, Kind::Merchant { ref id, item_index } => {
+            }
+            Kind::Merchant { ref id, item_index } => {
                 let merchant = area_state.get_merchant(id);
                 let merchant = match merchant {
                     None => return None,
@@ -161,7 +214,7 @@ impl ItemButton {
 
                 match merchant.items().get(item_index) {
                     None => None,
-                    Some(&(_, ref item_state)) => Some(item_state.clone())
+                    Some(&(_, ref item_state)) => Some(item_state.clone()),
                 }
             }
         }
@@ -170,7 +223,7 @@ impl ItemButton {
     fn check_sell_action(&self, widget: &Rc<RefCell<Widget>>) -> Option<ButtonAction> {
         let item_index = match self.kind {
             Kind::Inventory { item_index, .. } => item_index,
-            _ => return None
+            _ => return None,
         };
 
         // TODO this is a hack putting this here.  but, the state of the merchant
@@ -182,7 +235,7 @@ impl ItemButton {
             let action = ButtonAction {
                 label: "Sell".to_string(),
                 callback: sell_item_cb(merchant_window.player(), item_index),
-                can_left_click: true
+                can_left_click: true,
             };
 
             Some(action)
@@ -191,8 +244,12 @@ impl ItemButton {
         }
     }
 
-    fn add_price_text_arg(&self, root: &Rc<RefCell<Widget>>, item_window: &mut Widget,
-                          item_state: &ItemState) {
+    fn add_price_text_arg(
+        &self,
+        root: &Rc<RefCell<Widget>>,
+        item_window: &mut Widget,
+        item_state: &ItemState,
+    ) {
         let area_state = GameState::area_state();
         let area_state = area_state.borrow();
         match self.kind {
@@ -200,9 +257,12 @@ impl ItemButton {
                 let merchant = area_state.get_merchant(id);
                 if let Some(ref merchant) = merchant {
                     let value = merchant.get_buy_price(item_state);
-                    item_window.state.add_text_arg("price", &format_item_value(value));
+                    item_window
+                        .state
+                        .add_text_arg("price", &format_item_value(value));
                 }
-            }, Kind::Inventory { .. } | Kind::Equipped { .. } => {
+            }
+            Kind::Inventory { .. } | Kind::Equipped { .. } => {
                 let root_view = Widget::kind_mut::<RootView>(&root);
                 let merch_window = match root_view.get_merchant_window(&root) {
                     None => return,
@@ -212,9 +272,12 @@ impl ItemButton {
                 let merchant = area_state.get_merchant(window.merchant_id());
                 if let Some(ref merchant) = merchant {
                     let value = merchant.get_sell_price(item_state);
-                    item_window.state.add_text_arg("price", &format_item_value(value));
+                    item_window
+                        .state
+                        .add_text_arg("price", &format_item_value(value));
                 }
-            }, _ => (),
+            }
+            _ => (),
         }
     }
 }
@@ -229,7 +292,10 @@ impl WidgetKind for ItemButton {
     fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let qty_label = Widget::with_theme(Label::empty(), "quantity_label");
         if self.quantity > 1 {
-            qty_label.borrow_mut().state.add_text_arg("quantity", &self.quantity.to_string());
+            qty_label
+                .borrow_mut()
+                .state
+                .add_text_arg("quantity", &self.quantity.to_string());
         }
         let icon = Widget::empty("icon");
         icon.borrow_mut().state.add_text_arg("icon", &self.icon);
@@ -247,7 +313,9 @@ impl WidgetKind for ItemButton {
     fn on_mouse_enter(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
         self.super_on_mouse_enter(widget);
 
-        if self.item_window.is_some() { return true; }
+        if self.item_window.is_some() {
+            return true;
+        }
 
         let item_state = self.get_item_state();
         let item_state = match item_state {
@@ -260,8 +328,10 @@ impl WidgetKind for ItemButton {
         {
             let mut item_window = item_window.borrow_mut();
             item_window.state.disable();
-            item_window.state.set_position(widget.borrow().state.inner_right(),
-            widget.borrow().state.inner_top());
+            item_window.state.set_position(
+                widget.borrow().state.inner_right(),
+                widget.borrow().state.inner_top(),
+            );
 
             match self.kind {
                 Kind::Prop { .. } | Kind::Inventory { .. } | Kind::Merchant { .. } => {
@@ -271,25 +341,38 @@ impl WidgetKind for ItemButton {
                             item_window.state.add_text_arg("prof_not_met", "true");
                         }
 
-                        if !item_state.item.meets_prereqs(&player[0].borrow().actor.actor) {
+                        if !item_state
+                            .item
+                            .meets_prereqs(&player[0].borrow().actor.actor)
+                        {
                             item_window.state.add_text_arg("prereqs_not_met", "true");
                         }
 
                         if let Some(ref equip) = item_state.item.equippable {
                             if player[0].borrow().actor.actor.race.is_disabled(equip.slot) {
-                                item_window.state.add_text_arg("slot_disabled_for_race", "true");
-                                item_window.state.add_text_arg("player_race",
-                                                               &player[0].borrow().actor.actor.race.name);
+                                item_window
+                                    .state
+                                    .add_text_arg("slot_disabled_for_race", "true");
+                                item_window.state.add_text_arg(
+                                    "player_race",
+                                    &player[0].borrow().actor.actor.race.name,
+                                );
                             }
                         }
                     }
-                },
+                }
                 _ => (),
             }
 
-            item_window.state.add_text_arg("name", &item_state.item.name);
-            item_window.state.add_text_arg("value", &format_item_value(item_state.item.value));
-            item_window.state.add_text_arg("weight", &format_item_weight(item_state.item.weight));
+            item_window
+                .state
+                .add_text_arg("name", &item_state.item.name);
+            item_window
+                .state
+                .add_text_arg("value", &format_item_value(item_state.item.value));
+            item_window
+                .state
+                .add_text_arg("weight", &format_item_weight(item_state.item.weight));
             self.add_price_text_arg(&root, &mut item_window, &item_state);
 
             if let Some(ref prereqs) = &item_state.item.prereqs {
@@ -307,11 +390,14 @@ impl WidgetKind for ItemButton {
                         state.add_text_arg("consumable", "true");
                     }
                     match usable.duration {
-                        ability::Duration::Rounds(rounds) =>
-                            state.add_text_arg("usable_duration", &rounds.to_string()),
+                        ability::Duration::Rounds(rounds) => {
+                            state.add_text_arg("usable_duration", &rounds.to_string())
+                        }
                         ability::Duration::Mode => state.add_text_arg("usable_mode", "true"),
                         ability::Duration::Instant => state.add_text_arg("usable_instant", "true"),
-                        ability::Duration::Permanent => state.add_text_arg("usable_permanent", "true"),
+                        ability::Duration::Permanent => {
+                            state.add_text_arg("usable_permanent", "true")
+                        }
                     }
                     state.add_text_arg("usable_description", &usable.short_description);
                 }
@@ -324,7 +410,7 @@ impl WidgetKind for ItemButton {
                         add_attack_text_args(attack, &mut item_window.state);
                     }
                     add_bonus_text_args(&equippable.bonuses, &mut item_window.state);
-                },
+                }
             }
         }
         Widget::add_child_to(&root, Rc::clone(&item_window));
@@ -347,15 +433,20 @@ impl WidgetKind for ItemButton {
         match kind {
             event::ClickKind::Left => {
                 let sell_action = self.check_sell_action(widget);
-                let cb = sell_action.iter().chain(self.actions.iter())
+                let cb = sell_action
+                    .iter()
+                    .chain(self.actions.iter())
                     .find_map(|action| {
-                        if action.can_left_click { Some(action.callback.clone()) } else { None }
-                    }
-                );
+                        if action.can_left_click {
+                            Some(action.callback.clone())
+                        } else {
+                            None
+                        }
+                    });
                 if let Some(action) = cb {
                     action.call(widget, self);
                 }
-            },
+            }
             event::ClickKind::Right => {
                 let menu = ItemActionMenu::new();
 
@@ -366,7 +457,8 @@ impl WidgetKind for ItemButton {
                 }
 
                 for action in self.actions.iter() {
-                    menu.borrow_mut().add_action(&action.label, action.callback.clone());
+                    menu.borrow_mut()
+                        .add_action(&action.label, action.callback.clone());
                     at_least_one_action = true;
                 }
 
@@ -377,7 +469,7 @@ impl WidgetKind for ItemButton {
                     let root = Widget::get_root(widget);
                     Widget::add_child_to(&root, menu);
                 }
-            },
+            }
             _ => return false,
         }
 
@@ -399,8 +491,7 @@ pub fn clear_quickslot_cb(entity: &Rc<RefCell<EntityState>>, slot: QuickSlot) ->
     }))
 }
 
-pub fn set_quickslot_cb(entity: &Rc<RefCell<EntityState>>,
-                        index: usize) -> Callback {
+pub fn set_quickslot_cb(entity: &Rc<RefCell<EntityState>>, index: usize) -> Callback {
     let entity = Rc::clone(entity);
     Callback::new(Rc::new(move |_, _| {
         let stash = GameState::party_stash();
@@ -432,8 +523,11 @@ pub fn use_item_cb(entity: &Rc<RefCell<EntityState>>, kind: ScriptItemKind) -> C
     Callback::new(Rc::new(move |widget, _| {
         match kind {
             ScriptItemKind::Quick(slot) => {
-                if !entity.borrow().actor.can_use_quick(slot) { return; }
-            }, _ => (),
+                if !entity.borrow().actor.can_use_quick(slot) {
+                    return;
+                }
+            }
+            _ => (),
         }
         let (root, view) = Widget::parent_mut::<RootView>(widget);
         view.set_inventory_window(&root, false);
@@ -554,7 +648,9 @@ fn drop_item(widget: &Rc<RefCell<Widget>>, entity: &Rc<RefCell<EntityState>>, it
 fn drop_to_prop(item: ItemState, prop_index: usize) {
     let area_state = GameState::area_state();
     let mut area_state = area_state.borrow_mut();
-    if !area_state.prop_index_valid(prop_index) { return; }
+    if !area_state.prop_index_valid(prop_index) {
+        return;
+    }
 
     let prop_state = area_state.get_prop_mut(prop_index);
 
@@ -602,22 +698,60 @@ pub fn add_attack_text_args(attack: &AttackBuilder, widget_state: &mut WidgetSta
     add_if_present(widget_state, "damage_kind", attack.damage.kind);
 
     match attack.kind {
-        AttackKindBuilder::Melee { reach } =>
-            widget_state.add_text_arg("reach", &reach.to_string()),
-            AttackKindBuilder::Ranged { range, .. } =>
-                widget_state.add_text_arg("range", &range.to_string()),
+        AttackKindBuilder::Melee { reach } => {
+            widget_state.add_text_arg("reach", &reach.to_string())
+        }
+        AttackKindBuilder::Ranged { range, .. } => {
+            widget_state.add_text_arg("range", &range.to_string())
+        }
     }
 
     let bonuses = &attack.bonuses;
-    add_if_nonzero(widget_state, "attack_crit_chance", bonuses.crit_chance as f32);
-    add_if_nonzero(widget_state, "attack_hit_threshold", bonuses.hit_threshold as f32);
-    add_if_nonzero(widget_state, "attack_graze_threshold", bonuses.graze_threshold as f32);
-    add_if_nonzero(widget_state, "attack_graze_multiplier", bonuses.graze_multiplier);
-    add_if_nonzero(widget_state, "attack_hit_multiplier", bonuses.hit_multiplier);
-    add_if_nonzero(widget_state, "attack_crit_multiplier", bonuses.crit_multiplier);
-    add_if_nonzero(widget_state, "attack_melee_accuracy", bonuses.melee_accuracy as f32);
-    add_if_nonzero(widget_state, "attack_ranged_accuracy", bonuses.ranged_accuracy as f32);
-    add_if_nonzero(widget_state, "attack_spell_accuracy", bonuses.spell_accuracy as f32);
+    add_if_nonzero(
+        widget_state,
+        "attack_crit_chance",
+        bonuses.crit_chance as f32,
+    );
+    add_if_nonzero(
+        widget_state,
+        "attack_hit_threshold",
+        bonuses.hit_threshold as f32,
+    );
+    add_if_nonzero(
+        widget_state,
+        "attack_graze_threshold",
+        bonuses.graze_threshold as f32,
+    );
+    add_if_nonzero(
+        widget_state,
+        "attack_graze_multiplier",
+        bonuses.graze_multiplier,
+    );
+    add_if_nonzero(
+        widget_state,
+        "attack_hit_multiplier",
+        bonuses.hit_multiplier,
+    );
+    add_if_nonzero(
+        widget_state,
+        "attack_crit_multiplier",
+        bonuses.crit_multiplier,
+    );
+    add_if_nonzero(
+        widget_state,
+        "attack_melee_accuracy",
+        bonuses.melee_accuracy as f32,
+    );
+    add_if_nonzero(
+        widget_state,
+        "attack_ranged_accuracy",
+        bonuses.ranged_accuracy as f32,
+    );
+    add_if_nonzero(
+        widget_state,
+        "attack_spell_accuracy",
+        bonuses.spell_accuracy as f32,
+    );
 
     if let Some(damage) = bonuses.damage {
         widget_state.add_text_arg("attack_min_bonus_damage", &damage.min.to_string());
@@ -634,23 +768,38 @@ fn add<T: Display>(widget_state: &mut WidgetState, name: &str, value: T) {
 
 fn find_index(group: &str, uses_so_far: &mut Vec<String>) -> usize {
     for (index, so_far_group) in uses_so_far.iter().enumerate() {
-        if so_far_group == group { return index; }
+        if so_far_group == group {
+            return index;
+        }
     }
 
     uses_so_far.push(group.to_string());
     uses_so_far.len() - 1
 }
 
-fn add_bonus(bonus: &Bonus, state: &mut WidgetState, has_accuracy: &mut bool,
-             group_uses_so_far: &mut Vec<String>, damage_index: &mut usize, armor: &mut Armor) {
+fn add_bonus(
+    bonus: &Bonus,
+    state: &mut WidgetState,
+    has_accuracy: &mut bool,
+    group_uses_so_far: &mut Vec<String>,
+    damage_index: &mut usize,
+    armor: &mut Armor,
+) {
     use sulis_module::BonusKind::*;
     match &bonus.kind {
         Attribute { attribute, amount } => add(state, &attribute.short_name(), amount),
-        ActionPoints(amount) => add(state, "bonus_ap", *amount / Module::rules().display_ap as i32),
+        ActionPoints(amount) => add(
+            state,
+            "bonus_ap",
+            *amount / Module::rules().display_ap as i32,
+        ),
         Armor(amount) => armor.add_base(*amount),
         ArmorKind { kind, amount } => armor.add_kind(*kind, *amount),
-        Resistance { kind, amount } =>
-            add(state, &format!("resistance_{}", kind).to_lowercase(), *amount),
+        Resistance { kind, amount } => add(
+            state,
+            &format!("resistance_{}", kind).to_lowercase(),
+            *amount,
+        ),
         Damage(damage) => {
             let index = *damage_index;
             if damage.max > 0 {
@@ -664,14 +813,23 @@ fn add_bonus(bonus: &Bonus, state: &mut WidgetState, has_accuracy: &mut bool,
                 add(state, &format!("bonus_damage_kind_{}", index), kind);
             }
             *damage_index += 1;
-        },
+        }
         Reach(amount) => add(state, "bonus_reach", amount),
         Range(amount) => add(state, "bonus_range", amount),
         Initiative(amount) => add(state, "initiative", amount),
         HitPoints(amount) => add(state, "hit_points", amount),
-        MeleeAccuracy(amount) => { add(state, "melee_accuracy", amount); *has_accuracy = true; },
-        RangedAccuracy(amount) => { add(state, "ranged_accuracy", amount); *has_accuracy = true; },
-        SpellAccuracy(amount) => { add(state, "spell_accuracy", amount); *has_accuracy = true; },
+        MeleeAccuracy(amount) => {
+            add(state, "melee_accuracy", amount);
+            *has_accuracy = true;
+        }
+        RangedAccuracy(amount) => {
+            add(state, "ranged_accuracy", amount);
+            *has_accuracy = true;
+        }
+        SpellAccuracy(amount) => {
+            add(state, "spell_accuracy", amount);
+            *has_accuracy = true;
+        }
         Defense(amount) => add(state, "defense", amount),
         Fortitude(amount) => add(state, "fortitude", amount),
         Reflex(amount) => add(state, "reflex", amount),
@@ -683,33 +841,51 @@ fn add_bonus(bonus: &Bonus, state: &mut WidgetState, has_accuracy: &mut bool,
         GrazeThreshold(amount) => add(state, "graze_threshold", amount),
         CritMultiplier(amount) => state.add_text_arg("crit_multiplier", &format!("{:.2}", amount)),
         HitMultiplier(amount) => state.add_text_arg("hit_multiplier", &format!("{:.2}", amount)),
-        GrazeMultiplier(amount) => state.add_text_arg("graze_multiplier", &format!("{:.2}", amount)),
+        GrazeMultiplier(amount) => {
+            state.add_text_arg("graze_multiplier", &format!("{:.2}", amount))
+        }
         MovementRate(amount) => state.add_text_arg("movement_rate", &format!("{:.2}", amount)),
         CasterLevel(amount) => add(state, "caster_level", amount),
         AttackCost(amount) => {
             let cost = amount / Module::rules().display_ap as i32;
             add(state, "attack_cost", cost);
-        },
+        }
         AbilityActionPointCost(amount) => {
             let cost = amount / Module::rules().display_ap as i32;
             add(state, "ability_ap_cost", cost);
-        },
+        }
         GroupUsesPerEncounter { group, amount } => {
             let index = find_index(group, group_uses_so_far);
             add(state, &format!("ability_group_{}", index), group);
-            add(state, &format!("ability_group_{}_uses_per_encounter", index), amount);
-        },
+            add(
+                state,
+                &format!("ability_group_{}_uses_per_encounter", index),
+                amount,
+            );
+        }
         GroupUsesPerDay { group, amount } => {
             let index = find_index(group, group_uses_so_far);
             add(state, &format!("ability_group_{}", index), group);
-            add(state, &format!("ability_group_{}_uses_per_day", index), amount);
-        },
+            add(
+                state,
+                &format!("ability_group_{}_uses_per_day", index),
+                amount,
+            );
+        }
         ArmorProficiency(armor_kind) => {
-            add(state, &format!("armor_proficiency_{:?}", armor_kind), "true");
-        },
+            add(
+                state,
+                &format!("armor_proficiency_{:?}", armor_kind),
+                "true",
+            );
+        }
         WeaponProficiency(weapon_kind) => {
-            add(state, &format!("weapon_proficiency_{:?}", weapon_kind), "true");
-        },
+            add(
+                state,
+                &format!("weapon_proficiency_{:?}", weapon_kind),
+                "true",
+            );
+        }
         FlankingAngle(amount) => add(state, "flanking_angle", amount),
         FreeAbilityGroupUse => add(state, "free_ability_group_use", true),
         AbilitiesDisabled => add(state, "abilities_disabled", true),
@@ -727,7 +903,10 @@ pub fn add_prereq_text_args(prereqs: &PrereqList, state: &mut WidgetState) {
 
     if let Some(ref attrs) = prereqs.attributes {
         for &(attr, amount) in attrs.iter() {
-            state.add_text_arg(&format!("prereq_{}", attr.short_name()), &amount.to_string());
+            state.add_text_arg(
+                &format!("prereq_{}", attr.short_name()),
+                &amount.to_string(),
+            );
         }
     }
 
@@ -736,7 +915,8 @@ pub fn add_prereq_text_args(prereqs: &PrereqList, state: &mut WidgetState) {
             None => {
                 warn!("Invalid class '{}' in prereq list", class_id);
                 continue;
-            }, Some(class) => class,
+            }
+            Some(class) => class,
         };
         state.add_text_arg(&format!("prereq_class_{}", index), &class.name);
         state.add_text_arg(&format!("prereq_level_{}", index), &level.to_string());
@@ -755,7 +935,8 @@ pub fn add_prereq_text_args(prereqs: &PrereqList, state: &mut WidgetState) {
             None => {
                 warn!("No ability '{}' found for prereq list", ability_id);
                 continue;
-            }, Some(ability) => ability,
+            }
+            Some(ability) => ability,
         };
 
         state.add_text_arg(&format!("prereq_ability_{}", index), &ability.name);
@@ -772,8 +953,14 @@ pub fn add_bonus_text_args(bonuses: &BonusList, widget_state: &mut WidgetState) 
             Contingent::Always => (),
             _ => continue,
         }
-        add_bonus(bonus, widget_state, &mut has_accuracy, &mut group_uses_so_far,
-                  &mut damage_index, &mut armor);
+        add_bonus(
+            bonus,
+            widget_state,
+            &mut has_accuracy,
+            &mut group_uses_so_far,
+            &mut damage_index,
+            &mut armor,
+        );
     }
 
     if has_accuracy {
@@ -788,8 +975,14 @@ pub fn add_bonus_text_args(bonuses: &BonusList, widget_state: &mut WidgetState) 
     }
 
     for kind in DamageKind::iter() {
-        if !armor.differs_from_base(*kind) { continue; }
-        add(widget_state, &format!("armor_{}", kind).to_lowercase(), armor.amount(*kind));
+        if !armor.differs_from_base(*kind) {
+            continue;
+        }
+        add(
+            widget_state,
+            &format!("armor_{}", kind).to_lowercase(),
+            armor.amount(*kind),
+        );
     }
 }
 

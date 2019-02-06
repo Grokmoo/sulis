@@ -15,15 +15,15 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::any::Any;
-use std::rc::Rc;
 use std::cell::RefCell;
+use std::rc::Rc;
 
 use sulis_core::ui::{Widget, WidgetKind};
 use sulis_core::widgets::{Label, TextArea};
 use sulis_module::{Ability, Class};
 
-use crate::{CharacterBuilder};
 use crate::character_builder::BuilderPane;
+use crate::CharacterBuilder;
 
 pub const NAME: &str = "level_up_finish_pane";
 
@@ -59,8 +59,7 @@ impl BuilderPane for LevelUpFinishPane {
         widget.borrow_mut().invalidate_children();
     }
 
-    fn next(&mut self, _builder: &mut CharacterBuilder, _widget: Rc<RefCell<Widget>>) {
-    }
+    fn next(&mut self, _builder: &mut CharacterBuilder, _widget: Rc<RefCell<Widget>>) {}
 
     fn prev(&mut self, builder: &mut CharacterBuilder, widget: Rc<RefCell<Widget>>) {
         builder.next.borrow_mut().state.set_visible(true);
@@ -70,9 +69,15 @@ impl BuilderPane for LevelUpFinishPane {
 }
 
 impl WidgetKind for LevelUpFinishPane {
-    fn get_name(&self) -> &str { NAME }
-    fn as_any(&self) -> &Any { self }
-    fn as_any_mut(&mut self) -> &mut Any { self }
+    fn get_name(&self) -> &str {
+        NAME
+    }
+    fn as_any(&self) -> &Any {
+        self
+    }
+    fn as_any_mut(&mut self) -> &mut Any {
+        self
+    }
 
     fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let title = Widget::with_theme(Label::empty(), "title");

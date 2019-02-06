@@ -33,9 +33,7 @@ impl Index<usize> for ItemList {
 
 impl ItemList {
     pub fn new() -> ItemList {
-        ItemList {
-            items: Vec::new(),
-        }
+        ItemList { items: Vec::new() }
     }
 
     pub fn clear(&mut self) {
@@ -60,7 +58,9 @@ impl ItemList {
 
     pub fn get_quantity(&self, item: &ItemState) -> u32 {
         for &(qty, ref item_in_list) in self.items.iter() {
-            if item == item_in_list { return qty; }
+            if item == item_in_list {
+                return qty;
+            }
         }
 
         0
@@ -68,7 +68,9 @@ impl ItemList {
 
     pub fn find_index(&self, state: &ItemState) -> Option<usize> {
         for (i, &(_, ref item)) in self.items.iter().enumerate() {
-            if item == state { return Some(i); }
+            if item == state {
+                return Some(i);
+            }
         }
 
         None
@@ -81,7 +83,8 @@ impl ItemList {
             Some(index) => {
                 self.items[index].0 += qty;
                 index
-            }, None => {
+            }
+            None => {
                 self.items.push((qty, item_state));
                 self.items.len() - 1
             }
@@ -96,7 +99,9 @@ impl ItemList {
 
     /// Removes the entire quantity of items at the specified index and returns it
     pub fn remove_all_at(&mut self, index: usize) -> Option<(u32, ItemState)> {
-        if index >= self.items.len() { return None; }
+        if index >= self.items.len() {
+            return None;
+        }
 
         Some(self.items.remove(index))
     }
@@ -105,7 +110,9 @@ impl ItemList {
     /// Only removes one count, so the item may still exist if there is more
     /// than one
     pub fn remove(&mut self, index: usize) -> Option<ItemState> {
-        if index >= self.items.len() { return None; }
+        if index >= self.items.len() {
+            return None;
+        }
 
         if self.items[index].0 == 1 {
             let (_, item_state) = self.items.remove(index);
@@ -117,4 +124,3 @@ impl ItemList {
         }
     }
 }
-

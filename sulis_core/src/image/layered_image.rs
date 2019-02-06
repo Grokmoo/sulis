@@ -29,7 +29,10 @@ pub struct LayeredImage {
 }
 
 impl LayeredImage {
-    pub fn new(images: Vec<(f32, f32, Option<Color>, Rc<Image>)>, swap_hue: Option<f32>) -> LayeredImage {
+    pub fn new(
+        images: Vec<(f32, f32, Option<Color>, Rc<Image>)>,
+        swap_hue: Option<f32>,
+    ) -> LayeredImage {
         let mut max_x = 0.0;
         let mut max_y = 0.0;
 
@@ -51,8 +54,16 @@ impl LayeredImage {
     }
 
     #[inline]
-    fn draw_layer(&self, color: &Option<Color>, image: &Rc<Image>,
-                  x: f32, y: f32, scale_x: f32, scale_y: f32, millis: u32) -> DrawList {
+    fn draw_layer(
+        &self,
+        color: &Option<Color>,
+        image: &Rc<Image>,
+        x: f32,
+        y: f32,
+        scale_x: f32,
+        scale_y: f32,
+        millis: u32,
+    ) -> DrawList {
         let mut draw_list = DrawList::empty_sprite();
         let w = image.get_width_f32();
         let h = image.get_height_f32();
@@ -68,33 +79,77 @@ impl LayeredImage {
         draw_list
     }
 
-    pub fn draw_to_texture(&self, renderer: &mut GraphicsRenderer, texture_id: &str, scale_x: f32,
-                           scale_y: f32, x: f32, y: f32) {
+    pub fn draw_to_texture(
+        &self,
+        renderer: &mut GraphicsRenderer,
+        texture_id: &str,
+        scale_x: f32,
+        scale_y: f32,
+        x: f32,
+        y: f32,
+    ) {
         for &(offset_x, offset_y, color, ref image) in self.layers.iter() {
-            let draw_list = self.draw_layer(&color, image, x + offset_x, y + offset_y, scale_x,
-                                            scale_y, 0);
+            let draw_list = self.draw_layer(
+                &color,
+                image,
+                x + offset_x,
+                y + offset_y,
+                scale_x,
+                scale_y,
+                0,
+            );
             renderer.draw_to_texture(texture_id, draw_list);
         }
     }
 
-    pub fn draw(&self, renderer: &mut GraphicsRenderer, scale_x: f32, scale_y: f32,
-            x: f32, y: f32, millis: u32) {
+    pub fn draw(
+        &self,
+        renderer: &mut GraphicsRenderer,
+        scale_x: f32,
+        scale_y: f32,
+        x: f32,
+        y: f32,
+        millis: u32,
+    ) {
         for &(offset_x, offset_y, color, ref image) in self.layers.iter() {
-            let draw_list = self.draw_layer(&color, image, x + offset_x, y + offset_y,
-                                            scale_x, scale_y, millis);
+            let draw_list = self.draw_layer(
+                &color,
+                image,
+                x + offset_x,
+                y + offset_y,
+                scale_x,
+                scale_y,
+                millis,
+            );
             renderer.draw(draw_list);
         }
     }
 }
 
 impl Image for LayeredImage {
-    fn append_to_draw_list(&self, _draw_list: &mut DrawList, _state: &AnimationState,
-                           _x: f32, _y: f32, _w: f32, _h: f32, _millis: u32) {
+    fn append_to_draw_list(
+        &self,
+        _draw_list: &mut DrawList,
+        _state: &AnimationState,
+        _x: f32,
+        _y: f32,
+        _w: f32,
+        _h: f32,
+        _millis: u32,
+    ) {
         panic!("LayeredImage must be drawn directly");
     }
 
-    fn draw(&self, _renderer: &mut GraphicsRenderer, _state: &AnimationState,
-            _x: f32, _y: f32, _w: f32, _h: f32, _millis: u32) {
+    fn draw(
+        &self,
+        _renderer: &mut GraphicsRenderer,
+        _state: &AnimationState,
+        _x: f32,
+        _y: f32,
+        _w: f32,
+        _h: f32,
+        _millis: u32,
+    ) {
         panic!("LayeredImage must be drawn directly");
     }
 

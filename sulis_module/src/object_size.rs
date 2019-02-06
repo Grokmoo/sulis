@@ -14,7 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::io::{Error};
+use std::io::Error;
 use std::rc::Rc;
 
 use sulis_core::image::Image;
@@ -46,8 +46,10 @@ impl ObjectSize {
             let x = p[0] as i32;
             let y = p[1] as i32;
             if x < 0 || y < 0 || x >= width || y >= height {
-                return invalid_data_error(
-                    &format!("Point coords must be within {},{}", builder.width, builder.height));
+                return invalid_data_error(&format!(
+                    "Point coords must be within {},{}",
+                    builder.width, builder.height
+                ));
             }
 
             points.push(Point::new(x, y));
@@ -59,7 +61,8 @@ impl ObjectSize {
             None => {
                 warn!("Unable to locate image '{}'", builder.selection_image);
                 return unable_to_create_error("object_size", &builder.id);
-            }, Some(img) => img,
+            }
+            Some(img) => img,
         };
 
         let diagonal = (((width * width) + (height * height)) as f32).sqrt();
@@ -76,11 +79,21 @@ impl ObjectSize {
     }
 
     pub fn relative_points(&self) -> ObjectSizeIterator {
-        ObjectSizeIterator { size: &self, index: 0, x_offset: 0, y_offset: 0 }
+        ObjectSizeIterator {
+            size: &self,
+            index: 0,
+            x_offset: 0,
+            y_offset: 0,
+        }
     }
 
     pub fn points(&self, x: i32, y: i32) -> ObjectSizeIterator {
-        ObjectSizeIterator { size: &self, index: 0, x_offset: x, y_offset: y }
+        ObjectSizeIterator {
+            size: &self,
+            index: 0,
+            x_offset: x,
+            y_offset: y,
+        }
     }
 }
 
@@ -100,7 +113,7 @@ impl<'a> Iterator for ObjectSizeIterator<'a> {
 
         match next {
             None => None,
-            Some(p) => Some(p.add(self.x_offset, self.y_offset))
+            Some(p) => Some(p.add(self.x_offset, self.y_offset)),
         }
     }
 }

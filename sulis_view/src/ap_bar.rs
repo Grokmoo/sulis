@@ -15,14 +15,14 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::any::Any;
-use std::rc::Rc;
 use std::cell::RefCell;
+use std::rc::Rc;
 
-use sulis_state::{ChangeListener, EntityState, GameState};
 use sulis_core::io::event::ClickKind;
 use sulis_core::ui::{Widget, WidgetKind};
+use sulis_core::widgets::ProgressBar;
 use sulis_module::{Module, OnTrigger};
-use sulis_core::widgets::{ProgressBar};
+use sulis_state::{ChangeListener, EntityState, GameState};
 
 use crate::RootView;
 
@@ -35,10 +35,10 @@ pub fn check_end_turn(widget: &Rc<RefCell<Widget>>) {
         let mgr = mgr.borrow();
         if let Some(entity) = mgr.current() {
             let entity = entity.borrow();
-            if entity.is_party_member() &&
-                entity.actor.ap() < entity.actor.get_move_ap_cost(1) &&
-                !entity.actor.has_ap_to_attack() {
-
+            if entity.is_party_member()
+                && entity.actor.ap() < entity.actor.get_move_ap_cost(1)
+                && !entity.actor.has_ap_to_attack()
+            {
                 end_turn = true;
             }
         }
@@ -56,9 +56,7 @@ pub struct ApBar {
 
 impl ApBar {
     pub fn new(entity: Rc<RefCell<EntityState>>) -> Rc<RefCell<ApBar>> {
-        Rc::new(RefCell::new(ApBar {
-            entity,
-        }))
+        Rc::new(RefCell::new(ApBar { entity }))
     }
 }
 
@@ -75,12 +73,17 @@ impl WidgetKind for ApBar {
         false
     }
 
-    fn on_mouse_drag(&mut self, _widget: &Rc<RefCell<Widget>>, _kind: ClickKind,
-                     _delta_x: f32, _delta_y: f32) -> bool {
+    fn on_mouse_drag(
+        &mut self,
+        _widget: &Rc<RefCell<Widget>>,
+        _kind: ClickKind,
+        _delta_x: f32,
+        _delta_y: f32,
+    ) -> bool {
         false
     }
 
-    fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>>  {
+    fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let visible = GameState::is_current(&self.entity);
 
         let mut entity = self.entity.borrow_mut();
@@ -89,22 +92,28 @@ impl WidgetKind for ApBar {
 
         let widget_ref = Rc::clone(widget);
         let player_ref = GameState::player();
-        entity.actor.listeners.add(ChangeListener::new(NAME, Box::new(move |_| {
-            widget_ref.borrow_mut().invalidate_children();
-            let cb = OnTrigger::CheckEndTurn;
-            GameState::add_ui_callback(vec![cb], &player_ref, &player_ref);
-        })));
+        entity.actor.listeners.add(ChangeListener::new(
+            NAME,
+            Box::new(move |_| {
+                widget_ref.borrow_mut().invalidate_children();
+                let cb = OnTrigger::CheckEndTurn;
+                GameState::add_ui_callback(vec![cb], &player_ref, &player_ref);
+            }),
+        ));
 
         let widget_ref = Rc::clone(widget);
-        GameState::add_party_listener(ChangeListener::new(NAME, Box::new(move |entity| {
-            let bar = Widget::kind_mut::<ApBar>(&widget_ref);
+        GameState::add_party_listener(ChangeListener::new(
+            NAME,
+            Box::new(move |entity| {
+                let bar = Widget::kind_mut::<ApBar>(&widget_ref);
 
-            if let Some(entity) = entity {
-                bar.entity = Rc::clone(entity);
-            }
+                if let Some(entity) = entity {
+                    bar.entity = Rc::clone(entity);
+                }
 
-            widget_ref.borrow_mut().invalidate_children();
-        })));
+                widget_ref.borrow_mut().invalidate_children();
+            }),
+        ));
 
         let rules = Module::rules();
         let ap_per_ball = rules.display_ap;

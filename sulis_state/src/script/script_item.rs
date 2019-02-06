@@ -15,14 +15,14 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std;
+use std::cell::RefCell;
 use std::rc::Rc;
-use std::cell::{RefCell};
 
 use rlua::{self, Context, UserData, UserDataMethods};
 
-use sulis_module::{ability, Item, Module};
-use crate::{EntityState, ItemState, GameState, area_feedback_text::ColorKind};
 use crate::script::*;
+use crate::{area_feedback_text::ColorKind, EntityState, GameState, ItemState};
+use sulis_module::{ability, Item, Module};
 
 /// A kind of Item, represented by its owner (Stash, QuickSlot, or a generic
 /// item with a specified ID)
@@ -43,19 +43,15 @@ impl ScriptItemKind {
                     None => None,
                     Some(&(_, ref item)) => Some(item.clone()),
                 }
-            },
-            ScriptItemKind::Quick(slot) => {
-                match parent.borrow().actor.inventory().quick(*slot) {
-                    None => None,
-                    Some(item) => Some(item.clone()),
-                }
-            },
-            ScriptItemKind::WithID(id) => {
-                match Module::item(id) {
-                    None => None,
-                    Some(item) => Some(ItemState::new(item)),
-                }
             }
+            ScriptItemKind::Quick(slot) => match parent.borrow().actor.inventory().quick(*slot) {
+                None => None,
+                Some(item) => Some(item.clone()),
+            },
+            ScriptItemKind::WithID(id) => match Module::item(id) {
+                None => None,
+                Some(item) => Some(ItemState::new(item)),
+            },
         }
     }
 
@@ -68,19 +64,15 @@ impl ScriptItemKind {
                     None => unreachable!(),
                     Some(&(_, ref item)) => item.clone(),
                 }
-            },
-            ScriptItemKind::Quick(slot) => {
-                match parent.borrow().actor.inventory().quick(*slot) {
-                    None => unreachable!(),
-                    Some(item) => item.clone(),
-                }
-            },
-            ScriptItemKind::WithID(id) => {
-                match Module::item(id) {
-                    None => unreachable!(),
-                    Some(item) => ItemState::new(item),
-                }
             }
+            ScriptItemKind::Quick(slot) => match parent.borrow().actor.inventory().quick(*slot) {
+                None => unreachable!(),
+                Some(item) => item.clone(),
+            },
+            ScriptItemKind::WithID(id) => match Module::item(id) {
+                None => unreachable!(),
+                Some(item) => ItemState::new(item),
+            },
         }
     }
 }
@@ -123,11 +115,13 @@ pub struct ScriptItem {
 impl ScriptItem {
     pub fn new(parent: &Rc<RefCell<EntityState>>, kind: ScriptItemKind) -> Result<ScriptItem> {
         let item = match kind.item_checked(parent) {
-            None => return Err(rlua::Error::FromLuaConversionError {
-                from: "ScriptItem",
-                to: "Item",
-                message: Some(format!("Item with kind {:?} does not exist", kind)),
-            }),
+            None => {
+                return Err(rlua::Error::FromLuaConversionError {
+                    from: "ScriptItem",
+                    to: "Item",
+                    message: Some(format!("Item with kind {:?} does not exist", kind)),
+                });
+            }
             Some(item) => item,
         };
 
@@ -145,7 +139,9 @@ impl ScriptItem {
         })
     }
 
-    pub fn kind(&self) -> ScriptItemKind { self.kind.clone() }
+    pub fn kind(&self) -> ScriptItemKind {
+        self.kind.clone()
+    }
 
     pub fn try_item(&self) -> Result<Rc<Item>> {
         let parent = ScriptEntity::new(self.parent).try_unwrap()?;
@@ -155,7 +151,10 @@ impl ScriptItem {
             None => Err(rlua::Error::FromLuaConversionError {
                 from: "ScriptItem",
                 to: "Item",
-                message: Some(format!("The item '{}' no longer exists in the parent", self.id)),
+                message: Some(format!(
+                    "The item '{}' no longer exists in the parent",
+                    self.id
+                )),
             }),
             Some(item_state) => Ok(Rc::clone(&item_state.item)),
         }
@@ -165,9 +164,7 @@ impl ScriptItem {
 impl UserData for ScriptItem {
     fn add_methods<'lua, M: UserDataMethods<'lua, Self>>(methods: &mut M) {
         methods.add_method("activate", &activate_item);
-        methods.add_method("name", |_, item, ()| {
-            Ok(item.name.to_string())
-        });
+        methods.add_method("name", |_, item, ()| Ok(item.name.to_string()));
         methods.add_method("duration", |_, item, ()| {
             let item = item.try_item()?;
             match &item.usable {
@@ -197,7 +194,8 @@ fn activate_item(_lua: Context, script_item: &ScriptItem, target: ScriptEntity) 
 
     let area = GameState::area_state();
     let name = item.name.to_string();
-    area.borrow_mut().add_feedback_text(name, &target, ColorKind::Info);
+    area.borrow_mut()
+        .add_feedback_text(name, &target, ColorKind::Info);
 
     match item.usable {
         None => unreachable!(),
@@ -208,11 +206,13 @@ fn activate_item(_lua: Context, script_item: &ScriptItem, target: ScriptEntity) 
                     ScriptItemKind::Quick(slot) => {
                         let item = parent.borrow_mut().actor.clear_quick(*slot);
                         add_another_to_quickbar(&parent, item, *slot);
-                    }, ScriptItemKind::Stash(index) => {
+                    }
+                    ScriptItemKind::Stash(index) => {
                         // throw away item
                         let stash = GameState::party_stash();
                         let _ = stash.borrow_mut().remove_item(*index);
-                    }, ScriptItemKind::WithID(_) => (),
+                    }
+                    ScriptItemKind::WithID(_) => (),
                 };
             }
         }
@@ -221,9 +221,14 @@ fn activate_item(_lua: Context, script_item: &ScriptItem, target: ScriptEntity) 
     Ok(())
 }
 
-fn add_another_to_quickbar(parent: &Rc<RefCell<EntityState>>,
-                           item: Option<ItemState>, slot: QuickSlot) {
-    if !parent.borrow().is_party_member() { return; }
+fn add_another_to_quickbar(
+    parent: &Rc<RefCell<EntityState>>,
+    item: Option<ItemState>,
+    slot: QuickSlot,
+) {
+    if !parent.borrow().is_party_member() {
+        return;
+    }
 
     let item = match item {
         None => return,

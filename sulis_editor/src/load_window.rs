@@ -14,16 +14,16 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::fs;
-use std::ffi::OsStr;
-use std::path::Path;
 use std::any::Any;
-use std::rc::Rc;
 use std::cell::RefCell;
+use std::ffi::OsStr;
+use std::fs;
+use std::path::Path;
+use std::rc::Rc;
 
 use sulis_core::config::Config;
 use sulis_core::ui::{Callback, Widget, WidgetKind};
-use sulis_core::widgets::{Button, list_box, ListBox, ScrollPane};
+use sulis_core::widgets::{list_box, Button, ListBox, ScrollPane};
 
 use crate::AreaEditor;
 
@@ -35,31 +35,42 @@ pub struct LoadWindow {
 
 impl LoadWindow {
     pub fn new(area_editor: Rc<RefCell<AreaEditor>>) -> Rc<RefCell<LoadWindow>> {
-        Rc::new(RefCell::new(LoadWindow {
-            area_editor
-        }))
+        Rc::new(RefCell::new(LoadWindow { area_editor }))
     }
 }
 
 impl WidgetKind for LoadWindow {
-    fn get_name(&self) -> &str { NAME }
+    fn get_name(&self) -> &str {
+        NAME
+    }
 
-    fn as_any(&self) -> &Any { self }
+    fn as_any(&self) -> &Any {
+        self
+    }
 
-    fn as_any_mut(&mut self) -> &mut Any { self }
+    fn as_any_mut(&mut self) -> &mut Any {
+        self
+    }
 
     fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let close = Widget::with_theme(Button::empty(), "close");
-        close.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let (parent, _) = Widget::parent_mut::<LoadWindow>(widget);
-            parent.borrow_mut().mark_for_removal();
-        })));
+        close
+            .borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(|widget, _| {
+                let (parent, _) = Widget::parent_mut::<LoadWindow>(widget);
+                parent.borrow_mut().mark_for_removal();
+            })));
 
         let load = Widget::with_theme(Button::empty(), "load_button");
         load.borrow_mut().state.set_enabled(false);
 
         let campaigns_dir = Config::resources_config().campaigns_directory;
-        let dir_str = format!("../{}/{}/areas/", campaigns_dir, Config::editor_config().module);
+        let dir_str = format!(
+            "../{}/{}/areas/",
+            campaigns_dir,
+            Config::editor_config().module
+        );
         let areas = get_area_entries(&dir_str);
 
         let load_ref = Rc::clone(&load);
@@ -86,20 +97,23 @@ impl WidgetKind for LoadWindow {
 
         let area_editor_ref = Rc::clone(&self.area_editor);
         let areas_list_ref = Rc::clone(&areas_list);
-        load.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-            let areas = areas_list_ref.borrow();
-            let active_child = match areas.children.iter().find(|c| c.borrow().state.is_active()) {
-                None => return,
-                Some(child) => child,
-            };
-            let area = &active_child.borrow().state.text;
-            info!("Selected area to load: {}", area);
+        load.borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(move |widget, _| {
+                let areas = areas_list_ref.borrow();
+                let active_child =
+                    match areas.children.iter().find(|c| c.borrow().state.is_active()) {
+                        None => return,
+                        Some(child) => child,
+                    };
+                let area = &active_child.borrow().state.text;
+                info!("Selected area to load: {}", area);
 
-            area_editor_ref.borrow_mut().model.load(&dir_str, area);
+                area_editor_ref.borrow_mut().model.load(&dir_str, area);
 
-            let (parent, _) = Widget::parent::<LoadWindow>(widget);
-            parent.borrow_mut().mark_for_removal();
-        })));
+                let (parent, _) = Widget::parent::<LoadWindow>(widget);
+                parent.borrow_mut().mark_for_removal();
+            })));
         scrollpane.borrow().add_to_content(areas_list);
 
         vec![close, load, Widget::with_theme(scrollpane, "areas_list")]
@@ -135,8 +149,9 @@ fn get_area_entries(dir_str: &str) -> Vec<String> {
             continue;
         }
 
-        let extension: String = OsStr::to_str(path.extension().unwrap_or(
-                OsStr::new(""))).unwrap_or("").to_string();
+        let extension: String = OsStr::to_str(path.extension().unwrap_or(OsStr::new("")))
+            .unwrap_or("")
+            .to_string();
 
         if &extension != "yml" {
             continue;

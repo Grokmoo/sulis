@@ -14,36 +14,33 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::usize;
+use std::cell::RefCell;
+use std::collections::HashMap;
 use std::io::Error;
 use std::ptr;
 use std::rc::Rc;
-use std::cell::RefCell;
-use std::collections::HashMap;
+use std::usize;
 
 use sulis_core::config::Config;
 
-use sulis_core::io::GraphicsRenderer;
-use sulis_core::ui::{color, Color};
-use sulis_core::util::{Point, invalid_data_error};
-use sulis_module::{actor::Faction, Actor, ObjectSize, ObjectSizeIterator, Module, ai,
-    DamageKind, HitKind};
-use sulis_module::area::{MAX_AREA_SIZE, Transition};
-use crate::{ActorState, AreaState, ChangeListenerList, EntityTextureCache, EntityTextureSlot,
-    GameState, Location, PropState, ScriptCallback, TurnManager};
-use crate::script::{self, CallbackData, ScriptEntitySet};
 use crate::animation::{self, Anim};
 use crate::save_state::EntitySaveState;
+use crate::script::{self, CallbackData, ScriptEntitySet};
+use crate::{
+    ActorState, AreaState, ChangeListenerList, EntityTextureCache, EntityTextureSlot, GameState,
+    Location, PropState, ScriptCallback, TurnManager,
+};
+use sulis_core::io::GraphicsRenderer;
+use sulis_core::ui::{color, Color};
+use sulis_core::util::{invalid_data_error, Point};
+use sulis_module::area::{Transition, MAX_AREA_SIZE};
+use sulis_module::{
+    actor::Faction, ai, Actor, DamageKind, HitKind, Module, ObjectSize, ObjectSizeIterator,
+};
 
 enum AIState {
-    Player {
-        vis: Vec<bool>,
-        show_portrait: bool,
-    },
-    AI {
-        group: Option<usize>,
-        active: bool,
-    },
+    Player { vis: Vec<bool>, show_portrait: bool },
+    AI { group: Option<usize>, active: bool },
 }
 
 pub struct EntityState {
@@ -63,7 +60,7 @@ pub struct EntityState {
 
     custom_flags: HashMap<String, String>,
 
-    index: usize, // index in vec of the owning manager
+    index: usize,      // index in vec of the owning manager
     unique_id: String, // assigned when setting the index and persisted on save
 
     collapsed_groups: Vec<String>,
@@ -71,31 +68,33 @@ pub struct EntityState {
 
 impl PartialEq for EntityState {
     fn eq(&self, other: &EntityState) -> bool {
-        self.location.area_id == other.location.area_id &&
-            self.index == other.index
+        self.location.area_id == other.location.area_id && self.index == other.index
     }
 }
 
 impl EntityState {
-    pub(crate) fn load(save: EntitySaveState,
-                       areas: &HashMap<String, Rc<RefCell<AreaState>>>) -> Result<EntityState, Error> {
+    pub(crate) fn load(
+        save: EntitySaveState,
+        areas: &HashMap<String, Rc<RefCell<AreaState>>>,
+    ) -> Result<EntityState, Error> {
         let ai_state = match save.actor_base.as_ref() {
-            None => {
-                AIState::AI {
-                    group: save.ai_group,
-                    active: save.ai_active,
-                }
-            }, Some(_) => {
+            None => AIState::AI {
+                group: save.ai_group,
+                active: save.ai_active,
+            },
+            Some(_) => {
                 let dim = (MAX_AREA_SIZE * MAX_AREA_SIZE) as usize;
                 AIState::Player {
                     vis: vec![false; dim],
                     show_portrait: save.show_portrait,
                 }
-            },
+            }
         };
 
         let area = match areas.get(&save.location.area) {
-            None => invalid_data_error(&format!("Invalid area '{}' for entity", save.location.area)),
+            None => {
+                invalid_data_error(&format!("Invalid area '{}' for entity", save.location.area))
+            }
             Some(area) => Ok(area),
         }?;
 
@@ -128,8 +127,13 @@ impl EntityState {
         })
     }
 
-    pub(crate) fn new(actor: Rc<Actor>, unique_id: Option<String>, location: Location, is_pc: bool,
-                      ai_group: Option<usize>) -> EntityState {
+    pub(crate) fn new(
+        actor: Rc<Actor>,
+        unique_id: Option<String>,
+        location: Location,
+        is_pc: bool,
+        ai_group: Option<usize>,
+    ) -> EntityState {
         let ai_state = if is_pc {
             let dim = (MAX_AREA_SIZE * MAX_AREA_SIZE) as usize;
             AIState::Player {
@@ -161,7 +165,7 @@ impl EntityState {
             scale: 1.0,
             size,
             index: usize::MAX,
-            unique_id: unique_id,
+            unique_id,
             listeners: ChangeListenerList::default(),
             marked_for_removal: false,
             ai_state,
@@ -199,12 +203,16 @@ impl EntityState {
                 let func = func.to_string();
                 let result = match kind {
                     ai::FuncKind::OnDamaged => cbs.add_func(script::FuncKind::OnDamaged, func),
-                    ai::FuncKind::BeforeAttack => cbs.add_func(script::FuncKind::BeforeAttack, func),
+                    ai::FuncKind::BeforeAttack => {
+                        cbs.add_func(script::FuncKind::BeforeAttack, func)
+                    }
                     ai::FuncKind::AfterAttack => cbs.add_func(script::FuncKind::AfterAttack, func),
-                    ai::FuncKind::BeforeDefense =>
-                        cbs.add_func(script::FuncKind::BeforeDefense, func),
-                    ai::FuncKind::OnRoundElapsed =>
-                        cbs.add_func(script::FuncKind::OnRoundElapsed, func),
+                    ai::FuncKind::BeforeDefense => {
+                        cbs.add_func(script::FuncKind::BeforeDefense, func)
+                    }
+                    ai::FuncKind::OnRoundElapsed => {
+                        cbs.add_func(script::FuncKind::OnRoundElapsed, func)
+                    }
                 };
                 result.unwrap();
             }
@@ -221,13 +229,17 @@ impl EntityState {
     }
 
     pub fn callbacks(&self, mgr: &TurnManager) -> Vec<Rc<CallbackData>> {
-        let mut result: Vec<_> = self.actor.effects_iter().flat_map(|index| {
-            if let Some(effect) = mgr.effect_checked(*index) {
-                effect.callbacks()
-            } else {
-                Vec::new()
-            }
-        }).collect();
+        let mut result: Vec<_> = self
+            .actor
+            .effects_iter()
+            .flat_map(|index| {
+                if let Some(effect) = mgr.effect_checked(*index) {
+                    effect.callbacks()
+                } else {
+                    Vec::new()
+                }
+            })
+            .collect();
 
         if let Some(ref cb) = self.ai_callbacks {
             result.push(Rc::clone(cb));
@@ -236,7 +248,7 @@ impl EntityState {
         result
     }
 
-    pub fn custom_flags<'a>(&'a self) -> impl Iterator<Item=(&String, &String)> {
+    pub fn custom_flags<'a>(&'a self) -> impl Iterator<Item = (&String, &String)> {
         self.custom_flags.iter()
     }
 
@@ -245,7 +257,8 @@ impl EntityState {
     }
 
     pub fn set_custom_flag(&mut self, flag: &str, value: &str) {
-        self.custom_flags.insert(flag.to_string(), value.to_string());
+        self.custom_flags
+            .insert(flag.to_string(), value.to_string());
     }
 
     pub fn get_custom_flag(&self, flag: &str) -> Option<String> {
@@ -258,12 +271,10 @@ impl EntityState {
     pub fn add_num_flag(&mut self, flag: &str, value: f32) {
         let cur_val = match self.get_custom_flag(flag) {
             None => 0.0,
-            Some(ref val_str) => {
-                match val_str.parse::<f32>() {
-                    Err(_) => 0.0,
-                    Ok(val) => val,
-                }
-            }
+            Some(ref val_str) => match val_str.parse::<f32>() {
+                Err(_) => 0.0,
+                Ok(val) => val,
+            },
         };
         self.set_custom_flag(flag, &(cur_val + value).to_string());
     }
@@ -271,12 +282,10 @@ impl EntityState {
     pub fn get_num_flag(&self, flag: &str) -> f32 {
         match self.get_custom_flag(flag) {
             None => 0.0,
-            Some(ref val_str) => {
-                match val_str.parse::<f32>() {
-                    Err(_) => 0.0,
-                    Ok(val) => val,
-                }
-            }
+            Some(ref val_str) => match val_str.parse::<f32>() {
+                Err(_) => 0.0,
+                Ok(val) => val,
+            },
         }
     }
 
@@ -299,10 +308,7 @@ impl EntityState {
         match self.ai_state {
             AIState::Player { .. } => (),
             AIState::AI { group, .. } => {
-                self.ai_state = AIState::AI {
-                    group,
-                    active,
-                };
+                self.ai_state = AIState::AI { group, active };
             }
         }
     }
@@ -345,10 +351,8 @@ impl EntityState {
 
     pub fn clear_pc_vis(&mut self) {
         match self.ai_state {
-            AIState::Player { ref mut vis, .. } => {
-                unsafe {
-                    ptr::write_bytes(vis.as_mut_ptr(), 0, vis.len());
-                }
+            AIState::Player { ref mut vis, .. } => unsafe {
+                ptr::write_bytes(vis.as_mut_ptr(), 0, vis.len());
             },
             _ => panic!(),
         }
@@ -372,20 +376,26 @@ impl EntityState {
         let self_faction = self.actor.faction();
         let other_faction = other.borrow().actor.faction();
 
-        if let Faction::Neutral = self_faction { return false; }
-        if let Faction::Neutral = other_faction { return false; }
+        if let Faction::Neutral = self_faction {
+            return false;
+        }
+        if let Faction::Neutral = other_faction {
+            return false;
+        }
 
         self_faction != other_faction
     }
 
-    pub (crate) fn is_marked_for_removal(&self) -> bool {
+    pub(crate) fn is_marked_for_removal(&self) -> bool {
         self.marked_for_removal
     }
 
     /// Returns true if this entity has enough AP to move at least 1 square,
     /// false otherwise
     pub fn can_move(&self) -> bool {
-        if self.actor.stats.move_disabled { return false; }
+        if self.actor.stats.move_disabled {
+            return false;
+        }
 
         self.actor.ap() >= self.actor.get_move_ap_cost(1)
     }
@@ -407,23 +417,35 @@ impl EntityState {
     /// Returns true if this entity can attack the specified target with its
     /// current weapon, without moving
     pub fn can_attack(&self, target: &Rc<RefCell<EntityState>>, area_state: &AreaState) -> bool {
-        if self.actor.stats.attack_disabled { return false; }
+        if self.actor.stats.attack_disabled {
+            return false;
+        }
 
         let dist = self.dist_to_entity(target);
 
-        if !self.actor.can_weapon_attack(target, dist) { return false; }
+        if !self.actor.can_weapon_attack(target, dist) {
+            return false;
+        }
 
         area_state.has_visibility(&self, &target.borrow())
     }
 
-    pub fn attack(entity: &Rc<RefCell<EntityState>>, target: &Rc<RefCell<EntityState>>,
-                  callback: Option<Box<ScriptCallback>>, remove_ap: bool) {
+    pub fn attack(
+        entity: &Rc<RefCell<EntityState>>,
+        target: &Rc<RefCell<EntityState>>,
+        callback: Option<Box<ScriptCallback>>,
+        remove_ap: bool,
+    ) {
         let time = Config::animation_base_time_millis();
         let cbs: Vec<Box<ScriptCallback>> = callback.into_iter().collect();
         if entity.borrow().actor.stats.attack_is_melee() {
-            let anim = animation::melee_attack_animation::new(entity, target, time * 5, cbs, Box::new(|a, d| {
-                ActorState::weapon_attack(&a, &d)
-            }));
+            let anim = animation::melee_attack_animation::new(
+                entity,
+                target,
+                time * 5,
+                cbs,
+                Box::new(|a, d| ActorState::weapon_attack(&a, &d)),
+            );
             GameState::add_animation(anim);
         } else if entity.borrow().actor.stats.attack_is_ranged() {
             let anim = animation::ranged_attack_animation::new(entity, target, cbs, time);
@@ -440,8 +462,12 @@ impl EntityState {
         self.actor.add_xp(xp);
     }
 
-    pub fn remove_hp(entity: &Rc<RefCell<EntityState>>, attacker: &Rc<RefCell<EntityState>>,
-                     hit_kind: HitKind, damage: Vec<(DamageKind, u32)>) {
+    pub fn remove_hp(
+        entity: &Rc<RefCell<EntityState>>,
+        attacker: &Rc<RefCell<EntityState>>,
+        hit_kind: HitKind,
+        damage: Vec<(DamageKind, u32)>,
+    ) {
         let hp_amount = damage.iter().map(|(_, amount)| amount).sum();
         entity.borrow_mut().actor.remove_hp(hp_amount);
 
@@ -450,12 +476,15 @@ impl EntityState {
         let mgr = GameState::turn_manager();
         let cbs = entity.borrow().callbacks(&mgr.borrow());
         info!("Got {} cbs for {}", cbs.len(), entity.borrow().unique_id());
-        cbs.iter().for_each(|cb| cb.on_damaged(&targets, hit_kind, damage.clone()));
+        cbs.iter()
+            .for_each(|cb| cb.on_damaged(&targets, hit_kind, damage.clone()));
 
         let hp = entity.borrow().actor.hp();
         if hp <= 0 {
-            debug!("Entity '{}' has zero hit points.  Playing death animation",
-                   entity.borrow().actor.actor.name);
+            debug!(
+                "Entity '{}' has zero hit points.  Playing death animation",
+                entity.borrow().actor.actor.name
+            );
             let anim = Anim::new_entity_death(entity);
             GameState::add_animation(anim);
         } else {
@@ -465,8 +494,13 @@ impl EntityState {
 
     pub fn move_to(&mut self, x: i32, y: i32, squares: u32) -> bool {
         trace!("Move to {},{}", x, y);
-        if !self.location.coords_valid(x, y) { return false; }
-        if !self.location.coords_valid(x + self.size.width - 1, y + self.size.height - 1) {
+        if !self.location.coords_valid(x, y) {
+            return false;
+        }
+        if !self
+            .location
+            .coords_valid(x + self.size.width - 1, y + self.size.height - 1)
+        {
             return false;
         }
 
@@ -493,9 +527,11 @@ impl EntityState {
     }
 
     pub fn dist(&self, pos: Point, size: &Rc<ObjectSize>) -> f32 {
-        self.dist_internal(pos.x as f32 + size.width as f32 / 2.0,
-                           pos.y as f32 + size.height as f32 / 2.0,
-                           size.diagonal / 2.0)
+        self.dist_internal(
+            pos.x as f32 + size.width as f32 / 2.0,
+            pos.y as f32 + size.height as f32 / 2.0,
+            size.diagonal / 2.0,
+        )
     }
 
     fn dist_internal(&self, x2: f32, y2: f32, offset: f32) -> f32 {
@@ -505,15 +541,24 @@ impl EntityState {
         let mut dist = ((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2)).sqrt();
         dist -= self.size.diagonal / 2.0 + offset;
 
-        if dist > 0.0 { dist }
-        else { 0.0 }
+        if dist > 0.0 {
+            dist
+        } else {
+            0.0
+        }
     }
 
     pub fn dist_to_entity(&self, other: &Rc<RefCell<EntityState>>) -> f32 {
         let value = self.dist(other.borrow().location.to_point(), &other.borrow().size);
 
-        trace!("Computed distance from '{}' at {:?} to '{}' at {:?} = {}", self.actor.actor.name,
-               self.location, other.borrow().actor.actor.name, other.borrow().location, value);
+        trace!(
+            "Computed distance from '{}' at {:?} to '{}' at {:?} = {}",
+            self.actor.actor.name,
+            self.location,
+            other.borrow().actor.actor.name,
+            other.borrow().location,
+            value
+        );
 
         value
     }
@@ -521,8 +566,13 @@ impl EntityState {
     pub fn dist_to_transition(&self, other: &Transition) -> f32 {
         let value = self.dist(other.from, &other.size);
 
-        trace!("Computed distance from '{}' at {:?} to transition at {:?} = {}",
-               self.actor.actor.name, self.location, other.from, value);
+        trace!(
+            "Computed distance from '{}' at {:?} to transition at {:?} = {}",
+            self.actor.actor.name,
+            self.location,
+            other.from,
+            value
+        );
 
         value
     }
@@ -563,12 +613,29 @@ impl EntityState {
         self.size.points(x, y)
     }
 
-    pub fn draw_no_pos(&self, renderer: &mut GraphicsRenderer,
-                   scale_x: f32, scale_y: f32, x: f32, y: f32, alpha: f32) {
+    pub fn draw_no_pos(
+        &self,
+        renderer: &mut GraphicsRenderer,
+        scale_x: f32,
+        scale_y: f32,
+        x: f32,
+        y: f32,
+        alpha: f32,
+    ) {
         let a = self.color.a * alpha;
         let color = Color::new(self.color.r, self.color.g, self.color.b, a);
         if let Some(ref slot) = self.texture_cache_slot {
-            slot.draw(renderer, x, y, 0.0, 0.0, scale_x, scale_y, color, self.color_sec);
+            slot.draw(
+                renderer,
+                x,
+                y,
+                0.0,
+                0.0,
+                scale_x,
+                scale_y,
+                color,
+                self.color_sec,
+            );
         }
     }
 }
@@ -576,8 +643,16 @@ impl EntityState {
 pub trait AreaDrawable {
     fn cache(&mut self, renderer: &mut GraphicsRenderer, texture_cache: &mut EntityTextureCache);
 
-    fn draw(&self, renderer: &mut GraphicsRenderer,
-            scale_x: f32, scale_y: f32, x: f32, y: f32, millis: u32, color: Color);
+    fn draw(
+        &self,
+        renderer: &mut GraphicsRenderer,
+        scale_x: f32,
+        scale_y: f32,
+        x: f32,
+        y: f32,
+        millis: u32,
+        color: Color,
+    );
 
     fn location(&self) -> &Location;
 }
@@ -595,8 +670,16 @@ impl AreaDrawable for EntityState {
         }
     }
 
-    fn draw(&self, renderer: &mut GraphicsRenderer,
-            scale_x: f32, scale_y: f32, x: f32, y: f32, _millis: u32, color: Color) {
+    fn draw(
+        &self,
+        renderer: &mut GraphicsRenderer,
+        scale_x: f32,
+        scale_y: f32,
+        x: f32,
+        y: f32,
+        _millis: u32,
+        color: Color,
+    ) {
         // don't draw invisible hostiles
         if self.actor.stats.hidden {
             match self.actor.faction() {
@@ -611,10 +694,24 @@ impl AreaDrawable for EntityState {
         let x = x + self.location.x as f32 + self.sub_pos.0;
         let y = y + self.location.y as f32 + self.sub_pos.1;
 
-        let color = Color::new(self.color.r * color.r, self.color.g * color.g,
-                               self.color.b * color.b, self.color.a * color.a);
+        let color = Color::new(
+            self.color.r * color.r,
+            self.color.g * color.g,
+            self.color.b * color.b,
+            self.color.a * color.a,
+        );
         if let Some(ref slot) = self.texture_cache_slot {
-            slot.draw(renderer, x, y, offset_x, offset_y, scale_x, scale_y, color, self.color_sec);
+            slot.draw(
+                renderer,
+                x,
+                y,
+                offset_x,
+                offset_y,
+                scale_x,
+                scale_y,
+                color,
+                self.color_sec,
+            );
         }
     }
 

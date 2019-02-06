@@ -18,8 +18,8 @@ use std::rc::Rc;
 use std::time::Instant;
 
 use sulis_core::config::Config;
-use sulis_core::resource::{ResourceSet, Font};
 use sulis_core::io::GraphicsRenderer;
+use sulis_core::resource::{Font, ResourceSet};
 use sulis_core::ui::{Color, LineRenderer};
 use sulis_core::util::{self, Point};
 use sulis_module::DamageKind;
@@ -44,8 +44,9 @@ impl Default for Params {
             miss_color: LIGHT_GRAY,
             hit_color: RED,
             heal_color: BLUE,
-            damage_colors: [LIGHT_GRAY, LIGHT_GRAY, LIGHT_GRAY, GREEN,
-                CYAN, BLUE, YELLOW, PURPLE],
+            damage_colors: [
+                LIGHT_GRAY, LIGHT_GRAY, LIGHT_GRAY, GREEN, CYAN, BLUE, YELLOW, PURPLE,
+            ],
         }
     }
 }
@@ -76,8 +77,14 @@ pub struct AreaFeedbackText {
 }
 
 impl AreaFeedbackText {
-    pub fn new(area_pos: Point, text: String,
-               pos_x: f32, pos_y: f32, color_kind: ColorKind, move_rate: f32) -> AreaFeedbackText {
+    pub fn new(
+        area_pos: Point,
+        text: String,
+        pos_x: f32,
+        pos_y: f32,
+        color_kind: ColorKind,
+        move_rate: f32,
+    ) -> AreaFeedbackText {
         let duration = Config::animation_base_time_millis() * (50 + text.len() as u32 / 2);
 
         AreaFeedbackText {
@@ -95,12 +102,17 @@ impl AreaFeedbackText {
         }
     }
 
-    pub fn area_pos(&self) -> Point { self.area_pos }
+    pub fn area_pos(&self) -> Point {
+        self.area_pos
+    }
 
-    pub fn cur_hover_y(&self) -> f32 { self.hover_y }
+    pub fn cur_hover_y(&self) -> f32 {
+        self.hover_y
+    }
 
     pub fn update(&mut self) {
-        let frac = util::get_elapsed_millis(self.start_time.elapsed()) as f32 / self.duration as f32;
+        let frac =
+            util::get_elapsed_millis(self.start_time.elapsed()) as f32 / self.duration as f32;
 
         self.hover_y = frac * self.move_rate;
 
@@ -116,14 +128,20 @@ impl AreaFeedbackText {
     }
 
     // it is assumed that the params being passed in here do not change
-    pub fn draw(&mut self, renderer: &mut GraphicsRenderer, params: &Params,
-                offset_x: f32, offset_y: f32,
-                scale_x: f32, scale_y: f32) {
+    pub fn draw(
+        &mut self,
+        renderer: &mut GraphicsRenderer,
+        params: &Params,
+        offset_x: f32,
+        offset_y: f32,
+        scale_x: f32,
+        scale_y: f32,
+    ) {
         // creating the line renderer here is not ideal but is a low cost operation
         let font_renderer = LineRenderer::new(&params.font);
         if self.text_width == 0.0 {
-            self.text_width = params.font.get_width(&self.text) as f32
-                / params.font.line_height as f32;
+            self.text_width =
+                params.font.get_width(&self.text) as f32 / params.font.line_height as f32;
         }
 
         let mut color = match self.color_kind {
@@ -139,7 +157,9 @@ impl AreaFeedbackText {
         color.a = self.alpha;
 
         let mut pos_x = offset_x + self.pos_x - params.scale * self.text_width / 2.0;
-        if pos_x < 0.0 { pos_x = 0.0; }
+        if pos_x < 0.0 {
+            pos_x = 0.0;
+        }
         let pos_y = offset_y + self.pos_y - self.hover_y;
 
         let mut draw_list = font_renderer.get_draw_list(&self.text, pos_x, pos_y, params.scale);

@@ -15,14 +15,14 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::any::Any;
-use std::rc::Rc;
 use std::cell::RefCell;
+use std::rc::Rc;
 
 use sulis_core::image::Image;
+use sulis_core::io::{event::ClickKind, DrawList, GraphicsRenderer};
 use sulis_core::resource::ResourceSet;
-use sulis_core::ui::{Widget, WidgetKind, animation_state};
-use sulis_core::io::{DrawList, GraphicsRenderer, event::ClickKind};
-use sulis_core::util::{Point};
+use sulis_core::ui::{animation_state, Widget, WidgetKind};
+use sulis_core::util::Point;
 
 pub enum Mode {
     In,
@@ -80,9 +80,8 @@ impl WidgetKind for WindowFade {
             widget.borrow_mut().mark_for_removal();
         } else {
             self.frac = match self.mode {
-                Mode::In => {
-                    1.0 - elapsed as f32 / total as f32
-                }, Mode::OutIn => {
+                Mode::In => 1.0 - elapsed as f32 / total as f32,
+                Mode::OutIn => {
                     if elapsed > self.fade_millis + self.pause_millis {
                         let rel = elapsed - (self.fade_millis + self.pause_millis);
                         1.0 - rel as f32 / self.fade_millis as f32
@@ -107,17 +106,20 @@ impl WidgetKind for WindowFade {
         widget.do_base_layout();
     }
 
-    fn draw(&mut self, renderer: &mut GraphicsRenderer, _pixel_size: Point,
-            widget: &Widget, millis: u32) {
-
+    fn draw(
+        &mut self,
+        renderer: &mut GraphicsRenderer,
+        _pixel_size: Point,
+        widget: &Widget,
+        millis: u32,
+    ) {
         if let Some(ref fill) = self.fill {
             let x = widget.state.inner_left() as f32;
             let y = widget.state.inner_top() as f32;
             let w = widget.state.inner_width() as f32;
             let h = widget.state.inner_height() as f32;
             let mut draw_list = DrawList::empty_sprite();
-            fill.append_to_draw_list(&mut draw_list, &animation_state::NORMAL,
-                                     x, y, w, h, millis);
+            fill.append_to_draw_list(&mut draw_list, &animation_state::NORMAL, x, y, w, h, millis);
 
             draw_list.set_alpha(self.frac);
             renderer.draw(draw_list);
@@ -134,8 +136,13 @@ impl WidgetKind for WindowFade {
         false
     }
 
-    fn on_mouse_drag(&mut self, _widget: &Rc<RefCell<Widget>>, _kind: ClickKind,
-                     _delta_x: f32, _delta_y: f32) -> bool {
+    fn on_mouse_drag(
+        &mut self,
+        _widget: &Rc<RefCell<Widget>>,
+        _kind: ClickKind,
+        _delta_x: f32,
+        _delta_y: f32,
+    ) -> bool {
         false
     }
 

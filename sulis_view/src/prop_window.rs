@@ -15,13 +15,13 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::any::Any;
-use std::rc::Rc;
 use std::cell::{Cell, RefCell};
+use std::rc::Rc;
 
-use sulis_state::{ChangeListener, EntityState, GameState};
+use crate::{item_list_pane::Filter, ItemListPane, RootView};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_core::widgets::{Button, Label};
-use crate::{ItemListPane, RootView, item_list_pane::Filter};
+use sulis_state::{ChangeListener, EntityState, GameState};
 
 pub const NAME: &str = "prop_window";
 
@@ -40,9 +40,13 @@ impl PropWindow {
         }))
     }
 
-    pub fn prop_index(&self) -> usize { self.prop_index }
+    pub fn prop_index(&self) -> usize {
+        self.prop_index
+    }
 
-    pub fn player(&self) -> &Rc<RefCell<EntityState>> { &self.player }
+    pub fn player(&self) -> &Rc<RefCell<EntityState>> {
+        &self.player
+    }
 }
 
 impl WidgetKind for PropWindow {
@@ -56,7 +60,9 @@ impl WidgetKind for PropWindow {
         let area_state = GameState::area_state();
         let mut area_state = area_state.borrow_mut();
 
-        if !area_state.prop_index_valid(self.prop_index) { return; }
+        if !area_state.prop_index_valid(self.prop_index) {
+            return;
+        }
 
         let prop = area_state.get_prop_mut(self.prop_index);
 
@@ -87,27 +93,39 @@ impl WidgetKind for PropWindow {
 
             icon.borrow_mut().state.foreground = Some(Rc::clone(&prop.prop.icon));
 
-            close.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-                let (parent, _) = Widget::parent::<PropWindow>(widget);
-                parent.borrow_mut().mark_for_removal();
-            })));
+            close
+                .borrow_mut()
+                .state
+                .add_callback(Callback::new(Rc::new(|widget, _| {
+                    let (parent, _) = Widget::parent::<PropWindow>(widget);
+                    parent.borrow_mut().mark_for_removal();
+                })));
 
             let prop_index = self.prop_index;
-            take_all.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-                let (parent, _) = Widget::parent::<PropWindow>(widget);
-                parent.borrow_mut().mark_for_removal();
+            take_all
+                .borrow_mut()
+                .state
+                .add_callback(Callback::new(Rc::new(move |widget, _| {
+                    let (parent, _) = Widget::parent::<PropWindow>(widget);
+                    parent.borrow_mut().mark_for_removal();
 
-                let stash = GameState::party_stash();
-                stash.borrow_mut().take_all(prop_index);
+                    let stash = GameState::party_stash();
+                    stash.borrow_mut().take_all(prop_index);
 
-                let (root, view) = Widget::parent_mut::<RootView>(&parent);
-                view.set_inventory_window(&root, false);
-            })));
-            take_all.borrow_mut().state.set_enabled(!GameState::is_combat_active());
+                    let (root, view) = Widget::parent_mut::<RootView>(&parent);
+                    view.set_inventory_window(&root, false);
+                })));
+            take_all
+                .borrow_mut()
+                .state
+                .set_enabled(!GameState::is_combat_active());
         }
 
-        let item_list_pane = Widget::with_defaults(
-            ItemListPane::new_prop(&self.player, self.prop_index, &self.filter));
+        let item_list_pane = Widget::with_defaults(ItemListPane::new_prop(
+            &self.player,
+            self.prop_index,
+            &self.filter,
+        ));
 
         vec![icon, close, item_list_pane, take_all]
     }

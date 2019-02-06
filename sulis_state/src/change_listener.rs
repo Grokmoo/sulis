@@ -14,13 +14,13 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::rc::Rc;
 use std::cell::RefCell;
+use std::rc::Rc;
 
 use sulis_core::ui::Widget;
 
 pub struct ChangeListenerList<T> {
-   listeners: Vec<ChangeListener<T>>,
+    listeners: Vec<ChangeListener<T>>,
 }
 
 impl<T> Default for ChangeListenerList<T> {

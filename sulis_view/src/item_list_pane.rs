@@ -15,13 +15,13 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::any::Any;
-use std::rc::Rc;
 use std::cell::{Cell, RefCell};
+use std::rc::Rc;
 
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_core::widgets::{Button, ScrollPane};
 use sulis_module::{Item, Module};
-use sulis_state::{EntityState, GameState, script::ScriptItemKind};
+use sulis_state::{script::ScriptItemKind, EntityState, GameState};
 
 use crate::{item_button::*, ItemButton};
 
@@ -50,16 +50,18 @@ impl Filter {
             Weapon => item.is_weapon(),
             Armor => item.is_armor(),
             Accessory => {
-                if item.is_weapon() || item.is_armor() { return false; }
+                if item.is_weapon() || item.is_armor() {
+                    return false;
+                }
                 item.equippable.is_some()
-            },
+            }
             Usable => item.usable.is_some(),
         }
     }
 }
 
 use self::Filter::*;
-const FILTERS_LIST: [Filter; 5] = [ All, Weapon, Armor, Accessory, Usable ];
+const FILTERS_LIST: [Filter; 5] = [All, Weapon, Armor, Accessory, Usable];
 
 pub struct ItemListPane {
     entity: Rc<RefCell<EntityState>>,
@@ -68,8 +70,11 @@ pub struct ItemListPane {
 }
 
 impl ItemListPane {
-    fn new(entity: &Rc<RefCell<EntityState>>, kind: Kind,
-           cur_filter: &Rc<Cell<Filter>>) -> Rc<RefCell<ItemListPane>>{
+    fn new(
+        entity: &Rc<RefCell<EntityState>>,
+        kind: Kind,
+        cur_filter: &Rc<Cell<Filter>>,
+    ) -> Rc<RefCell<ItemListPane>> {
         Rc::new(RefCell::new(ItemListPane {
             entity: Rc::clone(entity),
             kind,
@@ -77,18 +82,26 @@ impl ItemListPane {
         }))
     }
 
-    pub fn new_entity(entity: &Rc<RefCell<EntityState>>,
-                      cur_filter: &Rc<Cell<Filter>>) -> Rc<RefCell<ItemListPane>> {
+    pub fn new_entity(
+        entity: &Rc<RefCell<EntityState>>,
+        cur_filter: &Rc<Cell<Filter>>,
+    ) -> Rc<RefCell<ItemListPane>> {
         ItemListPane::new(entity, Kind::Entity, cur_filter)
     }
 
-    pub fn new_prop(entity: &Rc<RefCell<EntityState>>, prop_index: usize,
-                    cur_filter: &Rc<Cell<Filter>>) -> Rc<RefCell<ItemListPane>> {
+    pub fn new_prop(
+        entity: &Rc<RefCell<EntityState>>,
+        prop_index: usize,
+        cur_filter: &Rc<Cell<Filter>>,
+    ) -> Rc<RefCell<ItemListPane>> {
         ItemListPane::new(entity, Kind::Prop(prop_index), cur_filter)
     }
 
-    pub fn new_merchant(entity: &Rc<RefCell<EntityState>>, merchant_id: String,
-                        cur_filter: &Rc<Cell<Filter>>) -> Rc<RefCell<ItemListPane>> {
+    pub fn new_merchant(
+        entity: &Rc<RefCell<EntityState>>,
+        merchant_id: String,
+        cur_filter: &Rc<Cell<Filter>>,
+    ) -> Rc<RefCell<ItemListPane>> {
         ItemListPane::new(entity, Kind::Merchant(merchant_id), cur_filter)
     }
 
@@ -109,12 +122,18 @@ impl ItemListPane {
         let scrollpane = ScrollPane::new();
         let list_content = Widget::with_theme(scrollpane.clone(), "items_list");
         for (index, &(qty, ref item)) in merchant.items().iter().enumerate() {
-            if !self.cur_filter.get().is_allowed(&item.item) { continue; }
+            if !self.cur_filter.get().is_allowed(&item.item) {
+                continue;
+            }
 
             let item_button = ItemButton::merchant(&item.item, qty, index, merchant_id);
-            item_button.borrow_mut().add_action("Buy", buy_item_cb(merchant_id, index), true);
+            item_button
+                .borrow_mut()
+                .add_action("Buy", buy_item_cb(merchant_id, index), true);
 
-            scrollpane.borrow().add_to_content(Widget::with_defaults(item_button));
+            scrollpane
+                .borrow()
+                .add_to_content(Widget::with_defaults(item_button));
         }
 
         list_content
@@ -133,14 +152,21 @@ impl ItemListPane {
             None => (),
             Some(ref items) => {
                 for (index, &(qty, ref item)) in items.iter().enumerate() {
-                    if !self.cur_filter.get().is_allowed(&item.item) { continue; }
+                    if !self.cur_filter.get().is_allowed(&item.item) {
+                        continue;
+                    }
 
                     let item_button = ItemButton::prop(&item.item, qty, index, prop_index);
                     if !combat_active {
-                        item_button.borrow_mut()
-                            .add_action("Take", take_item_cb(prop_index, index), true);
+                        item_button.borrow_mut().add_action(
+                            "Take",
+                            take_item_cb(prop_index, index),
+                            true,
+                        );
                     }
-                    scrollpane.borrow().add_to_content(Widget::with_defaults(item_button));
+                    scrollpane
+                        .borrow()
+                        .add_to_content(Widget::with_defaults(item_button));
                 }
             }
         }
@@ -159,7 +185,9 @@ impl ItemListPane {
         let stash = GameState::party_stash();
         let stash = stash.borrow();
         for (index, &(quantity, ref item)) in stash.items().iter().enumerate() {
-            if !self.cur_filter.get().is_allowed(&item.item) { continue; }
+            if !self.cur_filter.get().is_allowed(&item.item) {
+                continue;
+            }
 
             let item_but = ItemButton::inventory(&item.item, quantity, index);
 
@@ -167,8 +195,11 @@ impl ItemListPane {
                 if !combat_active && item.item.meets_prereqs(&actor.actor) {
                     let mut but = item_but.borrow_mut();
                     if usable.use_in_slot {
-                        but.add_action("Add to Use Slot",
-                            set_quickslot_cb(&self.entity, index), true);
+                        but.add_action(
+                            "Add to Use Slot",
+                            set_quickslot_cb(&self.entity, index),
+                            true,
+                        );
                     } else {
                         let kind = ScriptItemKind::Stash(index);
                         but.add_action("Use", use_item_cb(&self.entity, kind), true);
@@ -177,15 +208,20 @@ impl ItemListPane {
             }
 
             if !combat_active && actor.can_equip(&item) {
-                item_but.borrow_mut().add_action("Equip",
-                                                 equip_item_cb(&self.entity, index), true);
+                item_but
+                    .borrow_mut()
+                    .add_action("Equip", equip_item_cb(&self.entity, index), true);
             }
 
             if !combat_active {
-                item_but.borrow_mut().add_action("Drop", drop_item_cb(&self.entity, index), false);
+                item_but
+                    .borrow_mut()
+                    .add_action("Drop", drop_item_cb(&self.entity, index), false);
             }
 
-            scrollpane.borrow().add_to_content(Widget::with_defaults(item_but));
+            scrollpane
+                .borrow()
+                .add_to_content(Widget::with_defaults(item_but));
         }
 
         list_content
@@ -211,27 +247,33 @@ impl WidgetKind for ItemListPane {
                     None => {
                         warn!("Unable to find coins item");
                         return Vec::new();
-                    }, Some(item) => item,
+                    }
+                    Some(item) => item,
                 };
-                let amount = GameState::party_coins() as f32 /
-                    Module::rules().item_value_display_factor;
+                let amount =
+                    GameState::party_coins() as f32 / Module::rules().item_value_display_factor;
                 let button = ItemButton::inventory(&coins_item, amount as u32, 0);
                 let coins_button = Widget::with_theme(button, "coins_button");
                 coins_button.borrow_mut().state.set_enabled(false);
                 children.push(coins_button);
-            },
+            }
             _ => (),
         }
 
         for filter in FILTERS_LIST.iter() {
             let filter = *filter;
 
-            let button = Widget::with_theme(Button::empty(),
-                &format!("filter_{:?}", filter).to_lowercase());
-            button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-                let (parent, pane) = Widget::parent_mut::<ItemListPane>(widget);
-                pane.set_filter(filter, &parent);
-            })));
+            let button = Widget::with_theme(
+                Button::empty(),
+                &format!("filter_{:?}", filter).to_lowercase(),
+            );
+            button
+                .borrow_mut()
+                .state
+                .add_callback(Callback::new(Rc::new(move |widget, _| {
+                    let (parent, pane) = Widget::parent_mut::<ItemListPane>(widget);
+                    pane.set_filter(filter, &parent);
+                })));
             if filter == self.cur_filter.get() {
                 button.borrow_mut().state.set_active(true);
             }

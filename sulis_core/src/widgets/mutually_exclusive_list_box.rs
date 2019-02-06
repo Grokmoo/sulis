@@ -15,14 +15,17 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::any::Any;
+use std::cell::RefCell;
 use std::fmt::Display;
 use std::rc::Rc;
 use std::slice::Iter;
-use std::cell::RefCell;
 
 use crate::ui::{Callback, Widget, WidgetKind};
 
-use crate::widgets::{ListBox, list_box::{self, Entry}};
+use crate::widgets::{
+    list_box::{self, Entry},
+    ListBox,
+};
 
 pub struct MutuallyExclusiveListBox<T: Display + Clone + 'static> {
     list_box: ListBox<T>,
@@ -33,16 +36,16 @@ pub struct MutuallyExclusiveListBox<T: Display + Clone + 'static> {
 impl<T: Display + Clone + 'static> MutuallyExclusiveListBox<T> {
     pub fn new(entries: Vec<Entry<T>>) -> Rc<RefCell<MutuallyExclusiveListBox<T>>> {
         Rc::new(RefCell::new(MutuallyExclusiveListBox {
-            list_box: ListBox {
-                entries,
-            },
+            list_box: ListBox { entries },
             cb: Rc::new(|_entry| {}),
             active_entry: None,
         }))
     }
 
-    pub fn with_callback(entries: Vec<Entry<T>>, cb: Rc<Fn(Option<&Entry<T>>)>)
-        -> Rc<RefCell<MutuallyExclusiveListBox<T>>> {
+    pub fn with_callback(
+        entries: Vec<Entry<T>>,
+        cb: Rc<Fn(Option<&Entry<T>>)>,
+    ) -> Rc<RefCell<MutuallyExclusiveListBox<T>>> {
         Rc::new(RefCell::new(MutuallyExclusiveListBox {
             list_box: ListBox { entries },
             cb,
@@ -68,34 +71,43 @@ impl<T: Display + Clone + 'static> MutuallyExclusiveListBox<T> {
 }
 
 impl<T: Display + Clone> WidgetKind for MutuallyExclusiveListBox<T> {
-    fn get_name(&self) -> &str { list_box::NAME }
-    fn as_any(&self) -> &Any { self }
-    fn as_any_mut(&mut self) -> &mut Any { self }
+    fn get_name(&self) -> &str {
+        list_box::NAME
+    }
+    fn as_any(&self) -> &Any {
+        self
+    }
+    fn as_any_mut(&mut self) -> &mut Any {
+        self
+    }
 
     fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let mut children = Vec::new();
         for widget in self.list_box.on_add(widget) {
-            widget.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-                let (parent, parent_list_box) =
-                    Widget::parent_mut::<MutuallyExclusiveListBox<T>>(widget);
+            widget
+                .borrow_mut()
+                .state
+                .add_callback(Callback::new(Rc::new(move |widget, _| {
+                    let (parent, parent_list_box) =
+                        Widget::parent_mut::<MutuallyExclusiveListBox<T>>(widget);
 
-                let cur_state = widget.borrow_mut().state.is_active();
-                if !cur_state {
-                    for (index, child) in parent.borrow().children.iter().enumerate() {
-                        if Rc::ptr_eq(child, widget) {
-                            parent_list_box.active_entry = match parent_list_box.get(index) {
-                                None => None,
-                                Some(entry) => Some(entry.clone()),
-                            };
+                    let cur_state = widget.borrow_mut().state.is_active();
+                    if !cur_state {
+                        for (index, child) in parent.borrow().children.iter().enumerate() {
+                            if Rc::ptr_eq(child, widget) {
+                                parent_list_box.active_entry = match parent_list_box.get(index) {
+                                    None => None,
+                                    Some(entry) => Some(entry.clone()),
+                                };
+                            }
+                            child.borrow_mut().state.set_active(false);
                         }
-                        child.borrow_mut().state.set_active(false);
+                    } else {
+                        parent_list_box.active_entry = None;
                     }
-                } else {
-                    parent_list_box.active_entry = None;
-                }
-                widget.borrow_mut().state.set_active(!cur_state);
-                (parent_list_box.cb)(parent_list_box.active_entry());
-            })));
+                    widget.borrow_mut().state.set_active(!cur_state);
+                    (parent_list_box.cb)(parent_list_box.active_entry());
+                })));
             children.push(widget)
         }
 

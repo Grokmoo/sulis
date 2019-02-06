@@ -14,24 +14,24 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::io::{Error, ErrorKind};
-use std::collections::HashMap;
 use std::cell::{Ref, RefCell};
+use std::collections::HashMap;
+use std::io::{Error, ErrorKind};
 use std::rc::Rc;
 
 use crate::config::{Config, DisplayMode};
-use crate::io::*;
-use crate::io::keyboard_event::Key;
 use crate::io::event::ClickKind;
+use crate::io::keyboard_event::Key;
+use crate::io::*;
 use crate::resource::ResourceSet;
 use crate::ui::{Cursor, Widget};
 use crate::util::{self, Point};
 
-use glium::{self, CapabilitiesSource, Surface, glutin, Rect};
 use glium::backend::Facade;
 use glium::glutin::{ContextBuilder, VirtualKeyCode};
 use glium::texture::{RawImage2d, SrgbTexture2d};
-use glium::uniforms::{MinifySamplerFilter, MagnifySamplerFilter, Sampler};
+use glium::uniforms::{MagnifySamplerFilter, MinifySamplerFilter, Sampler};
+use glium::{self, glutin, CapabilitiesSource, Rect, Surface};
 
 const VERTEX_SHADER_SRC: &'static str = r#"
   #version 130
@@ -126,7 +126,7 @@ impl<'a> GliumRenderer<'a> {
             backface_culling: glium::draw_parameters::BackfaceCullingMode::CullingDisabled,
             clip_planes_bitmask: 0,
 
-            .. Default::default()
+            ..Default::default()
         };
 
         let hidpi_factor = display.hidpi_factor;
@@ -143,20 +143,31 @@ impl<'a> GliumRenderer<'a> {
             return;
         }
 
-        trace!("Creating texture for ID '{}' of type '{:?}'", texture_id, draw_list.kind);
+        trace!(
+            "Creating texture for ID '{}' of type '{:?}'",
+            texture_id,
+            draw_list.kind
+        );
         let image = match draw_list.kind {
-            DrawListKind::Sprite => ResourceSet::spritesheet(&texture_id)
-                .unwrap().image.clone(),
-            DrawListKind::Font => ResourceSet::font(&texture_id)
-                .unwrap().image.clone(),
+            DrawListKind::Sprite => ResourceSet::spritesheet(&texture_id).unwrap().image.clone(),
+            DrawListKind::Font => ResourceSet::font(&texture_id).unwrap().image.clone(),
         };
 
-        self.register_texture(texture_id, image, draw_list.texture_min_filter, draw_list.texture_mag_filter);
+        self.register_texture(
+            texture_id,
+            image,
+            draw_list.texture_min_filter,
+            draw_list.texture_mag_filter,
+        );
     }
 }
 
-fn draw_to_surface<T: glium::Surface>(surface: &mut T, draw_list: DrawList,
-                                      display: &GliumDisplay, params: &glium::DrawParameters) {
+fn draw_to_surface<T: glium::Surface>(
+    surface: &mut T,
+    draw_list: DrawList,
+    display: &GliumDisplay,
+    params: &glium::DrawParameters,
+) {
     let glium_texture = match display.textures.get(&draw_list.texture) {
         None => return,
         Some(texture) => texture,
@@ -217,8 +228,13 @@ impl<'a> GraphicsRenderer for GliumRenderer<'a> {
         self.params.scissor = None;
     }
 
-    fn register_texture(&mut self, id: &str, image: ImageBuffer<Rgba<u8>, Vec<u8>>,
-                        min_filter: TextureMinFilter, mag_filter: TextureMagFilter) {
+    fn register_texture(
+        &mut self,
+        id: &str,
+        image: ImageBuffer<Rgba<u8>, Vec<u8>>,
+        min_filter: TextureMinFilter,
+        mag_filter: TextureMagFilter,
+    ) {
         let dims = image.dimensions();
         trace!("Registering texture '{}', {}x{}", id, dims.0, dims.1);
         let image = RawImage2d::from_raw_rgba_reversed(&image.into_raw(), dims);
@@ -226,18 +242,26 @@ impl<'a> GraphicsRenderer for GliumRenderer<'a> {
 
         let sampler_fn: Box<Fn(Sampler<SrgbTexture2d>) -> Sampler<SrgbTexture2d>> =
             Box::new(move |sampler| {
-                sampler.magnify_filter(get_mag_filter(mag_filter))
+                sampler
+                    .magnify_filter(get_mag_filter(mag_filter))
                     .minify_filter(get_min_filter(min_filter))
             });
 
-        self.display.textures.insert(id.to_string(), GliumTexture { texture, sampler_fn });
+        self.display.textures.insert(
+            id.to_string(),
+            GliumTexture {
+                texture,
+                sampler_fn,
+            },
+        );
     }
 
     fn clear_texture_region(&mut self, id: &str, min_x: i32, min_y: i32, max_x: i32, max_y: i32) {
         let texture = self.display.textures.get(id).unwrap();
         let tex_height = texture.texture.height();
-        let mut framebuffer = glium::framebuffer::SimpleFrameBuffer::new(&self.display.display,
-                                                                         &texture.texture).unwrap();
+        let mut framebuffer =
+            glium::framebuffer::SimpleFrameBuffer::new(&self.display.display, &texture.texture)
+                .unwrap();
 
         let rect = Rect {
             left: min_x as u32,
@@ -251,8 +275,9 @@ impl<'a> GraphicsRenderer for GliumRenderer<'a> {
 
     fn clear_texture(&mut self, id: &str) {
         let texture = self.display.textures.get(id).unwrap();
-        let mut framebuffer = glium::framebuffer::SimpleFrameBuffer::new(&self.display.display,
-                                                                         &texture.texture).unwrap();
+        let mut framebuffer =
+            glium::framebuffer::SimpleFrameBuffer::new(&self.display.display, &texture.texture)
+                .unwrap();
 
         framebuffer.clear_color(0.0, 0.0, 0.0, 0.0);
     }
@@ -264,14 +289,17 @@ impl<'a> GraphicsRenderer for GliumRenderer<'a> {
     fn draw_to_texture(&mut self, texture_id: &str, draw_list: DrawList) {
         self.create_texture_if_missing(&draw_list.texture, &draw_list);
         let texture = self.display.textures.get(texture_id).unwrap();
-        let mut framebuffer = glium::framebuffer::SimpleFrameBuffer::new(&self.display.display,
-                                                                     &texture.texture).unwrap();
+        let mut framebuffer =
+            glium::framebuffer::SimpleFrameBuffer::new(&self.display.display, &texture.texture)
+                .unwrap();
 
         draw_to_surface(&mut framebuffer, draw_list, &self.display, &self.params);
     }
 
     fn draw(&mut self, draw_list: DrawList) {
-        if draw_list.texture.is_empty() { return; }
+        if draw_list.texture.is_empty() {
+            return;
+        }
         self.create_texture_if_missing(&draw_list.texture, &draw_list);
 
         draw_to_surface(self.target, draw_list, &self.display, &self.params);
@@ -285,16 +313,21 @@ fn glium_error<E: ::std::fmt::Display>(e: E) -> Result<GliumDisplay, Error> {
 fn get_monitor(events_loop: &glium::glutin::EventsLoop) -> Option<glium::glutin::MonitorId> {
     let target_monitor = Config::monitor();
     for (index, monitor) in events_loop.get_available_monitors().enumerate() {
-        if index == target_monitor { return Some(monitor); }
+        if index == target_monitor {
+            return Some(monitor);
+        }
     }
-    warn!("Unable to find a monitor with configured index {}", target_monitor);
+    warn!(
+        "Unable to find a monitor with configured index {}",
+        target_monitor
+    );
     None
 }
 
-fn try_get_display(events_loop: &glium::glutin::EventsLoop,
-                   monitor: Option<glium::glutin::MonitorId>)
-    -> Result<glium::Display, glium::backend::glutin::DisplayCreationError> {
-
+fn try_get_display(
+    events_loop: &glium::glutin::EventsLoop,
+    monitor: Option<glium::glutin::MonitorId>,
+) -> Result<glium::Display, glium::backend::glutin::DisplayCreationError> {
     let (fullscreen, decorations) = match Config::display_mode() {
         DisplayMode::Window => (None, true),
         DisplayMode::BorderlessWindow => (None, false),
@@ -309,8 +342,7 @@ fn try_get_display(events_loop: &glium::glutin::EventsLoop,
         .with_title("Sulis")
         .with_decorations(decorations)
         .with_fullscreen(fullscreen.clone());
-    let context = ContextBuilder::new()
-        .with_pixel_format(24, 8);
+    let context = ContextBuilder::new().with_pixel_format(24, 8);
 
     match glium::Display::new(window, context, &events_loop) {
         Ok(display) => return Ok(display),
@@ -329,7 +361,7 @@ fn try_get_display(events_loop: &glium::glutin::EventsLoop,
         .with_hardware_acceleration(None)
         .with_pixel_format(24, 8);
 
-    return glium::Display::new(window, context, &events_loop)
+    return glium::Display::new(window, context, &events_loop);
 }
 
 impl GliumDisplay {
@@ -360,20 +392,34 @@ impl GliumDisplay {
         info!("Vendor: {}", display.get_opengl_vendor_string());
         info!("Renderer: {}", display.get_opengl_renderer_string());
         info!("Max viewport: {:?}", display.get_max_viewport_dimensions());
-        info!("Video memory available: {:?}", display.get_free_video_memory());
+        info!(
+            "Video memory available: {:?}",
+            display.get_free_video_memory()
+        );
         trace!("Extensions: {:#?}", display.get_context().get_extensions());
-        trace!("Capabilities: {:?}", display.get_context().get_capabilities());
+        trace!(
+            "Capabilities: {:?}",
+            display.get_context().get_capabilities()
+        );
 
         info!("Using hi dpi factor: {}", hidpi_factor);
 
-        let base_program = match glium::Program::from_source(&display, VERTEX_SHADER_SRC,
-                                                  FRAGMENT_SHADER_SRC, None) {
+        let base_program = match glium::Program::from_source(
+            &display,
+            VERTEX_SHADER_SRC,
+            FRAGMENT_SHADER_SRC,
+            None,
+        ) {
             Ok(prog) => prog,
             Err(e) => return glium_error(e),
         };
 
-        let swap_program = match glium::Program::from_source(&display, VERTEX_SHADER_SRC,
-                                                       SWAP_FRAGMENT_SHADER_SRC, None) {
+        let swap_program = match glium::Program::from_source(
+            &display,
+            VERTEX_SHADER_SRC,
+            SWAP_FRAGMENT_SHADER_SRC,
+            None,
+        ) {
             Ok(prog) => prog,
             Err(e) => return glium_error(e),
         };
@@ -391,7 +437,7 @@ impl GliumDisplay {
                 [2.0 / ui_x as f32, 0.0, 0.0, 0.0],
                 [0.0, 2.0 / ui_y as f32, 0.0, 0.0],
                 [0.0, 0.0, 1.0, 0.0],
-                [-1.0 , -1.0, 0.0, 1.0f32],
+                [-1.0, -1.0, 0.0, 1.0f32],
             ],
             textures: HashMap::new(),
             hidpi_factor,
@@ -410,7 +456,6 @@ const RESOLUTIONS: [(u32, u32); 8] = [
     (1280, 720),
 ];
 
-
 impl IO for GliumDisplay {
     fn get_display_configurations(&self) -> Vec<DisplayConfiguration> {
         let mut configs = Vec::new();
@@ -419,14 +464,20 @@ impl IO for GliumDisplay {
             // glium get_name() does not seem to return anything useful in most cases
             let name = format!("Monitor {}", index + 1);
 
-            let dims: (u32, u32) = monitor_id.get_dimensions()
-                .to_logical(monitor_id.get_hidpi_factor()).into();
+            let dims: (u32, u32) = monitor_id
+                .get_dimensions()
+                .to_logical(monitor_id.get_hidpi_factor())
+                .into();
 
             let mut resolutions = vec![dims];
             for (w, h) in RESOLUTIONS.iter() {
                 let (w, h) = (*w, *h);
-                if w > dims.0 || h > dims.1 { continue; }
-                if w == dims.0 && h == dims.1 { continue; }
+                if w > dims.0 || h > dims.1 {
+                    continue;
+                }
+                if w == dims.0 && h == dims.1 {
+                    continue;
+                }
 
                 resolutions.push((w, h));
             }
@@ -434,7 +485,7 @@ impl IO for GliumDisplay {
             configs.push(DisplayConfiguration {
                 name,
                 index,
-                resolutions
+                resolutions,
             });
         }
 
@@ -458,7 +509,7 @@ impl IO for GliumDisplay {
                         let mouse_x = (ui_x as f64 * position.x / display_size.width) as f32;
                         let mouse_y = (ui_y as f64 * position.y / display_size.height) as f32;
                         mouse_move = Some((mouse_x, mouse_y));
-                    },
+                    }
                     _ => {
                         for action in process_window_event(event) {
                             InputAction::handle_action(action, &root);
@@ -527,7 +578,7 @@ fn process_window_event(event: glutin::WindowEvent) -> Vec<InputAction> {
                 Some(action) => result.push(action),
             };
             result
-        },
+        }
         MouseInput { state, button, .. } => {
             let kind = match button {
                 glium::glutin::MouseButton::Left => ClickKind::Left,
@@ -540,7 +591,7 @@ fn process_window_event(event: glutin::WindowEvent) -> Vec<InputAction> {
                 glium::glutin::ElementState::Pressed => vec![InputAction::MouseDown(kind)],
                 glium::glutin::ElementState::Released => vec![InputAction::MouseUp(kind)],
             }
-        },
+        }
         MouseWheel { delta, .. } => {
             let amount = match delta {
                 glium::glutin::MouseScrollDelta::LineDelta(_, y) => y,
@@ -563,7 +614,9 @@ fn process_window_event(event: glutin::WindowEvent) -> Vec<InputAction> {
 }
 
 fn process_keyboard_input(input: glutin::KeyboardInput) -> Option<KeyboardEvent> {
-    if input.state != glutin::ElementState::Pressed { return None; }
+    if input.state != glutin::ElementState::Pressed {
+        return None;
+    }
     trace!("Glium keyboard input {:?}", input);
 
     let key_code = match input.virtual_keycode {

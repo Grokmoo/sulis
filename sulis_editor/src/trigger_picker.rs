@@ -19,8 +19,8 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 use sulis_core::config::Config;
-use sulis_core::resource::{ResourceSet, Sprite};
 use sulis_core::io::{DrawList, GraphicsRenderer};
+use sulis_core::resource::{ResourceSet, Sprite};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_core::util::Point;
 use sulis_core::widgets::{Label, Spinner};
@@ -46,7 +46,7 @@ impl TriggerPicker {
             Err(_) => {
                 warn!("Encounter tile '{}' not found", enc_tile);
                 None
-            },
+            }
         };
 
         Rc::new(RefCell::new(TriggerPicker {
@@ -59,9 +59,16 @@ impl TriggerPicker {
 }
 
 impl EditorMode for TriggerPicker {
-    fn draw_mode(&mut self, renderer: &mut GraphicsRenderer, _model: &AreaModel, x: f32, y: f32,
-            scale_x: f32, scale_y: f32, _millis: u32) {
-
+    fn draw_mode(
+        &mut self,
+        renderer: &mut GraphicsRenderer,
+        _model: &AreaModel,
+        x: f32,
+        y: f32,
+        scale_x: f32,
+        scale_y: f32,
+        _millis: u32,
+    ) {
         let pos = match self.cursor_pos {
             None => return,
             Some(pos) => pos,
@@ -96,35 +103,47 @@ impl EditorMode for TriggerPicker {
 }
 
 impl WidgetKind for TriggerPicker {
-    fn get_name(&self) -> &str { NAME }
+    fn get_name(&self) -> &str {
+        NAME
+    }
 
-    fn as_any(&self) -> &Any { self }
+    fn as_any(&self) -> &Any {
+        self
+    }
 
-    fn as_any_mut(&mut self) -> &mut Any { self }
+    fn as_any_mut(&mut self) -> &mut Any {
+        self
+    }
 
     fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let width = Widget::with_theme(Spinner::new(self.cur_width, 1, 50), "width");
-        width.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, kind| {
-            let (_, picker) = Widget::parent_mut::<TriggerPicker>(widget);
+        width
+            .borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(|widget, kind| {
+                let (_, picker) = Widget::parent_mut::<TriggerPicker>(widget);
 
-            let spinner = match kind.as_any().downcast_ref::<Spinner>() {
-                None => panic!("Unable to downcast to spinner"),
-                Some(widget) => widget,
-            };
+                let spinner = match kind.as_any().downcast_ref::<Spinner>() {
+                    None => panic!("Unable to downcast to spinner"),
+                    Some(widget) => widget,
+                };
 
-            picker.cur_width = spinner.value();
-        })));
+                picker.cur_width = spinner.value();
+            })));
         let height = Widget::with_theme(Spinner::new(self.cur_height, 1, 50), "height");
-        height.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, kind| {
-            let (_, picker) = Widget::parent_mut::<TriggerPicker>(widget);
+        height
+            .borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(|widget, kind| {
+                let (_, picker) = Widget::parent_mut::<TriggerPicker>(widget);
 
-            let spinner = match kind.as_any().downcast_ref::<Spinner>() {
-                None => panic!("Unable to downcast to spinner"),
-                Some(widget) => widget,
-            };
+                let spinner = match kind.as_any().downcast_ref::<Spinner>() {
+                    None => panic!("Unable to downcast to spinner"),
+                    Some(widget) => widget,
+                };
 
-            picker.cur_height = spinner.value();
-        })));
+                picker.cur_height = spinner.value();
+            })));
 
         let size_label = Widget::with_theme(Label::empty(), "size_label");
 

@@ -18,11 +18,11 @@ use std::any::Any;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use sulis_core::io::{GraphicsRenderer};
+use sulis_core::io::GraphicsRenderer;
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_core::util::Point;
-use sulis_module::{Actor, Module};
 use sulis_core::widgets::{Button, ScrollPane};
+use sulis_module::{Actor, Module};
 
 use crate::{AreaModel, EditorMode};
 
@@ -45,14 +45,27 @@ impl ActorPicker {
 }
 
 impl EditorMode for ActorPicker {
-    fn draw_mode(&mut self, renderer: &mut GraphicsRenderer, _model: &AreaModel, x: f32, y: f32,
-            scale_x: f32, scale_y: f32, millis: u32) {
-
+    fn draw_mode(
+        &mut self,
+        renderer: &mut GraphicsRenderer,
+        _model: &AreaModel,
+        x: f32,
+        y: f32,
+        scale_x: f32,
+        scale_y: f32,
+        millis: u32,
+    ) {
         for &(pos, ref actor) in self.removal_actors.iter() {
             let w = actor.race.size.width as f32 / 2.0;
             let h = actor.race.size.height as f32 / 2.0;
-            actor.draw(renderer, scale_x, scale_y, x + pos.x as f32 - w,
-                       y + pos.y as f32 - h, millis);
+            actor.draw(
+                renderer,
+                scale_x,
+                scale_y,
+                x + pos.x as f32 - w,
+                y + pos.y as f32 - h,
+                millis,
+            );
         }
 
         let actor = match self.cur_actor {
@@ -67,8 +80,14 @@ impl EditorMode for ActorPicker {
 
         let w = actor.race.size.width as f32 / 2.0;
         let h = actor.race.size.height as f32 / 2.0;
-        actor.draw(renderer, scale_x, scale_y, x + pos.x as f32 - w,
-                   y + pos.y as f32 - h, millis);
+        actor.draw(
+            renderer,
+            scale_x,
+            scale_y,
+            x + pos.x as f32 - w,
+            y + pos.y as f32 - h,
+            millis,
+        );
     }
 
     fn cursor_size(&self) -> (i32, i32) {
@@ -86,7 +105,8 @@ impl EditorMode for ActorPicker {
             Some(ref actor) => actor,
         };
 
-        self.removal_actors = model.actors_within(x, y, actor.race.size.width, actor.race.size.height);
+        self.removal_actors =
+            model.actors_within(x, y, actor.race.size.width, actor.race.size.height);
     }
 
     fn left_click(&mut self, model: &mut AreaModel, x: i32, y: i32) {
@@ -110,11 +130,17 @@ impl EditorMode for ActorPicker {
 }
 
 impl WidgetKind for ActorPicker {
-    fn get_name(&self) -> &str { NAME }
+    fn get_name(&self) -> &str {
+        NAME
+    }
 
-    fn as_any(&self) -> &Any { self }
+    fn as_any(&self) -> &Any {
+        self
+    }
 
-    fn as_any_mut(&mut self) -> &mut Any { self }
+    fn as_any_mut(&mut self) -> &mut Any {
+        self
+    }
 
     fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let mut all_actors = Module::all_actors();
@@ -124,20 +150,23 @@ impl WidgetKind for ActorPicker {
         for actor in all_actors {
             let button = Widget::with_theme(Button::empty(), "actor_button");
             button.borrow_mut().state.add_text_arg("name", &actor.id);
-            button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-                let parent = Widget::direct_parent(widget);
-                let cur_state = widget.borrow_mut().state.is_active();
-                if !cur_state {
-                    trace!("Set active actor: {}", widget.borrow().state.text);
-                    for child in parent.borrow().children.iter() {
-                        child.borrow_mut().state.set_active(false);
+            button
+                .borrow_mut()
+                .state
+                .add_callback(Callback::new(Rc::new(move |widget, _| {
+                    let parent = Widget::direct_parent(widget);
+                    let cur_state = widget.borrow_mut().state.is_active();
+                    if !cur_state {
+                        trace!("Set active actor: {}", widget.borrow().state.text);
+                        for child in parent.borrow().children.iter() {
+                            child.borrow_mut().state.set_active(false);
+                        }
+                        widget.borrow_mut().state.set_active(true);
                     }
-                    widget.borrow_mut().state.set_active(true);
-                }
 
-                let (_, actor_picker) = Widget::parent_mut::<ActorPicker>(&parent);
-                actor_picker.cur_actor = Some(Rc::clone(&actor));
-            })));
+                    let (_, actor_picker) = Widget::parent_mut::<ActorPicker>(&parent);
+                    actor_picker.cur_actor = Some(Rc::clone(&actor));
+                })));
 
             scrollpane.borrow().add_to_content(button);
         }

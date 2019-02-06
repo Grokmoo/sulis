@@ -14,11 +14,11 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::rc::Rc;
 use std::collections::HashMap;
+use std::rc::Rc;
 
 use sulis_core::util::ExtInt;
-use sulis_module::{Actor, Module, Faction, StatList};
+use sulis_module::{Actor, Faction, Module, StatList};
 
 /// Persistent Stats, that are not computed from the base StatList, are
 /// saved, and may persist between actions
@@ -70,9 +70,13 @@ impl PStats {
         self.disabled = disabled;
     }
 
-    pub fn is_disabled(&self) -> bool { self.disabled }
+    pub fn is_disabled(&self) -> bool {
+        self.disabled
+    }
 
-    pub fn is_threatened(&self) -> bool { self.threatened_by.len() > 0 }
+    pub fn is_threatened(&self) -> bool {
+        self.threatened_by.len() > 0
+    }
 
     pub fn add_threatening(&mut self, index: usize) {
         if !self.threatening.contains(&index) {
@@ -94,21 +98,33 @@ impl PStats {
         self.threatened_by.retain(|x| *x != index);
     }
 
-    pub fn is_inventory_locked(&self) -> bool { self.inventory_locked }
+    pub fn is_inventory_locked(&self) -> bool {
+        self.inventory_locked
+    }
 
     pub fn set_inventory_locked(&mut self, locked: bool) {
         self.inventory_locked = locked;
     }
 
-    pub fn hp(&self) -> i32 { self.hp }
+    pub fn hp(&self) -> i32 {
+        self.hp
+    }
 
-    pub fn ap(&self) -> u32 { self.ap }
+    pub fn ap(&self) -> u32 {
+        self.ap
+    }
 
-    pub fn overflow_ap(&self) -> i32 { self.overflow_ap }
+    pub fn overflow_ap(&self) -> i32 {
+        self.overflow_ap
+    }
 
-    pub fn has_level_up(&self) -> bool { self.has_level_up }
+    pub fn has_level_up(&self) -> bool {
+        self.has_level_up
+    }
 
-    pub fn xp(&self) -> u32 { self.xp }
+    pub fn xp(&self) -> u32 {
+        self.xp
+    }
 
     pub fn set_overflow_ap(&mut self, ap: i32) {
         let rules = Module::rules();
@@ -165,7 +181,8 @@ impl PStats {
         self.hp = stats.max_hp;
 
         for (ref group, amount) in stats.uses_per_day_iter() {
-            self.current_group_uses_per_day.insert(group.to_string(), *amount);
+            self.current_group_uses_per_day
+                .insert(group.to_string(), *amount);
         }
 
         self.end_encounter(stats);
@@ -175,7 +192,8 @@ impl PStats {
     /// actions as well as `init_turn`
     pub fn end_encounter(&mut self, stats: &StatList) {
         for (ref group, amount) in stats.uses_per_encounter_iter() {
-            self.current_group_uses_per_encounter.insert(group.to_string(), *amount);
+            self.current_group_uses_per_encounter
+                .insert(group.to_string(), *amount);
         }
 
         self.init_turn(stats);

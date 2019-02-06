@@ -15,17 +15,17 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::cell::RefCell;
-use std::io::{Read, Error, ErrorKind};
-use std::path::Path;
-use std::fs::{self, File};
-use std::path::PathBuf;
 use std::collections::HashMap;
+use std::fs::{self, File};
+use std::io::{Error, ErrorKind, Read};
+use std::path::Path;
+use std::path::PathBuf;
 
-use serde::{Deserialize, Deserializer};
 use lazy_static::lazy_static;
+use serde::{Deserialize, Deserializer};
 
 use crate::io::keyboard_event::Key;
-use crate::io::{KeyboardEvent, InputAction};
+use crate::io::{InputAction, KeyboardEvent};
 
 use dirs;
 use serde_yaml;
@@ -42,14 +42,14 @@ lazy_static! {
 #[derive(Debug, Deserialize, Serialize, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct Config {
-  pub display: DisplayConfig,
-  pub resources: ResourcesConfig,
-  pub input: InputConfig,
-  pub logging: LoggingConfig,
-  pub editor: EditorConfig,
+    pub display: DisplayConfig,
+    pub resources: ResourcesConfig,
+    pub input: InputConfig,
+    pub logging: LoggingConfig,
+    pub editor: EditorConfig,
 
-  #[serde(default)]
-  pub debug: DebugConfig,
+    #[serde(default)]
+    pub debug: DebugConfig,
 }
 
 impl Config {
@@ -135,11 +135,9 @@ impl Config {
 
     pub fn get_input_action(k: KeyboardEvent) -> Option<InputAction> {
         debug!("Got keyboard input '{:?}'", k);
-        CONFIG.with(|c| {
-            match c.borrow().input.keybindings.get(&k.key) {
-                None => None,
-                Some(action) => Some(*action),
-            }
+        CONFIG.with(|c| match c.borrow().input.keybindings.get(&k.key) {
+            None => None,
+            Some(action) => Some(*action),
         })
     }
 
@@ -161,7 +159,7 @@ pub struct DebugConfig {
 impl Default for DebugConfig {
     fn default() -> Self {
         DebugConfig {
-            encounter_spawning: true
+            encounter_spawning: true,
         }
     }
 }
@@ -173,13 +171,15 @@ pub struct EditorConfig {
     pub cursor: String,
     pub transition_image: String,
 
-    #[serde(deserialize_with="de_non_empty_vec")]
+    #[serde(deserialize_with = "de_non_empty_vec")]
     pub transition_sizes: Vec<String>,
     pub area: EditorAreaConfig,
 }
 
 fn de_non_empty_vec<'de, D>(deserializer: D) -> Result<Vec<String>, D::Error>
-where D: Deserializer<'de> {
+where
+    D: Deserializer<'de>,
+{
     let result = Vec::deserialize(deserializer)?;
 
     if result.is_empty() {
@@ -200,10 +200,10 @@ pub struct EditorAreaConfig {
     pub explored_tile: String,
     pub encounter_tile: String,
 
-    #[serde(deserialize_with="de_non_empty_vec")]
+    #[serde(deserialize_with = "de_non_empty_vec")]
     pub layers: Vec<String>,
 
-    #[serde(deserialize_with="de_non_empty_vec")]
+    #[serde(deserialize_with = "de_non_empty_vec")]
     pub elev_tiles: Vec<String>,
     pub entity_layer: usize,
 }
@@ -253,7 +253,7 @@ pub struct ResourcesConfig {
 pub struct InputConfig {
     pub edge_scrolling: bool,
     pub scroll_speed: f32,
-    pub keybindings: HashMap<Key, InputAction>
+    pub keybindings: HashMap<Key, InputAction>,
 }
 
 #[derive(Debug, Deserialize, Serialize, Copy, Clone)]
@@ -266,9 +266,7 @@ pub enum IOAdapter {
 #[cfg(not(target_os = "windows"))]
 fn get_user_dir() -> PathBuf {
     let mut path = match ::std::env::var("XDG_CONFIG_HOME") {
-        Ok(path_str) => {
-            PathBuf::from(path_str)
-        },
+        Ok(path_str) => PathBuf::from(path_str),
         Err(_) => {
             let mut path = get_home_dir();
             path.push(".config/");
@@ -319,7 +317,10 @@ impl Config {
             Ok(config) => config,
             Err(e) => {
                 eprintln!("{}", e);
-                eprintln!("Error parsing config file at '{}', attempting delete.", CONFIG_FILENAME);
+                eprintln!(
+                    "Error parsing config file at '{}', attempting delete.",
+                    CONFIG_FILENAME
+                );
 
                 Config::create_config_from_sample(config_path);
 
@@ -338,7 +339,10 @@ impl Config {
     fn create_config_from_sample(config_path: &Path) {
         let config_base_path = Path::new(CONFIG_BASE);
 
-        println!("{} not found, attempting to create it from {}", CONFIG_FILENAME, CONFIG_BASE);
+        println!(
+            "{} not found, attempting to create it from {}",
+            CONFIG_FILENAME, CONFIG_BASE
+        );
         if let Some(path) = config_path.parent() {
             create_dir_and_warn(path);
         }
@@ -353,10 +357,10 @@ impl Config {
                         eprintln!("Unable to create configuration file '{}'", CONFIG_FILENAME);
                         eprintln!("Exiting...");
                         ::std::process::exit(1);
-                    },
+                    }
                     _ => {}
                 }
-            },
+            }
             _ => {}
         }
     }
@@ -376,13 +380,19 @@ impl Config {
 
         match config.logging.log_level.as_ref() {
             "error" | "warn" | "info" | "debug" | "trace" => (),
-            _ => return Err(Error::new(ErrorKind::InvalidData,
-                    format!("log_level must be one of error, warn, info, debug, or trace")))
+            _ => {
+                return Err(Error::new(
+                    ErrorKind::InvalidData,
+                    format!("log_level must be one of error, warn, info, debug, or trace"),
+                ));
+            }
         };
 
         if config.display.width < 80 || config.display.height < 24 {
-            return Err(Error::new(ErrorKind::InvalidData,
-                "Minimum terminal display size is 80x24"));
+            return Err(Error::new(
+                ErrorKind::InvalidData,
+                "Minimum terminal display size is 80x24",
+            ));
         }
 
         Ok(config)

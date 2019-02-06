@@ -15,30 +15,34 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::any::Any;
-use std::rc::Rc;
 use std::cell::RefCell;
+use std::rc::Rc;
 
 use sulis_core::ui::{Widget, WidgetKind};
-use sulis_core::widgets::{Label};
+use sulis_core::widgets::Label;
 
 pub const NAME: &str = "loading_screen";
 
-pub struct LoadingScreen {
-}
+pub struct LoadingScreen {}
 
 impl LoadingScreen {
     pub fn new() -> Rc<RefCell<LoadingScreen>> {
-        Rc::new(RefCell::new(LoadingScreen {
-        }))
+        Rc::new(RefCell::new(LoadingScreen {}))
     }
 }
 
 impl WidgetKind for LoadingScreen {
-    fn get_name(&self) -> &str { NAME }
+    fn get_name(&self) -> &str {
+        NAME
+    }
 
-    fn as_any(&self) -> &Any { self }
+    fn as_any(&self) -> &Any {
+        self
+    }
 
-    fn as_any_mut(&mut self) -> &mut Any { self }
+    fn as_any_mut(&mut self) -> &mut Any {
+        self
+    }
 
     fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let loading_label = Widget::with_theme(Label::empty(), "loading_label");

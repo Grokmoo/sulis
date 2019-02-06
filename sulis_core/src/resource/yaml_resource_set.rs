@@ -15,9 +15,9 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::collections::HashMap;
+use std::fs;
 use std::io::Error;
-use std::fs::{self};
-use std::path::{Path};
+use std::path::Path;
 
 use serde_yaml::{self, Value};
 
@@ -65,10 +65,14 @@ impl YamlResourceKind {
     fn from_path(top_level: &Path, path: &Path) -> Option<YamlResourceKind> {
         let path_str = match path.strip_prefix(top_level) {
             Err(e) => {
-                warn!("Unable to parse '{:?}' as subdir of '{:?}'", path, top_level);
+                warn!(
+                    "Unable to parse '{:?}' as subdir of '{:?}'",
+                    path, top_level
+                );
                 warn!("{}", e);
                 return None;
-            }, Ok(ref path) => path.to_string_lossy().to_string(),
+            }
+            Ok(ref path) => path.to_string_lossy().to_string(),
         };
 
         YamlResourceKind::from_str(&path_str)
@@ -81,7 +85,7 @@ impl YamlResourceKind {
             "fonts" => Font,
             "images/animated" | "images\\animated" => AnimatedImage,
             "images/composed" | "images\\composed" => ComposedImage,
-            "images/simple" | "images\\simple"  => SimpleImage,
+            "images/simple" | "images\\simple" => SimpleImage,
             "images/timer" | "images\\timer" => TimerImage,
             "spritesheets" => Spritesheet,
 
@@ -112,24 +116,42 @@ impl YamlResourceSet {
     pub fn new(data_dir: &Path) -> Result<YamlResourceSet, Error> {
         let mut resources = HashMap::new();
 
-        debug!("Parsing YAML in '{}'", data_dir.to_string_lossy().to_string());
+        debug!(
+            "Parsing YAML in '{}'",
+            data_dir.to_string_lossy().to_string()
+        );
 
-        read_recursive(data_dir, data_dir,
-            Some(YamlResourceKind::TopLevel), &mut resources);
+        read_recursive(
+            data_dir,
+            data_dir,
+            Some(YamlResourceKind::TopLevel),
+            &mut resources,
+        );
 
         Ok(YamlResourceSet { resources })
     }
 
     pub fn append(&mut self, dir: &Path) {
-        debug!("Appending resources in '{}'", dir.to_string_lossy().to_string());
+        debug!(
+            "Appending resources in '{}'",
+            dir.to_string_lossy().to_string()
+        );
 
-        read_recursive(dir, dir, Some(YamlResourceKind::TopLevel),
-            &mut self.resources);
+        read_recursive(
+            dir,
+            dir,
+            Some(YamlResourceKind::TopLevel),
+            &mut self.resources,
+        );
     }
 }
 
-fn read_recursive(dir: &Path, top_level: &Path, kind: Option<YamlResourceKind>,
-                  resources: &mut HashMap<YamlResourceKind, HashMap<String, Value>>) {
+fn read_recursive(
+    dir: &Path,
+    top_level: &Path,
+    kind: Option<YamlResourceKind>,
+    resources: &mut HashMap<YamlResourceKind, HashMap<String, Value>>,
+) {
     let dir_str = dir.to_string_lossy().to_string();
     let dir_entries = match fs::read_dir(dir) {
         Ok(entries) => entries,
@@ -152,10 +174,12 @@ fn read_recursive(dir: &Path, top_level: &Path, kind: Option<YamlResourceKind>,
         if path.is_dir() {
             let next_kind = match kind {
                 Some(YamlResourceKind::TopLevel) | None => {
-                    let kind =  YamlResourceKind::from_path(top_level, &path);
-                    if let Some(YamlResourceKind::Skip) = kind { continue; }
+                    let kind = YamlResourceKind::from_path(top_level, &path);
+                    if let Some(YamlResourceKind::Skip) = kind {
+                        continue;
+                    }
                     kind
-                },
+                }
                 Some(kind) => Some(kind),
             };
 
@@ -163,8 +187,11 @@ fn read_recursive(dir: &Path, top_level: &Path, kind: Option<YamlResourceKind>,
         } else if path.is_file() {
             match kind {
                 None => {
-                    warn!("Skipping file '{:?}' as it is not in a recognized directory", path);
-                },
+                    warn!(
+                        "Skipping file '{:?}' as it is not in a recognized directory",
+                        path
+                    );
+                }
                 Some(kind) => {
                     read_file(&dir_str, &path, kind, resources);
                 }
@@ -173,12 +200,17 @@ fn read_recursive(dir: &Path, top_level: &Path, kind: Option<YamlResourceKind>,
     }
 }
 
-fn read_file(dir_str: &str, path: &Path, kind: YamlResourceKind,
-             resources: &mut HashMap<YamlResourceKind, HashMap<String, Value>>) {
-
+fn read_file(
+    dir_str: &str,
+    path: &Path,
+    kind: YamlResourceKind,
+    resources: &mut HashMap<YamlResourceKind, HashMap<String, Value>>,
+) {
     let path_str = path.to_string_lossy().to_string();
 
-    if !path_str.ends_with("json") && ! path_str.ends_with("yml") { return; }
+    if !path_str.ends_with("json") && !path_str.ends_with("yml") {
+        return;
+    }
 
     debug!("Reading file as YAML at '{}'", path_str);
     let data = match fs::read_to_string(path) {
@@ -199,15 +231,11 @@ fn read_file(dir_str: &str, path: &Path, kind: YamlResourceKind,
     };
 
     let id = match value.get("id") {
-        Some(ref id_value) => {
-            match id_value {
-                Value::String(ref s) => {
-                    s.to_string()
-                },
-                _ => {
-                    warn!("Top level ID is not a string in '{}'", path_str);
-                    return;
-                }
+        Some(ref id_value) => match id_value {
+            Value::String(ref s) => s.to_string(),
+            _ => {
+                warn!("Top level ID is not a string in '{}'", path_str);
+                return;
             }
         },
         None => {
@@ -230,14 +258,23 @@ fn read_file(dir_str: &str, path: &Path, kind: YamlResourceKind,
             let dir = Value::String(dir_str.to_string());
             let mut seq = serde_yaml::Sequence::new();
             seq.push(dir);
-            mapping.insert(Value::String(DIRECTORY_VAL_STR.to_string()), Value::Sequence(seq));
+            mapping.insert(
+                Value::String(DIRECTORY_VAL_STR.to_string()),
+                Value::Sequence(seq),
+            );
 
             let file = Value::String(path_str);
             let mut seq = serde_yaml::Sequence::new();
             seq.push(file);
-            mapping.insert(Value::String(FILE_VAL_STR.to_string()), Value::Sequence(seq));
-        },
-        _ => warn!("Attempting to insert '{}' from '{}' which is not a mapping", id, path_str),
+            mapping.insert(
+                Value::String(FILE_VAL_STR.to_string()),
+                Value::Sequence(seq),
+            );
+        }
+        _ => warn!(
+            "Attempting to insert '{}' from '{}' which is not a mapping",
+            id, path_str
+        ),
     }
     map.insert(id, value);
 }
@@ -266,23 +303,35 @@ fn merge_doc(dir: &str, name: &str, base: &mut Value, append: Value) {
 
             match append {
                 Value::Mapping(append) => merge_map(dir, name, mapping, append),
-                _ => warn!("Unable to append '{}' to base YAML as it is not a mapping", name),
+                _ => warn!(
+                    "Unable to append '{}' to base YAML as it is not a mapping",
+                    name
+                ),
             }
-        },
-        _ => warn!("Unable to append '{}' to base YAML as it is not a mapping", name),
+        }
+        _ => warn!(
+            "Unable to append '{}' to base YAML as it is not a mapping",
+            name
+        ),
     }
 }
 
-fn merge_map(dir: &str, name: &str, map: &mut serde_yaml::Mapping,
-             mut append: serde_yaml::Mapping) {
+fn merge_map(
+    dir: &str,
+    name: &str,
+    map: &mut serde_yaml::Mapping,
+    mut append: serde_yaml::Mapping,
+) {
     let clear_base_keys: Value = Value::String("clear_base_keys".to_string());
     let remove_base_keys: Value = Value::String("remove_base_keys".to_string());
 
     if let Some(clear) = append.remove(&clear_base_keys) {
         match clear {
             Value::Bool(val) => {
-                if val { map.clear(); }
-            },
+                if val {
+                    map.clear();
+                }
+            }
             _ => warn!("clear_base_keys must be a boolean in '{}'", name),
         }
     }
@@ -293,8 +342,11 @@ fn merge_map(dir: &str, name: &str, map: &mut serde_yaml::Mapping,
                 for value in seq {
                     map.remove(&value);
                 }
-            },
-            _ => warn!("remove_base_keys must be a sequence of key-strings in '{}'", name),
+            }
+            _ => warn!(
+                "remove_base_keys must be a sequence of key-strings in '{}'",
+                name
+            ),
         }
     }
 
@@ -308,7 +360,7 @@ fn merge_map(dir: &str, name: &str, map: &mut serde_yaml::Mapping,
                         _ => warn!("Expected sequence for '{:?}' in '{}'", key, name),
                     }
                     continue;
-                },
+                }
                 Value::Mapping(ref mut map) => {
                     match value {
                         Value::Mapping(append) => merge_map(dir, name, map, append),
@@ -323,8 +375,12 @@ fn merge_map(dir: &str, name: &str, map: &mut serde_yaml::Mapping,
     }
 }
 
-fn merge_sequence(_dir: &str, _name: &str, seq: &mut serde_yaml::Sequence,
-                  append: serde_yaml::Sequence) {
+fn merge_sequence(
+    _dir: &str,
+    _name: &str,
+    seq: &mut serde_yaml::Sequence,
+    append: serde_yaml::Sequence,
+) {
     for value in append {
         seq.push(value);
     }

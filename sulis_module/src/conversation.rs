@@ -14,11 +14,11 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::slice::Iter;
 use std::collections::HashMap;
 use std::io::Error;
+use std::slice::Iter;
 
-use sulis_core::util::{unable_to_create_error};
+use sulis_core::util::unable_to_create_error;
 
 use crate::{Module, OnTrigger};
 
@@ -109,7 +109,7 @@ impl Conversation {
     pub fn text(&self, node: &str) -> &str {
         match self.nodes.get(node) {
             None => panic!("Invalid node"),
-            Some(ref node) => &node.text
+            Some(ref node) => &node.text,
         }
     }
 

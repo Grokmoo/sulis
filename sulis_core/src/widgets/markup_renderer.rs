@@ -160,7 +160,7 @@ impl MarkupRenderer {
                 '[' => {
                     tag_count += 1;
                     in_markup_tag = true;
-                },
+                }
                 '|' => in_markup_tag = false,
                 ']' => tag_count -= 1,
                 _ => {
@@ -170,7 +170,9 @@ impl MarkupRenderer {
                 }
             }
 
-            if tag_count == 0 { break; }
+            if tag_count == 0 {
+                break;
+            }
         }
 
         width as f32 * cur_markup.scale / cur_markup.font.line_height as f32
@@ -211,18 +213,30 @@ impl MarkupRenderer {
                 match c {
                     '\\' => {
                         escaped = true;
-                    }, '[' => {
-                        let (x1, y1) = self.draw_current(&mut word_buf, &cur_markup,
-                                                    x, y, pos_x, max_x, word_width);
+                    }
+                    '[' => {
+                        let (x1, y1) = self.draw_current(
+                            &mut word_buf,
+                            &cur_markup,
+                            x,
+                            y,
+                            pos_x,
+                            max_x,
+                            word_width,
+                        );
                         x = x1;
                         y = y1;
                         word_width = 0;
                         in_markup_tag = true;
-                    }, '|' => {
+                    }
+                    '|' => {
                         in_markup_tag = false;
                         markup_stack.push(cur_markup);
-                        cur_markup = Markup::from_string(&markup_buf, &markup_stack.last().unwrap(),
-                            widget_state);
+                        cur_markup = Markup::from_string(
+                            &markup_buf,
+                            &markup_stack.last().unwrap(),
+                            widget_state,
+                        );
                         markup_buf.clear();
                         if !cur_markup.ignore {
                             if let Some(markup_x) = cur_markup.pos_x {
@@ -245,9 +259,17 @@ impl MarkupRenderer {
                                 self.draw_sprite(&image, &cur_markup, x, y);
                             }
                         }
-                    }, ']' => {
-                        let (x1, y1) = self.draw_current(&mut word_buf, &cur_markup,
-                                                    x, y, pos_x, max_x, word_width);
+                    }
+                    ']' => {
+                        let (x1, y1) = self.draw_current(
+                            &mut word_buf,
+                            &cur_markup,
+                            x,
+                            y,
+                            pos_x,
+                            max_x,
+                            word_width,
+                        );
                         x = x1;
                         y = y1;
                         word_width = 0;
@@ -256,16 +278,25 @@ impl MarkupRenderer {
                             Some(markup) => cur_markup = markup,
                             None => warn!("Invalid ']' in markup"),
                         }
-                    }, ' ' | '\n' => {
+                    }
+                    ' ' | '\n' => {
                         if !in_markup_tag {
                             word_buf.push(c);
-                            let (x1, y1) = self.draw_current(&mut word_buf, &cur_markup,
-                                                        x, y, pos_x, max_x, word_width);
+                            let (x1, y1) = self.draw_current(
+                                &mut word_buf,
+                                &cur_markup,
+                                x,
+                                y,
+                                pos_x,
+                                max_x,
+                                word_width,
+                            );
                             x = x1;
                             y = y1;
                             word_width = 0;
                         }
-                    }, _ => {
+                    }
+                    _ => {
                         if in_markup_tag {
                             markup_buf.push(c);
                         } else {
@@ -288,8 +319,16 @@ impl MarkupRenderer {
         }
     }
 
-    fn draw_current(&mut self, word_buf: &mut String, markup: &Markup, mut x: f32, mut y: f32,
-                    start_x: f32, max_x: f32, word_width: u32) -> (f32, f32) {
+    fn draw_current(
+        &mut self,
+        word_buf: &mut String,
+        markup: &Markup,
+        mut x: f32,
+        mut y: f32,
+        start_x: f32,
+        max_x: f32,
+        word_width: u32,
+    ) -> (f32, f32) {
         let factor = markup.font.base as f32 / markup.font.line_height as f32;
 
         if markup.ignore {
@@ -309,7 +348,8 @@ impl MarkupRenderer {
                 '\n' => {
                     x = start_x;
                     y += markup.scale * factor;
-                }, _ => {
+                }
+                _ => {
                     x = markup.add_quad_and_advance(&mut quads, c, x, y);
 
                     let bottom_y = y + (markup.scale - 1.0) * factor;
@@ -332,19 +372,21 @@ impl MarkupRenderer {
     }
 
     fn draw_sprite(&mut self, image: &str, markup: &Markup, x: f32, y: f32) {
-        if markup.ignore { return; }
+        if markup.ignore {
+            return;
+        }
 
         let sprite = match ResourceSet::sprite(image) {
             Err(_) => {
                 warn!("Unable to find sprite '{}'", image);
                 return;
-            },
+            }
             Ok(sprite) => sprite,
         };
 
         let x_over_y = sprite.size.width as f32 / sprite.size.height as f32;
-        let mut draw_list = DrawList::from_sprite_f32(&sprite, x, y,
-                                                      markup.scale * x_over_y, markup.scale);
+        let mut draw_list =
+            DrawList::from_sprite_f32(&sprite, x, y, markup.scale * x_over_y, markup.scale);
         draw_list.set_color(markup.color);
         self.append_to_draw_lists(draw_list);
     }
@@ -364,8 +406,13 @@ impl MarkupRenderer {
 }
 
 impl FontRenderer for MarkupRenderer {
-    fn render(&self, renderer: &mut GraphicsRenderer, _pos_x: f32, _pos_y: f32,
-              _widget_state: &WidgetState) {
+    fn render(
+        &self,
+        renderer: &mut GraphicsRenderer,
+        _pos_x: f32,
+        _pos_y: f32,
+        _widget_state: &WidgetState,
+    ) {
         for draw_list in self.draw_lists.iter() {
             renderer.draw(draw_list.clone());
         }

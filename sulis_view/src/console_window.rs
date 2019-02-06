@@ -15,14 +15,14 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::any::Any;
-use std::rc::Rc;
 use std::cell::RefCell;
+use std::rc::Rc;
 
 use rlua;
 
-use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_core::io::InputAction;
-use sulis_core::widgets::{Label, InputField};
+use sulis_core::ui::{Callback, Widget, WidgetKind};
+use sulis_core::widgets::{InputField, Label};
 use sulis_state::{GameState, ScriptState};
 
 pub const NAME: &str = "console_window";
@@ -50,14 +50,16 @@ impl ConsoleWindow {
     }
 
     pub fn execute_script(&mut self, script: String) {
-        if script.trim().is_empty() { return; }
+        if script.trim().is_empty() {
+            return;
+        }
 
         self.history.push(script[0..script.len() - 1].to_string());
         self.history_index = self.history.len();
 
         let party = GameState::party();
 
-        let result =  match self.script_state.console(script, &party) {
+        let result = match self.script_state.console(script, &party) {
             Ok(result) => result,
             Err(rlua::Error::FromLuaConversionError { .. }) => "Success".to_string(),
             Err(e) => format!("{}", e),
@@ -68,7 +70,9 @@ impl ConsoleWindow {
     }
 
     pub fn current_history_text(&self) -> String {
-        if self.history_index >= self.history.len() { return "".to_string(); }
+        if self.history_index >= self.history.len() {
+            return "".to_string();
+        }
 
         self.history[self.history_index].clone()
     }
@@ -85,41 +89,45 @@ impl WidgetKind for ConsoleWindow {
     fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let prompt = Widget::with_theme(Label::empty(), "prompt");
 
-        self.input.borrow_mut().set_key_press_callback(Rc::new(|widget, field, key| {
-            let (parent, console) = Widget::parent_mut::<ConsoleWindow>(widget);
-            match key {
-                InputAction::ToggleConsole => {
-                    Widget::clear_keyboard_focus(widget);
-                    parent.borrow_mut().state.set_visible(false);
-                },
-                InputAction::ScrollUp => {
-                    if console.history_index > 0 {
-                        console.history_index -= 1;
-                        field.set_text(&console.current_history_text(), widget);
+        self.input
+            .borrow_mut()
+            .set_key_press_callback(Rc::new(|widget, field, key| {
+                let (parent, console) = Widget::parent_mut::<ConsoleWindow>(widget);
+                match key {
+                    InputAction::ToggleConsole => {
+                        Widget::clear_keyboard_focus(widget);
+                        parent.borrow_mut().state.set_visible(false);
                     }
-                },
-                InputAction::ScrollDown => {
-                    if console.history_index < console.history.len() {
-                        console.history_index += 1;
-                        field.set_text(&console.current_history_text(), widget);
+                    InputAction::ScrollUp => {
+                        if console.history_index > 0 {
+                            console.history_index -= 1;
+                            field.set_text(&console.current_history_text(), widget);
+                        }
                     }
+                    InputAction::ScrollDown => {
+                        if console.history_index < console.history.len() {
+                            console.history_index += 1;
+                            field.set_text(&console.current_history_text(), widget);
+                        }
+                    }
+                    _ => (),
                 }
-                _ => (),
-            }
-        }));
+            }));
 
-        self.input.borrow_mut().set_enter_callback(Callback::new(Rc::new(|widget, kind| {
-            let field = match kind.as_any_mut().downcast_mut::<InputField>() {
-                None => panic!(),
-                Some(widget) => widget,
-            };
+        self.input
+            .borrow_mut()
+            .set_enter_callback(Callback::new(Rc::new(|widget, kind| {
+                let field = match kind.as_any_mut().downcast_mut::<InputField>() {
+                    None => panic!(),
+                    Some(widget) => widget,
+                };
 
-            let text = field.text();
-            field.clear(widget);
+                let text = field.text();
+                field.clear(widget);
 
-            let (_, console) = Widget::parent_mut::<ConsoleWindow>(widget);
-            console.execute_script(text);
-        })));
+                let (_, console) = Widget::parent_mut::<ConsoleWindow>(widget);
+                console.execute_script(text);
+            })));
 
         vec![prompt, self.input_widget.clone(), self.output.clone()]
     }

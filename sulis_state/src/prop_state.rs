@@ -15,18 +15,18 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::fmt;
-use std::rc::Rc;
 use std::io::Error;
+use std::rc::Rc;
 
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::ui::{animation_state, AnimationState, Color};
 use sulis_core::util::invalid_data_error;
-use sulis_module::{Item, LootList, Module, Prop, prop, ObjectSizeIterator};
 use sulis_module::area::PropData;
+use sulis_module::{prop, Item, LootList, Module, ObjectSizeIterator, Prop};
 
 use crate::entity_state::AreaDrawable;
-use crate::{ChangeListenerList, EntityTextureCache, ItemList, ItemState, Location};
 use crate::save_state::PropInteractiveSaveState;
+use crate::{ChangeListenerList, EntityTextureCache, ItemList, ItemState, Location};
 
 #[derive(Debug)]
 pub enum Interactive {
@@ -40,7 +40,7 @@ pub enum Interactive {
         open: bool,
     },
     Hover {
-        text: String
+        text: String,
     },
 }
 
@@ -49,7 +49,7 @@ pub struct PropState {
     pub location: Location,
     pub animation_state: AnimationState,
     pub listeners: ChangeListenerList<PropState>,
-    pub (crate) interactive: Interactive,
+    pub(crate) interactive: Interactive,
     enabled: bool,
 
     marked_for_removal: bool,
@@ -70,10 +70,13 @@ impl PropState {
             let item = &item_save.item;
             let item = match Module::create_get_item(&item.id, &item.adjectives) {
                 None => {
-                    warn!("Unable to create item '{}' with '{:?}' in prop '{}'",
-                          item_save.item.id, item_save.item.adjectives, prop_data.prop.id);
+                    warn!(
+                        "Unable to create item '{}' with '{:?}' in prop '{}'",
+                        item_save.item.id, item_save.item.adjectives, prop_data.prop.id
+                    );
                     continue;
-                }, Some(item) => item,
+                }
+                Some(item) => item,
             };
             items.add_quantity(quantity, ItemState::new(item));
         }
@@ -83,20 +86,18 @@ impl PropState {
         let interactive = match prop_data.prop.interactive {
             prop::Interactive::Hover => {
                 let text = prop_data.hover_text.clone().unwrap_or(String::new());
-                Interactive::Hover {
-                    text
-                }
+                Interactive::Hover { text }
             }
             prop::Interactive::Not => {
-                if !items.is_empty() { warn!("Attempted to add items to a non-container prop"); }
-                Interactive::Not
-            },
-            prop::Interactive::Container { ref loot } => {
-                Interactive::Container {
-                    items,
-                    loot_to_generate: loot.clone(),
-                    temporary,
+                if !items.is_empty() {
+                    warn!("Attempted to add items to a non-container prop");
                 }
+                Interactive::Not
+            }
+            prop::Interactive::Container { ref loot } => Interactive::Container {
+                items,
+                loot_to_generate: loot.clone(),
+                temporary,
             },
             prop::Interactive::Door { initially_open, .. } => {
                 if initially_open {
@@ -104,7 +105,7 @@ impl PropState {
                 }
 
                 Interactive::Door {
-                    open: initially_open
+                    open: initially_open,
                 }
             }
         };
@@ -120,8 +121,10 @@ impl PropState {
         }
     }
 
-    pub(crate) fn load_interactive(&mut self, interactive: PropInteractiveSaveState)
-        -> Result<(), Error>{
+    pub(crate) fn load_interactive(
+        &mut self,
+        interactive: PropInteractiveSaveState,
+    ) -> Result<(), Error> {
         match interactive {
             PropInteractiveSaveState::Not => {
                 // the base prop interactive must match, if not don't load this.
@@ -131,8 +134,12 @@ impl PropState {
                     _ => return Ok(()),
                 }
                 self.interactive = Interactive::Not;
-            },
-            PropInteractiveSaveState::Container { loot_to_generate, temporary, items } => {
+            }
+            PropInteractiveSaveState::Container {
+                loot_to_generate,
+                temporary,
+                items,
+            } => {
                 // the base prop interactive must match, if not don't load this.
                 // this is for save compat.
                 match self.prop.interactive {
@@ -144,8 +151,10 @@ impl PropState {
                 for item_save_state in items {
                     let item = &item_save_state.item;
                     let item = match Module::create_get_item(&item.id, &item.adjectives) {
-                        None => invalid_data_error(&format!("No item with ID '{}'",
-                                                            item_save_state.item.id)),
+                        None => invalid_data_error(&format!(
+                            "No item with ID '{}'",
+                            item_save_state.item.id
+                        )),
                         Some(item) => Ok(item),
                     }?;
 
@@ -155,10 +164,9 @@ impl PropState {
                 let loot = match loot_to_generate {
                     None => Ok(None),
                     Some(ref id) => match Module::loot_list(id) {
-                        None => invalid_data_error(&format!("No loot list with ID '{}'",
-                                                            id)),
+                        None => invalid_data_error(&format!("No loot list with ID '{}'", id)),
                         Some(loot_list) => Ok(Some(loot_list)),
-                    }
+                    },
                 }?;
 
                 self.interactive = Interactive::Container {
@@ -166,7 +174,7 @@ impl PropState {
                     loot_to_generate: loot,
                     temporary,
                 };
-            },
+            }
             PropInteractiveSaveState::Door { open } => {
                 // the base prop interactive must match, if not don't load this.
                 // this is for save compat.
@@ -182,7 +190,7 @@ impl PropState {
                 } else {
                     self.animation_state.remove(animation_state::Kind::Active);
                 }
-            },
+            }
             PropInteractiveSaveState::Hover { text } => {
                 // the base prop interactive must match, if not don't load this.
                 // this is for save compat.
@@ -192,7 +200,7 @@ impl PropState {
                 }
 
                 self.interactive = Interactive::Hover { text: text.clone() };
-            },
+            }
         }
 
         Ok(())
@@ -213,22 +221,30 @@ impl PropState {
         self.prop.size.points(self.location.x, self.location.y)
     }
 
-    pub (crate) fn set_enabled(&mut self, enabled: bool) {
+    pub(crate) fn set_enabled(&mut self, enabled: bool) {
         self.enabled = enabled;
     }
 
-    pub (crate) fn is_marked_for_removal(&self) -> bool {
+    pub(crate) fn is_marked_for_removal(&self) -> bool {
         self.marked_for_removal
     }
 
     pub fn might_contain_items(&self) -> bool {
         match self.interactive {
-            Interactive::Container { ref items, ref loot_to_generate, .. } => {
-                if !items.is_empty() { return true; }
-                if loot_to_generate.is_some() { return true; }
+            Interactive::Container {
+                ref items,
+                ref loot_to_generate,
+                ..
+            } => {
+                if !items.is_empty() {
+                    return true;
+                }
+                if loot_to_generate.is_some() {
+                    return true;
+                }
 
                 false
-            },
+            }
             _ => false,
         }
     }
@@ -260,8 +276,14 @@ impl PropState {
 
         match self.interactive {
             Interactive::Not | Interactive::Hover { .. } => (),
-            Interactive::Container { ref mut items, ref mut loot_to_generate, .. } => {
-                if !is_active { return; }
+            Interactive::Container {
+                ref mut items,
+                ref mut loot_to_generate,
+                ..
+            } => {
+                if !is_active {
+                    return;
+                }
 
                 let loot = match loot_to_generate.take() {
                     None => return,
@@ -274,11 +296,11 @@ impl PropState {
                     let item_state = ItemState::new(item);
                     items.add_quantity(qty, item_state);
                 }
-            },
+            }
             Interactive::Door { ref mut open } => {
                 let cur_open = *open;
                 *open = !cur_open;
-            },
+            }
         }
     }
 
@@ -286,8 +308,11 @@ impl PropState {
         match self.interactive {
             Interactive::Container { ref mut items, .. } => {
                 items.add(item);
-            },
-            _ => warn!("Attempted to add item to a non-container prop {}", self.prop.id),
+            }
+            _ => warn!(
+                "Attempted to add item to a non-container prop {}",
+                self.prop.id
+            ),
         }
         self.listeners.notify(&self);
     }
@@ -299,8 +324,11 @@ impl PropState {
                     let item_state = ItemState::new(item);
                     items.add_quantity(qty, item_state);
                 }
-            },
-            _ => warn!("Attempted to add items to a non-container prop {}", self.prop.id),
+            }
+            _ => warn!(
+                "Attempted to add items to a non-container prop {}",
+                self.prop.id
+            ),
         }
         self.listeners.notify(&self);
     }
@@ -314,11 +342,12 @@ impl PropState {
 
     pub fn remove_all_at(&mut self, index: usize) -> Option<(u32, ItemState)> {
         let item_state = match self.interactive {
-            Interactive::Container { ref mut items, .. } => {
-                items.remove_all_at(index)
-            },
+            Interactive::Container { ref mut items, .. } => items.remove_all_at(index),
             _ => {
-                warn!("Attempted to remove items from a non-container prop {}", self.prop.id);
+                warn!(
+                    "Attempted to remove items from a non-container prop {}",
+                    self.prop.id
+                );
                 None
             }
         };
@@ -328,11 +357,12 @@ impl PropState {
 
     pub fn remove_one_at(&mut self, index: usize) -> Option<ItemState> {
         let item_state = match self.interactive {
-            Interactive::Container { ref mut items, .. } => {
-                items.remove(index)
-            },
+            Interactive::Container { ref mut items, .. } => items.remove(index),
             _ => {
-                warn!("Attempted to remove item from a non-container prop {}", self.prop.id);
+                warn!(
+                    "Attempted to remove item from a non-container prop {}",
+                    self.prop.id
+                );
                 None
             }
         };
@@ -343,9 +373,15 @@ impl PropState {
     fn notify_and_check(&mut self) {
         self.listeners.notify(&self);
         match self.interactive {
-            Interactive::Container { ref items, temporary, .. } => {
-                if items.is_empty() && temporary { self.marked_for_removal = true; }
-            },
+            Interactive::Container {
+                ref items,
+                temporary,
+                ..
+            } => {
+                if items.is_empty() && temporary {
+                    self.marked_for_removal = true;
+                }
+            }
             _ => (),
         }
     }
@@ -355,15 +391,25 @@ impl PropState {
     }
 
     pub fn append_to_draw_list(&self, draw_list: &mut DrawList, x: f32, y: f32, millis: u32) {
-        self.prop.append_to_draw_list(draw_list, &self.animation_state, x, y, millis);
+        self.prop
+            .append_to_draw_list(draw_list, &self.animation_state, x, y, millis);
     }
 }
 
 impl AreaDrawable for PropState {
-    fn cache(&mut self, _renderer: &mut GraphicsRenderer, _texture_cache: &mut EntityTextureCache) { }
+    fn cache(&mut self, _renderer: &mut GraphicsRenderer, _texture_cache: &mut EntityTextureCache) {
+    }
 
-    fn draw(&self, renderer: &mut GraphicsRenderer,
-            scale_x: f32, scale_y: f32, x: f32, y: f32, millis: u32, color: Color) {
+    fn draw(
+        &self,
+        renderer: &mut GraphicsRenderer,
+        scale_x: f32,
+        scale_y: f32,
+        x: f32,
+        y: f32,
+        millis: u32,
+        color: Color,
+    ) {
         let x = x + self.location.x as f32;
         let y = y + self.location.y as f32;
 

@@ -15,15 +15,15 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::any::Any;
-use std::rc::Rc;
 use std::cell::RefCell;
+use std::rc::Rc;
 
-use crate::widget_kind;
 use crate::config::Config;
+use crate::io::{event::ClickKind, GraphicsRenderer};
 use crate::ui::theme::SizeRelative;
 use crate::ui::{Widget, WidgetKind};
-use crate::io::{GraphicsRenderer, event::ClickKind};
 use crate::util::{Point, Size};
+use crate::widget_kind;
 use crate::widgets::MarkupRenderer;
 
 pub struct TextArea {
@@ -68,13 +68,22 @@ impl WidgetKind for TextArea {
         false
     }
 
-    fn on_mouse_drag(&mut self, _widget: &Rc<RefCell<Widget>>, _kind: ClickKind,
-                     _delta_x: f32, _delta_y: f32) -> bool {
+    fn on_mouse_drag(
+        &mut self,
+        _widget: &Rc<RefCell<Widget>>,
+        _kind: ClickKind,
+        _delta_x: f32,
+        _delta_y: f32,
+    ) -> bool {
         false
     }
 
-    fn on_mouse_move(&mut self, _widget: &Rc<RefCell<Widget>>,
-                     _delta_x: f32, _delta_y: f32) -> bool {
+    fn on_mouse_move(
+        &mut self,
+        _widget: &Rc<RefCell<Widget>>,
+        _delta_x: f32,
+        _delta_y: f32,
+    ) -> bool {
         true
     }
 
@@ -124,7 +133,9 @@ impl WidgetKind for TextArea {
         // limit position of text area to inside the screen
         // we need to double render in this case - first render finds
         // the text area size, second render to actually display the text
-        if !self.limit_to_screen_edge { return; }
+        if !self.limit_to_screen_edge {
+            return;
+        }
 
         if widget.state.top() + widget.state.height() > ui_y {
             let x = widget.state.left();
@@ -141,8 +152,13 @@ impl WidgetKind for TextArea {
         }
     }
 
-    fn draw(&mut self, renderer: &mut GraphicsRenderer, _pixel_size: Point,
-            widget: &Widget, _millis: u32) {
+    fn draw(
+        &mut self,
+        renderer: &mut GraphicsRenderer,
+        _pixel_size: Point,
+        widget: &Widget,
+        _millis: u32,
+    ) {
         let font_rend = match &widget.state.text_renderer {
             &None => return,
             &Some(ref renderer) => renderer,

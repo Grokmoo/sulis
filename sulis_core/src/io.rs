@@ -25,15 +25,15 @@ pub use self::input_action::InputAction;
 pub mod keyboard_event;
 pub use self::keyboard_event::KeyboardEvent;
 
+use std::cell::{Ref, RefCell};
 use std::io::Error;
 use std::rc::Rc;
-use std::cell::{RefCell, Ref};
 
 use crate::extern_image::{ImageBuffer, Rgba};
 
 use crate::config::{Config, IOAdapter};
-use crate::ui::{Widget, Color};
 use crate::resource::Sprite;
+use crate::ui::{Color, Widget};
 use crate::util::{Point, Size};
 
 #[derive(Debug, Clone)]
@@ -65,8 +65,13 @@ pub trait GraphicsRenderer {
 
     fn draw_to_texture(&mut self, texture_id: &str, draw_list: DrawList);
 
-    fn register_texture(&mut self, id: &str, image: ImageBuffer<Rgba<u8>, Vec<u8>>,
-                        min_filter: TextureMinFilter, mag_filter: TextureMagFilter);
+    fn register_texture(
+        &mut self,
+        id: &str,
+        image: ImageBuffer<Rgba<u8>, Vec<u8>>,
+        min_filter: TextureMinFilter,
+        mag_filter: TextureMagFilter,
+    );
 
     fn clear_texture(&mut self, id: &str);
 
@@ -169,8 +174,14 @@ impl DrawList {
     }
 
     #[inline]
-    pub fn from_texture_id(id: &str, tex_coords: &[f32; 8], x: f32,
-                           y: f32, w: f32, h: f32) -> DrawList {
+    pub fn from_texture_id(
+        id: &str,
+        tex_coords: &[f32; 8],
+        x: f32,
+        y: f32,
+        w: f32,
+        h: f32,
+    ) -> DrawList {
         let x_min = x;
         let y_max = Config::ui_height() as f32 - y;
         let x_max = x_min + w;
@@ -178,12 +189,30 @@ impl DrawList {
         let tc = tex_coords;
 
         let quads = vec![
-            Vertex { position: [ x_min, y_max ], tex_coords: [tc[0], tc[1]] },
-            Vertex { position: [ x_min, y_min ], tex_coords: [tc[2], tc[3]] },
-            Vertex { position: [ x_max, y_max ], tex_coords: [tc[4], tc[5]] },
-            Vertex { position: [ x_max, y_min ], tex_coords: [tc[6], tc[7]] },
-            Vertex { position: [ x_min, y_min ], tex_coords: [tc[2], tc[3]] },
-            Vertex { position: [ x_max, y_max ], tex_coords: [tc[4], tc[5]] },
+            Vertex {
+                position: [x_min, y_max],
+                tex_coords: [tc[0], tc[1]],
+            },
+            Vertex {
+                position: [x_min, y_min],
+                tex_coords: [tc[2], tc[3]],
+            },
+            Vertex {
+                position: [x_max, y_max],
+                tex_coords: [tc[4], tc[5]],
+            },
+            Vertex {
+                position: [x_max, y_min],
+                tex_coords: [tc[6], tc[7]],
+            },
+            Vertex {
+                position: [x_min, y_min],
+                tex_coords: [tc[2], tc[3]],
+            },
+            Vertex {
+                position: [x_max, y_max],
+                tex_coords: [tc[4], tc[5]],
+            },
         ];
 
         DrawList {
@@ -220,7 +249,12 @@ impl DrawList {
 
     #[inline]
     pub fn set_alpha(&mut self, alpha: f32) {
-        self.color_filter = [self.color_filter[0], self.color_filter[1], self.color_filter[2], alpha];
+        self.color_filter = [
+            self.color_filter[0],
+            self.color_filter[1],
+            self.color_filter[2],
+            alpha,
+        ];
     }
 
     /// enables color swapping for this draw list and sets the hue that the
@@ -271,7 +305,7 @@ impl DrawList {
             vertex.position[1] = -new_y + avg_y;
         }
     }
-    }
+}
 
 #[derive(Debug, Copy, Clone)]
 pub struct Vertex {

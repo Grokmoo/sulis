@@ -15,15 +15,15 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::any::Any;
-use std::rc::Rc;
 use std::cell::RefCell;
+use std::rc::Rc;
 
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_core::widgets::{Button, Label};
 use sulis_module::{Module, Race};
 
-use crate::{CharacterBuilder, RacePane};
 use crate::character_builder::BuilderPane;
+use crate::{CharacterBuilder, RacePane};
 
 pub const NAME: &str = "race_selector_pane";
 
@@ -43,7 +43,11 @@ impl BuilderPane for RaceSelectorPane {
     fn on_selected(&mut self, builder: &mut CharacterBuilder, _widget: Rc<RefCell<Widget>>) {
         builder.race = None;
         builder.prev.borrow_mut().state.set_enabled(false);
-        builder.next.borrow_mut().state.set_enabled(self.selected_race.is_some());
+        builder
+            .next
+            .borrow_mut()
+            .state
+            .set_enabled(self.selected_race.is_some());
     }
 
     fn next(&mut self, builder: &mut CharacterBuilder, widget: Rc<RefCell<Widget>>) {
@@ -56,13 +60,19 @@ impl BuilderPane for RaceSelectorPane {
         builder.next(&widget);
     }
 
-    fn prev(&mut self, _builder: &mut CharacterBuilder, _widget: Rc<RefCell<Widget>>) { }
+    fn prev(&mut self, _builder: &mut CharacterBuilder, _widget: Rc<RefCell<Widget>>) {}
 }
 
 impl WidgetKind for RaceSelectorPane {
-    fn get_name(&self) -> &str { NAME }
-    fn as_any(&self) -> &Any { self }
-    fn as_any_mut(&mut self) -> &mut Any { self }
+    fn get_name(&self) -> &str {
+        NAME
+    }
+    fn as_any(&self) -> &Any {
+        self
+    }
+    fn as_any_mut(&mut self) -> &mut Any {
+        self
+    }
 
     fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let title = Widget::with_theme(Label::empty(), "title");
@@ -73,24 +83,34 @@ impl WidgetKind for RaceSelectorPane {
                 None => {
                     warn!("Selectable race '{}' not found", race_id);
                     continue;
-                }, Some(race) => race,
+                }
+                Some(race) => race,
             };
 
             let race_button = Widget::with_theme(Button::empty(), "race_button");
-            race_button.borrow_mut().state.add_text_arg("name", &race.name);
+            race_button
+                .borrow_mut()
+                .state
+                .add_text_arg("name", &race.name);
             if let Some(ref selected_race) = self.selected_race {
-                race_button.borrow_mut().state.set_active(race == *selected_race);
+                race_button
+                    .borrow_mut()
+                    .state
+                    .set_active(race == *selected_race);
             }
 
             let race_ref = Rc::clone(&race);
-            race_button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-                let (parent, pane) = Widget::parent_mut::<RaceSelectorPane>(widget);
-                pane.selected_race = Some(Rc::clone(&race_ref));
-                parent.borrow_mut().invalidate_children();
+            race_button
+                .borrow_mut()
+                .state
+                .add_callback(Callback::new(Rc::new(move |widget, _| {
+                    let (parent, pane) = Widget::parent_mut::<RaceSelectorPane>(widget);
+                    pane.selected_race = Some(Rc::clone(&race_ref));
+                    parent.borrow_mut().invalidate_children();
 
-                let (_, builder) = Widget::parent_mut::<CharacterBuilder>(&parent);
-                builder.next.borrow_mut().state.set_enabled(true);
-            })));
+                    let (_, builder) = Widget::parent_mut::<CharacterBuilder>(&parent);
+                    builder.next.borrow_mut().state.set_enabled(true);
+                })));
 
             Widget::add_child_to(&races_pane, race_button);
         }

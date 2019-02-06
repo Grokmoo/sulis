@@ -19,13 +19,17 @@ use std::str::FromStr;
 use rlua::{Context, UserData, UserDataMethods};
 
 use sulis_core::util::{ExtInt, Point};
-use sulis_module::{Attribute, Bonus, BonusKind, BonusList, Damage, DamageKind, bonus::{self, Contingent},
-    WeaponKind, ArmorKind, Slot, WeaponStyle, ROUND_TIME_MILLIS};
+use sulis_module::{
+    bonus::{self, Contingent},
+    ArmorKind, Attribute, Bonus, BonusKind, BonusList, Damage, DamageKind, Slot, WeaponKind,
+    WeaponStyle, ROUND_TIME_MILLIS,
+};
 
-use crate::script::{CallbackData, Result, script_particle_generator, ScriptParticleGenerator,
-    script_color_animation, ScriptColorAnimation, ScriptAbility,
-    script_scale_animation, ScriptScaleAnimation,
-    script_image_layer_animation, ScriptImageLayerAnimation, ScriptCallback};
+use crate::script::{
+    script_color_animation, script_image_layer_animation, script_particle_generator,
+    script_scale_animation, CallbackData, Result, ScriptAbility, ScriptCallback,
+    ScriptColorAnimation, ScriptImageLayerAnimation, ScriptParticleGenerator, ScriptScaleAnimation,
+};
 use crate::{effect, Effect, GameState};
 
 /// Represents a surface that already exists, and is being passed into
@@ -47,7 +51,8 @@ impl UserData for ScriptActiveSurface {
                 None => {
                     warn!("Effect index associated with ScriptSurface is invalid");
                     return Ok(());
-                }, Some(effect) => effect,
+                }
+                Some(effect) => effect,
             };
             effect.mark_for_removal();
             Ok(())
@@ -61,8 +66,8 @@ enum Kind {
 
     Surface {
         points: Vec<(i32, i32)>,
-        squares_to_fire_on_moved: u32
-    }
+        squares_to_fire_on_moved: u32,
+    },
 }
 
 /// A user menu selection
@@ -76,9 +81,7 @@ pub struct ScriptMenuSelection {
 
 impl UserData for ScriptMenuSelection {
     fn add_methods<'lua, M: UserDataMethods<'lua, Self>>(methods: &mut M) {
-        methods.add_method("value", |_, selection, ()| {
-            Ok(selection.value.to_string())
-        });
+        methods.add_method("value", |_, selection, ()| Ok(selection.value.to_string()));
     }
 }
 
@@ -143,7 +146,8 @@ fn check_for_bonus(effect: &ScriptAppliedEffect, kind: String) -> bool {
         None => {
             error!("Invalid ScriptAppliedEffect {}", effect.name);
             return false;
-        }, Some(effect) => effect,
+        }
+        Some(effect) => effect,
     };
 
     use sulis_module::bonus::BonusKind::*;
@@ -187,7 +191,10 @@ fn check_for_bonus(effect: &ScriptAppliedEffect, kind: String) -> bool {
     };
 
     for bonus in effect.bonuses.iter() {
-        let check_bonus = Bonus { when: bonus.when, kind: kind.clone() };
+        let check_bonus = Bonus {
+            when: bonus.when,
+            kind: kind.clone(),
+        };
 
         if bonus::merge_if_dup(bonus, &check_bonus).is_some() {
             return true;
@@ -199,17 +206,11 @@ fn check_for_bonus(effect: &ScriptAppliedEffect, kind: String) -> bool {
 
 impl UserData for ScriptAppliedEffect {
     fn add_methods<'lua, M: UserDataMethods<'lua, Self>>(methods: &mut M) {
-        methods.add_method("name", |_, effect, ()| {
-            Ok(effect.name.to_string())
-        });
+        methods.add_method("name", |_, effect, ()| Ok(effect.name.to_string()));
 
-        methods.add_method("tag", |_, effect, ()| {
-            Ok(effect.tag.to_string())
-        });
+        methods.add_method("tag", |_, effect, ()| Ok(effect.tag.to_string()));
 
-        methods.add_method("cur_duration", |_, effect, ()| {
-            Ok(effect.cur_duration)
-        });
+        methods.add_method("cur_duration", |_, effect, ()| Ok(effect.cur_duration));
 
         methods.add_method("total_duration", |_, effect, ()| {
             Ok(match effect.total_duration {
@@ -361,7 +362,10 @@ pub struct ScriptEffect {
 impl ScriptEffect {
     pub fn new_surface(points: Vec<(i32, i32)>, name: &str, duration: ExtInt) -> ScriptEffect {
         ScriptEffect {
-            kind: Kind::Surface { points, squares_to_fire_on_moved: 1 },
+            kind: Kind::Surface {
+                points,
+                squares_to_fire_on_moved: 1,
+            },
             name: name.to_string(),
             tag: "default".to_string(),
             deactivate_with_ability: None,
@@ -396,9 +400,7 @@ impl ScriptEffect {
 
 impl UserData for ScriptEffect {
     fn add_methods<'lua, M: UserDataMethods<'lua, Self>>(methods: &mut M) {
-        methods.add_method("apply", |_, effect, _args: ()| {
-            apply(effect)
-        });
+        methods.add_method("apply", |_, effect, _args: ()| apply(effect));
         methods.add_method_mut("set_icon", |_, effect, (icon, text): (String, String)| {
             effect.icon = Some(effect::Icon { icon, text });
             Ok(())
@@ -414,10 +416,13 @@ impl UserData for ScriptEffect {
             }
             Ok(())
         });
-        methods.add_method_mut("add_image_layer_anim", |_, effect, anim: ScriptImageLayerAnimation| {
-            effect.image_layer_anims.push(anim);
-            Ok(())
-        });
+        methods.add_method_mut(
+            "add_image_layer_anim",
+            |_, effect, anim: ScriptImageLayerAnimation| {
+                effect.image_layer_anims.push(anim);
+                Ok(())
+            },
+        );
         methods.add_method_mut("add_scale_anim", |_, effect, anim: ScriptScaleAnimation| {
             effect.scale_anims.push(anim);
             Ok(())
@@ -443,30 +448,43 @@ impl UserData for ScriptEffect {
             Ok(())
         });
         methods.add_method_mut("add_num_bonus", &add_num_bonus);
-        methods.add_method_mut("add_damage", |_, effect, (min, max, ap, when):
-                               (f32, f32, Option<f32>, Option<String>)| {
-            let min = min as u32;
-            let max = max as u32;
-            let ap = ap.unwrap_or(0.0) as u32;
-            let kind = BonusKind::Damage(Damage { min, max, ap, kind: None });
-            add_bonus_to_effect(effect, kind, when);
-            Ok(())
-        });
+        methods.add_method_mut(
+            "add_damage",
+            |_, effect, (min, max, ap, when): (f32, f32, Option<f32>, Option<String>)| {
+                let min = min as u32;
+                let max = max as u32;
+                let ap = ap.unwrap_or(0.0) as u32;
+                let kind = BonusKind::Damage(Damage {
+                    min,
+                    max,
+                    ap,
+                    kind: None,
+                });
+                add_bonus_to_effect(effect, kind, when);
+                Ok(())
+            },
+        );
         methods.add_method_mut("add_hidden", |_, effect, when: Option<String>| {
             let kind = BonusKind::Hidden;
             add_bonus_to_effect(effect, kind, when);
             Ok(())
         });
-        methods.add_method_mut("add_free_ability_group_use", |_, effect, when: Option<String>| {
-            let kind = BonusKind::FreeAbilityGroupUse;
-            add_bonus_to_effect(effect, kind, when);
-            Ok(())
-        });
-        methods.add_method_mut("add_abilities_disabled", |_, effect, when: Option<String>| {
-            let kind = BonusKind::AbilitiesDisabled;
-            add_bonus_to_effect(effect, kind, when);
-            Ok(())
-        });
+        methods.add_method_mut(
+            "add_free_ability_group_use",
+            |_, effect, when: Option<String>| {
+                let kind = BonusKind::FreeAbilityGroupUse;
+                add_bonus_to_effect(effect, kind, when);
+                Ok(())
+            },
+        );
+        methods.add_method_mut(
+            "add_abilities_disabled",
+            |_, effect, when: Option<String>| {
+                let kind = BonusKind::AbilitiesDisabled;
+                add_bonus_to_effect(effect, kind, when);
+                Ok(())
+            },
+        );
         methods.add_method_mut("add_move_disabled", |_, effect, when: Option<String>| {
             let kind = BonusKind::MoveDisabled;
             add_bonus_to_effect(effect, kind, when);
@@ -482,11 +500,14 @@ impl UserData for ScriptEffect {
             add_bonus_to_effect(effect, kind, when);
             Ok(())
         });
-        methods.add_method_mut("add_sneak_attack_immunity", |_, effect, when: Option<String>| {
-            let kind = BonusKind::SneakAttackImmunity;
-            add_bonus_to_effect(effect, kind, when);
-            Ok(())
-        });
+        methods.add_method_mut(
+            "add_sneak_attack_immunity",
+            |_, effect, when: Option<String>| {
+                let kind = BonusKind::SneakAttackImmunity;
+                add_bonus_to_effect(effect, kind, when);
+                Ok(())
+            },
+        );
         methods.add_method_mut("add_crit_immunity", |_, effect, when: Option<String>| {
             let kind = BonusKind::CritImmunity;
             add_bonus_to_effect(effect, kind, when);
@@ -504,35 +525,48 @@ impl UserData for ScriptEffect {
             add_bonus_to_effect(effect, kind, when);
             Ok(())
         });
-        methods.add_method_mut("add_armor_of_kind", |_, effect, (value, kind, when):
-                               (f32, String, Option<String>)| {
-            let value = value as i32;
-            let armor_kind = DamageKind::from_str(&kind);
-            let kind = BonusKind::ArmorKind { kind: armor_kind, amount: value };
-            add_bonus_to_effect(effect, kind, when);
-            Ok(())
-        });
-        methods.add_method_mut("add_resistance", |_, effect, (value, kind, when):
-                               (f32, String, Option<String>)| {
-            let value = value as i32;
-            let dmg_kind = DamageKind::from_str(&kind);
-            let kind = BonusKind::Resistance { kind: dmg_kind, amount: value };
-            add_bonus_to_effect(effect, kind, when);
-            Ok(())
-        });
-        methods.add_method_mut("add_attribute_bonus", |_, effect, (attr, amount, when):
-                               (String, f32, Option<String>)| {
-            let amount = amount as i8;
-            let attribute = match Attribute::from(&attr) {
-                None => {
-                    warn!("Invalid attribute {} in script", attr);
-                    return Ok(());
-                }, Some(attr) => attr,
-            };
-            let kind = BonusKind::Attribute { attribute, amount };
-            add_bonus_to_effect(effect, kind, when);
-            Ok(())
-        });
+        methods.add_method_mut(
+            "add_armor_of_kind",
+            |_, effect, (value, kind, when): (f32, String, Option<String>)| {
+                let value = value as i32;
+                let armor_kind = DamageKind::from_str(&kind);
+                let kind = BonusKind::ArmorKind {
+                    kind: armor_kind,
+                    amount: value,
+                };
+                add_bonus_to_effect(effect, kind, when);
+                Ok(())
+            },
+        );
+        methods.add_method_mut(
+            "add_resistance",
+            |_, effect, (value, kind, when): (f32, String, Option<String>)| {
+                let value = value as i32;
+                let dmg_kind = DamageKind::from_str(&kind);
+                let kind = BonusKind::Resistance {
+                    kind: dmg_kind,
+                    amount: value,
+                };
+                add_bonus_to_effect(effect, kind, when);
+                Ok(())
+            },
+        );
+        methods.add_method_mut(
+            "add_attribute_bonus",
+            |_, effect, (attr, amount, when): (String, f32, Option<String>)| {
+                let amount = amount as i8;
+                let attribute = match Attribute::from(&attr) {
+                    None => {
+                        warn!("Invalid attribute {} in script", attr);
+                        return Ok(());
+                    }
+                    Some(attr) => attr,
+                };
+                let kind = BonusKind::Attribute { attribute, amount };
+                add_bonus_to_effect(effect, kind, when);
+                Ok(())
+            },
+        );
     }
 }
 
@@ -551,7 +585,10 @@ fn add_bonus_to_effect(effect: &mut ScriptEffect, bonus_kind: BonusKind, when: O
                 "attack_when_flanking" => Contingent::AttackWhenFlanking,
                 "threatened" => Contingent::Threatened,
                 _ => {
-                    warn!("Unable to parse contingent '{}'.  May need an additional arg.", when);
+                    warn!(
+                        "Unable to parse contingent '{}'.  May need an additional arg.",
+                        when
+                    );
                     return;
                 }
             }
@@ -568,7 +605,7 @@ fn add_bonus_to_effect(effect: &mut ScriptEffect, bonus_kind: BonusKind, when: O
                     } else {
                         return;
                     }
-                },
+                }
                 "armor_equipped" => {
                     if split.len() != 3 {
                         warn!("Need 3 args for armor_equipped from '{}'", when);
@@ -585,8 +622,11 @@ fn add_bonus_to_effect(effect: &mut ScriptEffect, bonus_kind: BonusKind, when: O
                         Ok(slot) => slot,
                     };
 
-                    Contingent::ArmorEquipped { kind: armor_kind, slot }
-                },
+                    Contingent::ArmorEquipped {
+                        kind: armor_kind,
+                        slot,
+                    }
+                }
                 "weapon_style" => {
                     if split.len() != 2 {
                         warn!("Need 2 args for weapon_style from '{}'", when);
@@ -598,7 +638,7 @@ fn add_bonus_to_effect(effect: &mut ScriptEffect, bonus_kind: BonusKind, when: O
                     } else {
                         return;
                     }
-                },
+                }
                 "attack_with_weapon" => {
                     if split.len() != 2 {
                         warn!("Need 2 args for attack_with_weapon from '{}'", when);
@@ -610,7 +650,7 @@ fn add_bonus_to_effect(effect: &mut ScriptEffect, bonus_kind: BonusKind, when: O
                     } else {
                         return;
                     }
-                },
+                }
                 "attack_with_damage_kind" => {
                     if split.len() != 2 {
                         warn!("Need 2 args for attack_with_damage_kind from '{}'", when);
@@ -618,23 +658,32 @@ fn add_bonus_to_effect(effect: &mut ScriptEffect, bonus_kind: BonusKind, when: O
                     }
 
                     Contingent::AttackWithDamageKind(DamageKind::from_str(split[1]))
-                },
+                }
                 _ => {
-                    warn!("Unable to parse contingent '{}'.  Unknown kind / too many args.", when);
-                    return
+                    warn!(
+                        "Unable to parse contingent '{}'.  Unknown kind / too many args.",
+                        when
+                    );
+                    return;
                 }
             }
         };
 
-        let bonus = Bonus { when: contingent, kind: bonus_kind };
+        let bonus = Bonus {
+            when: contingent,
+            kind: bonus_kind,
+        };
         effect.bonuses.add(bonus);
     } else {
         effect.bonuses.add_kind(bonus_kind);
     }
 }
 
-fn add_num_bonus(_lua: Context, effect: &mut ScriptEffect, (name, amount, when):
-                 (String, f32, Option<String>)) -> Result<()> {
+fn add_num_bonus(
+    _lua: Context,
+    effect: &mut ScriptEffect,
+    (name, amount, when): (String, f32, Option<String>),
+) -> Result<()> {
     let name = name.to_lowercase();
     let amount_int = amount as i32;
 
@@ -679,9 +728,17 @@ fn apply(effect_data: &ScriptEffect) -> Result<()> {
     let mgr = GameState::turn_manager();
     let duration = effect_data.duration * ROUND_TIME_MILLIS;
 
-    debug!("Apply effect with {}, {}, {}", effect_data.name, effect_data.tag, duration);
-    let mut effect = Effect::new(&effect_data.name, &effect_data.tag, duration, effect_data.bonuses.clone(),
-        effect_data.deactivate_with_ability.clone());
+    debug!(
+        "Apply effect with {}, {}, {}",
+        effect_data.name, effect_data.tag, duration
+    );
+    let mut effect = Effect::new(
+        &effect_data.name,
+        &effect_data.tag,
+        duration,
+        effect_data.bonuses.clone(),
+        effect_data.deactivate_with_ability.clone(),
+    );
     if let Some(icon) = &effect_data.icon {
         effect.set_icon(icon.icon.clone(), icon.text.clone());
     }
@@ -720,7 +777,11 @@ fn apply(effect_data: &ScriptEffect) -> Result<()> {
 
             let entity = mgr.borrow().entity(*parent);
             effect.set_owning_entity(entity.borrow().index());
-            info!("Apply effect to '{}' with duration {}", entity.borrow().actor.actor.name, duration);
+            info!(
+                "Apply effect to '{}' with duration {}",
+                entity.borrow().actor.actor.name,
+                duration
+            );
             // get the list of cbs before applying so it doesn't include itself
             let on_applied_cbs = entity.borrow().callbacks(&mgr.borrow());
 
@@ -729,9 +790,14 @@ fn apply(effect_data: &ScriptEffect) -> Result<()> {
 
             // fire the on_applied cbs
             let sae = ScriptAppliedEffect::new(&mgr.borrow().effect(index), index);
-            on_applied_cbs.iter().for_each(|cb| cb.on_effect_applied(sae.clone()));
-        },
-        Kind::Surface { points, squares_to_fire_on_moved } => {
+            on_applied_cbs
+                .iter()
+                .for_each(|cb| cb.on_effect_applied(sae.clone()));
+        }
+        Kind::Surface {
+            points,
+            squares_to_fire_on_moved,
+        } => {
             let points: Vec<_> = points.iter().map(|(x, y)| Point::new(*x, *y)).collect();
             for pgen in effect_data.pgens.iter() {
                 for p in points.iter() {
@@ -743,9 +809,14 @@ fn apply(effect_data: &ScriptEffect) -> Result<()> {
             }
             let area = GameState::area_state();
             effect.set_surface_for_area(&area.borrow().area.id, &points, *squares_to_fire_on_moved);
-            info!("Add surface to '{}' with duration {}", area.borrow().area.name, duration);
-            mgr.borrow_mut().add_surface(effect, &area, points, cbs, marked);
-        },
+            info!(
+                "Add surface to '{}' with duration {}",
+                area.borrow().area.name,
+                duration
+            );
+            mgr.borrow_mut()
+                .add_surface(effect, &area, points, cbs, marked);
+        }
     }
 
     Ok(())

@@ -14,14 +14,14 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::collections::HashMap;
 use std::io::Error;
 use std::rc::Rc;
-use std::collections::HashMap;
 
-use sulis_core::util::{invalid_data_error};
+use sulis_core::util::invalid_data_error;
 
 use crate::area::{AreaBuilder, Layer, PropData, Tile};
-use crate::{Module, generator};
+use crate::{generator, Module};
 
 pub struct LayerSet {
     pub width: i32,
@@ -34,8 +34,11 @@ pub struct LayerSet {
 }
 
 impl LayerSet {
-    pub fn new(builder: &AreaBuilder, module: &Module, props: &Vec<PropData>)
-        -> Result<LayerSet, Error> {
+    pub fn new(
+        builder: &AreaBuilder,
+        module: &Module,
+        props: &Vec<PropData>,
+    ) -> Result<LayerSet, Error> {
         let width = builder.width as i32;
         let height = builder.height as i32;
         let dim = (width * height) as usize;
@@ -50,14 +53,17 @@ impl LayerSet {
 
             let mut layer_tiles: HashMap<String, Vec<Vec<Rc<Tile>>>> = HashMap::new();
             for layer_id in builder.layers.iter() {
-                layer_tiles.insert(layer_id.to_string(), vec![Vec::new();dim]);
+                layer_tiles.insert(layer_id.to_string(), vec![Vec::new(); dim]);
             }
 
             for (tile_id, locations) in &builder.layer_set {
                 let tile = module.tiles.get(tile_id).unwrap();
 
                 if !layer_tiles.contains_key(&tile.layer) {
-                    return invalid_data_error(&format!("Tile {} has undefined layer {}", tile_id, tile.layer));
+                    return invalid_data_error(&format!(
+                        "Tile {} has undefined layer {}",
+                        tile_id, tile.layer
+                    ));
                 }
 
                 let cur_layer = layer_tiles.get_mut(&tile.layer).unwrap();
@@ -89,9 +95,13 @@ impl LayerSet {
 
         let entity_layer_index = builder.entity_layer;
 
-        trace!("Created layer_set for '{}' with {} layers.", builder.id, layers.len());
-        let mut passable = vec![true;dim];
-        let mut visible = vec![true;dim];
+        trace!(
+            "Created layer_set for '{}' with {} layers.",
+            builder.id,
+            layers.len()
+        );
+        let mut passable = vec![true; dim];
+        let mut visible = vec![true; dim];
         for layer in layers.iter() {
             for index in 0..dim {
                 if !layer.is_passable_index(index) {
@@ -144,13 +154,18 @@ impl LayerSet {
         }
 
         if entity_layer_index >= layers.len() {
-            return invalid_data_error(
-                &format!("Entity layer of {} is invalid.", entity_layer_index));
+            return invalid_data_error(&format!(
+                "Entity layer of {} is invalid.",
+                entity_layer_index
+            ));
         }
 
         let elevation;
         if builder.elevation.len() != dim {
-            warn!("In '{}': Elevation array must be dimensions length*width", builder.id);
+            warn!(
+                "In '{}': Elevation array must be dimensions length*width",
+                builder.id
+            );
             elevation = vec![0; dim];
         } else {
             elevation = builder.elevation.clone();
@@ -178,11 +193,12 @@ impl LayerSet {
             };
 
             for point in locations.iter() {
-                if point.len() == 2 { continue; }
+                if point.len() == 2 {
+                    continue;
+                }
 
                 return invalid_data_error(&format!("Point array length is not 2 in '{}'", tile_id));
             }
-
         }
 
         Ok(())

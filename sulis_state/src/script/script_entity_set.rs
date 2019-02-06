@@ -14,16 +14,16 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::rc::Rc;
 use std::cell::RefCell;
 use std::collections::HashMap;
 use std::io::Error;
+use std::rc::Rc;
 
 use rlua::{self, Context, UserData, UserDataMethods};
 
-use sulis_core::util::{gen_rand, invalid_data_error};
+use crate::script::{Result, ScriptActiveSurface, ScriptEntity};
 use crate::{EntityState, GameState};
-use crate::script::{ScriptEntity, ScriptActiveSurface, Result};
+use sulis_core::util::{gen_rand, invalid_data_error};
 
 /// Represents a set of ScriptEntities, which can be created from a variety of
 /// sources.  This is passed to many script functions as a `targets` variable.
@@ -128,29 +128,33 @@ pub struct ScriptEntitySet {
 }
 
 impl ScriptEntitySet {
-    pub fn update_entity_refs_on_load(&mut self,
-                                      entities: &HashMap<usize, Rc<RefCell<EntityState>>>) ->
-        ::std::result::Result<(), Error> {
-
+    pub fn update_entity_refs_on_load(
+        &mut self,
+        entities: &HashMap<usize, Rc<RefCell<EntityState>>>,
+    ) -> ::std::result::Result<(), Error> {
         match entities.get(&self.parent) {
             None => {
-                return invalid_data_error(
-                    &format!("Invalid parent {} for ScriptEntitySet", self.parent));
-            }, Some(ref entity) => self.parent = entity.borrow().index(),
+                return invalid_data_error(&format!(
+                    "Invalid parent {} for ScriptEntitySet",
+                    self.parent
+                ));
+            }
+            Some(ref entity) => self.parent = entity.borrow().index(),
         }
 
         let mut indices = Vec::new();
         for index in self.indices.drain(..) {
             match index {
                 None => indices.push(None),
-                Some(index) => {
-                    match entities.get(&index) {
-                        None => {
-                            return invalid_data_error(
-                                &format!("Invalid target {} for ScriptEntitySet", index));
-                        }, Some(ref entity) => indices.push(Some(entity.borrow().index())),
+                Some(index) => match entities.get(&index) {
+                    None => {
+                        return invalid_data_error(&format!(
+                            "Invalid target {} for ScriptEntitySet",
+                            index
+                        ));
                     }
-                }
+                    Some(ref entity) => indices.push(Some(entity.borrow().index())),
+                },
             }
         }
         self.indices = indices;
@@ -161,7 +165,8 @@ impl ScriptEntitySet {
     pub fn append(&mut self, other: &ScriptEntitySet) {
         self.indices.append(&mut other.indices.clone());
         self.selected_point = other.selected_point.clone();
-        self.affected_points.append(&mut other.affected_points.clone());
+        self.affected_points
+            .append(&mut other.affected_points.clone());
         self.surface = other.surface.clone();
     }
 
@@ -175,8 +180,10 @@ impl ScriptEntitySet {
         }
     }
 
-    pub fn from_pair(parent: &Rc<RefCell<EntityState>>,
-                     target: &Rc<RefCell<EntityState>>) -> ScriptEntitySet {
+    pub fn from_pair(
+        parent: &Rc<RefCell<EntityState>>,
+        target: &Rc<RefCell<EntityState>>,
+    ) -> ScriptEntitySet {
         let parent = parent.borrow().index();
         let indices = vec![Some(target.borrow().index())];
 
@@ -189,16 +196,19 @@ impl ScriptEntitySet {
         }
     }
 
-    pub fn new(parent: &Rc<RefCell<EntityState>>,
-               entities: &Vec<Option<Rc<RefCell<EntityState>>>>) -> ScriptEntitySet {
+    pub fn new(
+        parent: &Rc<RefCell<EntityState>>,
+        entities: &Vec<Option<Rc<RefCell<EntityState>>>>,
+    ) -> ScriptEntitySet {
         let parent = parent.borrow().index();
 
-        let indices = entities.iter().map(|e| {
-            match e {
+        let indices = entities
+            .iter()
+            .map(|e| match e {
                 &None => None,
                 &Some(ref e) => Some(e.borrow().index()),
-            }
-        }).collect();
+            })
+            .collect();
         ScriptEntitySet {
             parent,
             selected_point: None,
@@ -212,66 +222,74 @@ impl ScriptEntitySet {
 impl UserData for ScriptEntitySet {
     fn add_methods<'lua, M: UserDataMethods<'lua, Self>>(methods: &mut M) {
         methods.add_method("to_table", |_, set, ()| {
-            let table: Vec<ScriptEntity> = set.indices.iter().map(|i| ScriptEntity { index: *i }).collect();
+            let table: Vec<ScriptEntity> = set
+                .indices
+                .iter()
+                .map(|i| ScriptEntity { index: *i })
+                .collect();
 
             Ok(table)
         });
 
         methods.add_method("random_affected_points", |_, set, frac: f32| {
-            let table: Vec<HashMap<&str, i32>> = set.affected_points.iter().filter_map(|p| {
-                let roll = gen_rand(0.0, 1.0);
-                if roll > frac {
-                    None
-                } else {
-                    let mut map = HashMap::new();
-                    map.insert("x", p.0);
-                    map.insert("y", p.1);
-                    Some(map)
-                }
-            }).collect();
+            let table: Vec<HashMap<&str, i32>> = set
+                .affected_points
+                .iter()
+                .filter_map(|p| {
+                    let roll = gen_rand(0.0, 1.0);
+                    if roll > frac {
+                        None
+                    } else {
+                        let mut map = HashMap::new();
+                        map.insert("x", p.0);
+                        map.insert("y", p.1);
+                        Some(map)
+                    }
+                })
+                .collect();
             Ok(table)
         });
 
-        methods.add_method("surface", |_, set, ()| {
-            match &set.surface {
-                None => {
-                    warn!("Attempted to get surface from target set with no surface defined");
-                    Err(rlua::Error::FromLuaConversionError {
-                        from: "ScriptEntitySet",
-                        to: "Surface",
-                        message: Some("EntitySet has no surface".to_string())
-                    })
-                }, Some(surf) => {
-                    Ok(surf.clone())
-                }
+        methods.add_method("surface", |_, set, ()| match &set.surface {
+            None => {
+                warn!("Attempted to get surface from target set with no surface defined");
+                Err(rlua::Error::FromLuaConversionError {
+                    from: "ScriptEntitySet",
+                    to: "Surface",
+                    message: Some("EntitySet has no surface".to_string()),
+                })
             }
+            Some(surf) => Ok(surf.clone()),
         });
 
         methods.add_method("affected_points", |_, set, ()| {
-            let table: Vec<HashMap<&str, i32>> = set.affected_points.iter().map(|p| {
-                let mut map = HashMap::new();
-                map.insert("x", p.0);
-                map.insert("y", p.1);
-                map
-            }).collect();
+            let table: Vec<HashMap<&str, i32>> = set
+                .affected_points
+                .iter()
+                .map(|p| {
+                    let mut map = HashMap::new();
+                    map.insert("x", p.0);
+                    map.insert("y", p.1);
+                    map
+                })
+                .collect();
             Ok(table)
         });
 
-        methods.add_method("selected_point", |_, set, ()| {
-            match set.selected_point {
-                None => {
-                    warn!("Attempted to get selected point from EntitySet where none is defined");
-                    Err(rlua::Error::FromLuaConversionError {
-                        from: "ScriptEntitySet",
-                        to: "Point",
-                        message: Some("EntitySet has no selected point".to_string())
-                    })
-                }, Some((x, y)) => {
-                    let mut point = HashMap::new();
-                    point.insert("x", x);
-                    point.insert("y", y);
-                    Ok(point)
-                }
+        methods.add_method("selected_point", |_, set, ()| match set.selected_point {
+            None => {
+                warn!("Attempted to get selected point from EntitySet where none is defined");
+                Err(rlua::Error::FromLuaConversionError {
+                    from: "ScriptEntitySet",
+                    to: "Point",
+                    message: Some("EntitySet has no selected point".to_string()),
+                })
+            }
+            Some((x, y)) => {
+                let mut point = HashMap::new();
+                point.insert("x", x);
+                point.insert("y", y);
+                Ok(point)
             }
         });
         methods.add_method("is_empty", |_, set, ()| Ok(set.indices.is_empty()));
@@ -286,17 +304,17 @@ impl UserData for ScriptEntitySet {
             Err(rlua::Error::FromLuaConversionError {
                 from: "ScriptEntitySet",
                 to: "ScriptEntity",
-                message: Some("EntitySet is empty".to_string())
+                message: Some("EntitySet is empty".to_string()),
             })
         });
 
-        methods.add_method("parent", |_, set, ()| {
-            Ok(ScriptEntity::new(set.parent))
-        });
+        methods.add_method("parent", |_, set, ()| Ok(ScriptEntity::new(set.parent)));
 
         methods.add_method("without_self", &without_self);
         methods.add_method("visible_within", &visible_within);
-        methods.add_method("visible", |lua, set, ()| visible_within(lua, set, std::f32::MAX));
+        methods.add_method("visible", |lua, set, ()| {
+            visible_within(lua, set, std::f32::MAX)
+        });
         methods.add_method("hostile", |lua, set, ()| is_hostile(lua, set));
         methods.add_method("friendly", |lua, set, ()| is_friendly(lua, set));
         methods.add_method("reachable", &reachable);
@@ -306,14 +324,14 @@ impl UserData for ScriptEntitySet {
 }
 
 fn without_self(_lua: Context, set: &ScriptEntitySet, _: ()) -> Result<ScriptEntitySet> {
-    filter_entities(set, (), &|parent, entity, _| {
-        !Rc::ptr_eq(parent, entity)
-    })
+    filter_entities(set, (), &|parent, entity, _| !Rc::ptr_eq(parent, entity))
 }
 
 fn visible_within(_lua: Context, set: &ScriptEntitySet, dist: f32) -> Result<ScriptEntitySet> {
     filter_entities(set, dist, &|parent, entity, dist| {
-        if parent.borrow().dist_to_entity(entity) > dist { return false; }
+        if parent.borrow().dist_to_entity(entity) > dist {
+            return false;
+        }
 
         let area_state = GameState::area_state();
         let area_state = area_state.borrow();
@@ -332,8 +350,12 @@ fn attackable(_lua: Context, set: &ScriptEntitySet, _args: ()) -> Result<ScriptE
 fn threatening(_lua: Context, set: &ScriptEntitySet, _args: ()) -> Result<ScriptEntitySet> {
     filter_entities(set, (), &|parent, entity, _| {
         let entity = entity.borrow();
-        if !entity.actor.stats.attack_is_melee() { return false; }
-        if entity.actor.stats.attack_disabled { return false; }
+        if !entity.actor.stats.attack_is_melee() {
+            return false;
+        }
+        if entity.actor.stats.attack_disabled {
+            return false;
+        }
 
         entity.can_reach(parent)
     })
@@ -357,10 +379,11 @@ fn is_friendly(_lua: Context, set: &ScriptEntitySet) -> Result<ScriptEntitySet> 
     })
 }
 
-fn filter_entities<T: Copy>(set: &ScriptEntitySet, t: T,
-                  filter: &Fn(&Rc<RefCell<EntityState>>, &Rc<RefCell<EntityState>>, T) -> bool)
-    -> Result<ScriptEntitySet> {
-
+fn filter_entities<T: Copy>(
+    set: &ScriptEntitySet,
+    t: T,
+    filter: &Fn(&Rc<RefCell<EntityState>>, &Rc<RefCell<EntityState>>, T) -> bool,
+) -> Result<ScriptEntitySet> {
     let parent = ScriptEntity::new(set.parent);
     let parent = parent.try_unwrap()?;
 
@@ -379,7 +402,9 @@ fn filter_entities<T: Copy>(set: &ScriptEntitySet, t: T,
             Some(entity) => entity,
         };
 
-        if !(filter)(&parent, &entity, t) { continue; }
+        if !(filter)(&parent, &entity, t) {
+            continue;
+        }
 
         indices.push(*index);
     }

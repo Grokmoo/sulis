@@ -15,11 +15,11 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::any::Any;
-use std::rc::Rc;
 use std::cell::RefCell;
+use std::rc::Rc;
 
 use sulis_core::ui::{Widget, WidgetKind};
-use sulis_core::widgets::{TextArea};
+use sulis_core::widgets::TextArea;
 use sulis_module::Class;
 
 use crate::item_button::add_bonus_text_args;
@@ -32,15 +32,11 @@ pub struct ClassPane {
 
 impl ClassPane {
     pub fn empty() -> Rc<RefCell<ClassPane>> {
-        Rc::new(RefCell::new(ClassPane {
-            class: None,
-        }))
+        Rc::new(RefCell::new(ClassPane { class: None }))
     }
 
     pub fn new(class: Rc<Class>) -> Rc<RefCell<ClassPane>> {
-        Rc::new(RefCell::new(ClassPane {
-            class: Some(class),
-        }))
+        Rc::new(RefCell::new(ClassPane { class: Some(class) }))
     }
 
     pub fn clear_class(&mut self) {
@@ -53,9 +49,15 @@ impl ClassPane {
 }
 
 impl WidgetKind for ClassPane {
-    fn get_name(&self) -> &str { NAME }
-    fn as_any(&self) -> &Any { self }
-    fn as_any_mut(&mut self) -> &mut Any { self }
+    fn get_name(&self) -> &str {
+        NAME
+    }
+    fn as_any(&self) -> &Any {
+        self
+    }
+    fn as_any_mut(&mut self) -> &mut Any {
+        self
+    }
 
     fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let class = match self.class {

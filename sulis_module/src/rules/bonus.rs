@@ -16,8 +16,8 @@
 
 use std::mem;
 
+use crate::rules::{ArmorKind, Attribute, Damage, DamageKind, Slot, WeaponKind, WeaponStyle};
 use sulis_core::util::ExtInt;
-use crate::rules::{Attribute, Damage, DamageKind, ArmorKind, Slot, WeaponKind, WeaponStyle};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, PartialOrd)]
 #[serde(deny_unknown_fields)]
@@ -130,7 +130,7 @@ impl Default for BonusList {
 }
 
 impl BonusList {
-    pub fn iter(&self) -> impl Iterator<Item=&Bonus> {
+    pub fn iter(&self) -> impl Iterator<Item = &Bonus> {
         self.0.iter()
     }
 
@@ -139,7 +139,10 @@ impl BonusList {
     }
 
     pub fn add_kind(&mut self, kind: BonusKind) {
-        self.0.push(Bonus { when: Contingent::Always, kind });
+        self.0.push(Bonus {
+            when: Contingent::Always,
+            kind,
+        });
     }
 
     pub fn merge_duplicates(&mut self) {
@@ -148,7 +151,9 @@ impl BonusList {
 
         let mut i = 0;
         loop {
-            if i + 1 >= bonuses.len() { return; }
+            if i + 1 >= bonuses.len() {
+                return;
+            }
 
             if let Some(merged_bonus) = merge_if_dup(&bonuses[i], &bonuses[i + 1]) {
                 mem::replace(&mut bonuses[i], merged_bonus);
@@ -166,7 +171,6 @@ impl BonusList {
     }
 }
 
-
 macro_rules! apply_kind_mod_i32 {
     ($kind:ident ( $val:ident ) : $penalty:ident, $bonus:ident) => {
         if $val > 0 {
@@ -174,7 +178,7 @@ macro_rules! apply_kind_mod_i32 {
         } else {
             $kind(($val as f32 * $penalty).round() as i32)
         }
-    }
+    };
 }
 
 macro_rules! apply_kind_mod_f32 {
@@ -184,7 +188,7 @@ macro_rules! apply_kind_mod_f32 {
         } else {
             $kind($val * $penalty)
         }
-    }
+    };
 }
 
 fn apply_modifiers(bonus: &mut Bonus, neg: f32, pos: f32) {
@@ -221,29 +225,55 @@ fn apply_modifiers(bonus: &mut Bonus, neg: f32, pos: f32) {
         Damage(damage) => Damage(damage.mult_f32(pos)),
         ArmorKind { kind, amount } => {
             if amount > 0 {
-                ArmorKind { kind, amount: (amount as f32 * pos).round() as i32 }
+                ArmorKind {
+                    kind,
+                    amount: (amount as f32 * pos).round() as i32,
+                }
             } else {
-                ArmorKind { kind, amount: (amount as f32 * neg).round() as i32 }
+                ArmorKind {
+                    kind,
+                    amount: (amount as f32 * neg).round() as i32,
+                }
             }
-        },
+        }
         Resistance { kind, amount } => {
             if amount > 0 {
-                Resistance { kind, amount: (amount as f32 * pos).round() as i32 }
+                Resistance {
+                    kind,
+                    amount: (amount as f32 * pos).round() as i32,
+                }
             } else {
-                Resistance { kind, amount: (amount as f32 * neg).round() as i32 }
+                Resistance {
+                    kind,
+                    amount: (amount as f32 * neg).round() as i32,
+                }
             }
-        },
+        }
         Attribute { attribute, amount } => {
             if amount > 0 {
-                Attribute { attribute, amount: (amount as f32 * pos).round() as i8 }
+                Attribute {
+                    attribute,
+                    amount: (amount as f32 * pos).round() as i8,
+                }
             } else {
-                Attribute { attribute, amount: (amount as f32 * neg).round() as i8 }
+                Attribute {
+                    attribute,
+                    amount: (amount as f32 * neg).round() as i8,
+                }
             }
-        },
-        ArmorProficiency(_) | WeaponProficiency(_) | MoveDisabled
-            | AttackDisabled | Hidden | GroupUsesPerEncounter { .. }
-            | GroupUsesPerDay { .. } | FlankedImmunity | SneakAttackImmunity
-            | CritImmunity | AbilitiesDisabled | FreeAbilityGroupUse => return,
+        }
+        ArmorProficiency(_)
+        | WeaponProficiency(_)
+        | MoveDisabled
+        | AttackDisabled
+        | Hidden
+        | GroupUsesPerEncounter { .. }
+        | GroupUsesPerDay { .. }
+        | FlankedImmunity
+        | SneakAttackImmunity
+        | CritImmunity
+        | AbilitiesDisabled
+        | FreeAbilityGroupUse => return,
     };
 
     bonus.kind = new_kind;
@@ -252,83 +282,206 @@ fn apply_modifiers(bonus: &mut Bonus, neg: f32, pos: f32) {
 macro_rules! merge_int_bonus {
     ($kind:ident, $val:ident, $sec:ident, $when:ident) => {
         if let $kind(other) = $sec.kind {
-            return Some(Bonus { $when, kind: $kind($val + other) });
+            return Some(Bonus {
+                $when,
+                kind: $kind($val + other),
+            });
         }
-    }
+    };
 }
 
 pub fn merge_if_dup(first: &Bonus, sec: &Bonus) -> Option<Bonus> {
-    if first.when != sec.when { return None; }
+    if first.when != sec.when {
+        return None;
+    }
 
     let when = first.when;
     use self::BonusKind::*;
     match first.kind {
-        Attribute { attribute, amount } => if let Attribute { attribute: attr, amount: amt } = sec.kind {
-            if attr != attribute { return None; }
-            return Some(Bonus { when, kind: Attribute { attribute, amount: amount + amt }});
-        },
-        ArmorKind { kind, amount } => if let ArmorKind { kind: other_kind, amount: other } = sec.kind {
-            if other_kind != kind { return None; }
-            return Some(Bonus { when, kind: ArmorKind { kind, amount: amount + other }});
-        },
-        Resistance { kind, amount } => if let Resistance { kind: other_kind, amount: other } = sec.kind {
-            if other_kind != kind { return None; }
-            return Some(Bonus { when, kind: Resistance { kind, amount: amount + other }});
-        },
-        Damage(damage) => if let Damage(other) = sec.kind {
-            if damage.kind != other.kind { return None; }
-            let mut damage = damage.clone();
-            damage.add(other);
-            return Some(Bonus { when, kind: Damage(damage) });
-        },
-        ArmorProficiency(kind) => if let ArmorProficiency(other) = sec.kind {
-            if kind != other { return None; }
-            return Some(Bonus { when, kind: ArmorProficiency(kind) });
-        },
-        WeaponProficiency(kind) => if let WeaponProficiency(other) = sec.kind {
-            if kind != other { return None; }
-            return Some(Bonus { when, kind: WeaponProficiency(kind) });
-        },
-        MoveDisabled => if let MoveDisabled = sec.kind {
-            return Some(Bonus { when, kind: MoveDisabled });
-        },
-        AbilitiesDisabled => if let AbilitiesDisabled = sec.kind {
-            return Some(Bonus { when, kind: AbilitiesDisabled });
-        },
-        AttackDisabled => if let AttackDisabled = sec.kind {
-            return Some(Bonus { when, kind: AttackDisabled });
-        },
-        Hidden => if let Hidden = sec.kind {
-            return Some(Bonus { when, kind: Hidden });
-        },
-        FlankedImmunity => if let FlankedImmunity = sec.kind {
-            return Some(Bonus { when, kind: FlankedImmunity });
-        },
-        SneakAttackImmunity => if let SneakAttackImmunity = sec.kind {
-            return Some(Bonus { when, kind: SneakAttackImmunity });
-        },
-        CritImmunity => if let CritImmunity = sec.kind {
-            return Some(Bonus { when, kind: CritImmunity });
-        },
-        FreeAbilityGroupUse => if let FreeAbilityGroupUse = sec.kind {
-            return Some(Bonus { when, kind: FreeAbilityGroupUse });
-        },
+        Attribute { attribute, amount } => {
+            if let Attribute {
+                attribute: attr,
+                amount: amt,
+            } = sec.kind
+            {
+                if attr != attribute {
+                    return None;
+                }
+                return Some(Bonus {
+                    when,
+                    kind: Attribute {
+                        attribute,
+                        amount: amount + amt,
+                    },
+                });
+            }
+        }
+        ArmorKind { kind, amount } => {
+            if let ArmorKind {
+                kind: other_kind,
+                amount: other,
+            } = sec.kind
+            {
+                if other_kind != kind {
+                    return None;
+                }
+                return Some(Bonus {
+                    when,
+                    kind: ArmorKind {
+                        kind,
+                        amount: amount + other,
+                    },
+                });
+            }
+        }
+        Resistance { kind, amount } => {
+            if let Resistance {
+                kind: other_kind,
+                amount: other,
+            } = sec.kind
+            {
+                if other_kind != kind {
+                    return None;
+                }
+                return Some(Bonus {
+                    when,
+                    kind: Resistance {
+                        kind,
+                        amount: amount + other,
+                    },
+                });
+            }
+        }
+        Damage(damage) => {
+            if let Damage(other) = sec.kind {
+                if damage.kind != other.kind {
+                    return None;
+                }
+                let mut damage = damage.clone();
+                damage.add(other);
+                return Some(Bonus {
+                    when,
+                    kind: Damage(damage),
+                });
+            }
+        }
+        ArmorProficiency(kind) => {
+            if let ArmorProficiency(other) = sec.kind {
+                if kind != other {
+                    return None;
+                }
+                return Some(Bonus {
+                    when,
+                    kind: ArmorProficiency(kind),
+                });
+            }
+        }
+        WeaponProficiency(kind) => {
+            if let WeaponProficiency(other) = sec.kind {
+                if kind != other {
+                    return None;
+                }
+                return Some(Bonus {
+                    when,
+                    kind: WeaponProficiency(kind),
+                });
+            }
+        }
+        MoveDisabled => {
+            if let MoveDisabled = sec.kind {
+                return Some(Bonus {
+                    when,
+                    kind: MoveDisabled,
+                });
+            }
+        }
+        AbilitiesDisabled => {
+            if let AbilitiesDisabled = sec.kind {
+                return Some(Bonus {
+                    when,
+                    kind: AbilitiesDisabled,
+                });
+            }
+        }
+        AttackDisabled => {
+            if let AttackDisabled = sec.kind {
+                return Some(Bonus {
+                    when,
+                    kind: AttackDisabled,
+                });
+            }
+        }
+        Hidden => {
+            if let Hidden = sec.kind {
+                return Some(Bonus { when, kind: Hidden });
+            }
+        }
+        FlankedImmunity => {
+            if let FlankedImmunity = sec.kind {
+                return Some(Bonus {
+                    when,
+                    kind: FlankedImmunity,
+                });
+            }
+        }
+        SneakAttackImmunity => {
+            if let SneakAttackImmunity = sec.kind {
+                return Some(Bonus {
+                    when,
+                    kind: SneakAttackImmunity,
+                });
+            }
+        }
+        CritImmunity => {
+            if let CritImmunity = sec.kind {
+                return Some(Bonus {
+                    when,
+                    kind: CritImmunity,
+                });
+            }
+        }
+        FreeAbilityGroupUse => {
+            if let FreeAbilityGroupUse = sec.kind {
+                return Some(Bonus {
+                    when,
+                    kind: FreeAbilityGroupUse,
+                });
+            }
+        }
         GroupUsesPerEncounter { ref group, amount } => {
-            if let GroupUsesPerEncounter { group: ref other_grp, amount: amt } = sec.kind {
-                if group != other_grp { return None; }
+            if let GroupUsesPerEncounter {
+                group: ref other_grp,
+                amount: amt,
+            } = sec.kind
+            {
+                if group != other_grp {
+                    return None;
+                }
                 let group = group.clone();
                 let amount = amount + amt;
-                return Some(Bonus { when, kind: GroupUsesPerEncounter { group, amount }});
+                return Some(Bonus {
+                    when,
+                    kind: GroupUsesPerEncounter { group, amount },
+                });
             }
-        },
+        }
         GroupUsesPerDay { ref group, amount } => {
-            if let GroupUsesPerDay { group: ref other_grp, amount: amt } = sec.kind {
-                if group != other_grp { return None; }
+            if let GroupUsesPerDay {
+                group: ref other_grp,
+                amount: amt,
+            } = sec.kind
+            {
+                if group != other_grp {
+                    return None;
+                }
                 let group = group.clone();
                 let amount = amount + amt;
-                return Some(Bonus { when, kind: GroupUsesPerDay { group, amount }});
+                return Some(Bonus {
+                    when,
+                    kind: GroupUsesPerDay { group, amount },
+                });
             }
-        },
+        }
         // all of these statements could be easily merged into one macro,
         // but then it would need to be its own match statement and you would
         // lose the exhaustiveness check
@@ -363,8 +516,6 @@ pub fn merge_if_dup(first: &Bonus, sec: &Bonus) -> Option<Bonus> {
     None
 }
 
-
-
 #[derive(Deserialize, Debug, Clone)]
 #[serde(deny_unknown_fields)]
 #[serde(default)]
@@ -383,16 +534,22 @@ pub struct AttackBonuses {
 
 macro_rules! mod_field {
     ($field:expr, $pos:ident, $neg:ident) => {
-        if $field > 0 { $field = ($field as f32 * $pos).round() as i32; }
-        else { $field = ($field as f32 * $neg).round() as i32; }
-    }
+        if $field > 0 {
+            $field = ($field as f32 * $pos).round() as i32;
+        } else {
+            $field = ($field as f32 * $neg).round() as i32;
+        }
+    };
 }
 
 macro_rules! mod_field_f32 {
     ($field:expr, $pos:ident, $neg:ident) => {
-        if $field > 0.0 { $field = $field * $pos; }
-        else { $field = $field as f32 * $neg; }
-    }
+        if $field > 0.0 {
+            $field = $field * $pos;
+        } else {
+            $field = $field as f32 * $neg;
+        }
+    };
 }
 
 impl AttackBonuses {
@@ -487,11 +644,6 @@ impl AttackBuilder {
 #[derive(Deserialize, Debug, Clone)]
 #[serde(deny_unknown_fields, untagged)]
 pub enum AttackKindBuilder {
-    Melee {
-        reach: f32,
-    },
-    Ranged {
-        range: f32,
-        projectile: String,
-    },
+    Melee { reach: f32 },
+    Ranged { range: f32, projectile: String },
 }

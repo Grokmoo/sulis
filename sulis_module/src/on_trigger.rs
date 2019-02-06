@@ -21,8 +21,8 @@ use crate::rules::Time;
 pub enum Kind {
     Ability(String),
     Item(String), // callback is based on an item ID, not a particular
-                  // slot - this allows creating callbacks after the
-                  // consumable items has been used
+    // slot - this allows creating callbacks after the
+    // consumable items has been used
     Entity,
     Script(String),
 }
@@ -113,7 +113,7 @@ pub struct QuestStateData {
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
-#[serde(deny_unknown_fields, rename_all="snake_case")]
+#[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub enum OnTrigger {
     BlockUI(u32), // block user interface for specified number of millis
     PlayerCoins(i32),

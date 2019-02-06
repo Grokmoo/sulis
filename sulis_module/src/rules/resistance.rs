@@ -24,15 +24,15 @@ pub struct Resistance {
 
 impl Default for Resistance {
     fn default() -> Resistance {
-        Resistance {
-            kinds: [0; 8],
-        }
+        Resistance { kinds: [0; 8] }
     }
 }
 
 impl Resistance {
     pub fn add_kind(&mut self, kind: DamageKind, amount: i32) {
-        if kind == DamageKind::Raw { return; }
+        if kind == DamageKind::Raw {
+            return;
+        }
 
         let index = kind.index();
         self.kinds[index] = self.kinds[index] + amount;
@@ -41,14 +41,18 @@ impl Resistance {
     /// Returns the amount of damage resistance that this armor value
     /// applies to the specified damage kind.
     pub fn amount(&self, check_kind: DamageKind) -> i32 {
-        if check_kind == DamageKind::Raw { return 0; }
+        if check_kind == DamageKind::Raw {
+            return 0;
+        }
 
-        return self.kinds[check_kind.index()]
+        return self.kinds[check_kind.index()];
     }
 
     pub fn is_empty(&self) -> bool {
         for val in self.kinds.iter() {
-            if *val > 0 { return false; }
+            if *val > 0 {
+                return false;
+            }
         }
 
         true

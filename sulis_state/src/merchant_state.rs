@@ -20,7 +20,7 @@ use std::rc::Rc;
 use sulis_core::util::invalid_data_error;
 use sulis_module::{LootList, Module, Time};
 
-use crate::{ChangeListenerList, ItemList, ItemState, save_state::MerchantSaveState, GameState};
+use crate::{save_state::MerchantSaveState, ChangeListenerList, GameState, ItemList, ItemState};
 
 pub struct MerchantState {
     pub id: String,
@@ -59,8 +59,13 @@ impl MerchantState {
         })
     }
 
-    pub fn new(id: &str, loot_list: &Rc<LootList>, buy_frac: f32,
-               sell_frac: f32, refresh_time: Time) -> MerchantState {
+    pub fn new(
+        id: &str,
+        loot_list: &Rc<LootList>,
+        buy_frac: f32,
+        sell_frac: f32,
+        refresh_time: Time,
+    ) -> MerchantState {
         let mgr = GameState::turn_manager();
         let last_refresh_millis = mgr.borrow().total_elapsed_millis();
         let refresh_rate_millis = Module::rules().compute_millis(refresh_time);
@@ -85,13 +90,17 @@ impl MerchantState {
     }
 
     pub fn check_refresh(&mut self) {
-        if self.refresh_rate_millis == 0 { return; }
+        if self.refresh_rate_millis == 0 {
+            return;
+        }
 
         let mgr = GameState::turn_manager();
         let cur_millis = mgr.borrow().total_elapsed_millis();
-        info!("Check merchant '{}' refresh with current millis: {}, \
-              refresh rate: {}, last_refresh: {}", self.id, cur_millis,
-              self.refresh_rate_millis, self.last_refresh_millis);
+        info!(
+            "Check merchant '{}' refresh with current millis: {}, \
+             refresh rate: {}, last_refresh: {}",
+            self.id, cur_millis, self.refresh_rate_millis, self.last_refresh_millis
+        );
         if cur_millis < self.last_refresh_millis + self.refresh_rate_millis {
             return;
         }
@@ -105,9 +114,13 @@ impl MerchantState {
 
         let loot_list = match Module::loot_list(loot_list_id) {
             None => {
-                warn!("Invalid loot list '{}' saved in merchant state", loot_list_id);
+                warn!(
+                    "Invalid loot list '{}' saved in merchant state",
+                    loot_list_id
+                );
                 return;
-            }, Some(list) => list,
+            }
+            Some(list) => list,
         };
 
         self.items.clear();

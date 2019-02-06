@@ -19,8 +19,8 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 use sulis_core::config::Config;
-use sulis_core::resource::{ResourceSet, Sprite};
 use sulis_core::io::{DrawList, GraphicsRenderer};
+use sulis_core::resource::{ResourceSet, Sprite};
 use sulis_core::ui::{Callback, Color, Widget, WidgetKind};
 use sulis_core::util::Point;
 use sulis_core::widgets::{Label, Spinner};
@@ -42,7 +42,10 @@ pub struct ElevPicker {
 impl ElevPicker {
     pub fn new() -> Rc<RefCell<ElevPicker>> {
         let cursor_sprite = match ResourceSet::sprite(&Config::editor_config().cursor) {
-            Err(_) => panic!("Unable to find cursor sprite '{}'", Config::editor_config().cursor),
+            Err(_) => panic!(
+                "Unable to find cursor sprite '{}'",
+                Config::editor_config().cursor
+            ),
             Ok(sprite) => sprite,
         };
 
@@ -52,7 +55,8 @@ impl ElevPicker {
                 Err(_) => {
                     warn!("Editor elevation tile '{}' not found", sprite_id);
                     continue;
-                }, Ok(sprite) => sprite,
+                }
+                Ok(sprite) => sprite,
             };
             elev_tiles.push(sprite);
         }
@@ -68,8 +72,16 @@ impl ElevPicker {
 }
 
 impl EditorMode for ElevPicker {
-    fn draw_mode(&mut self, renderer: &mut GraphicsRenderer, model: &AreaModel, x_offset: f32, y_offset: f32,
-            scale_x: f32, scale_y: f32, _millis: u32) {
+    fn draw_mode(
+        &mut self,
+        renderer: &mut GraphicsRenderer,
+        model: &AreaModel,
+        x_offset: f32,
+        y_offset: f32,
+        scale_x: f32,
+        scale_y: f32,
+        _millis: u32,
+    ) {
         let mut draw_list = DrawList::empty_sprite();
         for y in 0..MAX_AREA_SIZE {
             for x in 0..MAX_AREA_SIZE {
@@ -89,7 +101,13 @@ impl EditorMode for ElevPicker {
                 for x in 0..self.brush_size {
                     let x = x as f32 + pos.x as f32 + x_offset;
                     let y = y as f32 + pos.y as f32 + y_offset;
-                    draw_list.append(&mut DrawList::from_sprite_f32(&self.cursor_sprite, x, y, 1.0, 1.0));
+                    draw_list.append(&mut DrawList::from_sprite_f32(
+                        &self.cursor_sprite,
+                        x,
+                        y,
+                        1.0,
+                        1.0,
+                    ));
                 }
             }
             draw_list.set_scale(scale_x, scale_y);
@@ -124,40 +142,56 @@ impl EditorMode for ElevPicker {
 }
 
 impl WidgetKind for ElevPicker {
-    fn get_name(&self) -> &str { NAME }
+    fn get_name(&self) -> &str {
+        NAME
+    }
 
-    fn as_any(&self) -> &Any { self }
+    fn as_any(&self) -> &Any {
+        self
+    }
 
-    fn as_any_mut(&mut self) -> &mut Any { self }
+    fn as_any_mut(&mut self) -> &mut Any {
+        self
+    }
 
     fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let brush_size = Widget::with_theme(Spinner::new(self.brush_size, 1, 10), "brush_size");
-        brush_size.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, kind| {
-            let (_, picker) = Widget::parent_mut::<ElevPicker>(widget);
+        brush_size
+            .borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(|widget, kind| {
+                let (_, picker) = Widget::parent_mut::<ElevPicker>(widget);
 
-            let spinner = match kind.as_any().downcast_ref::<Spinner>() {
-                None => panic!("Unable to downcast to spinner"),
-                Some(widget) => widget,
-            };
+                let spinner = match kind.as_any().downcast_ref::<Spinner>() {
+                    None => panic!("Unable to downcast to spinner"),
+                    Some(widget) => widget,
+                };
 
-            picker.brush_size = spinner.value();
-        })));
+                picker.brush_size = spinner.value();
+            })));
 
         let brush_size_label = Widget::with_theme(Label::empty(), "brush_size_label");
 
         let elev = Widget::with_theme(
-            Spinner::new(self.set_elev_to as i32, 0,
-                         Config::editor_config().area.elev_tiles.len() as i32 - 1), "elev");
-        elev.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, kind| {
-            let (_, picker) = Widget::parent_mut::<ElevPicker>(widget);
+            Spinner::new(
+                self.set_elev_to as i32,
+                0,
+                Config::editor_config().area.elev_tiles.len() as i32 - 1,
+            ),
+            "elev",
+        );
+        elev.borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(|widget, kind| {
+                let (_, picker) = Widget::parent_mut::<ElevPicker>(widget);
 
-            let spinner = match kind.as_any().downcast_ref::<Spinner>() {
-                None => panic!("Unable to downcast to spinner"),
-                Some(widget) => widget,
-            };
+                let spinner = match kind.as_any().downcast_ref::<Spinner>() {
+                    None => panic!("Unable to downcast to spinner"),
+                    Some(widget) => widget,
+                };
 
-            picker.set_elev_to = spinner.value() as u8;
-        })));
+                picker.set_elev_to = spinner.value() as u8;
+            })));
 
         let elev_label = Widget::with_theme(Label::empty(), "elev_label");
 

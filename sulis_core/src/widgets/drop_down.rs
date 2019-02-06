@@ -15,13 +15,13 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::any::Any;
-use std::rc::Rc;
 use std::cell::RefCell;
 use std::fmt::Display;
+use std::rc::Rc;
 use std::slice::Iter;
 
-use crate::widgets::{Button, ListBox, list_box::Entry};
 use crate::ui::{Callback, Widget, WidgetKind};
+use crate::widgets::{list_box::Entry, Button, ListBox};
 
 const NAME: &str = "drop_down";
 
@@ -48,11 +48,17 @@ impl<T: Display + Clone + 'static> DropDown<T> {
 }
 
 impl<T: Display + Clone + 'static> WidgetKind for DropDown<T> {
-    fn get_name(&self) -> &str { NAME }
+    fn get_name(&self) -> &str {
+        NAME
+    }
 
-    fn as_any(&self) -> &Any { self }
+    fn as_any(&self) -> &Any {
+        self
+    }
 
-    fn as_any_mut(&mut self) -> &mut Any { self }
+    fn as_any_mut(&mut self) -> &mut Any {
+        self
+    }
 
     fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let button = Widget::with_defaults(Button::empty());

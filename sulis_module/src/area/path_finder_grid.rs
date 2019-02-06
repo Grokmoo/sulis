@@ -14,11 +14,11 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::rc::Rc;
 use std::fmt;
+use std::rc::Rc;
 
-use crate::ObjectSize;
 use crate::area::LayerSet;
+use crate::ObjectSize;
 
 pub struct PathFinderGrid {
     pub size: Rc<ObjectSize>,
@@ -49,7 +49,7 @@ impl PathFinderGrid {
         let width = layer_set.width;
         let height = layer_set.height;
 
-        let mut passable = vec![false;(width * height) as usize];
+        let mut passable = vec![false; (width * height) as usize];
 
         for y in 0..height {
             for x in 0..width {

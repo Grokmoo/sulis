@@ -15,13 +15,13 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::any::Any;
-use std::rc::Rc;
 use std::cell::RefCell;
+use std::rc::Rc;
 
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_core::widgets::{Button, Label, Spinner};
 
-use crate::{AreaEditor};
+use crate::AreaEditor;
 
 pub const NAME: &str = "shift_tiles_window";
 
@@ -31,25 +31,32 @@ pub struct ShiftTilesWindow {
 
 impl ShiftTilesWindow {
     pub fn new(area_editor: Rc<RefCell<AreaEditor>>) -> Rc<RefCell<ShiftTilesWindow>> {
-        Rc::new(RefCell::new(ShiftTilesWindow {
-            area_editor,
-        }))
+        Rc::new(RefCell::new(ShiftTilesWindow { area_editor }))
     }
 }
 
 impl WidgetKind for ShiftTilesWindow {
-    fn get_name(&self) -> &str { NAME }
+    fn get_name(&self) -> &str {
+        NAME
+    }
 
-    fn as_any(&self) -> &Any { self }
+    fn as_any(&self) -> &Any {
+        self
+    }
 
-    fn as_any_mut(&mut self) -> &mut Any { self }
+    fn as_any_mut(&mut self) -> &mut Any {
+        self
+    }
 
     fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let close = Widget::with_theme(Button::empty(), "close");
-        close.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let (parent, _) = Widget::parent::<ShiftTilesWindow>(widget);
-            parent.borrow_mut().mark_for_removal();
-        })));
+        close
+            .borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(|widget, _| {
+                let (parent, _) = Widget::parent::<ShiftTilesWindow>(widget);
+                parent.borrow_mut().mark_for_removal();
+            })));
 
         let x_label = Widget::with_theme(Label::empty(), "x_label");
         let y_label = Widget::with_theme(Label::empty(), "y_label");
@@ -62,16 +69,29 @@ impl WidgetKind for ShiftTilesWindow {
         let y_spinner_widget = Widget::with_theme(y_spinner.clone(), "y_spinner");
 
         let accept = Widget::with_theme(Button::empty(), "apply_button");
-        accept.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-            let delta_x = x_spinner.borrow().value();
-            let delta_y = y_spinner.borrow().value();
-            info!("Shifting tiles in area by {},{}", delta_x, delta_y);
-            area_editor_ref.borrow_mut().model.shift_tiles(delta_x, delta_y);
+        accept
+            .borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(move |widget, _| {
+                let delta_x = x_spinner.borrow().value();
+                let delta_y = y_spinner.borrow().value();
+                info!("Shifting tiles in area by {},{}", delta_x, delta_y);
+                area_editor_ref
+                    .borrow_mut()
+                    .model
+                    .shift_tiles(delta_x, delta_y);
 
-            let (parent, _) = Widget::parent::<ShiftTilesWindow>(widget);
-            parent.borrow_mut().mark_for_removal();
-        })));
+                let (parent, _) = Widget::parent::<ShiftTilesWindow>(widget);
+                parent.borrow_mut().mark_for_removal();
+            })));
 
-        vec![close, x_label, y_label, x_spinner_widget, y_spinner_widget, accept]
+        vec![
+            close,
+            x_label,
+            y_label,
+            x_spinner_widget,
+            y_spinner_widget,
+            accept,
+        ]
     }
 }

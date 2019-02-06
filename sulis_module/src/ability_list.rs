@@ -14,11 +14,11 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::slice::Iter;
-use std::rc::Rc;
 use std::io::Error;
+use std::rc::Rc;
+use std::slice::Iter;
 
-use sulis_core::util::{unable_to_create_error};
+use sulis_core::util::unable_to_create_error;
 
 use crate::{Ability, Module};
 
@@ -42,7 +42,8 @@ impl AbilityList {
                 None => {
                     warn!("Unable to find ability '{}'", entry.id);
                     return unable_to_create_error("ability_list", &builder.id);
-                }, Some(ref ability) => Rc::clone(ability),
+                }
+                Some(ref ability) => Rc::clone(ability),
             };
 
             entries.push(Entry {
@@ -73,5 +74,5 @@ pub struct EntryBuilder {
 #[serde(deny_unknown_fields)]
 pub struct AbilityListBuilder {
     pub id: String,
-    abilities: Vec<EntryBuilder>
+    abilities: Vec<EntryBuilder>,
 }

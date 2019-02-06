@@ -14,12 +14,12 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::cell::RefCell;
 use std::f32;
 use std::rc::Rc;
-use std::cell::RefCell;
 
-use sulis_core::util;
 use crate::{EntityState, GameState};
+use sulis_core::util;
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 #[serde(deny_unknown_fields)]
@@ -30,9 +30,14 @@ pub struct Formation {
 impl Default for Formation {
     fn default() -> Self {
         Formation {
-            positions: vec![(-2.0, 0.0), (2.0, 0.0),
-                            (-2.0, 3.0), (2.0, 3.0),
-                            (-2.0, 6.0), (2.0, 6.0)],
+            positions: vec![
+                (-2.0, 0.0),
+                (2.0, 0.0),
+                (-2.0, 3.0),
+                (2.0, 3.0),
+                (-2.0, 6.0),
+                (2.0, 6.0),
+            ],
         }
     }
 }
@@ -54,21 +59,34 @@ fn center_of_group(entities: &Vec<Rc<RefCell<EntityState>>>) -> (f32, f32) {
 }
 
 impl Formation {
-    pub fn positions_iter(&self) -> impl Iterator<Item=&(f32, f32)> {
+    pub fn positions_iter(&self) -> impl Iterator<Item = &(f32, f32)> {
         self.positions.iter()
     }
 
     pub fn set_position(&mut self, index: usize, pos: (f32, f32)) {
-        if index >= self.positions.len() { return; }
+        if index >= self.positions.len() {
+            return;
+        }
 
         self.positions[index] = pos;
     }
 
-    pub fn move_group(&self, entities_to_move: &Vec<Rc<RefCell<EntityState>>>,
-                  entities_to_ignore: Vec<usize>, x_base: f32, y_base: f32) {
+    pub fn move_group(
+        &self,
+        entities_to_move: &Vec<Rc<RefCell<EntityState>>>,
+        entities_to_ignore: Vec<usize>,
+        x_base: f32,
+        y_base: f32,
+    ) {
         if entities_to_move.len() == 1 {
-            GameState::move_towards_point(&entities_to_move[0], entities_to_ignore,
-                                          x_base, y_base, 0.6, None);
+            GameState::move_towards_point(
+                &entities_to_move[0],
+                entities_to_ignore,
+                x_base,
+                y_base,
+                0.6,
+                None,
+            );
             return;
         }
 
@@ -95,16 +113,31 @@ impl Formation {
 
             for dist_increase in 0..3 {
                 let dist = 0.6 + dist_increase as f32 * 1.0;
-                if !GameState::can_move_towards_point(&to_move[index], entities_to_ignore.clone(),
-                    x, y, dist) { continue; }
+                if !GameState::can_move_towards_point(
+                    &to_move[index],
+                    entities_to_ignore.clone(),
+                    x,
+                    y,
+                    dist,
+                ) {
+                    continue;
+                }
 
-                GameState::move_towards_point(&to_move[index], entities_to_ignore.clone(),
-                    x, y, dist, None);
+                GameState::move_towards_point(
+                    &to_move[index],
+                    entities_to_ignore.clone(),
+                    x,
+                    y,
+                    dist,
+                    None,
+                );
                 break;
             }
         }
 
-        debug!("Formation move complete in {} secs",
-               util::format_elapsed_secs(start_time.elapsed()));
+        debug!(
+            "Formation move complete in {} secs",
+            util::format_elapsed_secs(start_time.elapsed())
+        );
     }
 }

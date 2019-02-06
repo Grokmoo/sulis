@@ -15,13 +15,13 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::any::Any;
-use std::rc::Rc;
 use std::cell::RefCell;
+use std::rc::Rc;
 
+use sulis_core::io::{event::ClickKind, GraphicsRenderer};
 use sulis_core::ui::{Widget, WidgetKind, WidgetState};
-use sulis_core::io::{GraphicsRenderer, event::ClickKind};
 use sulis_core::util::Point;
-use sulis_core::widgets::{TextArea};
+use sulis_core::widgets::TextArea;
 use sulis_state::{ChangeListener, EntityState, GameState};
 
 const NAME: &'static str = "area_mouseover";
@@ -35,24 +35,18 @@ enum Kind {
 impl PartialEq for AreaMouseover {
     fn eq(&self, other: &AreaMouseover) -> bool {
         match &self.kind {
-            Kind::Entity(ref entity) => {
-                match &other.kind {
-                    Kind::Entity(ref other_entity) => Rc::ptr_eq(entity, other_entity),
-                    _ => false,
-                }
+            Kind::Entity(ref entity) => match &other.kind {
+                Kind::Entity(ref other_entity) => Rc::ptr_eq(entity, other_entity),
+                _ => false,
             },
-            Kind::Prop(index) => {
-                match &other.kind {
-                    Kind::Prop(other_index) => other_index == index,
-                    _ => false,
-                }
+            Kind::Prop(index) => match &other.kind {
+                Kind::Prop(other_index) => other_index == index,
+                _ => false,
             },
-            Kind::Transition(ref name) => {
-                match &other.kind {
-                    Kind::Transition(ref other_name) => other_name == name,
-                    _ => false,
-                }
-            }
+            Kind::Transition(ref name) => match &other.kind {
+                Kind::Transition(ref other_name) => other_name == name,
+                _ => false,
+            },
         }
     }
 }
@@ -91,7 +85,7 @@ impl AreaMouseover {
                 state.add_text_arg("name", &actor.actor.name);
                 state.add_text_arg("cur_hp", &actor.hp().to_string());
                 state.add_text_arg("max_hp", &actor.stats.max_hp.to_string());
-            },
+            }
             Kind::Prop(index) => {
                 let area_state = GameState::area_state();
                 let area_state = area_state.borrow();
@@ -110,10 +104,10 @@ impl AreaMouseover {
                 if let Some(ref text) = prop.prop.status_text {
                     state.add_text_arg("status", text);
                 }
-            },
+            }
             Kind::Transition(ref name) => {
                 state.add_text_arg("name", &name);
-            },
+            }
         }
 
         true
@@ -133,13 +127,22 @@ impl WidgetKind for AreaMouseover {
         false
     }
 
-    fn on_mouse_drag(&mut self, _widget: &Rc<RefCell<Widget>>, _kind: ClickKind,
-                     _delta_x: f32, _delta_y: f32) -> bool {
+    fn on_mouse_drag(
+        &mut self,
+        _widget: &Rc<RefCell<Widget>>,
+        _kind: ClickKind,
+        _delta_x: f32,
+        _delta_y: f32,
+    ) -> bool {
         false
     }
 
-    fn on_mouse_move(&mut self, _widget: &Rc<RefCell<Widget>>,
-                     _delta_x: f32, _delta_y: f32) -> bool {
+    fn on_mouse_move(
+        &mut self,
+        _widget: &Rc<RefCell<Widget>>,
+        _delta_x: f32,
+        _delta_y: f32,
+    ) -> bool {
         true
     }
 
@@ -159,9 +162,12 @@ impl WidgetKind for AreaMouseover {
 
         match self.kind {
             Kind::Entity(ref entity) => {
-                entity.borrow_mut().actor.listeners.add(
-                    ChangeListener::invalidate_layout(NAME, widget));
-            },
+                entity
+                    .borrow_mut()
+                    .actor
+                    .listeners
+                    .add(ChangeListener::invalidate_layout(NAME, widget));
+            }
             _ => (),
         }
 
@@ -176,8 +182,15 @@ impl WidgetKind for AreaMouseover {
         self.text_area.borrow_mut().layout(widget);
     }
 
-    fn draw(&mut self, renderer: &mut GraphicsRenderer, pixel_size: Point,
-                          widget: &Widget, millis: u32) {
-        self.text_area.borrow_mut().draw(renderer, pixel_size, widget, millis);
+    fn draw(
+        &mut self,
+        renderer: &mut GraphicsRenderer,
+        pixel_size: Point,
+        widget: &Widget,
+        millis: u32,
+    ) {
+        self.text_area
+            .borrow_mut()
+            .draw(renderer, pixel_size, widget, millis);
     }
 }

@@ -14,16 +14,16 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::collections::HashMap;
 use std::rc::Rc;
 use std::str::FromStr;
-use std::collections::HashMap;
 
-use serde_derive::{Deserialize};
+use serde_derive::Deserialize;
 
 use crate::resource::ResourceSet;
 use crate::ui::color::Color;
-use crate::ui::{WidgetState, Border, LayoutKind};
-use crate::util::{Size, Point};
+use crate::ui::{Border, LayoutKind, WidgetState};
+use crate::util::{Point, Size};
 
 #[derive(Deserialize, Debug, Clone, Copy, Eq, Hash, PartialEq)]
 #[serde(deny_unknown_fields)]
@@ -34,7 +34,9 @@ pub enum HorizontalAlignment {
 }
 
 impl Default for HorizontalAlignment {
-    fn default() -> Self { HorizontalAlignment::Center }
+    fn default() -> Self {
+        HorizontalAlignment::Center
+    }
 }
 
 #[derive(Deserialize, Debug, Clone, Copy, Eq, Hash, PartialEq)]
@@ -46,7 +48,9 @@ pub enum VerticalAlignment {
 }
 
 impl Default for VerticalAlignment {
-    fn default() -> Self { VerticalAlignment::Center }
+    fn default() -> Self {
+        VerticalAlignment::Center
+    }
 }
 
 #[derive(Deserialize, Debug, Clone, Copy, Eq, Hash, PartialEq)]
@@ -76,7 +80,9 @@ pub enum PositionRelative {
 }
 
 impl Default for PositionRelative {
-    fn default() -> Self { PositionRelative::Zero }
+    fn default() -> Self {
+        PositionRelative::Zero
+    }
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -125,13 +131,15 @@ pub const DEFAULT_THEME_ID: &'static str = "default";
 #[derive(Deserialize, Debug, Copy, Clone)]
 pub enum Kind {
     Ref, // a reference to a widget that will be added in rust code, or
-         // simply used as a building block for another theme item
-    Label, // a widget showing static text - defined purely in the theme
+    // simply used as a building block for another theme item
+    Label,     // a widget showing static text - defined purely in the theme
     Container, // a widget holding other widgets - defined purely in the theme
 }
 
 impl Default for Kind {
-    fn default() -> Self { Kind::Ref }
+    fn default() -> Self {
+        Kind::Ref
+    }
 }
 
 #[derive(Debug)]
@@ -198,7 +206,9 @@ impl Theme {
             None => return,
             Some(ref text) => expand_text_args(text, state),
         };
-        if out.is_empty() { return; }
+        if out.is_empty() {
+            return;
+        }
 
         match ResourceSet::image(&out) {
             None => warn!("Unable to find image for background '{}'", out),
@@ -211,12 +221,13 @@ impl Theme {
     /// and `expand_text_args`
     pub fn apply_foreground(&self, state: &mut WidgetState) {
         if self.foreground.is_some() {
-
             let out = match self.foreground {
                 None => return,
                 Some(ref text) => expand_text_args(text, state),
             };
-            if out.is_empty() { return; }
+            if out.is_empty() {
+                return;
+            }
 
             match ResourceSet::image(&out) {
                 None => warn!("Unable to find image '{}'", out),
@@ -228,15 +239,13 @@ impl Theme {
     pub fn get_custom_or_default<T: Copy + FromStr>(&self, key: &str, default: T) -> T {
         match self.custom.get(key) {
             None => default,
-            Some(ref value) => {
-                match <T>::from_str(value) {
-                    Err(_) => {
-                        warn!("Unable to parse value {} from key {}", value, key);
-                        default
-                    },
-                    Ok(value) => value
+            Some(ref value) => match <T>::from_str(value) {
+                Err(_) => {
+                    warn!("Unable to parse value {} from key {}", value, key);
+                    default
                 }
-            }
+                Ok(value) => value,
+            },
         }
     }
 }
@@ -248,9 +257,7 @@ pub struct ThemeSet {
 
 impl ThemeSet {
     pub(crate) fn new(themes: HashMap<String, Rc<Theme>>) -> ThemeSet {
-        ThemeSet {
-            themes,
-        }
+        ThemeSet { themes }
     }
 
     pub fn default_theme(&self) -> &Rc<Theme> {
@@ -266,7 +273,7 @@ impl ThemeSet {
             None => {
                 warn!("Theme not found: {}", id);
                 &self.themes[DEFAULT_THEME_ID]
-            },
+            }
             Some(theme) => theme,
         }
     }
@@ -277,7 +284,7 @@ impl ThemeSet {
             Some(theme) => match self.compute_theme_id_recursive(theme, id) {
                 None => (),
                 Some(id) => return id,
-            }
+            },
         }
 
         format!("{}.{}", parent_id, id)
@@ -325,7 +332,7 @@ pub fn expand_text_args(text: &str, state: &WidgetState) -> String {
                         None => {
                             // trace!("No text arg '{}' for text '{}'", cur_arg, text);
                             ""
-                        },
+                        }
                         Some(arg) => arg,
                     };
                     out.push_str(text_arg);
@@ -347,7 +354,7 @@ pub fn expand_text_args(text: &str, state: &WidgetState) -> String {
             None => {
                 warn!("Non existant text arg '{}' in text '{}'", cur_arg, text);
                 ""
-            },
+            }
             Some(arg) => arg,
         };
         out.push_str(text_arg);
@@ -355,4 +362,3 @@ pub fn expand_text_args(text: &str, state: &WidgetState) -> String {
 
     out
 }
-

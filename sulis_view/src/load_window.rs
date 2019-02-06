@@ -15,15 +15,15 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::any::Any;
-use std::rc::Rc;
 use std::cell::RefCell;
+use std::rc::Rc;
 
 use sulis_core::ui::{Callback, Widget, WidgetKind};
-use sulis_core::widgets::{Button, Label, ScrollPane, TextArea, ConfirmationWindow};
-use sulis_state::{SaveState, SaveFileMetaData, NextGameStep};
-use sulis_state::save_file::{delete_save, load_state, get_available_save_files};
+use sulis_core::widgets::{Button, ConfirmationWindow, Label, ScrollPane, TextArea};
+use sulis_state::save_file::{delete_save, get_available_save_files, load_state};
+use sulis_state::{NextGameStep, SaveFileMetaData, SaveState};
 
-use crate::{LoadingScreen, main_menu::MainMenu, RootView};
+use crate::{main_menu::MainMenu, LoadingScreen, RootView};
 
 const NAME: &str = "load_window";
 
@@ -70,7 +70,8 @@ impl LoadWindow {
             Err(e) => {
                 error!("Error reading game state");
                 error!("{}", e);
-            }, Ok(state) => {
+            }
+            Ok(state) => {
                 self.set_load_step(state, root);
             }
         }
@@ -101,20 +102,22 @@ impl LoadWindow {
             Err(e) => {
                 error!("Error deleting save");
                 error!("{}", e);
-            }, Ok(()) => (),
+            }
+            Ok(()) => (),
         }
 
         self.entries.remove(index);
     }
 
     fn set_button_state(&self) {
-        self.delete.borrow_mut().state.set_enabled(self.selected_entry.is_some());
+        self.delete
+            .borrow_mut()
+            .state
+            .set_enabled(self.selected_entry.is_some());
 
         let accept_enabled = match self.selected_entry {
             None => false,
-            Some(index) => {
-                self.entries[index].error.is_none()
-            }
+            Some(index) => self.entries[index].error.is_none(),
         };
 
         self.accept.borrow_mut().state.set_enabled(accept_enabled);
@@ -127,10 +130,13 @@ impl WidgetKind for LoadWindow {
     fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let title = Widget::with_theme(Label::empty(), "title");
 
-        self.cancel.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let (parent, _) = Widget::parent::<LoadWindow>(widget);
-            parent.borrow_mut().mark_for_removal();
-        })));
+        self.cancel
+            .borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(|widget, _| {
+                let (parent, _) = Widget::parent::<LoadWindow>(widget);
+                parent.borrow_mut().mark_for_removal();
+            })));
 
         let load_window_widget_ref = Rc::clone(widget);
         let delete_cb = Callback::new(Rc::new(move |widget, _| {
@@ -145,46 +151,70 @@ impl WidgetKind for LoadWindow {
             parent.borrow_mut().mark_for_removal();
         }));
 
-        self.delete.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-            let root = Widget::get_root(widget);
-            let conf_window = Widget::with_theme(ConfirmationWindow::new(delete_cb.clone()), "delete_save_confirmation");
-            conf_window.borrow_mut().state.set_modal(true);
-            Widget::add_child_to(&root, conf_window);
-        })));
+        self.delete
+            .borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(move |widget, _| {
+                let root = Widget::get_root(widget);
+                let conf_window = Widget::with_theme(
+                    ConfirmationWindow::new(delete_cb.clone()),
+                    "delete_save_confirmation",
+                );
+                conf_window.borrow_mut().state.set_modal(true);
+                Widget::add_child_to(&root, conf_window);
+            })));
 
-        self.accept.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let (parent, load_window) = Widget::parent_mut::<LoadWindow>(widget);
-            let root = Widget::get_root(&parent);
-            load_window.load(&root);
+        self.accept
+            .borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(|widget, _| {
+                let (parent, load_window) = Widget::parent_mut::<LoadWindow>(widget);
+                let root = Widget::get_root(&parent);
+                load_window.load(&root);
 
-            parent.borrow_mut().mark_for_removal();
-        })));
+                parent.borrow_mut().mark_for_removal();
+            })));
 
         let scrollpane = ScrollPane::new();
         let entries = Widget::with_theme(scrollpane.clone(), "entries");
 
         for (index, ref meta) in self.entries.iter().enumerate() {
             let text_area = Widget::with_defaults(TextArea::empty());
-            text_area.borrow_mut().state.add_text_arg("player_name", &meta.player_name);
-            text_area.borrow_mut().state.add_text_arg("datetime", &meta.datetime);
-            text_area.borrow_mut().state.add_text_arg("current_area_name", &meta.current_area_name);
+            text_area
+                .borrow_mut()
+                .state
+                .add_text_arg("player_name", &meta.player_name);
+            text_area
+                .borrow_mut()
+                .state
+                .add_text_arg("datetime", &meta.datetime);
+            text_area
+                .borrow_mut()
+                .state
+                .add_text_arg("current_area_name", &meta.current_area_name);
             if meta.error.is_some() {
-                text_area.borrow_mut().state.add_text_arg("error", &meta.error.as_ref().unwrap());
+                text_area
+                    .borrow_mut()
+                    .state
+                    .add_text_arg("error", &meta.error.as_ref().unwrap());
             }
 
             let widget = Widget::with_theme(Button::empty(), "entry");
-            widget.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-                let (parent, load_window) = Widget::parent_mut::<LoadWindow>(widget);
-                parent.borrow_mut().invalidate_layout();
-                load_window.selected_entry = Some(index);
-                load_window.set_button_state();
+            widget
+                .borrow_mut()
+                .state
+                .add_callback(Callback::new(Rc::new(move |widget, _| {
+                    let (parent, load_window) = Widget::parent_mut::<LoadWindow>(widget);
+                    parent.borrow_mut().invalidate_layout();
+                    load_window.selected_entry = Some(index);
+                    load_window.set_button_state();
 
-                let content = Widget::direct_parent(widget);
-                for child in content.borrow().children.iter() {
-                    child.borrow_mut().state.set_active(false);
-                }
-                widget.borrow_mut().state.set_active(true);
-            })));
+                    let content = Widget::direct_parent(widget);
+                    for child in content.borrow().children.iter() {
+                        child.borrow_mut().state.set_active(false);
+                    }
+                    widget.borrow_mut().state.set_active(true);
+                })));
 
             if let Some(selected_index) = self.selected_entry {
                 if selected_index == index {
@@ -198,6 +228,12 @@ impl WidgetKind for LoadWindow {
 
         self.set_button_state();
 
-        vec![self.cancel.clone(), self.delete.clone(), self.accept.clone(), title, entries]
+        vec![
+            self.cancel.clone(),
+            self.delete.clone(),
+            self.accept.clone(),
+            title,
+            entries,
+        ]
     }
 }

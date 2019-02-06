@@ -14,15 +14,16 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-#[macro_use] extern crate log;
+#[macro_use]
+extern crate log;
 
-use sulis_core::ui;
 use sulis_core::config::Config;
 use sulis_core::resource::ResourceSet;
+use sulis_core::ui;
 use sulis_core::util;
 use sulis_module::Module;
 
-use sulis_editor::{EditorView, EditorMainLoopUpdater};
+use sulis_editor::{EditorMainLoopUpdater, EditorView};
 
 fn main() {
     // CONFIG will be lazily initialized here; if it fails it
@@ -47,7 +48,8 @@ fn main() {
             error!("{}", e);
             util::error_and_exit("Fatal error reading resources.");
             unreachable!();
-        }, Ok(yaml) => yaml,
+        }
+        Ok(yaml) => yaml,
     };
 
     if let Err(e) = Module::load_resources(yaml, dirs) {
@@ -67,11 +69,10 @@ fn main() {
 
     let root = ui::create_ui_tree(EditorView::new());
 
-    if let Err(e) = util::main_loop(&mut io, root, Box::new(EditorMainLoopUpdater { })) {
+    if let Err(e) = util::main_loop(&mut io, root, Box::new(EditorMainLoopUpdater {})) {
         error!("{}", e);
         error!("Error in main loop.  Exiting...");
     }
 
     util::ok_and_exit("Main loop complete.");
 }
-

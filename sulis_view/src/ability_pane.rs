@@ -15,11 +15,11 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::any::Any;
-use std::rc::Rc;
 use std::cell::RefCell;
+use std::rc::Rc;
 
 use sulis_core::ui::{Widget, WidgetKind, WidgetState};
-use sulis_core::widgets::{TextArea};
+use sulis_core::widgets::TextArea;
 use sulis_module::{ability, Ability, Module};
 
 use crate::item_button::{add_bonus_text_args, add_prereq_text_args};
@@ -56,9 +56,15 @@ impl AbilityPane {
 }
 
 impl WidgetKind for AbilityPane {
-    fn get_name(&self) -> &str { NAME }
-    fn as_any(&self) -> &Any { self }
-    fn as_any_mut(&mut self) -> &mut Any { self }
+    fn get_name(&self) -> &str {
+        NAME
+    }
+    fn as_any(&self) -> &Any {
+        self
+    }
+    fn as_any_mut(&mut self) -> &mut Any {
+        self
+    }
 
     fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let ability = match self.ability {
@@ -87,7 +93,9 @@ pub fn add_ability_text_args(state: &mut WidgetState, ability: &Rc<Ability>) {
         state.add_text_arg("activate_ap", &ap.to_string());
 
         match active.duration {
-            ability::Duration::Rounds(rounds) => state.add_text_arg("duration", &rounds.to_string()),
+            ability::Duration::Rounds(rounds) => {
+                state.add_text_arg("duration", &rounds.to_string())
+            }
             ability::Duration::Mode => state.add_text_arg("mode", "true"),
             ability::Duration::Instant => state.add_text_arg("instant", "true"),
             ability::Duration::Permanent => state.add_text_arg("permanent", "true"),

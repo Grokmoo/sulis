@@ -15,20 +15,27 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::any::Any;
-use std::rc::Rc;
 use std::cell::RefCell;
+use std::rc::Rc;
 
-use sulis_core::ui::{Widget, WidgetKind, theme, Callback};
 use sulis_core::io::{event, InputAction};
-use sulis_core::widgets::{TextArea};
-use sulis_module::{Actor, OnTrigger, MerchantData, Conversation,
-    conversation::{Response}, Module, on_trigger::{self, Kind, QuestStateData}};
-use sulis_state::{EntityState, ChangeListener, GameState, ItemState,
-    area_feedback_text::ColorKind, NextGameStep, Script,
-    script::{entity_with_id, CallbackData, FuncKind, ScriptEntity}};
+use sulis_core::ui::{theme, Callback, Widget, WidgetKind};
+use sulis_core::widgets::TextArea;
+use sulis_module::{
+    conversation::Response,
+    on_trigger::{self, Kind, QuestStateData},
+    Actor, Conversation, MerchantData, Module, OnTrigger,
+};
+use sulis_state::{
+    area_feedback_text::ColorKind,
+    script::{entity_with_id, CallbackData, FuncKind, ScriptEntity},
+    ChangeListener, EntityState, GameState, ItemState, NextGameStep, Script,
+};
 
-use crate::{character_window, CutsceneWindow, RootView, GameOverWindow, LoadingScreen,
-    window_fade, WindowFade, ConfirmationWindow, ScriptMenu, ap_bar, UIBlocker};
+use crate::{
+    ap_bar, character_window, window_fade, ConfirmationWindow, CutsceneWindow, GameOverWindow,
+    LoadingScreen, RootView, ScriptMenu, UIBlocker, WindowFade,
+};
 
 pub const NAME: &str = "dialog_window";
 
@@ -42,14 +49,17 @@ pub struct DialogWindow {
 }
 
 impl DialogWindow {
-    pub fn new(pc: &Rc<RefCell<EntityState>>, entity: &Rc<RefCell<EntityState>>,
-               convo: Rc<Conversation>) -> Rc<RefCell<DialogWindow>> {
+    pub fn new(
+        pc: &Rc<RefCell<EntityState>>,
+        entity: &Rc<RefCell<EntityState>>,
+        convo: Rc<Conversation>,
+    ) -> Rc<RefCell<DialogWindow>> {
         let cur_node = get_initial_node(&convo, pc, entity);
 
         Rc::new(RefCell::new(DialogWindow {
             pc: Rc::clone(pc),
             entity: Rc::clone(entity),
-            convo: convo,
+            convo,
             node: TextArea::empty(),
             cur_node,
         }))
@@ -77,8 +87,11 @@ impl WidgetKind for DialogWindow {
     }
 
     fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
-        self.entity.borrow_mut().actor.listeners.add(
-            ChangeListener::invalidate(NAME, widget));
+        self.entity
+            .borrow_mut()
+            .actor
+            .listeners
+            .add(ChangeListener::invalidate(NAME, widget));
 
         let cur_text = self.convo.text(&self.cur_node);
         let responses = self.convo.responses(&self.cur_node);
@@ -90,26 +103,37 @@ impl WidgetKind for DialogWindow {
                 node_widget.borrow_mut().state.add_text_arg(flag, val);
             }
         }
-        node_widget.borrow_mut().state.add_text_arg("player_name", &self.pc.borrow().actor.actor.name);
+        node_widget
+            .borrow_mut()
+            .state
+            .add_text_arg("player_name", &self.pc.borrow().actor.actor.name);
         let cur_text = theme::expand_text_args(cur_text, &node_widget.borrow().state);
 
         if responses.is_empty() {
             widget.borrow_mut().mark_for_removal();
 
             let area_state = GameState::area_state();
-            area_state.borrow_mut().add_feedback_text(cur_text, &self.entity,
-                                                      ColorKind::Info);
+            area_state
+                .borrow_mut()
+                .add_feedback_text(cur_text, &self.entity, ColorKind::Info);
             return Vec::new();
         }
 
         self.node.borrow_mut().text = Some(cur_text);
 
-        activate(widget, self.convo.on_view(&self.cur_node), &self.pc, &self.entity);
+        activate(
+            widget,
+            self.convo.on_view(&self.cur_node),
+            &self.pc,
+            &self.entity,
+        );
 
         let responses_widget = Widget::empty("responses");
         {
             for response in responses {
-                if !is_viewable(response, &self.pc, &self.entity) { continue; }
+                if !is_viewable(response, &self.pc, &self.entity) {
+                    continue;
+                }
 
                 let response_button = ResponseButton::new(&response, &self.pc);
                 let widget = Widget::with_defaults(response_button);
@@ -146,7 +170,9 @@ impl WidgetKind for ResponseButton {
         let text_area = TextArea::empty();
         let text_area_widget = Widget::with_defaults(text_area.clone());
 
-        text_area_widget.borrow_mut().state
+        text_area_widget
+            .borrow_mut()
+            .state
             .add_text_arg("player_name", &self.pc.borrow().actor.actor.name);
         let cur_text = theme::expand_text_args(&self.text, &text_area_widget.borrow().state);
 
@@ -170,7 +196,8 @@ impl WidgetKind for ResponseButton {
         match self.to {
             None => {
                 parent.borrow_mut().mark_for_removal();
-            }, Some(ref to) => {
+            }
+            Some(ref to) => {
                 window.cur_node = to.to_string();
                 parent.borrow_mut().invalidate_children();
             }
@@ -180,13 +207,20 @@ impl WidgetKind for ResponseButton {
     }
 }
 
-pub fn show_convo(convo: Rc<Conversation>, pc: &Rc<RefCell<EntityState>>,
-                  target: &Rc<RefCell<EntityState>>, widget: &Rc<RefCell<Widget>>) {
+pub fn show_convo(
+    convo: Rc<Conversation>,
+    pc: &Rc<RefCell<EntityState>>,
+    target: &Rc<RefCell<EntityState>>,
+    widget: &Rc<RefCell<Widget>>,
+) {
     let initial_node = get_initial_node(&convo, &pc, &target);
     if convo.responses(&initial_node).is_empty() {
         let area_state = GameState::area_state();
-        area_state.borrow_mut().add_feedback_text(convo.text(&initial_node).to_string(),
-            &target, ColorKind::Info);
+        area_state.borrow_mut().add_feedback_text(
+            convo.text(&initial_node).to_string(),
+            &target,
+            ColorKind::Info,
+        );
     } else {
         let window = Widget::with_defaults(DialogWindow::new(&pc, &target, convo));
         window.borrow_mut().state.set_modal(true);
@@ -196,58 +230,88 @@ pub fn show_convo(convo: Rc<Conversation>, pc: &Rc<RefCell<EntityState>>,
     }
 }
 
-pub fn get_initial_node(convo: &Rc<Conversation>, pc: &Rc<RefCell<EntityState>>,
-                        entity: &Rc<RefCell<EntityState>>) -> String {
+pub fn get_initial_node(
+    convo: &Rc<Conversation>,
+    pc: &Rc<RefCell<EntityState>>,
+    entity: &Rc<RefCell<EntityState>>,
+) -> String {
     let mut cur_node = "";
     for (node, on_trigger) in convo.initial_nodes() {
         cur_node = node;
 
-        if is_match(on_trigger, pc, entity) { break; }
+        if is_match(on_trigger, pc, entity) {
+            break;
+        }
     }
 
     cur_node.to_string()
 }
 
-pub fn is_match(on_trigger: &Vec<OnTrigger>, pc: &Rc<RefCell<EntityState>>,
-                target: &Rc<RefCell<EntityState>>) -> bool {
+pub fn is_match(
+    on_trigger: &Vec<OnTrigger>,
+    pc: &Rc<RefCell<EntityState>>,
+    target: &Rc<RefCell<EntityState>>,
+) -> bool {
     for trigger in on_trigger.iter() {
         use sulis_module::OnTrigger::*;
         match trigger {
             PlayerCoins(amount) => {
                 let cur = GameState::party_coins();
-                if cur < *amount { return false; }
-            },
+                if cur < *amount {
+                    return false;
+                }
+            }
             PartyMember(ref id) => {
-                if !GameState::has_party_member(id) { return false; }
-            },
+                if !GameState::has_party_member(id) {
+                    return false;
+                }
+            }
             PartyItem(ref id) => {
                 let stash = GameState::party_stash();
-                if !stash.borrow().has_item(id) { return false; }
-            },
+                if !stash.borrow().has_item(id) {
+                    return false;
+                }
+            }
             TargetNumFlag(ref data) => {
-                if target.borrow().get_num_flag(&data.flag) < data.val { return false; }
-            },
+                if target.borrow().get_num_flag(&data.flag) < data.val {
+                    return false;
+                }
+            }
             PlayerNumFlag(ref data) => {
-                if pc.borrow().get_num_flag(&data.flag) < data.val { return false; }
-            },
+                if pc.borrow().get_num_flag(&data.flag) < data.val {
+                    return false;
+                }
+            }
             NotTargetNumFlag(ref data) => {
-                if target.borrow().get_num_flag(&data.flag) >= data.val { return false; }
-            },
+                if target.borrow().get_num_flag(&data.flag) >= data.val {
+                    return false;
+                }
+            }
             NotPlayerNumFlag(ref data) => {
-                if pc.borrow().get_num_flag(&data.flag) >= data.val { return false; }
-            },
+                if pc.borrow().get_num_flag(&data.flag) >= data.val {
+                    return false;
+                }
+            }
             NotTargetFlag(ref flag) => {
-                if target.borrow().has_custom_flag(flag) { return false; }
-            },
+                if target.borrow().has_custom_flag(flag) {
+                    return false;
+                }
+            }
             NotPlayerFlag(ref flag) => {
-                if pc.borrow().has_custom_flag(flag) { return false; }
-            },
+                if pc.borrow().has_custom_flag(flag) {
+                    return false;
+                }
+            }
             TargetFlag(ref flag) => {
-                if !target.borrow().has_custom_flag(flag) { return false; }
-            },
+                if !target.borrow().has_custom_flag(flag) {
+                    return false;
+                }
+            }
             PlayerFlag(ref flag) => {
-                if !pc.borrow().has_custom_flag(flag) { return false; }
-            },
+                if !pc.borrow().has_custom_flag(flag) {
+                    return false;
+                }
+            }
             PlayerAbility(ref ability_to_find) => {
                 let mut has_ability = false;
                 for ability in pc.borrow().actor.actor.abilities.iter() {
@@ -257,8 +321,10 @@ pub fn is_match(on_trigger: &Vec<OnTrigger>, pc: &Rc<RefCell<EntityState>>,
                     }
                 }
 
-                if !has_ability { return false; }
-            },
+                if !has_ability {
+                    return false;
+                }
+            }
             QuestState(ref data) => {
                 let state = if let Some(ref entry) = data.entry {
                     GameState::get_quest_entry_state(data.quest.to_string(), entry.to_string())
@@ -266,8 +332,10 @@ pub fn is_match(on_trigger: &Vec<OnTrigger>, pc: &Rc<RefCell<EntityState>>,
                     GameState::get_quest_state(data.quest.to_string())
                 };
 
-                if state != data.state { return false; }
-            },
+                if state != data.state {
+                    return false;
+                }
+            }
             NotQuestState(ref data) => {
                 let state = if let Some(ref entry) = data.entry {
                     GameState::get_quest_entry_state(data.quest.to_string(), entry.to_string())
@@ -275,7 +343,9 @@ pub fn is_match(on_trigger: &Vec<OnTrigger>, pc: &Rc<RefCell<EntityState>>,
                     GameState::get_quest_state(data.quest.to_string())
                 };
 
-                if state == data.state { return false; }
+                if state == data.state {
+                    return false;
+                }
             }
             _ => {
                 warn!("Unsupported OnTrigger kind '{:?}' in validator", trigger);
@@ -286,14 +356,20 @@ pub fn is_match(on_trigger: &Vec<OnTrigger>, pc: &Rc<RefCell<EntityState>>,
     true
 }
 
-pub fn is_viewable(response: &Response, pc: &Rc<RefCell<EntityState>>,
-                   target: &Rc<RefCell<EntityState>>) -> bool {
+pub fn is_viewable(
+    response: &Response,
+    pc: &Rc<RefCell<EntityState>>,
+    target: &Rc<RefCell<EntityState>>,
+) -> bool {
     is_match(&response.to_view, pc, target)
 }
 
-pub fn activate(widget: &Rc<RefCell<Widget>>, on_select: &Vec<OnTrigger>,
-                pc: &Rc<RefCell<EntityState>>, target: &Rc<RefCell<EntityState>>) {
-
+pub fn activate(
+    widget: &Rc<RefCell<Widget>>,
+    on_select: &Vec<OnTrigger>,
+    pc: &Rc<RefCell<EntityState>>,
+    target: &Rc<RefCell<EntityState>>,
+) {
     use sulis_module::OnTrigger::*;
     for trigger in on_select.iter() {
         match trigger {
@@ -301,73 +377,88 @@ pub fn activate(widget: &Rc<RefCell<Widget>>, on_select: &Vec<OnTrigger>,
                 let root = Widget::get_root(widget);
                 let ui_blocker = Widget::with_defaults(UIBlocker::new(*millis));
                 Widget::add_child_to(&root, ui_blocker);
-            },
+            }
             CheckEndTurn => {
                 ap_bar::check_end_turn(widget);
             }
             PlayerAbility(ref ability_id) => {
                 let ability = match Module::ability(ability_id) {
                     None => {
-                        warn!("No ability found for '{}' when activating on_trigger", ability_id);
+                        warn!(
+                            "No ability found for '{}' when activating on_trigger",
+                            ability_id
+                        );
                         return;
-                    }, Some(ability) => ability,
+                    }
+                    Some(ability) => ability,
                 };
 
                 let mut pc = pc.borrow_mut();
                 let state = &mut pc.actor;
-                let new_actor = Actor::from(&state.actor, None, state.actor.xp, vec![ability],
-                                            Vec::new(), state.actor.inventory.clone());
+                let new_actor = Actor::from(
+                    &state.actor,
+                    None,
+                    state.actor.xp,
+                    vec![ability],
+                    Vec::new(),
+                    state.actor.inventory.clone(),
+                );
                 state.replace_actor(new_actor);
                 state.init_day();
-            },
+            }
             PlayerCoins(amount) => {
                 GameState::add_party_coins(*amount);
-            },
-            PartyMember(ref id) => {
-                match entity_with_id(id.to_string()) {
-                    None => warn!("Attempted to add party member '{}' but entity does not exist",
-                                  id),
-                    Some(entity) => GameState::add_party_member(entity, true),
-                }
+            }
+            PartyMember(ref id) => match entity_with_id(id.to_string()) {
+                None => warn!(
+                    "Attempted to add party member '{}' but entity does not exist",
+                    id
+                ),
+                Some(entity) => GameState::add_party_member(entity, true),
             },
             PartyItem(ref id) => {
                 let stash = GameState::party_stash();
                 match ItemState::from(id) {
                     None => warn!("Attempted to add item '{}' but it does not exist", id),
-                    Some(item) => { stash.borrow_mut().add_item(1, item); },
+                    Some(item) => {
+                        stash.borrow_mut().add_item(1, item);
+                    }
                 }
-            },
+            }
             TargetNumFlag(ref data) => {
                 target.borrow_mut().add_num_flag(&data.flag, data.val);
-            },
+            }
             PlayerNumFlag(ref data) => {
                 pc.borrow_mut().add_num_flag(&data.flag, data.val);
-            },
+            }
             NotTargetNumFlag(ref data) => {
                 target.borrow_mut().clear_custom_flag(&data.flag);
-            },
+            }
             NotPlayerNumFlag(ref data) => {
                 pc.borrow_mut().clear_custom_flag(&data.flag);
-            },
+            }
             NotTargetFlag(ref flag) => {
                 target.borrow_mut().clear_custom_flag(flag);
-            },
+            }
             NotPlayerFlag(ref flag) => {
                 pc.borrow_mut().clear_custom_flag(flag);
-            },
+            }
             TargetFlag(ref flag) => {
                 target.borrow_mut().set_custom_flag(flag, "true");
-            },
+            }
             PlayerFlag(ref flag) => {
                 pc.borrow_mut().set_custom_flag(flag, "true");
-            },
+            }
             ShowMerchant(ref merch) => show_merchant(widget, merch),
             StartConversation(ref convo) => start_convo(widget, convo, pc, target),
             SayLine(ref line) => {
                 let area_state = GameState::area_state();
-                area_state.borrow_mut().add_feedback_text(line.to_string(), &target,
-                ColorKind::Info);
-            },
+                area_state.borrow_mut().add_feedback_text(
+                    line.to_string(),
+                    &target,
+                    ColorKind::Info,
+                );
+            }
             ShowCutscene(ref cutscene) => show_cutscene(widget, cutscene),
             FireScript(ref script) => fire_script(&script.id, &script.func, pc, target),
             GameOverWindow(ref text) => game_over_window(widget, text.to_string()),
@@ -380,12 +471,15 @@ pub fn activate(widget: &Rc<RefCell<Widget>>, on_select: &Vec<OnTrigger>,
                 verify_quest(data);
 
                 if let Some(ref entry) = data.entry {
-                    GameState::set_quest_entry_state(data.quest.to_string(),
-                        entry.to_string(), data.state);
+                    GameState::set_quest_entry_state(
+                        data.quest.to_string(),
+                        entry.to_string(),
+                        data.state,
+                    );
                 } else {
                     GameState::set_quest_state(data.quest.to_string(), data.state);
                 }
-            },
+            }
             NotQuestState(_) => {
                 warn!("NotQuestState invalid for trigger/dialog on_activate");
             }
@@ -399,8 +493,10 @@ fn verify_quest(data: &QuestStateData) {
         Some(quest) => {
             if let Some(ref entry) = data.entry {
                 if !quest.entries.contains_key(entry) {
-                    warn!("Quest entry state for invalid quest entry '{}' in '{}'",
-                          entry, data.quest);
+                    warn!(
+                        "Quest entry state for invalid quest entry '{}' in '{}'",
+                        entry, data.quest
+                    );
                 }
             }
         }
@@ -411,20 +507,14 @@ fn show_menu(widget: &Rc<RefCell<Widget>>, data: &on_trigger::MenuData) {
     let root = Widget::get_root(widget);
 
     let mut script_cb = match &data.cb_kind {
-        Kind::Ability(ref id) => {
-            CallbackData::new_ability(data.cb_parent, id)
-        },
-        Kind::Item(id) => {
-            CallbackData::new_item(data.cb_parent, id.to_string())
-        },
-        Kind::Entity => {
-            CallbackData::new_entity(data.cb_parent)
-        },
-        Kind::Script(id) => {
-            CallbackData::new_trigger(data.cb_parent, id.to_string())
-        }
+        Kind::Ability(ref id) => CallbackData::new_ability(data.cb_parent, id),
+        Kind::Item(id) => CallbackData::new_item(data.cb_parent, id.to_string()),
+        Kind::Entity => CallbackData::new_entity(data.cb_parent),
+        Kind::Script(id) => CallbackData::new_trigger(data.cb_parent, id.to_string()),
     };
-    script_cb.add_func(FuncKind::OnMenuSelect, data.cb_func.to_string()).unwrap();
+    script_cb
+        .add_func(FuncKind::OnMenuSelect, data.cb_func.to_string())
+        .unwrap();
 
     let window = ScriptMenu::new(script_cb, data.title.to_string(), data.choices.clone());
     let widget = Widget::with_defaults(window);
@@ -450,9 +540,16 @@ fn show_confirm(widget: &Rc<RefCell<Widget>>, data: &on_trigger::DialogData) {
     let window = ConfirmationWindow::new(cb);
     {
         let title = Rc::clone(window.borrow().title());
-        title.borrow_mut().state.add_text_arg("message", &data.message);
-        window.borrow().add_accept_text_arg("text", &data.accept_text);
-        window.borrow().add_cancel_text_arg("text", &data.cancel_text);
+        title
+            .borrow_mut()
+            .state
+            .add_text_arg("message", &data.message);
+        window
+            .borrow()
+            .add_accept_text_arg("text", &data.accept_text);
+        window
+            .borrow()
+            .add_cancel_text_arg("text", &data.cancel_text);
     }
 
     let widget = Widget::with_theme(window, "script_confirmation");
@@ -465,12 +562,20 @@ fn load_module(widget: &Rc<RefCell<Widget>>, module_id: &str) {
 
     let pc = GameState::player();
     let inventory = character_window::get_inventory(&pc.borrow().actor);
-    let actor = Actor::from(&pc.borrow().actor.actor, None, pc.borrow().actor.xp(),
-        Vec::new(), Vec::new(), inventory);
+    let actor = Actor::from(
+        &pc.borrow().actor.actor,
+        None,
+        pc.borrow().actor.xp(),
+        Vec::new(),
+        Vec::new(),
+        inventory,
+    );
 
     let modules_list = Module::get_available_modules();
     for module in modules_list {
-        if module.id != module_id { continue; }
+        if module.id != module_id {
+            continue;
+        }
 
         let step = NextGameStep::LoadModuleAndNewCampaign {
             pc_actor: Rc::new(actor),
@@ -513,8 +618,13 @@ fn scroll_view(widget: &Rc<RefCell<Widget>>, x: i32, y: i32) {
         (area.area.width, area.area.height)
     };
 
-    area_view.borrow_mut().delayed_scroll_to_point(x as f32, y as f32, width, height,
-                                                   &area_view_widget.borrow());
+    area_view.borrow_mut().delayed_scroll_to_point(
+        x as f32,
+        y as f32,
+        width,
+        height,
+        &area_view_widget.borrow(),
+    );
 }
 
 fn game_over_window(widget: &Rc<RefCell<Widget>>, text: String) {
@@ -522,33 +632,52 @@ fn game_over_window(widget: &Rc<RefCell<Widget>>, text: String) {
         let (_, view) = Widget::parent_mut::<RootView>(widget);
         view.next_step = Some(NextGameStep::MainMenu);
     }));
-    let window = Widget::with_theme(GameOverWindow::new(menu_cb, text),
-        "script_game_over_window");
+    let window = Widget::with_theme(
+        GameOverWindow::new(menu_cb, text),
+        "script_game_over_window",
+    );
     window.borrow_mut().state.set_modal(true);
     let root = Widget::get_root(widget);
     Widget::add_child_to(&root, window);
 }
 
-fn fire_script(script_id: &str, func: &str, parent: &Rc<RefCell<EntityState>>,
-               target: &Rc<RefCell<EntityState>>) {
-    Script::trigger(script_id, func, (ScriptEntity::from(parent), ScriptEntity::from(target)));
+fn fire_script(
+    script_id: &str,
+    func: &str,
+    parent: &Rc<RefCell<EntityState>>,
+    target: &Rc<RefCell<EntityState>>,
+) {
+    Script::trigger(
+        script_id,
+        func,
+        (ScriptEntity::from(parent), ScriptEntity::from(target)),
+    );
 }
 
 fn show_merchant(widget: &Rc<RefCell<Widget>>, merch: &MerchantData) {
     let id = &merch.id;
     let loot = match Module::loot_list(&merch.loot_list) {
         None => {
-            warn!("Unable to find loot list '{}' for merchant '{}'", merch.loot_list, id);
+            warn!(
+                "Unable to find loot list '{}' for merchant '{}'",
+                merch.loot_list, id
+            );
             return;
-        }, Some(loot) => loot,
+        }
+        Some(loot) => loot,
     };
 
     {
         let area_state = GameState::area_state();
         let mut area_state = area_state.borrow_mut();
 
-        area_state.get_or_create_merchant(id, &loot, merch.buy_frac,
-                                          merch.sell_frac, merch.refresh_time);
+        area_state.get_or_create_merchant(
+            id,
+            &loot,
+            merch.buy_frac,
+            merch.sell_frac,
+            merch.refresh_time,
+        );
     }
 
     let (root, view) = Widget::parent_mut::<RootView>(widget);
@@ -560,10 +689,15 @@ fn show_cutscene(widget: &Rc<RefCell<Widget>>, cutscene_id: &str) {
         None => {
             warn!("Unable to find cutscene '{}' for on_trigger", cutscene_id);
             return;
-        }, Some(cutscene) => cutscene,
+        }
+        Some(cutscene) => cutscene,
     };
 
-    info!("Showing cutscene '{}' with {} frames.", cutscene_id, cutscene.frames.len());
+    info!(
+        "Showing cutscene '{}' with {} frames.",
+        cutscene_id,
+        cutscene.frames.len()
+    );
 
     let root = Widget::get_root(widget);
     let window = Widget::with_defaults(CutsceneWindow::new(cutscene));
@@ -571,13 +705,18 @@ fn show_cutscene(widget: &Rc<RefCell<Widget>>, cutscene_id: &str) {
     Widget::add_child_to(&root, window);
 }
 
-fn start_convo(widget: &Rc<RefCell<Widget>>, convo_id: &str, pc: &Rc<RefCell<EntityState>>,
-               target: &Rc<RefCell<EntityState>>) {
+fn start_convo(
+    widget: &Rc<RefCell<Widget>>,
+    convo_id: &str,
+    pc: &Rc<RefCell<EntityState>>,
+    target: &Rc<RefCell<EntityState>>,
+) {
     let convo = match Module::conversation(convo_id) {
         None => {
             warn!("Unable to find convo '{}' for on_trigger", convo_id);
             return;
-        }, Some(convo) => convo,
+        }
+        Some(convo) => convo,
     };
 
     info!("Showing conversation {}", convo_id);

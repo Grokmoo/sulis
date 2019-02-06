@@ -14,27 +14,31 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::collections::HashMap;
 use std::cmp::max;
-use std::{str::FromStr, io::{Error, ErrorKind}, fmt};
+use std::collections::HashMap;
+use std::{
+    fmt,
+    io::{Error, ErrorKind},
+    str::FromStr,
+};
 
 pub mod armor;
 pub use self::armor::Armor;
 
 pub mod attack;
+pub use self::attack::AccuracyKind;
 pub use self::attack::Attack;
 pub use self::attack::AttackKind;
-pub use self::attack::AccuracyKind;
 
 pub mod attribute;
 pub use self::attribute::Attribute;
 pub use self::attribute::AttributeList;
 
 pub mod bonus;
+pub use self::bonus::AttackBonuses;
 pub use self::bonus::Bonus;
 pub use self::bonus::BonusKind;
 pub use self::bonus::BonusList;
-pub use self::bonus::AttackBonuses;
 
 pub mod damage;
 pub use self::damage::Damage;
@@ -47,9 +51,9 @@ pub use self::resistance::Resistance;
 pub mod stat_list;
 pub use self::stat_list::StatList;
 
+use crate::area::LocationKind;
 use sulis_core::ui::{color, Color};
 use sulis_core::util::{gen_rand, invalid_data_error};
-use crate::area::LocationKind;
 
 #[derive(Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
@@ -138,14 +142,18 @@ impl Rules {
 
     pub fn validate(&self) -> Result<(), Error> {
         if self.hour_names.len() != self.hours_per_day as usize {
-            return invalid_data_error(&format!("Must specify '{}' hours names to match number of hours",
-                                              self.hours_per_day));
+            return invalid_data_error(&format!(
+                "Must specify '{}' hours names to match number of hours",
+                self.hours_per_day
+            ));
         }
 
         for (_, colors) in self.area_colors.iter() {
             if colors.len() != self.hours_per_day as usize {
-                return invalid_data_error(&format!("Must specify '{}' hours for each area_colors.",
-                                                   self.hours_per_day));
+                return invalid_data_error(&format!(
+                    "Must specify '{}' hours for each area_colors.",
+                    self.hours_per_day
+                ));
             }
         }
 
@@ -187,7 +195,8 @@ impl Rules {
         };
 
         let round_frac = 1.0 / self.rounds_per_hour as f32;
-        let next_frac = round_frac * (time.round as f32 + time.millis as f32 / ROUND_TIME_MILLIS as f32);
+        let next_frac =
+            round_frac * (time.round as f32 + time.millis as f32 / ROUND_TIME_MILLIS as f32);
         let prev_frac = 1.0 - next_frac;
 
         let r = prev_frac * prev.r + next_frac * next.r;
@@ -206,12 +215,23 @@ impl Rules {
     /// resulting vector may be an empty vector to indicate no damage, or a vector of
     /// one or more kinds each associated with a positive damage amount.  The damage
     /// amount for each entry will never be zero.
-    pub fn roll_damage(&self, damage: &DamageList, armor: &Armor, resistance: &Resistance,
-                       multiplier: f32) -> Vec<(DamageKind, u32)> {
-        debug!("Rolling damage from {} to {} vs {} base armor",
-               damage.min(), damage.max(), armor.base());
+    pub fn roll_damage(
+        &self,
+        damage: &DamageList,
+        armor: &Armor,
+        resistance: &Resistance,
+        multiplier: f32,
+    ) -> Vec<(DamageKind, u32)> {
+        debug!(
+            "Rolling damage from {} to {} vs {} base armor",
+            damage.min(),
+            damage.max(),
+            armor.base()
+        );
 
-        if damage.is_empty() { return Vec::new(); }
+        if damage.is_empty() {
+            return Vec::new();
+        }
 
         let mut output = Vec::new();
         for damage in damage.iter() {
@@ -240,18 +260,27 @@ impl Rules {
     /// is the maximum percentage that the armor of that level can reduce a damage
     /// amount by.  the remaining damage is rounded up.
     pub fn armor_damage_reduction_cap(&self, armor: u32) -> u32 {
-        *self.armor_damage_reduction_cap.get(armor as usize).unwrap_or(&100)
+        *self
+            .armor_damage_reduction_cap
+            .get(armor as usize)
+            .unwrap_or(&100)
     }
 
     pub fn get_xp_for_next_level(&self, cur_level: u32) -> u32 {
-        if cur_level < 1 { return 0; }
-        if cur_level - 1 >= self.experience_for_level.len() as u32 { return 0; }
+        if cur_level < 1 {
+            return 0;
+        }
+        if cur_level - 1 >= self.experience_for_level.len() as u32 {
+            return 0;
+        }
 
         self.experience_for_level[(cur_level - 1) as usize]
     }
 
     pub fn concealment_roll(&self, concealment: i32) -> bool {
-        if concealment == 0 { return true; }
+        if concealment == 0 {
+            return true;
+        }
         let roll = gen_rand(1, 101);
         debug!("Concealment roll: {} against {}", roll, concealment);
         roll > concealment
@@ -302,13 +331,21 @@ impl fmt::Display for Time {
     }
 }
 
-fn write_singular_or_plural(f: &mut fmt::Formatter, prev: bool,
-                            qty: u32, unit: &str) -> fmt::Result {
-    if prev { write!(f, ", ")?; }
+fn write_singular_or_plural(
+    f: &mut fmt::Formatter,
+    prev: bool,
+    qty: u32,
+    unit: &str,
+) -> fmt::Result {
+    if prev {
+        write!(f, ", ")?;
+    }
 
     write!(f, "{} {}", qty, unit)?;
 
-    if qty > 1 { write!(f, "s")?; }
+    if qty > 1 {
+        write!(f, "s")?;
+    }
 
     Ok(())
 }
@@ -365,9 +402,11 @@ impl FromStr for Slot {
             "finger_main" => Slot::FingerMain,
             "finger_off" => Slot::FingerOff,
             _ => {
-                return Err(Error::new(ErrorKind::InvalidInput,
-                                      format!("Unable to parse Slot from '{}'", s)));
-            },
+                return Err(Error::new(
+                    ErrorKind::InvalidInput,
+                    format!("Unable to parse Slot from '{}'", s),
+                ));
+            }
         };
 
         Ok(val)
@@ -377,8 +416,9 @@ impl FromStr for Slot {
 use self::Slot::*;
 
 // The sort order of this list is important
-const SLOTS_LIST: [Slot; 12] = [Cloak, Feet, Legs, Torso, Hands, Head, HeldMain, HeldOff, Waist,
-                                Neck, FingerMain, FingerOff];
+const SLOTS_LIST: [Slot; 12] = [
+    Cloak, Feet, Legs, Torso, Hands, Head, HeldMain, HeldOff, Waist, Neck, FingerMain, FingerOff,
+];
 
 #[derive(Deserialize, Serialize, Debug, Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
 #[serde(deny_unknown_fields)]
@@ -403,10 +443,10 @@ impl QuickSlot {
 
 use self::QuickSlot::*;
 
-const QUICKSLOTS_LIST: [QuickSlot; 6] = [ AltHeldMain, AltHeldOff, Usable1, Usable2, Usable3,
-                                          Usable4];
+const QUICKSLOTS_LIST: [QuickSlot; 6] =
+    [AltHeldMain, AltHeldOff, Usable1, Usable2, Usable3, Usable4];
 
-const USABLE_QUICKSLOTS_LIST: [QuickSlot; 4] = [ Usable1, Usable2, Usable3, Usable4 ];
+const USABLE_QUICKSLOTS_LIST: [QuickSlot; 4] = [Usable1, Usable2, Usable3, Usable4];
 
 #[derive(Debug, Deserialize, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum ItemKind {
@@ -452,9 +492,11 @@ impl FromStr for HitKind {
             "crit" => HitKind::Crit,
             "auto" => HitKind::Auto,
             _ => {
-                return Err(Error::new(ErrorKind::InvalidInput,
-                                      format!("Unable to parse HitKind from '{}'", s)));
-            },
+                return Err(Error::new(
+                    ErrorKind::InvalidInput,
+                    format!("Unable to parse HitKind from '{}'", s),
+                ));
+            }
         };
 
         Ok(val)
@@ -481,9 +523,11 @@ impl FromStr for WeaponStyle {
             "shielded" => WeaponStyle::Shielded,
             "dual_wielding" => WeaponStyle::DualWielding,
             _ => {
-                return Err(Error::new(ErrorKind::InvalidInput,
-                                      format!("Unable to parse WeaponStyle from '{}'", s)));
-            },
+                return Err(Error::new(
+                    ErrorKind::InvalidInput,
+                    format!("Unable to parse WeaponStyle from '{}'", s),
+                ));
+            }
         };
 
         Ok(val)
@@ -518,9 +562,11 @@ impl FromStr for WeaponKind {
             "mace" => WeaponKind::Mace,
             "simple" => WeaponKind::Simple,
             _ => {
-                return Err(Error::new(ErrorKind::InvalidInput,
-                                      format!("Unable to parse WeaponKind from '{}'", s)));
-            },
+                return Err(Error::new(
+                    ErrorKind::InvalidInput,
+                    format!("Unable to parse WeaponKind from '{}'", s),
+                ));
+            }
         };
 
         Ok(val)
@@ -543,9 +589,11 @@ impl FromStr for ArmorKind {
             "medium" => ArmorKind::Medium,
             "heavy" => ArmorKind::Heavy,
             _ => {
-                return Err(Error::new(ErrorKind::InvalidInput,
-                                      format!("Unable to parse ArmorKind from '{}'", s)));
-            },
+                return Err(Error::new(
+                    ErrorKind::InvalidInput,
+                    format!("Unable to parse ArmorKind from '{}'", s),
+                ));
+            }
         };
 
         Ok(val)

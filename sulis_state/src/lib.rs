@@ -14,8 +14,10 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-#[macro_use] extern crate log;
-#[macro_use] extern crate serde_derive;
+#[macro_use]
+extern crate log;
+#[macro_use]
+extern crate serde_derive;
 
 mod ai;
 pub use self::ai::AI;
@@ -42,8 +44,8 @@ mod effect;
 pub use self::effect::Effect;
 
 mod entity_state;
-pub use self::entity_state::EntityState;
 pub use self::entity_state::AreaDrawable;
+pub use self::entity_state::EntityState;
 
 mod entity_texture_cache;
 pub use self::entity_texture_cache::EntityTextureCache;
@@ -98,25 +100,32 @@ mod save_state;
 pub use self::save_state::SaveState;
 
 pub mod script;
-pub use self::script::{Script, ScriptState, ScriptCallback};
+pub use self::script::{Script, ScriptCallback, ScriptState};
 
 mod turn_manager;
 pub(crate) use self::turn_manager::TurnManager;
 
+use std::cell::RefCell;
 use std::collections::HashMap;
 use std::rc::Rc;
-use std::cell::RefCell;
 
-use sulis_module::{Actor, OnTrigger, Module};
+use sulis_module::{Actor, Module, OnTrigger};
 
 pub const MOVE_TO_THRESHOLD: f32 = 0.4;
 
 #[derive(Debug)]
 pub enum NextGameStep {
     Exit,
-    NewCampaign { pc_actor: Rc<Actor> },
-    LoadCampaign { save_state: SaveState },
-    LoadModuleAndNewCampaign { pc_actor: Rc<Actor>, module_dir: String },
+    NewCampaign {
+        pc_actor: Rc<Actor>,
+    },
+    LoadCampaign {
+        save_state: SaveState,
+    },
+    LoadModuleAndNewCampaign {
+        pc_actor: Rc<Actor>,
+        module_dir: String,
+    },
     MainMenu,
     MainMenuReloadResources,
     RecreateIO,
@@ -140,10 +149,13 @@ impl WorldMapState {
 
         let mut locations = HashMap::new();
         for location in map.locations.iter() {
-            locations.insert(location.id.clone(), WorldMapLocationState {
-                visible: location.initially_visible,
-                enabled: location.initially_enabled,
-            });
+            locations.insert(
+                location.id.clone(),
+                WorldMapLocationState {
+                    visible: location.initially_visible,
+                    enabled: location.initially_enabled,
+                },
+            );
         }
 
         WorldMapState { locations }
@@ -154,12 +166,17 @@ impl WorldMapState {
         let map = &campaign.world_map;
 
         for location in map.locations.iter() {
-            if self.locations.contains_key(&location.id) { continue; }
+            if self.locations.contains_key(&location.id) {
+                continue;
+            }
 
-            self.locations.insert(location.id.clone(), WorldMapLocationState {
-                visible: location.initially_visible,
-                enabled: location.initially_enabled,
-            });
+            self.locations.insert(
+                location.id.clone(),
+                WorldMapLocationState {
+                    visible: location.initially_visible,
+                    enabled: location.initially_enabled,
+                },
+            );
         }
     }
 

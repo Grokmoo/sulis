@@ -14,16 +14,16 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::time;
 use std::cell::Ref;
-use std::collections::{BTreeMap};
+use std::collections::BTreeMap;
+use std::time;
 use std::{f32, ptr};
 
 use hashbrown::{HashMap, HashSet};
 
+use crate::{AreaState, EntityState};
 use sulis_core::util::{self, Point};
 use sulis_module::Area;
-use crate::{EntityState, AreaState};
 
 const MAX_ITERATIONS: i32 = 400;
 
@@ -50,8 +50,8 @@ impl PathFinder {
         PathFinder {
             width,
             height,
-            f_score: vec![0;(width*height) as usize],
-            g_score: vec![0;(width*height) as usize],
+            f_score: vec![0; (width * height) as usize],
+            g_score: vec![0; (width * height) as usize],
             open: BTreeMap::new(),
             closed: HashSet::default(),
             came_from: HashMap::default(),
@@ -71,18 +71,34 @@ impl PathFinder {
     /// requester.
     /// If reconstruct is set to false, does not produce a path.  Instead, only
     /// checks if a path exists, returning Some if it does, None if not
-    pub fn find(&mut self, area_state: &AreaState, requester: Ref<EntityState>,
-                mut entities_to_ignore: Vec<usize>, reconstruct: bool,
-                dest_x: f32, dest_y: f32, dest_dist: f32) -> Option<Vec<Point>> {
-        if dest_x < 0.0 || dest_y < 0.0 { return None; }
-        if dest_x >= self.width as f32 || dest_y >= self.height as f32 { return None; }
+    pub fn find(
+        &mut self,
+        area_state: &AreaState,
+        requester: Ref<EntityState>,
+        mut entities_to_ignore: Vec<usize>,
+        reconstruct: bool,
+        dest_x: f32,
+        dest_y: f32,
+        dest_dist: f32,
+    ) -> Option<Vec<Point>> {
+        if dest_x < 0.0 || dest_y < 0.0 {
+            return None;
+        }
+        if dest_x >= self.width as f32 || dest_y >= self.height as f32 {
+            return None;
+        }
 
         let grid = area_state.area.get_path_grid(&requester.size());
         let prop_grid = &area_state.prop_pass_grid;
         let entity_grid = &area_state.entity_grid;
 
-        trace!("Finding path from {:?} to within {} of {},{}",
-               requester.location, dest_dist, dest_x, dest_y);
+        trace!(
+            "Finding path from {:?} to within {} of {},{}",
+            requester.location,
+            dest_dist,
+            dest_x,
+            dest_y
+        );
 
         entities_to_ignore.push(requester.index());
 
@@ -124,15 +140,20 @@ impl PathFinder {
         while iterations < MAX_ITERATIONS && !self.open.is_empty() {
             let (current_f_score, current) = self.find_lowest_f_score_in_open_set();
             if self.is_goal(current, dest_dist_squared) {
-                trace!("Path loop time: {}", util::format_elapsed_secs(loop_start_time.elapsed()));
+                trace!(
+                    "Path loop time: {}",
+                    util::format_elapsed_secs(loop_start_time.elapsed())
+                );
                 let path = self.reconstruct_path(current);
-                if path.len() == 1 && path[0].x == requester.location.x &&
-                    path[0].y == requester.location.y {
-                    return None
+                if path.len() == 1
+                    && path[0].x == requester.location.x
+                    && path[0].y == requester.location.y
+                {
+                    return None;
                 } else if reconstruct {
                     return Some(self.reconstruct_path(current));
                 } else {
-                    return Some(Vec::new())
+                    return Some(Vec::new());
                 }
             }
 
@@ -142,7 +163,9 @@ impl PathFinder {
             let neighbors = self.get_neighbors(current);
             for i in 0..4 {
                 let neighbor = neighbors[i];
-                if neighbor == -1 { continue; }
+                if neighbor == -1 {
+                    continue;
+                }
                 //trace!("Checking neighbor {}", neighbor);
                 if self.closed.contains(&neighbor) {
                     //trace!("Already evaluated.");
@@ -155,23 +178,27 @@ impl PathFinder {
 
                 // this should be equivalent to checking is_passable on the area_state
                 // but significantly faster here, removing unneccesary checks
-                if !grid.is_passable(neighbor_x, neighbor_y) ||
-                    !requester.points(neighbor_x, neighbor_y).all(|p| {
+                if !grid.is_passable(neighbor_x, neighbor_y)
+                    || !requester.points(neighbor_x, neighbor_y).all(|p| {
                         let index = (p.x + p.y * self.width) as usize;
-                        if !prop_grid[index] { return false; }
+                        if !prop_grid[index] {
+                            return false;
+                        }
                         for i in entity_grid[index].iter() {
-                            if !entities_to_ignore.contains(i) { return false; }
+                            if !entities_to_ignore.contains(i) {
+                                return false;
+                            }
                         }
                         true
-                    }) {
-
+                    })
+                {
                     self.closed.insert(neighbor);
                     //trace!("Not passable");
                     continue;
                 }
 
-                let tentative_g_score = self.g_score[current as usize] +
-                    self.get_cost(current, neighbor);
+                let tentative_g_score =
+                    self.g_score[current as usize] + self.get_cost(current, neighbor);
                 if tentative_g_score >= self.g_score[neighbor as usize] {
                     self.open.insert(self.f_score[neighbor as usize], neighbor);
                     //trace!("G score indicates this neighbor is not preferable.");
@@ -244,10 +271,18 @@ impl PathFinder {
         let bottom = point + width;
 
         let mut neighbors = [-1; 4];
-        if top > 0 { neighbors[0] = top; }
-        if bottom < width * height { neighbors[1] = bottom; }
-        if right % width != point % width { neighbors[2] = right; }
-        if left % width != point % width { neighbors[3] = left; }
+        if top > 0 {
+            neighbors[0] = top;
+        }
+        if bottom < width * height {
+            neighbors[1] = bottom;
+        }
+        if right % width != point % width {
+            neighbors[2] = right;
+        }
+        if left % width != point % width {
+            neighbors[3] = left;
+        }
 
         //trace!("Got neighbors for {}: {:?}", point, neighbors);
         neighbors

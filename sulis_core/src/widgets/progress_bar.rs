@@ -15,13 +15,13 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::any::Any;
-use std::rc::Rc;
 use std::cell::RefCell;
+use std::rc::Rc;
 
-use crate::resource::ResourceSet;
 use crate::image::Image;
+use crate::io::{DrawList, GraphicsRenderer};
+use crate::resource::ResourceSet;
 use crate::ui::{LineRenderer, Widget, WidgetKind};
-use crate::io::{GraphicsRenderer, DrawList};
 use crate::util::Point;
 
 use crate::widgets::Label;
@@ -49,15 +49,25 @@ impl ProgressBar {
 }
 
 fn limit(fraction: f32) -> f32 {
-    if fraction < 0.0 { return 0.0; }
-    if fraction > 1.0 { return 1.0; }
+    if fraction < 0.0 {
+        return 0.0;
+    }
+    if fraction > 1.0 {
+        return 1.0;
+    }
     fraction
 }
 
 impl WidgetKind for ProgressBar {
-    fn get_name(&self) -> &str { NAME }
-    fn as_any(&self) -> &Any { self }
-    fn as_any_mut(&mut self) -> &mut Any { self }
+    fn get_name(&self) -> &str {
+        NAME
+    }
+    fn as_any(&self) -> &Any {
+        self
+    }
+    fn as_any_mut(&mut self) -> &mut Any {
+        self
+    }
 
     fn layout(&mut self, widget: &mut Widget) {
         if let Some(ref text) = self.label.borrow().text {
@@ -74,8 +84,13 @@ impl WidgetKind for ProgressBar {
         }
     }
 
-    fn draw(&mut self, renderer: &mut GraphicsRenderer, pixel_size: Point,
-            widget: &Widget, millis: u32) {
+    fn draw(
+        &mut self,
+        renderer: &mut GraphicsRenderer,
+        pixel_size: Point,
+        widget: &Widget,
+        millis: u32,
+    ) {
         if self.fraction > 0.0 {
             if let Some(ref bar) = self.bar {
                 let x = widget.state.inner_left() as f32;
@@ -84,8 +99,15 @@ impl WidgetKind for ProgressBar {
                 let h = widget.state.inner_height() as f32;
 
                 let mut draw_list = DrawList::empty_sprite();
-                bar.append_to_draw_list(&mut draw_list, &widget.state.animation_state,
-                                        x, y, w, h, millis);
+                bar.append_to_draw_list(
+                    &mut draw_list,
+                    &widget.state.animation_state,
+                    x,
+                    y,
+                    w,
+                    h,
+                    millis,
+                );
 
                 // draw only the fractional part for images consisting of only
                 // a single quad
@@ -107,6 +129,8 @@ impl WidgetKind for ProgressBar {
             }
         }
 
-        self.label.borrow_mut().draw(renderer, pixel_size, widget, millis);
+        self.label
+            .borrow_mut()
+            .draw(renderer, pixel_size, widget, millis);
     }
 }

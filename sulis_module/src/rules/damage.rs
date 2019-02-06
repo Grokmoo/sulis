@@ -14,8 +14,8 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::slice::Iter;
 use std::fmt::{self, Display};
+use std::slice::Iter;
 
 use sulis_core::util::gen_rand;
 
@@ -88,7 +88,8 @@ impl DamageList {
             match cur_damage {
                 None => {
                     cur_damage = Some(damage);
-                }, Some(mut cur_damage_unwrapped) => {
+                }
+                Some(mut cur_damage_unwrapped) => {
                     if cur_damage_unwrapped.kind == damage.kind {
                         cur_damage_unwrapped.add(damage);
                     } else {
@@ -102,13 +103,22 @@ impl DamageList {
 
         if let Some(cur_damage) = cur_damage {
             assert!(cur_damage.kind.is_some());
-    damage_list.push(cur_damage);
+            damage_list.push(cur_damage);
         }
 
-        debug!("Created damage list {} to {}, base kind {}", min,
-               max, damage_list[0].kind.unwrap());
+        debug!(
+            "Created damage list {} to {}, base kind {}",
+            min,
+            max,
+            damage_list[0].kind.unwrap()
+        );
         for damage in damage_list.iter() {
-            trace!("Component: {} to {}, kind {:?}", damage.min, damage.max, damage.kind);
+            trace!(
+                "Component: {} to {}, kind {:?}",
+                damage.min,
+                damage.max,
+                damage.kind
+            );
         }
 
         DamageList {
@@ -119,15 +129,25 @@ impl DamageList {
         }
     }
 
-    pub fn iter(&self) -> impl Iterator<Item=&Damage> { self.damage.iter() }
+    pub fn iter(&self) -> impl Iterator<Item = &Damage> {
+        self.damage.iter()
+    }
 
-    pub fn is_empty(&self) -> bool { self.damage.is_empty() }
+    pub fn is_empty(&self) -> bool {
+        self.damage.is_empty()
+    }
 
-    pub fn ap(&self) -> u32 { self.ap }
+    pub fn ap(&self) -> u32 {
+        self.ap
+    }
 
-    pub fn min(&self) -> u32 { self.min }
+    pub fn min(&self) -> u32 {
+        self.min
+    }
 
-    pub fn max(&self) -> u32 { self.max }
+    pub fn max(&self) -> u32 {
+        self.max
+    }
 
     pub fn mult(&self, multiplier: f32) -> DamageList {
         let mut damage_vec = Vec::new();
@@ -168,8 +188,7 @@ use crate::rules::DamageKind::*;
 
 // This array MUST be in the same order as the ordering on the DamageKind enum
 // This is top to bottom declaration order for derived.
-const DAMAGE_KINDS: [DamageKind; 8] = [Slashing, Piercing, Crushing, Acid, Cold,
-    Shock, Fire, Raw];
+const DAMAGE_KINDS: [DamageKind; 8] = [Slashing, Piercing, Crushing, Acid, Cold, Shock, Fire, Raw];
 
 impl DamageKind {
     pub fn iter() -> Iter<'static, DamageKind> {

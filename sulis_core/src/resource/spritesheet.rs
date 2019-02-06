@@ -15,13 +15,13 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::collections::HashMap;
-use std::io::{Error};
-use std::rc::Rc;
+use std::io::Error;
 use std::path::PathBuf;
+use std::rc::Rc;
 
 use crate::image::SimpleImage;
-use crate::resource::{ResourceSet};
-use crate::util::{Point, Size, unable_to_create_error};
+use crate::resource::ResourceSet;
+use crate::util::{unable_to_create_error, Point, Size};
 
 use crate::extern_image::{self, ImageBuffer, Rgba};
 
@@ -42,8 +42,13 @@ pub struct Sprite {
 }
 
 impl Sprite {
-    fn new(sheet_id: &str, sprite_id: &str, image_size: &Size,
-           position: Point, size: Size) -> Sprite {
+    fn new(
+        sheet_id: &str,
+        sprite_id: &str,
+        image_size: &Size,
+        position: Point,
+        size: Size,
+    ) -> Sprite {
         let image_width = image_size.width as f32;
         let image_height = image_size.height as f32;
         let x_min = (position.x as f32) / image_width;
@@ -56,10 +61,7 @@ impl Sprite {
             sprite_id: sprite_id.to_string(),
             position,
             size,
-            tex_coords: [ x_min, y_max,
-                          x_min, y_min,
-                          x_max, y_max,
-                          x_max, y_min ],
+            tex_coords: [x_min, y_max, x_min, y_min, x_max, y_max, x_max, y_min],
         }
     }
 
@@ -73,9 +75,10 @@ impl Sprite {
 }
 
 impl Spritesheet {
-    pub fn new(builder: SpritesheetBuilder,
-               resources: &mut ResourceSet) -> Result<Rc<Spritesheet>, Error> {
-
+    pub fn new(
+        builder: SpritesheetBuilder,
+        resources: &mut ResourceSet,
+    ) -> Result<Rc<Spritesheet>, Error> {
         let mut image = None;
         for dir in builder.source_dirs.iter().rev() {
             let mut filepath = PathBuf::from(dir);
@@ -92,10 +95,13 @@ impl Spritesheet {
 
         let image = match image {
             None => {
-                warn!("Unable to read spritesheet source '{}' from any of '{:?}'",
-                      builder.src, builder.source_dirs);
+                warn!(
+                    "Unable to read spritesheet source '{}' from any of '{:?}'",
+                    builder.src, builder.source_dirs
+                );
                 return unable_to_create_error("spritesheet", &builder.id);
-            }, Some(img) => img,
+            }
+            Some(img) => img,
         };
 
         let image = image.to_rgba();
@@ -112,14 +118,16 @@ impl Spritesheet {
                         None => {
                             warn!("Template '{}' not found", id);
                             continue;
-                        }, Some(ref templates) => templates,
+                        }
+                        Some(ref templates) => templates,
                     };
 
                     match templates.get(id) {
                         None => {
                             warn!("Template '{}' not found", id);
                             continue;
-                        }, Some(template) => Some(template.clone()),
+                        }
+                        Some(template) => Some(template.clone()),
                     }
                 }
             };
@@ -132,10 +140,14 @@ impl Spritesheet {
             let base_pos = group.position;
 
             let mut areas: HashMap<String, Vec<i32>> = HashMap::new();
-            group.areas.drain().for_each(|(k, v)| { areas.insert(k, v); });
+            group.areas.drain().for_each(|(k, v)| {
+                areas.insert(k, v);
+            });
 
             if let Some(template) = template.as_mut() {
-                template.areas.drain().for_each(|(k, v)| { areas.insert(k, v); });
+                template.areas.drain().for_each(|(k, v)| {
+                    areas.insert(k, v);
+                });
             }
 
             for (base_id, area_pos) in areas {
@@ -146,9 +158,15 @@ impl Spritesheet {
 
                 let (mut pos, mut size) = match area_pos.len() {
                     2 => (base_pos.add(area_pos[0], area_pos[1]), base_size),
-                    4 => (base_pos.add(area_pos[0], area_pos[1]), base_size.add(area_pos[2], area_pos[3])),
+                    4 => (
+                        base_pos.add(area_pos[0], area_pos[1]),
+                        base_size.add(area_pos[2], area_pos[3]),
+                    ),
                     _ => {
-                        warn!("Error in definition for sprite '{}' in sheet '{}'", id, builder.id);
+                        warn!(
+                            "Error in definition for sprite '{}' in sheet '{}'",
+                            id, builder.id
+                        );
                         warn!("Coordinates must either by [x, y] or [x, y, w, h]");
                         continue;
                     }
@@ -156,7 +174,12 @@ impl Spritesheet {
 
                 pos.mult_mut(multiplier);
                 size.mult_mut(multiplier);
-                trace!("Creating sprite with id '{}' in '{}', {:?}", id, builder.id, size);
+                trace!(
+                    "Creating sprite with id '{}' in '{}', {:?}",
+                    id,
+                    builder.id,
+                    size
+                );
                 let sprite = Sprite::new(&builder.id, &id, &image_size, pos, size);
 
                 if sprites.contains_key(&id) {
@@ -166,12 +189,17 @@ impl Spritesheet {
 
                 let upper_bound_pos = sprite.position.add(sprite.size.width, sprite.size.height);
 
-                if !sprite.position.in_bounds(image_width as i32 + 1, image_height as i32 + 1) ||
-                    !upper_bound_pos.in_bounds(image_width as i32 + 1, image_height as i32 + 1) {
-                        warn!("Sprite '{}' in sheet '{}' coordinates fall outside image bounds",
-                              id, builder.id);
-                        continue;
-                    }
+                if !sprite
+                    .position
+                    .in_bounds(image_width as i32 + 1, image_height as i32 + 1)
+                    || !upper_bound_pos.in_bounds(image_width as i32 + 1, image_height as i32 + 1)
+                {
+                    warn!(
+                        "Sprite '{}' in sheet '{}' coordinates fall outside image bounds",
+                        id, builder.id
+                    );
+                    continue;
+                }
 
                 let sprite = Rc::new(sprite);
 

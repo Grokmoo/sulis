@@ -15,8 +15,8 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::any::Any;
-use std::rc::Rc;
 use std::cell::RefCell;
+use std::rc::Rc;
 
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_core::widgets::{Button, Label, TextArea};
@@ -30,7 +30,10 @@ pub struct GameOverWindow {
 
 impl GameOverWindow {
     pub fn new(menu_callback: Callback, content_text: String) -> Rc<RefCell<GameOverWindow>> {
-        Rc::new(RefCell::new(GameOverWindow { menu_callback, content_text }))
+        Rc::new(RefCell::new(GameOverWindow {
+            menu_callback,
+            content_text,
+        }))
     }
 }
 
@@ -43,7 +46,9 @@ impl WidgetKind for GameOverWindow {
         let label = Widget::with_theme(Label::empty(), "title");
         let content = Widget::with_theme(TextArea::new(&self.content_text), "content");
         let exit = Widget::with_theme(Button::empty(), "exit");
-        exit.borrow_mut().state.add_callback(self.menu_callback.clone());
+        exit.borrow_mut()
+            .state
+            .add_callback(self.menu_callback.clone());
 
         vec![label, exit, content]
     }

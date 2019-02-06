@@ -14,18 +14,18 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::time;
 use std::any::Any;
-use std::rc::Rc;
 use std::cell::{Cell, RefCell};
+use std::rc::Rc;
+use std::time;
 
-use sulis_core::util;
 use sulis_core::ui::{Callback, Widget, WidgetKind};
+use sulis_core::util;
 use sulis_core::widgets::{Button, Label};
-use sulis_module::{Slot, QuickSlot};
-use sulis_state::{EntityState, ChangeListener, GameState, script::ScriptItemKind};
+use sulis_module::{QuickSlot, Slot};
+use sulis_state::{script::ScriptItemKind, ChangeListener, EntityState, GameState};
 
-use crate::{item_button::*, ItemListPane, ItemButton, item_list_pane::Filter};
+use crate::{item_button::*, item_list_pane::Filter, ItemButton, ItemListPane};
 
 pub const NAME: &str = "inventory_window";
 
@@ -59,38 +59,56 @@ impl WidgetKind for InventoryWindow {
         let start_time = time::Instant::now();
 
         let stash = GameState::party_stash();
-        stash.borrow_mut().listeners.add(ChangeListener::invalidate(NAME, widget));
-        self.entity.borrow_mut().actor.listeners.add(
-            ChangeListener::invalidate(NAME, widget));
+        stash
+            .borrow_mut()
+            .listeners
+            .add(ChangeListener::invalidate(NAME, widget));
+        self.entity
+            .borrow_mut()
+            .actor
+            .listeners
+            .add(ChangeListener::invalidate(NAME, widget));
 
         let widget_ref = Rc::clone(widget);
-        GameState::add_party_listener(ChangeListener::new(NAME, Box::new(move |entity| {
-            let entity = match entity {
-                None => return,
-                Some(entity) => entity,
-            };
-            let window = Widget::kind_mut::<InventoryWindow>(&widget_ref);
-            window.entity = Rc::clone(entity);
-            widget_ref.borrow_mut().invalidate_children();
-        })));
+        GameState::add_party_listener(ChangeListener::new(
+            NAME,
+            Box::new(move |entity| {
+                let entity = match entity {
+                    None => return,
+                    Some(entity) => entity,
+                };
+                let window = Widget::kind_mut::<InventoryWindow>(&widget_ref);
+                window.entity = Rc::clone(entity);
+                widget_ref.borrow_mut().invalidate_children();
+            }),
+        ));
 
         let close = Widget::with_theme(Button::empty(), "close");
-        close.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let (parent, _) = Widget::parent::<InventoryWindow>(widget);
-            parent.borrow_mut().mark_for_removal();
-        })));
+        close
+            .borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(|widget, _| {
+                let (parent, _) = Widget::parent::<InventoryWindow>(widget);
+                parent.borrow_mut().mark_for_removal();
+            })));
 
         let swap_weapons = Widget::with_theme(Button::empty(), "swap_weapons");
         let entity_ref = Rc::clone(&self.entity);
-        swap_weapons.borrow_mut().state.add_callback(Callback::new(Rc::new(move |_, _| {
-            entity_ref.borrow_mut().actor.swap_weapon_set();
-        })));
-        swap_weapons.borrow_mut().state.set_enabled(self.entity.borrow().actor.can_swap_weapons());
+        swap_weapons
+            .borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(move |_, _| {
+                entity_ref.borrow_mut().actor.swap_weapon_set();
+            })));
+        swap_weapons
+            .borrow_mut()
+            .state
+            .set_enabled(self.entity.borrow().actor.can_swap_weapons());
 
         let ref actor = self.entity.borrow().actor;
 
-        let item_list_pane = Widget::with_defaults(ItemListPane::new_entity(&self.entity,
-                                                                            &self.filter));
+        let item_list_pane =
+            Widget::with_defaults(ItemListPane::new_entity(&self.entity, &self.filter));
 
         let equipped_area = Widget::empty("equipped_area");
         for slot in Slot::iter() {
@@ -101,12 +119,17 @@ impl WidgetKind for InventoryWindow {
                     let button = Widget::empty(&theme_id);
                     button.borrow_mut().state.set_enabled(false);
                     Widget::add_child_to(&equipped_area, button);
-                }, Some(item_state) => {
+                }
+                Some(item_state) => {
                     let button = ItemButton::equipped(&self.entity, &item_state.item, *slot);
                     if actor.can_unequip(*slot) {
                         let mut but = button.borrow_mut();
                         but.add_action("Unequip", unequip_item_cb(&self.entity, *slot), true);
-                        but.add_action("Drop", unequip_and_drop_item_cb(&self.entity, *slot), false);
+                        but.add_action(
+                            "Drop",
+                            unequip_and_drop_item_cb(&self.entity, *slot),
+                            false,
+                        );
                     }
 
                     Widget::add_child_to(&equipped_area, Widget::with_theme(button, &theme_id));
@@ -123,29 +146,35 @@ impl WidgetKind for InventoryWindow {
                     let button = Widget::empty(&theme_id);
                     button.borrow_mut().state.set_enabled(false);
                     Widget::add_child_to(&equipped_area, button);
-                }, Some(item_state) => {
+                }
+                Some(item_state) => {
                     let quantity = 1 + stash.borrow().items().get_quantity(&item_state);
-                    let but = ItemButton::quick(&self.entity, quantity, &item_state.item,
-                        *quick_slot);
+                    let but =
+                        ItemButton::quick(&self.entity, quantity, &item_state.item, *quick_slot);
 
                     if actor.can_use_quick(*quick_slot) {
                         let kind = ScriptItemKind::Quick(*quick_slot);
-                        but.borrow_mut().add_action("Use", use_item_cb(&self.entity, kind), true);
+                        but.borrow_mut()
+                            .add_action("Use", use_item_cb(&self.entity, kind), true);
                     }
 
-                    but.borrow_mut().add_action("Clear Slot",
-                        clear_quickslot_cb(&self.entity, *quick_slot), false);
+                    but.borrow_mut().add_action(
+                        "Clear Slot",
+                        clear_quickslot_cb(&self.entity, *quick_slot),
+                        false,
+                    );
 
                     Widget::add_child_to(&equipped_area, Widget::with_theme(but, &theme_id));
                 }
             }
         }
 
-
         let stash_title = Widget::with_theme(Label::empty(), "stash_title");
 
-        trace!("Inventory window creation time: {}",
-               util::format_elapsed_secs(start_time.elapsed()));
+        trace!(
+            "Inventory window creation time: {}",
+            util::format_elapsed_secs(start_time.elapsed())
+        );
 
         vec![close, equipped_area, item_list_pane, stash_title]
     }

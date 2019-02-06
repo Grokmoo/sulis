@@ -22,22 +22,22 @@ use self::Attribute::*;
 #[derive(Deserialize, Serialize, Debug, Copy, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct AttributeList {
-    #[serde(rename="str")]
+    #[serde(rename = "str")]
     pub strength: u8,
 
-    #[serde(rename="dex")]
+    #[serde(rename = "dex")]
     pub dexterity: u8,
 
-    #[serde(rename="end")]
+    #[serde(rename = "end")]
     pub endurance: u8,
 
-    #[serde(rename="per")]
+    #[serde(rename = "per")]
     pub perception: u8,
 
-    #[serde(rename="int")]
+    #[serde(rename = "int")]
     pub intellect: u8,
 
-    #[serde(rename="wis")]
+    #[serde(rename = "wis")]
     pub wisdom: u8,
 }
 
@@ -130,7 +130,9 @@ pub enum Attribute {
     Wisdom,
 }
 
-const ATTRS_LIST: [Attribute; 6] = [ Strength, Dexterity, Endurance, Perception, Intellect, Wisdom ];
+const ATTRS_LIST: [Attribute; 6] = [
+    Strength, Dexterity, Endurance, Perception, Intellect, Wisdom,
+];
 
 impl Attribute {
     pub fn from(text: &str) -> Option<Attribute> {

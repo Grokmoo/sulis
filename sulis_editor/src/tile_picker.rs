@@ -21,9 +21,9 @@ use std::rc::Rc;
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::ui::{Callback, Color, Widget, WidgetKind};
 use sulis_core::util::Point;
-use sulis_module::Module;
-use sulis_module::area::Tile;
 use sulis_core::widgets::{Button, ScrollPane};
+use sulis_module::area::Tile;
+use sulis_module::Module;
 
 use crate::{AreaModel, EditorMode};
 
@@ -48,16 +48,28 @@ impl TilePicker {
 }
 
 impl EditorMode for TilePicker {
-    fn draw_mode(&mut self, renderer: &mut GraphicsRenderer, _model: &AreaModel, x: f32, y: f32,
-                 scale_x: f32, scale_y: f32, _millis: u32) {
-
+    fn draw_mode(
+        &mut self,
+        renderer: &mut GraphicsRenderer,
+        _model: &AreaModel,
+        x: f32,
+        y: f32,
+        scale_x: f32,
+        scale_y: f32,
+        _millis: u32,
+    ) {
         if !self.removal_tiles.is_empty() {
             let mut draw_list = DrawList::empty_sprite();
             for &(pos, ref tile) in self.removal_tiles.iter() {
                 let x = x + pos.x as f32;
                 let y = y + pos.y as f32;
-                draw_list.append(&mut DrawList::from_sprite_f32(&tile.image_display, x, y,
-                                                                tile.width as f32, tile.height as f32));
+                draw_list.append(&mut DrawList::from_sprite_f32(
+                    &tile.image_display,
+                    x,
+                    y,
+                    tile.width as f32,
+                    tile.height as f32,
+                ));
             }
 
             draw_list.set_color(Color::from_string("F008"));
@@ -77,8 +89,13 @@ impl EditorMode for TilePicker {
 
         let x = x + pos.x as f32;
         let y = y + pos.y as f32;
-        let mut draw_list = DrawList::from_sprite_f32(&tile.image_display, x, y, tile.width as f32,
-                                                      tile.height as f32);
+        let mut draw_list = DrawList::from_sprite_f32(
+            &tile.image_display,
+            x,
+            y,
+            tile.width as f32,
+            tile.height as f32,
+        );
         draw_list.set_color(Color::from_string("FFF8"));
         draw_list.set_scale(scale_x, scale_y);
         renderer.draw(draw_list);
@@ -127,11 +144,17 @@ impl EditorMode for TilePicker {
 }
 
 impl WidgetKind for TilePicker {
-    fn get_name(&self) -> &str { NAME }
+    fn get_name(&self) -> &str {
+        NAME
+    }
 
-    fn as_any(&self) -> &Any { self }
+    fn as_any(&self) -> &Any {
+        self
+    }
 
-    fn as_any_mut(&mut self) -> &mut Any { self }
+    fn as_any_mut(&mut self) -> &mut Any {
+        self
+    }
 
     fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let mut all_tiles = Module::all_tiles();
@@ -148,11 +171,14 @@ impl WidgetKind for TilePicker {
         for layer in layers {
             let button = Widget::with_theme(Button::with_text(&layer), "layer_button");
             let layer_ref = layer.clone();
-            button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-                let (parent, tile_picker) = Widget::parent_mut::<TilePicker>(widget);
-                tile_picker.cur_layer = Some(layer_ref.clone());
-                parent.borrow_mut().invalidate_children();
-            })));
+            button
+                .borrow_mut()
+                .state
+                .add_callback(Callback::new(Rc::new(move |widget, _| {
+                    let (parent, tile_picker) = Widget::parent_mut::<TilePicker>(widget);
+                    tile_picker.cur_layer = Some(layer_ref.clone());
+                    parent.borrow_mut().invalidate_children();
+                })));
 
             Widget::add_child_to(&layers_content, button);
         }
@@ -164,10 +190,15 @@ impl WidgetKind for TilePicker {
 
         let scrollpane = ScrollPane::new();
         for tile in all_tiles {
-            if &tile.layer != cur_layer { continue; }
+            if &tile.layer != cur_layer {
+                continue;
+            }
 
             let button = Widget::with_theme(Button::empty(), "tile_button");
-            button.borrow_mut().state.add_text_arg("icon", &tile.image_display.full_id());
+            button
+                .borrow_mut()
+                .state
+                .add_text_arg("icon", &tile.image_display.full_id());
 
             let cb: Callback = Callback::new(Rc::new(move |widget, _kind| {
                 let parent = Widget::direct_parent(widget);

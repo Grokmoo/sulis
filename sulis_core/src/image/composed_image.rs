@@ -14,13 +14,13 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::rc::Rc;
 use std::io::{Error, ErrorKind};
+use std::rc::Rc;
 
-use crate::image::{Image, SimpleImage};
 use crate::image::simple_image::SimpleImageBuilder;
-use crate::resource::{ResourceSet};
+use crate::image::{Image, SimpleImage};
 use crate::io::{DrawList, GraphicsRenderer};
+use crate::resource::ResourceSet;
 use crate::ui::AnimationState;
 use crate::util::{invalid_data_error, Size};
 
@@ -35,8 +35,10 @@ pub struct ComposedImage {
     middle_size: Size,
 }
 
-fn get_images_from_grid(grid: Vec<String>,
-                        resources: &ResourceSet) -> Result<Vec<Rc<Image>>, Error> {
+fn get_images_from_grid(
+    grid: Vec<String>,
+    resources: &ResourceSet,
+) -> Result<Vec<Rc<Image>>, Error> {
     let mut images_vec: Vec<Rc<Image>> = Vec::new();
     for id in grid {
         let image = resources.images.get(&id);
@@ -51,8 +53,11 @@ fn get_images_from_grid(grid: Vec<String>,
     Ok(images_vec)
 }
 
-fn get_images_from_inline(grid: Vec<String>, sub_image_data: SubImageData,
-                          resources: &mut ResourceSet) -> Result<Vec<Rc<Image>>, Error> {
+fn get_images_from_inline(
+    grid: Vec<String>,
+    sub_image_data: SubImageData,
+    resources: &mut ResourceSet,
+) -> Result<Vec<Rc<Image>>, Error> {
     let size = sub_image_data.size;
     let spritesheet = sub_image_data.spritesheet;
 
@@ -62,7 +67,7 @@ fn get_images_from_inline(grid: Vec<String>, sub_image_data: SubImageData,
         let builder = SimpleImageBuilder {
             id: id.clone(),
             image_display,
-            size
+            size,
         };
         let image = SimpleImage::new(builder, resources)?;
         resources.images.insert(id, Rc::clone(&image));
@@ -73,30 +78,42 @@ fn get_images_from_inline(grid: Vec<String>, sub_image_data: SubImageData,
 }
 
 impl ComposedImage {
-    pub fn new(builder: ComposedImageBuilder,
-               resources: &mut ResourceSet) -> Result<Rc<Image>, Error> {
+    pub fn new(
+        builder: ComposedImageBuilder,
+        resources: &mut ResourceSet,
+    ) -> Result<Rc<Image>, Error> {
         if builder.grid.len() as i32 != GRID_LEN {
             return invalid_data_error(&format!("Composed image grid must be length {}", GRID_LEN));
         }
 
         let images_vec = match builder.generate_sub_images {
-            Some(sub_image_data) => get_images_from_inline(builder.grid, sub_image_data, resources)?,
+            Some(sub_image_data) => {
+                get_images_from_inline(builder.grid, sub_image_data, resources)?
+            }
             None => get_images_from_grid(builder.grid, resources)?,
         };
 
         // verify heights make sense for the grid
         let mut total_height = 0;
         for y in 0..GRID_DIM {
-            let row_height = images_vec.get((y * GRID_DIM) as usize)
-                .unwrap().get_size().height;
+            let row_height = images_vec
+                .get((y * GRID_DIM) as usize)
+                .unwrap()
+                .get_size()
+                .height;
 
             for x in 0..GRID_DIM {
-                let height = images_vec.get((y * GRID_DIM + x) as usize)
-                    .unwrap().get_size().height;
+                let height = images_vec
+                    .get((y * GRID_DIM + x) as usize)
+                    .unwrap()
+                    .get_size()
+                    .height;
 
                 if height != row_height {
-                    return Err(Error::new(ErrorKind::InvalidData,
-                         format!("All images in row {} must have the same height", y)));
+                    return Err(Error::new(
+                        ErrorKind::InvalidData,
+                        format!("All images in row {} must have the same height", y),
+                    ));
                 }
             }
             total_height += row_height;
@@ -108,12 +125,17 @@ impl ComposedImage {
             let col_width = images_vec.get(x as usize).unwrap().get_size().width;
 
             for y in 0..GRID_DIM {
-                let width = images_vec.get((y * GRID_DIM + x) as usize)
-                    .unwrap().get_size().width;
+                let width = images_vec
+                    .get((y * GRID_DIM + x) as usize)
+                    .unwrap()
+                    .get_size()
+                    .width;
 
                 if width != col_width {
-                    return Err(Error::new(ErrorKind::InvalidData,
-                        format!("All images in col {} must have the same width", x)));
+                    return Err(Error::new(
+                        ErrorKind::InvalidData,
+                        format!("All images in col {} must have the same width", x),
+                    ));
                 }
             }
             total_width += col_width;
@@ -131,8 +153,16 @@ impl ComposedImage {
 }
 
 impl Image for ComposedImage {
-    fn append_to_draw_list(&self, draw_list: &mut DrawList, state: &AnimationState,
-                           x: f32, y: f32, w: f32, h: f32, millis: u32) {
+    fn append_to_draw_list(
+        &self,
+        draw_list: &mut DrawList,
+        state: &AnimationState,
+        x: f32,
+        y: f32,
+        w: f32,
+        h: f32,
+        millis: u32,
+    ) {
         let fill_width = w - (self.size.width - self.middle_size.width) as f32;
         let fill_height = h - (self.size.height - self.middle_size.height) as f32;
 
@@ -188,8 +218,16 @@ impl Image for ComposedImage {
         image.append_to_draw_list(draw_list, state, draw_x, draw_y, draw_w, draw_h, millis);
     }
 
-    fn draw(&self, renderer: &mut GraphicsRenderer, state: &AnimationState,
-            x: f32, y: f32, w: f32, h: f32, millis: u32) {
+    fn draw(
+        &self,
+        renderer: &mut GraphicsRenderer,
+        state: &AnimationState,
+        x: f32,
+        y: f32,
+        w: f32,
+        h: f32,
+        millis: u32,
+    ) {
         let mut draw_list = DrawList::empty_sprite();
         self.append_to_draw_list(&mut draw_list, state, x, y, w, h, millis);
         renderer.draw(draw_list);
@@ -207,9 +245,10 @@ impl Image for ComposedImage {
         &self.size
     }
 
-    fn id(&self) -> String { self.id.clone() }
+    fn id(&self) -> String {
+        self.id.clone()
+    }
 }
-
 
 #[derive(Deserialize, Debug)]
 #[serde(deny_unknown_fields)]

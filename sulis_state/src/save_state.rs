@@ -14,22 +14,25 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::cell::RefCell;
+use std::collections::HashMap;
 use std::io::Error;
 use std::rc::Rc;
-use std::cell::RefCell;
 use std::u64;
-use std::collections::HashMap;
 
-use sulis_core::util::{Point, ExtInt};
-use sulis_module::{actor::{ActorBuilder, RewardBuilder}, ItemSaveState, ItemListEntrySaveState,
-    QuickSlot, Slot, BonusList};
+use sulis_core::util::{ExtInt, Point};
+use sulis_module::{
+    actor::{ActorBuilder, RewardBuilder},
+    BonusList, ItemListEntrySaveState, ItemSaveState, QuickSlot, Slot,
+};
 
-use crate::{ActorState, effect, Effect, EntityState, Formation, GameState, Location,
-    PropState, prop_state::Interactive, MerchantState, WorldMapState, PStats, QuestState,
-    turn_manager::EncounterRef};
-use crate::area_state::{TriggerState};
-use crate::script::CallbackData;
 use crate::animation::AnimSaveState;
+use crate::area_state::TriggerState;
+use crate::script::CallbackData;
+use crate::{
+    effect, prop_state::Interactive, turn_manager::EncounterRef, ActorState, Effect, EntityState,
+    Formation, GameState, Location, MerchantState, PStats, PropState, QuestState, WorldMapState,
+};
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
@@ -53,7 +56,9 @@ pub struct SaveState {
     pub(crate) total_elapsed_millis: usize,
 }
 
-fn default_zoom() -> f32 { 1.0 }
+fn default_zoom() -> f32 {
+    1.0
+}
 
 impl SaveState {
     pub fn create() -> SaveState {
@@ -290,27 +295,29 @@ impl PropSaveState {
         use self::PropInteractiveSaveState::*;
         let interactive = match prop_state.interactive {
             Interactive::Not => Not,
-            Interactive::Container { ref items, ref loot_to_generate, temporary } => {
+            Interactive::Container {
+                ref items,
+                ref loot_to_generate,
+                temporary,
+            } => {
                 let loot_to_generate = match loot_to_generate {
                     None => None,
                     Some(ref loot_list) => Some(loot_list.id.to_string()),
                 };
 
-                let items = items.iter().map(|(qty, ref it)|
-                    ItemListEntrySaveState::new(*qty, &it.item)).collect();
+                let items = items
+                    .iter()
+                    .map(|(qty, ref it)| ItemListEntrySaveState::new(*qty, &it.item))
+                    .collect();
 
                 Container {
                     loot_to_generate,
                     temporary,
                     items,
                 }
-            },
-            Interactive::Door { open } => Door {
-                open,
-            },
-            Interactive::Hover { ref text } => Hover {
-                text: text.clone(),
-            },
+            }
+            Interactive::Door { open } => Door { open },
+            Interactive::Hover { ref text } => Hover { text: text.clone() },
         };
 
         PropSaveState {
@@ -337,7 +344,7 @@ pub enum PropInteractiveSaveState {
     },
     Hover {
         text: String,
-    }
+    },
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -374,8 +381,11 @@ pub struct MerchantSaveState {
 
 impl MerchantSaveState {
     pub fn new(merchant: &MerchantState) -> MerchantSaveState {
-        let items = merchant.items().iter().map(|(q, ref it)|
-            ItemListEntrySaveState::new(*q, &it.item)).collect();
+        let items = merchant
+            .items()
+            .iter()
+            .map(|(q, ref it)| ItemListEntrySaveState::new(*q, &it.item))
+            .collect();
 
         MerchantSaveState {
             id: merchant.id.to_string(),
@@ -389,7 +399,9 @@ impl MerchantSaveState {
     }
 }
 
-fn serde_true() -> bool { true }
+fn serde_true() -> bool {
+    true
+}
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
@@ -404,7 +416,7 @@ pub struct EntitySaveState {
     pub(crate) ai_group: Option<usize>,
     pub(crate) ai_active: bool,
 
-    #[serde(default="serde_true")]
+    #[serde(default = "serde_true")]
     pub(crate) show_portrait: bool,
 
     #[serde(default)]
@@ -425,13 +437,11 @@ impl EntitySaveState {
 
             let reward = match actor.reward {
                 None => None,
-                Some(ref reward) => {
-                    Some(RewardBuilder {
-                        xp: reward.xp,
-                        loot: reward.loot.as_ref().map(|l| l.id.to_string()),
-                        loot_chance: Some(reward.loot_chance),
-                    })
-                }
+                Some(ref reward) => Some(RewardBuilder {
+                    xp: reward.xp,
+                    loot: reward.loot.as_ref().map(|l| l.id.to_string()),
+                    loot_chance: Some(reward.loot_chance),
+                }),
             };
 
             let mut abilities: Vec<String> = Vec::new();
@@ -470,9 +480,10 @@ impl EntitySaveState {
             None
         };
 
-        let flags = entity.custom_flags().map(|(k, v)| {
-            (k.to_string(), v.to_string())
-        }).collect();
+        let flags = entity
+            .custom_flags()
+            .map(|(k, v)| (k.to_string(), v.to_string()))
+            .collect();
 
         EntitySaveState {
             unique_id: entity.unique_id().to_string(),
@@ -540,9 +551,12 @@ impl ActorSaveState {
 
         let mut ability_states = HashMap::new();
         for (id, ref ability_state) in actor_state.ability_states.iter() {
-            ability_states.insert(id.to_string(), AbilitySaveState {
-                remaining_duration: ability_state.remaining_duration(),
-            });
+            ability_states.insert(
+                id.to_string(),
+                AbilitySaveState {
+                    remaining_duration: ability_state.remaining_duration(),
+                },
+            );
         }
 
         ActorSaveState {

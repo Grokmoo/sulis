@@ -15,12 +15,12 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::any::Any;
-use std::rc::Rc;
 use std::cell::RefCell;
+use std::rc::Rc;
 
+use crate::ui::{Callback, Widget, WidgetKind};
 use crate::widget_kind;
 use crate::widgets::{Button, Label};
-use crate::ui::{Callback, Widget, WidgetKind};
 
 pub struct ConfirmationWindow {
     accept_callback: Callback,
@@ -69,12 +69,22 @@ impl WidgetKind for ConfirmationWindow {
     }
 
     fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
-        self.cancel.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let (parent, _) = Widget::parent::<ConfirmationWindow>(widget);
-            parent.borrow_mut().mark_for_removal();
-        })));
-        self.accept.borrow_mut().state.add_callback(self.accept_callback.clone());
+        self.cancel
+            .borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(|widget, _| {
+                let (parent, _) = Widget::parent::<ConfirmationWindow>(widget);
+                parent.borrow_mut().mark_for_removal();
+            })));
+        self.accept
+            .borrow_mut()
+            .state
+            .add_callback(self.accept_callback.clone());
 
-        vec![Rc::clone(&self.cancel), Rc::clone(&self.accept), Rc::clone(&self.title)]
+        vec![
+            Rc::clone(&self.cancel),
+            Rc::clone(&self.accept),
+            Rc::clone(&self.title),
+        ]
     }
 }

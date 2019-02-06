@@ -15,13 +15,13 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::any::Any;
-use std::rc::Rc;
 use std::cell::RefCell;
+use std::rc::Rc;
 
 use sulis_core::ui::{Callback, Widget, WidgetKind};
-use sulis_core::widgets::{Label, Button, TextArea, ScrollPane};
-use sulis_module::{Quest, Module, on_trigger::QuestEntryState};
-use sulis_state::{GameState, ChangeListener};
+use sulis_core::widgets::{Button, Label, ScrollPane, TextArea};
+use sulis_module::{on_trigger::QuestEntryState, Module, Quest};
+use sulis_state::{ChangeListener, GameState};
 
 pub const NAME: &str = "quest_window";
 
@@ -56,20 +56,29 @@ impl WidgetKind for QuestWindow {
         }
 
         let close = Widget::with_theme(Button::empty(), "close");
-            close.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
+        close
+            .borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(|widget, _| {
                 let (parent, _) = Widget::parent::<QuestWindow>(widget);
                 parent.borrow_mut().mark_for_removal();
             })));
 
         let show_completed_toggle = Widget::with_theme(Button::empty(), "show_completed_toggle");
-        show_completed_toggle.borrow_mut().state.set_active(self.show_completed);
-        show_completed_toggle.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let (parent, window) = Widget::parent_mut::<QuestWindow>(widget);
-            let cur = window.show_completed;
-            window.show_completed = !cur;
-            window.active_quest = None;
-            parent.borrow_mut().invalidate_children();
-        })));
+        show_completed_toggle
+            .borrow_mut()
+            .state
+            .set_active(self.show_completed);
+        show_completed_toggle
+            .borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(|widget, _| {
+                let (parent, window) = Widget::parent_mut::<QuestWindow>(widget);
+                let cur = window.show_completed;
+                window.show_completed = !cur;
+                window.active_quest = None;
+                parent.borrow_mut().invalidate_children();
+            })));
 
         let show_completed_label = Widget::with_theme(Label::empty(), "show_completed_label");
 
@@ -91,25 +100,36 @@ impl WidgetKind for QuestWindow {
                 QuestEntryState::Visible => selected,
                 QuestEntryState::Active => true,
                 QuestEntryState::Complete => {
-                    if !self.show_completed { continue; }
+                    if !self.show_completed {
+                        continue;
+                    }
                     selected
-                },
+                }
             };
 
             let button = Widget::with_theme(Button::empty(), "quest_button");
             button.borrow_mut().state.set_active(active);
 
             let quest_ref = Rc::clone(&quest);
-            button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-                let (window, quest_window) = Widget::parent_mut::<QuestWindow>(widget);
-                quest_window.active_quest = Some(Rc::clone(&quest_ref));
-                window.borrow_mut().invalidate_children();
-            })));
+            button
+                .borrow_mut()
+                .state
+                .add_callback(Callback::new(Rc::new(move |widget, _| {
+                    let (window, quest_window) = Widget::parent_mut::<QuestWindow>(widget);
+                    quest_window.active_quest = Some(Rc::clone(&quest_ref));
+                    window.borrow_mut().invalidate_children();
+                })));
 
             let text_area = Widget::with_defaults(TextArea::empty());
-            text_area.borrow_mut().state.add_text_arg("name", &quest.name);
+            text_area
+                .borrow_mut()
+                .state
+                .add_text_arg("name", &quest.name);
             match quests.state(&quest.id) {
-                QuestEntryState::Complete => text_area.borrow_mut().state.add_text_arg("complete", "true"),
+                QuestEntryState::Complete => text_area
+                    .borrow_mut()
+                    .state
+                    .add_text_arg("complete", "true"),
                 _ => (),
             }
 
@@ -124,7 +144,6 @@ impl WidgetKind for QuestWindow {
         if let Some(ref quest) = self.active_quest {
             if let Some(ref quest_state) = quests.quest(&quest.id) {
                 for (id, _quest_entry) in quest_state.iter().rev() {
-
                     let active = match quests.entry_state(&quest.id, id) {
                         QuestEntryState::Hidden => continue,
                         QuestEntryState::Visible => false,
@@ -148,7 +167,12 @@ impl WidgetKind for QuestWindow {
             }
         }
 
-        vec![close, quest_list_widget, quest_entries_widget, show_completed_toggle,
-            show_completed_label]
+        vec![
+            close,
+            quest_list_widget,
+            quest_entries_widget,
+            show_completed_toggle,
+            show_completed_label,
+        ]
     }
 }

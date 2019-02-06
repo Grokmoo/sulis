@@ -15,15 +15,15 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::any::Any;
-use std::rc::Rc;
 use std::cell::RefCell;
+use std::rc::Rc;
 
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_core::widgets::{Button, Label};
-use sulis_module::{Module, Class};
+use sulis_module::{Class, Module};
 
-use crate::{CharacterBuilder, ClassPane};
 use crate::character_builder::BuilderPane;
+use crate::{CharacterBuilder, ClassPane};
 
 pub const NAME: &str = "class_selector_pane";
 
@@ -47,7 +47,11 @@ impl BuilderPane for ClassSelectorPane {
     fn on_selected(&mut self, builder: &mut CharacterBuilder, widget: Rc<RefCell<Widget>>) {
         builder.class = None;
         builder.prev.borrow_mut().state.set_enabled(self.allow_prev);
-        builder.next.borrow_mut().state.set_enabled(self.selected_class.is_some());
+        builder
+            .next
+            .borrow_mut()
+            .state
+            .set_enabled(self.selected_class.is_some());
         widget.borrow_mut().invalidate_children();
     }
 
@@ -69,9 +73,15 @@ impl BuilderPane for ClassSelectorPane {
 }
 
 impl WidgetKind for ClassSelectorPane {
-    fn get_name(&self) -> &str { NAME }
-    fn as_any(&self) -> &Any { self }
-    fn as_any_mut(&mut self) -> &mut Any { self }
+    fn get_name(&self) -> &str {
+        NAME
+    }
+    fn as_any(&self) -> &Any {
+        self
+    }
+    fn as_any_mut(&mut self) -> &mut Any {
+        self
+    }
 
     fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let title = Widget::with_theme(Label::empty(), "title");
@@ -82,24 +92,34 @@ impl WidgetKind for ClassSelectorPane {
                 None => {
                     warn!("Selectable class '{}' not found", class_id);
                     continue;
-                }, Some(class) => class,
+                }
+                Some(class) => class,
             };
 
             let class_button = Widget::with_theme(Button::empty(), "class_button");
-            class_button.borrow_mut().state.add_text_arg("name", &class.name);
+            class_button
+                .borrow_mut()
+                .state
+                .add_text_arg("name", &class.name);
             if let Some(ref selected_class) = self.selected_class {
-                class_button.borrow_mut().state.set_active(class == *selected_class);
+                class_button
+                    .borrow_mut()
+                    .state
+                    .set_active(class == *selected_class);
             }
 
             let class_ref = Rc::clone(&class);
-            class_button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-                let (parent, pane) = Widget::parent_mut::<ClassSelectorPane>(widget);
-                pane.selected_class = Some(Rc::clone(&class_ref));
-                parent.borrow_mut().invalidate_children();
+            class_button
+                .borrow_mut()
+                .state
+                .add_callback(Callback::new(Rc::new(move |widget, _| {
+                    let (parent, pane) = Widget::parent_mut::<ClassSelectorPane>(widget);
+                    pane.selected_class = Some(Rc::clone(&class_ref));
+                    parent.borrow_mut().invalidate_children();
 
-                let (_, builder) = Widget::parent_mut::<CharacterBuilder>(&parent);
-                builder.next.borrow_mut().state.set_enabled(true);
-            })));
+                    let (_, builder) = Widget::parent_mut::<CharacterBuilder>(&parent);
+                    builder.next.borrow_mut().state.set_enabled(true);
+                })));
 
             Widget::add_child_to(&classes_pane, class_button);
         }

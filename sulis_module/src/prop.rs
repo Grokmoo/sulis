@@ -14,17 +14,17 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::io::Error;
 use std::rc::Rc;
-use std::io::{Error};
 
-use sulis_core::ui::{AnimationState};
-use sulis_core::io::DrawList;
 use sulis_core::image::Image;
-use sulis_core::resource::{ResourceSet};
-use sulis_core::util::{Point, unable_to_create_error};
+use sulis_core::io::DrawList;
+use sulis_core::resource::ResourceSet;
+use sulis_core::ui::AnimationState;
+use sulis_core::util::{unable_to_create_error, Point};
 
-use crate::{LootList, Module, ObjectSize};
 use crate::area::tile::verify_point;
+use crate::{LootList, Module, ObjectSize};
 
 #[derive(Debug)]
 pub enum Interactive {
@@ -57,23 +57,26 @@ impl Prop {
     pub fn new(builder: PropBuilder, module: &Module) -> Result<Prop, Error> {
         let icon = match ResourceSet::image(&builder.icon) {
             None => {
-                    warn!("No image found for icon '{}'", builder.icon);
-                    return unable_to_create_error("prop", &builder.id);
-            }, Some(icon) => icon,
+                warn!("No image found for icon '{}'", builder.icon);
+                return unable_to_create_error("prop", &builder.id);
+            }
+            Some(icon) => icon,
         };
 
         let image = match ResourceSet::image(&builder.image) {
             None => {
                 warn!("No image found for image '{}'", builder.image);
                 return unable_to_create_error("prop", &builder.id);
-            }, Some(image) => image,
+            }
+            Some(image) => image,
         };
 
         let size = match module.sizes.get(&builder.size) {
             None => {
                 warn!("No size found with id '{}'", builder.size);
                 return unable_to_create_error("prop", &builder.id);
-            }, Some(ref size) => Rc::clone(size),
+            }
+            Some(ref size) => Rc::clone(size),
         };
 
         if builder.passable.is_some() && builder.impass.is_some() {
@@ -124,20 +127,25 @@ impl Prop {
             InteractiveBuilder::Container { loot } => {
                 let loot = match loot {
                     None => None,
-                    Some(loot) => {
-                        match module.loot_lists.get(&loot) {
-                            None => {
-                                warn!("Unable to find loot list '{}'", loot);
-                                return unable_to_create_error("prop", &builder.id);
-                            }, Some(loot) => Some(Rc::clone(loot))
+                    Some(loot) => match module.loot_lists.get(&loot) {
+                        None => {
+                            warn!("Unable to find loot list '{}'", loot);
+                            return unable_to_create_error("prop", &builder.id);
                         }
-                    }
+                        Some(loot) => Some(Rc::clone(loot)),
+                    },
                 };
                 Interactive::Container { loot }
-            },
-            InteractiveBuilder::Door { initially_open, closed_impass, closed_invis } => {
-                Interactive::Door { initially_open, closed_impass, closed_invis }
             }
+            InteractiveBuilder::Door {
+                initially_open,
+                closed_impass,
+                closed_invis,
+            } => Interactive::Door {
+                initially_open,
+                closed_impass,
+                closed_invis,
+            },
         };
 
         Ok(Prop {
@@ -153,12 +161,19 @@ impl Prop {
         })
     }
 
-    pub fn append_to_draw_list(&self, draw_list: &mut DrawList, state: &AnimationState,
-                               x: f32, y: f32, millis: u32) {
+    pub fn append_to_draw_list(
+        &self,
+        draw_list: &mut DrawList,
+        state: &AnimationState,
+        x: f32,
+        y: f32,
+        millis: u32,
+    ) {
         let w = self.size.width as f32;
         let h = self.size.height as f32;
 
-        self.image.append_to_draw_list(draw_list, state, x, y, w, h, millis);
+        self.image
+            .append_to_draw_list(draw_list, state, x, y, w, h, millis);
     }
 }
 
@@ -174,7 +189,7 @@ pub enum InteractiveBuilder {
         closed_impass: Vec<Point>,
         closed_invis: Vec<Point>,
     },
-    Hover
+    Hover,
 }
 
 #[derive(Deserialize, Debug)]

@@ -15,17 +15,17 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::any::Any;
-use std::rc::Rc;
-use std::cell::{RefCell};
+use std::cell::RefCell;
 use std::path::PathBuf;
+use std::rc::Rc;
 
 use sulis_core::ui::*;
 use sulis_core::util::ActiveResources;
 use sulis_core::widgets::{Button, Label, ScrollPane, TextArea};
-use sulis_module::{ModificationInfo};
+use sulis_module::ModificationInfo;
 use sulis_state::NextGameStep;
 
-use crate::main_menu::{MainMenu};
+use crate::main_menu::MainMenu;
 use crate::LoadingScreen;
 
 pub struct ModsSelector {
@@ -39,7 +39,11 @@ impl ModsSelector {
         let mut active_mods = Vec::new();
 
         let active_resources = ActiveResources::read();
-        let active: Vec<_> = active_resources.mods.iter().map(|path| PathBuf::from(&path)).collect();
+        let active: Vec<_> = active_resources
+            .mods
+            .iter()
+            .map(|path| PathBuf::from(&path))
+            .collect();
 
         for modif in mods {
             let mod_path = PathBuf::from(&modif.dir);
@@ -72,7 +76,8 @@ impl WidgetKind for ModsSelector {
         let active_pane = ScrollPane::new();
         let active = Widget::with_theme(active_pane.clone(), "active");
 
-        self.available_mods.sort_by(|ref a, ref b| a.name.cmp(&b.name));
+        self.available_mods
+            .sort_by(|ref a, ref b| a.name.cmp(&b.name));
 
         let len = self.available_mods.len();
         for (index, modif) in self.available_mods.iter().enumerate() {
@@ -87,44 +92,62 @@ impl WidgetKind for ModsSelector {
         }
 
         let clear = Widget::with_theme(Button::empty(), "clear");
-        clear.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let (parent, sel) = Widget::parent_mut::<ModsSelector>(widget);
+        clear
+            .borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(|widget, _| {
+                let (parent, sel) = Widget::parent_mut::<ModsSelector>(widget);
 
-             for modif in sel.active_mods.drain(..) {
-                 sel.available_mods.push(modif);
-             }
+                for modif in sel.active_mods.drain(..) {
+                    sel.available_mods.push(modif);
+                }
 
-            parent.borrow_mut().invalidate_children();
-        })));
+                parent.borrow_mut().invalidate_children();
+            })));
 
         let cancel = Widget::with_theme(Button::empty(), "cancel");
-        cancel.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let (root, menu) = Widget::parent_mut::<MainMenu>(widget);
-            menu.reset();
-            root.borrow_mut().invalidate_children();
-        })));
+        cancel
+            .borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(|widget, _| {
+                let (root, menu) = Widget::parent_mut::<MainMenu>(widget);
+                menu.reset();
+                root.borrow_mut().invalidate_children();
+            })));
 
         let apply = Widget::with_theme(Button::empty(), "apply");
-        apply.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let (_, sel) = Widget::parent_mut::<ModsSelector>(widget);
+        apply
+            .borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(|widget, _| {
+                let (_, sel) = Widget::parent_mut::<ModsSelector>(widget);
 
-            let mut resources = ActiveResources::read();
-            resources.mods.clear();
-            for modif in sel.active_mods.iter() {
-                resources.mods.push(modif.dir.to_string());
-            }
+                let mut resources = ActiveResources::read();
+                resources.mods.clear();
+                for modif in sel.active_mods.iter() {
+                    resources.mods.push(modif.dir.to_string());
+                }
 
-            resources.write();
+                resources.write();
 
-            let (root, menu) = Widget::parent_mut::<MainMenu>(widget);
-            menu.next_step = Some(NextGameStep::MainMenuReloadResources);
+                let (root, menu) = Widget::parent_mut::<MainMenu>(widget);
+                menu.next_step = Some(NextGameStep::MainMenuReloadResources);
 
-            let loading_screen = Widget::with_defaults(LoadingScreen::new());
-            loading_screen.borrow_mut().state.set_modal(true);
-            Widget::add_child_to(&root, loading_screen);
-        })));
+                let loading_screen = Widget::with_defaults(LoadingScreen::new());
+                loading_screen.borrow_mut().state.set_modal(true);
+                Widget::add_child_to(&root, loading_screen);
+            })));
 
-        vec![title, available_title, active_title, available, active, clear, cancel, apply]
+        vec![
+            title,
+            available_title,
+            active_title,
+            available,
+            active,
+            clear,
+            cancel,
+            apply,
+        ]
     }
 }
 
@@ -136,8 +159,12 @@ pub struct ModPane {
 }
 
 impl ModPane {
-    pub fn new(modif: ModificationInfo, active: bool, index: usize,
-               vec_len: usize) -> Rc<RefCell<ModPane>> {
+    pub fn new(
+        modif: ModificationInfo,
+        active: bool,
+        index: usize,
+        vec_len: usize,
+    ) -> Rc<RefCell<ModPane>> {
         Rc::new(RefCell::new(ModPane {
             modif,
             active,
@@ -164,68 +191,83 @@ impl WidgetKind for ModPane {
 
         let active = self.active;
         let index = self.index;
-        toggle.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-            let (parent, sel) = Widget::parent_mut::<ModsSelector>(widget);
+        toggle
+            .borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(move |widget, _| {
+                let (parent, sel) = Widget::parent_mut::<ModsSelector>(widget);
 
-            if active {
-                let modif = sel.active_mods.remove(index);
-                sel.available_mods.push(modif);
-            } else {
-                let modif = sel.available_mods.remove(index);
-                sel.active_mods.push(modif);
-            }
+                if active {
+                    let modif = sel.active_mods.remove(index);
+                    sel.available_mods.push(modif);
+                } else {
+                    let modif = sel.available_mods.remove(index);
+                    sel.active_mods.push(modif);
+                }
 
-            parent.borrow_mut().invalidate_children();
-        })));
+                parent.borrow_mut().invalidate_children();
+            })));
 
         let up = Widget::with_theme(Button::empty(), "up");
         let active = self.active;
         let index = self.index;
-        up.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-            if index == 0 { return; }
+        up.borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(move |widget, _| {
+                if index == 0 {
+                    return;
+                }
 
-            let (parent, sel) = Widget::parent_mut::<ModsSelector>(widget);
+                let (parent, sel) = Widget::parent_mut::<ModsSelector>(widget);
 
-            let vec = if active {
-                &mut sel.active_mods
-            } else {
-                &mut sel.available_mods
-            };
+                let vec = if active {
+                    &mut sel.active_mods
+                } else {
+                    &mut sel.available_mods
+                };
 
-            let modif = vec.remove(index);
-            vec.insert(index - 1, modif);
+                let modif = vec.remove(index);
+                vec.insert(index - 1, modif);
 
-            parent.borrow_mut().invalidate_children();
-        })));
+                parent.borrow_mut().invalidate_children();
+            })));
 
         let down = Widget::with_theme(Button::empty(), "down");
         let active = self.active;
         let index = self.index;
         let len = self.vec_len;
-        down.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-            if index == len - 1 { return; }
+        down.borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(move |widget, _| {
+                if index == len - 1 {
+                    return;
+                }
 
-            let (parent, sel) = Widget::parent_mut::<ModsSelector>(widget);
+                let (parent, sel) = Widget::parent_mut::<ModsSelector>(widget);
 
-            let vec = if active {
-                &mut sel.active_mods
-            } else {
-                &mut sel.available_mods
-            };
+                let vec = if active {
+                    &mut sel.active_mods
+                } else {
+                    &mut sel.available_mods
+                };
 
-            let modif = vec.remove(index);
-            vec.insert(index + 1, modif);
+                let modif = vec.remove(index);
+                vec.insert(index + 1, modif);
 
-            parent.borrow_mut().invalidate_children();
-        })));
+                parent.borrow_mut().invalidate_children();
+            })));
 
         if !self.active {
             up.borrow_mut().state.set_visible(false);
             down.borrow_mut().state.set_visible(false);
         }
 
-        if index == 0 { up.borrow_mut().state.set_enabled(false); }
-        if index == self.vec_len - 1 { down.borrow_mut().state.set_enabled(false); }
+        if index == 0 {
+            up.borrow_mut().state.set_enabled(false);
+        }
+        if index == self.vec_len - 1 {
+            down.borrow_mut().state.set_enabled(false);
+        }
 
         vec![description, toggle, up, down]
     }

@@ -1,0 +1,12 @@
+use_field_init_shorthand = true
+edition = "2018"
+
+# Unstable features we may eventually want once they are stable
+# condense_wildcard_suffixes = true
+# error_on_line_overflow = true
+# error_on_unformatted = true
+# fn_single_line = true
+# format_strings = true
+# match_block_trailing_comma = true
+# merge_imports = true
+# version = "Two"

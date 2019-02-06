@@ -15,13 +15,13 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::hash::{Hash, Hasher};
-use std::rc::Rc;
 use std::io::Error;
+use std::rc::Rc;
 
 use crate::rules::{BonusList, StatList};
 use sulis_core::image::Image;
-use sulis_core::resource::{ResourceSet};
-use sulis_core::util::{unable_to_create_error};
+use sulis_core::resource::ResourceSet;
+use sulis_core::util::unable_to_create_error;
 
 use crate::{Actor, Module, PrereqList, PrereqListBuilder};
 
@@ -32,7 +32,14 @@ pub struct AbilityGroup {
 
 impl AbilityGroup {
     pub fn new(module: &Module, group_id: &str) -> Option<AbilityGroup> {
-        for (index, other_group_id) in module.rules.as_ref().unwrap().ability_groups.iter().enumerate() {
+        for (index, other_group_id) in module
+            .rules
+            .as_ref()
+            .unwrap()
+            .ability_groups
+            .iter()
+            .enumerate()
+        {
             if other_group_id == group_id {
                 return Some(AbilityGroup { index });
             }
@@ -68,7 +75,7 @@ pub struct Ability {
     pub upgrades: Vec<Upgrade>,
 }
 
-impl Eq for Ability { }
+impl Eq for Ability {}
 
 impl Hash for Ability {
     fn hash<H: Hasher>(&self, state: &mut H) {
@@ -88,8 +95,8 @@ impl Ability {
             None => {
                 warn!("No image found for icon '{}'", builder.icon);
                 return unable_to_create_error("ability", &builder.id);
-            },
-            Some(icon) => icon
+            }
+            Some(icon) => icon,
         };
 
         let active = match builder.active {
@@ -99,23 +106,24 @@ impl Ability {
                     None => {
                         warn!("No script found with id '{}'", active.script);
                         return unable_to_create_error("ability", &builder.id);
-                    }, Some(_) => (),
+                    }
+                    Some(_) => (),
                 };
 
                 let cooldown = match active.cooldown {
-                    None => {
-                        match active.duration {
-                            Duration::Rounds(c) => c,
-                            Duration::Mode | Duration::Instant | Duration::Permanent => 0,
-                        }
-                    }, Some(c) => c,
+                    None => match active.duration {
+                        Duration::Rounds(c) => c,
+                        Duration::Mode | Duration::Instant | Duration::Permanent => 0,
+                    },
+                    Some(c) => c,
                 };
 
                 let group = match AbilityGroup::new(module, &active.group) {
                     None => {
                         warn!("Unable to find ability group '{}'", active.group);
                         return unable_to_create_error("ability", &builder.id);
-                    }, Some(group) => group,
+                    }
+                    Some(group) => group,
                 };
 
                 Some(Active {
@@ -127,7 +135,7 @@ impl Ability {
                     short_description: active.short_description,
                     ai: active.ai,
                 })
-            },
+            }
         };
 
         let prereqs = match builder.prereqs {
@@ -154,7 +162,9 @@ impl Ability {
         stats.add(&self.bonuses);
         let mut index = 1;
         for upgrade in self.upgrades.iter() {
-            if index > level { break; }
+            if index > level {
+                break;
+            }
 
             if let Some(ref bonuses) = upgrade.bonuses {
                 stats.add(bonuses);
@@ -210,13 +220,21 @@ pub struct AIData {
 }
 
 impl AIData {
-    pub fn priority(&self) -> u32 { self.priority }
+    pub fn priority(&self) -> u32 {
+        self.priority
+    }
 
-    pub fn kind(&self) -> String { format!("{:?}", self.kind) }
+    pub fn kind(&self) -> String {
+        format!("{:?}", self.kind)
+    }
 
-    pub fn group(&self) -> String { format!("{:?}", self.group) }
+    pub fn group(&self) -> String {
+        format!("{:?}", self.group)
+    }
 
-    pub fn range(&self) -> String { format!("{:?}", self.range) }
+    pub fn range(&self) -> String {
+        format!("{:?}", self.range)
+    }
 }
 
 #[derive(Deserialize, Debug, Clone, Copy, PartialEq, Eq)]
@@ -226,7 +244,7 @@ pub enum AIKind {
     Heal,
     Buff,
     Debuff,
-    Special
+    Special,
 }
 
 impl AIKind {
@@ -271,7 +289,7 @@ pub enum AIRange {
     Personal,
     Reach,
     Short,
-    Visible
+    Visible,
 }
 
 impl AIRange {

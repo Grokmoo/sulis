@@ -16,8 +16,8 @@
 
 use std::collections::HashMap;
 
-use sulis_module::{Module, on_trigger::QuestEntryState};
-use crate::{ChangeListenerList, save_state::QuestSaveState};
+use crate::{save_state::QuestSaveState, ChangeListenerList};
+use sulis_module::{on_trigger::QuestEntryState, Module};
 
 pub struct QuestStateSet {
     quests: HashMap<String, QuestState>,
@@ -36,7 +36,7 @@ impl QuestStateSet {
         QuestStateSet {
             quests,
             current_quest: data.current_quest,
-            listeners: ChangeListenerList::default()
+            listeners: ChangeListenerList::default(),
         }
     }
 
@@ -51,7 +51,7 @@ impl QuestStateSet {
         QuestStateSet {
             quests,
             current_quest: Vec::new(),
-            listeners: ChangeListenerList::default()
+            listeners: ChangeListenerList::default(),
         }
     }
 
@@ -101,7 +101,7 @@ impl QuestStateSet {
             QuestEntryState::Complete | QuestEntryState::Hidden => {
                 // don't add the current quest as active since it isn't
                 // displayed in the window by default
-            },
+            }
             QuestEntryState::Visible | QuestEntryState::Active => {
                 self.current_quest.push(quest.to_string());
             }
@@ -146,7 +146,7 @@ impl QuestStateSet {
         self.set_current_quest_and_notify(quest_id);
     }
 
-    pub fn into_iter(self) -> impl Iterator<Item=(String, QuestState)> {
+    pub fn into_iter(self) -> impl Iterator<Item = (String, QuestState)> {
         self.quests.into_iter()
     }
 }
@@ -169,7 +169,9 @@ impl QuestState {
 
     pub fn entry_state(&self, entry: &str) -> QuestEntryState {
         for (ref id, state) in self.entries.iter() {
-            if id == entry { return *state; }
+            if id == entry {
+                return *state;
+            }
         }
 
         QuestEntryState::Hidden
@@ -181,12 +183,14 @@ impl QuestState {
                 if self.state == QuestEntryState::Hidden {
                     self.state = QuestEntryState::Visible;
                 }
-            },
+            }
             _ => (),
         }
 
         for (ref id, ref mut entry_state) in self.entries.iter_mut() {
-            if id != entry { continue; }
+            if id != entry {
+                continue;
+            }
 
             *entry_state = state;
             return;
@@ -199,8 +203,7 @@ impl QuestState {
         self.state
     }
 
-    pub fn iter(&self) -> impl DoubleEndedIterator<Item=&(String, QuestEntryState)> {
+    pub fn iter(&self) -> impl DoubleEndedIterator<Item = &(String, QuestEntryState)> {
         self.entries.iter()
     }
 }
-

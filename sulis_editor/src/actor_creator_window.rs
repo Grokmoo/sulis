@@ -15,19 +15,20 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::any::Any;
-use std::rc::Rc;
 use std::cell::RefCell;
 use std::collections::HashMap;
+use std::rc::Rc;
 
-use sulis_core::image::{LayeredImage, Image};
 use sulis_core::config::Config;
+use sulis_core::image::{Image, LayeredImage};
 use sulis_core::io::GraphicsRenderer;
-use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_core::resource::write_to_file;
+use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_core::util::Point;
-use sulis_core::widgets::{Button, Label, list_box, MutuallyExclusiveListBox, InputField};
-use sulis_module::{Class, Module, Race, ImageLayer, Faction, Sex, ActorBuilder,
-    InventoryBuilder, AttributeList};
+use sulis_core::widgets::{list_box, Button, InputField, Label, MutuallyExclusiveListBox};
+use sulis_module::{
+    ActorBuilder, AttributeList, Class, Faction, ImageLayer, InventoryBuilder, Module, Race, Sex,
+};
 
 pub const NAME: &str = "actor_creator_window";
 
@@ -64,7 +65,9 @@ impl ActorCreatorWindow {
 
     fn save(&mut self) {
         let id = self.id_field.borrow().text();
-        if id.trim().len() == 0 { return; }
+        if id.trim().len() == 0 {
+            return;
+        }
 
         let race = match self.selected_race {
             None => return,
@@ -73,8 +76,12 @@ impl ActorCreatorWindow {
 
         let resources_config = Config::resources_config();
 
-        let filename = format!("../{}/{}/actors/{}.yml", resources_config.campaigns_directory,
-                               Config::editor_config().module, id);
+        let filename = format!(
+            "../{}/{}/actors/{}.yml",
+            resources_config.campaigns_directory,
+            Config::editor_config().module,
+            id
+        );
         info!("Writing created actor to {}", filename);
 
         let mut images = HashMap::new();
@@ -109,7 +116,7 @@ impl ActorCreatorWindow {
         match write_to_file(&filename, &actor) {
             Ok(()) => {
                 Module::add_actor_to_resources(actor);
-            },
+            }
             Err(e) => {
                 warn!("{}", e);
                 warn!("Unable to write created character to file '{}'", filename);
@@ -132,36 +139,48 @@ impl ActorCreatorWindow {
 
     fn populate_hue_pane(&mut self, pane: &Rc<RefCell<Widget>>) {
         let prev = Widget::with_theme(Button::empty(), "prev_button");
-        prev.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-            let (_, window) = Widget::parent_mut::<ActorCreatorWindow>(widget);
+        prev.borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(move |widget, _| {
+                let (_, window) = Widget::parent_mut::<ActorCreatorWindow>(widget);
 
-            let mut hue = window.selected_hue;
-            hue -= 0.1;
-            if hue < 0.0 { hue = 0.0; }
-            window.selected_hue = hue;
+                let mut hue = window.selected_hue;
+                hue -= 0.1;
+                if hue < 0.0 {
+                    hue = 0.0;
+                }
+                window.selected_hue = hue;
 
-            window.build_preview();
-        })));
+                window.build_preview();
+            })));
 
         let next = Widget::with_theme(Button::empty(), "next_button");
-        next.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-            let (_, window) = Widget::parent_mut::<ActorCreatorWindow>(widget);
+        next.borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(move |widget, _| {
+                let (_, window) = Widget::parent_mut::<ActorCreatorWindow>(widget);
 
-            let mut hue = window.selected_hue;
-            hue += 0.1;
-            if hue > 1.0 { hue = 1.0; }
-            window.selected_hue = hue;
+                let mut hue = window.selected_hue;
+                hue += 0.1;
+                if hue > 1.0 {
+                    hue = 1.0;
+                }
+                window.selected_hue = hue;
 
-            window.build_preview();
-        })));
+                window.build_preview();
+            })));
         Widget::add_children_to(pane, vec![prev, next]);
     }
 
     fn populate_images_pane(&mut self, race: Rc<Race>, pane: &Rc<RefCell<Widget>>) {
         for (layer, images) in race.editor_creator_images() {
-            if images.len() == 0 { continue; }
+            if images.len() == 0 {
+                continue;
+            }
 
-            self.selected_images.entry(layer).or_insert((0, Rc::clone(&images[0])));
+            self.selected_images
+                .entry(layer)
+                .or_insert((0, Rc::clone(&images[0])));
 
             let subpane = Widget::empty("layer_pane");
 
@@ -170,30 +189,38 @@ impl ActorCreatorWindow {
 
             let len = images.len();
             let images_ref = images.clone();
-            prev.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-                let (_, window) = Widget::parent_mut::<ActorCreatorWindow>(widget);
+            prev.borrow_mut()
+                .state
+                .add_callback(Callback::new(Rc::new(move |widget, _| {
+                    let (_, window) = Widget::parent_mut::<ActorCreatorWindow>(widget);
 
-                let index = window.selected_images.get(&layer).unwrap().0;
-                if index > 0 {
-                    let index = index - 1;
-                    window.selected_images.insert(layer, (index, Rc::clone(&images_ref[index])));
-                }
-                window.build_preview();
-            })));
+                    let index = window.selected_images.get(&layer).unwrap().0;
+                    if index > 0 {
+                        let index = index - 1;
+                        window
+                            .selected_images
+                            .insert(layer, (index, Rc::clone(&images_ref[index])));
+                    }
+                    window.build_preview();
+                })));
 
             let next = Widget::with_theme(Button::empty(), "next_button");
 
             let images_ref = images.clone();
-            next.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-                let (_, window) = Widget::parent_mut::<ActorCreatorWindow>(widget);
+            next.borrow_mut()
+                .state
+                .add_callback(Callback::new(Rc::new(move |widget, _| {
+                    let (_, window) = Widget::parent_mut::<ActorCreatorWindow>(widget);
 
-                let index = window.selected_images.get(&layer).unwrap().0;
-                if index < len - 1 {
-                    let index = index + 1;
-                    window.selected_images.insert(layer, (index, Rc::clone(&images_ref[index])));
-                }
-                window.build_preview();
-            })));
+                    let index = window.selected_images.get(&layer).unwrap().0;
+                    if index < len - 1 {
+                        let index = index + 1;
+                        window
+                            .selected_images
+                            .insert(layer, (index, Rc::clone(&images_ref[index])));
+                    }
+                    window.build_preview();
+                })));
 
             if images.len() < 2 {
                 prev.borrow_mut().state.set_enabled(false);
@@ -208,14 +235,25 @@ impl ActorCreatorWindow {
 }
 
 impl WidgetKind for ActorCreatorWindow {
-    fn get_name(&self) -> &str { NAME }
+    fn get_name(&self) -> &str {
+        NAME
+    }
 
-    fn as_any(&self) -> &Any { self }
+    fn as_any(&self) -> &Any {
+        self
+    }
 
-    fn as_any_mut(&mut self) -> &mut Any { self }
+    fn as_any_mut(&mut self) -> &mut Any {
+        self
+    }
 
-    fn draw(&mut self, renderer: &mut GraphicsRenderer, _pixel_size: Point,
-            _widget: &Widget, millis: u32) {
+    fn draw(
+        &mut self,
+        renderer: &mut GraphicsRenderer,
+        _pixel_size: Point,
+        _widget: &Widget,
+        millis: u32,
+    ) {
         let preview = match self.preview {
             None => return,
             Some(ref image) => image,
@@ -232,23 +270,34 @@ impl WidgetKind for ActorCreatorWindow {
 
     fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let close = Widget::with_theme(Button::empty(), "close");
-        close.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let (parent, _) = Widget::parent_mut::<ActorCreatorWindow>(widget);
-            parent.borrow_mut().mark_for_removal();
-        })));
+        close
+            .borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(|widget, _| {
+                let (parent, _) = Widget::parent_mut::<ActorCreatorWindow>(widget);
+                parent.borrow_mut().mark_for_removal();
+            })));
 
         let accept = Widget::with_theme(Button::empty(), "accept_button");
-        accept.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-            let (_, window) = Widget::parent_mut::<ActorCreatorWindow>(widget);
-            window.save();
-        })));
-        accept.borrow_mut().state.set_enabled(self.selected_race.is_some());
+        accept
+            .borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(move |widget, _| {
+                let (_, window) = Widget::parent_mut::<ActorCreatorWindow>(widget);
+                window.save();
+            })));
+        accept
+            .borrow_mut()
+            .state
+            .set_enabled(self.selected_race.is_some());
 
         let race_pane = Widget::empty("race_pane");
 
         let mut entries: Vec<list_box::Entry<Rc<Race>>> = Vec::new();
         for race in Module::all_races() {
-            if !race.has_editor_creator_images() { continue; }
+            if !race.has_editor_creator_images() {
+                continue;
+            }
 
             if let Some(ref sel) = self.selected_race {
                 if Rc::ptr_eq(sel, &race) {
@@ -267,7 +316,6 @@ impl WidgetKind for ActorCreatorWindow {
                 Some(ref entry) => window.selected_race = Some(Rc::clone(entry.item())),
             }
             window_ref.borrow_mut().invalidate_children();
-
         });
         let races_box = MutuallyExclusiveListBox::with_callback(entries, cb);
         Widget::add_child_to(&race_pane, Widget::with_theme(races_box, "races_list"));
@@ -302,11 +350,14 @@ impl WidgetKind for ActorCreatorWindow {
                 if faction == self.selected_faction {
                     widget.borrow_mut().state.set_active(true);
                 }
-                widget.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-                    let (parent, window) = Widget::parent_mut::<ActorCreatorWindow>(widget);
-                    window.selected_faction = faction;
-                    parent.borrow_mut().invalidate_children();
-                })));
+                widget
+                    .borrow_mut()
+                    .state
+                    .add_callback(Callback::new(Rc::new(move |widget, _| {
+                        let (parent, window) = Widget::parent_mut::<ActorCreatorWindow>(widget);
+                        window.selected_faction = faction;
+                        parent.borrow_mut().invalidate_children();
+                    })));
                 Widget::add_child_to(&faction_pane, widget);
             }
         }
@@ -319,11 +370,14 @@ impl WidgetKind for ActorCreatorWindow {
                 if sex == self.selected_sex {
                     widget.borrow_mut().state.set_active(true);
                 }
-                widget.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-                    let (parent, window) = Widget::parent_mut::<ActorCreatorWindow>(widget);
-                    window.selected_sex = sex;
-                    parent.borrow_mut().invalidate_children();
-                })));
+                widget
+                    .borrow_mut()
+                    .state
+                    .add_callback(Callback::new(Rc::new(move |widget, _| {
+                        let (parent, window) = Widget::parent_mut::<ActorCreatorWindow>(widget);
+                        window.selected_sex = sex;
+                        parent.borrow_mut().invalidate_children();
+                    })));
                 Widget::add_child_to(&sex_pane, widget);
             }
         }
@@ -335,17 +389,31 @@ impl WidgetKind for ActorCreatorWindow {
                 if Rc::ptr_eq(&class, &self.selected_class) {
                     widget.borrow_mut().state.set_active(true);
                 }
-                widget.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-                    let (parent, window) = Widget::parent_mut::<ActorCreatorWindow>(widget);
-                    window.selected_class = Rc::clone(&class);
-                    parent.borrow_mut().invalidate_children();
-                })));
+                widget
+                    .borrow_mut()
+                    .state
+                    .add_callback(Callback::new(Rc::new(move |widget, _| {
+                        let (parent, window) = Widget::parent_mut::<ActorCreatorWindow>(widget);
+                        window.selected_class = Rc::clone(&class);
+                        parent.borrow_mut().invalidate_children();
+                    })));
                 Widget::add_child_to(&levels_pane, widget);
             }
         }
 
         self.build_preview();
-        vec![close, accept, race_pane, images_pane, hue_pane, name_pane,
-            id_pane, faction_pane, sex_pane, levels_pane, self.view_pane.clone()]
+        vec![
+            close,
+            accept,
+            race_pane,
+            images_pane,
+            hue_pane,
+            name_pane,
+            id_pane,
+            faction_pane,
+            sex_pane,
+            levels_pane,
+            self.view_pane.clone(),
+        ]
     }
 }

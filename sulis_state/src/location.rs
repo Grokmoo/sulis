@@ -17,8 +17,8 @@
 use std::cmp::Ordering;
 use std::fmt::{Debug, Formatter, Result};
 
-use sulis_core::util::Point;
 use crate::AreaState;
+use sulis_core::util::Point;
 use sulis_module::Area;
 
 #[derive(Clone, Eq)]
@@ -61,9 +61,13 @@ impl PartialOrd for Location {
 
 impl PartialEq for Location {
     fn eq(&self, other: &Location) -> bool {
-        if self.x != other.x || self.y != other.y { return false; }
+        if self.x != other.x || self.y != other.y {
+            return false;
+        }
 
-        if &self.area_id != &other.area_id { return false; }
+        if &self.area_id != &other.area_id {
+            return false;
+        }
 
         true
     }
@@ -91,7 +95,10 @@ impl Location {
     }
 
     pub fn to_point(&self) -> Point {
-        Point { x: self.x, y: self.y }
+        Point {
+            x: self.x,
+            y: self.y,
+        }
     }
 
     pub fn move_to(&mut self, x: i32, y: i32) {
@@ -100,8 +107,12 @@ impl Location {
     }
 
     pub fn coords_valid(&self, x: i32, y: i32) -> bool {
-        if x < 0 || y < 0 { return false; }
-        if x >= self.area_width || y >= self.area_height { return false; }
+        if x < 0 || y < 0 {
+            return false;
+        }
+        if x >= self.area_width || y >= self.area_height {
+            return false;
+        }
 
         true
     }

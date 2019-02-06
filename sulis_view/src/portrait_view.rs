@@ -15,15 +15,15 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::any::Any;
-use std::rc::Rc;
 use std::cell::RefCell;
+use std::rc::Rc;
 
-use sulis_state::{ChangeListener, EntityState, GameState};
 use sulis_core::io::event;
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_core::widgets::{Button, Label, ProgressBar};
+use sulis_state::{ChangeListener, EntityState, GameState};
 
-use crate::{CharacterBuilder};
+use crate::CharacterBuilder;
 
 pub const NAME: &str = "portrait_view";
 
@@ -33,41 +33,64 @@ pub struct PortraitView {
 
 impl PortraitView {
     pub fn new(entity: Rc<RefCell<EntityState>>) -> Rc<RefCell<PortraitView>> {
-        Rc::new(RefCell::new(PortraitView {
-            entity,
-        }))
+        Rc::new(RefCell::new(PortraitView { entity }))
     }
 }
 
 impl WidgetKind for PortraitView {
     widget_kind!(NAME);
 
-    fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>>  {
+    fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let mut entity = self.entity.borrow_mut();
-        entity.actor.listeners.add(ChangeListener::invalidate(NAME, widget));
+        entity
+            .actor
+            .listeners
+            .add(ChangeListener::invalidate(NAME, widget));
 
         let portrait = Widget::with_theme(Label::empty(), "portrait");
         if let Some(ref image) = entity.actor.actor.portrait {
-            portrait.borrow_mut().state.add_text_arg("image", &image.id());
+            portrait
+                .borrow_mut()
+                .state
+                .add_text_arg("image", &image.id());
         }
 
         let frac = entity.actor.hp() as f32 / entity.actor.stats.max_hp as f32;
         let hp_bar = Widget::with_theme(ProgressBar::new(frac), "hp_bar");
-        hp_bar.borrow_mut().state.add_text_arg("cur_hp", &entity.actor.hp().to_string());
-        hp_bar.borrow_mut().state.add_text_arg("max_hp", &entity.actor.stats.max_hp.to_string());
+        hp_bar
+            .borrow_mut()
+            .state
+            .add_text_arg("cur_hp", &entity.actor.hp().to_string());
+        hp_bar
+            .borrow_mut()
+            .state
+            .add_text_arg("max_hp", &entity.actor.stats.max_hp.to_string());
 
         let entity_ref = Rc::clone(&self.entity);
         let level_up = Widget::with_theme(Button::empty(), "level_up");
-        level_up.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-            let root = Widget::get_root(&widget);
-            let window = Widget::with_defaults(CharacterBuilder::level_up(Rc::clone(&entity_ref)));
-            window.borrow_mut().state.set_modal(true);
-            Widget::add_child_to(&root, window);
-        })));
-        level_up.borrow_mut().state.set_visible(entity.actor.has_level_up());
-        level_up.borrow_mut().state.set_enabled(!GameState::is_combat_active());
+        level_up
+            .borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(move |widget, _| {
+                let root = Widget::get_root(&widget);
+                let window =
+                    Widget::with_defaults(CharacterBuilder::level_up(Rc::clone(&entity_ref)));
+                window.borrow_mut().state.set_modal(true);
+                Widget::add_child_to(&root, window);
+            })));
+        level_up
+            .borrow_mut()
+            .state
+            .set_visible(entity.actor.has_level_up());
+        level_up
+            .borrow_mut()
+            .state
+            .set_enabled(!GameState::is_combat_active());
 
-        widget.borrow_mut().state.set_enabled(!entity.actor.is_dead());
+        widget
+            .borrow_mut()
+            .state
+            .set_enabled(!entity.actor.is_dead());
 
         let icons = Widget::empty("icons");
         let mgr = GameState::turn_manager();
@@ -84,8 +107,14 @@ impl WidgetKind for PortraitView {
             };
 
             let icon_widget = Widget::with_theme(Label::empty(), "icon");
-            icon_widget.borrow_mut().state.add_text_arg("icon", &icon.icon);
-            icon_widget.borrow_mut().state.add_text_arg("text", &icon.text);
+            icon_widget
+                .borrow_mut()
+                .state
+                .add_text_arg("icon", &icon.icon);
+            icon_widget
+                .borrow_mut()
+                .state
+                .add_text_arg("text", &icon.text);
             Widget::add_child_to(&icons, icon_widget);
         }
 

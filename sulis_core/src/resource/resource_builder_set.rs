@@ -15,23 +15,23 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::collections::HashMap;
-use std::fs::{self, File};
-use std::io::{Read, Error};
 use std::ffi::OsStr;
+use std::fs::{self, File};
+use std::io::{Error, Read};
 use std::path::{Path, PathBuf};
 
 use serde;
-use serde_yaml;
 use serde_json;
+use serde_yaml;
 
-use crate::resource::*;
-use crate::resource::spritesheet::SpritesheetBuilder;
-use crate::resource::font::FontBuilder;
-use crate::image::simple_image::SimpleImageBuilder;
-use crate::image::composed_image::ComposedImageBuilder;
-use crate::image::timer_image::TimerImageBuilder;
 use crate::image::animated_image::AnimatedImageBuilder;
-use crate::ui::{ThemeBuilderSet};
+use crate::image::composed_image::ComposedImageBuilder;
+use crate::image::simple_image::SimpleImageBuilder;
+use crate::image::timer_image::TimerImageBuilder;
+use crate::resource::font::FontBuilder;
+use crate::resource::spritesheet::SpritesheetBuilder;
+use crate::resource::*;
+use crate::ui::ThemeBuilderSet;
 
 #[derive(Debug)]
 pub struct ResourceBuilderSet {
@@ -60,7 +60,10 @@ impl ResourceBuilderSet {
 
         use self::YamlResourceKind::*;
         Ok(ResourceBuilderSet {
-            theme_builder: ThemeBuilderSet { id: "themes".to_string(), themes: themes_out },
+            theme_builder: ThemeBuilderSet {
+                id: "themes".to_string(),
+                themes: themes_out,
+            },
             font_builders: read_builders_insert_dirs(resources, Font)?,
             simple_builders: read_builders(resources, SimpleImage)?,
             composed_builders: read_builders(resources, ComposedImage)?,
@@ -71,21 +74,25 @@ impl ResourceBuilderSet {
     }
 }
 
-pub fn read_builders<T: serde::de::DeserializeOwned>(resources: &mut YamlResourceSet,
-    kind: YamlResourceKind) -> Result<HashMap<String, T>, Error> {
-
+pub fn read_builders<T: serde::de::DeserializeOwned>(
+    resources: &mut YamlResourceSet,
+    kind: YamlResourceKind,
+) -> Result<HashMap<String, T>, Error> {
     read_builders_internal(resources, kind, false)
 }
 
-fn read_builders_insert_dirs<T: serde::de::DeserializeOwned>(resources: &mut YamlResourceSet,
-    kind: YamlResourceKind) -> Result<HashMap<String, T>, Error> {
-
+fn read_builders_insert_dirs<T: serde::de::DeserializeOwned>(
+    resources: &mut YamlResourceSet,
+    kind: YamlResourceKind,
+) -> Result<HashMap<String, T>, Error> {
     read_builders_internal(resources, kind, true)
 }
 
-fn read_builders_internal<T: serde::de::DeserializeOwned>(resources: &mut YamlResourceSet,
-    kind: YamlResourceKind, insert_dirs: bool) -> Result<HashMap<String, T>, Error> {
-
+fn read_builders_internal<T: serde::de::DeserializeOwned>(
+    resources: &mut YamlResourceSet,
+    kind: YamlResourceKind,
+    insert_dirs: bool,
+) -> Result<HashMap<String, T>, Error> {
     let dir_key = serde_yaml::Value::String(yaml_resource_set::DIRECTORY_VAL_STR.to_string());
     let file_key = serde_yaml::Value::String(yaml_resource_set::FILE_VAL_STR.to_string());
 
@@ -112,8 +119,10 @@ fn read_builders_internal<T: serde::de::DeserializeOwned>(resources: &mut YamlRe
                 });
 
                 if insert_dirs {
-                    map.insert(serde_yaml::Value::String("source_dirs".to_string()),
-                        serde_yaml::Value::Sequence(dirs));
+                    map.insert(
+                        serde_yaml::Value::String("source_dirs".to_string()),
+                        serde_yaml::Value::Sequence(dirs),
+                    );
                 }
             }
 
@@ -121,7 +130,8 @@ fn read_builders_internal<T: serde::de::DeserializeOwned>(resources: &mut YamlRe
                 Err(e) => {
                     warn!("Error in YAML file merged from {:?}", files);
                     return Err(e);
-                }, Ok(val) => val,
+                }
+                Ok(val) => val,
             };
 
             builders.insert(id, builder);
@@ -130,7 +140,9 @@ fn read_builders_internal<T: serde::de::DeserializeOwned>(resources: &mut YamlRe
     Ok(builders)
 }
 
-pub fn read_builder<T: serde::de::DeserializeOwned>(mut value: serde_yaml::Value) -> Result<T, Error> {
+pub fn read_builder<T: serde::de::DeserializeOwned>(
+    mut value: serde_yaml::Value,
+) -> Result<T, Error> {
     let dir_key = serde_yaml::Value::String(yaml_resource_set::DIRECTORY_VAL_STR.to_string());
     let file_key = serde_yaml::Value::String(yaml_resource_set::FILE_VAL_STR.to_string());
 
@@ -142,7 +154,9 @@ pub fn read_builder<T: serde::de::DeserializeOwned>(mut value: serde_yaml::Value
     read_builder_internal(value)
 }
 
-fn read_builder_internal<T: serde::de::DeserializeOwned>(value: serde_yaml::Value) -> Result<T, Error> {
+fn read_builder_internal<T: serde::de::DeserializeOwned>(
+    value: serde_yaml::Value,
+) -> Result<T, Error> {
     // we'd really rather not do this clone, but need to preserve the value in case there is an
     // error
     let value_clone = value.clone();
@@ -165,21 +179,26 @@ fn read_builder_internal<T: serde::de::DeserializeOwned>(value: serde_yaml::Valu
     }
 }
 
-fn handle_merged_error<T: serde::de::DeserializeOwned>(value: serde_yaml::Value) -> Result<String, Error> {
+fn handle_merged_error<T: serde::de::DeserializeOwned>(
+    value: serde_yaml::Value,
+) -> Result<String, Error> {
     let value_string = serde_yaml::to_string(&value)
         .map_err(|e| Error::new(ErrorKind::InvalidData, format!("{}", e)))?;
     let result: Result<T, serde_yaml::Error> = serde_yaml::from_str(&value_string);
 
     match result {
-        Ok(_) => Err(Error::new(ErrorKind::InvalidData,
-                                format!("There was no error when parsing the value as a string"))),
-        Err(e) => Ok(e.to_string())
+        Ok(_) => Err(Error::new(
+            ErrorKind::InvalidData,
+            format!("There was no error when parsing the value as a string"),
+        )),
+        Err(e) => Ok(e.to_string()),
     }
 }
 
-pub fn write_json_to_file<T: serde::ser::Serialize,
-    P: AsRef<Path>>(filename: P, data: &T) -> Result<(), Error> {
-
+pub fn write_json_to_file<T: serde::ser::Serialize, P: AsRef<Path>>(
+    filename: P,
+    data: &T,
+) -> Result<(), Error> {
     let file = File::create(filename)?;
 
     match serde_json::to_writer(file, data) {
@@ -188,7 +207,10 @@ pub fn write_json_to_file<T: serde::ser::Serialize,
     }
 }
 
-pub fn write_to_file<T: serde::ser::Serialize, P: AsRef<Path>>(filename: P, data: &T) -> Result<(), Error> {
+pub fn write_to_file<T: serde::ser::Serialize, P: AsRef<Path>>(
+    filename: P,
+    data: &T,
+) -> Result<(), Error> {
     let file = File::create(filename)?;
 
     match serde_yaml::to_writer(file, data) {
@@ -215,9 +237,11 @@ pub fn read_single_resource<T: serde::de::DeserializeOwned>(filename: &str) -> R
 
     let mut file = match file {
         Err(_) => {
-            return invalid_data_error(
-                &format!("Unable to locate '{}.json' or {}.yml'", filename, filename));
-        },
+            return invalid_data_error(&format!(
+                "Unable to locate '{}.json' or {}.yml'",
+                filename, filename
+            ));
+        }
         Ok(f) => f,
     };
 
@@ -276,7 +300,9 @@ fn read_file_to_string(path: PathBuf, resources: &mut HashMap<String, String>) {
     let path_str = path.to_string_lossy().to_string();
 
     // don't attempt to parse image files
-    if !path_str.ends_with("lua") { return; }
+    if !path_str.ends_with("lua") {
+        return;
+    }
 
     debug!("Reading file at {} to string", path_str);
     let data = match fs::read_to_string(path.clone()) {
@@ -287,7 +313,10 @@ fn read_file_to_string(path: PathBuf, resources: &mut HashMap<String, String>) {
         }
     };
 
-    let id: String = path.file_stem().unwrap_or(OsStr::new(""))
-        .to_string_lossy().to_string();
+    let id: String = path
+        .file_stem()
+        .unwrap_or(OsStr::new(""))
+        .to_string_lossy()
+        .to_string();
     resources.insert(id, data);
 }

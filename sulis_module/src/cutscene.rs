@@ -14,7 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::io::{Error};
+use std::io::Error;
 
 use crate::{Module, OnTrigger};
 
@@ -33,7 +33,7 @@ impl Cutscene {
         let mut frames = Vec::new();
         for frame_builder in builder.frames {
             let frame = Frame {
-                text: frame_builder.text
+                text: frame_builder.text,
             };
             frames.push(frame);
         }
@@ -45,7 +45,6 @@ impl Cutscene {
         })
     }
 }
-
 
 #[derive(Deserialize, Debug)]
 #[serde(deny_unknown_fields)]

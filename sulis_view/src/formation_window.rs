@@ -15,11 +15,11 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::any::Any;
+use std::cell::RefCell;
 use std::rc::Rc;
-use std::cell::{RefCell};
 
-use sulis_core::util::Size;
 use sulis_core::ui::{Callback, Cursor, Widget, WidgetKind};
+use sulis_core::util::Size;
 use sulis_core::widgets::{Button, Label};
 use sulis_state::{ChangeListener, GameState};
 
@@ -57,13 +57,19 @@ impl FormationWindow {
     fn set_active_entry(&mut self, index: Option<usize>) {
         if let Some(index) = self.active_entry {
             let formation = GameState::party_formation();
-            formation.borrow_mut().set_position(index, self.entries[index].position);
+            formation
+                .borrow_mut()
+                .set_position(index, self.entries[index].position);
         }
 
         self.active_entry = index;
         if let Some(index) = self.active_entry {
             for (entry_index, entry) in self.entries.iter().enumerate() {
-                entry.child.borrow_mut().state.set_enabled(index  == entry_index);
+                entry
+                    .child
+                    .borrow_mut()
+                    .state
+                    .set_enabled(index == entry_index);
             }
         } else {
             for entry in self.entries.iter() {
@@ -96,10 +102,14 @@ impl WidgetKind for FormationWindow {
         for entry in self.entries.iter() {
             let x = entry.position.0 * self.grid_size.0 + self.grid_offset.0;
             let y = entry.position.1 * self.grid_size.1 + self.grid_offset.1;
-            entry.child.borrow_mut().state.set_position(widget.state.inner_left() + x as i32,
-                                                        widget.state.inner_top() + y as i32);
-            entry.child.borrow_mut().state.set_size(Size::new((self.grid_size.0 * self.button_size) as i32,
-                (self.grid_size.1 * self.button_size) as i32));
+            entry.child.borrow_mut().state.set_position(
+                widget.state.inner_left() + x as i32,
+                widget.state.inner_top() + y as i32,
+            );
+            entry.child.borrow_mut().state.set_size(Size::new(
+                (self.grid_size.0 * self.button_size) as i32,
+                (self.grid_size.1 * self.button_size) as i32,
+            ));
         }
         widget.do_children_layout();
     }
@@ -117,7 +127,7 @@ impl WidgetKind for FormationWindow {
 
         let mut grid_pos = (
             ((x - self.grid_offset.0) / self.grid_size.0 - self.button_size / 4.0).floor(),
-            ((y - self.grid_offset.1) / self.grid_size.1 - self.button_size / 4.0).floor()
+            ((y - self.grid_offset.1) / self.grid_size.1 - self.button_size / 4.0).floor(),
         );
         if grid_pos.0 < -self.grid_half_width {
             grid_pos.0 = -self.grid_half_width;
@@ -137,15 +147,26 @@ impl WidgetKind for FormationWindow {
             let r1 = (grid_pos.0, grid_pos.1, self.button_size, self.button_size);
 
             for (i, entry) in self.entries.iter().enumerate() {
-                if i == index { continue; }
+                if i == index {
+                    continue;
+                }
 
-                let r2 = (entry.position.0, entry.position.1, self.button_size, self.button_size);
+                let r2 = (
+                    entry.position.0,
+                    entry.position.1,
+                    self.button_size,
+                    self.button_size,
+                );
 
                 // if one rectangle is on the left side of the other
-                if r1.0 >= r2.0 + r2.2 || r2.0 >= r1.0 + r1.2 { continue; }
+                if r1.0 >= r2.0 + r2.2 || r2.0 >= r1.0 + r1.2 {
+                    continue;
+                }
 
                 // if one rectangle is above the other
-                if r1.1 >= r2.1 + r2.3 || r2.1 >= r1.1 + r1.3 { continue; }
+                if r1.1 >= r2.1 + r2.3 || r2.1 >= r1.1 + r1.3 {
+                    continue;
+                }
 
                 // the rectangles overlap
                 return true;
@@ -159,15 +180,21 @@ impl WidgetKind for FormationWindow {
 
     fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let widget_ref = Rc::clone(widget);
-        GameState::add_party_listener(ChangeListener::new(NAME, Box::new(move |_| {
-            widget_ref.borrow_mut().invalidate_children();
-        })));
+        GameState::add_party_listener(ChangeListener::new(
+            NAME,
+            Box::new(move |_| {
+                widget_ref.borrow_mut().invalidate_children();
+            }),
+        ));
 
         let close = Widget::with_theme(Button::empty(), "close");
-        close.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let (parent, _) = Widget::parent::<FormationWindow>(widget);
-            parent.borrow_mut().mark_for_removal();
-        })));
+        close
+            .borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(|widget, _| {
+                let (parent, _) = Widget::parent::<FormationWindow>(widget);
+                parent.borrow_mut().mark_for_removal();
+            })));
 
         let mut children = vec![close];
 
@@ -177,19 +204,25 @@ impl WidgetKind for FormationWindow {
         let formation = formation.borrow();
         for (index, (x, y)) in formation.positions_iter().enumerate() {
             let button = Widget::with_theme(Button::empty(), "position");
-            button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-                let (_, window) = Widget::parent_mut::<FormationWindow>(widget);
-                if !window.active_entry.is_some() {
-                    window.set_active_entry(Some(index));
-                } else {
-                    window.set_active_entry(None);
-                }
-            })));
+            button
+                .borrow_mut()
+                .state
+                .add_callback(Callback::new(Rc::new(move |widget, _| {
+                    let (_, window) = Widget::parent_mut::<FormationWindow>(widget);
+                    if !window.active_entry.is_some() {
+                        window.set_active_entry(Some(index));
+                    } else {
+                        window.set_active_entry(None);
+                    }
+                })));
 
             let label = Widget::with_theme(Label::empty(), "portrait");
             if let Some(entity) = party.get(index) {
                 if let Some(ref image) = entity.borrow().actor.actor.portrait {
-                    label.borrow_mut().state.add_text_arg("portrait", &image.id());
+                    label
+                        .borrow_mut()
+                        .state
+                        .add_text_arg("portrait", &image.id());
                 }
             }
             Widget::add_child_to(&button, label);

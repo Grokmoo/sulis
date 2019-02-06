@@ -14,11 +14,11 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::io::{Error};
+use std::io::Error;
 use std::rc::Rc;
 
-use sulis_core::util::{gen_rand, unable_to_create_error};
 use crate::{Actor, Module};
+use sulis_core::util::{gen_rand, unable_to_create_error};
 
 struct Entry {
     actor: Rc<Actor>,
@@ -50,7 +50,8 @@ impl Encounter {
                 None => {
                     warn!("no actor '{}' found", entry.id);
                     return unable_to_create_error("encounter", &builder.id);
-                }, Some(actor) => Rc::clone(actor),
+                }
+                Some(actor) => Rc::clone(actor),
             };
 
             total_weight += entry.weight;
@@ -73,7 +74,9 @@ impl Encounter {
     }
 
     fn gen_actor(&self) -> Option<(Rc<Actor>, Option<String>)> {
-        if self.total_weight == 0 { return None; }
+        if self.total_weight == 0 {
+            return None;
+        }
 
         let roll = gen_rand(0, self.total_weight);
         let mut cur_weight = 0;
@@ -96,14 +99,17 @@ impl Encounter {
                 None => {
                     warn!("Unable to generate actor for encounter '{}'", self.id);
                     continue;
-                }, Some(actor_data) => {
+                }
+                Some(actor_data) => {
                     actors.push(actor_data);
                 }
             }
         }
 
         for entry in self.entries.iter() {
-            if entry.always { actors.push((Rc::clone(&entry.actor), entry.unique_id.clone())); }
+            if entry.always {
+                actors.push((Rc::clone(&entry.actor), entry.unique_id.clone()));
+            }
         }
 
         actors

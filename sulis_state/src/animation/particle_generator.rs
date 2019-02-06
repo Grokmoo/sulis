@@ -14,16 +14,16 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use rlua::{UserData};
+use rlua::UserData;
 
 use std::cell::{Cell, RefCell};
 use std::rc::Rc;
 
+use crate::{animation::Anim, EntityState};
 use sulis_core::image::Image;
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::ui::{animation_state, Color};
 use sulis_core::util::{approx_eq, gen_rand, ExtInt};
-use crate::{animation::Anim, EntityState};
 
 fn is_zero(val: &f32) -> bool {
     *val == 0.0
@@ -39,8 +39,13 @@ pub enum Coord {
 #[derive(Clone, Copy, Serialize, Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
 pub enum Dist {
-    Fixed { value: f32 },
-    Uniform { min: f32, max: f32 },
+    Fixed {
+        value: f32,
+    },
+    Uniform {
+        min: f32,
+        max: f32,
+    },
     FixedAngleUniformSpeed {
         angle: f32,
         min_speed: f32,
@@ -59,7 +64,7 @@ pub enum Dist {
     },
 }
 
-impl UserData for Dist { }
+impl UserData for Dist {}
 
 fn swap_if_backwards(min: f32, max: f32) -> (f32, f32) {
     if min > max {
@@ -71,7 +76,7 @@ fn swap_if_backwards(min: f32, max: f32) -> (f32, f32) {
 
 impl Dist {
     pub fn create_fixed(value: f32) -> Dist {
-        Dist::Fixed{ value }
+        Dist::Fixed { value }
     }
 
     pub fn create_uniform(min: f32, max: f32) -> Dist {
@@ -91,32 +96,57 @@ impl Dist {
             warn!("Creating invalid angular distribution with both speed and angle fixed");
             Dist::Fixed { value: min_speed }
         } else if approx_eq(min_angle, max_angle) {
-            Dist::FixedAngleUniformSpeed { angle: min_angle, min_speed, max_speed, }
+            Dist::FixedAngleUniformSpeed {
+                angle: min_angle,
+                min_speed,
+                max_speed,
+            }
         } else if approx_eq(min_speed, max_speed) {
-            Dist::UniformAngleFixedSpeed { min_angle, max_angle, speed: min_speed, }
+            Dist::UniformAngleFixedSpeed {
+                min_angle,
+                max_angle,
+                speed: min_speed,
+            }
         } else {
-            Dist::UniformAngleUniformSpeed { min_angle, max_angle, min_speed, max_speed, }
+            Dist::UniformAngleUniformSpeed {
+                min_angle,
+                max_angle,
+                min_speed,
+                max_speed,
+            }
         }
     }
 
     fn generate_pair(&self) -> (f32, f32) {
         match self {
             &Dist::Fixed { value } => (value, value),
-            &Dist::Uniform { min, max } => (gen_rand(min, max),
-                gen_rand(min, max)),
-            &Dist::FixedAngleUniformSpeed { angle, min_speed, max_speed } => {
+            &Dist::Uniform { min, max } => (gen_rand(min, max), gen_rand(min, max)),
+            &Dist::FixedAngleUniformSpeed {
+                angle,
+                min_speed,
+                max_speed,
+            } => {
                 let speed = gen_rand(min_speed, max_speed);
                 radial_to_cart(angle, speed)
-            },
-            &Dist::UniformAngleFixedSpeed { min_angle, max_angle, speed } => {
+            }
+            &Dist::UniformAngleFixedSpeed {
+                min_angle,
+                max_angle,
+                speed,
+            } => {
                 let angle = gen_rand(min_angle, max_angle);
                 radial_to_cart(angle, speed)
-            },
-            &Dist::UniformAngleUniformSpeed { min_angle, max_angle, min_speed, max_speed } => {
+            }
+            &Dist::UniformAngleUniformSpeed {
+                min_angle,
+                max_angle,
+                min_speed,
+                max_speed,
+            } => {
                 let speed = gen_rand(min_speed, max_speed);
                 let angle = gen_rand(min_angle, max_angle);
                 radial_to_cart(angle, speed)
-            },
+            }
         }
     }
 
@@ -148,11 +178,16 @@ pub struct DistParam {
 
 impl DistParam {
     pub fn new(value: Dist, dt: Dist, d2t: Dist, d3t: Dist) -> DistParam {
-        DistParam { value, dt, d2t, d3t }
+        DistParam {
+            value,
+            dt,
+            d2t,
+            d3t,
+        }
     }
 }
 
-impl UserData for DistParam { }
+impl UserData for DistParam {}
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
@@ -167,7 +202,7 @@ impl DistParam2D {
     }
 }
 
-impl UserData for DistParam2D { }
+impl UserData for DistParam2D {}
 
 #[derive(Copy, Clone, Debug, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -188,48 +223,65 @@ pub struct Param {
     pub value: f32,
 }
 
-impl UserData for Param { }
+impl UserData for Param {}
 
 impl Param {
     pub fn is_non_zero(&self) -> bool {
-        return self.initial_value != 0.0 ||
-            self.dt != 0.0 ||
-            self.d2t != 0.0 ||
-            self.d3t != 0.0;
+        return self.initial_value != 0.0 || self.dt != 0.0 || self.d2t != 0.0 || self.d3t != 0.0;
     }
 
     pub fn offset(&self, offset: f32) -> Param {
         let value = self.value + offset;
         Param {
-            initial_value: value, value, dt: self.dt, d2t: self.d2t, d3t: self.d3t
+            initial_value: value,
+            value,
+            dt: self.dt,
+            d2t: self.d2t,
+            d3t: self.d3t,
         }
     }
 
     pub fn fixed(value: f32) -> Param {
         let initial_value = value;
         Param {
-            initial_value, value, dt: 0.0, d2t: 0.0, d3t: 0.0,
+            initial_value,
+            value,
+            dt: 0.0,
+            d2t: 0.0,
+            d3t: 0.0,
         }
     }
 
     pub fn with_speed(value: f32, speed: f32) -> Param {
         let initial_value = value;
         Param {
-            initial_value, value, dt: speed, d2t: 0.0, d3t: 0.0,
+            initial_value,
+            value,
+            dt: speed,
+            d2t: 0.0,
+            d3t: 0.0,
         }
     }
 
     pub fn with_accel(value: f32, speed: f32, accel: f32) -> Param {
         let initial_value = value;
         Param {
-            initial_value, value, dt: speed, d2t: accel, d3t: 0.0,
+            initial_value,
+            value,
+            dt: speed,
+            d2t: accel,
+            d3t: 0.0,
         }
     }
 
     pub fn with_jerk(value: f32, speed: f32, accel: f32, jerk: f32) -> Param {
         let initial_value = value;
         Param {
-           initial_value, value, dt: speed, d2t: accel, d3t: jerk,
+            initial_value,
+            value,
+            dt: speed,
+            d2t: accel,
+            d3t: jerk,
         }
     }
 
@@ -238,8 +290,13 @@ impl Param {
     }
 }
 
-pub (in crate::animation) fn update(owner: &Rc<RefCell<EntityState>>, model: &mut GeneratorModel,
-                             state: &mut GeneratorState, marked_for_removal: &Rc<Cell<bool>>, millis: u32) {
+pub(in crate::animation) fn update(
+    owner: &Rc<RefCell<EntityState>>,
+    model: &mut GeneratorModel,
+    state: &mut GeneratorState,
+    marked_for_removal: &Rc<Cell<bool>>,
+    millis: u32,
+) {
     if model.moves_with_parent && owner.borrow().actor.is_dead() {
         marked_for_removal.set(true);
         return;
@@ -275,7 +332,9 @@ pub (in crate::animation) fn update(owner: &Rc<RefCell<EntityState>>, model: &mu
 
     let mut i = state.particles.len();
     loop {
-        if i == 0 { break; }
+        if i == 0 {
+            break;
+        }
 
         i -= 1;
 
@@ -289,9 +348,17 @@ pub (in crate::animation) fn update(owner: &Rc<RefCell<EntityState>>, model: &mu
     state.previous_secs = secs;
 }
 
-pub (in crate::animation) fn draw(state: &GeneratorState, model: &GeneratorModel, owner: &Rc<RefCell<EntityState>>,
-        renderer: &mut GraphicsRenderer, offset_x: f32, offset_y: f32,
-        scale_x: f32, scale_y: f32, _millis: u32) {
+pub(in crate::animation) fn draw(
+    state: &GeneratorState,
+    model: &GeneratorModel,
+    owner: &Rc<RefCell<EntityState>>,
+    renderer: &mut GraphicsRenderer,
+    offset_x: f32,
+    offset_y: f32,
+    scale_x: f32,
+    scale_y: f32,
+    _millis: u32,
+) {
     let (offset_x, offset_y) = if model.moves_with_parent {
         let parent = owner.borrow();
         let x = parent.location.x as f32 + parent.size.width as f32 / 2.0 + parent.sub_pos.0;
@@ -308,14 +375,25 @@ pub (in crate::animation) fn draw(state: &GeneratorState, model: &GeneratorModel
         let w = particle.width;
         let h = particle.height;
         let millis = (particle.current_duration * 1000.0) as u32;
-        state.image.append_to_draw_list(&mut draw_list, &animation_state::NORMAL,
-                                       x, y, w, h, millis);
+        state.image.append_to_draw_list(
+            &mut draw_list,
+            &animation_state::NORMAL,
+            x,
+            y,
+            w,
+            h,
+            millis,
+        );
     }
 
     if !draw_list.is_empty() {
         draw_list.set_scale(scale_x, scale_y);
-        draw_list.set_color(Color::new(model.red.value, model.green.value,
-                                       model.blue.value, model.alpha.value));
+        draw_list.set_color(Color::new(
+            model.red.value,
+            model.green.value,
+            model.blue.value,
+            model.alpha.value,
+        ));
         if let Some(ref rotation) = model.rotation {
             draw_list.rotate(rotation.value);
         }
@@ -328,12 +406,12 @@ pub fn new(owner: &Rc<RefCell<EntityState>>, image: Rc<Image>, model: GeneratorM
         image,
         particles: Vec::new(),
         gen_overflow: model.initial_overflow,
-        previous_secs: 0.0
+        previous_secs: 0.0,
     };
 
     Anim::new_pgen(owner, model.duration_millis, model, state)
 }
-pub (in crate::animation) struct GeneratorState {
+pub(in crate::animation) struct GeneratorState {
     pub(in crate::animation) image: Rc<Image>,
     pub(in crate::animation) particles: Vec<Particle>,
     pub(in crate::animation) gen_overflow: f32,
@@ -374,7 +452,7 @@ pub struct GeneratorModel {
     pub is_blocking: bool,
 }
 
-impl UserData for GeneratorModel { }
+impl UserData for GeneratorModel {}
 
 impl GeneratorModel {
     pub fn new(duration_millis: ExtInt, x: f32, y: f32) -> GeneratorModel {
@@ -420,7 +498,8 @@ impl GeneratorModel {
                     position.1.dt += dt.1;
                     position.1.d2t += d2t.1;
                     position.1.d3t += d3t.1;
-                }, Some(ref y) => {
+                }
+                Some(ref y) => {
                     let x = &dist2d.x;
                     position.0.initial_value += x.value.generate();
                     position.0.dt += x.dt.generate();
@@ -435,11 +514,8 @@ impl GeneratorModel {
             }
         }
 
-
         let total_duration = match self.particle_duration_dist {
-            None => {
-                self.duration_millis.to_f32() * 1000.0
-            },
+            None => self.duration_millis.to_f32() * 1000.0,
             Some(ref dist) => dist.generate(),
         };
 

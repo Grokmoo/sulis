@@ -15,17 +15,20 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::cmp;
-use std::io::{Error};
 use std::collections::hash_map::Iter;
 use std::collections::HashMap;
+use std::io::Error;
 use std::rc::Rc;
 
-use sulis_core::util::unable_to_create_error;
+use crate::rules::{bonus::AttackBuilder, BonusList, ItemKind, Slot};
 use sulis_core::image::Image;
-use sulis_core::resource::{ResourceSet};
-use crate::rules::{ItemKind, bonus::AttackBuilder, BonusList, Slot};
+use sulis_core::resource::ResourceSet;
+use sulis_core::util::unable_to_create_error;
 
-use crate::{Actor, ImageLayer, Module, ability::{AIData, Duration}, PrereqList, PrereqListBuilder, ItemAdjective};
+use crate::{
+    ability::{AIData, Duration},
+    Actor, ImageLayer, ItemAdjective, Module, PrereqList, PrereqListBuilder,
+};
 
 #[derive(Deserialize, Debug, Clone)]
 #[serde(deny_unknown_fields)]
@@ -76,8 +79,10 @@ pub struct Item {
     pub added_adjectives: Vec<Rc<ItemAdjective>>,
 }
 
-fn build_hash_map(id: &str, input: Option<HashMap<ImageLayer, String>>)
-    -> Result<Option<HashMap<ImageLayer, Rc<Image>>>, Error> {
+fn build_hash_map(
+    id: &str,
+    input: Option<HashMap<ImageLayer, String>>,
+) -> Result<Option<HashMap<ImageLayer, Rc<Image>>>, Error> {
     match input {
         Some(input_images) => {
             let mut output = HashMap::new();
@@ -86,20 +91,25 @@ fn build_hash_map(id: &str, input: Option<HashMap<ImageLayer, String>>)
                     None => {
                         warn!("No image found for image '{}'", image_str);
                         return unable_to_create_error("item", id);
-                    }, Some(image) => image,
+                    }
+                    Some(image) => image,
                 };
 
                 output.insert(layer, image);
             }
 
             Ok(Some(output))
-        }, None => Ok(None),
+        }
+        None => Ok(None),
     }
 }
 
 impl Item {
-    pub fn clone_with_adjectives(item: &Rc<Item>, mut adjectives: Vec<Rc<ItemAdjective>>,
-                                 new_id: String) -> Item {
+    pub fn clone_with_adjectives(
+        item: &Rc<Item>,
+        mut adjectives: Vec<Rc<ItemAdjective>>,
+        new_id: String,
+    ) -> Item {
         assert!(adjectives.len() > 0);
 
         let mut added_adjectives = item.added_adjectives.clone();
@@ -108,8 +118,11 @@ impl Item {
         let mut all_adjectives = item.builder_adjectives.clone();
         all_adjectives.extend_from_slice(&added_adjectives);
 
-        let (equippable, value) = apply_adjectives(&item.original_equippable,
-                                                   item.original_value, &all_adjectives);
+        let (equippable, value) = apply_adjectives(
+            &item.original_equippable,
+            item.original_value,
+            &all_adjectives,
+        );
 
         let mut name = String::new();
         for adj in all_adjectives.iter() {
@@ -149,10 +162,9 @@ impl Item {
             None => {
                 warn!("No image found for icon '{}'", builder.icon);
                 return unable_to_create_error("item", &builder.id);
-            },
-            Some(icon) => icon
+            }
+            Some(icon) => icon,
         };
-
 
         if let &Some(ref equippable) = &builder.equippable {
             if let Some(ref attack) = equippable.attack {
@@ -173,7 +185,8 @@ impl Item {
                     None => {
                         warn!("No script found with id '{}'", usable.script);
                         return unable_to_create_error("item", &builder.id);
-                    }, Some(_) => (),
+                    }
+                    Some(_) => (),
                 };
 
                 Some(Usable {
@@ -199,16 +212,18 @@ impl Item {
                 None => {
                     warn!("No item adjective found with id '{}'", adj_id);
                     return unable_to_create_error("item", &builder.id);
-                }, Some(ref adj) => Rc::clone(adj),
+                }
+                Some(ref adj) => Rc::clone(adj),
             };
             adjectives.push(adjective);
         }
 
-        let (equippable, value) = apply_adjectives(&builder.equippable, builder.value as i32, &adjectives);
+        let (equippable, value) =
+            apply_adjectives(&builder.equippable, builder.value as i32, &adjectives);
 
         Ok(Item {
             id: builder.id.clone(),
-            icon: icon,
+            icon,
             image: images,
             kind: builder.kind.unwrap_or(ItemKind::Other),
             alternate_image: alt_images,
@@ -227,8 +242,11 @@ impl Item {
     }
 
     pub fn adjective_icons(&self) -> Vec<String> {
-        self.builder_adjectives.iter().chain(self.added_adjectives.iter())
-            .map(|adj| adj.item_status_icon.id()).collect()
+        self.builder_adjectives
+            .iter()
+            .chain(self.added_adjectives.iter())
+            .map(|adj| adj.item_status_icon.id())
+            .collect()
     }
 
     pub fn meets_prereqs(&self, actor: &Rc<Actor>) -> bool {
@@ -267,8 +285,11 @@ impl Item {
     }
 }
 
-fn apply_adjectives(equippable: &Option<Equippable>, value: i32,
-                    adjectives: &Vec<Rc<ItemAdjective>>) -> (Option<Equippable>, i32) {
+fn apply_adjectives(
+    equippable: &Option<Equippable>,
+    value: i32,
+    adjectives: &Vec<Rc<ItemAdjective>>,
+) -> (Option<Equippable>, i32) {
     // first, add bonuses from adjectives and accumulate modifiers
     let mut value_add = 0;
     let mut value_modifier = 1.0;
@@ -305,7 +326,9 @@ fn apply_adjectives(equippable: &Option<Equippable>, value: i32,
 
         if let Some(ref mut attack) = equippable.attack {
             if attack_bonus_mod != 1.0 || attack_penalty_mod != 1.0 {
-                attack.bonuses.apply_modifier(attack_penalty_mod, attack_bonus_mod);
+                attack
+                    .bonuses
+                    .apply_modifier(attack_penalty_mod, attack_bonus_mod);
             }
 
             if attack_damage_mod != 1.0 {
@@ -314,10 +337,15 @@ fn apply_adjectives(equippable: &Option<Equippable>, value: i32,
             }
         }
 
-        equippable.bonuses.apply_modifiers(penalty_modifier, bonus_modifier);
+        equippable
+            .bonuses
+            .apply_modifiers(penalty_modifier, bonus_modifier);
     }
 
-    let value = cmp::max(0, (value as f32 * value_modifier).round() as i32 + value_add);
+    let value = cmp::max(
+        0,
+        (value as f32 * value_modifier).round() as i32 + value_add,
+    );
 
     (equippable, value)
 }
@@ -331,11 +359,13 @@ pub struct UsableBuilder {
     pub consumable: bool,
     pub short_description: String,
     pub ai: AIData,
-    #[serde(default="bool_true")]
+    #[serde(default = "bool_true")]
     pub use_in_slot: bool,
 }
 
-fn bool_true() -> bool { true }
+fn bool_true() -> bool {
+    true
+}
 
 #[derive(Deserialize, Debug)]
 #[serde(deny_unknown_fields)]

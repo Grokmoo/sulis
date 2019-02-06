@@ -15,13 +15,13 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::any::Any;
-use std::rc::Rc;
 use std::cell::RefCell;
+use std::rc::Rc;
 
+use sulis_core::io::GraphicsRenderer;
 use sulis_core::ui::{Widget, WidgetKind};
-use sulis_core::io::{GraphicsRenderer};
 use sulis_core::util::Point;
-use sulis_core::widgets::{TextArea};
+use sulis_core::widgets::TextArea;
 
 const NAME: &'static str = "prop_mouseover";
 
@@ -49,8 +49,15 @@ impl WidgetKind for BasicMouseover {
         self.text_area.borrow_mut().layout(widget);
     }
 
-    fn draw(&mut self, renderer: &mut GraphicsRenderer, pixel_size: Point,
-            widget: &Widget, millis: u32) {
-        self.text_area.borrow_mut().draw(renderer, pixel_size, widget, millis);
+    fn draw(
+        &mut self,
+        renderer: &mut GraphicsRenderer,
+        pixel_size: Point,
+        widget: &Widget,
+        millis: u32,
+    ) {
+        self.text_area
+            .borrow_mut()
+            .draw(renderer, pixel_size, widget, millis);
     }
 }

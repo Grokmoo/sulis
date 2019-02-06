@@ -15,14 +15,14 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::any::Any;
-use std::rc::Rc;
 use std::cell::{Cell, RefCell};
+use std::rc::Rc;
 
-use sulis_state::{ChangeListener, EntityState, GameState};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
-use sulis_core::widgets::{Button};
+use sulis_core::widgets::Button;
+use sulis_state::{ChangeListener, EntityState, GameState};
 
-use crate::{ItemListPane, item_list_pane::Filter};
+use crate::{item_list_pane::Filter, ItemListPane};
 
 pub const NAME: &str = "merchant_window";
 
@@ -41,9 +41,13 @@ impl MerchantWindow {
         }))
     }
 
-    pub fn merchant_id(&self) -> &str { &self.merchant_id }
+    pub fn merchant_id(&self) -> &str {
+        &self.merchant_id
+    }
 
-    pub fn player(&self) -> &Rc<RefCell<EntityState>> { &self.player }
+    pub fn player(&self) -> &Rc<RefCell<EntityState>> {
+        &self.player
+    }
 }
 
 impl WidgetKind for MerchantWindow {
@@ -73,17 +77,25 @@ impl WidgetKind for MerchantWindow {
                 Some(ref mut merchant) => merchant,
             };
 
-            merchant.listeners.add(ChangeListener::invalidate(NAME, widget));
+            merchant
+                .listeners
+                .add(ChangeListener::invalidate(NAME, widget));
         }
 
         let close = Widget::with_theme(Button::empty(), "close");
-        close.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let (parent, _) = Widget::parent::<MerchantWindow>(widget);
-            parent.borrow_mut().mark_for_removal();
-        })));
+        close
+            .borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(|widget, _| {
+                let (parent, _) = Widget::parent::<MerchantWindow>(widget);
+                parent.borrow_mut().mark_for_removal();
+            })));
 
-        let item_list_pane = Widget::with_defaults(
-            ItemListPane::new_merchant(&self.player, self.merchant_id.to_string(), &self.filter));
+        let item_list_pane = Widget::with_defaults(ItemListPane::new_merchant(
+            &self.player,
+            self.merchant_id.to_string(),
+            &self.filter,
+        ));
 
         vec![close, item_list_pane]
     }

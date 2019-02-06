@@ -14,38 +14,53 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::cmp;
 use std::cell::{Cell, RefCell};
+use std::cmp;
 use std::rc::Rc;
 
-use sulis_core::util::{Point};
+use crate::{animation::Anim, EntityState, GameState};
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::ui::animation_state;
+use sulis_core::util::Point;
 use sulis_module::ObjectSize;
-use crate::{animation::Anim, EntityState, GameState};
 
 fn check_immediate_cancel(mover: &Rc<RefCell<EntityState>>, model: &mut MoveAnimModel) -> bool {
     let cur_area_id = mover.borrow().location.area_id.to_string();
-    if (model.area_id != cur_area_id) || model.path.is_empty() { return true; }
+    if (model.area_id != cur_area_id) || model.path.is_empty() {
+        return true;
+    }
 
-    if GameState::is_combat_active() != model.combat_mode { return true; }
+    if GameState::is_combat_active() != model.combat_mode {
+        return true;
+    }
 
-    if mover.borrow().marked_for_removal { return true; }
+    if mover.borrow().marked_for_removal {
+        return true;
+    }
 
     let actor = &mover.borrow().actor;
-    if actor.is_dead() || actor.stats.move_disabled { return true; }
+    if actor.is_dead() || actor.stats.move_disabled {
+        return true;
+    }
 
     false
 }
 
-pub (in crate::animation) fn update(mover: &Rc<RefCell<EntityState>>, marked_for_removal: &Rc<Cell<bool>>,
-                             model: &mut MoveAnimModel, millis: u32) {
+pub(in crate::animation) fn update(
+    mover: &Rc<RefCell<EntityState>>,
+    marked_for_removal: &Rc<Cell<bool>>,
+    model: &mut MoveAnimModel,
+    millis: u32,
+) {
     if check_immediate_cancel(mover, model) {
         marked_for_removal.set(true);
         return;
     }
 
-    let frame_index = cmp::min((millis / model.frame_time_millis) as usize, model.path.len() - 1);
+    let frame_index = cmp::min(
+        (millis / model.frame_time_millis) as usize,
+        model.path.len() - 1,
+    );
     let frame_frac = (millis % model.frame_time_millis) as f32 / model.frame_time_millis as f32;
 
     if frame_index != model.path.len() - 1 {
@@ -69,7 +84,10 @@ pub (in crate::animation) fn update(mover: &Rc<RefCell<EntityState>>, marked_for
 
     let p = model.path[frame_index];
     let area_state = GameState::get_area_state(&mover.borrow().location.area_id).unwrap();
-    if !area_state.borrow_mut().move_entity(mover, p.x, p.y, move_ap as u32) {
+    if !area_state
+        .borrow_mut()
+        .move_entity(mover, p.x, p.y, move_ap as u32)
+    {
         marked_for_removal.set(true);
         return;
     }
@@ -79,10 +97,18 @@ pub (in crate::animation) fn update(mover: &Rc<RefCell<EntityState>>, marked_for
     }
 }
 
-pub (in crate::animation) fn draw(model: &MoveAnimModel, renderer: &mut GraphicsRenderer,
-                           offset_x: f32, offset_y: f32,
-                           scale_x: f32, scale_y: f32, millis: u32) {
-    if model.path.len() == 0 { return; }
+pub(in crate::animation) fn draw(
+    model: &MoveAnimModel,
+    renderer: &mut GraphicsRenderer,
+    offset_x: f32,
+    offset_y: f32,
+    scale_x: f32,
+    scale_y: f32,
+    millis: u32,
+) {
+    if model.path.len() == 0 {
+        return;
+    }
 
     let w = model.owner_size.width as f32;
     let h = model.owner_size.height as f32;
@@ -92,13 +118,20 @@ pub (in crate::animation) fn draw(model: &MoveAnimModel, renderer: &mut Graphics
     let y = offset_y + last.y as f32;
 
     let mut draw_list = DrawList::empty_sprite();
-    model.owner_size.selection_image.append_to_draw_list(&mut draw_list, &animation_state::NORMAL,
-                                                         x, y, w, h, millis);
+    model.owner_size.selection_image.append_to_draw_list(
+        &mut draw_list,
+        &animation_state::NORMAL,
+        x,
+        y,
+        w,
+        h,
+        millis,
+    );
     draw_list.set_scale(scale_x, scale_y);
     renderer.draw(draw_list);
 }
 
-pub (in crate::animation) fn cleanup(owner: &Rc<RefCell<EntityState>>) {
+pub(in crate::animation) fn cleanup(owner: &Rc<RefCell<EntityState>>) {
     owner.borrow_mut().sub_pos = (0.0, 0.0);
 }
 
@@ -114,9 +147,10 @@ pub fn new(mover: &Rc<RefCell<EntityState>>, path: Vec<Point>, frame_time_millis
         if i < path.len() as i32 - 2 {
             next = path[i as usize + 1];
             next2 = path[i as usize + 2];
-        } if i < path.len() as i32 - 1 {
+        }
+        if i < path.len() as i32 - 1 {
             next = path[i as usize + 1];
-            // next2 is already set to the final point
+        // next2 is already set to the final point
         } else {
             // next and next2 are already set to the final point
         }
@@ -148,9 +182,9 @@ pub fn new(mover: &Rc<RefCell<EntityState>>, path: Vec<Point>, frame_time_millis
 pub struct MoveAnimModel {
     area_id: String,
     combat_mode: bool, // whether this move was created in or out of combat.  a change in
-                       // this status will cancel the move
-    pub (in crate::animation) path: Vec<Point>,
-    pub (in crate::animation) last_frame_index: i32,
+    // this status will cancel the move
+    pub(in crate::animation) path: Vec<Point>,
+    pub(in crate::animation) last_frame_index: i32,
     frame_time_millis: u32,
     smoothed_path: Vec<(f32, f32)>,
     owner_size: Rc<ObjectSize>,

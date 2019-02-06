@@ -14,9 +14,9 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::cmp;
 use std::fmt;
 use std::ops;
-use std::cmp;
 
 use crate::ui::Border;
 
@@ -43,15 +43,24 @@ impl Point {
     }
 
     pub fn from(other: &Point) -> Point {
-        Point { x: other.x, y: other.y }
+        Point {
+            x: other.x,
+            y: other.y,
+        }
     }
 
     pub fn from_tuple_i32(vals: (i32, i32)) -> Point {
-        Point { x: vals.0, y: vals.1 }
+        Point {
+            x: vals.0,
+            y: vals.1,
+        }
     }
 
     pub fn from_tuple(other: (u32, u32)) -> Point {
-        Point { x: other.0 as i32, y: other.1 as i32 }
+        Point {
+            x: other.0 as i32,
+            y: other.1 as i32,
+        }
     }
 
     pub fn as_tuple(&self) -> (i32, i32) {
@@ -64,7 +73,10 @@ impl Point {
     }
 
     pub fn add(&self, x: i32, y: i32) -> Point {
-        Point { x: &self.x + x, y: &self.y + y }
+        Point {
+            x: &self.x + x,
+            y: &self.y + y,
+        }
     }
 
     pub fn add_mut(&mut self, x: i32, y: i32) {
@@ -114,22 +126,29 @@ impl Point {
     }
 
     pub fn inner(&self, border: &Border) -> Point {
-        Point { x: self.x + border.left, y: self.y + border.top }
+        Point {
+            x: self.x + border.left,
+            y: self.y + border.top,
+        }
     }
 
     /// Returns true if this point's x coordinate is in
     /// the interval [0, max_x) and the y coordinate is in
     /// the interval [0, max_y).  Returns false otherwise.
     pub fn in_bounds(&self, max_x: i32, max_y: i32) -> bool {
-        if self.x < 0 || self.y < 0 { return false; }
-        if self.x >= max_x || self.y >= max_y { return false; }
+        if self.x < 0 || self.y < 0 {
+            return false;
+        }
+        if self.x >= max_x || self.y >= max_y {
+            return false;
+        }
         true
     }
 
     /// Returns the eucliden distance between these two points
     pub fn dist(&self, other: &Point) -> f32 {
-        (((self.x - other.x) * (self.x - other.x) +
-            (self.y - other.y) * (self.y - other.y)) as f32).sqrt()
+        (((self.x - other.x) * (self.x - other.x) + (self.y - other.y) * (self.y - other.y)) as f32)
+            .sqrt()
     }
 }
 
@@ -139,7 +158,7 @@ impl ops::Add<Point> for Point {
     fn add(self, rhs: Point) -> Point {
         Point {
             x: self.x + rhs.x,
-            y: self.y + rhs.y
+            y: self.y + rhs.y,
         }
     }
 }

@@ -1,0 +1,42 @@
+---
+id: guard01
+name: Guard
+race: human_simple
+sex: Male
+attributes:
+  str: 12
+  dex: 10
+  end: 13
+  per: 10
+  int: 10
+  wis: 10
+conversation: guard01
+faction: Neutral
+images:
+  Background: creatures/human21
+  Shadow: empty
+  Foreground: empty
+hue: 0.30000001192092898
+inventory:
+  equipped:
+    Feet: { id: boots_mail }
+    Torso: { id: torso_mail }
+    Legs: { id: legs_mail }
+    HeldMain: { id: warhammer }
+    HeldOff: { id: shield_kite }
+  quick: {}
+levels:
+  fighter: 1
+abilities:
+  - armor_light
+  - armor_medium
+  - armor_heavy
+  - weapon_axe
+  - weapon_crossbow
+  - weapon_bow
+  - weapon_small_sword
+  - weapon_large_sword
+  - weapon_spear
+  - weapon_mace
+  - weapon_simple
+ai: ~

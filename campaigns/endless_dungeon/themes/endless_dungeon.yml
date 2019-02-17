@@ -1,0 +1,17 @@
+---
+id: theme
+themes:
+  game:
+    children:
+      world_map_window:
+        children:
+          bg:
+            background: bay_of_birie
+          labels:
+            from: text_area
+            relative:
+              width: Max
+              height: Max
+            text: |
+              [s=4.0|
+              ][f=outlined;s=10.0;a=210|Bay of Birie]

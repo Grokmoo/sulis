@@ -161,9 +161,11 @@ impl LayerSet {
         }
 
         let elevation;
-        if builder.elevation.len() != dim {
+        if builder.elevation.is_empty() {
+            elevation = vec![0; dim];
+        } else if builder.elevation.len() != dim {
             warn!(
-                "In '{}': Elevation array must be dimensions length*width",
+                "In '{}': Elevation array must be zero or dimensions length*width",
                 builder.id
             );
             elevation = vec![0; dim];

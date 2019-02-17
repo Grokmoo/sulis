@@ -1,0 +1,18 @@
+id: misc_merch01
+initial_nodes:
+  - id: start01
+nodes:
+  start01:
+    text: |
+      I sell all manner of items fit for the adventuring sort.  What can I get you?
+    responses:
+      - text: "Yes, I'll have a look."
+        on_select:
+          - show_merchant:
+              id: misc_merch01
+              loot_list: level5_misc_merchant
+              buy_frac: 1.0
+              sell_frac: 0.25
+              refresh_time:
+                hour: 24
+      - text: "Nothing for now."

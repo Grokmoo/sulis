@@ -1,0 +1,53 @@
+id: guard01
+initial_nodes:
+  - id: start01
+nodes:
+  start01:
+    text: |
+      [c=888|The guard seems friendly enough.]
+      
+      Welcome to Moonmouth.
+    responses:
+      - text: "[c=888|Continue]"
+        to: main
+  main:
+    text: |
+      [c=888|He awaits your question.]
+    responses:
+      - text: "What can you tell me about the Dungeon?"
+        to: dungeon_ask
+      - text: "Where is the entrance to the Dungeon?"
+        to: location_ask
+      - text: "Is the Dungeon dangerous?"
+        to: danger_ask
+      - text: "What is the history of this town?"
+        to: history_ask
+      - text: "Farewell."
+  dungeon_ask:
+    text: |
+      Well, not much is known, to be honest.  Some months back, a rockslide revealed a cave in the side of the hill.  Some folks went inside, and found the entrance.
+      
+      They say it goes on forever.  I don't know about that, but it is certainly mighty big.
+    responses:
+      - text: "[c=888|Continue]"
+        to: main
+  location_ask:
+    text: |
+      Just head South into town and turn to the East.  You can't miss it.
+    responses:
+      - text: "[c=888|Continue]"
+        to: main
+  history_ask:
+    text: |
+      Well, Moonmouth has always just been a tiny fishing village, nothing of note, really.  All that has changed since the dungeon was discovered.  Town's been overrun with adventurers of all types.
+    responses:
+      - text: "[c=888|Continue]"
+        to: main
+  danger_ask:
+    text: |
+      I reckon so.  An awful lot of people have gone in, and never come back out.  Types that can handle themselves, too.
+      
+      Myself, I haven't been inside and don't intend to.
+    responses:
+      - text: "[c=888|Continue]"
+        to: main

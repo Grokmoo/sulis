@@ -433,6 +433,8 @@ where
     let vec_u8 = base64::decode(&input.entries).map_err(|err| Error::custom(err.to_string()))?;
 
     let mut out = Vec::new();
+    if vec_u8.is_empty() { return Ok(out); }
+
     let mut i = 0;
     loop {
         if i + 2 > vec_u8.len() {
@@ -514,6 +516,7 @@ where
 
         let mut result_vec: Vec<Vec<u16>> = Vec::new();
         let mut i = 0;
+        if vec_u8.is_empty() { continue; }
         loop {
             if i + 4 > vec_u8.len() {
                 return Err(Error::custom("Invalid encoded base64 string"));

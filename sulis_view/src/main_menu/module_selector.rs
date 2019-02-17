@@ -78,12 +78,7 @@ impl WidgetKind for ModuleSelector {
         for campaign_group in campaign_groups {
             let group_widget = Widget::empty("campaign_group");
 
-            let name = Widget::with_theme(Label::empty(), "name_label");
-            name.borrow_mut()
-                .state
-                .add_text_arg("name", &campaign_group.name);
-            Widget::add_child_to(&group_widget, name);
-
+            let mut modules_in_group = 0;
             for index in groups.get(campaign_group).iter().flat_map(|v| v.iter()) {
                 let index = *index;
                 let module = &self.modules[index];
@@ -110,8 +105,17 @@ impl WidgetKind for ModuleSelector {
                         parent.borrow_mut().invalidate_children();
                     })));
                 Widget::add_child_to(&group_widget, button);
+                modules_in_group += 1;
             }
 
+            if modules_in_group > 1 {
+                // only show group label if there is more than one campaign in the group
+                let name = Widget::with_theme(Label::empty(), "name_label");
+                name.borrow_mut()
+                    .state
+                    .add_text_arg("name", &campaign_group.name);
+                Widget::add_child_to_front(&group_widget, name);
+            }
             scrollpane.borrow().add_to_content(group_widget);
         }
 

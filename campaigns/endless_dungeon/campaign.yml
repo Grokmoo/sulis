@@ -1,0 +1,31 @@
+id: endless_dungeon
+group:
+  id: endless_dungeon
+  name: "The Endless Dungeon"
+  position: 0
+name: "The Endless Dungeon"
+starting_time:
+  day: 1
+  hour: 9
+starting_area: moonmouth
+starting_location: [29, 5]
+description: |
+  This story begins in the town of Moonmouth, located on the northern shores of Uqebesh, near the bay of Birie.
+  
+  An entrance to the fabled Endless Dungeon has recently been uncovered here.  According to the legend, no one has ever reached the bottom.
+  
+  Adventurers from across the known world and beyond have come here, to test their skills, earn a name for themselves, or perhaps just partake in the unimaginably vast riches below.  What will be your fate?
+backstory_conversation: backstory
+max_starting_level: 1
+on_party_death_script:
+  id: campaign
+  func: on_party_death
+world_map:
+  size: [21.0, 12.0]
+  offset: [-1.0, -0.7]
+  locations:
+    moonmouth:
+      name: "Moonmouth"
+      position: [9.5, 6.75]
+      icon: town01
+      initially_enabled: false

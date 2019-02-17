@@ -1,0 +1,28 @@
+---
+id: misc_merch01
+name: Merchant
+race: human
+sex: Male
+attributes:
+  str: 10
+  dex: 10
+  end: 10
+  per: 10
+  int: 10
+  wis: 10
+conversation: misc_merch01
+faction: Neutral
+images:
+  Foreground: empty
+  Background: creatures/human29
+  Shadow: empty
+hue: 0.30000001192092898
+inventory:
+  equipped: {}
+  quick: {}
+  pc_starting_coins: 0
+  pc_starting_items: []
+levels:
+  fighter: 1
+abilities: []
+ai: ~

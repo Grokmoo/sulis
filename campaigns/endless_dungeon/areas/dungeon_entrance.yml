@@ -1,0 +1,42 @@
+---
+id: dungeon_entrance
+name: Dungeon Entrance
+generate: true
+width: 50
+height: 50
+visibility_tile: gui/area_invis
+explored_tile: gui/area_unexplored
+max_vis_distance: 12
+max_vis_up_one_distance: 6
+world_map_location: moonmouth
+on_rest:
+  Disabled:
+    message: "You may not rest here."
+location_kind: Indoors
+generate: false
+layers:
+  - terrain_base
+  - terrain_border
+  - walls
+  - walls_top
+  - prop
+  - object
+  - object_interior
+  - decoration
+  - walls_aerial
+  - aerial
+  - aerial_prop
+entity_layer: 7
+actors: []
+props: []
+encounters: []
+transitions: []
+triggers: []
+terrain:
+  kinds: []
+  entries: ""
+walls:
+  kinds: []
+  entries: ""
+layer_set: {}
+elevation: ""

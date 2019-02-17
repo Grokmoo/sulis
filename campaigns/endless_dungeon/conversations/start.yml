@@ -1,0 +1,23 @@
+id: start
+initial_nodes:
+  - id: start01
+nodes:
+  start01:
+    text: |
+      [c=888|You jump off of the small row boat that you used to reach shore.  Far off at sea lies the transport vessel that you booked passage on to Moonmouth.]
+    responses:
+      - text: |
+          [c=888|Continue]
+        to: start02
+  start02:
+    text: |
+      [c=888|Before you lies the town.  There is quite a bit of activity, most of it surely a result of the discovery of the Dungeon entrance.]
+    responses:
+      - text: |
+          [c=888|Continue]
+        to: start03
+  start03:
+    text: |
+      [c=888|The Dungeon itself should not be hard to find.  Your future awaits!]
+    responses:
+      - text: "[c=888|Onward!]"

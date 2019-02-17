@@ -1,0 +1,7 @@
+id: bay_of_birie
+src: "bay_of_birie.png"
+size: [ 896, 512 ]
+groups:
+  misc:
+    areas:
+      worldmap: [0, 0, 896, 512]

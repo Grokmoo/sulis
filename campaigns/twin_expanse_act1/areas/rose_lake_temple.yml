@@ -12,7 +12,6 @@ on_rest:
   Disabled:
     message: You cannot rest here.  Find an inn or temple.
 location_kind: Indoors
-generate: false
 layers:
   - terrain_base
   - terrain_border

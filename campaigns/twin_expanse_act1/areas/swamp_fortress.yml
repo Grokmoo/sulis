@@ -12,7 +12,6 @@ on_rest:
   Disabled:
     message: You cannot rest here.  There are too many enemies about.
 location_kind: Outdoors
-generate: false
 layers:
   - terrain_base
   - terrain_border

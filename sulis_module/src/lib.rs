@@ -61,7 +61,8 @@ pub mod campaign;
 pub use self::campaign::Campaign;
 pub use self::campaign::CampaignGroup;
 
-mod generator;
+pub mod generator;
+use self::generator::{Generator, GeneratorBuilder};
 
 pub mod image_layer;
 pub use self::image_layer::ImageLayer;
@@ -171,6 +172,8 @@ pub struct Module {
     wall_rules: Option<WallRules>,
     wall_kinds: Vec<WallKind>,
 
+    generators: HashMap<String, Rc<Generator>>,
+
     root_dir: Option<String>,
     init: bool,
 }
@@ -223,6 +226,16 @@ macro_rules! getters {
                 MODULE.with(|m| get_resource(id, &m.borrow().$plural))
             }
          )*
+    }
+}
+
+impl Module {
+    pub fn wall_kind(&self, id: &str) -> Option<WallKind> {
+        self.wall_kinds.iter().find(|k| k.id == id).cloned()
+    }
+
+    pub fn terrain_kind(&self, id: &str) -> Option<TerrainKind> {
+        self.terrain_kinds.iter().find(|k| k.id == id).cloned()
     }
 }
 
@@ -399,7 +412,7 @@ impl Module {
         let campaign_builder: CampaignBuilder = read_builder(campaign_yaml)?;
 
         let builder_set = ModuleBuilder::from_yaml(&mut yaml)?;
-        MODULE.with(|module| {
+        let area_builders = MODULE.with(|module| {
             let mut module = module.borrow_mut();
             module.abilities.clear();
             module.ability_lists.clear();
@@ -419,6 +432,7 @@ impl Module {
             module.sizes.clear();
             module.tiles.clear();
             module.scripts.clear();
+            module.generators.clear();
 
             module.rules = Some(Rc::new(rules));
             module.scripts = read_to_string(&dirs, "scripts");
@@ -553,10 +567,21 @@ impl Module {
                 );
             }
 
-            for (id, builder) in builder_set.area_builders {
-                insert_if_ok("area", id, Area::new(builder, &module), &mut module.areas);
+            for (id, builder) in builder_set.generator_builders {
+                insert_if_ok("generator", id, Generator::new(builder, &module), &mut module.generators);
             }
+
+            builder_set.area_builders
         });
+
+        // creates areas outside of the with block to allow them to access Module:: methods
+        for (id, builder) in area_builders {
+            let area = Area::new(builder);
+            MODULE.with(|module| {
+                let mut module = module.borrow_mut();
+                insert_if_ok("area", id, area, &mut module.areas);
+            });
+        }
 
         let campaign = Campaign::new(campaign_builder)?;
 
@@ -687,7 +712,9 @@ impl Module {
         quest, quests, Quest;
         prop, props, Prop;
         race, races, Race;
-        tile, tiles, Tile
+        tile, tiles, Tile;
+        generator, generators, Generator;
+        size, sizes, ObjectSize
         );
 
     pub fn script(id: &str) -> Option<String> {
@@ -698,6 +725,10 @@ impl Module {
                 Some(ref script) => Some(script.to_string()),
             }
         })
+    }
+
+    pub fn all_sizes() -> Vec<Rc<ObjectSize>> {
+        MODULE.with(|r| all_resources(&r.borrow().sizes))
     }
 
     pub fn all_scripts() -> Vec<String> {
@@ -774,6 +805,7 @@ impl Default for Module {
             terrain_kinds: Vec::new(),
             wall_rules: None,
             wall_kinds: Vec::new(),
+            generators: HashMap::new(),
             init: false,
         }
     }
@@ -795,6 +827,7 @@ struct ModuleBuilder {
     race_builders: HashMap<String, RaceBuilder>,
     size_builders: HashMap<String, ObjectSizeBuilder>,
     tile_builders: HashMap<String, Tileset>,
+    generator_builders: HashMap<String, GeneratorBuilder>,
 
     item_adjectives: HashMap<String, ItemAdjective>,
     quests: HashMap<String, Quest>,
@@ -821,6 +854,7 @@ impl ModuleBuilder {
             race_builders: read_builders(resources, Race)?,
             size_builders: read_builders(resources, Size)?,
             tile_builders: read_builders(resources, Tile)?,
+            generator_builders: read_builders(resources, Generator)?,
         })
     }
 }

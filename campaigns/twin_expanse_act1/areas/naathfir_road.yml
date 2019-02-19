@@ -12,7 +12,6 @@ on_rest:
   Disabled:
     message: It is too dangerous to rest here.
 location_kind: Outdoors
-generate: false
 layers:
   - terrain_base
   - terrain_border

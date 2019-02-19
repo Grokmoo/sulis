@@ -120,7 +120,7 @@ impl EditorMode for TilePicker {
             None => return,
             Some(ref layer) => layer,
         };
-        self.removal_tiles = model.tiles_within(layer_id, x, y, tile.width, tile.height);
+        self.removal_tiles = model.tiles().within(layer_id, x, y, tile.width, tile.height);
     }
 
     fn left_click(&mut self, model: &mut AreaModel, x: i32, y: i32) {

@@ -12,7 +12,6 @@ on_rest:
   Disabled:
     message: There are too many enemies about.  You may not rest here.
 location_kind: Underground
-generate: false
 layers:
   - terrain_base
   - terrain_border

@@ -16,7 +16,6 @@
 
 use std::any::Any;
 use std::cell::RefCell;
-use std::io::Error;
 use std::rc::Rc;
 
 use sulis_core::config::Config;
@@ -26,59 +25,14 @@ use sulis_core::ui::{Callback, Color, Widget, WidgetKind};
 use sulis_core::util::Point;
 use sulis_core::widgets::{Button, Label, ScrollPane, Spinner};
 use sulis_module::{
-    area::tile::{Tile, WallKind, WallRules},
+    area::tile::{WallRules},
     area::MAX_AREA_SIZE,
     Module,
 };
 
-use crate::terrain_picker::EdgesList;
 use crate::{AreaModel, EditorMode};
 
 const NAME: &str = "wall_picker";
-
-#[derive(Clone)]
-pub struct WallTiles {
-    pub id: String,
-    fill_tile: Option<Rc<Tile>>,
-
-    edges: EdgesList,
-    extended: Vec<EdgesList>,
-    interior_border: bool,
-}
-
-impl WallTiles {
-    pub fn new(kind: WallKind, rules: &WallRules) -> Result<WallTiles, Error> {
-        let fill_tile = match kind.fill_tile {
-            None => None,
-            Some(ref fill_tile) => {
-                let fill_tile_id = format!("{}{}{}", &rules.prefix, &kind.id, fill_tile);
-                match Module::tile(&fill_tile_id) {
-                    None => {
-                        warn!("No fill tile found for '{}'", kind.id);
-                        None
-                    }
-                    Some(tile) => Some(tile),
-                }
-            }
-        };
-
-        let edges = EdgesList::new(&kind.id, &rules.prefix, &rules.edges)?;
-
-        let mut extended = Vec::new();
-        for prefix in kind.extended {
-            let e = EdgesList::new(&prefix, &rules.prefix, &rules.edges)?;
-            extended.push(e);
-        }
-
-        Ok(WallTiles {
-            id: kind.id,
-            edges,
-            extended,
-            fill_tile,
-            interior_border: kind.interior_border,
-        })
-    }
-}
 
 pub struct WallPicker {
     level_widget: Rc<RefCell<Widget>>,
@@ -129,238 +83,6 @@ impl WallPicker {
             wall_rules,
             cur_wall: None,
         }))
-    }
-
-    fn check_add_border(&self, model: &mut AreaModel, x: i32, y: i32) {
-        let (self_elev, self_index) = match model.wall_at(x, y) {
-            (elev, Some(index)) => (elev, index),
-            (_, None) => return,
-        };
-
-        let tiles = model.wall_kind(self_index).clone();
-
-        if tiles.interior_border {
-            self.check_add_border_interior(model, x, y, self_elev, tiles);
-        } else {
-            self.check_add_border_exterior(model, x, y, self_elev, tiles);
-        }
-    }
-
-    fn check_add_border_exterior(
-        &self,
-        model: &mut AreaModel,
-        x: i32,
-        y: i32,
-        self_elev: u8,
-        tiles: WallTiles,
-    ) {
-        model.add_tile(&tiles.fill_tile, x, y);
-
-        let (gh, gw) = (self.grid_height, self.grid_width);
-
-        let n = self.is_border(model, self_elev, x, y, 0, -gh);
-        let e = self.is_border(model, self_elev, x, y, gw, 0);
-        let s = self.is_border(model, self_elev, x, y, 0, gh);
-        let w = self.is_border(model, self_elev, x, y, -gw, 0);
-        let nw = self.is_border(model, self_elev, x, y, -gw, -gh);
-        let ne = self.is_border(model, self_elev, x, y, gw, -gh);
-        let se = self.is_border(model, self_elev, x, y, gw, gh);
-        let sw = self.is_border(model, self_elev, x, y, -gw, gh);
-
-        if n && nw && w {
-            model.add_tile(&tiles.edges.outer_nw, x - gw, y - gh);
-        }
-
-        if n && nw && ne {
-            model.add_tile(&tiles.edges.outer_n, x, y - gh);
-        }
-
-        if n && ne && e {
-            model.add_tile(&tiles.edges.outer_ne, x + gw, y - gh);
-        }
-
-        if e && ne && se {
-            model.add_tile(&tiles.edges.outer_e, x + gw, y);
-        } else if e && ne {
-            model.add_tile(&tiles.edges.inner_ne, x + gw, y);
-        } else if e && se {
-            model.add_tile(&tiles.edges.inner_se, x + gw, y);
-
-            for (i, ext) in tiles.extended.iter().enumerate() {
-                let offset = 1 + i as i32;
-                model.add_tile(&ext.outer_s, x + gw, y + offset * gh);
-            }
-        }
-
-        if w && nw && sw {
-            model.add_tile(&tiles.edges.outer_w, x - gw, y);
-        } else if w && nw {
-            model.add_tile(&tiles.edges.inner_nw, x - gw, y);
-        } else if w && sw {
-            model.add_tile(&tiles.edges.inner_sw, x - gw, y);
-            for (i, ext) in tiles.extended.iter().enumerate() {
-                let offset = 1 + i as i32;
-                model.add_tile(&ext.outer_s, x - gw, y + offset * gh);
-            }
-        }
-
-        if s && sw && se {
-            model.add_tile(&tiles.edges.outer_s, x, y + gh);
-            for (i, ext) in tiles.extended.iter().enumerate() {
-                let offset = 2 + i as i32;
-                model.add_tile(&ext.outer_s, x, y + offset * gh);
-            }
-        }
-
-        if s && se && e {
-            model.add_tile(&tiles.edges.outer_se, x + gw, y + gh);
-
-            for (i, ext) in tiles.extended.iter().enumerate() {
-                let offset = 2 + i as i32;
-                model.add_tile(&ext.outer_se, x + gw, y + offset * gh);
-            }
-        }
-
-        if s && sw && w {
-            model.add_tile(&tiles.edges.outer_sw, x - gw, y + gh);
-
-            for (i, ext) in tiles.extended.iter().enumerate() {
-                let offset = 2 + i as i32;
-                model.add_tile(&ext.outer_sw, x - gw, y + offset * gh);
-            }
-        }
-    }
-
-    fn check_add_border_interior(
-        &self,
-        model: &mut AreaModel,
-        x: i32,
-        y: i32,
-        self_elev: u8,
-        tiles: WallTiles,
-    ) {
-        let (gh, gw) = (self.grid_height, self.grid_width);
-
-        let n = self.is_border(model, self_elev, x, y, 0, -gh);
-        let e = self.is_border(model, self_elev, x, y, gw, 0);
-        let s = self.is_border(model, self_elev, x, y, 0, gh);
-        let w = self.is_border(model, self_elev, x, y, -gw, 0);
-        let nw = self.is_border(model, self_elev, x, y, -gw, -gh);
-        let ne = self.is_border(model, self_elev, x, y, gw, -gh);
-        let se = self.is_border(model, self_elev, x, y, gw, gh);
-        let sw = self.is_border(model, self_elev, x, y, -gw, gh);
-
-        if !n && !e && !s && !w && !nw && !ne && !se && !sw {
-            model.add_tile(&tiles.fill_tile, x, y);
-            return;
-        }
-
-        if n && e && s && w && nw && ne && se && sw {
-            model.add_tile(&tiles.edges.outer_all, x, y);
-            for (i, ext) in tiles.extended.iter().enumerate() {
-                model.add_tile(&ext.outer_all, x, y + (i as i32 + 1) * gh);
-            }
-            return;
-        }
-
-        if ne && sw && !n && !s && !e && !w {
-            model.add_tile(&tiles.edges.inner_ne_sw, x, y);
-            return;
-        }
-
-        if nw && se && !n && !s && !e && !w {
-            model.add_tile(&tiles.edges.inner_nw_se, x, y);
-            return;
-        }
-
-        if n && nw && w {
-            model.add_tile(&tiles.edges.outer_nw, x, y);
-        }
-
-        if n && !w && !e {
-            model.add_tile(&tiles.edges.outer_n, x, y);
-        }
-
-        if n && ne && e {
-            model.add_tile(&tiles.edges.outer_ne, x, y);
-        }
-
-        if e && !n && !s {
-            model.add_tile(&tiles.edges.outer_e, x, y);
-        }
-        if w && !n && !s {
-            model.add_tile(&tiles.edges.outer_w, x, y);
-        }
-
-        if nw && !n && !w {
-            model.add_tile(&tiles.edges.inner_nw, x, y);
-        }
-        if ne && !n && !e {
-            model.add_tile(&tiles.edges.inner_ne, x, y);
-        }
-
-        if sw && !s && !w {
-            model.add_tile(&tiles.edges.inner_sw, x, y);
-            for (i, ext) in tiles.extended.iter().enumerate() {
-                model.add_tile(&ext.outer_s, x, y + (i as i32 + 1) * gh);
-            }
-        }
-
-        if se && !s && !e {
-            model.add_tile(&tiles.edges.inner_se, x, y);
-            for (i, ext) in tiles.extended.iter().enumerate() {
-                model.add_tile(&ext.outer_s, x, y + (i as i32 + 1) * gh);
-            }
-        }
-
-        if s && !w && !e {
-            model.add_tile(&tiles.edges.outer_s, x, y);
-            for (i, ext) in tiles.extended.iter().enumerate() {
-                let offset = 1 + i as i32;
-                model.add_tile(&ext.outer_s, x, y + offset * gh);
-            }
-        }
-
-        if s && se && e {
-            model.add_tile(&tiles.edges.outer_se, x, y);
-
-            for (i, ext) in tiles.extended.iter().enumerate() {
-                let offset = 1 + i as i32;
-                model.add_tile(&ext.outer_se, x, y + offset * gh);
-            }
-        }
-
-        if s && sw && w {
-            model.add_tile(&tiles.edges.outer_sw, x, y);
-
-            for (i, ext) in tiles.extended.iter().enumerate() {
-                let offset = 1 + i as i32;
-                model.add_tile(&ext.outer_sw, x, y + offset * gh);
-            }
-        }
-    }
-
-    fn is_border(
-        &self,
-        model: &AreaModel,
-        self_elev: u8,
-        x: i32,
-        y: i32,
-        delta_x: i32,
-        delta_y: i32,
-    ) -> bool {
-        let x = x + delta_x;
-        let y = y + delta_y;
-        if x < 0 || x >= MAX_AREA_SIZE || y < 0 || y >= MAX_AREA_SIZE {
-            return false;
-        }
-
-        let (dest_elev, dest_index) = model.wall_at(x, y);
-
-        match dest_index {
-            None => true,
-            Some(_) => dest_elev < self_elev,
-        }
     }
 }
 
@@ -467,7 +189,7 @@ impl EditorMode for WallPicker {
                 if x < 0 || x >= MAX_AREA_SIZE || y < 0 || y >= MAX_AREA_SIZE {
                     continue;
                 }
-                self.check_add_border(model, x, y);
+                model.check_add_wall_border(x, y);
             }
         }
     }

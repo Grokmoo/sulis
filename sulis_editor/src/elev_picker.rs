@@ -85,7 +85,7 @@ impl EditorMode for ElevPicker {
         let mut draw_list = DrawList::empty_sprite();
         for y in 0..MAX_AREA_SIZE {
             for x in 0..MAX_AREA_SIZE {
-                let sprite = &self.elev_tiles[model.elevation(x, y) as usize];
+                let sprite = &self.elev_tiles[model.tiles().elevation(x, y) as usize];
                 let x = x as f32 + x_offset;
                 let y = y as f32 + y_offset;
                 draw_list.append(&mut DrawList::from_sprite_f32(&sprite, x, y, 1.0, 1.0));

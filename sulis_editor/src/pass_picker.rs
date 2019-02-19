@@ -57,7 +57,7 @@ impl EditorMode for PassPicker {
         _millis: u32,
     ) {
         let mut draw_list = DrawList::empty_sprite();
-        for (p, tile) in model.all_tiles() {
+        for (p, tile) in model.tiles().all() {
             let x_base = x_offset + p.x as f32;
             let y_base = y_offset + p.y as f32;
             for p in tile.impass.iter() {

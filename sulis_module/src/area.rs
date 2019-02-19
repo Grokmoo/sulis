@@ -121,15 +121,24 @@ impl PartialEq for Area {
 }
 
 impl Area {
-    pub fn new(builder: AreaBuilder, module: &Module) -> Result<Area, Error> {
+    pub fn new(builder: AreaBuilder) -> Result<Area, Error> {
         let mut props = Vec::new();
         for prop_builder in builder.props.iter() {
-            let prop_data = create_prop(prop_builder, module)?;
+            let prop_data = create_prop(prop_builder)?;
             props.push(prop_data);
         }
 
-        info!("Creating area {}", builder.id);
-        let layer_set = LayerSet::new(&builder, module, &props);
+        let layers = if let Some(ref generator) = builder.generator {
+            let generator = Module::generator(generator).ok_or(
+                Error::new(ErrorKind::InvalidInput, format!("Generator '{}' not found",
+                                                            generator)))?;
+            generator.gen_layer_set(&builder)?
+        } else {
+            Vec::new()
+        };
+
+        info!("Creating area '{}'", builder.id);
+        let layer_set = LayerSet::new(&builder, &props, layers);
         let layer_set = match layer_set {
             Ok(l) => l,
             Err(e) => {
@@ -139,8 +148,8 @@ impl Area {
         };
 
         let mut path_grids = HashMap::new();
-        for (_, size) in module.sizes.iter() {
-            let path_grid = PathFinderGrid::new(Rc::clone(size), &layer_set);
+        for size in Module::all_sizes() {
+            let path_grid = PathFinderGrid::new(Rc::clone(&size), &layer_set);
             debug!("Generated path grid for size {}", size.id);
             path_grids.insert(size.id.to_string(), path_grid);
         }
@@ -160,7 +169,7 @@ impl Area {
                 Some(image) => image,
             };
 
-            let size = match module.sizes.get(&t_builder.size) {
+            let size = match Module::size(&t_builder.size) {
                 None => {
                     warn!("Size '{}' not found for transition.", t_builder.size);
                     continue;
@@ -206,12 +215,12 @@ impl Area {
         let mut used_triggers = HashSet::new();
         let mut encounters = Vec::new();
         for encounter_builder in builder.encounters {
-            let encounter = match module.encounters.get(&encounter_builder.id) {
+            let encounter = match Module::encounter(&encounter_builder.id) {
                 None => {
                     warn!("No encounter '{}' found", &encounter_builder.id);
                     return unable_to_create_error("area", &builder.id);
                 }
-                Some(encounter) => Rc::clone(encounter),
+                Some(encounter) => encounter,
             };
 
             let mut encounter_triggers = Vec::new();
@@ -308,7 +317,9 @@ pub struct AreaBuilder {
     pub world_map_location: Option<String>,
     pub on_rest: OnRest,
     pub location_kind: LocationKind,
-    pub generate: bool,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub generator: Option<String>,
     pub layers: Vec<String>,
     pub entity_layer: usize,
     pub actors: Vec<ActorData>,
@@ -621,10 +632,10 @@ pub struct PropDataBuilder {
     pub hover_text: Option<String>,
 }
 
-pub fn create_prop(builder: &PropDataBuilder, module: &Module) -> Result<PropData, Error> {
-    let prop = match module.props.get(&builder.id) {
+pub fn create_prop(builder: &PropDataBuilder) -> Result<PropData, Error> {
+    let prop = match Module::prop(&builder.id) {
         None => return unable_to_create_error("prop", &builder.id),
-        Some(prop) => Rc::clone(prop),
+        Some(prop) => prop,
     };
 
     let location = builder.location;

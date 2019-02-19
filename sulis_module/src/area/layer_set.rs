@@ -15,13 +15,13 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::collections::HashMap;
-use std::io::Error;
+use std::io::{Error};
 use std::rc::Rc;
 
 use sulis_core::util::invalid_data_error;
 
 use crate::area::{AreaBuilder, Layer, PropData, Tile};
-use crate::{generator, Module};
+use crate::{Module};
 
 pub struct LayerSet {
     pub width: i32,
@@ -34,22 +34,13 @@ pub struct LayerSet {
 }
 
 impl LayerSet {
-    pub fn new(
-        builder: &AreaBuilder,
-        module: &Module,
-        props: &Vec<PropData>,
-    ) -> Result<LayerSet, Error> {
+    pub fn new(builder: &AreaBuilder, props: &Vec<PropData>, mut layers: Vec<Layer>) -> Result<LayerSet, Error> {
         let width = builder.width as i32;
         let height = builder.height as i32;
         let dim = (width * height) as usize;
 
-        let layers = if builder.generate {
-            let (id, tiles) = generator::generate_area(width, height, module)?;
-
-            let layer = Layer::new(builder, id, tiles)?;
-            vec![layer]
-        } else {
-            LayerSet::validate_tiles(builder, module)?;
+        if layers.is_empty() { // layers have not been generated
+            LayerSet::validate_tiles(builder)?;
 
             let mut layer_tiles: HashMap<String, Vec<Vec<Rc<Tile>>>> = HashMap::new();
             for layer_id in builder.layers.iter() {
@@ -57,7 +48,7 @@ impl LayerSet {
             }
 
             for (tile_id, locations) in &builder.layer_set {
-                let tile = module.tiles.get(tile_id).unwrap();
+                let tile = Module::tile(tile_id).unwrap();
 
                 if !layer_tiles.contains_key(&tile.layer) {
                     return invalid_data_error(&format!(
@@ -79,15 +70,12 @@ impl LayerSet {
                 }
             }
 
-            let mut layers: Vec<Layer> = Vec::new();
             for layer_id in builder.layers.iter() {
                 let tiles = layer_tiles.remove(layer_id).unwrap();
                 let layer = Layer::new(builder, layer_id.to_string(), tiles)?;
                 layers.push(layer);
             }
-
-            layers
-        };
+        }
 
         if layers.is_empty() {
             return invalid_data_error("No tiles in area layer_set");
@@ -184,9 +172,9 @@ impl LayerSet {
         })
     }
 
-    fn validate_tiles(builder: &AreaBuilder, module: &Module) -> Result<(), Error> {
+    fn validate_tiles(builder: &AreaBuilder) -> Result<(), Error> {
         for (tile_id, locations) in &builder.layer_set {
-            let tile_ref = module.tiles.get(tile_id);
+            let tile_ref = Module::tile(tile_id);
             match tile_ref {
                 Some(t) => t,
                 None => {

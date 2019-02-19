@@ -26,20 +26,17 @@ use sulis_core::ui::{animation_state, LineRenderer};
 use sulis_core::util::{Point, Size};
 use sulis_module::area::*;
 use sulis_module::{Actor, Encounter, Module, Prop};
-
-use crate::terrain_picker::TerrainTiles;
-use crate::wall_picker::WallTiles;
+use sulis_module::generator::{TilesModel, is_removal};
 
 pub struct AreaModel {
     pub config: EditorConfig,
 
-    tiles: Vec<(String, Vec<(Point, Rc<Tile>)>)>,
+    tiles: TilesModel,
     actors: Vec<(Point, Rc<Actor>, Option<String>)>,
     props: Vec<PropData>,
     encounters: Vec<EncounterData>,
     transitions: Vec<Transition>,
     triggers: Vec<TriggerBuilder>,
-    elevation: Vec<u8>,
 
     encounter_sprite: Option<Rc<Sprite>>,
     font_renderer: Option<LineRenderer>,
@@ -52,12 +49,6 @@ pub struct AreaModel {
     pub world_map_location: Option<String>,
     pub location_kind: LocationKind,
     pub on_rest: OnRest,
-
-    terrain_kinds: Vec<TerrainTiles>,
-    terrain: Vec<Option<usize>>,
-
-    wall_kinds: Vec<WallTiles>,
-    walls: Vec<(u8, Option<usize>)>,
 }
 
 impl AreaModel {
@@ -80,45 +71,16 @@ impl AreaModel {
             Some(font) => Some(LineRenderer::new(&font)),
         };
 
-        let mut tiles = Vec::new();
-        for ref layer_id in config.area.layers.iter() {
-            tiles.push((layer_id.to_string(), Vec::new()));
-        }
-
-        let elevation = vec![0; (MAX_AREA_SIZE * MAX_AREA_SIZE) as usize];
-
-        let terrain_rules = Module::terrain_rules();
-        let mut terrain_kinds = Vec::new();
-
-        let all_kinds = Module::terrain_kinds();
-        for kind in Module::terrain_kinds() {
-            match TerrainTiles::new(&terrain_rules, kind, &all_kinds) {
-                Err(_) => continue,
-                Ok(terrain) => terrain_kinds.push(terrain),
-            }
-        }
-
-        let wall_rules = Module::wall_rules();
-        let mut wall_kinds = Vec::new();
-        for kind in Module::wall_kinds() {
-            match WallTiles::new(kind, &wall_rules) {
-                Err(_) => continue,
-                Ok(wall) => wall_kinds.push(wall),
-            }
-        }
-
         let id = config.area.id.clone();
         let name = config.area.name.clone();
         let filename = config.area.filename.clone();
 
+        let tiles = TilesModel::new(Module::terrain_rules(), Module::terrain_kinds(),
+            Module::wall_rules(), Module::wall_kinds());
+
         AreaModel {
             config,
             tiles,
-            elevation,
-            terrain_kinds,
-            terrain: vec![None; (MAX_AREA_SIZE * MAX_AREA_SIZE) as usize],
-            wall_kinds,
-            walls: vec![(0, None); (MAX_AREA_SIZE * MAX_AREA_SIZE) as usize],
             actors: Vec::new(),
             props: Vec::new(),
             encounters: Vec::new(),
@@ -166,163 +128,6 @@ impl AreaModel {
 
     pub fn set_location_kind(&mut self, location_kind: LocationKind) {
         self.location_kind = location_kind;
-    }
-
-    pub fn elevation(&self, x: i32, y: i32) -> u8 {
-        if x < 0 || y < 0 {
-            return 0;
-        }
-
-        let index = (x + y * MAX_AREA_SIZE) as usize;
-        if index >= (MAX_AREA_SIZE * MAX_AREA_SIZE) as usize {
-            return 0;
-        }
-
-        self.elevation[index]
-    }
-
-    pub fn set_elevation(&mut self, elev: u8, x: i32, y: i32) {
-        if x < 0 || y < 0 {
-            return;
-        }
-
-        let index = (x + y * MAX_AREA_SIZE) as usize;
-        if index >= (MAX_AREA_SIZE * MAX_AREA_SIZE) as usize {
-            return;
-        }
-
-        self.elevation[index] = elev;
-    }
-
-    pub fn wall_kind(&self, index: usize) -> &WallTiles {
-        &self.wall_kinds[index]
-    }
-
-    pub fn wall_kinds(&self) -> &Vec<WallTiles> {
-        &self.wall_kinds
-    }
-
-    pub fn wall_at(&self, x: i32, y: i32) -> (u8, Option<usize>) {
-        self.walls[(x + y * MAX_AREA_SIZE) as usize]
-    }
-
-    pub fn set_wall(&mut self, x: i32, y: i32, elev: u8, index: Option<usize>) {
-        self.walls[(x + y * MAX_AREA_SIZE) as usize] = (elev, index);
-    }
-
-    pub fn terrain_index_at(&self, x: i32, y: i32) -> Option<usize> {
-        self.terrain[(x + y * MAX_AREA_SIZE) as usize]
-    }
-
-    pub fn terrain_kind(&self, index: usize) -> &TerrainTiles {
-        &self.terrain_kinds[index]
-    }
-
-    pub fn terrain_kinds(&self) -> &Vec<TerrainTiles> {
-        &self.terrain_kinds
-    }
-
-    pub fn set_terrain_index(&mut self, x: i32, y: i32, index: Option<usize>) {
-        self.terrain[(x + y * MAX_AREA_SIZE) as usize] = index;
-    }
-
-    pub fn all_tiles(&self) -> impl Iterator<Item = &(Point, Rc<Tile>)> {
-        self.tiles
-            .iter()
-            .map(|ref v| &v.1)
-            .flat_map(|ref t| t.iter())
-    }
-
-    pub fn add_tile(&mut self, tile: &Option<Rc<Tile>>, x: i32, y: i32) {
-        let tile = match tile {
-            &None => return,
-            &Some(ref tile) => tile,
-        };
-
-        if x < 0 || y < 0 {
-            return;
-        }
-
-        let index = self.create_layer_if_missing(&tile.layer);
-
-        // check if the tile already exists
-        for &(p, ref other_tile) in self.tiles[index].1.iter() {
-            if p.x == x && p.y == y && Rc::ptr_eq(other_tile, tile) {
-                return;
-            }
-        }
-        self.tiles[index]
-            .1
-            .push((Point::new(x, y), Rc::clone(tile)));
-    }
-
-    pub fn remove_all_tiles(&mut self, x: i32, y: i32, width: i32, height: i32) {
-        for &mut (_, ref mut tiles) in self.tiles.iter_mut() {
-            tiles.retain(|&(pos, ref tile)| {
-                !is_removal(pos, tile.width, tile.height, x, y, width, height)
-            });
-        }
-    }
-
-    pub fn remove_tiles_within(&mut self, layer_id: &str, x: i32, y: i32, width: i32, height: i32) {
-        for &mut (ref cur_layer_id, ref mut tiles) in self.tiles.iter_mut() {
-            if layer_id != cur_layer_id {
-                continue;
-            }
-
-            tiles.retain(|&(pos, ref tile)| {
-                !is_removal(pos, tile.width, tile.height, x, y, width, height)
-            });
-        }
-    }
-
-    pub fn tiles_within(
-        &mut self,
-        layer_id: &str,
-        x: i32,
-        y: i32,
-        width: i32,
-        height: i32,
-    ) -> Vec<(Point, Rc<Tile>)> {
-        let mut within = Vec::new();
-
-        for &(ref cur_layer_id, ref tiles) in self.tiles.iter() {
-            if layer_id != cur_layer_id {
-                continue;
-            }
-
-            for &(pos, ref tile) in tiles {
-                if !is_removal(pos, tile.width, tile.height, x, y, width, height) {
-                    continue;
-                }
-
-                within.push((pos, Rc::clone(tile)));
-            }
-        }
-
-        within
-    }
-
-    pub fn shift_tiles(&mut self, delta_x: i32, delta_y: i32) {
-        for &mut (_, ref mut layer) in self.tiles.iter_mut() {
-            for &mut (ref mut point, ref tile) in layer.iter_mut() {
-                if point.x + delta_x < 0
-                    || point.y + delta_y < 0
-                    || point.x + delta_x + tile.width > MAX_AREA_SIZE
-                    || point.y + delta_y + tile.height > MAX_AREA_SIZE
-                {
-                    warn!("Invalid tile shift parameters: {},{}", delta_x, delta_y);
-                    return;
-                }
-            }
-        }
-
-        for &mut (_, ref mut layer) in self.tiles.iter_mut() {
-            for &mut (ref mut point, _) in layer.iter_mut() {
-                point.x += delta_x;
-                point.y += delta_y;
-            }
-        }
     }
 
     pub fn add_trigger(&mut self, x: i32, y: i32, w: i32, h: i32) {
@@ -504,6 +309,49 @@ impl AreaModel {
         &mut self.transitions[index]
     }
 
+    pub fn add_tile(&mut self, tile: &Option<Rc<Tile>>, x: i32, y: i32) {
+        match tile {
+            None => return,
+            Some(tile) => self.tiles.add(Rc::clone(tile), x, y),
+        }
+    }
+
+    pub fn shift_tiles(&mut self, delta_x: i32, delta_y: i32) {
+        self.tiles.shift(delta_x, delta_y);
+    }
+
+    pub fn remove_all_tiles(&mut self, x: i32, y: i32, width: i32, height: i32) {
+        self.tiles.remove_all(x, y, width, height);
+    }
+
+    pub fn remove_tiles_within(&mut self, layer_id: &str, x: i32, y: i32, width: i32, height: i32) {
+        self.tiles.remove_within(layer_id, x, y, width, height);
+    }
+
+    pub fn tiles(&self) -> &TilesModel {
+        &self.tiles
+    }
+
+    pub fn set_elevation(&mut self, elev: u8, x: i32, y: i32) {
+        self.tiles.set_elevation(elev, x, y);
+    }
+
+    pub fn set_wall(&mut self, x: i32, y: i32, elev: u8, index: Option<usize>) {
+        self.tiles.set_wall(x, y, elev, index);
+    }
+
+    pub fn set_terrain_index(&mut self, x: i32, y: i32, index: Option<usize>) {
+        self.tiles.set_terrain_index(x, y, index);
+    }
+
+    pub fn check_add_terrain_border(&mut self, x: i32, y: i32) {
+        self.tiles.check_add_terrain_border(x, y);
+    }
+
+    pub fn check_add_wall_border(&mut self, x: i32, y: i32) {
+        self.tiles.check_add_wall_border(x, y);
+    }
+
     pub fn draw(
         &self,
         renderer: &mut GraphicsRenderer,
@@ -655,11 +503,11 @@ impl AreaModel {
             }
 
             match id {
-                None => self.terrain[(x + y * MAX_AREA_SIZE) as usize] = None,
+                None => self.tiles.set_terrain_index(x, y, None),
                 Some(id) => {
-                    for (index, kind) in self.terrain_kinds.iter().enumerate() {
+                    for (index, kind) in self.tiles.terrain_kinds().iter().enumerate() {
                         if kind.id == id {
-                            self.terrain[(x + y * MAX_AREA_SIZE) as usize] = Some(index);
+                            self.tiles.set_terrain_index(x, y, Some(index));
                             break;
                         }
                     }
@@ -681,11 +529,11 @@ impl AreaModel {
             }
 
             match id {
-                None => self.walls[(x + y * MAX_AREA_SIZE) as usize] = (elev, None),
+                None => self.tiles.set_wall(x, y, elev, None),
                 Some(id) => {
-                    for (index, kind) in self.wall_kinds.iter().enumerate() {
+                    for (index, kind) in self.tiles().wall_kinds().iter().enumerate() {
                         if kind.id == id {
-                            self.walls[(x + y * MAX_AREA_SIZE) as usize] = (elev, Some(index));
+                            self.tiles.set_wall(x, y, elev, Some(index));
                             break;
                         }
                     }
@@ -700,9 +548,8 @@ impl AreaModel {
         }
 
         trace!("Loading area layer_set.");
-        for &mut (_, ref mut vec) in self.tiles.iter_mut() {
-            vec.clear();
-        }
+        self.tiles.clear();
+
         for (tile_id, positions) in area_builder.layer_set {
             let tile = match Module::tile(&tile_id) {
                 None => {
@@ -718,10 +565,7 @@ impl AreaModel {
                     continue;
                 }
 
-                let p = Point::new(position[0] as i32, position[1] as i32);
-
-                let index = self.create_layer_if_missing(&tile.layer);
-                self.tiles[index].1.push((p, Rc::clone(&tile)));
+                self.tiles.add(Rc::clone(&tile), position[0] as i32, position[1] as i32);
             }
         }
 
@@ -819,14 +663,17 @@ impl AreaModel {
 
         trace!("Loading area elevation.");
         let elev = &area_builder.elevation;
+        let dest_elev = self.tiles.raw_elevation();
         if elev.len() != area_builder.height * area_builder.width {
             warn!("Invalid elevation array in {}", path);
-            self.elevation = vec![0; (MAX_AREA_SIZE * MAX_AREA_SIZE) as usize];
+            for i in 0..(MAX_AREA_SIZE * MAX_AREA_SIZE) as usize {
+                dest_elev[i] = 0;
+            }
         } else {
             for y in 0..area_builder.height {
                 for x in 0..area_builder.width {
                     let val = elev[x + y * area_builder.width];
-                    self.elevation[x + y * MAX_AREA_SIZE as usize] = val;
+                    dest_elev[x + y * MAX_AREA_SIZE as usize] = val;
                 }
             }
         }
@@ -911,8 +758,7 @@ impl AreaModel {
         let mut elevation = Vec::new();
         for y in 0..height {
             for x in 0..width {
-                let val = self.elevation[(x + y * MAX_AREA_SIZE) as usize];
-                elevation.push(val);
+                elevation.push(self.tiles.elevation(x, y));
             }
         }
 
@@ -920,7 +766,7 @@ impl AreaModel {
         let mut terrain = Vec::new();
         for y in 0..height {
             for x in 0..width {
-                let index = match self.terrain[(x + y * MAX_AREA_SIZE) as usize] {
+                let index = match self.tiles.terrain_index_at(x, y) {
                     None => {
                         terrain.push(None);
                         continue;
@@ -928,7 +774,7 @@ impl AreaModel {
                     Some(index) => index,
                 };
 
-                let tiles = &self.terrain_kinds[index];
+                let tiles = self.tiles.terrain_kind(index);
                 terrain.push(Some(tiles.id.to_string()));
             }
         }
@@ -937,7 +783,7 @@ impl AreaModel {
         let mut walls = Vec::new();
         for y in 0..height {
             for x in 0..width {
-                let (elev, index) = match self.walls[(x + y * MAX_AREA_SIZE) as usize] {
+                let (elev, index) = match self.tiles.wall_at(x, y) {
                     (elev, None) => {
                         walls.push((elev, None));
                         continue;
@@ -945,7 +791,7 @@ impl AreaModel {
                     (elev, Some(index)) => (elev, index),
                 };
 
-                let cur_wall = &self.wall_kinds[index];
+                let cur_wall = self.tiles.wall_kind(index);
                 walls.push((elev, Some(cur_wall.id.to_string())));
             }
         }
@@ -963,7 +809,7 @@ impl AreaModel {
             explored_tile,
             width: width as usize,
             height: height as usize,
-            generate: false,
+            generator: None,
             entity_layer,
             actors,
             props,
@@ -985,29 +831,4 @@ impl AreaModel {
             Ok(()) => {}
         }
     }
-
-    fn create_layer_if_missing(&mut self, layer_id: &str) -> usize {
-        for (index, &(ref id, _)) in self.tiles.iter().enumerate() {
-            if id == layer_id {
-                return index;
-            }
-        }
-
-        self.tiles.push((layer_id.to_string(), Vec::new()));
-        self.tiles.len() - 1
-    }
-}
-
-fn is_removal(pos: Point, pos_w: i32, pos_h: i32, x: i32, y: i32, w: i32, h: i32) -> bool {
-    // if one rectangle is on left side of the other
-    if pos.x >= x + w || x >= pos.x + pos_w {
-        return false;
-    }
-
-    // if one rectangle is above the other
-    if pos.y >= y + h || y >= pos.y + pos_h {
-        return false;
-    }
-
-    true
 }

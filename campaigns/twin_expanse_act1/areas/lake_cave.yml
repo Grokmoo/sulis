@@ -10,9 +10,8 @@ max_vis_up_one_distance: 6
 world_map_location: lake_grounds
 on_rest:
   Disabled:
-    message: "<PLACEHOLDER>"
+    message: There are too many enemies about.  You may not rest here.
 location_kind: Underground
-generate: false
 layers:
   - terrain_base
   - terrain_border

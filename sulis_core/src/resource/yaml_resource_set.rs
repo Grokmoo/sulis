@@ -59,6 +59,7 @@ pub enum YamlResourceKind {
     Race,
     Size,
     Tile,
+    Generator,
 }
 
 impl YamlResourceKind {
@@ -106,6 +107,7 @@ impl YamlResourceKind {
             "races" => Race,
             "sizes" => Size,
             "tiles" => Tile,
+            "generators" => Generator,
             "scripts" | "theme" => Skip,
             _ => return None,
         })

@@ -16,226 +16,21 @@
 
 use std::any::Any;
 use std::cell::RefCell;
-use std::collections::HashMap;
-use std::io::Error;
 use std::rc::Rc;
 
 use sulis_core::config::Config;
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::resource::{ResourceSet, Sprite};
 use sulis_core::ui::{Callback, Color, Widget, WidgetKind};
-use sulis_core::util::{gen_rand, unable_to_create_error, Point};
+use sulis_core::util::{Point};
 use sulis_core::widgets::{Button, Label, ScrollPane, Spinner};
 use sulis_module::{
-    area::tile::{EdgeRules, TerrainKind, TerrainRules, Tile},
+    area::tile::{TerrainRules},
     area::MAX_AREA_SIZE,
     Module,
 };
 
 use crate::{AreaModel, EditorMode};
-
-#[derive(Clone)]
-pub struct TerrainTiles {
-    pub id: String,
-    base: Rc<Tile>,
-    base_weight: u32,
-    variants: Vec<Rc<Tile>>,
-    edges: EdgesList,
-    borders: HashMap<usize, EdgesList>,
-}
-
-#[derive(Clone)]
-pub struct EdgesList {
-    pub inner_nw: Option<Rc<Tile>>,
-    pub inner_ne: Option<Rc<Tile>>,
-    pub inner_sw: Option<Rc<Tile>>,
-    pub inner_se: Option<Rc<Tile>>,
-
-    pub outer_n: Option<Rc<Tile>>,
-    pub outer_s: Option<Rc<Tile>>,
-    pub outer_e: Option<Rc<Tile>>,
-    pub outer_w: Option<Rc<Tile>>,
-    pub outer_se: Option<Rc<Tile>>,
-    pub outer_ne: Option<Rc<Tile>>,
-    pub outer_sw: Option<Rc<Tile>>,
-    pub outer_nw: Option<Rc<Tile>>,
-
-    pub outer_all: Option<Rc<Tile>>,
-    pub inner_ne_sw: Option<Rc<Tile>>,
-    pub inner_nw_se: Option<Rc<Tile>>,
-}
-
-impl EdgesList {
-    pub fn new(id: &str, prefix: &str, rules: &EdgeRules) -> Result<EdgesList, Error> {
-        let inner_nw =
-            EdgesList::get_edge(&prefix, &id, &rules.inner_edge_postfix, &rules.nw_postfix);
-        let inner_ne =
-            EdgesList::get_edge(&prefix, &id, &rules.inner_edge_postfix, &rules.ne_postfix);
-        let inner_sw =
-            EdgesList::get_edge(&prefix, &id, &rules.inner_edge_postfix, &rules.sw_postfix);
-        let inner_se =
-            EdgesList::get_edge(&prefix, &id, &rules.inner_edge_postfix, &rules.se_postfix);
-
-        let outer_n =
-            EdgesList::get_edge(&prefix, &id, &rules.outer_edge_postfix, &rules.n_postfix);
-        let outer_s =
-            EdgesList::get_edge(&prefix, &id, &rules.outer_edge_postfix, &rules.s_postfix);
-        let outer_e =
-            EdgesList::get_edge(&prefix, &id, &rules.outer_edge_postfix, &rules.e_postfix);
-        let outer_w =
-            EdgesList::get_edge(&prefix, &id, &rules.outer_edge_postfix, &rules.w_postfix);
-        let outer_ne =
-            EdgesList::get_edge(&prefix, &id, &rules.outer_edge_postfix, &rules.ne_postfix);
-        let outer_nw =
-            EdgesList::get_edge(&prefix, &id, &rules.outer_edge_postfix, &rules.nw_postfix);
-        let outer_se =
-            EdgesList::get_edge(&prefix, &id, &rules.outer_edge_postfix, &rules.se_postfix);
-        let outer_sw =
-            EdgesList::get_edge(&prefix, &id, &rules.outer_edge_postfix, &rules.sw_postfix);
-        let outer_all =
-            EdgesList::get_edge(&prefix, &id, &rules.outer_edge_postfix, &rules.all_postfix);
-
-        let inner_ne_sw = EdgesList::get_edge(
-            &prefix,
-            &id,
-            &rules.inner_edge_postfix,
-            &rules.ne_sw_postfix,
-        );
-
-        let inner_nw_se = EdgesList::get_edge(
-            &prefix,
-            &id,
-            &rules.inner_edge_postfix,
-            &rules.nw_se_postfix,
-        );
-
-        Ok(EdgesList {
-            inner_nw,
-            inner_ne,
-            inner_sw,
-            inner_se,
-            outer_n,
-            outer_s,
-            outer_e,
-            outer_w,
-            outer_se,
-            outer_ne,
-            outer_sw,
-            outer_nw,
-            outer_all,
-            inner_ne_sw,
-            inner_nw_se,
-        })
-    }
-
-    fn get_edge(prefix: &str, id: &str, edge_postfix: &str, dir_postfix: &str) -> Option<Rc<Tile>> {
-        let tile_id = format!("{}{}{}{}", prefix, id, edge_postfix, dir_postfix);
-
-        match Module::tile(&tile_id) {
-            None => {
-                trace!(
-                    "Edge tile with '{}', '{}' not found for '{}'",
-                    edge_postfix,
-                    dir_postfix,
-                    id
-                );
-                None
-            }
-            Some(tile) => Some(tile),
-        }
-    }
-}
-
-impl TerrainTiles {
-    pub fn new(
-        rules: &TerrainRules,
-        kind: TerrainKind,
-        all_kinds: &Vec<TerrainKind>,
-    ) -> Result<TerrainTiles, Error> {
-        let base_tile_id = format!("{}{}{}", rules.prefix, kind.id, rules.base_postfix);
-        let base = match Module::tile(&base_tile_id) {
-            None => {
-                warn!("Base tile for terrain kind '{}' not found", kind.id);
-                return unable_to_create_error("terrain_tiles", &kind.id);
-            }
-            Some(tile) => tile,
-        };
-
-        let base_weight = match kind.base_weight {
-            None => rules.base_weight,
-            Some(weight) => weight,
-        };
-
-        let mut variants = Vec::new();
-        for i in kind.variants {
-            let tile_id = format!(
-                "{}{}{}{}",
-                rules.prefix,
-                kind.id,
-                rules.variant_postfix,
-                i.to_string()
-            );
-            let tile = match Module::tile(&tile_id) {
-                None => {
-                    warn!(
-                        "Tile variant '{}' not found for terrain kind '{}'",
-                        i, kind.id
-                    );
-                    continue;
-                }
-                Some(tile) => tile,
-            };
-            variants.push(tile);
-        }
-
-        let mut borders = HashMap::new();
-        for (other_terrain, id) in kind.borders.iter() {
-            let edges = EdgesList::new(id, &rules.prefix, &rules.edges)?;
-
-            let mut index = None;
-            for (i, other_kind) in all_kinds.iter().enumerate() {
-                if &other_kind.id == other_terrain {
-                    index = Some(i);
-                    break;
-                }
-            }
-
-            match index {
-                None => {
-                    warn!(
-                        "Other terrain '{}' not found for border of '{}'",
-                        other_terrain, kind.id
-                    );
-                    continue;
-                }
-                Some(index) => {
-                    borders.insert(index, edges);
-                }
-            }
-        }
-
-        let edges = EdgesList::new(&kind.id, &rules.prefix, &rules.edges)?;
-
-        Ok(TerrainTiles {
-            id: kind.id,
-            base,
-            base_weight,
-            variants,
-            borders,
-            edges,
-        })
-    }
-
-    fn matching_edges(&self, index: Option<usize>) -> &EdgesList {
-        match index {
-            None => &self.edges,
-            Some(index) => match self.borders.get(&index) {
-                None => &self.edges,
-                Some(ref edges) => edges,
-            },
-        }
-    }
-}
 
 const NAME: &str = "terrain_picker";
 
@@ -279,115 +74,6 @@ impl TerrainPicker {
             terrain_rules,
             cur_terrain: None,
         }))
-    }
-
-    fn gen_choice(&self, tiles: &TerrainTiles) -> Rc<Tile> {
-        if tiles.variants.len() == 0 {
-            return Rc::clone(&tiles.base);
-        }
-
-        let base_weight = tiles.base_weight;
-        let total_weight = base_weight + tiles.variants.len() as u32;
-
-        let roll = gen_rand(0, total_weight);
-
-        if roll < base_weight {
-            return Rc::clone(&tiles.base);
-        }
-
-        return Rc::clone(&tiles.variants[(roll - base_weight) as usize]);
-    }
-
-    fn check_add_border(&self, model: &mut AreaModel, x: i32, y: i32) {
-        let self_index = match model.terrain_index_at(x, y) {
-            Some(index) => index,
-            None => return,
-        };
-        let tiles = model.terrain_kind(self_index).clone();
-        let gh = self.grid_height;
-        let gw = self.grid_width;
-
-        let n_val = self.is_border(model, x, y, 0, -gh);
-        let e_val = self.is_border(model, x, y, gw, 0);
-        let s_val = self.is_border(model, x, y, 0, gh);
-        let w_val = self.is_border(model, x, y, -gw, 0);
-        let nw_val = self.is_border(model, x, y, -gw, -gh);
-        let ne_val = self.is_border(model, x, y, gw, -gh);
-        let se_val = self.is_border(model, x, y, gw, gh);
-        let sw_val = self.is_border(model, x, y, -gw, gh);
-
-        let n = self.check_index(self_index, n_val);
-        let e = self.check_index(self_index, e_val);
-        let s = self.check_index(self_index, s_val);
-        let w = self.check_index(self_index, w_val);
-        let nw = self.check_index(self_index, nw_val);
-        let ne = self.check_index(self_index, ne_val);
-        let se = self.check_index(self_index, se_val);
-        let sw = self.check_index(self_index, sw_val);
-
-        if n && nw && w {
-            model.add_tile(&tiles.matching_edges(nw_val).outer_nw, x - gw, y - gh);
-        }
-
-        if n && nw && ne {
-            model.add_tile(&tiles.matching_edges(n_val).outer_n, x, y - gh);
-        }
-
-        if n && ne && e {
-            model.add_tile(&tiles.matching_edges(ne_val).outer_ne, x + gw, y - gh);
-        }
-
-        if e && ne && se {
-            model.add_tile(&tiles.matching_edges(e_val).outer_e, x + gw, y);
-        } else if e && ne {
-            model.add_tile(&tiles.matching_edges(ne_val).inner_ne, x + gw, y);
-        } else if e && se {
-            model.add_tile(&tiles.matching_edges(se_val).inner_se, x + gw, y);
-        }
-
-        if w && nw && sw {
-            model.add_tile(&tiles.matching_edges(w_val).outer_w, x - gw, y);
-        } else if w && nw {
-            model.add_tile(&tiles.matching_edges(nw_val).inner_nw, x - gw, y);
-        } else if w && sw {
-            model.add_tile(&tiles.matching_edges(sw_val).inner_sw, x - gw, y);
-        }
-
-        if s && sw && se {
-            model.add_tile(&tiles.matching_edges(s_val).outer_s, x, y + gh);
-        }
-
-        if s && se && e {
-            model.add_tile(&tiles.matching_edges(se_val).outer_se, x + gw, y + gh);
-        }
-
-        if s && sw && w {
-            model.add_tile(&tiles.matching_edges(sw_val).outer_sw, x - gw, y + gh);
-        }
-    }
-
-    fn check_index(&self, index: usize, other_index: Option<usize>) -> bool {
-        match other_index {
-            None => true,
-            Some(other_index) => index < other_index,
-        }
-    }
-
-    fn is_border(
-        &self,
-        model: &AreaModel,
-        x: i32,
-        y: i32,
-        delta_x: i32,
-        delta_y: i32,
-    ) -> Option<usize> {
-        let x = x + delta_x;
-        let y = y + delta_y;
-        if x < 0 || x >= MAX_AREA_SIZE || y < 0 || y >= MAX_AREA_SIZE {
-            return None;
-        }
-
-        model.terrain_index_at(x, y)
     }
 }
 
@@ -449,7 +135,7 @@ impl EditorMode for TerrainPicker {
     fn left_click(&mut self, model: &mut AreaModel, x: i32, y: i32) {
         let (index, cur_terrain) = match self.cur_terrain {
             None => return,
-            Some(i) => (i, model.terrain_kind(i).clone()),
+            Some(i) => (i, model.tiles().terrain_kind(i).clone()),
         };
 
         let x_min = if x % 2 == 0 { x } else { x + 1 };
@@ -478,7 +164,7 @@ impl EditorMode for TerrainPicker {
                 }
 
                 model.set_terrain_index(x, y, Some(index));
-                model.add_tile(&Some(self.gen_choice(&cur_terrain)), x, y);
+                model.add_tile(&Some(model.tiles().gen_choice(&cur_terrain)), x, y);
             }
         }
 
@@ -491,7 +177,7 @@ impl EditorMode for TerrainPicker {
                 if x < 0 || x >= MAX_AREA_SIZE || y < 0 || y >= MAX_AREA_SIZE {
                     continue;
                 }
-                self.check_add_border(model, x, y);
+                model.check_add_terrain_border(x, y);
             }
         }
     }

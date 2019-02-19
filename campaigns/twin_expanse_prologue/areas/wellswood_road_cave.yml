@@ -13,7 +13,6 @@ on_rest:
     id: campaign
     func: on_rest
 location_kind: Underground
-generate: false
 layers:
   - terrain_base
   - terrain_border

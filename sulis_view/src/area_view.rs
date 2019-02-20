@@ -984,14 +984,17 @@ impl WidgetKind for AreaView {
 
         let color = Color::new(area_color.r, area_color.g, area_color.b, 0.6 * area_color.a);
         self.draw_entities_props(renderer, scale_x, scale_y, color, widget, &state, millis);
-        self.draw_layer(
-            renderer,
-            scale_x,
-            scale_y,
-            widget,
-            VISIBILITY_TEX_ID,
-            color::WHITE,
-        );
+
+        if Config::debug().limit_line_of_sight {
+            self.draw_layer(
+                renderer,
+                scale_x,
+                scale_y,
+                widget,
+                VISIBILITY_TEX_ID,
+                color::WHITE,
+                );
+        }
 
         if let Some(ref image) = self.selection_box_image {
             if let Some((x, y, x_end, y_end)) = self.get_selection_box_coords() {

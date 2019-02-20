@@ -869,20 +869,28 @@ uniform_sets:
     impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
     invis: [[0, 0], [1, 0], [0, 1], [1, 1]]
     tiles: [
-      stone_ceil_base, stone_ceil_outer_edge_all, stone_ceil_outer_edge_nw, stone_ceil_outer_edge_n,
-      stone_ceil_outer_edge_ne, stone_ceil_outer_edge_w, stone_ceil_outer_edge_e, stone_ceil_outer_edge_sw,
+      stone_ceil_base, stone_ceil_outer_edge_all, stone_ceil_outer_edge_w, stone_ceil_outer_edge_e, stone_ceil_outer_edge_sw,
       stone_ceil_outer_edge_s, stone_ceil_outer_edge_se, stone_ceil_inner_edge_sw, stone_ceil_inner_edge_se,
       stone_ceil_inner_edge_nw, stone_ceil_inner_edge_ne, stone_ceil_inner_edge_ne_sw, stone_ceil_inner_edge_nw_se,
       
-      brick_base, brick_outer_edge_all, brick_outer_edge_nw, brick_outer_edge_n,
-      brick_outer_edge_ne, brick_outer_edge_w, brick_outer_edge_e, brick_outer_edge_sw,
+      brick_base, brick_outer_edge_all, brick_outer_edge_w, brick_outer_edge_e, brick_outer_edge_sw,
       brick_outer_edge_s, brick_outer_edge_se, brick_inner_edge_sw, brick_inner_edge_se,
       brick_inner_edge_nw, brick_inner_edge_ne, brick_inner_edge_ne_sw, brick_inner_edge_nw_se,
       
-      wood_base, wood_outer_edge_all, wood_outer_edge_nw, wood_outer_edge_n,
-      wood_outer_edge_ne, wood_outer_edge_w, wood_outer_edge_e, wood_outer_edge_sw,
+      wood_base, wood_outer_edge_all, wood_outer_edge_w, wood_outer_edge_e, wood_outer_edge_sw,
       wood_outer_edge_s, wood_outer_edge_se, wood_inner_edge_sw, wood_inner_edge_se,
       wood_inner_edge_nw, wood_inner_edge_ne, wood_inner_edge_ne_sw, wood_inner_edge_nw_se,
+    ]
+  interior_walls_top:
+    layer: walls_aerial
+    size: [2, 2]
+    sprite_prefix: "tileset/interior_"
+    impass: [[0, 1], [1, 1]]
+    invis: [[0, 1], [1, 1]]
+    tiles: [
+      stone_ceil_outer_edge_nw, stone_ceil_outer_edge_n, stone_ceil_outer_edge_ne,
+      brick_outer_edge_nw, brick_outer_edge_n, brick_outer_edge_ne,
+      wood_outer_edge_nw, wood_outer_edge_n, wood_outer_edge_ne
     ]
 non_uniform_sets:
   dungeon_bars:
@@ -993,11 +1001,11 @@ non_uniform_sets:
         impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
         invis: [[0, 0], [1, 0], [0, 1], [1, 1]]
       outer_edge_nw:
-        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+        impass: [[0, 1], [1, 1]]
       outer_edge_n:
-        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+        impass: [[0, 1], [1, 1]]
       outer_edge_ne:
-        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+        impass: [[0, 1], [1, 1]]
       outer_edge_w:
         impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
       outer_edge_e:
@@ -1021,11 +1029,11 @@ non_uniform_sets:
         impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
         invis: [[0, 0], [1, 0], [0, 1], [1, 1]]
       outer_edge_nw:
-        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+        impass: [[0, 1], [1, 1]]
       outer_edge_n:
-        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+        impass: [[0, 1], [1, 1]]
       outer_edge_ne:
-        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+        impass: [[0, 1], [1, 1]]
       outer_edge_w:
         impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
       outer_edge_e:
@@ -1049,11 +1057,11 @@ non_uniform_sets:
         impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
         invis: [[0, 0], [1, 0], [0, 1], [1, 1]]
       outer_edge_nw:
-        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+        impass: [[0, 1], [1, 1]]
       outer_edge_n:
-        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+        impass: [[0, 1], [1, 1]]
       outer_edge_ne:
-        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+        impass: [[0, 1], [1, 1]]
       outer_edge_w:
         impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
       outer_edge_e:
@@ -1077,11 +1085,11 @@ non_uniform_sets:
         impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
         invis: [[0, 0], [1, 0], [0, 1], [1, 1]]
       outer_edge_nw:
-        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+        impass: [[0, 1], [1, 1]]
       outer_edge_n:
-        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+        impass: [[0, 1], [1, 1]]
       outer_edge_ne:
-        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+        impass: [[0, 1], [1, 1]]
       outer_edge_w:
         impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
       outer_edge_e:
@@ -1105,11 +1113,11 @@ non_uniform_sets:
         impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
         invis: [[0, 0], [1, 0], [0, 1], [1, 1]]
       outer_edge_nw:
-        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+        impass: [[0, 1], [1, 1]]
       outer_edge_n:
-        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+        impass: [[0, 1], [1, 1]]
       outer_edge_ne:
-        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+        impass: [[0, 1], [1, 1]]
       outer_edge_w:
         impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
       outer_edge_e:
@@ -1165,33 +1173,39 @@ non_uniform_sets:
         impass: []
       ext2_outer_edge_se:
         impass: []
-  cave_top:
+  cave_top_aerial:
+    layer: walls_aerial
+    size: [2, 2]
+    sprite_prefix: "tileset/cave_top_"
+    tiles:
+      outer_edge_nw:
+        impass: []
+      outer_edge_n:
+        impass: []
+      outer_edge_ne:
+        impass: []
+      outer_edge_w:
+        impass: [[1, 0], [1, 1]]
+      outer_edge_e:
+        impass: [[0, 0], [0, 1]]
+      inner_edge_nw:
+        impass: [[1, 0], [1, 1]]
+      inner_edge_ne:
+        impass: [[0, 0], [0, 1]]
+  cave_top_base:
     layer: walls_top
     size: [2, 2]
     sprite_prefix: "tileset/cave_top_"
     tiles:
       base:
         impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
-      outer_edge_nw:
-        impass: [[1, 1]]
-      outer_edge_n:
-        impass: [[0, 1], [1, 1]]
-      outer_edge_ne:
-        impass: [[0, 1]]
-      outer_edge_w:
-        impass: [[1, 0], [1, 1]]
-      outer_edge_e:
-        impass: [[0, 0], [0, 1]]
+        invis: [[0, 0], [1, 0], [0, 1], [1, 1]]
       outer_edge_sw:
         impass: [[1, 0]]
       outer_edge_s:
         impass: [[0, 0], [1, 0]]
       outer_edge_se:
         impass: [[0, 0]]
-      inner_edge_nw:
-        impass: [[1, 0], [0, 1], [1, 1]]
-      inner_edge_ne:
-        impass: [[0, 0], [0, 1], [1, 1]]
       inner_edge_sw:
         impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
       inner_edge_se:
@@ -1218,33 +1232,39 @@ non_uniform_sets:
         impass: []
       cliffs_ext2_outer_edge_se:
         impass: []
-  cliffs_dark:
+  cliffs_dark_aerial:
+    layer: walls_aerial
+    size: [2, 2]
+    sprite_prefix: "tileset/cliffs_dark_"
+    tiles:
+      outer_edge_nw:
+        impass: []
+      outer_edge_n:
+        impass: []
+      outer_edge_ne:
+        impass: []
+      outer_edge_w:
+        impass: [[1, 0], [1, 1]]
+      outer_edge_e:
+        impass: [[0, 0], [0, 1]]
+      inner_edge_nw:
+        impass: [[1, 0], [1, 1]]
+      inner_edge_ne:
+        impass: [[0, 0], [0, 1]]
+  cliffs_dark_base:
     layer: walls_top
     size: [2, 2]
     sprite_prefix: "tileset/cliffs_dark_"
     tiles:
       base:
         impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
-      outer_edge_nw:
-        impass: [[1, 1]]
-      outer_edge_n:
-        impass: [[0, 1], [1, 1]]
-      outer_edge_ne:
-        impass: [[0, 1]]
-      outer_edge_w:
-        impass: [[1, 0], [1, 1]]
-      outer_edge_e:
-        impass: [[0, 0], [0, 1]]
+        invis: [[0, 0], [1, 0], [0, 1], [1, 1]]
       outer_edge_sw:
         impass: [[1, 0]]
       outer_edge_s:
         impass: [[0, 0], [1, 0]]
       outer_edge_se:
         impass: [[0, 0]]
-      inner_edge_nw:
-        impass: [[1, 0], [0, 1], [1, 1]]
-      inner_edge_ne:
-        impass: [[0, 0], [0, 1], [1, 1]]
       inner_edge_sw:
         impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
       inner_edge_se:

@@ -154,12 +154,14 @@ impl Config {
 #[serde(deny_unknown_fields)]
 pub struct DebugConfig {
     pub encounter_spawning: bool,
+    pub limit_line_of_sight: bool,
 }
 
 impl Default for DebugConfig {
     fn default() -> Self {
         DebugConfig {
             encounter_spawning: true,
+            limit_line_of_sight: true,
         }
     }
 }

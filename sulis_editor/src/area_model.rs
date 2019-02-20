@@ -75,8 +75,7 @@ impl AreaModel {
         let name = config.area.name.clone();
         let filename = config.area.filename.clone();
 
-        let tiles = TilesModel::new(Module::terrain_rules(), Module::terrain_kinds(),
-            Module::wall_rules(), Module::wall_kinds());
+        let tiles = TilesModel::new();
 
         AreaModel {
             config,

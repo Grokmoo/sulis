@@ -1,0 +1,27 @@
+id: town
+terrain_kind: grass_med
+wall_kinds:
+  roof_thatched:
+    weight: 1
+  roof_stone:
+    weight: 1
+  roof_brick:
+    weight: 1
+  roof_wood:
+    weight: 1
+  roof_wood_02:
+    weight: 1
+grid_width: 2
+grid_height: 2
+rooms:
+  min_size: [2, 2]
+  max_size: [4, 2]
+  min_spacing: 3
+  room_placement_attempts: 50
+  winding_chance: 70
+  extra_connection_chance: 20
+  dead_end_keep_chance: 20
+  invert: true
+  gen_corridors: false
+  room_edge_overfill_chance: 0
+  corridor_edge_overfill_chance: 0

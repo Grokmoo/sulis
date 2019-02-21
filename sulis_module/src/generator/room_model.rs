@@ -22,7 +22,7 @@ use sulis_core::util::{Point, gen_rand, shuffle};
 use crate::generator::RoomParams;
 
 #[derive(Clone, Copy, PartialEq, Eq)]
-enum TileKind {
+pub enum TileKind {
     Wall,
     Corridor(usize),
     Room(usize),
@@ -71,15 +71,18 @@ impl RoomModel {
         }
     }
 
-    pub(crate) fn generate(&mut self, params: &RoomParams) -> Result<(), Error> {
-        self.generate_rooms(params);
+    pub(crate) fn generate(&mut self, params: &RoomParams,
+                           open_locs: &[Point]) -> Result<(), Error> {
+        self.generate_rooms(params, open_locs);
         info!("Generated {} total rooms", self.rooms.len());
 
-        self.generate_corridors(params);
+        if params.gen_corridors {
+            self.generate_corridors(params);
 
-        self.connect_regions(params);
+            self.connect_regions(params);
 
-        self.remove_dead_ends(params);
+            self.remove_dead_ends(params);
+        }
         Ok(())
     }
 
@@ -103,7 +106,7 @@ impl RoomModel {
 
                     if exits > 1 { continue; }
 
-                    if gen_rand(1, 101) < params.dead_end_removal { continue; }
+                    if gen_rand(1, 101) < params.dead_end_keep_chance { continue; }
 
                     self.set_tile(x, y, TileKind::Wall);
 
@@ -172,12 +175,12 @@ impl RoomModel {
                 if (connector.x - conn.x) * (connector.x - conn.x) +
                     (connector.y - conn.y) * (connector.y - conn.y) < 4 { return false; }
 
-                let regions: Vec<_> = connector_regions[conn].iter().
+                let regions: HashSet<_> = connector_regions[conn].iter().
                     map(|region| merged[*region]).collect();
                 if regions.len() > 1 { return true; }
 
                 // randomly add some additional connectors
-                if gen_rand(1, 101) < params.connectivity {
+                if gen_rand(1, 101) < params.extra_connection_chance {
                     self.set_tile(conn.x, conn.y, TileKind::DoorWay);
                 }
 
@@ -186,19 +189,31 @@ impl RoomModel {
         }
     }
 
-    fn generate_rooms(&mut self, params: &RoomParams) {
-        // push a room that the player will transition into
-        // TODO make this configurable based on the area data
-        self.add_room(Room { x: 0, y: 0, width: 4, height: 4 });
+    fn generate_rooms(&mut self, params: &RoomParams, open_locs: &[Point]) {
+        if !params.invert {
+            for loc in open_locs {
+                let room = Room::center_on(self.width, self.height, params, *loc);
+                self.add_room(room);
+            }
+        }
 
-        debug!("Generating rooms with {} attempts", params.placement_attempts);
-        for _ in 0..params.placement_attempts {
+        debug!("Generating rooms with {} attempts", params.room_placement_attempts);
+        for _ in 0..params.room_placement_attempts {
             let room = Room::gen(self.width, self.height, params);
             let mut overlaps = false;
             for other in &self.rooms {
-                if room.overlaps(other) {
+                if room.overlaps(other, params) {
                     overlaps = true;
                     break;
+                }
+            }
+
+            if params.invert {
+                for p in open_locs {
+                    if room.contains(*p) {
+                        overlaps = true;
+                        break;
+                    }
                 }
             }
 
@@ -282,8 +297,31 @@ impl RoomModel {
         self.rooms.push(room);
     }
 
-    pub fn is_wall(&self, x: i32, y: i32) -> bool {
-        self.tiles[(x + y * self.width) as usize] == TileKind::Wall
+    /// Returns an array of the tilekind of the specified tile and its 4 neighbors.
+    /// In order: self (center), North, East, South, West
+    pub fn neighbors(&self, x: i32, y: i32) -> [Option<TileKind>; 5] {
+        let c = self.tile_checked(x, y);
+        let n = self.tile_checked(x, y - 1);
+        let e = self.tile_checked(x + 1, y);
+        let s = self.tile_checked(x, y + 1);
+        let w = self.tile_checked(x - 1, y);
+
+        [c, n, e, s, w]
+    }
+
+    pub fn region(&self, x: i32, y: i32) -> Option<usize> {
+        match self.tile(x, y) {
+            TileKind::Wall => None,
+            TileKind::Corridor(region) => Some(region),
+            TileKind::Room(region) => Some(region),
+            TileKind::DoorWay => Some(std::u32::MAX as usize),
+        }
+    }
+
+    fn tile_checked(&self, x: i32, y: i32) -> Option<TileKind> {
+        if x < 0 || y < 0 || x >= self.width || y >= self.height { return None; }
+
+        Some(self.tile(x, y))
     }
 
     fn tile(&self, x: i32, y: i32) -> TileKind {
@@ -323,16 +361,43 @@ impl Room {
         }
     }
 
-    fn overlaps(&self, other: &Room) -> bool {
-        !self.not_overlaps(other)
+    fn center_on(area_width: i32, area_height: i32, params: &RoomParams, loc: Point) -> Room {
+        let mut room = Room::gen(area_width, area_height, params);
+        room.x = loc.x - room.width / 2;
+        room.y = loc.y - room.height / 2;
+
+        if room.x < 0 { room.x = 0; }
+        else if room.x + room.width >= area_width {
+            room.x = area_width - room.width - 1;
+        }
+
+        if room.y < 0 { room.y = 0; }
+        else if room.y + room.height >= area_height {
+            room.y = area_height - room.height - 1;
+        }
+
+        room
     }
 
-    fn not_overlaps(&self, other: &Room) -> bool {
-        if self.x > other.x + other.width || other.x > self.x + self.width {
+    fn contains(&self, p: Point) -> bool {
+        if p.x < self.x || p.x > self.x + self.width { return false; }
+        if p.y < self.y || p.y > self.y + self.height { return false; }
+
+        true
+    }
+
+    fn overlaps(&self, other: &Room, params: &RoomParams) -> bool {
+        !self.not_overlaps(other, params)
+    }
+
+    fn not_overlaps(&self, other: &Room, params: &RoomParams) -> bool {
+        let sp = params.min_spacing as i32 - 1;
+
+        if self.x > other.x + other.width + sp || other.x > self.x + self.width + sp {
             return true;
         }
 
-        if self.y > other.y + other.height || other.y > self.y + self.height {
+        if self.y > other.y + other.height + sp || other.y > self.y + self.height + sp {
             return true;
         }
 

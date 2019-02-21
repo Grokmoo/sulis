@@ -1,0 +1,21 @@
+id: dungeon
+terrain_kind: interior_dirt
+wall_kinds:
+  interior_brick:
+    weight: 1
+  interior_stone_ceil:
+    weight: 1
+grid_width: 2
+grid_height: 3
+rooms:
+  min_size: [2, 2]
+  max_size: [5, 4]
+  min_spacing: 2
+  room_placement_attempts: 30
+  winding_chance: 70
+  extra_connection_chance: 10
+  dead_end_keep_chance: 5
+  invert: false
+  gen_corridors: true
+  room_edge_overfill_chance: 30
+  corridor_edge_overfill_chance: 0

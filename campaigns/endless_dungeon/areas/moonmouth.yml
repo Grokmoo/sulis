@@ -85,8 +85,8 @@ transitions:
     to:
       Area:
         id: dungeon_entrance
-        x: 6
-        y: 6
+        x: 64
+        y: 68
     hover_text: To The Dungeon
     image_display: empty
 triggers:

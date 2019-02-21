@@ -1,12 +1,21 @@
 id: cave
 terrain_kind: rocks_med
-wall_kind: cave_top
+wall_kinds:
+  cave_top:
+    weight: 1
+  cliffs_dark:
+    weight: 1
 grid_width: 3
 grid_height: 4
 rooms:
   min_size: [2, 2]
-  max_size: [4, 4]
-  placement_attempts: 50
-  winding_chance: 30
-  connectivity: 25
-  dead_end_removal: 20
+  max_size: [4, 3]
+  min_spacing: 2
+  room_placement_attempts: 20
+  winding_chance: 80
+  extra_connection_chance: 20
+  dead_end_keep_chance: 10
+  invert: false
+  gen_corridors: true
+  room_edge_overfill_chance: 50
+  corridor_edge_overfill_chance: 25

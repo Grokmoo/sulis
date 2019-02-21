@@ -29,7 +29,18 @@ entity_layer: 7
 actors: []
 props: []
 encounters: []
-transitions: []
+transitions:
+  - from:
+      x: 64
+      y: 64
+    size: 4by4
+    to:
+      Area:
+        id: moonmouth
+        x: 67
+        y: 57
+    hover_text: To Outside
+    image_display: empty
 triggers: []
 terrain:
   kinds: []

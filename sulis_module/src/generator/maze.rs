@@ -52,7 +52,7 @@ impl Direction {
     }
 }
 
-pub struct RoomModel {
+pub struct Maze {
     width: i32,
     height: i32,
     rooms: Vec<Room>,
@@ -60,9 +60,9 @@ pub struct RoomModel {
     cur_region: usize,
 }
 
-impl RoomModel {
-    pub(crate) fn new(width: u32, height: u32) -> RoomModel {
-        RoomModel {
+impl Maze {
+    pub(crate) fn new(width: u32, height: u32) -> Maze {
+        Maze {
             width: width as i32,
             height: height as i32,
             rooms: Vec::new(),

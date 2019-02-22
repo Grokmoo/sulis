@@ -1,5 +1,4 @@
 id: dungeon
-terrain_kind: interior_dirt
 wall_kinds:
   interior_brick:
     weight: 1
@@ -19,3 +18,23 @@ rooms:
   gen_corridors: true
   room_edge_overfill_chance: 30
   corridor_edge_overfill_chance: 0
+terrain:
+  base_kinds:
+    interior_dirt:
+      weight: 1
+    interior_stone:
+      weight: 1
+  feature_passes:
+    terrain_sprinkle:
+      kinds:
+        interior_wood01:
+          weight: 1
+        interior_wood02:
+          weight: 1
+        interior_tile:
+          weight: 1
+      min_size: [2, 2]
+      max_size: [10, 10]
+      spacing: 2
+      placement_attempts: 10
+      edge_underfill_chance: 0

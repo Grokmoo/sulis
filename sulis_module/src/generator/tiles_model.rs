@@ -273,6 +273,16 @@ impl TilesModel {
         return Rc::clone(&tiles.variants[(roll - base_weight) as usize]);
     }
 
+    pub fn check_add_terrain(&mut self, x: i32, y: i32) {
+        let terrain = match self.terrain_index_at(x, y) {
+            Some(index) => index,
+            None => return,
+        };
+
+        let tiles = &self.terrain_kind(terrain);
+        self.add(self.gen_choice(tiles), x, y);
+    }
+
     pub fn check_add_terrain_border(&mut self, x: i32, y: i32) {
         let self_index = match self.terrain_index_at(x, y) {
             Some(index) => index,

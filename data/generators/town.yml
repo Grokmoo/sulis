@@ -1,5 +1,4 @@
 id: town
-terrain_kind: grass_med
 wall_kinds:
   roof_thatched:
     weight: 1
@@ -25,3 +24,23 @@ rooms:
   gen_corridors: false
   room_edge_overfill_chance: 0
   corridor_edge_overfill_chance: 0
+terrain:
+  base_kinds:
+    grass_med:
+      weight: 1
+    grass_light:
+      weight: 1
+    grass_dark:
+      weight: 1
+  feature_passes:
+    terrain_sprinkle:
+      kinds:
+        grass_light:
+          weight: 1
+        grass_dark:
+          weight: 1
+      min_size: [2, 2]
+      max_size: [10, 10]
+      spacing: 3
+      placement_attempts: 10
+      edge_underfill_chance: 50

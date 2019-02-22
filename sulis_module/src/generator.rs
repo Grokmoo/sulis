@@ -14,8 +14,11 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-mod room_model;
-use self::room_model::{RoomModel, TileKind};
+mod maze;
+use self::maze::{Maze, TileKind};
+
+mod terrain_gen;
+use self::terrain_gen::{TerrainGen, TerrainParams, TerrainParamsBuilder};
 
 mod terrain_tiles;
 pub use self::terrain_tiles::{EdgesList, TerrainTiles};
@@ -32,15 +35,42 @@ use std::io::{Error, ErrorKind};
 
 use sulis_core::util::{Point, gen_rand};
 use crate::area::{AreaBuilder, Layer};
-use crate::{Module, TerrainKind, WallKind};
+use crate::{Module, WallKind};
 
-struct WallKinds {
+pub struct WeightedList<T> {
     total_weight: u32,
-    entries: Vec<(WallKind, u32)>,
+    entries: Vec<(T, u32)>,
 }
 
-impl WallKinds {
-    fn pick_kind(&self) -> &WallKind {
+impl<T> WeightedList<T> {
+    pub fn new<F>(kinds: HashMap<String, WeightedEntry>, name: &str, getter: F)
+        -> Result<WeightedList<T>, Error> where F: Fn(&str) -> Option<T> {
+        let mut entries = Vec::new();
+        let mut total_weight = 0;
+        for (id, entry) in kinds {
+            let t = getter(&id).ok_or(
+                Error::new(ErrorKind::InvalidInput, format!("Invalid {} '{}'", name, id))
+            )?;
+
+            total_weight += entry.weight;
+            entries.push((t, entry.weight));
+        }
+
+        if total_weight == 0 || entries.len() == 0 {
+            return Err(Error::new(ErrorKind::InvalidInput,
+                format!("Must specify at least one {}", name)));
+        }
+
+        Ok(WeightedList {
+            entries,
+            total_weight,
+        })
+    }
+
+    pub fn len(&self) -> usize { self.entries.len() }
+    pub fn is_empty(&self) -> bool { self.entries.is_empty() }
+
+    pub fn pick(&self) -> &T {
         if self.entries.len() == 1 || self.total_weight == 1 {
             return &self.entries[0].0;
         }
@@ -57,9 +87,15 @@ impl WallKinds {
 
         unreachable!()
     }
+}
 
+struct WallKinds {
+    kinds: WeightedList<WallKind>,
+}
+
+impl WallKinds {
     fn pick_index(&self, model: &TilesModel) -> Option<usize> {
-        let wall_kind = self.pick_kind();
+        let wall_kind = self.kinds.pick();
         let mut wall_index = None;
         for (index, kind) in model.wall_kinds().iter().enumerate() {
             if kind.id == wall_kind.id {
@@ -79,44 +115,25 @@ impl WallKinds {
 
 pub struct Generator {
     pub id: String,
-    terrain_kind: TerrainKind,
     wall_kinds: WallKinds,
     grid_width: u32,
     grid_height: u32,
     room_params: RoomParams,
+    terrain_params: TerrainParams,
 }
 
 impl Generator {
     pub fn new(builder: GeneratorBuilder, module: &Module) -> Result<Generator, Error> {
-        let terrain_kind = module.terrain_kind(&builder.terrain_kind).
-            ok_or(Error::new(ErrorKind::InvalidInput, format!("Invalid terrain kind '{}'",
-                                                                  builder.terrain_kind)))?;
-
-        let mut entries = Vec::new();
-        let mut total_weight = 0;
-        for (id, def) in builder.wall_kinds {
-            let wall_kind = module.wall_kind(&id).ok_or(
-                Error::new(ErrorKind::InvalidInput, format!("Invalid wall kind '{}'", id))
-            )?;
-
-            total_weight += def.weight;
-            entries.push((wall_kind, def.weight));
-        }
-
-        if total_weight == 0 || entries.len() == 0 {
-            return Err(Error::new(ErrorKind::InvalidInput,
-                format!("Must specify at least one wall kind")));
-        }
-
-        let wall_kinds = WallKinds { total_weight, entries };
+        let wall_kinds_list = WeightedList::new(builder.wall_kinds, "WallKind",
+                                                |id| module.wall_kind(id))?;
 
         Ok(Generator {
             id: builder.id,
-            terrain_kind,
-            wall_kinds,
+            wall_kinds: WallKinds { kinds: wall_kinds_list },
             grid_width: builder.grid_width,
             grid_height: builder.grid_height,
             room_params: builder.rooms,
+            terrain_params: TerrainParams::new(builder.terrain, module)?,
         })
     }
 
@@ -124,17 +141,26 @@ impl Generator {
         info!("Generating area '{}'", builder.id);
         let mut model = GenModel::new(builder, self.grid_width as i32, self.grid_height as i32);
 
-        self.fill_terrain(&mut model);
-
         let (room_width, room_height) = model.region_size();
-        let mut room_model = RoomModel::new(room_width, room_height);
+        let mut maze = Maze::new(room_width, room_height);
 
         let open_locs: Vec<Point> = builder.transitions.iter().map(|t| {
             let (x, y) = model.to_region_coords(t.from.x, t.from.y);
             Point::new(x, y)
         }).collect();
-        room_model.generate(&self.room_params, &open_locs)?;
-        self.add_walls(&mut model, room_model);
+        maze.generate(&self.room_params, &open_locs)?;
+        self.add_walls(&mut model, maze);
+
+        info!("Generating terrain");
+        let mut gen = TerrainGen::new(&mut model, &self.terrain_params);
+        gen.generate();
+
+        // add the tiles to the model
+        for p in model.tiles() {
+            model.model.check_add_wall_border(p.x, p.y);
+            model.model.check_add_terrain(p.x, p.y);
+            model.model.check_add_terrain_border(p.x, p.y);
+        }
 
         info!("Generation complete.  Marshalling.");
         self.create_layers(&model.builder, model.model)
@@ -172,7 +198,7 @@ impl Generator {
         }
     }
 
-    fn add_walls(&self, model: &mut GenModel, room_model: RoomModel) {
+    fn add_walls(&self, model: &mut GenModel, maze: Maze) {
         info!("Generating walls");
 
         // either carve rooms out or put walls in
@@ -190,14 +216,14 @@ impl Generator {
         let mut mapped = HashMap::new();
 
         // carve out procedurally generated rooms
-        let room_iter = TileIter::simple(room_model.width(), room_model.height());
+        let room_iter = TileIter::simple(maze.width(), maze.height());
         for p_room in room_iter {
-            let region = match room_model.region(p_room.x, p_room.y) {
+            let region = match maze.region(p_room.x, p_room.y) {
                 None => continue,
                 Some(region) => region,
             };
 
-            let neighbors = room_model.neighbors(p_room.x, p_room.y);
+            let neighbors = maze.neighbors(p_room.x, p_room.y);
             let (elev, wall_kind) = self.pick_wall_kind(model, self.room_params.invert,
                                                         region, &mut mapped);
 
@@ -206,11 +232,6 @@ impl Generator {
             let (gw, gh) = (model.model.grid_width, model.model.grid_height);
             self.carve_wall(model, neighbors, Point::new(offset_x, offset_y),
                 Point::new(gw as i32, gh as i32), Point::new(tot_gw, tot_gh), elev, wall_kind);
-        }
-
-        // add the tiles to the model
-        for p in model.tiles() {
-            model.model.check_add_wall_border(p.x, p.y);
         }
     }
 
@@ -291,31 +312,6 @@ impl Generator {
             }
         }
     }
-
-    fn fill_terrain(&self, model: &mut GenModel) {
-        info!("Generating base terrain from '{}'", self.terrain_kind.id);
-        let mut kind_index = None;
-        for (index, kind) in model.model.terrain_kinds().iter().enumerate() {
-            if kind.id == self.terrain_kind.id {
-                kind_index = Some(index);
-                break;
-            }
-        }
-
-        let terrain = match kind_index {
-            None => {
-                error!("Invalid terrain kind '{}'.  This is a bug", self.terrain_kind.id);
-                panic!();
-            },
-            Some(index) => model.model.terrain_kind(index).clone(),
-        };
-
-        let tiles = model.tiles();
-        let model = &mut model.model;
-        for p in tiles {
-            model.add(model.gen_choice(&terrain), p.x, p.y);
-        }
-    }
 }
 
 fn is_rough_edge(neighbors: &[Option<TileKind>; 5], index: usize,
@@ -339,7 +335,7 @@ fn is_rough_edge(neighbors: &[Option<TileKind>; 5], index: usize,
     }
 }
 
-struct GenModel<'a> {
+pub(crate) struct GenModel<'a> {
     model: TilesModel,
     builder: &'a AreaBuilder,
     total_grid_size: Point,
@@ -444,16 +440,16 @@ impl Iterator for TileIter {
 #[serde(deny_unknown_fields)]
 pub struct GeneratorBuilder {
     id: String,
-    terrain_kind: String,
-    wall_kinds: HashMap<String, WallKindDef>,
+    wall_kinds: HashMap<String, WeightedEntry>,
     grid_width: u32,
     grid_height: u32,
     rooms: RoomParams,
+    terrain: TerrainParamsBuilder,
 }
 
 #[derive(Debug, Deserialize)]
 #[serde(deny_unknown_fields)]
-pub struct WallKindDef {
+pub struct WeightedEntry {
     weight: u32,
 }
 

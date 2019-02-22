@@ -34,6 +34,14 @@ pub struct TerrainTiles {
     pub borders: HashMap<usize, EdgesList>,
 }
 
+impl PartialEq for TerrainTiles {
+    fn eq(&self, other: &TerrainTiles) -> bool {
+        self.id == other.id
+    }
+}
+
+impl Eq for TerrainTiles {}
+
 #[derive(Clone)]
 pub struct EdgesList {
     pub inner_nw: Option<Rc<Tile>>,

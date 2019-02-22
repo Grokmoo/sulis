@@ -1,5 +1,5 @@
 id: cave
-terrain_kind: rocks_med
+
 wall_kinds:
   cave_top:
     weight: 1
@@ -19,3 +19,19 @@ rooms:
   gen_corridors: true
   room_edge_overfill_chance: 50
   corridor_edge_overfill_chance: 25
+terrain:
+  base_kinds:
+    rocks_med:
+      weight: 1
+  feature_passes:
+    terrain_sprinkle:
+      kinds:
+        rocks_light:
+          weight: 1
+        rocks_dark:
+          weight: 1
+      min_size: [4, 4]
+      max_size: [15, 15]
+      spacing: 2
+      placement_attempts: 10
+      edge_underfill_chance: 50

@@ -1,9 +1,6 @@
 id: cave
-
 wall_kinds:
   cave_top:
-    weight: 1
-  cliffs_dark:
     weight: 1
 grid_width: 3
 grid_height: 4
@@ -21,17 +18,27 @@ rooms:
   corridor_edge_overfill_chance: 25
 terrain:
   base_kinds:
-    rocks_med:
+    rocks_dark:
       weight: 1
   feature_passes:
-    terrain_sprinkle:
-      kinds:
-        rocks_light:
+    - kinds:
+        pit_black:
           weight: 1
-        rocks_dark:
+        lava:
+          weight: 1
+      min_size: [2, 2]
+      max_size: [8, 8]
+      spacing: 3
+      placement_attempts: 100
+      edge_underfill_chance: 50
+      allowable_regions: [ Room, Wall ]
+      border_walls_by: { top: 3, bottom: 0, left: 1, right: 1 }
+    - kinds:
+        rocks_med:
           weight: 1
       min_size: [4, 4]
       max_size: [15, 15]
       spacing: 2
-      placement_attempts: 10
+      placement_attempts: 50
       edge_underfill_chance: 50
+      allowable_regions: [ Wall, Corridor, Room, Doorway ]

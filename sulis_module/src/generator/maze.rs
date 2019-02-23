@@ -21,7 +21,7 @@ use std::io::Error;
 use sulis_core::util::{Point, gen_rand, shuffle};
 use crate::generator::RoomParams;
 
-#[derive(Clone, Copy, PartialEq, Eq)]
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub enum TileKind {
     Wall,
     Corridor(usize),
@@ -318,13 +318,13 @@ impl Maze {
         }
     }
 
-    fn tile_checked(&self, x: i32, y: i32) -> Option<TileKind> {
+    pub fn tile_checked(&self, x: i32, y: i32) -> Option<TileKind> {
         if x < 0 || y < 0 || x >= self.width || y >= self.height { return None; }
 
         Some(self.tile(x, y))
     }
 
-    fn tile(&self, x: i32, y: i32) -> TileKind {
+    pub fn tile(&self, x: i32, y: i32) -> TileKind {
         self.tiles[(x + y * self.width) as usize]
     }
 

@@ -228,6 +228,10 @@ impl TilesModel {
         &self.wall_kinds
     }
 
+    pub fn is_wall(&self, x: i32, y: i32) -> bool {
+        self.walls[(x + y * MAX_AREA_SIZE) as usize].1.is_some()
+    }
+
     pub fn wall_at(&self, x: i32, y: i32) -> (u8, Option<usize>) {
         self.walls[(x + y * MAX_AREA_SIZE) as usize]
     }

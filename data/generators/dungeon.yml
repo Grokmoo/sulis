@@ -25,8 +25,7 @@ terrain:
     interior_stone:
       weight: 1
   feature_passes:
-    terrain_sprinkle:
-      kinds:
+    - kinds:
         interior_wood01:
           weight: 1
         interior_wood02:
@@ -38,3 +37,4 @@ terrain:
       spacing: 2
       placement_attempts: 10
       edge_underfill_chance: 0
+      allowable_regions: [ Wall, Corridor, Room, Doorway ]

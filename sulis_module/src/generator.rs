@@ -149,10 +149,10 @@ impl Generator {
             Point::new(x, y)
         }).collect();
         maze.generate(&self.room_params, &open_locs)?;
-        self.add_walls(&mut model, maze);
+        self.add_walls(&mut model, &maze);
 
         info!("Generating terrain");
-        let mut gen = TerrainGen::new(&mut model, &self.terrain_params);
+        let mut gen = TerrainGen::new(&mut model, &self.terrain_params, &maze);
         gen.generate();
 
         // add the tiles to the model
@@ -198,7 +198,7 @@ impl Generator {
         }
     }
 
-    fn add_walls(&self, model: &mut GenModel, maze: Maze) {
+    fn add_walls(&self, model: &mut GenModel, maze: &Maze) {
         info!("Generating walls");
 
         // either carve rooms out or put walls in

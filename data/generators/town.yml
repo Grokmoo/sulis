@@ -33,8 +33,7 @@ terrain:
     grass_dark:
       weight: 1
   feature_passes:
-    terrain_sprinkle:
-      kinds:
+    - kinds:
         grass_light:
           weight: 1
         grass_dark:
@@ -44,3 +43,4 @@ terrain:
       spacing: 3
       placement_attempts: 10
       edge_underfill_chance: 50
+      allowable_regions: [ Room ]

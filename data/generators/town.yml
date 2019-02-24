@@ -44,3 +44,5 @@ terrain:
       placement_attempts: 10
       edge_underfill_chance: 50
       allowable_regions: [ Room ]
+props:
+  passes: []

@@ -21,7 +21,8 @@ use sulis_core::ui::Border;
 use sulis_core::util::{Point, gen_rand};
 use crate::Module;
 use crate::area::tile::TerrainKind;
-use crate::generator::{GenModel, WeightedEntry, WeightedList, Maze, TileKind};
+use crate::generator::{GenModel, WeightedEntry, WeightedList, Maze,
+    RegionKind, RegionKinds};
 
 pub struct TerrainGen<'a, 'b> {
     model: &'b mut GenModel<'a>,
@@ -75,7 +76,7 @@ impl<'a, 'b> TerrainGen<'a, 'b> {
             for y in y1..=y2 {
                 for x in x1..=x2 {
                     let t = self.maze.tile_checked(x, y);
-                    if !pass.is_allowable(t) {
+                    if !pass.allowable_regions.is_allowable(t) {
                         invalid = true;
                         break;
                     }
@@ -213,22 +214,8 @@ pub(crate) struct FeaturePass {
     spacing: u32,
     placement_attempts: u32,
     edge_underfill_chance: u32,
-    allowable_regions: [bool; 4],
+    allowable_regions: RegionKinds,
     border_walls_by: Option<Border>,
-}
-
-impl FeaturePass {
-    fn is_allowable(&self, kind: Option<TileKind>) -> bool {
-        let index = match kind {
-            Some(TileKind::Wall) => 0,
-            Some(TileKind::Corridor(_)) => 1,
-            Some(TileKind::Room(_)) => 2,
-            Some(TileKind::DoorWay) => 3,
-            None => return false,
-        };
-
-        self.allowable_regions[index]
-    }
 }
 
 impl TerrainParams {
@@ -241,12 +228,6 @@ impl TerrainParams {
             let kinds = WeightedList::new(pass_bldr.kinds, "TerrainKind",
                                           |id| module.terrain_kind(id))?;
 
-            let alw_src = pass_bldr.allowable_regions;
-            let allowable_regions = [
-                alw_src.contains(&RegionKind::Wall), alw_src.contains(&RegionKind::Corridor),
-                alw_src.contains(&RegionKind::Room), alw_src.contains(&RegionKind::Doorway),
-            ];
-
             passes.push(FeaturePass {
                 kinds,
                 min_size: Point::new(pass_bldr.min_size.0 as i32, pass_bldr.min_size.1 as i32),
@@ -254,7 +235,7 @@ impl TerrainParams {
                 spacing: pass_bldr.spacing,
                 placement_attempts: pass_bldr.placement_attempts,
                 edge_underfill_chance: pass_bldr.edge_underfill_chance,
-                allowable_regions,
+                allowable_regions: RegionKinds::new(pass_bldr.allowable_regions),
                 border_walls_by: pass_bldr.border_walls_by,
             });
         }
@@ -266,14 +247,6 @@ impl TerrainParams {
     }
 }
 
-#[derive(Debug, Deserialize, PartialEq, Eq)]
-#[serde(deny_unknown_fields)]
-pub enum RegionKind {
-    Wall,
-    Corridor,
-    Room,
-    Doorway,
-}
 
 #[derive(Debug, Deserialize)]
 #[serde(deny_unknown_fields)]

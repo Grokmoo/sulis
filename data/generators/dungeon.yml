@@ -38,3 +38,5 @@ terrain:
       placement_attempts: 10
       edge_underfill_chance: 0
       allowable_regions: [ Wall, Corridor, Room, Doorway ]
+props:
+  passes: []

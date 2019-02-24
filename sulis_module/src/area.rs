@@ -122,20 +122,24 @@ impl PartialEq for Area {
 
 impl Area {
     pub fn new(builder: AreaBuilder) -> Result<Area, Error> {
+        let mut generated_props = Vec::new();
+        let mut layers = Vec::new();
+
+        if let Some(ref generator) = builder.generator {
+            let generator = Module::generator(generator).ok_or(
+                Error::new(ErrorKind::InvalidInput, format!("Generator '{}' not found", generator))
+            )?;
+
+            let output = generator.generate(&builder)?;
+            layers = output.layers;
+            generated_props = output.props;
+        }
+
         let mut props = Vec::new();
-        for prop_builder in builder.props.iter() {
+        for prop_builder in builder.props.iter().chain(&generated_props) {
             let prop_data = create_prop(prop_builder)?;
             props.push(prop_data);
         }
-
-        let layers = if let Some(ref generator) = builder.generator {
-            let generator = Module::generator(generator).ok_or(
-                Error::new(ErrorKind::InvalidInput, format!("Generator '{}' not found",
-                                                            generator)))?;
-            generator.gen_layer_set(&builder)?
-        } else {
-            Vec::new()
-        };
 
         info!("Creating area '{}'", builder.id);
         let layer_set = LayerSet::new(&builder, &props, layers);

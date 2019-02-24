@@ -24,14 +24,14 @@ terrain:
     - kinds:
         pit_black:
           weight: 1
-        lava:
+        pit_dark:
           weight: 1
       min_size: [2, 2]
       max_size: [8, 8]
       spacing: 3
       placement_attempts: 100
       edge_underfill_chance: 50
-      allowable_regions: [ Room, Wall ]
+      allowable_regions: [ Room, TransitionRoom, Wall ]
       border_walls_by: { top: 3, bottom: 0, left: 1, right: 1 }
     - kinds:
         rocks_med:
@@ -41,4 +41,19 @@ terrain:
       spacing: 2
       placement_attempts: 50
       edge_underfill_chance: 50
-      allowable_regions: [ Wall, Corridor, Room, Doorway ]
+      allowable_regions: [ Wall, Corridor, Room, TransitionRoom, Doorway ]
+props:
+  passes:
+    - kinds:
+        chest_medium_level1_misc:
+          weight: 1
+        chest_small_level1_misc:
+          weight: 1
+        chest_xl_level1_armor:
+          weight: 1
+        chest_xl_level1_weapons:
+          weight: 1
+      spacing: 8
+      placement_attempts: 100
+      allowable_regions: [ Room ]
+      require_passable: true

@@ -25,7 +25,7 @@ use crate::generator::RoomParams;
 pub enum TileKind {
     Wall,
     Corridor(usize),
-    Room(usize),
+    Room { region: usize, transition: bool },
     DoorWay,
 }
 
@@ -129,7 +129,7 @@ impl Maze {
                         continue;
                     }
                     match self.tile(p.x, p.y) {
-                        TileKind::Room(region) => { regions.insert(region); },
+                        TileKind::Room { region, .. } => { regions.insert(region); },
                         TileKind::Corridor(region) => { regions.insert(region); },
                         TileKind::Wall => (),
                         TileKind::DoorWay => panic!(), // should not be any doorways yet
@@ -193,7 +193,7 @@ impl Maze {
         if !params.invert {
             for loc in open_locs {
                 let room = Room::center_on(self.width, self.height, params, *loc);
-                self.add_room(room);
+                self.add_room(room, true);
             }
         }
 
@@ -219,7 +219,7 @@ impl Maze {
 
             if overlaps { continue; }
 
-            self.add_room(room);
+            self.add_room(room, false);
         }
     }
 
@@ -285,10 +285,13 @@ impl Maze {
         }
     }
 
-    fn add_room(&mut self, room: Room) {
+    fn add_room(&mut self, room: Room, transition: bool) {
         for yi in room.y..(room.y + room.height) {
             for xi in room.x..(room.x + room.width) {
-                self.set_tile(xi, yi, TileKind::Room(self.cur_region));
+                self.set_tile(xi, yi, TileKind::Room{
+                    region: self.cur_region,
+                    transition,
+                });
             }
         }
 
@@ -313,7 +316,7 @@ impl Maze {
         match self.tile(x, y) {
             TileKind::Wall => None,
             TileKind::Corridor(region) => Some(region),
-            TileKind::Room(region) => Some(region),
+            TileKind::Room { region, .. } => Some(region),
             TileKind::DoorWay => Some(std::u32::MAX as usize),
         }
     }

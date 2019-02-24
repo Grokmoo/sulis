@@ -17,6 +17,9 @@
 mod maze;
 use self::maze::{Maze, TileKind};
 
+mod prop_gen;
+use self::prop_gen::{PropGen, PropParams, PropParamsBuilder};
+
 mod terrain_gen;
 use self::terrain_gen::{TerrainGen, TerrainParams, TerrainParamsBuilder};
 
@@ -34,7 +37,7 @@ use std::rc::Rc;
 use std::io::{Error, ErrorKind};
 
 use sulis_core::util::{Point, gen_rand};
-use crate::area::{AreaBuilder, Layer};
+use crate::area::{AreaBuilder, Layer, PropDataBuilder};
 use crate::{Module, WallKind};
 
 pub struct WeightedList<T> {
@@ -113,6 +116,11 @@ impl WallKinds {
     }
 }
 
+pub struct GeneratorOutput {
+    pub layers: Vec<Layer>,
+    pub props: Vec<PropDataBuilder>,
+}
+
 pub struct Generator {
     pub id: String,
     wall_kinds: WallKinds,
@@ -120,6 +128,7 @@ pub struct Generator {
     grid_height: u32,
     room_params: RoomParams,
     terrain_params: TerrainParams,
+    prop_params: PropParams,
 }
 
 impl Generator {
@@ -134,10 +143,11 @@ impl Generator {
             grid_height: builder.grid_height,
             room_params: builder.rooms,
             terrain_params: TerrainParams::new(builder.terrain, module)?,
+            prop_params: PropParams::new(builder.props, module)?,
         })
     }
 
-    pub fn gen_layer_set(&self, builder: &AreaBuilder) -> Result<Vec<Layer>, Error> {
+    pub fn generate(&self, builder: &AreaBuilder) -> Result<GeneratorOutput, Error> {
         info!("Generating area '{}'", builder.id);
         let mut model = GenModel::new(builder, self.grid_width as i32, self.grid_height as i32);
 
@@ -162,11 +172,20 @@ impl Generator {
             model.model.check_add_terrain_border(p.x, p.y);
         }
 
-        info!("Generation complete.  Marshalling.");
-        self.create_layers(&model.builder, model.model)
+        info!("Tile generation complete.  Creating layers.");
+        let layers = self.create_layers(&model.builder, &model.model)?;
+
+        info!("Generating props");
+        let mut gen = PropGen::new(&mut model, &layers, &self.prop_params, &maze);
+        let props = gen.generate()?;
+
+        Ok(GeneratorOutput {
+            layers,
+            props,
+        })
     }
 
-    fn create_layers(&self, builder: &AreaBuilder, model: TilesModel) -> Result<Vec<Layer>, Error> {
+    fn create_layers(&self, builder: &AreaBuilder, model: &TilesModel) -> Result<Vec<Layer>, Error> {
         let mut out = Vec::new();
         for (id, tiles_data) in model.iter() {
             let mut tiles = vec![Vec::new(); (builder.width * builder.height) as usize];
@@ -248,7 +267,7 @@ impl Generator {
                     None
                 }
             },
-            Some(TileKind::Room(_)) => {
+            Some(TileKind::Room { .. }) => {
                 if gen_rand(1, 101) < self.room_params.room_edge_overfill_chance {
                     Some(gen_rand(1, 5))
                 } else {
@@ -319,7 +338,7 @@ fn is_rough_edge(neighbors: &[Option<TileKind>; 5], index: usize,
     if neighbors[index] != Some(TileKind::Wall) { return false; }
 
     match neighbors[0] {
-        Some(TileKind::Room(_)) => {
+        Some(TileKind::Room { .. }) => {
             match edge_choice {
                 None => false,
                 Some(_) => true,
@@ -445,6 +464,7 @@ pub struct GeneratorBuilder {
     grid_height: u32,
     rooms: RoomParams,
     terrain: TerrainParamsBuilder,
+    props: PropParamsBuilder,
 }
 
 #[derive(Debug, Deserialize)]
@@ -467,4 +487,46 @@ pub(crate) struct RoomParams {
     gen_corridors: bool,
     room_edge_overfill_chance: u32,
     corridor_edge_overfill_chance: u32,
+}
+
+#[derive(Debug, Deserialize, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
+pub enum RegionKind {
+    Wall,
+    Corridor,
+    Room,
+    TransitionRoom,
+    Doorway,
+}
+
+pub struct RegionKinds {
+    allowed: [bool; 5],
+}
+
+impl RegionKinds {
+    pub fn new(src: Vec<RegionKind>) -> RegionKinds {
+        let allowed = [
+            src.contains(&RegionKind::Wall),
+            src.contains(&RegionKind::Corridor),
+            src.contains(&RegionKind::Room),
+            src.contains(&RegionKind::TransitionRoom),
+            src.contains(&RegionKind::Doorway),
+        ];
+
+        RegionKinds {
+            allowed
+        }
+    }
+
+    pub fn is_allowable(&self, kind: Option<TileKind>) -> bool {
+        let index = match kind {
+            Some(TileKind::Wall) => 0,
+            Some(TileKind::Corridor(_)) => 1,
+            Some(TileKind::Room { transition, .. }) => if transition { 3 } else { 2 },
+            Some(TileKind::DoorWay) => 4,
+            None => return false,
+        };
+
+        self.allowed[index]
+    }
 }

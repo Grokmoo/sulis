@@ -33,6 +33,15 @@ impl PartialOrd for Point {
     }
 }
 
+impl From<(i32, i32)> for Point {
+    fn from(item: (i32, i32)) -> Self {
+        Point {
+            x: item.0,
+            y: item.1,
+        }
+    }
+}
+
 impl Point {
     fn cmp_hash(&self) -> i32 {
         self.x + self.y * 65536
@@ -40,13 +49,6 @@ impl Point {
 
     pub fn new(x: i32, y: i32) -> Point {
         Point { x, y }
-    }
-
-    pub fn from(other: &Point) -> Point {
-        Point {
-            x: other.x,
-            y: other.y,
-        }
     }
 
     pub fn from_tuple_i32(vals: (i32, i32)) -> Point {

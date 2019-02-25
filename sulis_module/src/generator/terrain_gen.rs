@@ -22,7 +22,7 @@ use sulis_core::util::{Point, gen_rand};
 use crate::Module;
 use crate::area::tile::TerrainKind;
 use crate::generator::{GenModel, WeightedEntry, WeightedList, Maze,
-    RegionKind, RegionKinds};
+    RegionKind, RegionKinds, Rect};
 
 pub struct TerrainGen<'a, 'b> {
     model: &'b mut GenModel<'a>,
@@ -71,24 +71,14 @@ impl<'a, 'b> TerrainGen<'a, 'b> {
             let (x1, y1) = self.model.to_region_coords(feature.x * gw, feature.y * gh);
             let (x2, y2) = self.model.to_region_coords((feature.x + feature.w) * gw,
                                                        (feature.y + feature.h) * gh);
+            let p1 = Point::from((x1, y1));
+            let p2 = Point::from((x2, y2));
+
+            if !pass.allowable_regions.check_coords(&self.maze, p1, p2) { continue; }
 
             let mut invalid = false;
-            for y in y1..=y2 {
-                for x in x1..=x2 {
-                    let t = self.maze.tile_checked(x, y);
-                    if !pass.allowable_regions.is_allowable(t) {
-                        invalid = true;
-                        break;
-                    }
-                }
-
-                if invalid { break; }
-            }
-
-            if invalid { continue; }
-
             for other in features.iter() {
-                if feature.overlaps(other, pass) {
+                if feature.overlaps(other, pass.spacing as i32) {
                     invalid = true;
                     break;
                 }
@@ -275,6 +265,13 @@ struct Feature {
     h: i32,
 }
 
+impl Rect for Feature{
+    fn x(&self) -> i32 { self.x }
+    fn y(&self) -> i32 { self.y }
+    fn w(&self) -> i32 { self.w }
+    fn h(&self) -> i32 { self.h }
+}
+
 impl Feature {
     fn gen(max_x: i32, max_y: i32, params: &FeaturePass) -> Feature {
         let w = gen_rand(params.min_size.x, params.max_size.x + 1);
@@ -283,23 +280,5 @@ impl Feature {
         let y = gen_rand(0, max_y - h);
 
         Feature { x, y, w, h }
-    }
-
-    fn overlaps(&self, other: &Feature, params: &FeaturePass) -> bool {
-        !self.not_overlaps(other, params)
-    }
-
-    fn not_overlaps(&self, other: &Feature, params: &FeaturePass) -> bool {
-        let sp = params.spacing as i32 - 1;
-
-        if self.x > other.x + other.w + sp || other.x > self.x + self.w + sp {
-            return true;
-        }
-
-        if self.y > other.y + other.h + sp || other.y > self.y + self.h + sp {
-            return true;
-        }
-
-        false
     }
 }

@@ -62,7 +62,7 @@ pub use self::campaign::Campaign;
 pub use self::campaign::CampaignGroup;
 
 pub mod generator;
-use self::generator::{Generator, GeneratorBuilder};
+use self::generator::{AreaGenerator, GeneratorBuilder};
 
 pub mod image_layer;
 pub use self::image_layer::ImageLayer;
@@ -172,7 +172,7 @@ pub struct Module {
     wall_rules: Option<WallRules>,
     wall_kinds: Vec<WallKind>,
 
-    generators: HashMap<String, Rc<Generator>>,
+    generators: HashMap<String, Rc<AreaGenerator>>,
 
     root_dir: Option<String>,
     init: bool,
@@ -568,7 +568,7 @@ impl Module {
             }
 
             for (id, builder) in builder_set.generator_builders {
-                insert_if_ok("generator", id, Generator::new(builder, &module), &mut module.generators);
+                insert_if_ok("generator", id, AreaGenerator::new(builder, &module), &mut module.generators);
             }
 
             builder_set.area_builders
@@ -713,7 +713,7 @@ impl Module {
         prop, props, Prop;
         race, races, Race;
         tile, tiles, Tile;
-        generator, generators, Generator;
+        generator, generators, AreaGenerator;
         size, sizes, ObjectSize
         );
 

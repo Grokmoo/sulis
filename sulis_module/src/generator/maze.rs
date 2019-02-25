@@ -19,7 +19,7 @@ use std::cmp::Ordering;
 use std::io::Error;
 
 use sulis_core::util::{Point, gen_rand, shuffle};
-use crate::generator::RoomParams;
+use crate::generator::{Rect, RoomParams};
 
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub enum TileKind {
@@ -202,7 +202,7 @@ impl Maze {
             let room = Room::gen(self.width, self.height, params);
             let mut overlaps = false;
             for other in &self.rooms {
-                if room.overlaps(other, params) {
+                if room.overlaps(other, params.min_spacing as i32) {
                     overlaps = true;
                     break;
                 }
@@ -300,6 +300,10 @@ impl Maze {
         self.rooms.push(room);
     }
 
+    pub fn rooms(&self) -> impl Iterator<Item=&Room> {
+        self.rooms.iter()
+    }
+
     /// Returns an array of the tilekind of the specified tile and its 4 neighbors.
     /// In order: self (center), North, East, South, West
     pub fn neighbors(&self, x: i32, y: i32) -> [Option<TileKind>; 5] {
@@ -348,6 +352,13 @@ pub struct Room {
     pub height: i32,
 }
 
+impl Rect for Room{
+    fn x(&self) -> i32 { self.x }
+    fn y(&self) -> i32 { self.y }
+    fn w(&self) -> i32 { self.width }
+    fn h(&self) -> i32 { self.height }
+}
+
 impl Room {
     fn gen(area_width: i32, area_height: i32, params: &RoomParams) -> Room {
         // align rooms with odd tiles
@@ -380,30 +391,5 @@ impl Room {
         }
 
         room
-    }
-
-    fn contains(&self, p: Point) -> bool {
-        if p.x < self.x || p.x > self.x + self.width { return false; }
-        if p.y < self.y || p.y > self.y + self.height { return false; }
-
-        true
-    }
-
-    fn overlaps(&self, other: &Room, params: &RoomParams) -> bool {
-        !self.not_overlaps(other, params)
-    }
-
-    fn not_overlaps(&self, other: &Room, params: &RoomParams) -> bool {
-        let sp = params.min_spacing as i32 - 1;
-
-        if self.x > other.x + other.width + sp || other.x > self.x + self.width + sp {
-            return true;
-        }
-
-        if self.y > other.y + other.height + sp || other.y > self.y + self.height + sp {
-            return true;
-        }
-
-        false
     }
 }

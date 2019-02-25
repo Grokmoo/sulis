@@ -122,6 +122,7 @@ impl PartialEq for Area {
 
 impl Area {
     pub fn new(builder: AreaBuilder) -> Result<Area, Error> {
+        let mut generated_encounters = Vec::new();
         let mut generated_props = Vec::new();
         let mut layers = Vec::new();
 
@@ -133,6 +134,7 @@ impl Area {
             let output = generator.generate(&builder)?;
             layers = output.layers;
             generated_props = output.props;
+            generated_encounters = output.encounters;
         }
 
         let mut props = Vec::new();
@@ -218,7 +220,7 @@ impl Area {
 
         let mut used_triggers = HashSet::new();
         let mut encounters = Vec::new();
-        for encounter_builder in builder.encounters {
+        for encounter_builder in builder.encounters.iter().chain(&generated_encounters) {
             let encounter = match Module::encounter(&encounter_builder.id) {
                 None => {
                     warn!("No encounter '{}' found", &encounter_builder.id);

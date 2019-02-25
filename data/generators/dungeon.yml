@@ -40,3 +40,5 @@ terrain:
       allowable_regions: [ Wall, Corridor, Room, Doorway ]
 props:
   passes: []
+encounters:
+  passes: []

@@ -57,3 +57,12 @@ props:
       placement_attempts: 100
       allowable_regions: [ Room ]
       require_passable: true
+encounters:
+  passes:
+    - kinds:
+        goblins_level1:
+          weight: 1
+      spacing: 20
+      chance_per_room: 75
+      allowable_regions: [ Room ]
+      size: [10, 10]

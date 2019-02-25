@@ -20,7 +20,8 @@ use std::collections::HashMap;
 
 use sulis_core::util::{gen_rand, Point};
 use crate::{Module, Prop, area::{Layer, PropDataBuilder}};
-use crate::generator::{GenModel, WeightedEntry, WeightedList, Maze, RegionKind, RegionKinds};
+use crate::generator::{GenModel, WeightedEntry, WeightedList, Maze, RegionKind, RegionKinds,
+    Rect};
 
 pub struct PropGen<'a, 'b> {
     model: &'b mut GenModel<'a>,
@@ -56,22 +57,13 @@ impl<'a, 'b> PropGen<'a, 'b> {
                     if !self.is_passable(&data) { continue; }
                 }
 
-                let (x1, y1) = self.model.to_region_coords(data.x, data.y);
-                let (x2, y2) = self.model.to_region_coords(data.x + data.w(), data.y + data.h());
+                let p1 = Point::from(self.model.to_region_coords(data.x, data.y));
+                let p2 = Point::from(self.model.to_region_coords(data.x + data.w(),
+                                                                 data.y + data.h()));
+
+                if !pass.allowable_regions.check_coords(&self.maze, p1, p2) { continue; }
 
                 let mut invalid = false;
-                for y in y1..=y2 {
-                    for x in x1..=x2 {
-                        let t = self.maze.tile_checked(x, y);
-                        if !pass.allowable_regions.is_allowable(t) {
-                            invalid = true;
-                            break;
-                        }
-                    }
-                }
-
-                if invalid { continue; }
-
                 for other in props.iter() {
                     if data.overlaps(other, pass.spacing as i32) {
                         invalid = true;
@@ -124,6 +116,13 @@ struct PropData {
     y: i32,
 }
 
+impl Rect for PropData {
+    fn x(&self) -> i32 { self.x }
+    fn y(&self) -> i32 { self.y }
+    fn w(&self) -> i32 { self.prop.size.width }
+    fn h(&self) -> i32 { self.prop.size.height }
+}
+
 impl PropData {
     fn gen(max_x: i32, max_y: i32, prop: &Rc<Prop>) -> PropData {
         let prop = Rc::clone(prop);
@@ -133,28 +132,6 @@ impl PropData {
         let y = gen_rand(0, max_y - h);
 
         PropData { prop, x, y }
-    }
-
-    fn w(&self) -> i32 { self.prop.size.width }
-
-    fn h(&self) -> i32 { self.prop.size.height }
-
-    fn overlaps(&self, other: &PropData, spacing: i32) -> bool {
-        !self.not_overlaps(other, spacing)
-    }
-
-    fn not_overlaps(&self, other: &PropData, spacing: i32) -> bool {
-        let sp = spacing - 1;
-
-        if self.x > other.x + other.w() + sp || other.x > self.x + self.w() + sp {
-            return true;
-        }
-
-        if self.y > other.y + other.h() + sp || other.y > self.y + self.h() + sp {
-            return true;
-        }
-
-        false
     }
 }
 

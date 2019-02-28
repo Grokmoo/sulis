@@ -1,0 +1,74 @@
+id: features
+features:
+  boxes:
+    entries:
+      - tiles:
+          props/boxes01: [0, 0]
+        weight: 1
+      - tiles:
+          props/boxes02: [0, 0]
+        weight: 1
+      - tiles:
+          props/boxes03: [0, 0]
+        weight: 1
+      - tiles:
+          props/boxes04: [0, 0]
+        weight: 1
+      - tiles:
+          props/boxes05: [0, 0]
+        weight: 1
+    size: [2, 2]
+  mushrooms:
+    entries:
+      - tiles:
+          tileset/mushroom01: [0, 0]
+        weight: 1
+      - tiles:
+          tileset/mushroom02: [0, 0]
+        weight: 1
+      - tiles:
+          tileset/mushroom03: [0, 0]
+        weight: 1
+      - tiles:
+          tileset/mushroom04: [0, 0]
+        weight: 1
+      - tiles:
+          tileset/mushroom05: [0, 0]
+        weight: 1
+    size: [4, 2]
+  rocks:
+    entries:
+      - tiles:
+          tileset/rocks01: [0, 0]
+        weight: 1
+      - tiles:
+          tileset/rocks02: [0, 0]
+        weight: 1
+      - tiles:
+          tileset/rocks03: [0, 0]
+        weight: 1
+      - tiles:
+          tileset/rocks04: [0, 0]
+        weight: 1
+      - tiles:
+          tileset/rocks05: [0, 0]
+        weight: 1
+    size: [4, 2]
+  stairs_down:
+    entries:
+      - tiles:
+          stairs_down_top: [0, 0]
+          stairs_down_bot: [0, 2]
+        weight: 1
+    size:
+      width: 6
+      height: 6
+  stairs_up:
+    entries:
+      - tiles:
+          stairs_up_top: [0, 0]
+          stairs_up_bot: [0, 4]
+        weight: 1
+    size:
+      width: 6
+      height: 6

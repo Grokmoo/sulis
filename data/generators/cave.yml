@@ -31,7 +31,7 @@ terrain:
       spacing: 3
       placement_attempts: 100
       edge_underfill_chance: 50
-      allowable_regions: [ Room, TransitionRoom, Wall ]
+      allowable_regions: [ Room, Wall ]
       border_walls_by: { top: 3, bottom: 0, left: 1, right: 1 }
     - kinds:
         rocks_med:
@@ -63,7 +63,7 @@ encounters:
         goblins_level1:
           weight: 1
       spacing: 20
-      chance_per_room: 75
+      chance_per_room: 0
       allowable_regions: [ Room ]
       size: [10, 10]
 features:
@@ -71,11 +71,18 @@ features:
     - [ stairs_up, [63, 62] ]
   passes:
     - kinds:
-        stairs_down:
+        mushrooms:
           weight: 1
-        stairs_up:
+        rocks:
           weight: 1
-      spacing: 10
+      spacing: 5
+      allowable_regions: [ Room, TransitionRoom, Corridor ]
+      placement_attempts: 500
+      require_passable: true
+    - kinds:
+        boxes:
+          weight: 1
+      spacing: 5
       allowable_regions: [ Room ]
-      placement_attempts: 0
+      placement_attempts: 200
       require_passable: true

@@ -77,12 +77,8 @@ impl<'a, 'b> FeatureGen<'a, 'b> {
         for data in features {
             let feature = data.feature;
             let (base_x, base_y) = (data.x, data.y);
-            for (tile_id, p) in &feature.tiles {
-                let tile = Module::tile(tile_id).ok_or(
-                    Error::new(ErrorKind::InvalidData, format!("Invalid tile '{}' in feature",
-                                                               tile_id)))?;
-
-                self.model.model.add(tile, base_x + p.x, base_y + p.y);
+            for (tile, p) in feature.rand_entry() {
+                self.model.model.add(Rc::clone(tile), base_x + p.x, base_y + p.y);
             }
         }
 

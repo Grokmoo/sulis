@@ -19,13 +19,69 @@ use std::io::Error;
 use std::rc::Rc;
 
 use sulis_core::resource::{ResourceSet, Sprite};
-use sulis_core::util::{invalid_data_error, unable_to_create_error, Point, Size};
+use sulis_core::util::{invalid_data_error, unable_to_create_error, Point, Size, gen_rand};
+use crate::Module;
 
 #[derive(Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
-pub struct Feature {
-    pub tiles: HashMap<String, Point>,
+pub struct FeatureBuilder {
+    pub entries: Vec<FeatureEntry>,
     pub size: Size
+}
+
+#[derive(Deserialize, Debug)]
+#[serde(deny_unknown_fields)]
+pub struct FeatureEntry {
+    weight: u32,
+    tiles: HashMap<String, Point>,
+}
+
+pub struct Feature {
+    pub id: String,
+    pub size: Size,
+    entries: Vec<(Vec<(Rc<Tile>, Point)>, u32)>,
+}
+
+impl Feature {
+    pub fn new(id: String, builder: FeatureBuilder, module: &Module) -> Result<Feature, Error> {
+        let mut entries = Vec::new();
+        for entry in builder.entries {
+            let mut tiles = Vec::new();
+
+            for (tile_id, p) in entry.tiles {
+                let tile = match module.tiles.get(&tile_id) {
+                    None => {
+                        warn!("No tile '{}' found for feature '{}'", tile_id, id);
+                        return unable_to_create_error("feature", &id);
+                    }, Some(tile) => Rc::clone(tile),
+                };
+
+                tiles.push((tile, p));
+            }
+
+            entries.push((tiles, entry.weight));
+        }
+
+        if entries.is_empty() {
+            warn!("Feature '{}' must have 1 or more entries.", id);
+            return unable_to_create_error("feature", &id);
+        }
+
+        Ok(Feature {
+            id,
+            size: builder.size,
+            entries,
+        })
+    }
+
+    pub fn rand_entry(&self) -> &[(Rc<Tile>, Point)] {
+        if self.entries.len() == 1 {
+            &self.entries[0].0
+        } else {
+            let index = gen_rand(0, self.entries.len());
+            &self.entries[index].0
+        }
+    }
 }
 
 #[derive(Deserialize, Debug)]
@@ -137,14 +193,27 @@ pub struct TerrainKind {
 #[serde(deny_unknown_fields)]
 pub struct Tileset {
     pub id: String,
+
+    #[serde(default)]
     pub tiles: HashMap<String, TileBuilder>,
+
+    #[serde(default)]
     pub uniform_sets: HashMap<String, UniformSet>,
+
+    #[serde(default)]
     pub non_uniform_sets: HashMap<String, NonUniformSet>,
-    pub terrain_rules: TerrainRules,
+
+    #[serde(default)]
     pub terrain_kinds: Vec<TerrainKind>,
-    pub wall_rules: WallRules,
+
+    pub terrain_rules: Option<TerrainRules>,
+    pub wall_rules: Option<WallRules>,
+
+    #[serde(default)]
     pub wall_kinds: Vec<WallKind>,
-    pub features: HashMap<String, Feature>,
+
+    #[serde(default)]
+    pub features: HashMap<String, FeatureBuilder>,
 }
 
 impl Tileset {

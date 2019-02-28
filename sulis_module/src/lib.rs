@@ -435,6 +435,10 @@ impl Module {
             module.scripts.clear();
             module.generators.clear();
             module.features.clear();
+            module.terrain_rules = None;;
+            module.terrain_kinds.clear();
+            module.wall_rules = None;
+            module.wall_kinds.clear();
 
             module.rules = Some(Rc::new(rules));
             module.scripts = read_to_string(&dirs, "scripts");
@@ -463,17 +467,26 @@ impl Module {
                 insert_if_ok("size", id, ObjectSize::new(builder), &mut module.sizes);
             }
 
+            let mut feature_builders = Vec::new();
             for (_, mut tiles_list) in builder_set.tile_builders {
                 tiles_list.move_tiles();
 
-                module.terrain_rules = Some(tiles_list.terrain_rules);
-                module.terrain_kinds = tiles_list.terrain_kinds;
-                module.wall_rules = Some(tiles_list.wall_rules);
-                module.wall_kinds = tiles_list.wall_kinds;
-
-                for (id, feature) in tiles_list.features {
-                    module.features.insert(id, Rc::new(feature));
+                if let Some(rules) = tiles_list.terrain_rules {
+                    if module.terrain_rules.is_some() {
+                        warn!("Overwritting terrain rules.");
+                    }
+                    module.terrain_rules = Some(rules);
                 }
+
+                if let Some(rules) = tiles_list.wall_rules {
+                    if module.wall_rules.is_some() {
+                        warn!("Overwritting wall rules.");
+                    }
+                    module.wall_rules = Some(rules);
+                }
+
+                module.terrain_kinds.append(&mut tiles_list.terrain_kinds);
+                module.wall_kinds.append(&mut tiles_list.wall_kinds);
 
                 for (id, tile_builder) in tiles_list.tiles {
                     insert_if_ok(
@@ -483,6 +496,16 @@ impl Module {
                         &mut module.tiles,
                     );
                 }
+
+                tiles_list.features.drain().for_each(|f| feature_builders.push(f));
+            }
+
+            for (id, feature_builder) in feature_builders {
+                insert_if_ok("feature",
+                             id.to_string(),
+                             Feature::new(id, feature_builder, &module),
+                             &mut module.features,
+                             );
             }
 
             for (id, builder) in builder_set.ai_builders {

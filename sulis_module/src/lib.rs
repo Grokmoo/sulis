@@ -127,7 +127,7 @@ use self::ability_list::AbilityListBuilder;
 use self::area::AreaBuilder;
 use self::area::Tile;
 use self::area::{
-    tile::{TerrainKind, TerrainRules, WallKind, WallRules},
+    tile::{TerrainKind, TerrainRules, WallKind, WallRules, Feature},
     Tileset,
 };
 use self::campaign::CampaignBuilder;
@@ -167,6 +167,7 @@ pub struct Module {
     tiles: HashMap<String, Rc<Tile>>,
     scripts: HashMap<String, String>,
 
+    features: HashMap<String, Rc<Feature>>,
     terrain_rules: Option<TerrainRules>,
     terrain_kinds: Vec<TerrainKind>,
     wall_rules: Option<WallRules>,
@@ -433,6 +434,7 @@ impl Module {
             module.tiles.clear();
             module.scripts.clear();
             module.generators.clear();
+            module.features.clear();
 
             module.rules = Some(Rc::new(rules));
             module.scripts = read_to_string(&dirs, "scripts");
@@ -468,6 +470,10 @@ impl Module {
                 module.terrain_kinds = tiles_list.terrain_kinds;
                 module.wall_rules = Some(tiles_list.wall_rules);
                 module.wall_kinds = tiles_list.wall_kinds;
+
+                for (id, feature) in tiles_list.features {
+                    module.features.insert(id, Rc::new(feature));
+                }
 
                 for (id, tile_builder) in tiles_list.tiles {
                     insert_if_ok(
@@ -714,7 +720,8 @@ impl Module {
         race, races, Race;
         tile, tiles, Tile;
         generator, generators, AreaGenerator;
-        size, sizes, ObjectSize
+        size, sizes, ObjectSize;
+        feature, features, Feature
         );
 
     pub fn script(id: &str) -> Option<String> {
@@ -805,6 +812,7 @@ impl Default for Module {
             terrain_kinds: Vec::new(),
             wall_rules: None,
             wall_kinds: Vec::new(),
+            features: HashMap::new(),
             generators: HashMap::new(),
             init: false,
         }

@@ -1,4 +1,19 @@
 id: tileset
+features:
+  stairs_down:
+    tiles:
+      stairs_down_top: [0, 0]
+      stairs_down_bot: [0, 2]
+    size:
+      width: 6
+      height: 6
+  stairs_up:
+    tiles:
+      stairs_up_top: [0, 0]
+      stairs_up_bot: [0, 4]
+    size:
+      width: 6
+      height: 6
 wall_rules:
   grid_width: 2
   grid_height: 2
@@ -1967,3 +1982,27 @@ tiles:
     pass: [[0, 3], [1, 3], [2, 3], [3, 3]]
     invis: []
     sprite: tileset/table05
+  stairs_up_top:
+    layer: aerial
+    size: [6, 4]
+    impass: [[2, 3], [3, 3], [4, 3]]
+    invis: [[2, 3], [3, 3], [4, 3]]
+    sprite: tileset/stairs_up_top
+  stairs_up_bot:
+    layer: object
+    size: [6, 2]
+    impass: [[2, 0], [3, 0], [4, 0]]
+    invis: [[2, 0], [3, 0], [4, 0]]
+    sprite: tileset/stairs_up_bot
+  stairs_down_top:
+    layer: aerial
+    size: [6, 2]
+    impass: []
+    invis: []
+    sprite: tileset/stairs_down_top
+  stairs_down_bot:
+    layer: object
+    size: [6, 4]
+    impass: [[1, 0], [2, 0], [3, 0], [4, 0], [1, 1], [2, 1], [3, 1], [4, 1]]
+    invis: []
+    sprite: tileset/stairs_down_bot

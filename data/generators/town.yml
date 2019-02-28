@@ -32,7 +32,7 @@ terrain:
       weight: 1
     grass_dark:
       weight: 1
-  feature_passes:
+  patch_passes:
     - kinds:
         grass_light:
           weight: 1
@@ -47,4 +47,7 @@ terrain:
 props:
   passes: []
 encounters:
+  passes: []
+features:
+  fixed: []
   passes: []

@@ -22,7 +22,7 @@ use sulis_core::util::{gen_rand, Point};
 use crate::{Module, area::{Layer, AreaBuilder}};
 use crate::generator::{WeightedList, WallKinds, RoomParams, TerrainParams, PropParams,
     EncounterParams, GeneratorBuilder, GenModel, Maze, TerrainGen, PropGen, EncounterGen,
-    TileKind, TileIter, TilesModel, GeneratorOutput};
+    TileKind, TileIter, TilesModel, GeneratorOutput, FeatureParams, FeatureGen};
 
 pub struct AreaGenerator {
     pub id: String,
@@ -33,6 +33,7 @@ pub struct AreaGenerator {
     terrain_params: TerrainParams,
     prop_params: PropParams,
     encounter_params: EncounterParams,
+    feature_params: FeatureParams,
 }
 
 impl AreaGenerator {
@@ -49,6 +50,7 @@ impl AreaGenerator {
             terrain_params: TerrainParams::new(builder.terrain, module)?,
             prop_params: PropParams::new(builder.props, module)?,
             encounter_params: EncounterParams::new(builder.encounters, module)?,
+            feature_params: FeatureParams::new(builder.features, module)?,
         })
     }
 
@@ -77,8 +79,13 @@ impl AreaGenerator {
             model.model.check_add_terrain_border(p.x, p.y);
         }
 
-        info!("Tile generation complete.  Creating layers.");
+        // pre-gen layers for use in the next step
+        info!("Tile generation complete.  Pre-Gen layers.");
         let layers = self.create_layers(&model.builder, &model.model)?;
+
+        info!("Generating features");
+        let mut gen = FeatureGen::new(&mut model, &layers, &self.feature_params, &maze);
+        gen.generate()?;
 
         info!("Generating props");
         let mut gen = PropGen::new(&mut model, &layers, &self.prop_params, &maze);
@@ -87,6 +94,9 @@ impl AreaGenerator {
         info!("Generating encounters");
         let mut gen = EncounterGen::new(&mut model, &layers, &self.encounter_params, &maze);
         let encounters = gen.generate()?;
+
+        info!("Final Layer Gen");
+        let layers = self.create_layers(&model.builder, &model.model)?;
 
         Ok(GeneratorOutput {
             layers,

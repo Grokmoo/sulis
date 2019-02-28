@@ -22,7 +22,7 @@ use sulis_core::util::{Point, gen_rand};
 use crate::Module;
 use crate::area::tile::TerrainKind;
 use crate::generator::{GenModel, WeightedEntry, WeightedList, Maze,
-    RegionKind, RegionKinds, Rect};
+    RegionKind, RegionKinds, Rect, overlaps_any};
 
 pub struct TerrainGen<'a, 'b> {
     model: &'b mut GenModel<'a>,
@@ -47,91 +47,83 @@ impl<'a, 'b> TerrainGen<'a, 'b> {
             self.model.model.set_terrain_index(p.x, p.y, base_terrain);
         }
 
-        let mut features = Vec::new();
-        for i in 0..self.params.feature_passes.len() {
-            self.gen_feature_pass(i, &mut features);
+        let mut patches = Vec::new();
+        for i in 0..self.params.patch_passes.len() {
+            self.gen_patch_pass(i, &mut patches);
         }
     }
 
-    fn gen_feature_pass(&mut self, pass: usize, features: &mut Vec<Feature>) {
-        let pass = &self.params.feature_passes[pass];
+    fn gen_patch_pass(&mut self, pass: usize, patches: &mut Vec<Feature>) {
+        let pass = &self.params.patch_passes[pass];
 
         let gw = self.model.model.grid_width;
         let gh = self.model.model.grid_height;
 
-        trace!("Performing feature pass");
-        let skip = features.len();
+        trace!("Performing patch pass");
+        let skip = patches.len();
         for _ in 0..pass.placement_attempts {
-            let feature = Feature::gen(
+            let patch = Feature::gen(
                 self.model.builder.width as i32 / gw,
                 self.model.builder.height as i32 / gh,
                 pass
             );
 
-            let (x1, y1) = self.model.to_region_coords(feature.x * gw, feature.y * gh);
-            let (x2, y2) = self.model.to_region_coords((feature.x + feature.w) * gw,
-                                                       (feature.y + feature.h) * gh);
+            let (x1, y1) = self.model.to_region_coords(patch.x * gw, patch.y * gh);
+            let (x2, y2) = self.model.to_region_coords((patch.x + patch.w) * gw,
+                                                       (patch.y + patch.h) * gh);
             let p1 = Point::from((x1, y1));
             let p2 = Point::from((x2, y2));
 
             if !pass.allowable_regions.check_coords(&self.maze, p1, p2) { continue; }
 
-            let mut invalid = false;
-            for other in features.iter() {
-                if feature.overlaps(other, pass.spacing as i32) {
-                    invalid = true;
-                    break;
-                }
-            }
+            if overlaps_any(&patch, &patches, pass.spacing as i32) { continue; }
 
-            if invalid { continue; }
-
-            features.push(feature);
+            patches.push(patch);
         }
 
-        for feature in features.iter().skip(skip) {
+        for patch in patches.iter().skip(skip) {
             let terrain = self.get_terrain_tiles(pass.kinds.pick());
 
-            self.do_feature_area(feature, terrain, pass.edge_underfill_chance,
+            self.do_patch_area(patch, terrain, pass.edge_underfill_chance,
                                  pass.border_walls_by);
         }
     }
 
-    fn do_feature_area(&mut self, feature: &Feature, terrain: Option<usize>,
+    fn do_patch_area(&mut self, patch: &Feature, terrain: Option<usize>,
                        chance: u32, border_walls_by: Option<Border>) {
         let mut accum = 0;
 
         // north
-        for x in feature.x..(feature.x + feature.w - 1) {
+        for x in patch.x..(patch.x + patch.w - 1) {
             if self.check_terrain_chance(&mut accum, chance) {
-                self.set_terrain(x, feature.y, border_walls_by, terrain);
+                self.set_terrain(x, patch.y, border_walls_by, terrain);
             }
         }
 
         // east
-        for y in feature.y..(feature.y + feature.h - 1) {
+        for y in patch.y..(patch.y + patch.h - 1) {
             if self.check_terrain_chance(&mut accum, chance) {
-                self.set_terrain(feature.x + feature.w - 1, y, border_walls_by, terrain);
+                self.set_terrain(patch.x + patch.w - 1, y, border_walls_by, terrain);
             }
         }
 
         // south
-        for x in ((feature.x + 1)..(feature.x + feature.w)).rev() {
+        for x in ((patch.x + 1)..(patch.x + patch.w)).rev() {
             if self.check_terrain_chance(&mut accum, chance) {
-                self.set_terrain(x, feature.y + feature.h - 1, border_walls_by, terrain);
+                self.set_terrain(x, patch.y + patch.h - 1, border_walls_by, terrain);
             }
         }
 
         // west
-        for y in ((feature.y + 1)..(feature.y + feature.h)).rev() {
+        for y in ((patch.y + 1)..(patch.y + patch.h)).rev() {
             if self.check_terrain_chance(&mut accum, chance) {
-                self.set_terrain(feature.x, y, border_walls_by, terrain);
+                self.set_terrain(patch.x, y, border_walls_by, terrain);
             }
         }
 
         // center
-        for y in (feature.y + 1)..(feature.y + feature.h) {
-            for x in (feature.x + 1)..(feature.x + feature.w) {
+        for y in (patch.y + 1)..(patch.y + patch.h) {
+            for x in (patch.x + 1)..(patch.x + patch.w) {
                 self.set_terrain(x, y, border_walls_by, terrain);
             }
         }
@@ -194,7 +186,7 @@ impl<'a, 'b> TerrainGen<'a, 'b> {
 
 pub(crate) struct TerrainParams {
     base_kinds: WeightedList<TerrainKind>,
-    feature_passes: Vec<FeaturePass>,
+    patch_passes: Vec<FeaturePass>,
 }
 
 pub(crate) struct FeaturePass {
@@ -214,7 +206,7 @@ impl TerrainParams {
                                            |id| module.terrain_kind(id))?;
 
         let mut passes = Vec::new();
-        for pass_bldr in builder.feature_passes {
+        for pass_bldr in builder.patch_passes {
             let kinds = WeightedList::new(pass_bldr.kinds, "TerrainKind",
                                           |id| module.terrain_kind(id))?;
 
@@ -232,7 +224,7 @@ impl TerrainParams {
 
         Ok(TerrainParams {
             base_kinds,
-            feature_passes: passes
+            patch_passes: passes
         })
     }
 }
@@ -242,7 +234,7 @@ impl TerrainParams {
 #[serde(deny_unknown_fields)]
 pub(crate) struct TerrainParamsBuilder {
     base_kinds: HashMap<String, WeightedEntry>,
-    feature_passes: Vec<FeaturePassBuilder>,
+    patch_passes: Vec<FeaturePassBuilder>,
 }
 
 #[derive(Debug, Deserialize)]

@@ -19,7 +19,14 @@ use std::io::Error;
 use std::rc::Rc;
 
 use sulis_core::resource::{ResourceSet, Sprite};
-use sulis_core::util::{invalid_data_error, unable_to_create_error, Point};
+use sulis_core::util::{invalid_data_error, unable_to_create_error, Point, Size};
+
+#[derive(Deserialize, Debug)]
+#[serde(deny_unknown_fields)]
+pub struct Feature {
+    pub tiles: HashMap<String, Point>,
+    pub size: Size
+}
 
 #[derive(Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
@@ -137,6 +144,7 @@ pub struct Tileset {
     pub terrain_kinds: Vec<TerrainKind>,
     pub wall_rules: WallRules,
     pub wall_kinds: Vec<WallKind>,
+    pub features: HashMap<String, Feature>,
 }
 
 impl Tileset {

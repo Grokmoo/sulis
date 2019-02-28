@@ -21,7 +21,7 @@ use std::collections::HashMap;
 use sulis_core::util::{gen_rand, Point};
 use crate::{Module, Prop, area::{Layer, PropDataBuilder}};
 use crate::generator::{GenModel, WeightedEntry, WeightedList, Maze, RegionKind, RegionKinds,
-    Rect};
+    Rect, overlaps_any};
 
 pub struct PropGen<'a, 'b> {
     model: &'b mut GenModel<'a>,
@@ -54,7 +54,7 @@ impl<'a, 'b> PropGen<'a, 'b> {
                                          prop);
 
                 if pass.require_passable {
-                    if !self.is_passable(&data) { continue; }
+                    if !data.is_passable(&self.layers) { continue; }
                 }
 
                 let p1 = Point::from(self.model.to_region_coords(data.x, data.y));
@@ -63,15 +63,7 @@ impl<'a, 'b> PropGen<'a, 'b> {
 
                 if !pass.allowable_regions.check_coords(&self.maze, p1, p2) { continue; }
 
-                let mut invalid = false;
-                for other in props.iter() {
-                    if data.overlaps(other, pass.spacing as i32) {
-                        invalid = true;
-                        break;
-                    }
-                }
-
-                if invalid { continue; }
+                if overlaps_any(&data, &props, pass.spacing as i32) { continue; }
 
                 props.push(data);
             }
@@ -88,25 +80,6 @@ impl<'a, 'b> PropGen<'a, 'b> {
             });
         }
         Ok(out)
-    }
-
-    fn is_passable(&self, prop: &PropData) -> bool {
-        for yi in 0..prop.h() {
-            for xi in 0..prop.w() {
-                let x = prop.x + xi;
-                let y = prop.y + yi;
-                if !self.point_is_passable(x, y) { return false; }
-            }
-        }
-
-        true
-    }
-
-    fn point_is_passable(&self, x: i32, y: i32) -> bool {
-        for layer in self.layers {
-            if !layer.is_passable(x, y) { return false; }
-        }
-        true
     }
 }
 

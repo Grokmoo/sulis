@@ -20,6 +20,9 @@ pub use self::area_generator::AreaGenerator;
 mod encounter_gen;
 use self::encounter_gen::{EncounterGen, EncounterParams, EncounterParamsBuilder};
 
+mod feature_gen;
+use self::feature_gen::{FeatureGen, FeatureParams, FeatureParamsBuilder};
+
 mod maze;
 use self::maze::{Maze, TileKind};
 
@@ -239,6 +242,7 @@ pub struct GeneratorBuilder {
     terrain: TerrainParamsBuilder,
     props: PropParamsBuilder,
     encounters: EncounterParamsBuilder,
+    features: FeatureParamsBuilder,
 }
 
 #[derive(Debug, Deserialize)]
@@ -316,6 +320,13 @@ impl RegionKinds {
     }
 }
 
+pub fn overlaps_any<T: Rect>(rect: &T, others: &[T], spacing: i32) -> bool {
+    for other in others {
+        if rect.overlaps(other, spacing) { return true; }
+    }
+    false
+}
+
 pub trait Rect {
     fn x(&self) -> i32;
     fn y(&self) -> i32;
@@ -345,5 +356,25 @@ pub trait Rect {
         }
 
         false
+    }
+
+    fn is_passable(&self, layers: &[Layer]) -> bool {
+        for yi in 0..self.h() {
+            for xi in 0..self.w() {
+                let x = self.x() + xi;
+                let y = self.y() + yi;
+                if !self.point_is_passable(x, y, layers) { return false; }
+            }
+        }
+
+        true
+    }
+
+    fn point_is_passable(&self, x: i32, y: i32, layers: &[Layer]) -> bool {
+        for layer in layers {
+            if !layer.is_passable(x, y) { return false; }
+        }
+
+        true
     }
 }

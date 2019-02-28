@@ -21,7 +21,7 @@ use std::collections::HashMap;
 use sulis_core::util::{gen_rand, Point, Size};
 use crate::{Module, Encounter, area::{Layer, EncounterDataBuilder}};
 use crate::generator::{GenModel, WeightedEntry, WeightedList, Maze, RegionKind, RegionKinds,
-    maze::Room, Rect};
+    maze::Room, Rect, overlaps_any};
 
 pub struct EncounterGen<'a, 'b> {
     model: &'b mut GenModel<'a>,
@@ -59,15 +59,7 @@ impl<'a, 'b> EncounterGen<'a, 'b> {
 
                 if !pass.allowable_regions.check_coords(&self.maze, p1, p2) { continue; }
 
-                let mut invalid = false;
-                for other in encounters.iter() {
-                    if data.overlaps(other, pass.spacing as i32) {
-                        invalid = true;
-                        break;
-                    }
-                }
-
-                if invalid { continue; }
+                if overlaps_any(&data, &encounters, pass.spacing as i32) { continue; }
 
                 encounters.push(data);
             }

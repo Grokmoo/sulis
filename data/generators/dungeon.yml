@@ -24,7 +24,7 @@ terrain:
       weight: 1
     interior_stone:
       weight: 1
-  feature_passes:
+  patch_passes:
     - kinds:
         interior_wood01:
           weight: 1
@@ -41,4 +41,7 @@ terrain:
 props:
   passes: []
 encounters:
+  passes: []
+features:
+  fixed: []
   passes: []

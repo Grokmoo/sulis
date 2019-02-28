@@ -20,7 +20,7 @@ terrain:
   base_kinds:
     rocks_dark:
       weight: 1
-  feature_passes:
+  patch_passes:
     - kinds:
         pit_black:
           weight: 1
@@ -66,3 +66,16 @@ encounters:
       chance_per_room: 75
       allowable_regions: [ Room ]
       size: [10, 10]
+features:
+  fixed:
+    - [ stairs_up, [63, 62] ]
+  passes:
+    - kinds:
+        stairs_down:
+          weight: 1
+        stairs_up:
+          weight: 1
+      spacing: 10
+      allowable_regions: [ Room ]
+      placement_attempts: 0
+      require_passable: true

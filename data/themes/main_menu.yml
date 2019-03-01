@@ -18,8 +18,9 @@ themes:
         text_params:
           scale: 12
           font: outlined
-        text: "Sulis"
-        size: [40, 10]
+        text: |
+          [a=200|Sulis]
+        size: [200, 10]
         relative:
           x: Center
         position: [0, 5]
@@ -28,8 +29,9 @@ themes:
         text_params:
           scale: 10
           font: outlined
-        text: "#group# #module#"
-        size: [100, 10]
+        text: |
+          [a=200|[?group|#group#] #module#]
+        size: [200, 10]
         relative:
           x: Center
         position: [0, 15]
@@ -902,9 +904,11 @@ themes:
               height: Max
             size: [-7, 0]
             layout: BoxVertical
+            layout_spacing: { bottom: 5 }
             children:
               campaign_group:
-                border: { bottom: 5 }
+                background: bg_subtle
+                border: { bottom: 2, left: 2, right: 2, top: 2 }
                 relative:
                   width: Max
                   height: ChildSum

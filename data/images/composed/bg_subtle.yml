@@ -1,0 +1,7 @@
+id: bg_subtle
+generate_sub_images:
+  size: [1, 1]
+  spritesheet: "gui"
+grid: [ "bg_subtle_top_left",    "bg_subtle_top_middle",    "bg_subtle_top_right",
+        "bg_subtle_middle_left", "bg_subtle_middle",        "bg_subtle_middle_right",
+        "bg_subtle_bottom_left", "bg_subtle_bottom_middle", "bg_subtle_bottom_right" ]

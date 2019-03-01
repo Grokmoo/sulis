@@ -6,7 +6,7 @@ width: 128
 height: 128
 visibility_tile: gui/area_invis
 explored_tile: gui/area_unexplored
-max_vis_distance: 12
+max_vis_distance: 16
 max_vis_up_one_distance: 6
 world_map_location: moonmouth
 on_rest:

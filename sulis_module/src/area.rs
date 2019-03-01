@@ -36,7 +36,7 @@ use serde::{Deserialize, Deserializer, Serializer};
 
 use sulis_core::image::Image;
 use sulis_core::resource::{ResourceSet, Sprite};
-use sulis_core::util::{unable_to_create_error, Point, Size};
+use sulis_core::util::{self, unable_to_create_error, Point, Size};
 
 use crate::{Encounter, ItemListEntrySaveState, Module, ObjectSize, OnTrigger, Prop};
 
@@ -127,6 +127,8 @@ impl Area {
         let mut layers = Vec::new();
 
         if let Some(ref generator) = builder.generator {
+            let start_time = std::time::Instant::now();
+
             let generator = Module::generator(generator).ok_or(
                 Error::new(ErrorKind::InvalidInput, format!("Generator '{}' not found", generator))
             )?;
@@ -135,6 +137,9 @@ impl Area {
             layers = output.layers;
             generated_props = output.props;
             generated_encounters = output.encounters;
+
+            info!("Area generation complete in {} secs",
+                  util::format_elapsed_secs(start_time.elapsed()));
         }
 
         let mut props = Vec::new();

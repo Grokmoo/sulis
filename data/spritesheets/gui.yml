@@ -337,6 +337,19 @@ groups:
       bg_selection_box_bottom_left:   [0, 10]
       bg_selection_box_bottom_middle: [5, 10]
       bg_selection_box_bottom_right:  [10, 10]
+  bg_subtle:
+    size: [5, 5]
+    position: [0, 338]
+    areas:
+      bg_subtle_top_left:      [0,  0]
+      bg_subtle_top_middle:    [5,  0]
+      bg_subtle_top_right:     [10, 0]
+      bg_subtle_middle_left:   [0,  5]
+      bg_subtle_middle:        [5,  5]
+      bg_subtle_middle_right:  [10, 5]
+      bg_subtle_bottom_left:   [0, 10]
+      bg_subtle_bottom_middle: [5, 10]
+      bg_subtle_bottom_right:  [10, 10]
   hint_to_click_bg_base1:
     size: [5, 5]
     position: [91, 146]

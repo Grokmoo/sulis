@@ -982,7 +982,7 @@ impl WidgetKind for AreaView {
             );
         }
 
-        let color = Color::new(area_color.r, area_color.g, area_color.b, 0.6 * area_color.a);
+        let color = Color::new(area_color.r, area_color.g, area_color.b, 0.2 * area_color.a);
         self.draw_entities_props(renderer, scale_x, scale_y, color, widget, &state, millis);
 
         if Config::debug().limit_line_of_sight {

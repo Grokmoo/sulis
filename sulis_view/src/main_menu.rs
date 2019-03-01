@@ -40,7 +40,7 @@ use sulis_core::config::Config;
 use sulis_core::io::{DisplayConfiguration, InputAction, MainLoopUpdater};
 use sulis_core::ui::*;
 use sulis_core::util;
-use sulis_core::widgets::{Button, ConfirmationWindow, Label};
+use sulis_core::widgets::{Button, ConfirmationWindow, TextArea};
 use sulis_module::{modification, Module};
 use sulis_state::{save_file, NextGameStep};
 
@@ -139,11 +139,11 @@ impl WidgetKind for MainMenu {
     fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         debug!("Adding to main menu widget");
 
-        let title = Widget::with_theme(Label::empty(), "title");
+        let title = Widget::with_theme(TextArea::empty(), "title");
 
         let background = Widget::empty("background");
 
-        let module_title = Widget::with_theme(Label::empty(), "module_title");
+        let module_title = Widget::with_theme(TextArea::empty(), "module_title");
         if Module::is_initialized() {
             let campaign = Module::campaign();
             module_title

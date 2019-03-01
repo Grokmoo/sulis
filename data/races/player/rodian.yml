@@ -55,7 +55,7 @@ image_layer_offsets:
   Legs: [-8,-12]
   Feet: [-8,-12]
   Background: [-8,-12]
-  Cloak: [-8,-12]
+  Cloak: [-8,-14]
   Shadow: [-8,-12]
 image_layer_postfix:
   Female: "_dwarf"

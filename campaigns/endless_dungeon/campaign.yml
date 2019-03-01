@@ -1,8 +1,5 @@
 id: endless_dungeon
-group:
-  id: endless_dungeon
-  name: "The Endless Dungeon"
-  position: 0
+
 name: "The Endless Dungeon"
 starting_time:
   day: 1
@@ -15,6 +12,8 @@ description: |
   An entrance to the fabled Endless Dungeon has recently been uncovered here.  According to the legend, no one has ever reached the bottom.
   
   Adventurers from across the known world and beyond have come here, to test their skills, earn a name for themselves, or perhaps just partake in the unimaginably vast riches below.  What will be your fate?
+  
+  The Endless Dungeon is a Roguelike dungeon crawl for characters starting at level 1.
 backstory_conversation: backstory
 max_starting_level: 1
 on_party_death_script:

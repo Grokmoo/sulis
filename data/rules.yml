@@ -47,6 +47,7 @@ selectable_races: [ dracon, dwarf, elf, human, kimer, rodian, trollkin ]
 selectable_classes: [ fighter, rogue, mage, druid ]
 ability_groups: [ "Special", "Fighter", "Rogue", "Druid", "Modes", "Mechanics", "4th Circle", "3rd Circle", "2nd Circle", "1st Circle", "Cantrips"]
 
+experience_factor: 1.0
 experience_for_level: [100, 300, 600, 1300, 2100, 3100, 4500, 6100, 8200,
                        10700, 13700, 17400, 21600, 26700, 32600, 39500, 47500, 56800, 67400,
                        79700, 93700, 109700, 127900, 148600, 172100, 198600, 228700, 262500, 300700,

@@ -167,7 +167,8 @@ impl PStats {
     }
 
     pub fn add_xp(&mut self, xp: u32, actor: &Rc<Actor>) {
-        self.xp += xp;
+        let factor = Module::rules().experience_factor;
+        self.xp += (xp as f32 * factor) as u32;
         self.recompute_level_up(actor);
     }
 

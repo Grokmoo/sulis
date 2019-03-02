@@ -86,3 +86,10 @@ features:
       allowable_regions: [ Room ]
       placement_attempts: 200
       require_passable: true
+transitions:
+  level_down:
+    allowable_regions: [ Room ]
+    feature: stairs_down
+  level_up:
+    allowable_regions: [ Room ]
+    feature: stairs_up

@@ -38,6 +38,9 @@ pub use self::terrain_tiles::{EdgesList, TerrainTiles};
 mod tiles_model;
 pub use self::tiles_model::{TilesModel, is_removal};
 
+mod transition_gen;
+use self::transition_gen::{TransitionsGen, TransitionsParams, TransitionsParamsBuilder};
+
 mod wall_tiles;
 pub use self::wall_tiles::{WallTiles};
 

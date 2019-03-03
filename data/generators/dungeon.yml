@@ -45,3 +45,5 @@ encounters:
 features:
   fixed: []
   passes: []
+transitions:
+  kinds: {}

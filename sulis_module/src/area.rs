@@ -124,19 +124,21 @@ impl Area {
     pub fn new(builder: AreaBuilder) -> Result<Area, Error> {
         let mut generated_encounters = Vec::new();
         let mut generated_props = Vec::new();
+        let mut generated_transitions = Vec::new();
         let mut layers = Vec::new();
 
-        if let Some(ref generator) = builder.generator {
+        if let Some(ref params) = builder.generator {
             let start_time = std::time::Instant::now();
 
-            let generator = Module::generator(generator).ok_or(
-                Error::new(ErrorKind::InvalidInput, format!("Generator '{}' not found", generator))
+            let generator = Module::generator(&params.id).ok_or(
+                Error::new(ErrorKind::InvalidInput, format!("Generator '{}' not found", params.id))
             )?;
 
-            let output = generator.generate(&builder)?;
+            let output = generator.generate(&builder, params)?;
             layers = output.layers;
             generated_props = output.props;
             generated_encounters = output.encounters;
+            generated_transitions = output.transitions;
 
             info!("Area generation complete in {} secs",
                   util::format_elapsed_secs(start_time.elapsed()));
@@ -168,7 +170,9 @@ impl Area {
         // TODO validate position of all actors, props, encounters
 
         let mut transitions: Vec<Transition> = Vec::new();
-        for (index, t_builder) in builder.transitions.into_iter().enumerate() {
+        for (index, t_builder) in builder.transitions.into_iter()
+            .chain(generated_transitions).enumerate() {
+
             let image = match ResourceSet::image(&t_builder.image_display) {
                 None => {
                     warn!(
@@ -330,7 +334,7 @@ pub struct AreaBuilder {
     pub location_kind: LocationKind,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub generator: Option<String>,
+    pub generator: Option<GeneratorParams>,
     pub layers: Vec<String>,
     pub entity_layer: usize,
     pub actors: Vec<ActorData>,
@@ -350,6 +354,23 @@ pub struct AreaBuilder {
 
     #[serde(serialize_with = "as_base64", deserialize_with = "from_base64")]
     pub elevation: Vec<u8>,
+}
+
+#[derive(Deserialize, Serialize, Debug)]
+#[serde(deny_unknown_fields)]
+pub struct GeneratorParams {
+    id: String,
+
+    #[serde(default)]
+    pub transitions: Vec<TransitionAreaParams>,
+}
+
+#[derive(Deserialize, Serialize, Debug)]
+#[serde(deny_unknown_fields)]
+pub struct TransitionAreaParams {
+    pub to: String,
+    pub kind: String,
+    pub hover_text: String,
 }
 
 #[derive(Deserialize, Serialize, Debug)]

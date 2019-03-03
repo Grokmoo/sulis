@@ -19,10 +19,11 @@ use std::rc::Rc;
 use std::collections::HashMap;
 
 use sulis_core::util::{gen_rand, Point};
-use crate::{Module, area::{Layer, AreaBuilder}};
+use crate::{Module, area::{Layer, AreaBuilder, GeneratorParams}};
 use crate::generator::{WeightedList, WallKinds, RoomParams, TerrainParams, PropParams,
     EncounterParams, GeneratorBuilder, GenModel, Maze, TerrainGen, PropGen, EncounterGen,
-    TileKind, TileIter, TilesModel, GeneratorOutput, FeatureParams, FeatureGen};
+    TileKind, TileIter, TilesModel, GeneratorOutput, FeatureParams, FeatureGen,
+    TransitionParams, TransitionGen};
 
 pub struct AreaGenerator {
     pub id: String,
@@ -34,6 +35,7 @@ pub struct AreaGenerator {
     prop_params: PropParams,
     encounter_params: EncounterParams,
     feature_params: FeatureParams,
+    transition_params: TransitionParams,
 }
 
 impl AreaGenerator {
@@ -51,10 +53,12 @@ impl AreaGenerator {
             prop_params: PropParams::new(builder.props, module)?,
             encounter_params: EncounterParams::new(builder.encounters, module)?,
             feature_params: FeatureParams::new(builder.features, module)?,
+            transition_params: TransitionParams::new(builder.transitions, module)?,
         })
     }
 
-    pub fn generate(&self, builder: &AreaBuilder) -> Result<GeneratorOutput, Error> {
+    pub fn generate(&self, builder: &AreaBuilder,
+                    params: &GeneratorParams) -> Result<GeneratorOutput, Error> {
         info!("Generating area '{}'", builder.id);
         let mut model = GenModel::new(builder, self.grid_width as i32, self.grid_height as i32);
 
@@ -95,6 +99,10 @@ impl AreaGenerator {
         let mut gen = EncounterGen::new(&mut model, &layers, &self.encounter_params, &maze);
         let encounters = gen.generate()?;
 
+        info!("Generating transitions");
+        let mut gen = TransitionGen::new(&mut model, &self.transition_params);
+        let transitions = gen.generate(&params.transitions)?;
+
         info!("Final Layer Gen");
         let layers = self.create_layers(&model.builder, &model.model)?;
 
@@ -102,6 +110,7 @@ impl AreaGenerator {
             layers,
             props,
             encounters,
+            transitions,
         })
     }
 

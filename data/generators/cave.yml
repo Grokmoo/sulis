@@ -87,9 +87,13 @@ features:
       placement_attempts: 200
       require_passable: true
 transitions:
-  level_down:
-    allowable_regions: [ Room ]
-    feature: stairs_down
-  level_up:
-    allowable_regions: [ Room ]
-    feature: stairs_up
+  spacing: 10
+  kinds:
+    level_down:
+      feature: stairs_down
+      feature_offset: [-1, -1]
+      size: "4by4"
+    level_up:
+      feature: stairs_up
+      feature_offset: [-1, -1]
+      size: "4by4"

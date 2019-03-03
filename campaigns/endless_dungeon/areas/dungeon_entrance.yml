@@ -1,7 +1,12 @@
 ---
 id: dungeon_entrance
 name: Dungeon Entrance
-generator: cave
+generator:
+  id: cave
+  transitions:
+    - to: dungeon_level01
+      kind: level_down
+      hover_text: "Down"
 width: 128
 height: 128
 visibility_tile: gui/area_invis

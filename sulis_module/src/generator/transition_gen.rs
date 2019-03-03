@@ -18,109 +18,167 @@ use std::collections::HashMap;
 use std::io::{ErrorKind, Error};
 use std::rc::Rc;
 
-use sulis_core::util::{gen_rand};
-use crate::{Module, area::{Layer, tile::{Feature}}};
-use crate::generator::{GenModel, Maze, RegionKind,
-    RegionKinds, Rect};
+use sulis_core::util::{gen_rand, Point};
+use crate::{Module, ObjectSize,
+    area::{TransitionBuilder, ToKind, TransitionAreaParams, tile::{Feature}}};
+use crate::generator::{GenModel, Rect, overlaps_any};
 
-pub struct TransitionsGen<'a, 'b> {
+pub struct TransitionGen<'a, 'b> {
     model: &'b mut GenModel<'a>,
-    layers: &'b [Layer],
-    params: &'a TransitionsParams,
-    maze: &'b Maze,
+    params: &'a TransitionParams,
 }
 
-impl<'a, 'b> TransitionsGen<'a, 'b> {
+impl<'a, 'b> TransitionGen<'a, 'b> {
     pub(crate) fn new(model: &'b mut GenModel<'a>,
-                      layers: &'b [Layer],
-                      params: &'a TransitionsParams,
-                      maze: &'b Maze) -> TransitionsGen<'a, 'b> {
-        TransitionsGen {
+                      params: &'a TransitionParams) -> TransitionGen<'a, 'b> {
+        TransitionGen {
             model,
-            layers,
             params,
-            maze,
         }
     }
 
-    pub fn generate(&mut self) -> Result<(), Error> {
+    pub fn generate(&mut self, transitions: &[TransitionAreaParams])
+        -> Result<Vec<TransitionBuilder>, Error> {
 
-        Ok(())
+        let mut gened = Vec::new();
+        let mut out = Vec::new();
+        for transition in transitions {
+            let kind = self.params.kinds.get(&transition.kind).ok_or(
+                Error::new(ErrorKind::InvalidInput, format!("Invalid transition kind '{}'",
+                                                            transition.kind))
+            )?;
+
+            // keep trying until we succeed.  we always want to place transitions
+            let mut placed = false;
+            for _ in 0..1000 {
+                let data = TransitionData::gen(self.model.builder.width as i32,
+                                               self.model.builder.height as i32,
+                                               kind.size.width,
+                                               kind.size.height,
+                                               &transition.to,
+                                               &kind.feature);
+
+                if overlaps_any(&data, &gened, self.params.spacing as i32) { continue; }
+
+                if let Some(feature) = &kind.feature {
+                    let base_x = data.x + kind.feature_offset.x;
+                    let base_y = data.y + kind.feature_offset.y;
+                    for (tile, p) in feature.rand_entry() {
+                        self.model.model.add(Rc::clone(tile), base_x + p.x, base_y + p.y);
+                    }
+                }
+
+                out.push(TransitionBuilder {
+                    from: Point::new(data.x, data.y),
+                    size: kind.size.id.to_string(),
+                    to: ToKind::Area {
+                        id: transition.to.to_string(),
+                        x: 0,
+                        y: 0,
+                    },
+                    hover_text: transition.hover_text.to_string(),
+                    image_display: "empty".to_string(),
+                });
+
+                placed = true;
+                gened.push(data);
+                break;
+            }
+
+            if !placed {
+                return Err(Error::new(ErrorKind::InvalidData, "Unable to place transition"));
+            }
+        }
+
+        Ok(out)
     }
 }
 
 #[derive(Clone)]
-struct TransitionData {
-    feature: Rc<Feature>,
+struct TransitionData<'a> {
+    feature: Option<Rc<Feature>>,
+    to: &'a str,
     x: i32,
     y: i32,
+    w: i32,
+    h: i32,
 }
 
-impl TransitionData {
-    fn gen(max_x: i32, max_y: i32, feature: &Rc<Feature>) -> TransitionData {
-        let feature = Rc::clone(feature);
-        let w = feature.size.width;
-        let h = feature.size.height;
+impl<'a> TransitionData<'a> {
+    fn gen(max_x: i32, max_y: i32, w: i32, h: i32,
+           to: &'a str,
+           feature: &Option<Rc<Feature>>) -> TransitionData<'a> {
+        let feature = feature.clone();
         let x = gen_rand(0, max_x - w);
         let y= gen_rand(0, max_y - h);
 
-        TransitionData { feature, x, y }
+        TransitionData { feature, to, x, y, w, h }
     }
 }
 
-impl Rect for TransitionData {
+impl<'a> Rect for TransitionData<'a> {
     fn x(&self) -> i32 { self.x }
     fn y(&self) -> i32 { self.y }
-    fn w(&self) -> i32 { self.feature.size.width }
-    fn h(&self) -> i32 { self.feature.size.height }
+    fn w(&self) -> i32 { self.w }
+    fn h(&self) -> i32 { self.h }
 }
 
-pub(crate) struct TransitionsParams {
-    kinds: HashMap<String, TransitionsKind>,
+pub(crate) struct TransitionParams {
+    spacing: u32,
+    kinds: HashMap<String, TransitionKind>,
 }
 
-impl TransitionsParams {
-    pub(crate) fn new(builder: TransitionsParamsBuilder,
-                      module: &Module) -> Result<TransitionsParams, Error> {
+impl TransitionParams {
+    pub(crate) fn new(builder: TransitionParamsBuilder,
+                      module: &Module) -> Result<TransitionParams, Error> {
         let mut kinds = HashMap::new();
 
         for (id, kind) in builder.kinds {
-            let regions = RegionKinds::new(kind.allowable_regions);
-
             let feature = match kind.feature {
                 None => None,
                 Some(feature_id) => {
-                    Some(Rc::clone(module.features.get(&id).ok_or(
+                    Some(module.features.get(&feature_id).map(|f| Rc::clone(f)).ok_or(
                         Error::new(ErrorKind::InvalidInput, format!("Invalid feature '{}'",
                                                                     feature_id))
-                    )?))
+                    )?)
                 }
             };
 
-            kinds.insert(id, TransitionsKind {
-                allowable_regions: regions,
+            let size = module.sizes.get(&kind.size).ok_or(
+                Error::new(ErrorKind::InvalidInput, format!("Invalid size '{}'", kind.size))
+            )?;
+
+            kinds.insert(id, TransitionKind {
                 feature,
+                feature_offset: kind.feature_offset,
+                size: Rc::clone(size),
             });
         }
 
-        Ok(TransitionsParams { kinds })
+        Ok(TransitionParams {
+            kinds,
+            spacing: builder.spacing,
+        })
     }
 }
 
-pub(crate) struct TransitionsKind {
-    allowable_regions: RegionKinds,
+pub(crate) struct TransitionKind {
     feature: Option<Rc<Feature>>,
+    size: Rc<ObjectSize>,
+    feature_offset: Point,
 }
 
 #[derive(Debug, Deserialize)]
 #[serde(deny_unknown_fields)]
-pub(crate) struct TransitionsParamsBuilder {
-    kinds: HashMap<String, TransitionsKindBuilder>,
+pub(crate) struct TransitionParamsBuilder {
+    spacing: u32,
+    kinds: HashMap<String, TransitionKindBuilder>,
 }
 
 #[derive(Debug, Deserialize)]
 #[serde(deny_unknown_fields)]
-pub(crate) struct TransitionsKindBuilder {
-    allowable_regions: Vec<RegionKind>,
-    feature: Option<String>
+pub(crate) struct TransitionKindBuilder {
+    size: String,
+    feature_offset: Point,
+    feature: Option<String>,
 }

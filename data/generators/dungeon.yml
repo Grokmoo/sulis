@@ -46,4 +46,5 @@ features:
   fixed: []
   passes: []
 transitions:
+  spacing: 10
   kinds: {}

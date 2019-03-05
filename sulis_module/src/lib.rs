@@ -124,8 +124,7 @@ use sulis_core::util::invalid_data_error;
 
 use self::ability::AbilityBuilder;
 use self::ability_list::AbilityListBuilder;
-use self::area::AreaBuilder;
-use self::area::Tile;
+use self::area::{AreaBuilder, ToKind, Tile};
 use self::area::{
     tile::{TerrainKind, TerrainRules, WallKind, WallRules, Feature},
     Tileset,
@@ -413,7 +412,7 @@ impl Module {
         let campaign_builder: CampaignBuilder = read_builder(campaign_yaml)?;
 
         let builder_set = ModuleBuilder::from_yaml(&mut yaml)?;
-        let area_builders = MODULE.with(|module| {
+        let mut area_builders = MODULE.with(|module| {
             let mut module = module.borrow_mut();
             module.abilities.clear();
             module.ability_lists.clear();
@@ -603,9 +602,61 @@ impl Module {
             builder_set.area_builders
         });
 
-        // creates areas outside of the with block to allow them to access Module:: methods
+        // do all area creation outside of with block to allow access to Module:: methods
+
+        let mut pregen_data = HashMap::new();
+        for (ref id, ref mut builder) in area_builders.iter_mut() {
+            info!("Performing pregen for '{}'", id);
+            let pregen = builder.pregen()?;
+            pregen_data.insert(id.to_string(), pregen);
+        }
+
+        // link transitions
+        let keys: Vec<_> = area_builders.keys().map(|id| id.clone()).collect();
+        for pregen_id in keys {
+            debug!("Looking for linked transitions in {}", pregen_id);
+            let builder = &area_builders[&pregen_id];
+
+            let mut links = Vec::new();
+
+            for (index, transition) in builder.transitions.iter().enumerate() {
+                match transition.to {
+                    ToKind::FindLink { ref id, x_offset, y_offset } => {
+                        trace!("  Found transition at {} to {}", index, id);
+                        let to_area_id = id;
+                        for to_transition in &area_builders[to_area_id].transitions {
+                            trace!("    Checking {} with {:?}", to_area_id, to_transition.to);
+                            match to_transition.to {
+                                ToKind::Area { ref id, .. } | ToKind::FindLink { ref id, .. } => {
+                                    if id == &pregen_id {
+                                        links.push(
+                                            (index, to_area_id.to_string(),
+                                            to_transition.from.x + x_offset,
+                                            to_transition.from.y + y_offset)
+                                        );
+                                        break;
+                                    }
+                                },
+                                _ => continue,
+                            }
+                        }
+                    },
+                    _ => continue,
+                }
+            }
+
+            for (index, id, x, y) in links {
+                debug!("  Setting link for {} to {} at {},{}", index, id, x, y);
+                area_builders.get_mut(&pregen_id).unwrap().transitions[index].to = ToKind::Area {
+                    id,
+                    x,
+                    y,
+                };
+            }
+        }
+
         for (id, builder) in area_builders {
-            let area = Area::new(builder);
+            let area = Area::new(builder, pregen_data.remove(&id).unwrap());
             MODULE.with(|module| {
                 let mut module = module.borrow_mut();
                 insert_if_ok("area", id, area, &mut module.areas);

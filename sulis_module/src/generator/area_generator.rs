@@ -19,11 +19,11 @@ use std::rc::Rc;
 use std::collections::HashMap;
 
 use sulis_core::util::{gen_rand, Point};
-use crate::{Module, area::{Layer, AreaBuilder, GeneratorParams}};
+use crate::{Module, area::{Tile, Layer, AreaBuilder, GeneratorParams}};
 use crate::generator::{WeightedList, WallKinds, RoomParams, TerrainParams, PropParams,
     EncounterParams, GeneratorBuilder, GenModel, Maze, TerrainGen, PropGen, EncounterGen,
     TileKind, TileIter, TilesModel, GeneratorOutput, FeatureParams, FeatureGen,
-    TransitionParams, TransitionGen};
+    TransitionParams, TransitionGen, TransitionOutput};
 
 pub struct AreaGenerator {
     pub id: String,
@@ -57,8 +57,18 @@ impl AreaGenerator {
         })
     }
 
-    pub fn generate(&self, builder: &AreaBuilder,
-                    params: &GeneratorParams) -> Result<GeneratorOutput, Error> {
+    pub fn generate_transitions(&self, builder: &AreaBuilder,
+                                params: &GeneratorParams) -> Result<Vec<TransitionOutput>, Error> {
+
+        info!("Generating transitions");
+        let width = builder.width as i32;
+        let height = builder.height as i32;
+        let mut gen = TransitionGen::new(width, height, &self.transition_params);
+        gen.generate(&params.transitions)
+    }
+
+    pub fn generate(&self, builder: &AreaBuilder, _params: &GeneratorParams,
+                    tiles_to_add: Vec<(Rc<Tile>, i32, i32)>) -> Result<GeneratorOutput, Error> {
         info!("Generating area '{}'", builder.id);
         let mut model = GenModel::new(builder, self.grid_width as i32, self.grid_height as i32);
 
@@ -76,6 +86,9 @@ impl AreaGenerator {
         let mut gen = TerrainGen::new(&mut model, &self.terrain_params, &maze);
         gen.generate();
 
+        for (tile, x, y) in tiles_to_add {
+            model.model.add(tile, x, y);
+        }
         // add the tiles to the model
         for p in model.tiles() {
             model.model.check_add_wall_border(p.x, p.y);
@@ -99,10 +112,6 @@ impl AreaGenerator {
         let mut gen = EncounterGen::new(&mut model, &layers, &self.encounter_params, &maze);
         let encounters = gen.generate()?;
 
-        info!("Generating transitions");
-        let mut gen = TransitionGen::new(&mut model, &self.transition_params);
-        let transitions = gen.generate(&params.transitions)?;
-
         info!("Final Layer Gen");
         let layers = self.create_layers(&model.builder, &model.model)?;
 
@@ -110,7 +119,6 @@ impl AreaGenerator {
             layers,
             props,
             encounters,
-            transitions,
         })
     }
 

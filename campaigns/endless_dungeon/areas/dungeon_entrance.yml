@@ -7,6 +7,9 @@ generator:
     - to: dungeon_level01
       kind: level_down
       hover_text: "Down"
+    - to: moonmouth
+      kind: level_up
+      hover_text: "To Outside"
 width: 128
 height: 128
 visibility_tile: gui/area_invis
@@ -34,18 +37,7 @@ entity_layer: 7
 actors: []
 props: []
 encounters: []
-transitions:
-  - from:
-      x: 64
-      y: 64
-    size: 4by4
-    to:
-      Area:
-        id: moonmouth
-        x: 67
-        y: 57
-    hover_text: To Outside
-    image_display: empty
+transitions: []
 triggers: []
 terrain:
   kinds: []

@@ -39,7 +39,7 @@ mod tiles_model;
 pub use self::tiles_model::{TilesModel, is_removal};
 
 mod transition_gen;
-use self::transition_gen::{TransitionGen, TransitionParams, TransitionParamsBuilder};
+use self::transition_gen::{TransitionGen, TransitionParams, TransitionParamsBuilder, TransitionOutput};
 
 mod wall_tiles;
 pub use self::wall_tiles::{WallTiles};
@@ -48,7 +48,7 @@ use std::collections::{HashMap};
 use std::io::{Error, ErrorKind};
 
 use sulis_core::util::{Point, gen_rand};
-use crate::area::{AreaBuilder, Layer, PropDataBuilder, EncounterDataBuilder, TransitionBuilder};
+use crate::area::{AreaBuilder, Layer, PropDataBuilder, EncounterDataBuilder};
 use crate::{WallKind};
 
 pub struct WeightedList<T> {
@@ -131,7 +131,6 @@ pub struct GeneratorOutput {
     pub layers: Vec<Layer>,
     pub props: Vec<PropDataBuilder>,
     pub encounters: Vec<EncounterDataBuilder>,
-    pub transitions: Vec<TransitionBuilder>,
 }
 
 pub(crate) struct GenModel<'a> {

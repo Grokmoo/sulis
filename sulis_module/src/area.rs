@@ -39,6 +39,7 @@ use sulis_core::resource::{ResourceSet, Sprite};
 use sulis_core::util::{self, unable_to_create_error, Point, Size};
 
 use crate::{Encounter, ItemListEntrySaveState, Module, ObjectSize, OnTrigger, Prop};
+use crate::generator::AreaGenerator;
 
 pub const MAX_AREA_SIZE: i32 = 128;
 
@@ -121,24 +122,18 @@ impl PartialEq for Area {
 }
 
 impl Area {
-    pub fn new(builder: AreaBuilder) -> Result<Area, Error> {
+    pub fn new(builder: AreaBuilder, pregen_out: Option<PregenOutput>) -> Result<Area, Error> {
         let mut generated_encounters = Vec::new();
         let mut generated_props = Vec::new();
-        let mut generated_transitions = Vec::new();
         let mut layers = Vec::new();
 
-        if let Some(ref params) = builder.generator {
+        if let Some(pregen) = pregen_out {
             let start_time = std::time::Instant::now();
 
-            let generator = Module::generator(&params.id).ok_or(
-                Error::new(ErrorKind::InvalidInput, format!("Generator '{}' not found", params.id))
-            )?;
-
-            let output = generator.generate(&builder, params)?;
+            let output = pregen.generator.generate(&builder, &pregen.params, pregen.tiles_to_add)?;
             layers = output.layers;
             generated_props = output.props;
             generated_encounters = output.encounters;
-            generated_transitions = output.transitions;
 
             info!("Area generation complete in {} secs",
                   util::format_elapsed_secs(start_time.elapsed()));
@@ -170,8 +165,7 @@ impl Area {
         // TODO validate position of all actors, props, encounters
 
         let mut transitions: Vec<Transition> = Vec::new();
-        for (index, t_builder) in builder.transitions.into_iter()
-            .chain(generated_transitions).enumerate() {
+        for (index, t_builder) in builder.transitions.into_iter().enumerate() {
 
             let image = match ResourceSet::image(&t_builder.image_display) {
                 None => {
@@ -354,6 +348,45 @@ pub struct AreaBuilder {
 
     #[serde(serialize_with = "as_base64", deserialize_with = "from_base64")]
     pub elevation: Vec<u8>,
+}
+
+pub struct PregenOutput {
+    generator: Rc<AreaGenerator>,
+    params: GeneratorParams,
+    tiles_to_add: Vec<(Rc<Tile>, i32, i32)>,
+}
+
+impl AreaBuilder {
+    pub fn pregen(&mut self) -> Result<Option<PregenOutput>, Error> {
+        let start_time = std::time::Instant::now();
+
+        let params = match self.generator.take() {
+            None => return Ok(None),
+            Some(p) => p,
+        };
+
+
+        let generator = Module::generator(&params.id).ok_or(
+            Error::new(ErrorKind::InvalidInput, format!("Generator '{}' not found", params.id))
+        )?;
+
+        let transition_out = generator.generate_transitions(self, &params)?;
+
+        info!("Area pregen complete in {} secs",
+              util::format_elapsed_secs(start_time.elapsed()));
+
+        let mut tiles_out = Vec::new();
+        for mut data in transition_out {
+            self.transitions.push(data.transition);
+            tiles_out.append(&mut data.tiles);
+        }
+
+        Ok(Some(PregenOutput {
+            generator,
+            params,
+            tiles_to_add: tiles_out,
+        }))
+    }
 }
 
 #[derive(Deserialize, Serialize, Debug)]
@@ -632,6 +665,7 @@ pub enum ToKind {
     Area { id: String, x: i32, y: i32 },
     CurArea { x: i32, y: i32 },
     WorldMap,
+    FindLink { id: String, x_offset: i32, y_offset: i32 },
 }
 
 #[derive(Deserialize, Serialize, Debug)]

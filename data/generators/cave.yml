@@ -63,12 +63,11 @@ encounters:
         goblins_level1:
           weight: 1
       spacing: 20
-      chance_per_room: 75
+      chance_per_room: 0 
       allowable_regions: [ Room ]
       size: [10, 10]
 features:
-  fixed:
-    - [ stairs_up, [63, 62] ]
+  fixed: []
   passes:
     - kinds:
         mushrooms:
@@ -93,7 +92,9 @@ transitions:
       feature: stairs_down
       feature_offset: [-1, -1]
       size: "4by4"
+      transition_offset: [1, 5]
     level_up:
       feature: stairs_up
       feature_offset: [-1, -1]
       size: "4by4"
+      transition_offset: [1, 5]

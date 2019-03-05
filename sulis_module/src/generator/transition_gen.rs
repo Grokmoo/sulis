@@ -20,25 +20,27 @@ use std::rc::Rc;
 
 use sulis_core::util::{gen_rand, Point};
 use crate::{Module, ObjectSize,
-    area::{TransitionBuilder, ToKind, TransitionAreaParams, tile::{Feature}}};
-use crate::generator::{GenModel, Rect, overlaps_any};
+    area::{TransitionBuilder, ToKind, TransitionAreaParams, tile::{Tile, Feature}}};
+use crate::generator::{Rect, overlaps_any};
 
-pub struct TransitionGen<'a, 'b> {
-    model: &'b mut GenModel<'a>,
+pub struct TransitionGen<'a> {
+    width: i32,
+    height: i32,
     params: &'a TransitionParams,
 }
 
-impl<'a, 'b> TransitionGen<'a, 'b> {
-    pub(crate) fn new(model: &'b mut GenModel<'a>,
-                      params: &'a TransitionParams) -> TransitionGen<'a, 'b> {
+impl<'a> TransitionGen<'a> {
+    pub(crate) fn new(width: i32, height: i32,
+                      params: &'a TransitionParams) -> TransitionGen<'a> {
         TransitionGen {
-            model,
+            width,
+            height,
             params,
         }
     }
 
     pub fn generate(&mut self, transitions: &[TransitionAreaParams])
-        -> Result<Vec<TransitionBuilder>, Error> {
+        -> Result<Vec<TransitionOutput>, Error> {
 
         let mut gened = Vec::new();
         let mut out = Vec::new();
@@ -51,8 +53,8 @@ impl<'a, 'b> TransitionGen<'a, 'b> {
             // keep trying until we succeed.  we always want to place transitions
             let mut placed = false;
             for _ in 0..1000 {
-                let data = TransitionData::gen(self.model.builder.width as i32,
-                                               self.model.builder.height as i32,
+                let data = TransitionData::gen(self.width,
+                                               self.height,
                                                kind.size.width,
                                                kind.size.height,
                                                &transition.to,
@@ -60,24 +62,29 @@ impl<'a, 'b> TransitionGen<'a, 'b> {
 
                 if overlaps_any(&data, &gened, self.params.spacing as i32) { continue; }
 
+                let mut tiles_out = Vec::new();
                 if let Some(feature) = &kind.feature {
                     let base_x = data.x + kind.feature_offset.x;
                     let base_y = data.y + kind.feature_offset.y;
                     for (tile, p) in feature.rand_entry() {
-                        self.model.model.add(Rc::clone(tile), base_x + p.x, base_y + p.y);
+                        tiles_out.push((Rc::clone(tile), base_x + p.x, base_y + p.y));
                     }
                 }
 
-                out.push(TransitionBuilder {
+                let transition_out = TransitionBuilder {
                     from: Point::new(data.x, data.y),
                     size: kind.size.id.to_string(),
-                    to: ToKind::Area {
+                    to: ToKind::FindLink {
                         id: transition.to.to_string(),
-                        x: 0,
-                        y: 0,
+                        x_offset: kind.transition_offset.x,
+                        y_offset: kind.transition_offset.y,
                     },
                     hover_text: transition.hover_text.to_string(),
                     image_display: "empty".to_string(),
+                };
+                out.push(TransitionOutput {
+                    transition: transition_out,
+                    tiles: tiles_out,
                 });
 
                 placed = true;
@@ -92,6 +99,11 @@ impl<'a, 'b> TransitionGen<'a, 'b> {
 
         Ok(out)
     }
+}
+
+pub struct TransitionOutput {
+    pub transition: TransitionBuilder,
+    pub tiles: Vec<(Rc<Tile>, i32, i32)>,
 }
 
 #[derive(Clone)]
@@ -109,8 +121,9 @@ impl<'a> TransitionData<'a> {
            to: &'a str,
            feature: &Option<Rc<Feature>>) -> TransitionData<'a> {
         let feature = feature.clone();
-        let x = gen_rand(0, max_x - w);
-        let y= gen_rand(0, max_y - h);
+        // the 10 tile buffer keeps transitions off the edge of the usable space
+        let x = gen_rand(10, max_x - w - 10);
+        let y= gen_rand(10, max_y - h - 10);
 
         TransitionData { feature, to, x, y, w, h }
     }
@@ -151,6 +164,7 @@ impl TransitionParams {
             kinds.insert(id, TransitionKind {
                 feature,
                 feature_offset: kind.feature_offset,
+                transition_offset: kind.transition_offset,
                 size: Rc::clone(size),
             });
         }
@@ -166,6 +180,7 @@ pub(crate) struct TransitionKind {
     feature: Option<Rc<Feature>>,
     size: Rc<ObjectSize>,
     feature_offset: Point,
+    transition_offset: Point,
 }
 
 #[derive(Debug, Deserialize)]
@@ -180,5 +195,6 @@ pub(crate) struct TransitionParamsBuilder {
 pub(crate) struct TransitionKindBuilder {
     size: String,
     feature_offset: Point,
+    transition_offset: Point,
     feature: Option<String>,
 }

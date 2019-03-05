@@ -417,7 +417,8 @@ impl ActionKind for TransitionAction {
             ToKind::WorldMap => {
                 let (root, view) = Widget::parent_mut::<RootView>(widget);
                 view.set_map_window(&root, true, true);
-            }
+            },
+            ToKind::FindLink {.. } => unreachable!(),
         }
     }
 }

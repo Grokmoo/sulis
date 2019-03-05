@@ -83,10 +83,10 @@ transitions:
       y: 51
     size: 4by4
     to:
-      Area:
+      FindLink:
         id: dungeon_entrance
-        x: 64
-        y: 68
+        x_offset: 1
+        y_offset: 5
     hover_text: To The Dungeon
     image_display: empty
 triggers:

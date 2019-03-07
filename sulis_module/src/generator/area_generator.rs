@@ -50,8 +50,8 @@ impl AreaGenerator {
             grid_height: builder.grid_height,
             room_params: builder.rooms,
             terrain_params: TerrainParams::new(builder.terrain, module)?,
-            prop_params: PropParams::new(builder.props, module)?,
-            encounter_params: EncounterParams::new(builder.encounters, module)?,
+            prop_params: PropParams::with_module(builder.props, module)?,
+            encounter_params: EncounterParams::with_module(builder.encounters, module)?,
             feature_params: FeatureParams::new(builder.features, module)?,
             transition_params: TransitionParams::new(builder.transitions, module)?,
         })
@@ -67,7 +67,7 @@ impl AreaGenerator {
         gen.generate(&params.transitions)
     }
 
-    pub fn generate(&self, builder: &AreaBuilder, _params: &GeneratorParams,
+    pub fn generate(&self, builder: &AreaBuilder, params: &GeneratorParams,
                     tiles_to_add: Vec<(Rc<Tile>, i32, i32)>) -> Result<GeneratorOutput, Error> {
         info!("Generating area '{}'", builder.id);
         let mut model = GenModel::new(builder, self.grid_width as i32, self.grid_height as i32);
@@ -106,11 +106,11 @@ impl AreaGenerator {
 
         info!("Generating props");
         let mut gen = PropGen::new(&mut model, &layers, &self.prop_params, &maze);
-        let props = gen.generate()?;
+        let props = gen.generate(&params.props.passes)?;
 
         info!("Generating encounters");
         let mut gen = EncounterGen::new(&mut model, &layers, &self.encounter_params, &maze);
-        let encounters = gen.generate()?;
+        let encounters = gen.generate(&params.encounters.passes)?;
 
         info!("Final Layer Gen");
         let layers = self.create_layers(&model.builder, &model.model)?;

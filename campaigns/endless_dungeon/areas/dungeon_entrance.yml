@@ -2,7 +2,7 @@
 id: dungeon_entrance
 name: Dungeon Entrance
 generator:
-  id: cave
+  id: dungeon
   transitions:
     - to: dungeon_level01
       kind: level_down
@@ -10,6 +10,30 @@ generator:
     - to: moonmouth
       kind: level_up
       hover_text: "To Outside"
+  props:
+    passes:
+      - kinds:
+          chest_medium_level1_misc:
+            weight: 1
+          chest_small_level1_misc:
+            weight: 1
+          chest_xl_level1_armor:
+            weight: 1
+          chest_xl_level1_weapons:
+            weight: 1
+        spacing: 8
+        placement_attempts: 100
+        allowable_regions: [ Room ]
+        require_passable: true
+  encounters:
+    passes:
+      - kinds:
+          goblins_level1:
+            weight: 1
+        spacing: 20
+        chance_per_room: 75 
+        allowable_regions: [ Room ]
+        size: [10, 10]
 width: 128
 height: 128
 visibility_tile: gui/area_invis

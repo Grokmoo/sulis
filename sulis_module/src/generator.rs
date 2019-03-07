@@ -18,7 +18,7 @@ mod area_generator;
 pub use self::area_generator::AreaGenerator;
 
 mod encounter_gen;
-use self::encounter_gen::{EncounterGen, EncounterParams, EncounterParamsBuilder};
+pub(crate) use self::encounter_gen::{EncounterGen, EncounterParams, EncounterParamsBuilder};
 
 mod feature_gen;
 use self::feature_gen::{FeatureGen, FeatureParams, FeatureParamsBuilder};
@@ -27,7 +27,7 @@ mod maze;
 use self::maze::{Maze, TileKind};
 
 mod prop_gen;
-use self::prop_gen::{PropGen, PropParams, PropParamsBuilder};
+pub(crate) use self::prop_gen::{PropGen, PropParams, PropParamsBuilder};
 
 mod terrain_gen;
 use self::terrain_gen::{TerrainGen, TerrainParams, TerrainParamsBuilder};
@@ -249,7 +249,7 @@ pub struct GeneratorBuilder {
     transitions: TransitionParamsBuilder,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct WeightedEntry {
     weight: u32,
@@ -271,7 +271,7 @@ pub(crate) struct RoomParams {
     corridor_edge_overfill_chance: u32,
 }
 
-#[derive(Debug, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(deny_unknown_fields)]
 pub enum RegionKind {
     Wall,

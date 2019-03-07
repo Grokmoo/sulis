@@ -121,9 +121,9 @@ impl<'a> TransitionData<'a> {
            to: &'a str,
            feature: &Option<Rc<Feature>>) -> TransitionData<'a> {
         let feature = feature.clone();
-        // the 10 tile buffer keeps transitions off the edge of the usable space
-        let x = gen_rand(10, max_x - w - 10);
-        let y= gen_rand(10, max_y - h - 10);
+        // the tile buffer keeps transitions off the edge of the usable space
+        let x = gen_rand(8, max_x - w - 16);
+        let y= gen_rand(8, max_y - h - 16);
 
         TransitionData { feature, to, x, y, w, h }
     }

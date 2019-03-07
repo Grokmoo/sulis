@@ -7,6 +7,32 @@ generator:
     - to: dungeon_entrance
       kind: level_up
       hover_text: "Up"
+  props:
+    passes:
+      - kinds:
+          chest_medium_level1_misc:
+            weight: 1
+          chest_small_level1_misc:
+            weight: 1
+          chest_xl_level1_armor:
+            weight: 1
+          chest_xl_level1_weapons:
+            weight: 1
+        spacing: 8
+        placement_attempts: 100
+        allowable_regions: [ Room ]
+        require_passable: true
+  encounters:
+    passes:
+      - kinds:
+          goblins_level2:
+            weight: 2
+          goblins_level3:
+            weight: 1
+        spacing: 20
+        chance_per_room: 75 
+        allowable_regions: [ Room ]
+        size: [10, 10]
 width: 128
 height: 128
 visibility_tile: gui/area_invis

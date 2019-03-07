@@ -41,10 +41,11 @@ impl<'a, 'b> EncounterGen<'a, 'b> {
         }
     }
 
-    pub(crate) fn generate(&mut self) -> Result<Vec<EncounterDataBuilder>, Error> {
+    pub(crate) fn generate(&mut self,
+        addn_passes: &[EncounterPass]) -> Result<Vec<EncounterDataBuilder>, Error> {
         let mut encounters = Vec::new();
 
-        for pass in self.params.passes.iter() {
+        for pass in self.params.passes.iter().chain(addn_passes) {
             for room in self.maze.rooms() {
                 let encounter = pass.kinds.pick();
 
@@ -106,17 +107,26 @@ impl EncounterData {
 }
 
 pub(crate) struct EncounterParams {
-    passes: Vec<EncounterPass>,
+    pub(crate) passes: Vec<EncounterPass>,
 }
 
 impl EncounterParams {
-    pub(crate) fn new(builder: EncounterParamsBuilder,
-                      module: &Module) -> Result<EncounterParams, Error> {
+    pub(crate) fn with_module(builder: EncounterParamsBuilder,
+                              module: &Module) -> Result<EncounterParams, Error> {
+        EncounterParams::build(builder, |id| module.encounters.get(id).map(|e| Rc::clone(e)))
+    }
+
+    pub(crate) fn new(builder: EncounterParamsBuilder) -> Result<EncounterParams, Error> {
+        EncounterParams::build(builder, |id| Module::encounter(id))
+    }
+
+    fn build<F>(builder: EncounterParamsBuilder, f: F) -> Result<EncounterParams, Error>
+        where F: Fn(&str) -> Option<Rc<Encounter>> {
+
         let mut passes = Vec::new();
 
         for pass in builder.passes {
-            let kinds = WeightedList::new(pass.kinds, "Encounter",
-                                          |id| module.encounters.get(id).map(|p| Rc::clone(p)))?;
+            let kinds = WeightedList::new(pass.kinds, "Encounter", &f)?;
             let regions = RegionKinds::new(pass.allowable_regions);
 
             passes.push(EncounterPass {
@@ -139,13 +149,13 @@ pub(crate) struct EncounterPass {
     size: Point,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize, Default)]
 #[serde(deny_unknown_fields)]
 pub(crate) struct EncounterParamsBuilder {
     passes: Vec<EncounterPassBuilder>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub(crate) struct EncounterPassBuilder {
     kinds: HashMap<String, WeightedEntry>,

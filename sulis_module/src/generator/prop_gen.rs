@@ -43,10 +43,11 @@ impl<'a, 'b> PropGen<'a, 'b> {
         }
     }
 
-    pub(crate) fn generate(&mut self) -> Result<Vec<PropDataBuilder>, Error> {
+    pub(crate) fn generate(&mut self,
+                           addn_passes: &[PropPass]) -> Result<Vec<PropDataBuilder>, Error> {
         let mut props = Vec::new();
 
-        for pass in self.params.passes.iter() {
+        for pass in self.params.passes.iter().chain(addn_passes) {
             for _ in 0..pass.placement_attempts {
                 let prop = pass.kinds.pick();
                 let data = PropData::gen(self.model.builder.width as i32,
@@ -109,16 +110,25 @@ impl PropData {
 }
 
 pub(crate) struct PropParams {
-    passes: Vec<PropPass>,
+    pub(crate) passes: Vec<PropPass>,
 }
 
 impl PropParams {
-    pub(crate) fn new(builder: PropParamsBuilder, module: &Module) -> Result<PropParams, Error> {
+    pub(crate) fn with_module(builder: PropParamsBuilder,
+                              module: &Module) -> Result<PropParams, Error> {
+        PropParams::build(builder, |id| module.props.get(id).map(|p| Rc::clone(p)))
+    }
+
+    pub(crate) fn new(builder: PropParamsBuilder) -> Result<PropParams, Error> {
+        PropParams::build(builder, |id| Module::prop(id))
+    }
+
+    fn build<F>(builder: PropParamsBuilder, f: F) -> Result<PropParams, Error>
+        where F: Fn(&str) -> Option<Rc<Prop>> {
         let mut passes = Vec::new();
 
         for pass in builder.passes {
-            let kinds = WeightedList::new(pass.kinds, "Prop",
-                                          |id| module.props.get(id).map(|p| Rc::clone(p)))?;
+            let kinds = WeightedList::new(pass.kinds, "Prop", &f)?;
             let regions = RegionKinds::new(pass.allowable_regions);
 
             passes.push(PropPass {
@@ -141,13 +151,13 @@ pub(crate) struct PropPass {
     require_passable: bool,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize, Default)]
 #[serde(deny_unknown_fields)]
 pub(crate) struct PropParamsBuilder {
     passes: Vec<PropPassBuilder>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub(crate) struct PropPassBuilder {
     kinds: HashMap<String, WeightedEntry>,

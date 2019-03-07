@@ -39,7 +39,8 @@ use sulis_core::resource::{ResourceSet, Sprite};
 use sulis_core::util::{self, unable_to_create_error, Point, Size};
 
 use crate::{Encounter, ItemListEntrySaveState, Module, ObjectSize, OnTrigger, Prop};
-use crate::generator::AreaGenerator;
+use crate::generator::{AreaGenerator, EncounterParams, EncounterParamsBuilder,
+    PropParams, PropParamsBuilder};
 
 pub const MAX_AREA_SIZE: i32 = 128;
 
@@ -328,7 +329,7 @@ pub struct AreaBuilder {
     pub location_kind: LocationKind,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub generator: Option<GeneratorParams>,
+    pub(crate) generator: Option<GeneratorParamsBuilder>,
     pub layers: Vec<String>,
     pub entity_layer: usize,
     pub actors: Vec<ActorData>,
@@ -362,7 +363,7 @@ impl AreaBuilder {
 
         let params = match self.generator.take() {
             None => return Ok(None),
-            Some(p) => p,
+            Some(builder) => GeneratorParams::new(builder)?,
         };
 
 
@@ -389,13 +390,38 @@ impl AreaBuilder {
     }
 }
 
+pub struct GeneratorParams {
+    id: String,
+
+    pub(crate) transitions: Vec<TransitionAreaParams>,
+    pub(crate) encounters: EncounterParams,
+    pub(crate) props: PropParams,
+}
+
+impl GeneratorParams {
+    fn new(builder: GeneratorParamsBuilder) -> Result<GeneratorParams, Error> {
+        Ok(GeneratorParams {
+            id: builder.id,
+            transitions: builder.transitions,
+            encounters: EncounterParams::new(builder.encounters)?,
+            props: PropParams::new(builder.props)?,
+        })
+    }
+}
+
 #[derive(Deserialize, Serialize, Debug)]
 #[serde(deny_unknown_fields)]
-pub struct GeneratorParams {
+pub(crate) struct GeneratorParamsBuilder {
     id: String,
 
     #[serde(default)]
     pub transitions: Vec<TransitionAreaParams>,
+
+    #[serde(default)]
+    pub encounters: EncounterParamsBuilder,
+
+    #[serde(default)]
+    pub props: PropParamsBuilder,
 }
 
 #[derive(Deserialize, Serialize, Debug)]

@@ -43,29 +43,9 @@ terrain:
       edge_underfill_chance: 50
       allowable_regions: [ Wall, Corridor, Room, TransitionRoom, Doorway ]
 props:
-  passes:
-    - kinds:
-        chest_medium_level1_misc:
-          weight: 1
-        chest_small_level1_misc:
-          weight: 1
-        chest_xl_level1_armor:
-          weight: 1
-        chest_xl_level1_weapons:
-          weight: 1
-      spacing: 8
-      placement_attempts: 100
-      allowable_regions: [ Room ]
-      require_passable: true
+  passes: []
 encounters:
-  passes:
-    - kinds:
-        goblins_level1:
-          weight: 1
-      spacing: 20
-      chance_per_room: 0 
-      allowable_regions: [ Room ]
-      size: [10, 10]
+  passes: []
 features:
   fixed: []
   passes:

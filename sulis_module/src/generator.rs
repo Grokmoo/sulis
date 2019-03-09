@@ -47,13 +47,13 @@ pub use self::wall_tiles::{WallTiles};
 use std::collections::{HashMap};
 use std::io::{Error, ErrorKind};
 
-use sulis_core::util::{Point, gen_rand};
+use sulis_core::util::{Point, ReproducibleRandom};
 use crate::area::{AreaBuilder, Layer, PropDataBuilder, EncounterDataBuilder};
 use crate::{WallKind};
 
 pub struct WeightedList<T> {
     total_weight: u32,
-    entries: Vec<(T, u32)>,
+    entries: Vec<(String, T, u32)>,
 }
 
 impl<T> WeightedList<T> {
@@ -67,8 +67,10 @@ impl<T> WeightedList<T> {
             )?;
 
             total_weight += entry.weight;
-            entries.push((t, entry.weight));
+            entries.push((id, t, entry.weight));
         }
+
+        entries.sort_by(|a, b| a.0.cmp(&b.0));
 
         if total_weight == 0 || entries.len() == 0 {
             return Err(Error::new(ErrorKind::InvalidInput,
@@ -84,15 +86,15 @@ impl<T> WeightedList<T> {
     pub fn len(&self) -> usize { self.entries.len() }
     pub fn is_empty(&self) -> bool { self.entries.is_empty() }
 
-    pub fn pick(&self) -> &T {
+    pub fn pick(&self, rand: &mut ReproducibleRandom) -> &T {
         if self.entries.len() == 1 || self.total_weight == 1 {
-            return &self.entries[0].0;
+            return &self.entries[0].1;
         }
 
-        let roll = gen_rand(0, self.total_weight);
+        let roll = rand.gen(0, self.total_weight);
 
         let mut cur_weight = 0;
-        for (kind, weight) in self.entries.iter() {
+        for (_, kind, weight) in self.entries.iter() {
             cur_weight += weight;
             if roll < cur_weight {
                 return kind;
@@ -108,8 +110,8 @@ struct WallKinds {
 }
 
 impl WallKinds {
-    fn pick_index(&self, model: &TilesModel) -> Option<usize> {
-        let wall_kind = self.kinds.pick();
+    fn pick_index(&self, rand: &mut ReproducibleRandom, model: &TilesModel) -> Option<usize> {
+        let wall_kind = self.kinds.pick(rand);
         let mut wall_index = None;
         for (index, kind) in model.wall_kinds().iter().enumerate() {
             if kind.id == wall_kind.id {
@@ -138,10 +140,14 @@ pub(crate) struct GenModel<'a> {
     builder: &'a AreaBuilder,
     total_grid_size: Point,
     region_overfill_edges: HashMap<usize, usize>,
+    rand: ReproducibleRandom,
 }
 
 impl<'a> GenModel<'a> {
-    fn new(builder: &'a AreaBuilder, gen_grid_width: i32, gen_grid_height: i32) -> GenModel<'a> {
+    fn new(builder: &'a AreaBuilder,
+           rand: ReproducibleRandom,
+           gen_grid_width: i32,
+           gen_grid_height: i32) -> GenModel<'a> {
         let model = TilesModel::new();
         let gen_grid_size = Point::new(gen_grid_width, gen_grid_height);
         let total_grid_size = Point::new(gen_grid_size.x * model.grid_width,
@@ -151,6 +157,7 @@ impl<'a> GenModel<'a> {
             builder,
             total_grid_size,
             region_overfill_edges: HashMap::new(),
+            rand,
         }
     }
 

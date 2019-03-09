@@ -18,7 +18,7 @@ use std::rc::Rc;
 use std::io::Error;
 use std::collections::HashMap;
 
-use sulis_core::util::{gen_rand, Point, Size};
+use sulis_core::util::{Point, Size};
 use crate::{Module, Encounter, area::{Layer, EncounterDataBuilder}};
 use crate::generator::{GenModel, WeightedEntry, WeightedList, Maze, RegionKind, RegionKinds,
     maze::Room, Rect, overlaps_any};
@@ -47,12 +47,12 @@ impl<'a, 'b> EncounterGen<'a, 'b> {
 
         for pass in self.params.passes.iter().chain(addn_passes) {
             for room in self.maze.rooms() {
-                let encounter = pass.kinds.pick();
+                let encounter = pass.kinds.pick(&mut self.model.rand);
 
-                if gen_rand(1, 101) > pass.chance_per_room { continue; }
+                if self.model.rand.gen(1, 101) > pass.chance_per_room { continue; }
 
 
-                let data = EncounterData::gen(&self.model, encounter, room,
+                let data = EncounterData::gen(&mut self.model, encounter, room,
                                               pass.size.x, pass.size.y);
 
                 let p1 = Point::from(self.model.to_region_coords(data.x, data.y));
@@ -94,13 +94,13 @@ impl Rect for EncounterData {
 }
 
 impl EncounterData {
-    fn gen(model: &GenModel, encounter: &Rc<Encounter>,
+    fn gen(model: &mut GenModel, encounter: &Rc<Encounter>,
            room: &Room, w: i32, h: i32) -> EncounterData {
         let encounter = Rc::clone(encounter);
         let (min_x, min_y) = model.from_region_coords(room.x, room.y);
         let (max_x, max_y) = model.from_region_coords(room.x + room.width, room.y + room.height);
-        let x = gen_rand(min_x, max_x - w);
-        let y = gen_rand(min_y, max_y - h);
+        let x = model.rand.gen(min_x, max_x - w);
+        let y = model.rand.gen(min_y, max_y - h);
 
         EncounterData { encounter, x, y, w, h }
     }

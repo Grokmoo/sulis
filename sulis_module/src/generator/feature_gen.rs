@@ -18,7 +18,7 @@ use std::collections::HashMap;
 use std::io::{ErrorKind, Error};
 use std::rc::Rc;
 
-use sulis_core::util::{Point, gen_rand};
+use sulis_core::util::{Point};
 use crate::{Module, area::{Layer, tile::{Feature}}};
 use crate::generator::{GenModel, Maze, WeightedEntry, WeightedList, RegionKind,
     RegionKinds, Rect, overlaps_any};
@@ -52,11 +52,10 @@ impl<'a, 'b> FeatureGen<'a, 'b> {
 
         for pass in self.params.passes.iter() {
             for _ in 0..pass.placement_attempts {
-                let feature = pass.kinds.pick();
+                let feature = pass.kinds.pick(&mut self.model.rand);
 
-                let data = FeatureData::gen(self.model.builder.width as i32,
-                                            self.model.builder.height as i32,
-                                            feature);
+                let (w, h) = (self.model.builder.width as i32, self.model.builder.height as i32);
+                let data = FeatureData::gen(&mut self.model, w, h, feature);
 
                 let p1 = Point::from(self.model.to_region_coords(data.x, data.y));
                 let p2 = Point::from(self.model.to_region_coords(data.x + data.w(),
@@ -94,12 +93,12 @@ struct FeatureData {
 }
 
 impl FeatureData {
-    fn gen(max_x: i32, max_y: i32, feature: &Rc<Feature>) -> FeatureData {
+    fn gen(model: &mut GenModel, max_x: i32, max_y: i32, feature: &Rc<Feature>) -> FeatureData {
         let feature = Rc::clone(feature);
         let w = feature.size.width;
         let h = feature.size.height;
-        let x = gen_rand(0, max_x - w);
-        let y= gen_rand(0, max_y - h);
+        let x = model.rand.gen(0, max_x - w);
+        let y = model.rand.gen(0, max_y - h);
 
         FeatureData { feature, x, y }
     }

@@ -18,7 +18,7 @@ use std::rc::Rc;
 use std::io::Error;
 use std::collections::HashMap;
 
-use sulis_core::util::{gen_rand, Point};
+use sulis_core::util::{Point};
 use crate::{Module, Prop, area::{Layer, PropDataBuilder}};
 use crate::generator::{GenModel, WeightedEntry, WeightedList, Maze, RegionKind, RegionKinds,
     Rect, overlaps_any};
@@ -49,10 +49,9 @@ impl<'a, 'b> PropGen<'a, 'b> {
 
         for pass in self.params.passes.iter().chain(addn_passes) {
             for _ in 0..pass.placement_attempts {
-                let prop = pass.kinds.pick();
-                let data = PropData::gen(self.model.builder.width as i32,
-                                         self.model.builder.height as i32,
-                                         prop);
+                let prop = pass.kinds.pick(&mut self.model.rand);
+                let (w, h) = (self.model.builder.width as i32, self.model.builder.height as i32);
+                let data = PropData::gen(&mut self.model, w, h, prop);
 
                 if pass.require_passable {
                     if !data.is_passable(&self.layers) { continue; }
@@ -98,12 +97,12 @@ impl Rect for PropData {
 }
 
 impl PropData {
-    fn gen(max_x: i32, max_y: i32, prop: &Rc<Prop>) -> PropData {
+    fn gen(model: &mut GenModel, max_x: i32, max_y: i32, prop: &Rc<Prop>) -> PropData {
         let prop = Rc::clone(prop);
         let w = prop.size.width;
         let h = prop.size.height;
-        let x = gen_rand(0, max_x - w);
-        let y = gen_rand(0, max_y - h);
+        let x = model.rand.gen(0, max_x - w);
+        let y = model.rand.gen(0, max_y - h);
 
         PropData { prop, x, y }
     }

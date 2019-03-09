@@ -36,6 +36,7 @@ use std::{thread, time};
 use backtrace::Backtrace;
 use flexi_logger::{opt_format, Duplicate, Logger};
 use rand::{self, distributions::uniform::SampleUniform, Rng, seq::SliceRandom};
+use rand_pcg::Pcg64Mcg;
 use serde_yaml;
 
 use crate::config::{self, Config};
@@ -59,6 +60,31 @@ pub fn approx_eq(a: f32, b: f32) -> bool {
     let b_int: i32 = unsafe { std::mem::transmute(b) };
 
     i32::abs(a_int - b_int) <= MAX_ULPS
+}
+
+pub struct ReproducibleRandom {
+    seed: u128,
+    gen: Pcg64Mcg,
+}
+
+impl ReproducibleRandom {
+    pub fn new(seed: Option<u128>) -> ReproducibleRandom {
+        let seed = match seed {
+            Some(s) => s,
+            None => rand::thread_rng().gen()
+        };
+
+        ReproducibleRandom {
+            seed,
+            gen: Pcg64Mcg::new(seed),
+        }
+    }
+
+    pub fn gen<T: SampleUniform + Sized>(&mut self, min: T, max: T) -> T {
+        self.gen.gen_range(min, max)
+    }
+
+    pub fn seed(&self) -> u128 { self.seed }
 }
 
 pub fn shuffle<T>(values: &mut [T]) {

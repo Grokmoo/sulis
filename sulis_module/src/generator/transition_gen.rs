@@ -18,7 +18,7 @@ use std::collections::HashMap;
 use std::io::{ErrorKind, Error};
 use std::rc::Rc;
 
-use sulis_core::util::{gen_rand, Point};
+use sulis_core::util::{ReproducibleRandom, Point};
 use crate::{Module, ObjectSize,
     area::{TransitionBuilder, ToKind, TransitionAreaParams, tile::{Tile, Feature}}};
 use crate::generator::{Rect, overlaps_any};
@@ -39,7 +39,8 @@ impl<'a> TransitionGen<'a> {
         }
     }
 
-    pub fn generate(&mut self, transitions: &[TransitionAreaParams])
+    pub fn generate(&mut self, random: &mut ReproducibleRandom,
+                    transitions: &[TransitionAreaParams])
         -> Result<Vec<TransitionOutput>, Error> {
 
         let mut gened = Vec::new();
@@ -53,7 +54,8 @@ impl<'a> TransitionGen<'a> {
             // keep trying until we succeed.  we always want to place transitions
             let mut placed = false;
             for _ in 0..1000 {
-                let data = TransitionData::gen(self.width,
+                let data = TransitionData::gen(random,
+                                               self.width,
                                                self.height,
                                                kind.size.width,
                                                kind.size.height,
@@ -117,13 +119,14 @@ struct TransitionData<'a> {
 }
 
 impl<'a> TransitionData<'a> {
-    fn gen(max_x: i32, max_y: i32, w: i32, h: i32,
+    fn gen(random: &mut ReproducibleRandom,
+           max_x: i32, max_y: i32, w: i32, h: i32,
            to: &'a str,
            feature: &Option<Rc<Feature>>) -> TransitionData<'a> {
         let feature = feature.clone();
         // the tile buffer keeps transitions off the edge of the usable space
-        let x = gen_rand(8, max_x - w - 16);
-        let y= gen_rand(8, max_y - h - 16);
+        let x = random.gen(8, max_x - w - 16);
+        let y = random.gen(8, max_y - h - 16);
 
         TransitionData { feature, to, x, y, w, h }
     }

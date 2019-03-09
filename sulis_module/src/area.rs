@@ -36,7 +36,7 @@ use serde::{Deserialize, Deserializer, Serializer};
 
 use sulis_core::image::Image;
 use sulis_core::resource::{ResourceSet, Sprite};
-use sulis_core::util::{self, unable_to_create_error, Point, Size};
+use sulis_core::util::{self, unable_to_create_error, Point, Size, ReproducibleRandom};
 
 use crate::{Encounter, ItemListEntrySaveState, Module, ObjectSize, OnTrigger, Prop};
 use crate::generator::{AreaGenerator, EncounterParams, EncounterParamsBuilder,
@@ -123,7 +123,8 @@ impl PartialEq for Area {
 }
 
 impl Area {
-    pub fn new(builder: AreaBuilder, pregen_out: Option<PregenOutput>) -> Result<Area, Error> {
+    pub fn new(builder: AreaBuilder,
+               pregen_out: Option<PregenOutput>) -> Result<Area, Error> {
         let mut generated_encounters = Vec::new();
         let mut generated_props = Vec::new();
         let mut layers = Vec::new();
@@ -131,7 +132,8 @@ impl Area {
         if let Some(pregen) = pregen_out {
             let start_time = std::time::Instant::now();
 
-            let output = pregen.generator.generate(&builder, &pregen.params, pregen.tiles_to_add)?;
+            let output = pregen.generator.generate(&builder, pregen.rand,
+                                                   &pregen.params, pregen.tiles_to_add)?;
             layers = output.layers;
             generated_props = output.props;
             generated_encounters = output.encounters;
@@ -355,10 +357,12 @@ pub struct PregenOutput {
     generator: Rc<AreaGenerator>,
     params: GeneratorParams,
     tiles_to_add: Vec<(Rc<Tile>, i32, i32)>,
+    rand: ReproducibleRandom,
 }
 
 impl AreaBuilder {
     pub fn pregen(&mut self) -> Result<Option<PregenOutput>, Error> {
+        let mut rand = ReproducibleRandom::new(None);
         let start_time = std::time::Instant::now();
 
         let params = match self.generator.take() {
@@ -371,7 +375,7 @@ impl AreaBuilder {
             Error::new(ErrorKind::InvalidInput, format!("Generator '{}' not found", params.id))
         )?;
 
-        let transition_out = generator.generate_transitions(self, &params)?;
+        let transition_out = generator.generate_transitions(self, &mut rand, &params)?;
 
         info!("Area pregen complete in {} secs",
               util::format_elapsed_secs(start_time.elapsed()));
@@ -386,6 +390,7 @@ impl AreaBuilder {
             generator,
             params,
             tiles_to_add: tiles_out,
+            rand,
         }))
     }
 }

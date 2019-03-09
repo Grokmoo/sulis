@@ -596,7 +596,8 @@ impl Module {
             }
 
             for (id, builder) in builder_set.generator_builders {
-                insert_if_ok("generator", id, AreaGenerator::new(builder, &module), &mut module.generators);
+                insert_if_ok("generator", id,
+                             AreaGenerator::new(builder, &module), &mut module.generators);
             }
 
             builder_set.area_builders

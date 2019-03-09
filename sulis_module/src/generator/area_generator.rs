@@ -18,7 +18,7 @@ use std::io::Error;
 use std::rc::Rc;
 use std::collections::HashMap;
 
-use sulis_core::util::{gen_rand, Point};
+use sulis_core::util::{Point, ReproducibleRandom};
 use crate::{Module, area::{Tile, Layer, AreaBuilder, GeneratorParams}};
 use crate::generator::{WeightedList, WallKinds, RoomParams, TerrainParams, PropParams,
     EncounterParams, GeneratorBuilder, GenModel, Maze, TerrainGen, PropGen, EncounterGen,
@@ -57,20 +57,22 @@ impl AreaGenerator {
         })
     }
 
-    pub fn generate_transitions(&self, builder: &AreaBuilder,
+    pub fn generate_transitions(&self, builder: &AreaBuilder, rand: &mut ReproducibleRandom,
                                 params: &GeneratorParams) -> Result<Vec<TransitionOutput>, Error> {
 
         info!("Generating transitions");
         let width = builder.width as i32;
         let height = builder.height as i32;
         let mut gen = TransitionGen::new(width, height, &self.transition_params);
-        gen.generate(&params.transitions)
+        gen.generate(rand, &params.transitions)
     }
 
-    pub fn generate(&self, builder: &AreaBuilder, params: &GeneratorParams,
+    pub fn generate(&self, builder: &AreaBuilder, rand: ReproducibleRandom,
+                    params: &GeneratorParams,
                     tiles_to_add: Vec<(Rc<Tile>, i32, i32)>) -> Result<GeneratorOutput, Error> {
         info!("Generating area '{}'", builder.id);
-        let mut model = GenModel::new(builder, self.grid_width as i32, self.grid_height as i32);
+        let mut model = GenModel::new(builder, rand,
+                                      self.grid_width as i32, self.grid_height as i32);
 
         let (room_width, room_height) = model.region_size();
         let mut maze = Maze::new(room_width, room_height);
@@ -139,7 +141,7 @@ impl AreaGenerator {
     }
 
     fn pick_wall_kind(&self,
-                      model: &GenModel,
+                      model: &mut GenModel,
                       invert: bool,
                       region: usize,
                       mapped: &mut HashMap<usize, Option<usize>>) -> (u8, Option<usize>) {
@@ -148,7 +150,7 @@ impl AreaGenerator {
         if mapped.contains_key(&region) {
             (1, mapped[&region])
         } else {
-            let wall_index = self.wall_kinds.pick_index(&model.model);
+            let wall_index = self.wall_kinds.pick_index(&mut model.rand, &model.model);
             mapped.insert(region, wall_index);
             (1, wall_index)
         }
@@ -163,7 +165,7 @@ impl AreaGenerator {
                 model.model.set_wall(p.x, p.y, 0, None);
             }
         } else {
-            let wall_index = self.wall_kinds.pick_index(&model.model);
+            let wall_index = self.wall_kinds.pick_index(&mut model.rand, &model.model);
             for p in model.tiles() {
                 model.model.set_wall(p.x, p.y, 1, wall_index);
             }
@@ -196,17 +198,17 @@ impl AreaGenerator {
                   elev: u8, wall_kind: Option<usize>) {
         let edge_choice = match neighbors[0] {
             Some(TileKind::Corridor(region)) => {
-                if gen_rand(1, 101) < self.room_params.corridor_edge_overfill_chance {
+                if model.rand.gen(1, 101) < self.room_params.corridor_edge_overfill_chance {
                     // pregen a single potential overfill for each corridor, preventing
                     // both sides from becoming blocked at room coord intersection
-                    Some(*model.region_overfill_edges.entry(region).or_insert(gen_rand(1, 5)))
+                    Some(*model.region_overfill_edges.entry(region).or_insert(model.rand.gen(1, 5)))
                 } else {
                     None
                 }
             },
             Some(TileKind::Room { .. }) => {
-                if gen_rand(1, 101) < self.room_params.room_edge_overfill_chance {
-                    Some(gen_rand(1, 5))
+                if model.rand.gen(1, 101) < self.room_params.room_edge_overfill_chance {
+                    Some(model.rand.gen(1, 5))
                 } else {
                     None
                 }

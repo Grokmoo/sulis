@@ -18,7 +18,7 @@ use std::collections::HashMap;
 use std::io::{Error};
 
 use sulis_core::ui::Border;
-use sulis_core::util::{Point, gen_rand};
+use sulis_core::util::{Point};
 use crate::Module;
 use crate::area::tile::TerrainKind;
 use crate::generator::{GenModel, WeightedEntry, WeightedList, Maze,
@@ -42,7 +42,8 @@ impl<'a, 'b> TerrainGen<'a, 'b> {
     }
 
     pub fn generate(&mut self) {
-        let base_terrain = self.get_terrain_tiles(self.params.base_kinds.pick());
+        let picks = self.params.base_kinds.pick(&mut self.model.rand);
+        let base_terrain = self.get_terrain_tiles(picks);
         for p in self.model.tiles() {
             self.model.model.set_terrain_index(p.x, p.y, base_terrain);
         }
@@ -62,11 +63,9 @@ impl<'a, 'b> TerrainGen<'a, 'b> {
         trace!("Performing patch pass");
         let skip = patches.len();
         for _ in 0..pass.placement_attempts {
-            let patch = Feature::gen(
-                self.model.builder.width as i32 / gw,
-                self.model.builder.height as i32 / gh,
-                pass
-            );
+
+            let (w, h) = (self.model.builder.width as i32, self.model.builder.height as i32);
+            let patch = Feature::gen(&mut self.model, w, h, pass);
 
             let (x1, y1) = self.model.to_region_coords(patch.x * gw, patch.y * gh);
             let (x2, y2) = self.model.to_region_coords((patch.x + patch.w) * gw,
@@ -82,7 +81,8 @@ impl<'a, 'b> TerrainGen<'a, 'b> {
         }
 
         for patch in patches.iter().skip(skip) {
-            let terrain = self.get_terrain_tiles(pass.kinds.pick());
+            let picks = pass.kinds.pick(&mut self.model.rand);
+            let terrain = self.get_terrain_tiles(picks);
 
             self.do_patch_area(patch, terrain, pass.edge_underfill_chance,
                                  pass.border_walls_by);
@@ -160,7 +160,7 @@ impl<'a, 'b> TerrainGen<'a, 'b> {
             *accum -= 1;
             false
         } else {
-            if gen_rand(1, 101) < chance {
+            if self.model.rand.gen(1, 101) < chance {
                 if *accum > 1 { *accum += 1; } else { *accum = 1; }
                 true
             } else {
@@ -265,11 +265,11 @@ impl Rect for Feature{
 }
 
 impl Feature {
-    fn gen(max_x: i32, max_y: i32, params: &FeaturePass) -> Feature {
-        let w = gen_rand(params.min_size.x, params.max_size.x + 1);
-        let h = gen_rand(params.min_size.y, params.max_size.y + 1);
-        let x = gen_rand(0, max_x - w);
-        let y = gen_rand(0, max_y - h);
+    fn gen(model: &mut GenModel, max_x: i32, max_y: i32, params: &FeaturePass) -> Feature {
+        let w = model.rand.gen(params.min_size.x, params.max_size.x + 1);
+        let h = model.rand.gen(params.min_size.y, params.max_size.y + 1);
+        let x = model.rand.gen(0, max_x - w);
+        let y = model.rand.gen(0, max_y - h);
 
         Feature { x, y, w, h }
     }

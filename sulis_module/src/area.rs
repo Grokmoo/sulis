@@ -21,7 +21,7 @@ mod layer_set;
 pub use self::layer_set::LayerSet;
 
 mod path_finder_grid;
-use self::path_finder_grid::PathFinderGrid;
+pub use self::path_finder_grid::PathFinderGrid;
 
 pub mod tile;
 pub use self::tile::Tile;
@@ -79,6 +79,7 @@ pub struct ActorData {
     pub unique_id: Option<String>,
 }
 
+#[derive(Clone)]
 pub struct PropData {
     pub prop: Rc<Prop>,
     pub location: Point,
@@ -87,6 +88,7 @@ pub struct PropData {
     pub hover_text: Option<String>,
 }
 
+#[derive(Clone)]
 pub struct EncounterData {
     pub encounter: Rc<Encounter>,
     pub location: Point,
@@ -132,8 +134,11 @@ impl Area {
         if let Some(pregen) = pregen_out {
             let start_time = std::time::Instant::now();
 
-            let output = pregen.generator.generate(&builder, pregen.rand,
-                                                   &pregen.params, pregen.tiles_to_add)?;
+            let output = pregen.generator.generate(builder.width as i32,
+                                                   builder.height as i32,
+                                                   pregen.rand,
+                                                   &pregen.params,
+                                                   pregen.tiles_to_add)?;
             layers = output.layers;
             generated_props = output.props;
             generated_encounters = output.encounters;
@@ -331,7 +336,7 @@ pub struct AreaBuilder {
     pub location_kind: LocationKind,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub(crate) generator: Option<GeneratorParamsBuilder>,
+    pub generator: Option<GeneratorParamsBuilder>,
     pub layers: Vec<String>,
     pub entity_layer: usize,
     pub actors: Vec<ActorData>,
@@ -396,15 +401,15 @@ impl AreaBuilder {
 }
 
 pub struct GeneratorParams {
-    id: String,
+    pub id: String,
 
-    pub(crate) transitions: Vec<TransitionAreaParams>,
-    pub(crate) encounters: EncounterParams,
-    pub(crate) props: PropParams,
+    pub transitions: Vec<TransitionAreaParams>,
+    pub encounters: EncounterParams,
+    pub props: PropParams,
 }
 
 impl GeneratorParams {
-    fn new(builder: GeneratorParamsBuilder) -> Result<GeneratorParams, Error> {
+    pub fn new(builder: GeneratorParamsBuilder) -> Result<GeneratorParams, Error> {
         Ok(GeneratorParams {
             id: builder.id,
             transitions: builder.transitions,
@@ -414,9 +419,9 @@ impl GeneratorParams {
     }
 }
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 #[serde(deny_unknown_fields)]
-pub(crate) struct GeneratorParamsBuilder {
+pub struct GeneratorParamsBuilder {
     id: String,
 
     #[serde(default)]
@@ -429,7 +434,7 @@ pub(crate) struct GeneratorParamsBuilder {
     pub props: PropParamsBuilder,
 }
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct TransitionAreaParams {
     pub to: String,

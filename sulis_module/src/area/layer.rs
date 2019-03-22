@@ -17,7 +17,7 @@
 use std::io::Error;
 use std::rc::Rc;
 
-use crate::area::{AreaBuilder, Tile};
+use crate::area::{Tile};
 use sulis_core::resource::{ResourceSet, Spritesheet};
 use sulis_core::util::{invalid_data_error, Point};
 
@@ -34,12 +34,11 @@ pub struct Layer {
 
 impl Layer {
     pub fn new(
-        builder: &AreaBuilder,
+        width: i32,
+        height: i32,
         id: String,
         tiles: Vec<Vec<Rc<Tile>>>,
     ) -> Result<Layer, Error> {
-        let width = builder.width as i32;
-        let height = builder.height as i32;
         let dim = (width * height) as usize;
 
         let mut impass_overrides = Vec::new();

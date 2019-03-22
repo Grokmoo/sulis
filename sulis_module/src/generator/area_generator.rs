@@ -67,20 +67,20 @@ impl AreaGenerator {
         gen.generate(rand, &params.transitions)
     }
 
-    pub fn generate(&self, builder: &AreaBuilder, rand: ReproducibleRandom,
+    pub fn generate(&self, width: i32, height: i32, rand: ReproducibleRandom,
                     params: &GeneratorParams,
                     tiles_to_add: Vec<(Rc<Tile>, i32, i32)>) -> Result<GeneratorOutput, Error> {
-        info!("Generating area '{}'", builder.id);
-        let mut model = GenModel::new(builder, rand,
+        let mut model = GenModel::new(width, height, rand,
                                       self.grid_width as i32, self.grid_height as i32);
 
         let (room_width, room_height) = model.region_size();
         let mut maze = Maze::new(room_width, room_height);
 
-        let open_locs: Vec<Point> = builder.transitions.iter().map(|t| {
-            let (x, y) = model.to_region_coords(t.from.x, t.from.y);
-            Point::new(x, y)
-        }).collect();
+        let open_locs = Vec::new();
+        // let open_locs: Vec<Point> = builder.transitions.iter().map(|t| {
+        //     let (x, y) = model.to_region_coords(t.from.x, t.from.y);
+        //     Point::new(x, y)
+        // }).collect();
         maze.generate(&self.room_params, &open_locs)?;
         self.add_walls(&mut model, &maze);
 
@@ -100,7 +100,7 @@ impl AreaGenerator {
 
         // pre-gen layers for use in the next step
         info!("Tile generation complete.  Pre-Gen layers.");
-        let layers = self.create_layers(&model.builder, &model.model)?;
+        let layers = self.create_layers(width, height, &model.model)?;
 
         info!("Generating features");
         let mut gen = FeatureGen::new(&mut model, &layers, &self.feature_params, &maze);
@@ -115,7 +115,7 @@ impl AreaGenerator {
         let encounters = gen.generate(&params.encounters.passes)?;
 
         info!("Final Layer Gen");
-        let layers = self.create_layers(&model.builder, &model.model)?;
+        let layers = self.create_layers(width, height, &model.model)?;
 
         Ok(GeneratorOutput {
             layers,
@@ -124,17 +124,18 @@ impl AreaGenerator {
         })
     }
 
-    fn create_layers(&self, builder: &AreaBuilder, model: &TilesModel) -> Result<Vec<Layer>, Error> {
+    fn create_layers(&self, width: i32, height: i32,
+                     model: &TilesModel) -> Result<Vec<Layer>, Error> {
         let mut out = Vec::new();
         for (id, tiles_data) in model.iter() {
-            let mut tiles = vec![Vec::new(); (builder.width * builder.height) as usize];
+            let mut tiles = vec![Vec::new(); (width * height) as usize];
             for (p, tile) in tiles_data.iter() {
-                if p.x >= builder.width as i32|| p.y >= builder.height as i32 { continue; }
-                let index = (p.x + p.y * builder.width as i32) as usize;
+                if p.x >= width || p.y >= height { continue; }
+                let index = (p.x + p.y * width) as usize;
                 tiles[index].push(Rc::clone(tile));
             }
 
-            out.push(Layer::new(builder, id.to_string(), tiles)?);
+            out.push(Layer::new(width, height, id.to_string(), tiles)?);
         }
 
         Ok(out)

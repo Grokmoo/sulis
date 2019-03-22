@@ -48,7 +48,7 @@ use std::collections::{HashMap};
 use std::io::{Error, ErrorKind};
 
 use sulis_core::util::{Point, ReproducibleRandom};
-use crate::area::{AreaBuilder, Layer, PropDataBuilder, EncounterDataBuilder};
+use crate::area::{Layer, PropDataBuilder, EncounterDataBuilder};
 use crate::{WallKind};
 
 pub struct WeightedList<T> {
@@ -135,26 +135,29 @@ pub struct GeneratorOutput {
     pub encounters: Vec<EncounterDataBuilder>,
 }
 
-pub(crate) struct GenModel<'a> {
+pub(crate) struct GenModel {
     model: TilesModel,
-    builder: &'a AreaBuilder,
+    area_width: i32,
+    area_height: i32,
     total_grid_size: Point,
     region_overfill_edges: HashMap<usize, usize>,
     rand: ReproducibleRandom,
 }
 
-impl<'a> GenModel<'a> {
-    fn new(builder: &'a AreaBuilder,
+impl GenModel {
+    fn new(width: i32,
+           height: i32,
            rand: ReproducibleRandom,
            gen_grid_width: i32,
-           gen_grid_height: i32) -> GenModel<'a> {
+           gen_grid_height: i32) -> GenModel {
         let model = TilesModel::new();
         let gen_grid_size = Point::new(gen_grid_width, gen_grid_height);
         let total_grid_size = Point::new(gen_grid_size.x * model.grid_width,
                                          gen_grid_size.y * model.grid_height);
         GenModel {
             model,
-            builder,
+            area_width: width,
+            area_height: height,
             total_grid_size,
             region_overfill_edges: HashMap::new(),
             rand,
@@ -162,9 +165,9 @@ impl<'a> GenModel<'a> {
     }
 
     fn region_size(&self) -> (u32, u32) {
-        let x = (self.builder.width as i32 - 2 * self.model.grid_width)
+        let x = (self.area_width - 2 * self.model.grid_width)
             / self.total_grid_size.x;
-        let y = (self.builder.height as i32 - 2 * self.model.grid_height)
+        let y = (self.area_height - 2 * self.model.grid_height)
             / self.total_grid_size.y;
         (x as u32, y as u32)
     }
@@ -205,12 +208,12 @@ impl TileIter {
         }
     }
 
-    fn new<'a>(model: &'a GenModel<'a>) -> TileIter {
+    fn new<'a>(model: &'a GenModel) -> TileIter {
         TileIter {
             x: 0,
             y: 0,
-            max_x: model.builder.width as i32,
-            max_y: model.builder.height as i32,
+            max_x: model.area_width,
+            max_y: model.area_height,
             step_x: model.model.grid_width as i32,
             step_y: model.model.grid_height as i32,
         }
@@ -256,7 +259,7 @@ pub struct GeneratorBuilder {
     transitions: TransitionParamsBuilder,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Clone, Copy)]
 #[serde(deny_unknown_fields)]
 pub struct WeightedEntry {
     weight: u32,
@@ -278,7 +281,7 @@ pub(crate) struct RoomParams {
     corridor_edge_overfill_chance: u32,
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Copy)]
 #[serde(deny_unknown_fields)]
 pub enum RegionKind {
     Wall,

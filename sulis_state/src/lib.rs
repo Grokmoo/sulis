@@ -57,6 +57,9 @@ pub use self::formation::Formation;
 mod game_state;
 pub use self::game_state::GameState;
 
+mod generated_area;
+pub use self::generated_area::GeneratedArea;
+
 mod item_state;
 pub use self::item_state::ItemState;
 

@@ -25,13 +25,13 @@ use crate::generator::{GenModel, WeightedEntry, WeightedList, Maze,
     RegionKind, RegionKinds, Rect, overlaps_any};
 
 pub struct TerrainGen<'a, 'b> {
-    model: &'b mut GenModel<'a>,
+    model: &'b mut GenModel,
     params: &'a TerrainParams,
     maze: &'b Maze,
 }
 
 impl<'a, 'b> TerrainGen<'a, 'b> {
-    pub(crate) fn new(model: &'b mut GenModel<'a>,
+    pub(crate) fn new(model: &'b mut GenModel,
                       params: &'a TerrainParams,
                       maze: &'b Maze) -> TerrainGen<'a, 'b> {
         TerrainGen {
@@ -64,7 +64,7 @@ impl<'a, 'b> TerrainGen<'a, 'b> {
         let skip = patches.len();
         for _ in 0..pass.placement_attempts {
 
-            let (w, h) = (self.model.builder.width as i32, self.model.builder.height as i32);
+            let (w, h) = (self.model.area_width, self.model.area_height);
             let patch = Feature::gen(&mut self.model, w, h, pass);
 
             let (x1, y1) = self.model.to_region_coords(patch.x * gw, patch.y * gh);

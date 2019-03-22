@@ -188,14 +188,14 @@ pub(crate) struct TransitionKind {
 
 #[derive(Debug, Deserialize)]
 #[serde(deny_unknown_fields)]
-pub(crate) struct TransitionParamsBuilder {
+pub struct TransitionParamsBuilder {
     spacing: u32,
     kinds: HashMap<String, TransitionKindBuilder>,
 }
 
 #[derive(Debug, Deserialize)]
 #[serde(deny_unknown_fields)]
-pub(crate) struct TransitionKindBuilder {
+pub struct TransitionKindBuilder {
     size: String,
     feature_offset: Point,
     transition_offset: Point,

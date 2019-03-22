@@ -72,7 +72,8 @@ impl LayerSet {
 
             for layer_id in builder.layers.iter() {
                 let tiles = layer_tiles.remove(layer_id).unwrap();
-                let layer = Layer::new(builder, layer_id.to_string(), tiles)?;
+                let layer = Layer::new(builder.width as i32, builder.height as i32,
+                                       layer_id.to_string(), tiles)?;
                 layers.push(layer);
             }
         }

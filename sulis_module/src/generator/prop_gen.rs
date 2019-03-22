@@ -24,14 +24,14 @@ use crate::generator::{GenModel, WeightedEntry, WeightedList, Maze, RegionKind, 
     Rect, overlaps_any};
 
 pub struct PropGen<'a, 'b> {
-    model: &'b mut GenModel<'a>,
+    model: &'b mut GenModel,
     layers: &'b [Layer],
     params: &'a PropParams,
     maze: &'b Maze,
 }
 
 impl<'a, 'b> PropGen<'a, 'b> {
-    pub(crate) fn new(model: &'b mut GenModel<'a>,
+    pub(crate) fn new(model: &'b mut GenModel,
                       layers: &'b [Layer],
                       params: &'a PropParams,
                       maze: &'b Maze) -> PropGen<'a, 'b> {
@@ -50,7 +50,7 @@ impl<'a, 'b> PropGen<'a, 'b> {
         for pass in self.params.passes.iter().chain(addn_passes) {
             for _ in 0..pass.placement_attempts {
                 let prop = pass.kinds.pick(&mut self.model.rand);
-                let (w, h) = (self.model.builder.width as i32, self.model.builder.height as i32);
+                let (w, h) = (self.model.area_width, self.model.area_height);
                 let data = PropData::gen(&mut self.model, w, h, prop);
 
                 if pass.require_passable {
@@ -108,8 +108,8 @@ impl PropData {
     }
 }
 
-pub(crate) struct PropParams {
-    pub(crate) passes: Vec<PropPass>,
+pub struct PropParams {
+    pub passes: Vec<PropPass>,
 }
 
 impl PropParams {
@@ -142,7 +142,7 @@ impl PropParams {
     }
 }
 
-pub(crate) struct PropPass {
+pub struct PropPass {
     kinds: WeightedList<Rc<Prop>>,
     spacing: u32,
     placement_attempts: u32,
@@ -150,15 +150,15 @@ pub(crate) struct PropPass {
     require_passable: bool,
 }
 
-#[derive(Debug, Deserialize, Serialize, Default)]
+#[derive(Debug, Deserialize, Serialize, Default, Clone)]
 #[serde(deny_unknown_fields)]
-pub(crate) struct PropParamsBuilder {
+pub struct PropParamsBuilder {
     passes: Vec<PropPassBuilder>,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 #[serde(deny_unknown_fields)]
-pub(crate) struct PropPassBuilder {
+pub struct PropPassBuilder {
     kinds: HashMap<String, WeightedEntry>,
     spacing: u32,
     placement_attempts: u32,

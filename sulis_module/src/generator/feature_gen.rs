@@ -24,14 +24,14 @@ use crate::generator::{GenModel, Maze, WeightedEntry, WeightedList, RegionKind,
     RegionKinds, Rect, overlaps_any};
 
 pub struct FeatureGen<'a, 'b> {
-    model: &'b mut GenModel<'a>,
+    model: &'b mut GenModel,
     layers: &'b [Layer],
     params: &'a FeatureParams,
     maze: &'b Maze,
 }
 
 impl<'a, 'b> FeatureGen<'a, 'b> {
-    pub(crate) fn new(model: &'b mut GenModel<'a>,
+    pub(crate) fn new(model: &'b mut GenModel,
                       layers: &'b [Layer],
                       params: &'a FeatureParams,
                       maze: &'b Maze) -> FeatureGen<'a, 'b> {
@@ -54,7 +54,7 @@ impl<'a, 'b> FeatureGen<'a, 'b> {
             for _ in 0..pass.placement_attempts {
                 let feature = pass.kinds.pick(&mut self.model.rand);
 
-                let (w, h) = (self.model.builder.width as i32, self.model.builder.height as i32);
+                let (w, h) = (self.model.area_width, self.model.area_height);
                 let data = FeatureData::gen(&mut self.model, w, h, feature);
 
                 let p1 = Point::from(self.model.to_region_coords(data.x, data.y));

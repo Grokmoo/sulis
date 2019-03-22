@@ -24,13 +24,13 @@ use crate::generator::{GenModel, WeightedEntry, WeightedList, Maze, RegionKind, 
     maze::Room, Rect, overlaps_any};
 
 pub struct EncounterGen<'a, 'b> {
-    model: &'b mut GenModel<'a>,
+    model: &'b mut GenModel,
     params: &'a EncounterParams,
     maze: &'b Maze,
 }
 
 impl<'a, 'b> EncounterGen<'a, 'b> {
-    pub(crate) fn new(model: &'b mut GenModel<'a>,
+    pub(crate) fn new(model: &'b mut GenModel,
                       _layers: &'b [Layer],
                       params: &'a EncounterParams,
                       maze: &'b Maze) -> EncounterGen<'a, 'b> {
@@ -106,8 +106,8 @@ impl EncounterData {
     }
 }
 
-pub(crate) struct EncounterParams {
-    pub(crate) passes: Vec<EncounterPass>,
+pub struct EncounterParams {
+    pub passes: Vec<EncounterPass>,
 }
 
 impl EncounterParams {
@@ -141,7 +141,7 @@ impl EncounterParams {
     }
 }
 
-pub(crate) struct EncounterPass {
+pub struct EncounterPass {
     kinds: WeightedList<Rc<Encounter>>,
     spacing: u32,
     chance_per_room: u32,
@@ -149,15 +149,15 @@ pub(crate) struct EncounterPass {
     size: Point,
 }
 
-#[derive(Debug, Deserialize, Serialize, Default)]
+#[derive(Debug, Deserialize, Serialize, Default, Clone)]
 #[serde(deny_unknown_fields)]
-pub(crate) struct EncounterParamsBuilder {
+pub struct EncounterParamsBuilder {
     passes: Vec<EncounterPassBuilder>,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 #[serde(deny_unknown_fields)]
-pub(crate) struct EncounterPassBuilder {
+pub struct EncounterPassBuilder {
     kinds: HashMap<String, WeightedEntry>,
     spacing: u32,
     chance_per_room: u32,

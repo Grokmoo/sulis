@@ -92,6 +92,7 @@ impl WidgetKind for TransitionWindow {
                 ToKind::CurArea { x, y } => (String::new(), x, y),
                 ToKind::Area { ref id, x, y } => (id.to_string(), x, y),
                 ToKind::WorldMap => (String::new(), 0, 0),
+                ToKind::FindLink { .. } => (String::new(), 0, 0),
             };
 
             let max = MAX_AREA_SIZE - 1;
@@ -171,6 +172,7 @@ impl WidgetKind for TransitionWindow {
                 ToKind::CurArea { .. } => cur_area_button.borrow_mut().state.set_active(true),
                 ToKind::Area { .. } => area_button.borrow_mut().state.set_active(true),
                 ToKind::WorldMap => world_map_button.borrow_mut().state.set_active(true),
+                ToKind::FindLink { .. } => (),
             }
 
             let refs = vec![
@@ -286,6 +288,7 @@ impl WidgetKind for TransitionWindow {
                 ToKind::CurArea { .. } => "self".to_string(),
                 ToKind::Area { ref id, .. } => id.to_string(),
                 ToKind::WorldMap => "World Map".to_string(),
+                ToKind::FindLink { .. } => "Generated".to_string(),
             };
 
             let text = format!("{}: {}", index, to);

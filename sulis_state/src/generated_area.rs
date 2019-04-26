@@ -18,6 +18,7 @@ use std::io::{ErrorKind, Error};
 use std::collections::HashMap;
 use std::rc::Rc;
 
+use sulis_core::resource::ResourceSet;
 use sulis_core::util::{self, ReproducibleRandom, unable_to_create_error};
 use sulis_module::Module;
 use sulis_module::area::{Area, AreaBuilder, LayerSet, Tile, PathFinderGrid, PropData,
@@ -27,7 +28,7 @@ use sulis_module::generator::AreaGenerator;
 pub struct GeneratedArea {
     area: Rc<Area>,
     layer_set: LayerSet,
-    path_grid: HashMap<String, PathFinderGrid>,
+    path_grids: HashMap<String, PathFinderGrid>,
     props: Vec<PropData>,
     transitions: Vec<Transition>,
     encounters: Vec<EncounterData>,
@@ -76,10 +77,54 @@ impl GeneratedArea {
             });
         }
 
+        let layer_set = LayerSet::new(&area.builder, &props, layers)?;
+
+        let mut path_grids = HashMap::new();
+        for size in Module::all_sizes() {
+            let path_grid = PathFinderGrid::new(Rc::clone(&size), &layer_set);
+            path_grids.insert(size.id.to_string(), path_grid);
+        }
+
+        let mut transitions = Vec::new();
+        for (index, t_builder) in area.builder.transitions.iter().enumerate() {
+            let img_id = &t_builder.image_display;
+            let image = ResourceSet::image(img_id).ok_or(
+                Error::new(ErrorKind::InvalidInput, format!("No image '{}' found", img_id))
+            )?;
+
+            let size = Module::size(&t_builder.size).ok_or(
+                Error::new(ErrorKind::InvalidInput, format!("No size '{}' found", t_builder.size))
+            )?;
+
+            let p = t_builder.from;
+            if !p.in_bounds(area.width, area.height) {
+                warn!("Transition {} falls outside area bounds", index);
+                continue;
+            }
+
+            p.add(size.width, size.height);
+            if !p.in_bounds(area.width, area.height) {
+                warn!("Transition {} falls outside area bounds", index);
+                continue;
+            }
+
+            let transition = Transition {
+                from: t_builder.from,
+                to: t_builder.to.clone(),
+                hover_text: t_builder.hover_text.clone(),
+                size,
+                image_display: image,
+            };
+            transitions.push(transition);
+        }
+
         Ok(GeneratedArea {
             area,
             props,
             encounters,
+            layer_set,
+            path_grids,
+            transitions,
         })
     }
 }

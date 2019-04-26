@@ -69,7 +69,7 @@ pub struct Transition {
     pub image_display: Rc<Image>,
 }
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct ActorData {
     pub id: String,
@@ -116,6 +116,7 @@ pub struct Area {
     pub world_map_location: Option<String>,
     pub on_rest: OnRest,
     pub location_kind: LocationKind,
+    pub builder: AreaBuilder,
 }
 
 impl PartialEq for Area {
@@ -173,7 +174,7 @@ impl Area {
         // TODO validate position of all actors, props, encounters
 
         let mut transitions: Vec<Transition> = Vec::new();
-        for (index, t_builder) in builder.transitions.into_iter().enumerate() {
+        for (index, t_builder) in builder.transitions.iter().enumerate() {
 
             let image = match ResourceSet::image(&t_builder.image_display) {
                 None => {
@@ -212,8 +213,8 @@ impl Area {
 
             let transition = Transition {
                 from: t_builder.from,
-                to: t_builder.to,
-                hover_text: t_builder.hover_text,
+                to: t_builder.to.clone(),
+                hover_text: t_builder.hover_text.clone(),
                 size,
                 image_display: image,
             };
@@ -221,10 +222,10 @@ impl Area {
         }
 
         let mut triggers: Vec<Trigger> = Vec::new();
-        for tbuilder in builder.triggers {
+        for tbuilder in &builder.triggers {
             triggers.push(Trigger {
-                kind: tbuilder.kind,
-                on_activate: tbuilder.on_activate,
+                kind: tbuilder.kind.clone(),
+                on_activate: tbuilder.on_activate.clone(),
                 initially_enabled: tbuilder.initially_enabled,
             });
         }
@@ -281,13 +282,13 @@ impl Area {
         let explored_tile = ResourceSet::sprite(&builder.explored_tile)?;
 
         Ok(Area {
-            id: builder.id,
-            name: builder.name,
+            id: builder.id.to_string(),
+            name: builder.name.to_string(),
             width: builder.width as i32,
             height: builder.height as i32,
             layer_set,
             path_grids,
-            actors: builder.actors,
+            actors: builder.actors.clone(),
             encounters,
             props,
             visibility_tile,
@@ -298,9 +299,10 @@ impl Area {
             vis_dist_squared: builder.max_vis_distance * builder.max_vis_distance,
             vis_dist_up_one_squared: builder.max_vis_up_one_distance
                 * builder.max_vis_up_one_distance,
-            world_map_location: builder.world_map_location,
-            on_rest: builder.on_rest,
-            location_kind: builder.location_kind,
+            world_map_location: builder.world_map_location.clone(),
+            on_rest: builder.on_rest.clone(),
+            location_kind: builder.location_kind.clone(),
+            builder,
         })
     }
 

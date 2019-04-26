@@ -387,7 +387,7 @@ pub fn main_loop(
 pub fn setup_logger() {
     let mut path = config::USER_DIR.clone();
     path.push("log");
-    let log_dir = path.to_string_lossy();
+    let log_dir = path;
 
     let log_config = Config::logging_config();
 

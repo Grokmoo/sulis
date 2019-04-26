@@ -1034,7 +1034,7 @@ themes:
                   content:
                     size: [-7, 0]
                     layout: Grid
-                    layout_spacing: { top :0, bottom: 2, left: 0, right: 2 }
+                    layout_spacing: { bottom: 2, right: 2 }
                     relative:
                       width: Max
                       height: Max
@@ -1061,7 +1061,7 @@ themes:
               content:
                 size: [-7, 0]
                 layout: Grid
-                layout_spacing: { top :0, bottom: 1, left: 0, right: 1 }
+                layout_spacing: { top: 0, bottom: 1, left: 0, right: 1 }
                 relative:
                   width: Max
                   height: Max

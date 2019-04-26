@@ -20,7 +20,7 @@ upgrades:
       Your ranged attacks are nearly impossible to resist.  You gain armor penetration and ignore a large amount of concealment on all ranged attacks.
     bonuses:
       - kind:
-          damage: { min:0, max: 0, ap: 10 }
+          damage: { min: 0, max: 0, ap: 10 }
         when:
           WeaponStyle: Ranged
       - kind:

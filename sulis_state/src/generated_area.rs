@@ -26,12 +26,12 @@ use sulis_module::area::{Area, AreaBuilder, LayerSet, Tile, PathFinderGrid, Prop
 use sulis_module::generator::AreaGenerator;
 
 pub struct GeneratedArea {
-    area: Rc<Area>,
-    layer_set: LayerSet,
-    path_grids: HashMap<String, PathFinderGrid>,
-    props: Vec<PropData>,
-    transitions: Vec<Transition>,
-    encounters: Vec<EncounterData>,
+    pub area: Rc<Area>,
+    pub layer_set: LayerSet,
+    pub path_grids: HashMap<String, PathFinderGrid>,
+    pub props: Vec<PropData>,
+    pub transitions: Vec<Transition>,
+    pub encounters: Vec<EncounterData>,
 }
 
 impl GeneratedArea {
@@ -132,8 +132,8 @@ impl GeneratedArea {
 pub struct PregenOutput {
     generator: Rc<AreaGenerator>,
     params: GeneratorParams,
-    tiles_to_add: Vec<(Rc<Tile>, i32, i32)>,
-    transitions: Vec<TransitionBuilder>,
+    pub tiles_to_add: Vec<(Rc<Tile>, i32, i32)>,
+    pub transitions: Vec<TransitionBuilder>,
     rand: ReproducibleRandom,
 }
 

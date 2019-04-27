@@ -202,7 +202,7 @@ impl WidgetKind for CharacterSelector {
             let mut actor_state = ActorState::new(Rc::clone(actor));
             actor_state.compute_stats();
             actor_state.init_day();
-            create_details_text_box(&actor_state)
+            create_details_text_box(&actor_state, false)
         } else {
             Widget::with_theme(TextArea::empty(), "details")
         };

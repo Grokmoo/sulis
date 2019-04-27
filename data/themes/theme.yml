@@ -998,12 +998,28 @@ themes:
             position: [0, 7]
             size: [0, -6]
             children:
+              show_passives_label:
+                kind: Label
+                from: label
+                relative:
+                  x: Max
+                position: [-6, 0]
+                size: [25, 5]
+                text: "Show Passive"
+                text_params:
+                  horizontal_alignment: Right
+              show_passives:
+                from: button
+                relative:
+                  x: Max
+                position: [0, 0]
+                size: [5, 5]
               details_pane:
                 background: bg_base
                 relative:
                   width: Max
                   y: Max
-                size: [0, 66]
+                size: [0, 60]
                 children:
                   scrollbar:
                     from: scrollbar
@@ -1023,6 +1039,7 @@ themes:
                           height: Custom
               list:
                 size: [0, -68]
+                position: [0, 6]
                 relative:
                   width: Max
                   height: Max
@@ -1043,6 +1060,8 @@ themes:
                         from: button
                         size: [12, 12]
                         foreground: "#icon#"
+                        custom:
+                          tooltip: "#name#"
           effects:
             background: bg_rounded
             border: [2, 2, 2, 2]
@@ -1072,6 +1091,16 @@ themes:
                     border: [1, 1, 1, 1]
                     size: [48, 35]
           details:
+            children:
+              export:
+                from: button
+                foreground: export
+                relative:
+                  x: Max
+                size: [7, 7]
+                position: [0, 41]
+                custom:
+                  tooltip: "Export"
             background: bg_rounded
             border: [2, 2, 2, 2]
             relative:
@@ -1151,15 +1180,6 @@ themes:
               x: Max
             size: [20, 6]
             position: [-4, 10]
-          export:
-            from: button
-            text: "Export"
-            text_params:
-              scale: 7.0
-            relative:
-              x: Max
-            size: [20, 5]
-            position: [-4, 2]
       race_pane:
         size: [40, 40]
         background: bg_base

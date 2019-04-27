@@ -57,7 +57,6 @@ impl InputAction {
             _ => debug!("Received action {:?}", action),
         }
 
-        Widget::remove_mouse_over(&root);
         use crate::io::InputAction::*;
         match action {
             MouseMove(x, y) => Cursor::move_to(root, x, y),

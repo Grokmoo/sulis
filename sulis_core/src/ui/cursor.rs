@@ -110,6 +110,8 @@ impl Cursor {
             return;
         }
 
+        // mouse move event below should recreate mouse over as needed
+        Widget::remove_mouse_over(&root);
         trace!("Cursor move by {}, {}", x, y);
 
         let event = Event::new(event::Kind::MouseMove {

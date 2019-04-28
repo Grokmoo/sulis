@@ -78,6 +78,10 @@ logging:
     # trace logging the most and error logging the least.
     log_level: info
 
+    # See log_level above.  Messages at this level or higher get sent
+    # to stderr.  You can also specify none to print no error messages to stderr.
+    stderr_log_level: warn
+
     # If set to true, log files are generated with a timestamp,
     # Meaning each run of the game will generate a unique log filename.
     # If false, each run will simply use the same main.log file.

@@ -214,6 +214,7 @@ pub struct EditorAreaConfig {
 #[serde(deny_unknown_fields)]
 pub struct LoggingConfig {
     pub log_level: String,
+    pub stderr_log_level: String,
     pub use_timestamps: bool,
     pub append: bool,
 }

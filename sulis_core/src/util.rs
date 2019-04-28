@@ -391,11 +391,25 @@ pub fn setup_logger() {
 
     let log_config = Config::logging_config();
 
+    let dup = match log_config.stderr_log_level.as_ref() {
+        "error" => Duplicate::Error,
+        "warn" => Duplicate::Warn,
+        "info" => Duplicate::Info,
+        "debug" => Duplicate::Debug,
+        "trace" => Duplicate::Trace,
+        "none" => Duplicate::None,
+        other => {
+            eprintln!("Invalid stderr_log_level: {}", other);
+            eprintln!("Valid levels are: 'error', 'warn', 'info', 'debug', 'trace', and 'none'");
+            std::process::exit(1);
+        }
+    };
+
     let mut logger = Logger::with_str(&log_config.log_level)
         .log_to_file()
         .print_message()
         .directory(log_dir)
-        .duplicate_to_stderr(Duplicate::Warn)
+        .duplicate_to_stderr(dup)
         .format(opt_format);
 
     if log_config.append {

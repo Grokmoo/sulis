@@ -36,7 +36,6 @@ pub struct InputField {
     carat_offset: f32,
     enter_callback: Option<Callback>,
     key_press_callback: Option<Rc<Fn(&Rc<RefCell<Widget>>, &mut InputField, InputAction)>>,
-    initializing: bool,
     ignore_next: bool, // hack to prevent console from receiving a character
 }
 
@@ -51,7 +50,6 @@ impl InputField {
             carat_offset: 0.0,
             enter_callback: None,
             key_press_callback: None,
-            initializing: true,
             ignore_next: false,
         }))
     }
@@ -101,14 +99,6 @@ impl WidgetKind for InputField {
 
     fn wants_keyboard_focus(&self) -> bool {
         true
-    }
-
-    fn update(&mut self, widget: &Rc<RefCell<Widget>>, _millis: u32) {
-        if self.initializing {
-            if Widget::grab_keyboard_focus(&widget) {
-                self.initializing = false;
-            }
-        }
     }
 
     fn layout(&mut self, widget: &mut Widget) {

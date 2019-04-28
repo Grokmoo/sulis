@@ -653,6 +653,8 @@ impl Widget {
         if has_keyboard_child {
             let child = Rc::clone(widget.borrow().keyboard_focus_child.as_ref().unwrap());
             let child_kind = Rc::clone(&child.borrow().kind);
+
+            trace!("Dispatch to keyboard focus child: {}", child.borrow().theme_id);
             match event.kind {
                 event::Kind::CharTyped(c) => {
                     return child_kind.borrow_mut().on_char_typed(&child, c);
@@ -672,8 +674,8 @@ impl Widget {
 
         let has_modal = widget.borrow().modal_child.is_some();
         if has_modal {
-            trace!("Dispatching to modal child.");
             let child = Rc::clone(widget.borrow().modal_child.as_ref().unwrap());
+            trace!("Dispatching to modal child: {}", child.borrow().theme_id);
             return Widget::dispatch_event(&child, event);
         }
 
@@ -701,6 +703,7 @@ impl Widget {
                 }
 
                 if !event_eaten && Widget::dispatch_event(&child, event) {
+                    trace!("Event dispatch eaten by child.");
                     event_eaten = true;
                 }
             } else if child.borrow().state.mouse_is_inside {
@@ -723,6 +726,7 @@ impl Widget {
             return true;
         }
 
+        trace!("Dispatch to direct widget kind.");
         match event.kind {
             MousePress(kind) => widget_kind.borrow_mut().on_mouse_press(widget, kind),
             MouseRelease(kind) => widget_kind.borrow_mut().on_mouse_release(widget, kind),

@@ -489,6 +489,7 @@ impl WidgetKind for RootView {
     }
 
     fn on_key_press(&mut self, widget: &Rc<RefCell<Widget>>, key: InputAction) -> bool {
+        trace!("Key press: {:?} in root view.", key);
         use sulis_core::io::InputAction::*;
         match key {
             ShowMenu => self.show_menu(widget),

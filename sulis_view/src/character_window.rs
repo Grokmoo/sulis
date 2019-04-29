@@ -407,14 +407,15 @@ fn add_if_nonzero(state: &mut WidgetState, index: usize, name: &str, value: f32)
 pub fn create_details_text_box(pc: &ActorState, is_pc: bool) -> Rc<RefCell<Widget>> {
     let details = Widget::with_theme(TextArea::empty(), "details");
     {
-        let export = Widget::with_theme(Button::empty(), "export");
-        export.borrow_mut().state.set_visible(is_pc);
-        export.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let player = GameState::player();
-            widget.borrow_mut().state.set_enabled(false);
-            export_character(&player.borrow().actor);
-        })));
-        Widget::add_child_to(&details, export);
+        if is_pc {
+            let export = Widget::with_theme(Button::empty(), "export");
+            export.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
+                let player = GameState::player();
+                widget.borrow_mut().state.set_enabled(false);
+                export_character(&player.borrow().actor);
+            })));
+            Widget::add_child_to(&details, export);
+        }
 
         let rules = Module::rules();
         let state = &mut details.borrow_mut().state;

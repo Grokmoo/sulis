@@ -791,6 +791,10 @@ impl Module {
         MODULE.with(|r| all_resources(&r.borrow().encounters))
     }
 
+    pub fn all_features() -> Vec<Rc<Feature>> {
+        MODULE.with(|r| all_resources(&r.borrow().features))
+    }
+
     pub fn all_props() -> Vec<Rc<Prop>> {
         MODULE.with(|r| all_resources(&r.borrow().props))
     }

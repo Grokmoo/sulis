@@ -32,6 +32,9 @@ use crate::elev_picker::ElevPicker;
 mod encounter_picker;
 use crate::encounter_picker::EncounterPicker;
 
+mod feature_picker;
+use crate::feature_picker::FeaturePicker;
+
 mod load_window;
 use crate::load_window::LoadWindow;
 
@@ -277,6 +280,7 @@ impl WidgetKind for EditorView {
         let tile_picker_kind = TilePicker::new();
         let terrain_picker_kind = TerrainPicker::new();
         let wall_picker_kind = WallPicker::new();
+        let feature_picker_kind = FeaturePicker::new();
         let actor_picker_kind = ActorPicker::new();
         let prop_picker_kind = PropPicker::new();
         let elev_picker_kind = ElevPicker::new();
@@ -289,6 +293,7 @@ impl WidgetKind for EditorView {
         pickers.push(Widget::with_defaults(tile_picker_kind.clone()));
         pickers.push(Widget::with_defaults(terrain_picker_kind.clone()));
         pickers.push(Widget::with_defaults(wall_picker_kind.clone()));
+        pickers.push(Widget::with_defaults(feature_picker_kind.clone()));
         pickers.push(Widget::with_defaults(actor_picker_kind.clone()));
         pickers.push(Widget::with_defaults(prop_picker_kind.clone()));
         pickers.push(Widget::with_defaults(elev_picker_kind.clone()));
@@ -304,6 +309,7 @@ impl WidgetKind for EditorView {
             tile_picker_kind,
             terrain_picker_kind,
             wall_picker_kind,
+            feature_picker_kind,
             actor_picker_kind,
             prop_picker_kind,
             elev_picker_kind,
@@ -317,6 +323,7 @@ impl WidgetKind for EditorView {
             "Tiles",
             "Terrain",
             "Walls",
+            "Features",
             "Actors",
             "Props",
             "Elevation",

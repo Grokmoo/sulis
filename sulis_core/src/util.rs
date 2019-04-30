@@ -85,7 +85,18 @@ impl ReproducibleRandom {
         self.gen.gen_range(min, max)
     }
 
+    pub fn shuffle<T>(&mut self, values: &mut [T]) {
+        values.shuffle(&mut self.gen);
+    }
+
     pub fn seed(&self) -> u128 { self.seed }
+}
+
+impl std::fmt::Debug for ReproducibleRandom {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        let state = serde_json::to_string(&self.gen).map_err(|_| std::fmt::Error)?;
+        write!(f, "Random: {}", state)
+    }
 }
 
 pub fn shuffle<T>(values: &mut [T]) {

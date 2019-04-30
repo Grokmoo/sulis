@@ -407,18 +407,22 @@ impl ActionKind for TransitionAction {
         };
         match self.to {
             ToKind::Area { ref id, x, y } => {
-                GameState::transition(&Some(id.to_string()), x, y, time);
+                GameState::transition_to(Some(id), Some(Point::new(x, y)), Point::default(), time);
                 let root = Widget::get_root(widget);
                 root.borrow_mut().invalidate_children();
             }
             ToKind::CurArea { x, y } => {
-                GameState::transition(&None, x, y, time);
+                GameState::transition_to(None, Some(Point::new(x, y)), Point::default(), time);
             }
             ToKind::WorldMap => {
                 let (root, view) = Widget::parent_mut::<RootView>(widget);
                 view.set_map_window(&root, true, true);
             },
-            ToKind::FindLink {.. } => unreachable!(),
+            ToKind::FindLink { ref id, x_offset, y_offset } => {
+                GameState::transition_to(Some(id), None, Point::new(x_offset, y_offset), time);
+                let root = Widget::get_root(widget);
+                root.borrow_mut().invalidate_children();
+            },
         }
     }
 }

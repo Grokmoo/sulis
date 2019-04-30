@@ -60,7 +60,7 @@ impl AreaGenerator {
     pub fn generate_transitions(&self, width: i32, height: i32, rand: &mut ReproducibleRandom,
                                 params: &GeneratorParams) -> Result<Vec<TransitionOutput>, Error> {
 
-        info!("Generating transitions");
+        info!("Generating transitions with rand {:?}", rand);
         let mut gen = TransitionGen::new(width, height, &self.transition_params);
         gen.generate(rand, &params.transitions)
     }
@@ -69,9 +69,12 @@ impl AreaGenerator {
                     params: &GeneratorParams,
                     transitions: &[TransitionBuilder],
                     tiles_to_add: Vec<(Rc<Tile>, i32, i32)>) -> Result<GeneratorOutput, Error> {
+        info!("Generating area with rand {:?}", rand);
+
         let mut model = GenModel::new(width, height, rand,
                                       self.grid_width as i32, self.grid_height as i32);
 
+        info!("Model gened {:?}", model.rand());
         let (room_width, room_height) = model.region_size();
         let mut maze = Maze::new(room_width, room_height);
 
@@ -79,10 +82,12 @@ impl AreaGenerator {
             let (x, y) = model.to_region_coords(t.from.x, t.from.y);
             Point::new(x, y)
         }).collect();
-        maze.generate(&self.room_params, &open_locs)?;
+        maze.generate(&self.room_params, model.rand_mut(), &open_locs)?;
+        info!("Maze generated {:?}", model.rand());
+
         self.add_walls(&mut model, &maze);
 
-        info!("Generating terrain");
+        info!("Generating terrain {:?}", model.rand());
         let mut gen = TerrainGen::new(&mut model, &self.terrain_params, &maze);
         gen.generate();
 
@@ -97,22 +102,22 @@ impl AreaGenerator {
         }
 
         // pre-gen layers for use in the next step
-        info!("Tile generation complete.  Pre-Gen layers.");
+        info!("Tile generation complete.  Pre-Gen layers {:?}", model.rand());
         let layers = self.create_layers(width, height, &model.model)?;
 
-        info!("Generating features");
+        info!("Generating features {:?}", model.rand());
         let mut gen = FeatureGen::new(&mut model, &layers, &self.feature_params, &maze);
         gen.generate()?;
 
-        info!("Generating props");
+        info!("Generating props {:?}", model.rand());
         let mut gen = PropGen::new(&mut model, &layers, &self.prop_params, &maze);
         let props = gen.generate(&params.props.passes)?;
 
-        info!("Generating encounters");
+        info!("Generating encounters {:?}", model.rand());
         let mut gen = EncounterGen::new(&mut model, &layers, &self.encounter_params, &maze);
         let encounters = gen.generate(&params.encounters.passes)?;
 
-        info!("Final Layer Gen");
+        info!("Final Layer Gen {:?}", model.rand());
         let layers = self.create_layers(width, height, &model.model)?;
 
         Ok(GeneratorOutput {
@@ -156,8 +161,6 @@ impl AreaGenerator {
     }
 
     fn add_walls(&self, model: &mut GenModel, maze: &Maze) {
-        info!("Generating walls");
-
         // either carve rooms out or put walls in
         if self.room_params.invert {
             for p in model.tiles() {
@@ -170,6 +173,7 @@ impl AreaGenerator {
             }
         }
 
+        info!("Picked wall type {:?}", model.rand());
         let mut mapped = HashMap::new();
 
         // carve out procedurally generated rooms

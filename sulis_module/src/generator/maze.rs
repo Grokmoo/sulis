@@ -14,11 +14,12 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::collections::{HashMap, HashSet};
 use std::cmp::Ordering;
 use std::io::Error;
 
-use sulis_core::util::{Point, gen_rand, shuffle};
+use indexmap::{IndexMap, IndexSet};
+
+use sulis_core::util::{Point, ReproducibleRandom};
 use crate::generator::{Rect, RoomParams};
 
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
@@ -71,22 +72,25 @@ impl Maze {
         }
     }
 
-    pub(crate) fn generate(&mut self, params: &RoomParams,
+    pub(crate) fn generate(&mut self, params: &RoomParams, rand: &mut ReproducibleRandom,
                            open_locs: &[Point]) -> Result<(), Error> {
-        self.generate_rooms(params, open_locs);
-        info!("Generated {} total rooms", self.rooms.len());
+        self.generate_rooms(params, open_locs, rand);
+        info!("Generated {} total rooms {:?}", self.rooms.len(), rand);
 
         if params.gen_corridors {
-            self.generate_corridors(params);
+            self.generate_corridors(params, rand);
+            info!("  Gened corridors {:?}", rand);
 
-            self.connect_regions(params);
+            self.connect_regions(params, rand);
+            info!("  Connected regions {:?}", rand);
 
-            self.remove_dead_ends(params);
+            self.remove_dead_ends(params, rand);
+            info!("  Removed dead ends {:?}", rand);
         }
         Ok(())
     }
 
-    fn remove_dead_ends(&mut self, params: &RoomParams) {
+    fn remove_dead_ends(&mut self, params: &RoomParams, rand: &mut ReproducibleRandom) {
         let mut did_work = true;
         while did_work {
             did_work = false;
@@ -106,7 +110,7 @@ impl Maze {
 
                     if exits > 1 { continue; }
 
-                    if gen_rand(1, 101) < params.dead_end_keep_chance { continue; }
+                    if rand.gen(1, 101) < params.dead_end_keep_chance { continue; }
 
                     self.set_tile(x, y, TileKind::Wall);
 
@@ -116,13 +120,13 @@ impl Maze {
         }
     }
 
-    fn connect_regions(&mut self, params: &RoomParams) {
-        let mut connector_regions = HashMap::new();
+    fn connect_regions(&mut self, params: &RoomParams, rand: &mut ReproducibleRandom) {
+        let mut connector_regions = IndexMap::new();
         for y in 0..self.height {
             for x in 0..self.width {
                 if self.tile(x, y) != TileKind::Wall { continue; }
 
-                let mut regions = HashSet::new();
+                let mut regions = IndexSet::new();
                 for dir in DIRECTIONS.iter() {
                     let p = dir.add(Point::new(x, y), 1);
                     if p.x < 0 || p.y < 0 || p.x >= self.width || p.y >= self.height {
@@ -143,11 +147,11 @@ impl Maze {
         }
 
         let mut connectors: Vec<Point> = connector_regions.keys().map(|k| k.clone()).collect();
-        shuffle(&mut connectors);
+        rand.shuffle(&mut connectors);
         info!("Found connectors: {}", connectors.len());
 
         let mut merged = vec![0; self.cur_region as usize];
-        let mut open_regions = HashSet::new();
+        let mut open_regions = IndexSet::new();
         for i in 0..self.cur_region {
             open_regions.insert(i);
             merged[i] = i;
@@ -175,12 +179,12 @@ impl Maze {
                 if (connector.x - conn.x) * (connector.x - conn.x) +
                     (connector.y - conn.y) * (connector.y - conn.y) < 4 { return false; }
 
-                let regions: HashSet<_> = connector_regions[conn].iter().
+                let regions: IndexSet<_> = connector_regions[conn].iter().
                     map(|region| merged[*region]).collect();
                 if regions.len() > 1 { return true; }
 
                 // randomly add some additional connectors
-                if gen_rand(1, 101) < params.extra_connection_chance {
+                if rand.gen(1, 101) < params.extra_connection_chance {
                     self.set_tile(conn.x, conn.y, TileKind::DoorWay);
                 }
 
@@ -189,17 +193,18 @@ impl Maze {
         }
     }
 
-    fn generate_rooms(&mut self, params: &RoomParams, open_locs: &[Point]) {
+    fn generate_rooms(&mut self, params: &RoomParams, open_locs: &[Point],
+                      rand: &mut ReproducibleRandom) {
         if !params.invert {
             for loc in open_locs {
-                let room = Room::center_on(self.width, self.height, params, *loc);
+                let room = Room::center_on(self.width, self.height, params, *loc, rand);
                 self.add_room(room, true);
             }
         }
 
         debug!("Generating rooms with {} attempts", params.room_placement_attempts);
         for _ in 0..params.room_placement_attempts {
-            let room = Room::gen(self.width, self.height, params);
+            let room = Room::gen(self.width, self.height, params, rand);
             let mut overlaps = false;
             for other in &self.rooms {
                 if room.overlaps(other, params.min_spacing as i32) {
@@ -223,18 +228,18 @@ impl Maze {
         }
     }
 
-    fn generate_corridors(&mut self, params: &RoomParams) {
+    fn generate_corridors(&mut self, params: &RoomParams, rand: &mut ReproducibleRandom) {
         for y in (1..self.height - 1).step_by(2) {
             for x in (1..self.width - 1).step_by(2) {
                 if self.tile(x, y) != TileKind::Wall { continue; }
 
-                self.grow_maze(x, y, params);
+                self.grow_maze(x, y, params, rand);
                 self.cur_region += 1;
             }
         }
     }
 
-    fn grow_maze(&mut self, x: i32, y: i32, params: &RoomParams) {
+    fn grow_maze(&mut self, x: i32, y: i32, params: &RoomParams, rand: &mut ReproducibleRandom) {
         self.set_tile(x, y, TileKind::Corridor(self.cur_region));
 
         let mut last_dir = Direction::None;
@@ -269,10 +274,10 @@ impl Maze {
                 cells.pop();
                 last_dir = Direction::None;
             } else {
-                let dir = if unmade_cells.len() == 1 || gen_rand(1, 101) >= params.winding_chance {
+                let dir = if unmade_cells.len() == 1 || rand.gen(1, 101) >= params.winding_chance {
                     unmade_cells[0]
                 } else {
-                    unmade_cells[gen_rand(0, unmade_cells.len())]
+                    unmade_cells[rand.gen(0, unmade_cells.len())]
                 };
 
                 let new_cell = dir.add(*cell, 1);
@@ -360,12 +365,13 @@ impl Rect for Room{
 }
 
 impl Room {
-    fn gen(area_width: i32, area_height: i32, params: &RoomParams) -> Room {
+    fn gen(area_width: i32, area_height: i32, params: &RoomParams,
+           rand: &mut ReproducibleRandom) -> Room {
         // align rooms with odd tiles
-        let width = (gen_rand(params.min_size.x, params.max_size.x + 1) / 2) * 2 + 1;
-        let height = (gen_rand(params.min_size.y, params.max_size.y + 1) / 2) * 2 + 1;
-        let x = (gen_rand(0, area_width - width) / 2) * 2 + 1;
-        let y = (gen_rand(0, area_height - height) / 2) * 2 + 1;
+        let width = (rand.gen(params.min_size.x, params.max_size.x + 1) / 2) * 2 + 1;
+        let height = (rand.gen(params.min_size.y, params.max_size.y + 1) / 2) * 2 + 1;
+        let x = (rand.gen(0, area_width - width) / 2) * 2 + 1;
+        let y = (rand.gen(0, area_height - height) / 2) * 2 + 1;
 
         Room {
             x,
@@ -375,8 +381,9 @@ impl Room {
         }
     }
 
-    fn center_on(area_width: i32, area_height: i32, params: &RoomParams, loc: Point) -> Room {
-        let mut room = Room::gen(area_width, area_height, params);
+    fn center_on(area_width: i32, area_height: i32, params: &RoomParams,
+                 loc: Point, rand: &mut ReproducibleRandom) -> Room {
+        let mut room = Room::gen(area_width, area_height, params, rand);
         room.x = loc.x - room.width / 2;
         room.y = loc.y - room.height / 2;
 

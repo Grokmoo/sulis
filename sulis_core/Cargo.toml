@@ -13,7 +13,7 @@ glium = "0.24"
 lazy_static = "1.0"
 log = "0.4"
 rand = "0.6"
-rand_pcg = "0.1"
+rand_pcg = { version = "0.1", features = [ "serde1" ] }
 serde = "1.0"
 serde_derive = "1.0"
 serde_yaml = "0.8"

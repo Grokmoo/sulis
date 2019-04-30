@@ -185,6 +185,10 @@ impl GenModel {
     fn tiles(&self) -> TileIter {
         TileIter::new(self)
     }
+
+    pub fn rand(&self) -> &ReproducibleRandom { &self.rand }
+
+    pub fn rand_mut(&mut self) -> &mut ReproducibleRandom { &mut self.rand }
 }
 
 pub struct TileIter {

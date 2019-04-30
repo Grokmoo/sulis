@@ -22,7 +22,7 @@ use sulis_core::resource::ResourceSet;
 use sulis_core::util::{self, ReproducibleRandom, unable_to_create_error};
 use sulis_module::Module;
 use sulis_module::area::{Area, LayerSet, Tile, PathFinderGrid, PropData,
-    EncounterData, ToKind, Transition, TransitionBuilder, create_prop};
+    EncounterData, Transition, TransitionBuilder, create_prop};
 use sulis_module::generator::AreaGenerator;
 
 pub struct GeneratedArea {
@@ -134,16 +134,6 @@ impl GeneratedArea {
         }
 
         info!("{} total transitions created", transitions.len());
-
-        // TODO link transitions
-        for ref mut transition in transitions.iter_mut() {
-            match transition.to {
-                ToKind::FindLink { ref id, x_offset, y_offset } => {
-                    transition.to = ToKind::Area { id: id.clone(), x: x_offset, y: y_offset };
-                },
-                _ => (),
-            }
-        }
 
         let (width, height) = (area.width, area.height);
 

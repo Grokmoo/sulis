@@ -946,17 +946,10 @@ impl UserData for ScriptInterface {
         methods.add_method(
             "transition_party_to",
             |_, _, (x, y, area): (i32, i32, Option<String>)| {
-                GameState::transition(
-                    &area,
-                    x,
-                    y,
-                    Time {
-                        day: 0,
-                        hour: 0,
-                        round: 0,
-                        millis: 0,
-                    },
-                );
+                let id = area.as_ref().map(|s| &**s);
+                let p = Some(Point::new(x, y));
+                let time = Time { day: 0, hour: 0, round: 0, millis: 0 };
+                GameState::transition_to(id, p, Point::default(), time);
                 Ok(())
             },
         );

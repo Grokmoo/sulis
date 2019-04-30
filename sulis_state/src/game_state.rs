@@ -25,7 +25,7 @@ use sulis_core::io::GraphicsRenderer;
 use sulis_core::util::{self, invalid_data_error, ExtInt, Point};
 use sulis_module::on_trigger::QuestEntryState;
 use sulis_module::{
-    area::{Trigger, TriggerKind},
+    area::{Trigger, TriggerKind, ToKind},
     Actor, Module, ObjectSize, OnTrigger, Time,
 };
 
@@ -751,51 +751,109 @@ impl GameState {
         })
     }
 
-    pub fn transition(area_id: &Option<String>, x: i32, y: i32, travel_time: Time) {
-        let p = Point::new(x, y);
-        info!("Area transition to {:?} at {},{}", area_id, x, y);
-
-        if let &Some(ref area_id) = area_id {
-            // check if area state has already been loaded
-            let area_state = GameState::get_area_state(area_id);
-            let area_state = match area_state {
-                Some(area_state) => area_state,
-                None => match GameState::setup_area_state(area_id) {
-                    // area state has not already been loaded, try to load it
-                    Ok(area_state) => {
-                        STATE.with(|state| {
-                            let mut state = state.borrow_mut();
-                            let state = state.as_mut().unwrap();
-                            state
-                                .areas
-                                .insert(area_id.to_string(), Rc::clone(&area_state));
-                        });
-
-                        area_state
-                    }
-                    Err(e) => {
-                        error!("Unable to transition to '{}'", &area_id);
-                        error!("{}", e);
-                        return;
+    fn find_link(state: &AreaState, from: &str) -> Option<Point> {
+        for transition in state.area.transitions.iter() {
+            match transition.to {
+                ToKind::Area { ref id, .. } | ToKind::FindLink { ref id, .. } => {
+                    if id == from {
+                        return Some(transition.from);
                     }
                 },
-            };
-
-            if !GameState::check_location(&p, &area_state) {
-                return;
+                _ => (),
             }
+        }
 
-            STATE.with(|state| {
-                let path_finder = PathFinder::new(&area_state.borrow().area.area);
-                state.borrow_mut().as_mut().unwrap().path_finder = path_finder;
-                state.borrow_mut().as_mut().unwrap().area_state = area_state;
-            });
-        } else {
-            if !GameState::check_location(&p, &GameState::area_state()) {
+        None
+    }
+
+    fn preload_area(area_id: &str) -> Result<(), Error> {
+        if let Some(_) = GameState::get_area_state(area_id) { return Ok(()); }
+
+        let area_state = GameState::setup_area_state(area_id)?;
+
+        STATE.with(|state| {
+            let mut state = state.borrow_mut();
+            let state = state.as_mut().unwrap();
+            state.areas.insert(area_id.to_string(), area_state);
+        });
+
+        Ok(())
+    }
+
+
+    pub fn transition_to(area_id: Option<&str>,
+                         p: Option<Point>,
+                         offset: Point,
+                         travel_time: Time) {
+        info!("Area transition to {:?} at {:?}", area_id, p);
+
+        // perform area preload if area is not already loaded
+        if let Some(id) = area_id {
+            if let Err(e) = GameState::preload_area(id) {
+                error!("Error loading {} for transition", id);
+                error!("{}", e);
                 return;
             }
         }
 
+        let (area, location) = match area_id {
+            None => {
+                // intra-area transition
+                if let None = p {
+                    error!("No point specified for intra area transition");
+                    return;
+                }
+
+                (GameState::area_state(), p.unwrap())
+            },
+            Some(id) => {
+                // transition to another area
+                let state = GameState::get_area_state(id).unwrap();
+
+                if Rc::ptr_eq(&state, &GameState::area_state()) {
+                    error!("Area transition to already loaded area, but not intra area: {}",
+                            state.borrow().area.area.id);
+                    return;
+                }
+
+                // use location if specified, otherwise find appropriate link
+                let location = match p {
+                    Some(p) => p,
+                    None => {
+                        let old = GameState::area_state();
+                        let old = old.borrow();
+                        match GameState::find_link(&state.borrow(), &old.area.area.id) {
+                            None => {
+                                error!("Error finding linked coordinates for transition {}", id);
+                                return;
+                            }, Some(loc) => loc,
+                        }
+                    }
+                };
+                (state, location)
+            }
+        };
+
+        if !GameState::check_location(&location, &area) {
+            error!("Invalid transition location to {:?} in {}",
+                   location, area.borrow().area.area.id);
+            return;
+        }
+
+        // now set the new area as the current area if it is not already
+        if !Rc::ptr_eq(&GameState::area_state(), &area) {
+            STATE.with(|state| {
+                let mut state = state.borrow_mut();
+                let state = state.as_mut().unwrap();
+                let path_finder = PathFinder::new(&area.borrow().area.area);
+                state.path_finder = path_finder;
+                state.area_state = area;
+            });
+        }
+
+        let (x, y) = (location.x + offset.x, location.y + offset.y);
+
+        // clean up animations and surfaces
         GameState::set_clear_anims();
 
         STATE.with(|state| {
@@ -821,6 +879,7 @@ impl GameState {
         let mgr = GameState::turn_manager();
         mgr.borrow_mut().add_time(travel_time);
 
+        // find transition locations for all party members
         let area_state = GameState::area_state();
         let base_location = Location::new(x, y, &area_state.borrow().area.area);
         for entity in GameState::party() {

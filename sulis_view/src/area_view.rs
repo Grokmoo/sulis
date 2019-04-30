@@ -217,7 +217,7 @@ impl AreaView {
         let (max_tile_x, max_tile_y) =
             AreaView::get_texture_cache_max(area_state.area.width, area_state.area.height);
 
-        let vis_dist = area_state.area.vis_dist;
+        let vis_dist = area_state.area.area.vis_dist;
         for pc in GameState::party() {
             let c_x = pc.borrow().location.x + pc.borrow().size.width / 2;
             let c_y = pc.borrow().location.y + pc.borrow().size.height / 2;
@@ -813,7 +813,7 @@ impl WidgetKind for AreaView {
         }
 
         if self.cache_invalid {
-            info!("Caching area '{}' layers to texture", state.area.id);
+            info!("Caching area '{}' layers to texture", state.area.area.id);
 
             let texture_ids = vec![
                 VISIBILITY_TEX_ID,
@@ -858,8 +858,8 @@ impl WidgetKind for AreaView {
                 trace!("Full area visibility draw from 0,0 to {},{}", max_x, max_y);
                 self.draw_vis_to_texture(
                     renderer,
-                    &state.area.visibility_tile,
-                    &state.area.explored_tile,
+                    &state.area.area.visibility_tile,
+                    &state.area.area.explored_tile,
                     &state,
                     0,
                     0,
@@ -871,8 +871,8 @@ impl WidgetKind for AreaView {
                 trace!("Redrawing PC visibility to texture");
                 self.draw_visibility_to_texture(
                     renderer,
-                    &state.area.visibility_tile,
-                    &state.area.explored_tile,
+                    &state.area.area.visibility_tile,
+                    &state.area.area.explored_tile,
                     &state,
                     delta_x,
                     delta_y,
@@ -886,7 +886,7 @@ impl WidgetKind for AreaView {
         let rules = Module::rules();
         let mgr = GameState::turn_manager();
         let time = mgr.borrow().current_time();
-        let area_color = rules.get_area_color(state.area.location_kind, time);
+        let area_color = rules.get_area_color(state.area.area.location_kind, time);
 
         self.draw_layer(
             renderer,

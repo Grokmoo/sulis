@@ -623,7 +623,7 @@ impl UserData for ScriptInterface {
                     return Ok(ScriptEntity::invalid());
                 }
 
-                let location = Location::new(x, y, &area_state.borrow().area);
+                let location = Location::new(x, y, &area_state.borrow().area.area);
                 let result = match area_state
                     .borrow_mut()
                     .add_actor(actor, location, None, false, None)

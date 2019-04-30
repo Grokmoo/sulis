@@ -25,8 +25,8 @@ use crate::save_state::AreaSaveState;
 use crate::script::AreaTargeter;
 use crate::*;
 use sulis_core::config::Config;
-use sulis_core::util::{self, gen_rand, invalid_data_error, Point};
-use sulis_module::area::{EncounterData, PropData, Transition, TriggerKind};
+use sulis_core::util::{self, gen_rand, invalid_data_error, Point, Size};
+use sulis_module::area::{PropData, Transition, TriggerKind};
 use sulis_module::{
     prop, Actor, Area, DamageKind, HitFlags, HitKind, LootList, Module, ObjectSize, Prop, Time,
 };
@@ -46,7 +46,8 @@ pub enum PCVisRedraw {
 impl PCVisRedraw {}
 
 pub struct AreaState {
-    pub area: Rc<Area>,
+    pub area: GeneratedArea,
+    pub area_gen_seed: u128,
 
     // Members that need to be saved
     pub(crate) pc_explored: Vec<bool>,
@@ -77,13 +78,26 @@ pub struct AreaState {
 
 impl PartialEq for AreaState {
     fn eq(&self, other: &AreaState) -> bool {
-        self.area == other.area
+        Rc::ptr_eq(&self.area.area, &other.area.area)
     }
 }
 
+fn gen_area(area: Rc<Area>, seed: Option<u128>) -> Result<(GeneratedArea, u128), Error> {
+    let pregen_output = PregenOutput::new(&area, seed)?;
+    let seed = match &pregen_output {
+        None => 0,
+        Some(out) => out.seed(),
+    };
+
+    let area = GeneratedArea::new(area, pregen_output)?;
+    Ok((area, seed))
+}
+
 impl AreaState {
-    pub fn new(area: Rc<Area>) -> AreaState {
-        let dim = (area.width * area.height) as usize;
+    pub fn new(area: Rc<Area>, seed: Option<u128>) -> Result<AreaState, Error> {
+        let (gened, area_gen_seed) = gen_area(Rc::clone(&area), seed)?;
+
+        let dim = (gened.area.width * gened.area.height) as usize;
         let entity_grid = vec![Vec::new(); dim];
         let surface_grid = vec![Vec::new(); dim];
         let transition_grid = vec![None; dim];
@@ -92,9 +106,10 @@ impl AreaState {
         let pc_vis = vec![false; dim];
         let pc_explored = vec![false; dim];
 
-        info!("Initializing area state for '{}'", area.name);
-        AreaState {
-            area,
+        info!("Initializing area state for '{}'", gened.area.name);
+        Ok(AreaState {
+            area: gened,
+            area_gen_seed,
             props: Vec::new(),
             entities: Vec::new(),
             surfaces: Vec::new(),
@@ -114,7 +129,7 @@ impl AreaState {
             targeter: None,
             merchants: Vec::new(),
             on_load_fired: false,
-        }
+        })
     }
 
     pub fn load(id: &str, save: AreaSaveState) -> Result<AreaState, Error> {
@@ -123,7 +138,7 @@ impl AreaState {
             Some(area) => Ok(area),
         }?;
 
-        let mut area_state = AreaState::new(area);
+        let mut area_state = AreaState::new(area, Some(save.seed))?;
 
         area_state.on_load_fired = save.on_load_fired;
 
@@ -146,7 +161,8 @@ impl AreaState {
                 Some(prop) => Ok(prop),
             }?;
 
-            let location = Location::from_point(&prop_save_state.location, &area_state.area);
+            let location = Location::from_point(&prop_save_state.location,
+                                                &area_state.area.area);
 
             let prop_data = PropData {
                 prop,
@@ -166,7 +182,7 @@ impl AreaState {
         }
 
         for (index, trigger_save) in save.triggers.into_iter().enumerate() {
-            if index >= area_state.area.triggers.len() {
+            if index >= area_state.area.area.triggers.len() {
                 return invalid_data_error(&format!("Too many triggers defined in save"));
             }
 
@@ -242,13 +258,13 @@ impl AreaState {
 
     /// Adds entities defined in the area definition to this area state
     pub fn populate(&mut self) {
-        let area = Rc::clone(&self.area);
+        let area = Rc::clone(&self.area.area);
         for actor_data in area.actors.iter() {
             let actor = match Module::actor(&actor_data.id) {
                 None => {
                     warn!(
                         "No actor with id '{}' found when initializing area '{}'",
-                        actor_data.id, self.area.id
+                        actor_data.id, area.id
                     );
                     continue;
                 }
@@ -260,7 +276,7 @@ impl AreaState {
                 Some(ref uid) => uid.to_string(),
             };
 
-            let location = Location::from_point(&actor_data.location, &self.area);
+            let location = Location::from_point(&actor_data.location, &area);
             debug!("Adding actor '{}' at '{:?}'", actor.id, location);
             match self.add_actor(actor, location, Some(unique_id), false, None) {
                 Ok(_) => (),
@@ -270,10 +286,12 @@ impl AreaState {
             }
         }
 
-        for prop_data in area.props.iter() {
+        // regrettably need to clone for ownership here, even though add_prop
+        // does not borrow self.area and so it would be fine without
+        for prop_data in self.area.props.clone() {
             let location = Location::from_point(&prop_data.location, &area);
             debug!("Adding prop '{}' at '{:?}'", prop_data.prop.id, location);
-            match self.add_prop(prop_data, location, false) {
+            match self.add_prop(&prop_data, location, false) {
                 Err(e) => {
                     warn!("Unable to add prop at {:?}", &prop_data.location);
                     warn!("{}", e);
@@ -293,13 +311,13 @@ impl AreaState {
 
         self.add_transitions_from_area();
 
-        for (enc_index, enc_data) in area.encounters.iter().enumerate() {
-            let encounter = &enc_data.encounter;
-            if !encounter.auto_spawn {
-                continue;
-            }
+        let mut auto_spawn = Vec::with_capacity(self.area.encounters.len());
+        for encounter in &self.area.encounters {
+            auto_spawn.push(encounter.encounter.auto_spawn);
+        }
 
-            self.spawn_encounter(enc_index, enc_data, true);
+        for (index, spawn) in auto_spawn.into_iter().enumerate() {
+            if spawn { self.spawn_encounter(index, true); }
         }
     }
 
@@ -368,7 +386,7 @@ impl AreaState {
     }
 
     fn add_trigger(&mut self, index: usize, trigger_state: TriggerState) {
-        let trigger = &self.area.triggers[index];
+        let trigger = &self.area.area.triggers[index];
         self.triggers.push(trigger_state);
 
         let (location, size) = match trigger.kind {
@@ -393,7 +411,7 @@ impl AreaState {
 
         let player = GameState::player();
         for trigger_index in self.area.encounters[index].triggers.iter() {
-            let trigger = &self.area.triggers[*trigger_index];
+            let trigger = &self.area.area.triggers[*trigger_index];
             if self.triggers[*trigger_index].fired {
                 continue;
             }
@@ -414,7 +432,7 @@ impl AreaState {
 
         let player = GameState::player();
         for trigger_index in self.area.encounters[index].triggers.iter() {
-            let trigger = &self.area.triggers[*trigger_index];
+            let trigger = &self.area.area.triggers[*trigger_index];
             self.triggers[*trigger_index].fired = true;
 
             match trigger.kind {
@@ -428,40 +446,42 @@ impl AreaState {
     }
 
     pub fn spawn_encounter_at(&mut self, x: i32, y: i32) -> bool {
-        let area = Rc::clone(&self.area);
+        let mut enc_index = None;
+        for (index, data) in self.area.encounters.iter().enumerate() {
+            if data.location.x != x || data.location.y != y { continue; }
 
-        for (enc_index, enc_data) in area.encounters.iter().enumerate() {
-            if enc_data.location.x != x || enc_data.location.y != y {
-                continue;
-            }
-
-            // this method is called by script, still spawn in debug mode
-            self.spawn_encounter(enc_index, enc_data, false);
-            return true;
+            enc_index = Some(index);
+            break;
         }
 
-        false
+        if let Some(index) = enc_index {
+            // this method is called by script, still spawn in debug mode
+            self.spawn_encounter(index, false);
+            true
+        } else {
+            false
+        }
     }
 
-    pub fn spawn_encounter(
-        &mut self,
-        enc_index: usize,
-        enc_data: &EncounterData,
-        respect_debug: bool,
-    ) {
-        let mgr = GameState::turn_manager();
-        let ai_group = mgr.borrow_mut().get_next_ai_group(&self.area.id, enc_index);
-        if respect_debug && !Config::debug().encounter_spawning {
-            return;
-        }
-        let encounter = &enc_data.encounter;
-        let actors = encounter.gen_actors();
+    pub fn spawn_encounter(&mut self, enc_index: usize, respect_debug: bool) {
+        let (actors, point, size, ai_group) = {
+            let enc_data = &self.area.encounters[enc_index];
+
+            let mgr = GameState::turn_manager();
+            let ai_group = mgr.borrow_mut().get_next_ai_group(&self.area.area.id, enc_index);
+            if respect_debug && !Config::debug().encounter_spawning {
+                return;
+            }
+            let encounter = &enc_data.encounter;
+            (encounter.gen_actors(), enc_data.location, enc_data.size, ai_group)
+        };
+
         for (actor, unique_id) in actors {
-            let location = match self.gen_location(&actor, &enc_data) {
+            let location = match self.gen_location(&actor, point, size) {
                 None => {
                     warn!(
                         "Unable to generate location for encounter '{}' at {},{}",
-                        encounter.id, enc_data.location.x, enc_data.location.y
+                        enc_index, point.x, point.y
                     );
                     continue;
                 }
@@ -473,15 +493,15 @@ impl AreaState {
                 Err(e) => {
                     warn!(
                         "Error adding actor for spawned encounter: '{}' at {},{}",
-                        e, enc_data.location.x, enc_data.location.y
+                        e, point.x, point.y
                     );
                 }
             }
         }
     }
 
-    fn gen_location(&self, actor: &Rc<Actor>, data: &EncounterData) -> Option<Location> {
-        let available = self.get_available_locations(actor, data);
+    fn gen_location(&self, actor: &Rc<Actor>, loc: Point, size: Size) -> Option<Location> {
+        let available = self.get_available_locations(actor, loc, size);
         if available.is_empty() {
             return None;
         }
@@ -489,27 +509,27 @@ impl AreaState {
         let roll = gen_rand(0, available.len());
 
         let point = available[roll];
-        let location = Location::from_point(&point, &self.area);
+        let location = Location::from_point(&point, &self.area.area);
         Some(location)
     }
 
-    fn get_available_locations(&self, actor: &Rc<Actor>, data: &EncounterData) -> Vec<Point> {
+    fn get_available_locations(&self, actor: &Rc<Actor>, loc: Point, size: Size) -> Vec<Point> {
         let mut locations = Vec::new();
 
-        let min_x = data.location.x;
-        let min_y = data.location.y;
-        let max_x = data.location.x + data.size.width - actor.race.size.width + 1;
-        let max_y = data.location.y + data.size.height - actor.race.size.height + 1;
+        let min_x = loc.x;
+        let min_y = loc.y;
+        let max_x = loc.x + size.width - actor.race.size.width + 1;
+        let max_y = loc.y + size.height - actor.race.size.height + 1;
 
         for y in min_y..max_y {
             for x in min_x..max_x {
-                if !self.area.coords_valid(x, y) {
+                if !self.area.area.coords_valid(x, y) {
                     continue;
                 }
 
                 if !self
                     .area
-                    .get_path_grid(&actor.race.size.id)
+                    .path_grid(&actor.race.size.id)
                     .is_passable(x, y)
                 {
                     continue;
@@ -538,11 +558,11 @@ impl AreaState {
     }
 
     pub fn is_terrain_passable(&self, size: &str, x: i32, y: i32) -> bool {
-        if !self.area.coords_valid(x, y) {
+        if !self.area.area.coords_valid(x, y) {
             return false;
         }
 
-        if !self.area.get_path_grid(size).is_passable(x, y) {
+        if !self.area.path_grid(size).is_passable(x, y) {
             return false;
         }
 
@@ -583,7 +603,7 @@ impl AreaState {
     }
 
     pub fn prop_index_at(&self, x: i32, y: i32) -> Option<usize> {
-        if !self.area.coords_valid(x, y) {
+        if !self.area.area.coords_valid(x, y) {
             return None;
         }
 
@@ -600,7 +620,7 @@ impl AreaState {
         enabled: bool,
         hover_text: Option<String>,
     ) {
-        let location = Location::new(x, y, &self.area);
+        let location = Location::new(x, y, &self.area.area);
         let prop_data = PropData {
             prop: Rc::clone(prop),
             enabled,
@@ -634,7 +654,7 @@ impl AreaState {
             Some(prop) => prop,
         };
 
-        let location = Location::new(x, y, &self.area);
+        let location = Location::new(x, y, &self.area.area);
         let prop_data = PropData {
             prop,
             enabled: true,
@@ -743,7 +763,7 @@ impl AreaState {
     }
 
     pub fn get_entity_at(&self, x: i32, y: i32) -> Option<Rc<RefCell<EntityState>>> {
-        if !self.area.coords_valid(x, y) {
+        if !self.area.area.coords_valid(x, y) {
             return None;
         }
 
@@ -761,7 +781,7 @@ impl AreaState {
     }
 
     pub fn get_transition_at(&self, x: i32, y: i32) -> Option<&Transition> {
-        if !self.area.coords_valid(x, y) {
+        if !self.area.area.coords_valid(x, y) {
             return None;
         }
 
@@ -826,7 +846,7 @@ impl AreaState {
     }
 
     pub fn set_trigger_enabled_at(&mut self, x: i32, y: i32, enabled: bool) -> bool {
-        if !self.area.coords_valid(x, y) {
+        if !self.area.area.coords_valid(x, y) {
             warn!("Invalid coords to enable trigger at {},{}", x, y);
             return false;
         }
@@ -856,7 +876,7 @@ impl AreaState {
 
         self.triggers[index].fired = true;
         GameState::add_ui_callback(
-            self.area.triggers[index].on_activate.clone(),
+            self.area.area.triggers[index].on_activate.clone(),
             entity,
             entity,
         );
@@ -875,7 +895,7 @@ impl AreaState {
     }
 
     fn point_size_passable(&self, x: i32, y: i32) -> bool {
-        if !self.area.coords_valid(x, y) {
+        if !self.area.area.coords_valid(x, y) {
             return false;
         }
 
@@ -890,7 +910,7 @@ impl AreaState {
     }
 
     fn point_entities_passable(&self, entities_to_ignore: &Vec<usize>, x: i32, y: i32) -> bool {
-        if !self.area.coords_valid(x, y) {
+        if !self.area.area.coords_valid(x, y) {
             return false;
         }
 
@@ -917,10 +937,11 @@ impl AreaState {
     ) -> Result<usize, Error> {
         let prop = &prop_data.prop;
 
-        if !self.area.coords_valid(location.x, location.y) {
+        if !self.area.area.coords_valid(location.x, location.y) {
             return invalid_data_error(&format!("Prop location outside area bounds"));
         }
         if !self
+            .area
             .area
             .coords_valid(location.x + prop.size.width, location.y + prop.size.height)
         {
@@ -1055,7 +1076,7 @@ impl AreaState {
 
         let mut entities = HashSet::new();
         for p in points {
-            if !self.area.coords_valid(p.x, p.y) {
+            if !self.area.area.coords_valid(p.x, p.y) {
                 warn!(
                     "Attempted to add surface with invalid coordinate {},{}",
                     p.x, p.y
@@ -1160,7 +1181,7 @@ impl AreaState {
         let x = location.x;
         let y = location.y;
 
-        if !self.area.coords_valid(x, y) {
+        if !self.area.area.coords_valid(x, y) {
             return invalid_data_error(&format!("entity location is out of bounds: {},{}", x, y));
         }
 
@@ -1168,7 +1189,7 @@ impl AreaState {
         if !self.is_passable(&entity.borrow(), &entities_to_ignore, x, y) {
             info!(
                 "Entity location in '{}' is not passable: {},{} for '{}'",
-                &self.area.id,
+                &self.area.area.id,
                 x,
                 y,
                 &entity.borrow().actor.actor.id

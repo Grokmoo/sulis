@@ -104,7 +104,7 @@ impl WidgetKind for WorldMapWindow {
         self.offset = map.offset;
 
         let area_state = GameState::area_state();
-        let cur_location_id = area_state.borrow().area.world_map_location.clone();
+        let cur_location_id = area_state.borrow().area.area.world_map_location.clone();
 
         for location in map.locations.iter() {
             let button = Widget::with_theme(Button::empty(), "location");

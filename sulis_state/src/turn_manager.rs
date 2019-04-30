@@ -544,7 +544,7 @@ impl TurnManager {
 
         for group in groups_to_activate {
             let enc_ref = self.ai_groups.get(&group).unwrap().clone();
-            if enc_ref.area_id == area_state.area.id {
+            if enc_ref.area_id == area_state.area.area.id {
                 area_state.fire_on_encounter_activated(enc_ref.encounter_index, &mover);
             } else {
                 let area_state = GameState::get_area_state(&enc_ref.area_id).unwrap();

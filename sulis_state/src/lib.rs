@@ -58,7 +58,7 @@ mod game_state;
 pub use self::game_state::GameState;
 
 mod generated_area;
-pub use self::generated_area::GeneratedArea;
+pub use self::generated_area::{GeneratedArea, PregenOutput};
 
 mod item_state;
 pub use self::item_state::ItemState;

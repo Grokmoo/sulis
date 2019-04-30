@@ -424,7 +424,7 @@ impl WidgetKind for RootView {
     fn update(&mut self, widget: &Rc<RefCell<Widget>>, millis: u32) {
         let area_state = GameState::area_state();
         let root = Widget::get_root(widget);
-        let area = area_state.borrow().area.id.clone();
+        let area = area_state.borrow().area.area.id.clone();
         if area != self.area {
             self.area = area;
             root.borrow_mut().invalidate_children();
@@ -547,7 +547,7 @@ impl WidgetKind for RootView {
                 .state
                 .add_callback(Callback::new(Rc::new(|_, _| {
                     let area_state = GameState::area_state();
-                    let area = Rc::clone(&area_state.borrow().area);
+                    let area = Rc::clone(&area_state.borrow().area.area);
 
                     let target = GameState::player();
                     match area.on_rest {

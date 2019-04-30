@@ -234,7 +234,7 @@ impl Shape {
 
         if !allow_impass {
             points.retain(|p| {
-                if !area_state.area.coords_valid(p.x, p.y) {
+                if !area_state.area.area.coords_valid(p.x, p.y) {
                     return false;
                 }
 
@@ -249,7 +249,7 @@ impl Shape {
 
         if !allow_invis {
             points.retain(|p| {
-                if !area_state.area.coords_valid(p.x, p.y) {
+                if !area_state.area.area.coords_valid(p.x, p.y) {
                     return false;
                 }
 

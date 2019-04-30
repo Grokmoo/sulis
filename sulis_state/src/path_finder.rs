@@ -88,7 +88,7 @@ impl PathFinder {
             return None;
         }
 
-        let grid = area_state.area.get_path_grid(&requester.size());
+        let grid = area_state.area.path_grid(&requester.size());
         let prop_grid = &area_state.prop_pass_grid;
         let entity_grid = &area_state.entity_grid;
 

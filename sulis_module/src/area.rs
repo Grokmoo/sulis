@@ -36,10 +36,10 @@ use serde::{Deserialize, Deserializer, Serializer};
 
 use sulis_core::image::Image;
 use sulis_core::resource::{ResourceSet, Sprite};
-use sulis_core::util::{self, unable_to_create_error, Point, Size, ReproducibleRandom};
+use sulis_core::util::{unable_to_create_error, Point, Size};
 
 use crate::{Encounter, ItemListEntrySaveState, Module, ObjectSize, OnTrigger, Prop};
-use crate::generator::{AreaGenerator, EncounterParams, EncounterParamsBuilder,
+use crate::generator::{EncounterParams, EncounterParamsBuilder,
     PropParams, PropParamsBuilder};
 
 pub const MAX_AREA_SIZE: i32 = 128;
@@ -101,8 +101,6 @@ pub struct Area {
     pub name: String,
     pub width: i32,
     pub height: i32,
-    pub layer_set: LayerSet,
-    path_grids: HashMap<String, PathFinderGrid>,
     pub visibility_tile: Rc<Sprite>,
     pub explored_tile: Rc<Sprite>,
     pub actors: Vec<ActorData>,
@@ -116,6 +114,7 @@ pub struct Area {
     pub world_map_location: Option<String>,
     pub on_rest: OnRest,
     pub location_kind: LocationKind,
+    pub generator: Option<GeneratorParams>,
     pub builder: AreaBuilder,
 }
 
@@ -126,52 +125,12 @@ impl PartialEq for Area {
 }
 
 impl Area {
-    pub fn new(builder: AreaBuilder,
-               pregen_out: Option<PregenOutput>) -> Result<Area, Error> {
-        let mut generated_encounters = Vec::new();
-        let mut generated_props = Vec::new();
-        let mut layers = Vec::new();
-
-        if let Some(pregen) = pregen_out {
-            let start_time = std::time::Instant::now();
-
-            let output = pregen.generator.generate(builder.width as i32,
-                                                   builder.height as i32,
-                                                   pregen.rand,
-                                                   &pregen.params,
-                                                   pregen.tiles_to_add)?;
-            layers = output.layers;
-            generated_props = output.props;
-            generated_encounters = output.encounters;
-
-            info!("Area generation complete in {} secs",
-                  util::format_elapsed_secs(start_time.elapsed()));
-        }
-
+    pub fn new(mut builder: AreaBuilder) -> Result<Area, Error> {
         let mut props = Vec::new();
-        for prop_builder in builder.props.iter().chain(&generated_props) {
+        for prop_builder in builder.props.iter() {
             let prop_data = create_prop(prop_builder)?;
             props.push(prop_data);
         }
-
-        info!("Creating area '{}'", builder.id);
-        let layer_set = LayerSet::new(&builder, &props, layers);
-        let layer_set = match layer_set {
-            Ok(l) => l,
-            Err(e) => {
-                warn!("Unable to generate layer_set for area '{}'", builder.id);
-                return Err(e);
-            }
-        };
-
-        let mut path_grids = HashMap::new();
-        for size in Module::all_sizes() {
-            let path_grid = PathFinderGrid::new(Rc::clone(&size), &layer_set);
-            debug!("Generated path grid for size {}", size.id);
-            path_grids.insert(size.id.to_string(), path_grid);
-        }
-
-        // TODO validate position of all actors, props, encounters
 
         let mut transitions: Vec<Transition> = Vec::new();
         for (index, t_builder) in builder.transitions.iter().enumerate() {
@@ -232,7 +191,7 @@ impl Area {
 
         let mut used_triggers = HashSet::new();
         let mut encounters = Vec::new();
-        for encounter_builder in builder.encounters.iter().chain(&generated_encounters) {
+        for encounter_builder in builder.encounters.iter() {
             let encounter = match Module::encounter(&encounter_builder.id) {
                 None => {
                     warn!("No encounter '{}' found", &encounter_builder.id);
@@ -281,13 +240,16 @@ impl Area {
         let visibility_tile = ResourceSet::sprite(&builder.visibility_tile)?;
         let explored_tile = ResourceSet::sprite(&builder.explored_tile)?;
 
+        let generator = match builder.generator.take() {
+            None => None,
+            Some(gen) => Some(GeneratorParams::new(gen)?),
+        };
+
         Ok(Area {
             id: builder.id.to_string(),
             name: builder.name.to_string(),
             width: builder.width as i32,
             height: builder.height as i32,
-            layer_set,
-            path_grids,
             actors: builder.actors.clone(),
             encounters,
             props,
@@ -302,6 +264,7 @@ impl Area {
             world_map_location: builder.world_map_location.clone(),
             on_rest: builder.on_rest.clone(),
             location_kind: builder.location_kind.clone(),
+            generator,
             builder,
         })
     }
@@ -315,10 +278,6 @@ impl Area {
         }
 
         true
-    }
-
-    pub fn get_path_grid(&self, size_id: &str) -> &PathFinderGrid {
-        self.path_grids.get(size_id).unwrap()
     }
 }
 
@@ -358,48 +317,6 @@ pub struct AreaBuilder {
 
     #[serde(serialize_with = "as_base64", deserialize_with = "from_base64")]
     pub elevation: Vec<u8>,
-}
-
-pub struct PregenOutput {
-    generator: Rc<AreaGenerator>,
-    params: GeneratorParams,
-    tiles_to_add: Vec<(Rc<Tile>, i32, i32)>,
-    rand: ReproducibleRandom,
-}
-
-impl AreaBuilder {
-    pub fn pregen(&mut self) -> Result<Option<PregenOutput>, Error> {
-        let mut rand = ReproducibleRandom::new(None);
-        let start_time = std::time::Instant::now();
-
-        let params = match self.generator.take() {
-            None => return Ok(None),
-            Some(builder) => GeneratorParams::new(builder)?,
-        };
-
-
-        let generator = Module::generator(&params.id).ok_or(
-            Error::new(ErrorKind::InvalidInput, format!("Generator '{}' not found", params.id))
-        )?;
-
-        let transition_out = generator.generate_transitions(self, &mut rand, &params)?;
-
-        info!("Area pregen complete in {} secs",
-              util::format_elapsed_secs(start_time.elapsed()));
-
-        let mut tiles_out = Vec::new();
-        for mut data in transition_out {
-            self.transitions.push(data.transition);
-            tiles_out.append(&mut data.tiles);
-        }
-
-        Ok(Some(PregenOutput {
-            generator,
-            params,
-            tiles_to_add: tiles_out,
-            rand,
-        }))
-    }
 }
 
 pub struct GeneratorParams {

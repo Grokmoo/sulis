@@ -19,7 +19,7 @@ use std::rc::Rc;
 use std::collections::HashMap;
 
 use sulis_core::util::{Point, ReproducibleRandom};
-use crate::{Module, area::{Tile, Layer, AreaBuilder, GeneratorParams}};
+use crate::{Module, area::{Tile, Layer, GeneratorParams}};
 use crate::generator::{WeightedList, WallKinds, RoomParams, TerrainParams, PropParams,
     EncounterParams, GeneratorBuilder, GenModel, Maze, TerrainGen, PropGen, EncounterGen,
     TileKind, TileIter, TilesModel, GeneratorOutput, FeatureParams, FeatureGen,
@@ -57,12 +57,10 @@ impl AreaGenerator {
         })
     }
 
-    pub fn generate_transitions(&self, builder: &AreaBuilder, rand: &mut ReproducibleRandom,
+    pub fn generate_transitions(&self, width: i32, height: i32, rand: &mut ReproducibleRandom,
                                 params: &GeneratorParams) -> Result<Vec<TransitionOutput>, Error> {
 
         info!("Generating transitions");
-        let width = builder.width as i32;
-        let height = builder.height as i32;
         let mut gen = TransitionGen::new(width, height, &self.transition_params);
         gen.generate(rand, &params.transitions)
     }

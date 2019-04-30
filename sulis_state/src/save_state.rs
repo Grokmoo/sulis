@@ -69,7 +69,7 @@ impl SaveState {
         }
 
         let area_state = GameState::area_state();
-        let current_area = area_state.borrow().area.id.to_string();
+        let current_area = area_state.borrow().area.area.id.to_string();
 
         let mut party = Vec::new();
         for entity in GameState::party().iter() {
@@ -224,6 +224,9 @@ pub struct AreaSaveState {
     pub(crate) triggers: Vec<TriggerSaveState>,
     pub(crate) merchants: Vec<MerchantSaveState>,
     pub(crate) pc_explored: Vec<u64>,
+
+    #[serde(default)]
+    pub(crate) seed: u128,
 }
 
 impl AreaSaveState {
@@ -274,6 +277,7 @@ impl AreaSaveState {
             props,
             triggers,
             merchants,
+            seed: area_state.area_gen_seed,
         }
     }
 }

@@ -21,14 +21,16 @@ use std::rc::Rc;
 use sulis_core::resource::ResourceSet;
 use sulis_core::util::{self, ReproducibleRandom, unable_to_create_error};
 use sulis_module::Module;
-use sulis_module::area::{Area, AreaBuilder, LayerSet, Tile, PathFinderGrid, PropData,
-    EncounterData, Transition, TransitionBuilder, GeneratorParams, create_prop};
+use sulis_module::area::{Area, LayerSet, Tile, PathFinderGrid, PropData,
+    EncounterData, ToKind, Transition, TransitionBuilder, create_prop};
 use sulis_module::generator::AreaGenerator;
 
 pub struct GeneratedArea {
     pub area: Rc<Area>,
+    pub width: i32,
+    pub height: i32,
     pub layer_set: LayerSet,
-    pub path_grids: HashMap<String, PathFinderGrid>,
+    path_grids: HashMap<String, PathFinderGrid>,
     pub props: Vec<PropData>,
     pub transitions: Vec<Transition>,
     pub encounters: Vec<EncounterData>,
@@ -43,10 +45,12 @@ impl GeneratedArea {
         if let Some(pregen) = pregen_out {
             let start_time = std::time::Instant::now();
 
+            let params = area.generator.as_ref().unwrap();
+
             let output = pregen.generator.generate(area.width,
                                                    area.height,
                                                    pregen.rand,
-                                                   &pregen.params, pregen.tiles_to_add)?;
+                                                   params, pregen.tiles_to_add)?;
             layers = output.layers;
             generated_props = output.props;
             generated_encounters = output.encounters;
@@ -118,8 +122,22 @@ impl GeneratedArea {
             transitions.push(transition);
         }
 
+        // TODO link transitions
+        for ref mut transition in transitions.iter_mut() {
+            match transition.to {
+                ToKind::FindLink { ref id, x_offset, y_offset } => {
+                    transition.to = ToKind::Area { id: id.clone(), x: x_offset, y: y_offset };
+                },
+                _ => (),
+            }
+        }
+
+        let (width, height) = (area.width, area.height);
+
         Ok(GeneratedArea {
             area,
+            width,
+            height,
             props,
             encounters,
             layer_set,
@@ -127,31 +145,35 @@ impl GeneratedArea {
             transitions,
         })
     }
+
+    pub fn path_grid(&self, size_id: &str) -> &PathFinderGrid {
+        &self.path_grids[size_id]
+    }
 }
 
 pub struct PregenOutput {
     generator: Rc<AreaGenerator>,
-    params: GeneratorParams,
     pub tiles_to_add: Vec<(Rc<Tile>, i32, i32)>,
     pub transitions: Vec<TransitionBuilder>,
     rand: ReproducibleRandom,
 }
 
 impl PregenOutput {
-    pub fn new(builder: &AreaBuilder) -> Result<Option<PregenOutput>, Error> {
-        let mut rand = ReproducibleRandom::new(None);
+    pub fn new(area: &Area, seed: Option<u128>) -> Result<Option<PregenOutput>, Error> {
+        let mut rand = ReproducibleRandom::new(seed);
         let start_time = std::time::Instant::now();
 
-        let params = match &builder.generator {
+        let params = match &area.generator {
             None => return Ok(None),
-            Some(builder) => GeneratorParams::new(builder.clone())?,
+            Some(params) => params,
         };
 
         let generator = Module::generator(&params.id).ok_or(
             Error::new(ErrorKind::InvalidInput, format!("Generator '{}' not found", params.id))
         )?;
 
-        let transition_out = generator.generate_transitions(builder, &mut rand, &params)?;
+        let (w, h) = (area.width, area.height);
+        let transition_out = generator.generate_transitions(w, h, &mut rand, &params)?;
 
         info!("Area pregen complete in {} secs",
               util::format_elapsed_secs(start_time.elapsed()));
@@ -165,10 +187,11 @@ impl PregenOutput {
 
         Ok(Some(PregenOutput {
             generator,
-            params,
             tiles_to_add: tiles_out,
             transitions,
             rand,
         }))
     }
+
+    pub fn seed(&self) -> u128 { self.rand.seed() }
 }

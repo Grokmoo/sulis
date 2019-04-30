@@ -98,7 +98,8 @@ impl EntityState {
             Some(area) => Ok(area),
         }?;
 
-        let location = Location::new(save.location.x, save.location.y, &area.borrow().area);
+        let location = Location::new(save.location.x, save.location.y,
+                                     &area.borrow().area.area);
 
         let size = match Module::object_size(&save.size) {
             None => invalid_data_error(&format!("Invalid size '{}' for actor", save.size)),
@@ -405,7 +406,7 @@ impl EntityState {
     pub fn can_reach(&self, target: &Rc<RefCell<EntityState>>) -> bool {
         let dist = self.dist_to_entity(target);
         let area = GameState::area_state();
-        let vis_dist = area.borrow().area.vis_dist as f32;
+        let vis_dist = area.borrow().area.area.vis_dist as f32;
 
         if dist > vis_dist {
             false

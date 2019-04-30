@@ -483,7 +483,7 @@ impl UserData for ScriptEntity {
             let parent = entity.try_unwrap()?;
             let area_id = &parent.borrow().location.area_id;
             let area = GameState::get_area_state(area_id).unwrap();
-            let dist = area.borrow().area.vis_dist as f32;
+            let dist = area.borrow().area.area.vis_dist as f32;
             Ok(dist)
         });
 
@@ -980,7 +980,7 @@ impl UserData for ScriptEntity {
                     mgr.borrow_mut().remove_from_surface(entity_index, surface);
                 }
 
-                let new_loc = Location::new(x, y, &area_state.borrow().area);
+                let new_loc = Location::new(x, y, &area_state.borrow().area.area);
                 match area_state
                     .borrow_mut()
                     .transition_entity_to(&entity, entity_index, new_loc)

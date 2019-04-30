@@ -16,22 +16,20 @@
 
 use std::cmp;
 use std::collections::HashSet;
-use std::rc::Rc;
 
-use crate::EntityState;
-use sulis_module::Area;
+use crate::{EntityState, GeneratedArea};
 
 #[must_use]
 pub fn calculate_los(
     exp: &mut Vec<bool>,
-    area: &Rc<Area>,
+    area: &GeneratedArea,
     prop_vis_grid: &[bool],
     prop_grid: &[Option<usize>],
     entity: &mut EntityState,
     delta_x: i32,
     delta_y: i32,
 ) -> HashSet<usize> {
-    let max_dist = area.vis_dist;
+    let max_dist = area.area.vis_dist;
     let entity_x = entity.location.x + entity.size.width / 2;
     let entity_y = entity.location.y + entity.size.height / 2;
 
@@ -81,7 +79,7 @@ pub fn calculate_los(
 }
 
 pub fn has_visibility(
-    area: &Rc<Area>,
+    area: &GeneratedArea,
     prop_vis_grid: &[bool],
     entity: &EntityState,
     target: &EntityState,
@@ -100,7 +98,7 @@ pub fn has_visibility(
 }
 
 fn check_vis(
-    area: &Rc<Area>,
+    area: &GeneratedArea,
     prop_vis_grid: &[bool],
     start_x: i32,
     start_y: i32,
@@ -111,7 +109,7 @@ fn check_vis(
     let dist_squared =
         (start_x - end_x) * (start_x - end_x) + (start_y - end_y) * (start_y - end_y);
 
-    if dist_squared < area.vis_dist_up_one_squared {
+    if dist_squared < area.area.vis_dist_up_one_squared {
         cast_ray(
             area,
             prop_vis_grid,
@@ -121,7 +119,7 @@ fn check_vis(
             end_y,
             src_elev + 1,
         )
-    } else if dist_squared < area.vis_dist_squared {
+    } else if dist_squared < area.area.vis_dist_squared {
         cast_ray(
             area,
             prop_vis_grid,
@@ -137,7 +135,7 @@ fn check_vis(
 }
 
 fn cast_ray(
-    area: &Rc<Area>,
+    area: &GeneratedArea,
     prop_vis_grid: &[bool],
     start_x: i32,
     start_y: i32,
@@ -192,7 +190,7 @@ fn cast_ray(
     }
 }
 
-fn check(area: &Rc<Area>, prop_vis_grid: &[bool], x: i32, y: i32, src_elev: u8) -> bool {
+fn check(area: &GeneratedArea, prop_vis_grid: &[bool], x: i32, y: i32, src_elev: u8) -> bool {
     let index = (x + y * area.width) as usize;
 
     prop_vis_grid[index]
@@ -201,7 +199,7 @@ fn check(area: &Rc<Area>, prop_vis_grid: &[bool], x: i32, y: i32, src_elev: u8) 
 }
 
 fn cast_high(
-    area: &Rc<Area>,
+    area: &GeneratedArea,
     prop_vis_grid: &[bool],
     start_x: i32,
     start_y: i32,
@@ -241,7 +239,7 @@ fn cast_high(
 }
 
 fn cast_low(
-    area: &Rc<Area>,
+    area: &GeneratedArea,
     prop_vis_grid: &[bool],
     start_x: i32,
     start_y: i32,

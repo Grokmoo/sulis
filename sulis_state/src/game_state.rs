@@ -32,9 +32,9 @@ use sulis_module::{
 use crate::animation::{self, particle_generator::Param, Anim, AnimSaveState, AnimState};
 use crate::script::{script_cache, script_callback, Script, ScriptCallback, ScriptEntity};
 use crate::{
-    AreaState, ChangeListener, ChangeListenerList, Effect, EntityState, Formation, ItemList,
-    ItemState, Location, PartyStash, PathFinder, QuestStateSet, SaveState, TurnManager, UICallback,
-    WorldMapState, AI, MOVE_TO_THRESHOLD,
+    AreaState, ChangeListener, ChangeListenerList, Effect, EntityState, Formation,
+    ItemList, ItemState, Location, PartyStash, PathFinder, QuestStateSet,
+    SaveState, TurnManager, UICallback, WorldMapState, AI, MOVE_TO_THRESHOLD,
 };
 
 thread_local! {
@@ -98,7 +98,7 @@ impl GameState {
                 )),
             }?;
 
-            let path_finder = PathFinder::new(&area_state.borrow().area);
+            let path_finder = PathFinder::new(&area_state.borrow().area.area);
 
             let mut entities = HashMap::new();
             let mut selected = Vec::new();
@@ -285,13 +285,13 @@ impl GameState {
         area_state.borrow_mut().on_load_fired = true;
         let area_state = area_state.borrow();
         GameState::add_ui_callbacks_of_kind(
-            &area_state.area.triggers,
+            &area_state.area.area.triggers,
             TriggerKind::OnCampaignStart,
             &pc,
             &pc,
         );
         GameState::add_ui_callbacks_of_kind(
-            &area_state.area.triggers,
+            &area_state.area.area.triggers,
             TriggerKind::OnAreaLoad,
             &pc,
             &pc,
@@ -316,7 +316,8 @@ impl GameState {
             "Setting up PC {}, with {:?}",
             &pc.name, &campaign.starting_location
         );
-        let location = Location::from_point(&campaign.starting_location, &area_state.borrow().area);
+        let location = Location::from_point(&campaign.starting_location,
+                                            &area_state.borrow().area.area);
 
         if !location.coords_valid(location.x, location.y) {
             error!("Starting location coordinates must be valid for the starting area.");
@@ -342,7 +343,7 @@ impl GameState {
 
         pc_state.borrow_mut().actor.init_turn();
 
-        let path_finder = PathFinder::new(&area_state.borrow().area);
+        let path_finder = PathFinder::new(&area_state.borrow().area.area);
 
         let mut areas: HashMap<String, Rc<RefCell<AreaState>>> = HashMap::new();
         areas.insert(campaign.starting_area.to_string(), Rc::clone(&area_state));
@@ -785,7 +786,7 @@ impl GameState {
             }
 
             STATE.with(|state| {
-                let path_finder = PathFinder::new(&area_state.borrow().area);
+                let path_finder = PathFinder::new(&area_state.borrow().area.area);
                 state.borrow_mut().as_mut().unwrap().path_finder = path_finder;
                 state.borrow_mut().as_mut().unwrap().area_state = area_state;
             });
@@ -821,7 +822,7 @@ impl GameState {
         mgr.borrow_mut().add_time(travel_time);
 
         let area_state = GameState::area_state();
-        let base_location = Location::new(x, y, &area_state.borrow().area);
+        let base_location = Location::new(x, y, &area_state.borrow().area.area);
         for entity in GameState::party() {
             entity.borrow_mut().clear_pc_vis();
             let mut cur_location = base_location.clone();
@@ -859,7 +860,7 @@ impl GameState {
         if !area_state.on_load_fired {
             area_state.on_load_fired = true;
             GameState::add_ui_callbacks_of_kind(
-                &area_state.area.triggers,
+                &area_state.area.area.triggers,
                 TriggerKind::OnAreaLoad,
                 &pc,
                 &pc,
@@ -893,7 +894,7 @@ impl GameState {
     }
 
     fn check_location(p: &Point, area_state: &Rc<RefCell<AreaState>>) -> bool {
-        let location = Location::from_point(p, &area_state.borrow().area);
+        let location = Location::from_point(p, &area_state.borrow().area.area);
         if !location.coords_valid(location.x, location.y) {
             error!(
                 "Location coordinates {},{} are not valid for area {}",
@@ -916,7 +917,9 @@ impl GameState {
                 return Err(Error::new(ErrorKind::NotFound, "Unable to create area."));
             }
         };
-        let area_state = Rc::new(RefCell::new(AreaState::new(area)));
+
+        let state = AreaState::new(area, None)?;
+        let area_state = Rc::new(RefCell::new(state));
         area_state.borrow_mut().populate();
 
         Ok(area_state)
@@ -1166,7 +1169,7 @@ impl GameState {
         let mut range = sizes + entity.borrow().actor.stats.attack_distance();
 
         let area = GameState::area_state();
-        let vis_dist = area.borrow().area.vis_dist as f32;
+        let vis_dist = area.borrow().area.area.vis_dist as f32;
         if range > vis_dist {
             range = vis_dist;
         }

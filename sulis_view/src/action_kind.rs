@@ -28,7 +28,7 @@ use sulis_state::{
 pub fn get_action(x_f32: f32, y_f32: f32) -> Box<ActionKind> {
     let (x, y) = (x_f32 as i32, y_f32 as i32);
     let area_state = GameState::area_state();
-    if !area_state.borrow().area.coords_valid(x, y) {
+    if !area_state.borrow().area.area.coords_valid(x, y) {
         return Box::new(InvalidAction {});
     }
     if !area_state.borrow().is_pc_explored(x, y) {

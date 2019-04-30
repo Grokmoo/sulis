@@ -128,7 +128,7 @@ fn create_meta_data(datetime: String) -> SaveFileMetaData {
     SaveFileMetaData {
         player_name: player.actor.actor.name.to_string(),
         datetime,
-        current_area_name: cur_area.area.name.to_string(),
+        current_area_name: cur_area.area.area.name.to_string(),
         path: Default::default(),
         error: None,
     }

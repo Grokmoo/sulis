@@ -41,16 +41,27 @@ impl GeneratedArea {
         let mut generated_encounters = Vec::new();
         let mut generated_props = Vec::new();
         let mut layers = Vec::new();
+        let mut transition_builders = Vec::new();
+
+        for transition in area.builder.transitions.iter() {
+            transition_builders.push((*transition).clone());
+        }
 
         if let Some(pregen) = pregen_out {
             let start_time = std::time::Instant::now();
+
+            for transition in pregen.transitions {
+                transition_builders.push(transition);
+            }
 
             let params = area.generator.as_ref().unwrap();
 
             let output = pregen.generator.generate(area.width,
                                                    area.height,
                                                    pregen.rand,
-                                                   params, pregen.tiles_to_add)?;
+                                                   params,
+                                                   &transition_builders,
+                                                   pregen.tiles_to_add)?;
             layers = output.layers;
             generated_props = output.props;
             generated_encounters = output.encounters;
@@ -90,7 +101,7 @@ impl GeneratedArea {
         }
 
         let mut transitions = Vec::new();
-        for (index, t_builder) in area.builder.transitions.iter().enumerate() {
+        for (index, t_builder) in transition_builders.into_iter().enumerate() {
             let img_id = &t_builder.image_display;
             let image = ResourceSet::image(img_id).ok_or(
                 Error::new(ErrorKind::InvalidInput, format!("No image '{}' found", img_id))
@@ -121,6 +132,8 @@ impl GeneratedArea {
             };
             transitions.push(transition);
         }
+
+        info!("{} total transitions created", transitions.len());
 
         // TODO link transitions
         for ref mut transition in transitions.iter_mut() {

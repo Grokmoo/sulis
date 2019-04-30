@@ -19,7 +19,7 @@ use std::rc::Rc;
 use std::collections::HashMap;
 
 use sulis_core::util::{Point, ReproducibleRandom};
-use crate::{Module, area::{Tile, Layer, GeneratorParams}};
+use crate::{Module, area::{Tile, Layer, GeneratorParams, TransitionBuilder}};
 use crate::generator::{WeightedList, WallKinds, RoomParams, TerrainParams, PropParams,
     EncounterParams, GeneratorBuilder, GenModel, Maze, TerrainGen, PropGen, EncounterGen,
     TileKind, TileIter, TilesModel, GeneratorOutput, FeatureParams, FeatureGen,
@@ -67,6 +67,7 @@ impl AreaGenerator {
 
     pub fn generate(&self, width: i32, height: i32, rand: ReproducibleRandom,
                     params: &GeneratorParams,
+                    transitions: &[TransitionBuilder],
                     tiles_to_add: Vec<(Rc<Tile>, i32, i32)>) -> Result<GeneratorOutput, Error> {
         let mut model = GenModel::new(width, height, rand,
                                       self.grid_width as i32, self.grid_height as i32);
@@ -74,11 +75,10 @@ impl AreaGenerator {
         let (room_width, room_height) = model.region_size();
         let mut maze = Maze::new(room_width, room_height);
 
-        let open_locs = Vec::new();
-        // let open_locs: Vec<Point> = builder.transitions.iter().map(|t| {
-        //     let (x, y) = model.to_region_coords(t.from.x, t.from.y);
-        //     Point::new(x, y)
-        // }).collect();
+        let open_locs: Vec<Point> = transitions.iter().map(|t| {
+            let (x, y) = model.to_region_coords(t.from.x, t.from.y);
+            Point::new(x, y)
+        }).collect();
         maze.generate(&self.room_params, &open_locs)?;
         self.add_walls(&mut model, &maze);
 

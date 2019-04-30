@@ -623,7 +623,7 @@ pub enum ToKind {
     FindLink { id: String, x_offset: i32, y_offset: i32 },
 }
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct TransitionBuilder {
     pub from: Point,

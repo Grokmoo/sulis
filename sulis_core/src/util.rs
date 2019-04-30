@@ -69,9 +69,10 @@ pub struct ReproducibleRandom {
 
 impl ReproducibleRandom {
     pub fn new(seed: Option<u128>) -> ReproducibleRandom {
+        // TODO only seed with u64 for now because serde_yaml doesn't serialize u128 correctly
         let seed = match seed {
             Some(s) => s,
-            None => rand::thread_rng().gen()
+            None => rand::thread_rng().gen::<u64>() as u128
         };
 
         ReproducibleRandom {

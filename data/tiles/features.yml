@@ -1,5 +1,17 @@
 id: features
 features:
+  tree_med:
+    entries:
+      - tiles:
+          tree_med_02: [0, 0]
+        weight: 1
+      - tiles:
+          tree_med_03: [0, 0]
+        weight: 1
+      - tiles:
+          tree_med_04: [0, 0]
+        weight: 1
+    size: [14, 14]
   boxes:
     entries:
       - tiles:

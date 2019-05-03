@@ -27,7 +27,7 @@ generator:
       - kinds:
           goblins_level2:
             weight: 2
-          goblins_level3:
+          goblins_level1:
             weight: 1
         spacing: 20
         chance_per_room: 75 

@@ -224,6 +224,37 @@ themes:
           elev:
             from: spinner
             position: [35, 30]
+      feature_picker:
+        background: bg_base
+        border: [1, 1, 1, 1]
+        size: [128, -4]
+        relative:
+          x: Max
+          height: Max
+        position: [0, 4]
+        layout: Grid
+        layout_spacing: [0, 1, 0, 1]
+        children:
+          features:
+            relative:
+              width: Max
+              height: Max
+            children:
+              scrollbar:
+                from: scrollbar
+                custom:
+                  scroll_delta: "10"
+              content:
+                relative:
+                  width: Max
+                  height: Max
+                layout: Grid
+                layout_spacing: [0, 0, 0, 0]
+                children:
+                  feature_button:
+                    from: button
+                    text: "#name#"
+                    size: [40, 6]
       actor_picker:
         background: bg_base
         border: [1, 1, 1, 1]

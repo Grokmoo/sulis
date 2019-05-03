@@ -40,6 +40,7 @@ pub struct Feature {
     pub id: String,
     pub size: Size,
     entries: Vec<(Vec<(Rc<Tile>, Point)>, u32)>,
+    pub preview: Vec<(Rc<Tile>, Point)>,
 }
 
 impl Feature {
@@ -67,10 +68,13 @@ impl Feature {
             return unable_to_create_error("feature", &id);
         }
 
+        let preview = entries[0].0.clone();
+
         Ok(Feature {
             id,
             size: builder.size,
             entries,
+            preview,
         })
     }
 

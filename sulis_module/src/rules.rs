@@ -97,6 +97,7 @@ pub struct Rules {
     pub experience_factor: f32,
     pub experience_for_level: Vec<u32>,
 
+    pub combat_run_away_vis_factor: f32,
     pub loot_drop_prop: String,
 
     pub item_weight_display_factor: f32,

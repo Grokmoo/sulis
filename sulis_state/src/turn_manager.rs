@@ -349,6 +349,12 @@ impl TurnManager {
 
     #[must_use]
     pub fn next(&mut self) -> Vec<Rc<CallbackData>> {
+        if self.is_combat_active() && self.check_combat_run_away() {
+            self.set_combat_active(false);
+            self.listeners.notify(&self);
+            return Vec::new();
+        }
+
         let cbs = self.iterate_to_next_entity();
         self.init_turn_for_current_entity();
 
@@ -603,6 +609,31 @@ impl TurnManager {
         } else {
             self.initiate_combat();
         }
+    }
+
+    fn check_combat_run_away(&self) -> bool {
+        let run_away_dist = Module::rules().combat_run_away_vis_factor *
+            GameState::area_state().borrow().area.area.vis_dist as f32;
+
+        let party_pos: Vec<_> = GameState::party().into_iter().
+            map(|e| e.borrow().location.to_point()).collect();
+
+        for entity in self.entities.iter() {
+            let entity = match entity {
+                None => continue,
+                Some(ref entity) => entity,
+            };
+            let entity = entity.borrow();
+            if !entity.is_ai_active() { continue; }
+
+            for p in &party_pos {
+                if p.dist(&entity.location.to_point()) < run_away_dist {
+                    return false;
+                }
+            }
+        }
+
+        true
     }
 
     fn end_combat(&mut self) {

@@ -113,9 +113,10 @@ impl WidgetKind for DialogWindow {
             widget.borrow_mut().mark_for_removal();
 
             let area_state = GameState::area_state();
-            area_state
-                .borrow_mut()
-                .add_feedback_text(cur_text, &self.entity, ColorKind::Info);
+            let mut area = area_state.borrow_mut();
+            let mut text = area.create_feedback_text(&self.entity.borrow());
+            text.add_entry(cur_text, ColorKind::Info);
+            area.add_feedback_text(text);
             return Vec::new();
         }
 
@@ -216,11 +217,10 @@ pub fn show_convo(
     let initial_node = get_initial_node(&convo, &pc, &target);
     if convo.responses(&initial_node).is_empty() {
         let area_state = GameState::area_state();
-        area_state.borrow_mut().add_feedback_text(
-            convo.text(&initial_node).to_string(),
-            &target,
-            ColorKind::Info,
-        );
+        let mut area = area_state.borrow_mut();
+        let mut text = area.create_feedback_text(&target.borrow());
+        text.add_entry(convo.text(&initial_node).to_string(), ColorKind::Info);
+        area.add_feedback_text(text);
     } else {
         let window = Widget::with_defaults(DialogWindow::new(&pc, &target, convo));
         window.borrow_mut().state.set_modal(true);
@@ -453,11 +453,10 @@ pub fn activate(
             StartConversation(ref convo) => start_convo(widget, convo, pc, target),
             SayLine(ref line) => {
                 let area_state = GameState::area_state();
-                area_state.borrow_mut().add_feedback_text(
-                    line.to_string(),
-                    &target,
-                    ColorKind::Info,
-                );
+                let mut area = area_state.borrow_mut();
+                let mut text = area.create_feedback_text(&target.borrow());
+                text.add_entry(line.to_string(), ColorKind::Info);
+                area.add_feedback_text(text);
             }
             ShowCutscene(ref cutscene) => show_cutscene(widget, cutscene),
             FireScript(ref script) => fire_script(&script.id, &script.func, pc, target),

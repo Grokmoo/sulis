@@ -453,6 +453,12 @@ themes:
           feedback_text_damage_electrical_color: 007eff
           feedback_text_damage_fire_color: ff6c00
           feedback_text_damage_raw_color: ff00a2
+          feedback_icon_concealment: gui/feedback_concealment
+          feedback_icon_backstab: gui/feedback_backstab
+          feedback_icon_flanking: gui/feedback_flanking
+          feedback_icon_crit: gui/feedback_crit
+          feedback_icon_hit: gui/feedback_hit
+          feedback_icon_graze: gui/feedback_graze
           selection_box_image: "bg_selection_box"
         children:
           targeter_label:

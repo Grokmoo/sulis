@@ -1180,11 +1180,9 @@ impl UserData for ScriptEntity {
             let parent = entity.try_unwrap()?;
             parent.borrow_mut().actor.add_hp(amount);
             let area_state = GameState::area_state();
-            area_state.borrow_mut().add_feedback_text(
-                format!("{}", amount),
-                &parent,
-                ColorKind::Heal,
-            );
+            let mut text = area_state.borrow_mut().create_feedback_text(&parent.borrow());
+            text.add_entry(format!("{}", amount), ColorKind::Heal);
+            area_state.borrow_mut().add_feedback_text(text);
 
             Ok(())
         });

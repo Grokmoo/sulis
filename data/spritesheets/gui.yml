@@ -539,6 +539,17 @@ groups:
       status_will: [416, 0]
       status_movement: [416, 32]
       status_flanking: [448, 0]
+  feedback_icons:
+    size: [64, 64]
+    position: [1568, 960]
+    simple_image_gen_scale: 64
+    areas:
+      feedback_concealment: [0, 0]
+      feedback_backstab: [64, 0]
+      feedback_flanking: [128, 0]
+      feedback_crit: [192, 0]
+      feedback_hit: [256, 0]
+      feedback_graze: [320, 0]
   special:
     areas:
       empty: [0, 512, 5, 5]

@@ -194,8 +194,10 @@ fn activate_item(_lua: Context, script_item: &ScriptItem, target: ScriptEntity) 
 
     let area = GameState::area_state();
     let name = item.name.to_string();
-    area.borrow_mut()
-        .add_feedback_text(name, &target, ColorKind::Info);
+
+    let mut text = area.borrow_mut().create_feedback_text(&target.borrow());
+    text.add_entry(name, ColorKind::Info);
+    area.borrow_mut().add_feedback_text(text);
 
     match item.usable {
         None => unreachable!(),

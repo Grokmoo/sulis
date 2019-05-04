@@ -432,7 +432,7 @@ impl AreaModel {
                 ToKind::FindLink { .. } => "Error".to_string(),
             };
 
-            let mut draw_list = font_renderer.get_draw_list(&text, x, y, 1.0);
+            let (mut draw_list, _) = font_renderer.get_draw_list(&text, x, y, 1.0);
             draw_list.set_scale(scale_x, scale_y);
             renderer.draw(draw_list);
         }
@@ -447,7 +447,7 @@ impl AreaModel {
             renderer.draw(draw_list);
 
             let text = format!("{}", encounter_data.encounter.id);
-            let mut draw_list = font_renderer.get_draw_list(&text, x, y, 1.0);
+            let (mut draw_list, _) = font_renderer.get_draw_list(&text, x, y, 1.0);
             draw_list.set_scale(scale_x, scale_y);
             renderer.draw(draw_list);
         }
@@ -466,7 +466,7 @@ impl AreaModel {
             draw_list.set_scale(scale_x, scale_y);
             renderer.draw(draw_list);
 
-            let mut draw_list = font_renderer.get_draw_list("Trigger", x, y, 1.0);
+            let (mut draw_list, _) = font_renderer.get_draw_list("Trigger", x, y, 1.0);
             draw_list.set_scale(scale_x, scale_y);
             renderer.draw(draw_list);
         }

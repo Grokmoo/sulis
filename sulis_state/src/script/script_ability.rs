@@ -384,8 +384,9 @@ fn activate(
     }
 
     let area = GameState::area_state();
-    area.borrow_mut()
-        .add_feedback_text(ability.name.to_string(), &entity, ColorKind::Info);
+    let mut text = area.borrow_mut().create_feedback_text(&entity.borrow());
+    text.add_entry(ability.name.to_string(), ColorKind::Info);
+    area.borrow_mut().add_feedback_text(text);
     entity
         .borrow_mut()
         .actor

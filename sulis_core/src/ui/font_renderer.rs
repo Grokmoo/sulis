@@ -42,13 +42,13 @@ impl LineRenderer {
         }
     }
 
-    pub fn get_draw_list(&self, text: &str, pos_x: f32, pos_y: f32, scale: f32) -> DrawList {
+    pub fn get_draw_list(&self, text: &str, pos_x: f32, pos_y: f32, scale: f32) -> (DrawList, f32) {
         let mut quads: Vec<Vertex> = Vec::new();
         let mut x = pos_x;
         for c in text.chars() {
             x = self.font.get_quad(&mut quads, c, x, pos_y, scale);
         }
-        DrawList::from_font(&self.font.id, quads)
+        (DrawList::from_font(&self.font.id, quads), x)
     }
 }
 

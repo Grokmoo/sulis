@@ -1491,76 +1491,50 @@ impl AreaState {
         hit_flags: HitFlags,
         damage: Vec<(DamageKind, u32)>,
     ) {
-        let mut add_space = false;
+        use area_feedback_text::{ColorKind, IconKind};
+        let mut text = self.create_feedback_text(&target.borrow());
+
         let mut output = String::new();
         if hit_flags.sneak_attack {
-            output.push_str("Sneak Attack!");
-            add_space = true;
+            text.add_icon_entry(IconKind::Backstab, ColorKind::Info);
         } else if hit_flags.flanking {
-            output.push_str("Flanking!");
-            add_space = true;
+            text.add_icon_entry(IconKind::Flanking, ColorKind::Info);
         }
 
         if hit_flags.concealment {
-            if add_space {
-                output.push_str(" ");
+            text.add_icon_entry(IconKind::Concealment, ColorKind::Info);
+        }
+
+        let mut first = true;
+        for (kind, amount) in damage {
+            if !first {
+                text.add_entry(" + ".to_string(), ColorKind::Info);
             }
-            output.push_str("Concealment!");
-            add_space = true;
+
+            let color = ColorKind::Damage { kind };
+            output.push_str(&format!("{}", amount));
+
+            text.add_entry(output.clone(), color);
+
+            output.clear();
+            first = false;
         }
 
-        if add_space {
-            output.push_str(" ");
+        match hit_kind {
+            HitKind::Graze => text.add_icon_entry(IconKind::Graze, ColorKind::Info),
+            HitKind::Hit => text.add_icon_entry(IconKind::Hit, ColorKind::Info),
+            HitKind::Crit => text.add_icon_entry(IconKind::Crit, ColorKind::Info),
+            HitKind::Miss => text.add_entry("Miss".to_string(), ColorKind::Miss),
+            HitKind::Auto => (),
         }
-        output.push_str(match hit_kind {
-            HitKind::Miss => "Miss",
-            HitKind::Graze => "Graze",
-            HitKind::Hit => "Hit",
-            HitKind::Crit => "Crit",
-            HitKind::Auto => "",
-        });
-        add_space = true;
 
-        if damage.is_empty() {
-            let color = match hit_kind {
-                HitKind::Miss => area_feedback_text::ColorKind::Miss,
-                HitKind::Graze | HitKind::Hit | HitKind::Crit | HitKind::Auto => {
-                    area_feedback_text::ColorKind::Hit
-                }
-            };
-
-            self.add_feedback_text(output, target, color);
-        } else {
-            for (kind, amount) in damage {
-                if add_space {
-                    output.push_str(" ");
-                }
-
-                let color = area_feedback_text::ColorKind::Damage { kind };
-                output.push_str(&format!("{}", amount));
-
-                self.add_feedback_text(output.clone(), target, color);
-
-                // only display the flags and hit info on the first entry
-                add_space = false;
-                output.clear();
-            }
-        }
+        self.add_feedback_text(text);
     }
 
-    pub fn add_feedback_text(
-        &mut self,
-        text: String,
-        target: &Rc<RefCell<EntityState>>,
-        color_kind: area_feedback_text::ColorKind,
-    ) {
+    pub fn create_feedback_text(&self, target: &EntityState) -> AreaFeedbackText {
         let move_rate = 3.0;
 
-        if text.trim().is_empty() {
-            return;
-        }
-
-        let mut area_pos = target.borrow().location.to_point();
+        let mut area_pos = target.location.to_point();
         loop {
             let mut area_pos_valid = true;
 
@@ -1574,20 +1548,20 @@ impl AreaState {
                 }
             }
 
-            if area_pos_valid {
-                break;
-            }
-            if area_pos.y == 0 {
-                break;
-            }
+            if area_pos_valid { break; }
+            if area_pos.y == 0 { break; }
         }
-        let width = target.borrow().size.width as f32;
+        let width = target.size.width as f32;
         let pos_x = area_pos.x as f32 + width / 2.0;
         let pos_y = area_pos.y as f32 - 1.5;
 
-        self.feedback_text.push(AreaFeedbackText::new(
-            area_pos, text, pos_x, pos_y, color_kind, move_rate,
-        ));
+        AreaFeedbackText::new(area_pos, pos_x, pos_y, move_rate)
+    }
+
+    pub fn add_feedback_text(&mut self, text: AreaFeedbackText) {
+        if text.is_empty() { return; }
+
+        self.feedback_text.push(text);
     }
 
     pub fn feedback_text_iter(&mut self) -> impl Iterator<Item = &mut AreaFeedbackText> {

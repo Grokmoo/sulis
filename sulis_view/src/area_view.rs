@@ -716,6 +716,28 @@ impl WidgetKind for AreaView {
                 theme.get_custom_or_default(&id, color::LIGHT_GRAY);
         }
 
+        if let Some(ref image_id) = theme.custom.get("feedback_icon_concealment") {
+            self.feedback_text_params.concealment_icon = ResourceSet::image_else_empty(image_id);
+        }
+
+
+        if let Some(ref image_id) = theme.custom.get("feedback_icon_backstab") {
+            self.feedback_text_params.backstab_icon = ResourceSet::image_else_empty(image_id);
+        }
+        if let Some(ref image_id) = theme.custom.get("feedback_icon_flanking") {
+            self.feedback_text_params.flanking_icon = ResourceSet::image_else_empty(image_id);
+        }
+
+        if let Some(ref image_id) = theme.custom.get("feedback_icon_crit") {
+            self.feedback_text_params.crit_icon = ResourceSet::image_else_empty(image_id);
+        }
+        if let Some(ref image_id) = theme.custom.get("feedback_icon_hit") {
+            self.feedback_text_params.hit_icon = ResourceSet::image_else_empty(image_id);
+        }
+        if let Some(ref image_id) = theme.custom.get("feedback_icon_graze") {
+            self.feedback_text_params.graze_icon = ResourceSet::image_else_empty(image_id);
+        }
+
         if self.targeter_tile.is_none() {
             warn!("No targeter tile specified for Areaview");
         }
@@ -1027,6 +1049,7 @@ impl WidgetKind for AreaView {
                 p.y as f32 - self.scroll.y(),
                 scale_x,
                 scale_y,
+                millis
             );
         }
     }

@@ -11,5 +11,5 @@ attack_bonus_modifier: 1.0
 attack_penalty_modifier: 1.0
 bonuses:
   - kind:
-      concealment: 100
+      concealment: 5
 attack_bonuses: {}

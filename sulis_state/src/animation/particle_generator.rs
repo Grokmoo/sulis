@@ -67,19 +67,30 @@ pub enum Dist {
 impl UserData for Dist {}
 
 fn swap_if_backwards(min: f32, max: f32) -> (f32, f32) {
-    if min > max {
+    if min >= max {
         (max, min)
     } else {
         (min, max)
     }
 }
 
+fn force_normal(val: f32) -> f32 {
+    if val.is_normal() {
+        val
+    } else {
+        0.0
+    }
+}
+
 impl Dist {
     pub fn create_fixed(value: f32) -> Dist {
+        let value = force_normal(value);
         Dist::Fixed { value }
     }
 
     pub fn create_uniform(min: f32, max: f32) -> Dist {
+        let min = force_normal(min);
+        let max = force_normal(max);
         if approx_eq(min, max) {
             Dist::Fixed { value: min }
         } else {
@@ -89,6 +100,8 @@ impl Dist {
     }
 
     pub fn create_angular(min_angle: f32, max_angle: f32, min_speed: f32, max_speed: f32) -> Dist {
+        let (min_speed, max_speed) = (force_normal(min_speed), force_normal(max_speed));
+        let (min_angle, max_angle) = (force_normal(min_angle), force_normal(max_angle));
         let (min_speed, max_speed) = swap_if_backwards(min_speed, max_speed);
         let (min_angle, max_angle) = swap_if_backwards(min_angle, max_angle);
 

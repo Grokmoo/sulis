@@ -45,7 +45,7 @@ use crate::resource::write_to_file;
 use crate::ui::Widget;
 
 const MAX_ULPS: i32 = 100;
-const MAX_DIFF: f32 = std::f32::EPSILON;
+const MAX_DIFF: f32 = 2.0 * std::f32::EPSILON;
 
 pub fn approx_eq(a: f32, b: f32) -> bool {
     if (a - b).abs() <= MAX_DIFF {

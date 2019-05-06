@@ -225,7 +225,15 @@ pub fn show_convo(
         let window = Widget::with_defaults(DialogWindow::new(&pc, &target, convo));
         window.borrow_mut().state.set_modal(true);
 
-        let root = Widget::get_root(widget);
+        let (root, view) = Widget::parent_mut::<RootView>(widget);
+        let (area, _) = view.area_view();
+        area.borrow_mut().clear_mouse_state();
+
+        let (x, y) = {
+            let loc = &target.borrow().location;
+            (loc.x, loc.y)
+        };
+        scroll_view(&root, x, y);
         Widget::add_child_to(&root, window);
     }
 }

@@ -634,6 +634,13 @@ impl AreaView {
         let delta_y = speed * delta_y / self.scale.1;
         self.scroll.change(delta_x, delta_y)
     }
+
+    pub fn clear_mouse_state(&mut self) {
+        self.hover_sprite = None;
+        self.selection_box_start = None;
+        Cursor::set_cursor_state(animation_state::Kind::Normal);
+        self.clear_area_mouseover();
+    }
 }
 
 impl WidgetKind for AreaView {
@@ -1098,7 +1105,11 @@ impl WidgetKind for AreaView {
 
             if fire_action {
                 let mut action = action_kind::get_action(x, y);
-                action.fire_action(widget);
+                let clear_mouse_state = action.fire_action(widget);
+
+                if clear_mouse_state {
+                    self.clear_mouse_state();
+                }
             }
         }
         true

@@ -17,10 +17,10 @@
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use crate::{dialog_window, RootView};
+use crate::{RootView};
 use sulis_core::ui::{animation_state, Widget};
 use sulis_core::util::Point;
-use sulis_module::{area::ToKind, Faction, Module, ObjectSize, Time};
+use sulis_module::{area::ToKind, Faction, Module, ObjectSize, Time, OnTrigger};
 use sulis_state::{
     AreaState, EntityState, GameState, PropState, ScriptCallback, MOVE_TO_THRESHOLD,
 };
@@ -95,7 +95,10 @@ pub trait ActionKind {
 
     fn get_hover_info(&self) -> Option<(Rc<ObjectSize>, i32, i32)>;
 
-    fn fire_action(&mut self, widget: &Rc<RefCell<Widget>>);
+    /// Fires the action for this ActionKind using the specified parent
+    /// widget if needed.  Returns true if the method opens a window / modal
+    /// that should clear the mouse state in the callee, false otherwise
+    fn fire_action(&mut self, widget: &Rc<RefCell<Widget>>) -> bool;
 }
 
 struct SelectAction {
@@ -137,9 +140,10 @@ impl ActionKind for SelectAction {
         Some((size, point.x, point.y))
     }
 
-    fn fire_action(&mut self, _widget: &Rc<RefCell<Widget>>) {
+    fn fire_action(&mut self, _widget: &Rc<RefCell<Widget>>) -> bool {
         trace!("Firing select action.");
         GameState::set_selected_party_member(Rc::clone(&self.target));
+        false
     }
 }
 
@@ -205,18 +209,21 @@ impl ActionKind for DialogAction {
         Some((size, point.x, point.y))
     }
 
-    fn fire_action(&mut self, widget: &Rc<RefCell<Widget>>) {
+    fn fire_action(&mut self, _widget: &Rc<RefCell<Widget>>) -> bool {
         trace!("Firing dialog action.");
 
         let convo = match self.target.borrow().actor.actor.conversation {
             None => {
                 warn!("Attempted to fire conversation action with entity with no convo");
-                return;
+                return false;
             }
             Some(ref convo) => Rc::clone(convo),
         };
 
-        dialog_window::show_convo(convo, &self.pc, &self.target, widget);
+        // trigger the dialog indirectly to avoid double borrow of area view
+        let cb = OnTrigger::StartConversation(convo.id.to_string());
+        GameState::add_ui_callback(vec![cb], &self.pc, &self.target);
+        true
     }
 }
 
@@ -264,10 +271,11 @@ impl ActionKind for DoorPropAction {
         Some((Rc::clone(&prop.prop.size), point.x, point.y))
     }
 
-    fn fire_action(&mut self, _widget: &Rc<RefCell<Widget>>) {
+    fn fire_action(&mut self, _widget: &Rc<RefCell<Widget>>) -> bool {
         let area_state = GameState::area_state();
         let mut area_state = area_state.borrow_mut();
         area_state.toggle_prop_active(self.index);
+        false
     }
 }
 
@@ -319,7 +327,7 @@ impl ActionKind for LootPropAction {
         Some((Rc::clone(&prop.prop.size), point.x, point.y))
     }
 
-    fn fire_action(&mut self, widget: &Rc<RefCell<Widget>>) {
+    fn fire_action(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
         let is_active = {
             let area_state = GameState::area_state();
             let mut area_state = area_state.borrow_mut();
@@ -330,6 +338,7 @@ impl ActionKind for LootPropAction {
 
         let (root, view) = Widget::parent_mut::<RootView>(widget);
         view.set_prop_window(&root, is_active, self.index);
+        true
     }
 }
 
@@ -397,7 +406,7 @@ impl ActionKind for TransitionAction {
         ))
     }
 
-    fn fire_action(&mut self, widget: &Rc<RefCell<Widget>>) {
+    fn fire_action(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
         trace!("Firing transition callback.");
         let time = Time {
             day: 0,
@@ -417,6 +426,7 @@ impl ActionKind for TransitionAction {
             ToKind::WorldMap => {
                 let (root, view) = Widget::parent_mut::<RootView>(widget);
                 view.set_map_window(&root, true, true);
+                return true;
             },
             ToKind::FindLink { ref id, x_offset, y_offset } => {
                 GameState::transition_to(Some(id), None, Point::new(x_offset, y_offset), time);
@@ -424,6 +434,7 @@ impl ActionKind for TransitionAction {
                 root.borrow_mut().invalidate_children();
             },
         }
+        false
     }
 }
 
@@ -497,7 +508,7 @@ impl ActionKind for AttackAction {
         Some((size, point.x, point.y))
     }
 
-    fn fire_action(&mut self, _widget: &Rc<RefCell<Widget>>) {
+    fn fire_action(&mut self, _widget: &Rc<RefCell<Widget>>) -> bool {
         trace!("Firing attack action.");
         let area_state = GameState::area_state();
         if !self
@@ -505,10 +516,11 @@ impl ActionKind for AttackAction {
             .borrow()
             .can_attack(&self.target, &area_state.borrow())
         {
-            return;
+            return false;
         }
 
         EntityState::attack(&self.pc, &self.target, None, true);
+        false
     }
 }
 
@@ -562,9 +574,9 @@ impl ActionKind for MoveThenAction {
         self.cursor_state
     }
 
-    fn fire_action(&mut self, widget: &Rc<RefCell<Widget>>) {
+    fn fire_action(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
         let action = match self.cb_action.take() {
-            None => return,
+            None => return false,
             Some(action) => Rc::new(RefCell::new(action)),
         };
 
@@ -575,6 +587,7 @@ impl ActionKind for MoveThenAction {
 
         self.move_action.cb = Some(Box::new(cb));
         self.move_action.fire_action(widget);
+        false
     }
 
     fn get_hover_info(&self) -> Option<(Rc<ObjectSize>, i32, i32)> {
@@ -673,7 +686,7 @@ impl ActionKind for MoveAction {
         animation_state::Kind::MouseMove
     }
 
-    fn fire_action(&mut self, widget: &Rc<RefCell<Widget>>) {
+    fn fire_action(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
         trace!("Firing move action");
         let (root, view) = Widget::parent_mut::<RootView>(widget);
         view.set_prop_window(&root, false, 0);
@@ -684,6 +697,7 @@ impl ActionKind for MoveAction {
         } else {
             self.move_all();
         }
+        false
     }
 
     fn get_hover_info(&self) -> Option<(Rc<ObjectSize>, i32, i32)> {
@@ -701,7 +715,7 @@ impl ActionKind for InvalidAction {
         animation_state::Kind::MouseInvalid
     }
 
-    fn fire_action(&mut self, _widget: &Rc<RefCell<Widget>>) {}
+    fn fire_action(&mut self, _widget: &Rc<RefCell<Widget>>) -> bool { false }
 
     fn get_hover_info(&self) -> Option<(Rc<ObjectSize>, i32, i32)> {
         None

@@ -14,7 +14,7 @@ nodes:
     responses: []
   start01:
     text: |
-      [c=888|The nobleman looks you over.]
+      [c=6868FF|#target_name#] - [c=888|The nobleman looks you over.]
       
       Ah, you might be just the person I am looking for!  I am Jevero.
     responses:
@@ -25,7 +25,7 @@ nodes:
       - text: "I'm afraid I am not interested.  Goodbye."
   quest01:
     text: |
-      Yes, yes.  You see, there is a rather delicate matter of some funds I am owed.  A sum of 500 coins - nothing particularly large, you see, but I cannot allow debts to be unpaid for this long.
+      [c=6868FF|#target_name#] - Yes, yes.  You see, there is a rather delicate matter of some funds I am owed.  A sum of 500 coins - nothing particularly large, you see, but I cannot allow debts to be unpaid for this long.
     on_view:
       - target_flag: already_talked
     responses:
@@ -33,7 +33,7 @@ nodes:
         to: quest02
   quest02:
     text: |
-      Anyway, the debtor is a Rodian they call Weasel.  He's usually found in the Warrens on the north end of town.
+      [c=6868FF|#target_name#] - Anyway, the debtor is a Rodian they call Weasel.  He's usually found in the Warrens on the north end of town.
       
       He's really being quite unreasonable.  I need someone who can show a bit of strength, and get him to pay up.
     responses:
@@ -41,7 +41,7 @@ nodes:
         to: quest03
   quest03:
     text: |
-      So.  Are you interested?
+      [c=6868FF|#target_name#] - So.  Are you interested?
     on_view:
       - quest_state:
           quest: a_weasels_debt
@@ -56,17 +56,17 @@ nodes:
         to: quest_reject
   quest_accept:
     text: |
-      That's wonderful.  As I said, you'll likely find him in the Warrens.  Please let me know when you have the coins.
+      [c=6868FF|#target_name#] - That's wonderful.  As I said, you'll likely find him in the Warrens.  Please let me know when you have the coins.
     responses:
       - text: "Farewell."
   quest_reject:
     text: |
-      I hope you reconsider.  I am usually here if you are able to collect.
+      [c=6868FF|#target_name#] - I hope you reconsider.  I am usually here if you are able to collect.
     responses:
       - text: "Farewell."
   quest_negotiate:
     text: |
-      Well, there is a finder's fee of course.  Let's say 20% - 100 coins.
+      [c=6868FF|#target_name#] - Well, there is a finder's fee of course.  Let's say 20% - 100 coins.
     on_view:
       - target_num_flag: { flag: negotiate, val: 1 }
     responses:
@@ -82,12 +82,12 @@ nodes:
           - target_num_flag: { flag: negotiate, val: 2 }
   quest_negotiate02:
     text: |
-      Yes, yes, very well.  As I said you'll likely find him in the Warrens.  Let me know when you have been able to collect.
+      [c=6868FF|#target_name#] - Yes, yes, very well.  As I said you'll likely find him in the Warrens.  Let me know when you have been able to collect.
     responses:
       - text: "Farewell."
   quest_negotiate03:
     text: |
-      Wait!
+      [c=6868FF|#target_name#] - Wait!
       
       I'll offer you 40% - 200 coins.  I simply can't go any higher.
     responses:
@@ -97,7 +97,7 @@ nodes:
         to: quest_reject
   quest_update:
     text: |
-      So, were you able to collect the money from Weasel?
+      [c=6868FF|#target_name#] - So, were you able to collect the money from Weasel?
     responses:
       - text: "No, and I'm not going to.  You are done preying on those people."
         to_view:
@@ -116,14 +116,14 @@ nodes:
       - text: "No, not yet."
   quest_help01:
     text: |
-      What do you mean?  I made a business transaction.  If you don't want to collect, I'll find someone who will.
+      [c=6868FF|#target_name#] - What do you mean?  I made a business transaction.  If you don't want to collect, I'll find someone who will.
     responses:
       - text: "Those people have no jobs, no food, no money.  You are going to have to chalk up a loss on this one."
         to: quest_help02
       - text: "Fine.  Goodbye."
   quest_help02:
     text: |
-      [c=888|He seems flustered.]
+      [c=6868FF|#target_name#] - [c=888|He seems flustered.]
       
       I'm not out to hurt anyone, I just want back what is rightfully mine.
     responses:
@@ -133,7 +133,7 @@ nodes:
         to: quest_help03
   quest_help03:
     text: |
-      [c=888|He frowns.]
+      [c=6868FF|#target_name#] - [c=888|He frowns.]
       
       Perhaps not.  I suppose I have no choice but to take the loss and move on.
     responses:
@@ -141,7 +141,7 @@ nodes:
         to: quest_help04
   quest_help04:
     text: |
-      No, I suppose not.  You've made your point.
+      [c=6868FF|#target_name#] - No, I suppose not.  You've made your point.
       
       If you don't mind, I have other matters to attend.  Farewell.
     responses:
@@ -153,7 +153,7 @@ nodes:
               func: weasel_debt_help_complete
   quest_take01:
     text: |
-      So, you have the 500 then?
+      [c=6868FF|#target_name#] - So, you have the 500 then?
     responses:
       - text: "Yes, here is the 500."
         to_view:
@@ -178,7 +178,7 @@ nodes:
       - text: "Sorry, I have to go get it."
   quest_take_200:
     text: |
-      Truly?  I suppose you told him the deal is settled as well?  
+      [c=6868FF|#target_name#] - Truly?  I suppose you told him the deal is settled as well?  
       
       I guess it will do, but this is coming out of your end!
     responses:
@@ -186,19 +186,19 @@ nodes:
         to: quest_take_complete
   quest_take_300:
     text: |
-      I see.  Well, I suppose it will do.  Your fee will have to be a bit less, of course.
+      [c=6868FF|#target_name#] - I see.  Well, I suppose it will do.  Your fee will have to be a bit less, of course.
     responses:
       - text: "[c=888| Continue]"
         to: quest_take_complete
   quest_take_500:
     text: |
-      Fantastic!  The finder's fee is yours.
+      [c=6868FF|#target_name#] - Fantastic!  The finder's fee is yours.
     responses:
       - text: "[c=888| Continue]"
         to: quest_take_complete
   quest_take_complete:
     text: |
-      Now, if you will excuse me.
+      [c=6868FF|#target_name#] - Now, if you will excuse me.
     on_view:
       - target_flag: complete
       - fire_script:

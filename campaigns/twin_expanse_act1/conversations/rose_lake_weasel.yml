@@ -9,14 +9,16 @@ initial_nodes:
   - id: start01
 nodes:
   grateful:
-    text: "Thank you so much for your help."
+    text: |
+      [c=6868FF|#target_name#] - Thank you so much for your help.
     responses: []
   hateful:
-    text: "You got what you wanted.  Leave us alone."
+    text: |
+      [c=6868FF|#target_name#] - You got what you wanted.  Leave us alone.
     responses: []
   start01:
     text: |
-      What do you want?
+      [c=6868FF|#target_name#] - What do you want?
     responses:
       - text: "I'm here to collect for Jevero."
         to_view:
@@ -28,7 +30,7 @@ nodes:
       - text: "Nothing for now."
   collect01:
     text: |
-      [c=888|The Rodian's eyes dart nervously from one side to the other.]
+      [c=6868FF|#target_name#] - [c=888|The Rodian's eyes dart nervously from one side to the other.]
       
       I already told Jevero, I have no money.  We have nothing here, see?
       
@@ -41,7 +43,7 @@ nodes:
       - text: "You know what, forget it.  Farewell."
   collect_inquire01:
     text: |
-      Three hundred.  For tools, clothes - for jobs.  But none of the humans above will hire us.  So now we have nothing, no money, no jobs.
+      [c=6868FF|#target_name#] - Three hundred.  For tools, clothes - for jobs.  But none of the humans above will hire us.  So now we have nothing, no money, no jobs.
     responses:
       - text: "That's very sad.  But Jevero says you owe five hundred.  So pay up."
         to: ask_hard
@@ -52,7 +54,7 @@ nodes:
       - text: "I'm sorry I asked.  Farewell."
   ask_hard:
     text: |
-      Already told you, I have no money!  Nothing!
+      [c=6868FF|#target_name#] - Already told you, I have no money!  Nothing!
     responses:
       - text: "I don't believe that for a second.  You are holding out on me."
         to: ask_hard2
@@ -62,7 +64,7 @@ nodes:
         to: ask_soft
   ask_hard2:
     text: |
-      Ok ok.  We can do the three hundred.  But that is everything.  We have no more.
+      [c=6868FF|#target_name#] - Ok ok.  We can do the three hundred.  But that is everything.  We have no more.
     responses:
       - text: "That will do.  I will make sure Jevero accepts."
         on_select:
@@ -74,7 +76,7 @@ nodes:
         to: ask_hard3b
   ask_hard3a:
     text: |
-      No, we have nothing.  Please, three hundred.  It is all we have.
+      [c=6868FF|#target_name#] - No, we have nothing.  Please, three hundred.  It is all we have.
     responses:
       - text: "Ok, then.  300 will do."
         on_select:
@@ -84,7 +86,7 @@ nodes:
         to: ask_hard3b
   ask_hard3b:
     text: |
-      [c=888|The Rodian is quivering slightly as he responds.]
+      [c=6868FF|#target_name#] - [c=888|The Rodian is quivering slightly as he responds.]
       
       Please!  We need money for food!  Our children won't eat!
     responses:
@@ -96,7 +98,7 @@ nodes:
         to: ask_hard_end
   ask_hard4:
     text: |
-      [c=888|The Rodian sighs, defeated.]
+      [c=6868FF|#target_name#] - [c=888|The Rodian sighs, defeated.]
       
       We give you 500.  Then you go away.
     responses:
@@ -106,7 +108,7 @@ nodes:
         to: ask_hard_end
   ask_med:
     text: |
-      Work out what?
+      [c=6868FF|#target_name#] - Work out what?
     responses:
       - text: "Give me whatever you can spare.  I will take it to Jevero and get him to call it even."
         to: ask_med2a
@@ -114,7 +116,7 @@ nodes:
         to: ask_med2b
   ask_med2a:
     text: |
-      Ok.  You take two hundred.  Every penny from all of us.  We call it even.
+      [c=6868FF|#target_name#] - Ok.  You take two hundred.  Every penny from all of us.  We call it even.
     responses:
       - text: "Ok.  I will make Jevero accept."
         on_select:
@@ -122,7 +124,7 @@ nodes:
         to: ask_med_end
   ask_med2b:
     text: |
-      Sigh.  It will be hard on us.  But here, three hundred.  Just make sure Jerevo calls it even.
+      [c=6868FF|#target_name#] - Sigh.  It will be hard on us.  But here, three hundred.  Just make sure Jerevo calls it even.
     responses:
       - text: "Yes, he will."
         on_select:
@@ -130,7 +132,7 @@ nodes:
         to: ask_hard_end
   ask_hard_end:
     text: |
-      You go then, and not come back.
+      [c=6868FF|#target_name#] - You go then, and not come back.
     on_view:
       - target_flag: extorted
       - quest_state:
@@ -144,7 +146,7 @@ nodes:
       - text: "Goodbye."
   ask_med_end:
     text: |
-      Thank you.  We will be glad to put this behind.
+      [c=6868FF|#target_name#] - Thank you.  We will be glad to put this behind.
     on_view:
       - target_flag: agreed_to_help
       - quest_state:
@@ -158,7 +160,7 @@ nodes:
       - text: "Farewell."
   ask_soft:
     text: |
-      I thank you, thank you!  Please just get him to leave us alone!
+      [c=6868FF|#target_name#] - I thank you, thank you!  Please just get him to leave us alone!
     on_view:
       - target_flag: agreed_to_help
       - quest_state:

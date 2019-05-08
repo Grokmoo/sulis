@@ -13,7 +13,7 @@ initial_nodes:
 nodes:
   start01:
     text: |
-      [c=888|This rodian seems very out of place in a small town.]
+      [c=6868FF|#target_name#] - [c=888|This rodian seems very out of place in a small town.]
       
       This one offers you greetings.  This one is called Cragnik.
     on_view:
@@ -25,7 +25,7 @@ nodes:
         to: start02
   start02:
     text: |
-      Greetings, #player_name#.  This one is most humbled by your presence.  This one has a request if you would hear it.
+      [c=6868FF|#target_name#] - Greetings, #player_name#.  This one is most humbled by your presence.  This one has a request if you would hear it.
     responses:
       - text: "Go ahead."
         to: start04
@@ -35,14 +35,14 @@ nodes:
         to: start03
   start03:
     text: |
-      Not selling anything, no!  Will just take a moment!
+      [c=6868FF|#target_name#] - Not selling anything, no!  Will just take a moment!
     responses:
       - text: "Not interested.  Farewell."
       - text: "Ok.  Go ahead."
         to: start04
   start04:
     text: |
-      You are a traveler-adventurer, yes?  This one wishes to join you.  This one is a skilled rogue and can help you.
+      [c=6868FF|#target_name#] - You are a traveler-adventurer, yes?  This one wishes to join you.  This one is a skilled rogue and can help you.
     responses:
       - text: "Why do you want to join me?"
         to: start05
@@ -52,7 +52,7 @@ nodes:
         to: reject
   start05:
     text: |
-      This one does not do well in the small town, in the forest.  This one is at home in the city.  This one wants to go to Rose Lake, but entrance is closed.
+      [c=6868FF|#target_name#] - This one does not do well in the small town, in the forest.  This one is at home in the city.  This one wants to go to Rose Lake, but entrance is closed.
     responses:
       - text: "Rose Lake is closed off?  Why?"
         to: start06
@@ -62,27 +62,30 @@ nodes:
         to: reject
   start06:
     text: |
-      This one doesn't know details.  Some internal politics in city, this one thinks.
+      [c=6868FF|#target_name#] - This one doesn't know details.  Some internal politics in city, this one thinks.
     responses:
       - text: "Ok.  You can join me."
         to: join
       - text: "I'm not interested in you joining me."
         to: reject
   reject:
-    text: "This one hopes you will reconsider."
+    text: |
+      [c=6868FF|#target_name#] - This one hopes you will reconsider.
     on_view:
       - target_flag: rejected
     responses:
       - text: "[c=888|Leave]"
   reconsider:
-    text: "Have you reconsidered my offer of joining you?"
+    text: |
+      [c=6868FF|#target_name#] - Have you reconsidered my offer of joining you?
     responses:
       - text: "Yes.  Welcome aboard."
         to: join
       - text: "No, not interested."
         to: reject
   join:
-    text: "This one is overjoyed!  You will not regret it."
+    text: |
+      [c=6868FF|#target_name#] - This one is overjoyed!  You will not regret it.
     on_view:
       - fire_script:
           id: wellswood
@@ -91,6 +94,6 @@ nodes:
       - text: "[c=888|Leave]"
   questions:
     text: |
-      What can this one do for you?
+      [c=6868FF|#target_name#] - What can this one do for you?
     responses:
       - text: "Nothing right now, Cragnik."

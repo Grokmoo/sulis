@@ -19,7 +19,7 @@ nodes:
         to: start03
   start03:
     text: |
-      Ah, the survivor.  I was wondering if you would show up.
+      [c=6868FF|#target_name#] - Ah, the survivor.  I was wondering if you would show up.
       
       It will not please you to learn you were the only survivor, I imagine.
     on_view:
@@ -33,7 +33,7 @@ nodes:
         to: start04
   start04:
     text: |
-      My name is Kaelwyn.  I am here due to our mutual companion Ethel.  He was carrying a ring of some importance.
+      [c=6868FF|#target_name#] - My name is Kaelwyn.  I am here due to our mutual companion Ethel.  He was carrying a ring of some importance.
       
       Unfortunately, it was already gone when I arrived.
     responses:
@@ -42,7 +42,7 @@ nodes:
       - text: "That's nice.  Farewell."
   start05:
     text: |
-      I'm afraid not.  It is a private matter within the Elves, you see.
+      [c=6868FF|#target_name#] - I'm afraid not.  It is a private matter within the Elves, you see.
       
       I must be off now.  Farewell.
     responses:
@@ -65,19 +65,19 @@ nodes:
         to: start_vaalyun03
   start_vaalyun03:
     text: |
-      [c=888|Vaalyun speaks.]  Hail brother!  What brings you so far from home?
+      [c=68FF68|Vaalyun] - Hail brother!  What brings you so far from home?
     responses:
       - text: "[c=888|Continue]"
         to: start_vaalyun04
   start_vaalyun04:
     text: |
-      Don't play dumb.  The ring.  Same reason as you.
+      [c=6868FF|#target_name#] - Don't play dumb.  The ring.  Same reason as you.
     responses:
       - text: "[c=888|Continue]"
         to: start_vaalyun05
   start_vaalyun05:
     text: |
-      [c=888|Vaalyun seems taken aback.  Or perhaps he is only playing at it.]
+      [c=68FF68|Vaalyun] - [c=888|Vaalyun seems taken aback.  Or perhaps he is only playing at it.]
       
       You hurt me!  My main concern is of course for the safety of our brother, Ethel!
     responses:
@@ -85,13 +85,13 @@ nodes:
         to: start_vaalyun06
   start_vaalyun06:
     text: |
-      Then you will be saddened to know of his death.
+      [c=6868FF|#target_name#] - Then you will be saddened to know of his death.
     responses:
       - text: "[c=888|Continue]"
         to: start_vaalyun07
   start_vaalyun07:
     text: |
-      [c=888|Vaalyun does not seem terribly upset.]
+      [c=68FF68|Vaalyun] - [c=888|Vaalyun does not seem terribly upset.]
       
       Of course!  I mean, I feared the worst, but to know for certain...
       
@@ -101,7 +101,7 @@ nodes:
         to: start_vaalyun08
   start_vaalyun08:
     text: |
-      Yes.  I'm afraid our mutual friend here was the only survivor of this disaster.
+      [c=6868FF|#target_name#] - Yes.  I'm afraid our mutual friend here was the only survivor of this disaster.
       
       And before you ask, the ring was already gone when I got here.  Taken, I'm afraid.
     on_view:
@@ -113,7 +113,7 @@ nodes:
         to: start_vaalyun09
   start_vaalyun09:
     text: |
-      [c=888|Before Vaalyun can reply, the elf is already on his way.]
+      [c=6868FF|#target_name#] - [c=888|Before Vaalyun can reply, the elf is already on his way.]
       
       I imagine I'll see you soon, Vaalyun.
     responses:
@@ -125,7 +125,7 @@ nodes:
         to: vaalyun_questions
   vaalyun_questions:
     text: |
-      [c=888|Vaalyun seems distraught.]
+      [c=68FF68|Vaalyun] - [c=888|Vaalyun seems distraught.]
       
       The ring gone and no leads...
     on_view:
@@ -146,19 +146,19 @@ nodes:
           - not_player_flag: asked_vaalyun_next
   vaalyun_who:
     text: |
-      That was Kaelwyn, and ally of Ethel and I.  He will also seek the return of the ring.
+      [c=68FF68|Vaalyun] - That was Kaelwyn, and ally of Ethel and I.  He will also seek the return of the ring.
     responses:
       - text: "[c=888|Continue]"
         to: vaalyun_questions
   vaalyun_ring:
     text: |
-      As I said before, it is an item of some importance to us, but of no value to you.
+      [c=68FF68|Vaalyun] - As I said before, it is an item of some importance to us, but of no value to you.
     responses:
       - text: "[c=888|Continue]"
         to: vaalyun_questions
   vaalyun_next:
     text: |
-      I'm not sure.  I will continue to travel with you.  Perhaps we will happen upon some clues about what to do next.
+      [c=68FF68|Vaalyun] - I'm not sure.  I will continue to travel with you.  Perhaps we will happen upon some clues about what to do next.
     responses:
       - text: "[c=888|Continue]"
         on_select:

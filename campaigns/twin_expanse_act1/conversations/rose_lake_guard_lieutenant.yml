@@ -22,7 +22,7 @@ nodes:
     responses: []
   in_progress:
     text: |
-      [c=888|This woman has the air of veteran about her.]
+      [c=6868FF|#target_name#] - [c=888|This woman has the air of veteran about her.]
       
       You must be the one the captain mentioned.  You ready to help out?
     responses:
@@ -34,14 +34,14 @@ nodes:
         to: no_help
   no_help:
     text: |
-      [c=888|She looks annoyed.]
+      [c=6868FF|#target_name#] - [c=888|She looks annoyed.]
       
       Well, don't be wasting my time then.  Either help or get your ass out of here.
     responses:
       - text: "[c=888|Leave]"
   help01:
     text: |
-      Of course.  The basic rundown is that we've had a series of disappearances in and around the lake.  Most recently, right here on the docks where I'm standing.
+      [c=6868FF|#target_name#] - Of course.  The basic rundown is that we've had a series of disappearances in and around the lake.  Most recently, right here on the docks where I'm standing.
       
       Now, one or two fisherman falling in the water doesn't concern us, but this is more than that.
     responses:
@@ -49,7 +49,7 @@ nodes:
         to: help02
   help02:
     text: |
-      We're also hearing reports of a lot of unusual serpent activity, especially for this time of year.  I think it is probably connected.
+      [c=6868FF|#target_name#] - We're also hearing reports of a lot of unusual serpent activity, especially for this time of year.  I think it is probably connected.
     responses:
       - text: "Serpents?"
         to: help02b
@@ -57,13 +57,13 @@ nodes:
         to: help03
   help02b:
     text: |
-      Yeah, Sea Serpents.  We have always had them in the Lake.  But attacks on humans are extremely rare - until now, if I'm right.
+      [c=6868FF|#target_name#] - Yeah, Sea Serpents.  We have always had them in the Lake.  But attacks on humans are extremely rare - until now, if I'm right.
     responses:
       - text: "[c=888|Continue]"
         to: help03
   help03:
     text: |
-      Unfortunately the Guard has its hands full with the situation here, and I don't want to lose good men to those things.
+      [c=6868FF|#target_name#] - Unfortunately the Guard has its hands full with the situation here, and I don't want to lose good men to those things.
       
       So, I need you to head around to the other side of the Lake, to their spawning grounds.  See what you can dig up.  Report back to the Guardhouse when you are done.
     on_view:

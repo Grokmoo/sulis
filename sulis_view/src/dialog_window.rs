@@ -96,17 +96,28 @@ impl WidgetKind for DialogWindow {
         let cur_text = self.convo.text(&self.cur_node);
         let responses = self.convo.responses(&self.cur_node);
 
-        let node_widget = Widget::with_theme(self.node.clone(), "node");
-        {
-            let entity = self.entity.borrow();
-            for (ref flag, ref val) in entity.custom_flags() {
-                node_widget.borrow_mut().state.add_text_arg(flag, val);
+        if let Some(ref speaker) = self.convo.switch_speaker(&self.cur_node) {
+            if let Some(speaker) = entity_with_id(speaker.to_string()) {
+                let speaker = &speaker.borrow().location;
+                let cb = OnTrigger::ScrollView(speaker.x, speaker.y);
+                GameState::add_ui_callback(vec![cb], &self.pc, &self.entity);
+            } else {
+                warn!("Attempted to switch to invalid speaker '{}'", speaker);
             }
         }
-        node_widget
-            .borrow_mut()
-            .state
-            .add_text_arg("player_name", &self.pc.borrow().actor.actor.name);
+
+        let node_widget = Widget::with_theme(self.node.clone(), "node");
+        {
+            let node = &mut node_widget.borrow_mut().state;
+            let entity = self.entity.borrow();
+            for (ref flag, ref val) in entity.custom_flags() {
+                node.add_text_arg(flag, val);
+            }
+
+            node.add_text_arg("player_name", &self.pc.borrow().actor.actor.name);
+            node.add_text_arg("target_name", &entity.actor.actor.name);
+        }
+
         let cur_text = theme::expand_text_args(cur_text, &node_widget.borrow().state);
 
         if responses.is_empty() {

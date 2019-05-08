@@ -17,7 +17,7 @@ nodes:
     responses: []
   ambush_cleared:
     text: |
-      [c=888|Tervald is visibly shaken, something you haven't seen before.]
+      [c=6868FF|#target_name#] - [c=888|Tervald is visibly shaken, something you haven't seen before.]
       
       Damn it those goblins were right on top of us!
     on_view:
@@ -28,7 +28,7 @@ nodes:
         to: ambush_cleared_02
   ambush_cleared_02:
     text: |
-      That was just a scouting party.  There are going to be a whole lot more of them, and they are not far behind us.
+      [c=6868FF|#target_name#] - That was just a scouting party.  There are going to be a whole lot more of them, and they are not far behind us.
     responses:
       - text: |
           What should we do?
@@ -41,7 +41,7 @@ nodes:
         to: ambush_cleared_03a
   ambush_cleared_03a:
     text: |
-      We can't go back, and I don't like our chances in a stand up fight with that many goblins.
+      [c=6868FF|#target_name#] - We can't go back, and I don't like our chances in a stand up fight with that many goblins.
       
       Our best chance is to find a clear path out of this valley, but we can't do that with goblins on top of us.
     responses:
@@ -50,7 +50,7 @@ nodes:
         to: ambush_cleared_04
   ambush_cleared_04:
     text: |
-      The majority of the group will stay here for now with me.  We'll block the pass and try to set up some traps to slow down the main force of goblins.
+      [c=6868FF|#target_name#] - The majority of the group will stay here for now with me.  We'll block the pass and try to set up some traps to slow down the main force of goblins.
       
       #player_name#, you scout to the North and try to find us a way out of this mess.  You will probably get in some fights, so you should take someone with you.
     responses:
@@ -91,7 +91,7 @@ nodes:
     responses: []
   start01:
     text: |
-      [c=888|Tervald, the leader of your group, addresses you.]
+      [c=6868FF|#target_name#] - [c=888|The leader of your group addresses you.]
       
       Alright, we know the wagon went into these woods.  The question is: did it come out again?
     on_view:
@@ -102,7 +102,7 @@ nodes:
         to: start02
   start02:
     text: |
-      I'm not seeing much in the way of a clear trail.  #player_name#, see if you can spot anything further up the river.
+      [c=6868FF|#target_name#] - I'm not seeing much in the way of a clear trail.  #player_name#, see if you can spot anything further up the river.
       
       The rest of us will make ready for battle - I don't like the looks of this one bit.
     responses:
@@ -111,7 +111,7 @@ nodes:
         to: start03
   start03:
     text: |
-      And #player_name#, watch yourself.  If you spot any trouble, you come back here as quick as you can.  Don't be a hero.
+      [c=6868FF|#target_name#] - And #player_name#, watch yourself.  If you spot any trouble, you come back here as quick as you can.  Don't be a hero.
     responses:
       - text: |
           Will do.  See you soon.

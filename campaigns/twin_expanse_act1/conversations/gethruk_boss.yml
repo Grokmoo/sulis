@@ -4,7 +4,7 @@ initial_nodes:
 nodes:
   start01:
     text: |
-      [c=888|The man you now know as Gethruk addresses you.]
+      [c=6868FF|#target_name#] - [c=888|The man you now know as Gethruk addresses you.]
       
       Who the hell are you?
     responses:
@@ -19,7 +19,7 @@ nodes:
         to: start02b
   start02a:
     text: |
-      And you think you can stop us!  Think again!
+      [c=6868FF|#target_name#] - And you think you can stop us!  Think again!
       
       Let's show this fool who's really in charge of Wellswood!
     responses:
@@ -30,7 +30,7 @@ nodes:
               func: set_boss_hostile
   start02b:
     text: |
-      [c=888|Gethruk laughs.]  You mean how we've got every merchant and farmer bankrolling us?
+      [c=6868FF|#target_name#] - [c=888|Gethruk laughs.]  You mean how we've got every merchant and farmer bankrolling us?
     responses:
       - text: "[c=888|Continue]"
         to_view:
@@ -42,13 +42,13 @@ nodes:
         to: start04
   start03a:
     text: |
-      You've got some nerve, I'll give you that.  Claiming you want to talk after carving through my men.
+      [c=6868FF|#target_name#] - You've got some nerve, I'll give you that.  Claiming you want to talk after carving through my men.
     responses:
       - text: "[c=888|Continue]"
         to: start04
   start04:
     text: |
-      I'm afraid there will be no negotiation.  Kill these fools!
+      [c=6868FF|#target_name#] - I'm afraid there will be no negotiation.  Kill these fools!
     responses:
       - text: "[c=f00|Fight]"
         on_select:

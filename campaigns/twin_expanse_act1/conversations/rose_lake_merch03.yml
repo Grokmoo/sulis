@@ -4,7 +4,7 @@ initial_nodes:
 nodes:
   start01:
     text: |
-      [c=888|This man has a bit of a slimy demeanor.]
+      [c=6868FF|#target_name#] - [c=888|This man has a bit of a slimy demeanor.]
       
       I've got all manner of bargains here.  What are you in the market for?
     responses:

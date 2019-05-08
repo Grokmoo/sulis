@@ -4,7 +4,7 @@ initial_nodes:
 nodes:
   start01:
     text: |
-      [c=888|Standing before you is a Mage of Sulis.  He doesn't seem to notice you.]
+      [c=6868FF|#target_name#] - [c=888|Standing before you is a Mage of Sulis.  He doesn't seem to notice you.]
       
       At last.  I can finally leave this accursed place.
     responses:
@@ -12,13 +12,13 @@ nodes:
         to: start02
   start02:
     text: |
-      [c=888|Reaching into the water, he pulls out a glowing object.  It looks to be a wand or stave of some kind.]
+      [c=6868FF|#target_name#] - [c=888|Reaching into the water, he pulls out a glowing object.  It looks to be a wand or stave of some kind.]
     responses:
       - text: "[c=888|Continue]"
         to: start03
   start03:
     text: |
-      [c=888|With a start, he notices you.]
+      [c=6868FF|#target_name#] - [c=888|With a start, he notices you.]
 
       What...how did you get past all the serpents?
     responses:
@@ -34,13 +34,13 @@ nodes:
               func: arzel_spawn
   start04b:
     text: |
-      The master has given me a taste of power.  Not that these creatures would pose a threat to me regardless.
+      [c=6868FF|#target_name#] - The master has given me a taste of power.  Not that these creatures would pose a threat to me regardless.
     responses:
       - text: "[c=888|Continue]"
         to: start05
   start04a:
     text: |
-      [c=888|For just a moment, his lips form a smile.]
+      [c=6868FF|#target_name#] - [c=888|For just a moment, his lips form a smile.]
       
       How...delightful.
     responses:
@@ -48,7 +48,7 @@ nodes:
         to: start05
   start05:
     text: |
-      I suppose you seek the Aegis.  Well, you are too late.  I will be the one to give it to the master.
+      [c=6868FF|#target_name#] - I suppose you seek the Aegis.  Well, you are too late.  I will be the one to give it to the master.
     responses:
       - text: "[c=f00|Fight] We'll see about that."
         to: convo_exit
@@ -62,7 +62,7 @@ nodes:
         to: start06b
   start06a:
     text: |
-      [c=888|He seems surprised.]
+      [c=6868FF|#target_name#] - [c=888|He seems surprised.]
       
       Together...
       
@@ -72,7 +72,7 @@ nodes:
         to: start07
   start06b:
     text: |
-      [c=888|He seems surprised, but only for a moment.  His expression hardens.]
+      [c=6868FF|#target_name#] - [c=888|He seems surprised, but only for a moment.  His expression hardens.]
       
       You truly do not know?  Did you just stumble in here unawares?
     responses:
@@ -80,7 +80,7 @@ nodes:
         to: start07
   start07:
     text: |
-      I'll save you some trouble.  Rose Lake is already ours.  Now we have another piece of the Aegis.
+      [c=6868FF|#target_name#] - I'll save you some trouble.  Rose Lake is already ours.  Now we have another piece of the Aegis.
       
       You have no hope.
     responses:
@@ -94,7 +94,7 @@ nodes:
         to: start08
   start08:
     text: |
-      [c=888|He laughs again.]
+      [c=6868FF|#target_name#] - [c=888|He laughs again.]
       
       I'm afraid that will not be possible.
     responses:

@@ -10,7 +10,7 @@ initial_nodes:
 nodes:
   start01:
     text: |
-      [c=888|The elf watches you approach, clearly eager to speak to you.]
+      [c=6868FF|#target_name#] - [c=888|The elf watches you approach, clearly eager to speak to you.]
       
       Thanks for speaking to me.  My name is Vaalyun, formerly of Pard.
     on_view:
@@ -22,7 +22,7 @@ nodes:
         to: start02
   start02:
     text: |
-      Yes, I know of you.  You traveled with a group including an elf - Ethel - into the wood searching for a caravan.  Do you know what became of him?
+      [c=6868FF|#target_name#] - Yes, I know of you.  You traveled with a group including an elf - Ethel - into the wood searching for a caravan.  Do you know what became of him?
     responses:
       - text: "[c=f00|Lie] I don't know."
         to: start03a
@@ -34,7 +34,7 @@ nodes:
         to: start03b
   start03a:
     text: |
-      I was afraid you might say that.  In truth, I hold out little hope for his survival.  Still, I would like to know for certain.
+      [c=6868FF|#target_name#] - I was afraid you might say that.  In truth, I hold out little hope for his survival.  Still, I would like to know for certain.
     responses:
       - text: "[c=888|Continue]"
         to: start04
@@ -46,7 +46,7 @@ nodes:
         to: start04
   start04:
     text: |
-      Ethel was carrying something valuable to me and I would like to recover it.
+      [c=6868FF|#target_name#] - Ethel was carrying something valuable to me and I would like to recover it.
       
       You knew and traveled with him, so I think you are my best chance to do this.  I propose we travel together and attempt to recover this item.
     on_view:
@@ -66,7 +66,7 @@ nodes:
         to: join_reject
   item_ask:
     text: |
-      It is a personal matter, and would mean nothing to you.  The item is only of value to me.
+      [c=6868FF|#target_name#] - It is a personal matter, and would mean nothing to you.  The item is only of value to me.
       
       What do you say?
     responses:
@@ -79,18 +79,21 @@ nodes:
       - text: "Not interested."
         to: join_reject
   join_confirm:
-    text: "That is acceptable.  Please do not delay too long - I don't want to lose the trail."
+    text: |
+      [c=6868FF|#target_name#] - That is acceptable.  Please do not delay too long - I don't want to lose the trail.
     responses:
       - text: "Agreed.  Lets go."
         to: join
       - text: "I've changed my mind."
         to: join_reject
   join_reject:
-    text: "I am sorry to hear that.  Let me know if you change your mind."
+    text: |
+      [c=6868FF|#target_name#] - I am sorry to hear that.  Let me know if you change your mind.
     responses:
       - text: "Farewell."
   join:
-    text: "Excellent.  Lets be off."
+    text: |
+      [c=6868FF|#target_name#] - Excellent.  Lets be off.
     on_view:
       - fire_script:
           id: wellswood_farms
@@ -98,7 +101,8 @@ nodes:
     responses:
       - text: "[c=888|Leave]"
   not_joined:
-    text: "Have you reconsidered?  Should I join you?"
+    text: |
+      [c=6868FF|#target_name#] - Have you reconsidered?  Should I join you?
     responses:
       - text: "Yes.  Let's go."
         to: join

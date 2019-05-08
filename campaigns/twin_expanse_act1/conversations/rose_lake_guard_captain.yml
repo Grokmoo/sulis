@@ -25,7 +25,7 @@ nodes:
     responses: []
   complete:
     text: |
-      [c=888|The captain of the guard greets you more warmly than before.]
+      [c=6868FF|#target_name#] - [c=888|The captain of the guard greets you more warmly than before.]
       
       I heard you have been out working with the Lieutenant.  What's your report?
     responses:
@@ -33,7 +33,7 @@ nodes:
         to: complete02
   complete02:
     text: |
-      [c=888|The captain listens intently.]
+      [c=6868FF|#target_name#] - [c=888|The captain listens intently.]
       
       Well damn.  Based on your story, you need to get right over to the Council right away.  And bring this 'Aegis'.  I'm sure they will want to see it.
     on_view:
@@ -45,7 +45,7 @@ nodes:
         to: complete03
   complete03:
     text: |
-      You did fine work, #player_name#.  None of my people could have done better.
+      [c=6868FF|#target_name#] - You did fine work, #player_name#.  None of my people could have done better.
     responses:
       - text: "Thanks.  Farewell."
   in_progress:
@@ -53,7 +53,7 @@ nodes:
     responses: []
   start01:
     text: |
-      [c=888|The captain of the guard glances up from his desk at you, but only for a moment.  Then his eyes return to his work.]
+      [c=6868FF|#target_name#] - [c=888|The captain of the guard glances up from his desk at you, but only for a moment.  Then his eyes return to his work.]
       
       Make it quick, citizen.
     responses:
@@ -67,7 +67,7 @@ nodes:
       - text: "Nothing, nevermind."
   ask_council01:
     text: |
-      [c=888|You seem to have caught his interest as he looks up, directly at you.]
+      [c=6868FF|#target_name#] - [c=888|You seem to have caught his interest as he looks up, directly at you.]
       
       Oh?  What sort of information is that?
     responses:
@@ -81,7 +81,7 @@ nodes:
         to: ask_council_easy
   ask_council_neg:
     text: |
-      [c=888|Without losing a beat, the captain looks back down at his work.]
+      [c=6868FF|#target_name#] - [c=888|Without losing a beat, the captain looks back down at his work.]
       
       I doubt that very much.  Get out of here, before I have you removed.
     responses:
@@ -90,14 +90,14 @@ nodes:
       - text: "[c=888|Leave]"
   ask_council_neg02:
     text: |
-      [c=888|He looks at you again.]
+      [c=6868FF|#target_name#] - [c=888|He looks at you again.]
       
       I won't repeat myself again.  Get out of here!
     responses:
       - text: "[c=888|Leave]"
   ask_council_med:
     text: |
-      [c=888|He sighs.]
+      [c=6868FF|#target_name#] - [c=888|He sighs.]
       
       I suppose if it really is that important, best to keep it close.
     responses:
@@ -105,7 +105,7 @@ nodes:
         to: ask_council02
   ask_council_easy:
     text: |
-      [c=888|He listens intently.]
+      [c=6868FF|#target_name#] - [c=888|He listens intently.]
     
       That is quite a story.  If it is true, I'm sure the council will want to hear it from you.
     responses:
@@ -113,7 +113,7 @@ nodes:
         to: ask_council02
   ask_council02:
     text: |
-      The truth is I can help you.  But, I can't just send anyone who walks in here on to the Council.  You'll need to prove yourself first.
+      [c=6868FF|#target_name#] - The truth is I can help you.  But, I can't just send anyone who walks in here on to the Council.  You'll need to prove yourself first.
     responses:
       - text: "Prove myself?  This is urgent!"
         to: ask_council03
@@ -121,13 +121,13 @@ nodes:
         to: ask_council04
   ask_council03:
     text: |
-      I know it may seem that way, but the Council of Five deals with these sorts of threats all the time.  They are dealing with one right now, as a matter of fact.
+      [c=6868FF|#target_name#] - I know it may seem that way, but the Council of Five deals with these sorts of threats all the time.  They are dealing with one right now, as a matter of fact.
     responses:
       - text: "[c=888|Continue]"
         to: ask_council04
   ask_council04:
     text: |
-      What I need from you is simple enough.  Find my Lieutenant out on the docks.  Help her with this current case we're dealing with.  Then, I'll let you see the Council.
+      [c=6868FF|#target_name#] - What I need from you is simple enough.  Find my Lieutenant out on the docks.  Help her with this current case we're dealing with.  Then, I'll let you see the Council.
     responses:
       - text: "Ok, you've got a deal.  I'll return when I've helped the Lieutenant."
         to: ask_council06
@@ -135,13 +135,13 @@ nodes:
         to: ask_council05
   ask_council05:
     text: |
-      I'll let her explain that.  Just meet her at the docks.
+      [c=6868FF|#target_name#] - I'll let her explain that.  Just meet her at the docks.
     responses:
       - text: "[c=888|Continue]"
         to: ask_council06
   ask_council06:
     text: |
-      Alright, now get to it.  And good luck.
+      [c=6868FF|#target_name#] - Alright, now get to it.  And good luck.
     responses:
       - text: "[c=888|Leave]"
         on_select:

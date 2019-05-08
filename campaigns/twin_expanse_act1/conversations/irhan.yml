@@ -4,7 +4,7 @@ initial_nodes:
 nodes:
   start01:
     text: |
-      [c=888|You see before you a mage of the third or perhaps even fourth circle.]
+      [c=6868FF|#target_name#] - [c=888|You see before you a mage of the third or perhaps even fourth circle.]
       
       Greetings.  I must admit I am a bit surprised to see you here?
     responses:
@@ -15,14 +15,14 @@ nodes:
       - text: "[c=f00|Fight] I'm not interested in talking."
   start02a:
     text: |
-      I am called Irhan.  I lead these creatures.
+      [c=6868FF|#target_name#] - I am called Irhan.  I lead these creatures.
     responses:
       - text: "[c=888|Continue]"
         to: menu
       - text: "[c=f00|Fight] Time to die, Irhan."
   start02b:
     text: |
-      In a manner of speaking.  I have watched your progress with some interest.
+      [c=6868FF|#target_name#] - In a manner of speaking.  I have watched your progress with some interest.
       
       I am called Irhan.
     responses:
@@ -31,7 +31,7 @@ nodes:
       - text: "[c=f00|Fight] Time to die, Irhan."
   menu:
     text: |
-      You wish to parlay, I take it?
+      [c=6868FF|#target_name#] - You wish to parlay, I take it?
     responses:
       - text: "What is the purpose of these attacks?"
         to: attacks
@@ -44,7 +44,7 @@ nodes:
       - text: "[c=f00|Fight] Time to end this."
   attacks:
     text: |
-      Obviously, to sow chaos and death.  To gain power, and money.
+      [c=6868FF|#target_name#] - Obviously, to sow chaos and death.  To gain power, and money.
       
       What other end is there?
     responses:
@@ -52,7 +52,7 @@ nodes:
         to: menu
   tribes:
     text: |
-      Would you believe me if I told you it was my natural charisma?
+      [c=6868FF|#target_name#] - Would you believe me if I told you it was my natural charisma?
       
       [c=888|He chuckles.]
       
@@ -64,18 +64,18 @@ nodes:
         to: menu
   ask_serve:
     text: |
-      An astute question.  Why should someone who holds such power serve anyone?
+      [c=6868FF|#target_name#] - An astute question.  Why should someone who holds such power serve anyone?
     responses:
       - text: "[c=888|Continue]"
         to: ask_serve02
   ask_serve02:
     text: |
-      Well, the one I serve holds such power that even the Gods must take notice - and soon.
+      [c=6868FF|#target_name#] - Well, the one I serve holds such power that even the Gods must take notice - and soon.
     responses:
       - text: "[c=888|Continue]"
         to: ask_serve03
   ask_serve03:
     text: |
-      Be that as it may, I'm afraid that now you must die.  Kill them all!
+      [c=6868FF|#target_name#] - Be that as it may, I'm afraid that now you must die.  Kill them all!
     responses:
       - text: "[c=f00|Fight!]"

@@ -10,7 +10,7 @@ initial_nodes:
 nodes:
   start01:
     text: |
-      Bastards!  Why bother working when every penny goes to those thugs?
+      [c=6868FF|#target_name#] - Bastards!  Why bother working when every penny goes to those thugs?
     on_view:
       - target_flag: already_talked
     responses:
@@ -18,7 +18,7 @@ nodes:
         to: main
   main:
     text: |
-      [c=888|The man does not seem terribly interested in you.]
+      [c=6868FF|#target_name#] - [c=888|The man does not seem terribly interested in you.]
       
       Whaddaya want?
     responses:
@@ -27,7 +27,7 @@ nodes:
         to: thugs01
   thugs01:
     text: |
-      Yeah, right.  I know their leader is Gethruk.  He's holding them together.  Get rid of him, and they go back to fighting each other.
+      [c=6868FF|#target_name#] - Yeah, right.  I know their leader is Gethruk.  He's holding them together.  Get rid of him, and they go back to fighting each other.
     responses:
       - text: "Anything more?  Where can I find Gethruk?"
         to_view:
@@ -43,12 +43,12 @@ nodes:
         to: thugs02c
   thugs02a:
     text: |
-      You didn't seem too interesting in stopping them earlier.  Why should I stick my neck out now?
+      [c=6868FF|#target_name#] - You didn't seem too interesting in stopping them earlier.  Why should I stick my neck out now?
     responses:
       - text: "I guess you shouldn't.  Farewell."
   thugs02b:
     text: |
-      I doubt you can talk much sense into Gethruk, but I'll mark where his hideout is on your map.  Its a cave south of town.  I overheard them talking about it.
+      [c=6868FF|#target_name#] - I doubt you can talk much sense into Gethruk, but I'll mark where his hideout is on your map.  Its a cave south of town.  I overheard them talking about it.
     on_view:
       - fire_script:
           id: wellswood
@@ -57,7 +57,7 @@ nodes:
       - text: "Thank you.  Farewell."
   thugs02c:
     text: |
-      I don't know if you will be able to fight the whole lot of them, but I'll mark where his hideout is on your map.  Its a cave south of town.  I overheard them talking about it.
+      [c=6868FF|#target_name#] - I don't know if you will be able to fight the whole lot of them, but I'll mark where his hideout is on your map.  Its a cave south of town.  I overheard them talking about it.
     on_view:
       - fire_script:
           id: wellswood
@@ -66,7 +66,7 @@ nodes:
       - text: "Thank you.  Farewell."
   got_info:
     text: |
-      [c=888|The dock foreman is perhaps in a better mood than before, but only just so.]
+      [c=6868FF|#target_name#] - [c=888|The dock foreman is perhaps in a better mood than before, but only just so.]
       
       What is it?
     responses:

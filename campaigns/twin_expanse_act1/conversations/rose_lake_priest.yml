@@ -4,7 +4,7 @@ initial_nodes:
 nodes:
   start01:
     text: |
-      [c=888|This woman is marked as a priest of Anu.]
+      [c=6868FF|#target_name#] - [c=888|This woman is marked as a priest of Anu.]
       
       Hello.  What can the goddess do for you on this day?
     responses:
@@ -22,7 +22,7 @@ nodes:
       - text: "Nothing for now."
   rest:
     text: |
-      Yes, of course.
+      [c=6868FF|#target_name#] - Yes, of course.
       
       Rest, and recover from your injuries.
     responses:

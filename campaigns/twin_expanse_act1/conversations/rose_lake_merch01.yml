@@ -4,7 +4,7 @@ initial_nodes:
 nodes:
   start01:
     text: |
-      I sell all manner of items fit for the adventuring sort.  What can I get you?
+      [c=6868FF|#target_name#] - I sell all manner of items fit for the adventuring sort.  What can I get you?
     responses:
       - text: "Yes, I'll have a look."
         on_select:

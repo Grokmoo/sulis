@@ -10,7 +10,7 @@ nodes:
         to: start02
   start02:
     text: |
-      [c=888|The thug who seems to be the leader speaks.]
+      [c=6868FF|Thug] - [c=888|The thug who seems to be the leader speaks.]
       
       So, where is it?
     on_view:
@@ -22,31 +22,35 @@ nodes:
         to: start03
   start03:
     text: |
-      [c=888|The dock worker looks nervous.]
+      [c=68FF68|Dockworker] - [c=888|The worker looks nervous.]
       
       I'm s...sorry, we don't have it.  Things have been slow...
+    switch_speaker: dock_foreman
     responses:
       - text: "[c=888|Continue]"
         to: start04
   start04:
     text: |
-      [c=888|The thug maintains his calm.]
+      [c=6868FF|Thug] - [c=888|The thug maintains his calm.]
       
       The boss doesn't want excuses.  He wants his money.
+    switch_speaker: thug01
     responses:
       - text: "[c=888|Continue]"
         to: start05
   start05:
     text: |
-      "We just don't have it.  We need more time!"
+      [c=68FF68|Dockworker] - "We just don't have it.  We need more time!"
+    switch_speaker: dock_foreman
     responses:
       - text: "[c=888|Continue]"
         to: start06
   start06:
     text: |
-      [c=888|The thug is about to respond, but then notices your presence.]
+      [c=6868FF|Thug] - [c=888|The thug is about to respond, but then notices your presence.]
       
       This is a private conversation!  If you know what is good for you, you'll get outta here!
+    switch_speaker: thug01
     responses:
       - text: "I'm sorry.  We'll move along."
         on_select:
@@ -59,7 +63,7 @@ nodes:
         to: interjectB
   interjectA:
     text: |
-      [c=888|The thug doesn't bat an eye.]
+      [c=6868FF|Thug] - [c=888|The thug doesn't bat an eye.]
       
       So?  What are you going to do about it?
     responses:
@@ -77,7 +81,7 @@ nodes:
               func: docks_thugs_attack
   interjectB:
     text: |
-      The only way to solve our disagreement is to pay what is owed...100 gold.
+      [c=6868FF|Thug] - The only way to solve our disagreement is to pay what is owed...100 gold.
     responses:
       - text: "That's outrageous!  I'll pay you 50 to leave these workers in peace."
         to_view:
@@ -97,7 +101,7 @@ nodes:
         to: interjectB_not_paid
   interjectB_paid:
     text: |
-      That will do for now.  We'll be back later for more.
+      [c=6868FF|Thug] - That will do for now.  We'll be back later for more.
     responses:
       - text: "[c=888|Continue]"
         on_select:
@@ -106,7 +110,7 @@ nodes:
               func: docks_thugs_leave_helped
   interjectB_not_paid:
     text: |
-      Then you are no use to me.  Get out of my sight.
+      [c=6868FF|Thug] - Then you are no use to me.  Get out of my sight.
     responses:
       - text: "Very well.  Farewell."
         on_select:
@@ -122,7 +126,7 @@ nodes:
               func: docks_thugs_attack
   interject_threat:
     text: |
-      Boss says not to cause too much of a ruckus in the streets, or I would make you eat those words.
+      [c=6868FF|Thug] - Boss says not to cause too much of a ruckus in the streets, or I would make you eat those words.
       
       We'll be back soon.  [c=888|He turns to the workers.]  You had better have our money then.
     responses:

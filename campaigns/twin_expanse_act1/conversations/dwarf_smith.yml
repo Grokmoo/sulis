@@ -4,7 +4,7 @@ initial_nodes:
 nodes:
   start01:
     text: |
-      [c=888|This man stands near an anvil in the market square.]
+      [c=6868FF|#target_name#] - [c=888|This man stands near an anvil in the market square.]
       
       Superior dwarven arms.  For sale here.
     responses:
@@ -27,7 +27,7 @@ nodes:
       - text: "No thanks."
   ask_mines:
     text: |
-      They are just up the road, at the North end of town.
+      [c=6868FF|#target_name#] - They are just up the road, at the North end of town.
     responses:
       - text: "[c=888|Continue]"
         to: start01

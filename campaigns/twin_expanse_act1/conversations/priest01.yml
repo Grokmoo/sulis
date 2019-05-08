@@ -4,7 +4,7 @@ initial_nodes:
 nodes:
   start01:
     text: |
-      [c=888|This person's symbols and outfit identify them as a priest of Icanir.]
+      [c=6868FF|#target_name#] - [c=888|This person's symbols and outfit identify them as a priest of Icanir.]
       
       Hello.  How may I help you?
     responses:
@@ -22,7 +22,7 @@ nodes:
       - text: "Nothing for now."
   rest:
     text: |
-      Of course, all Icanir's children are always welcome here.
+      [c=6868FF|#target_name#] - Of course, all Icanir's children are always welcome here.
       
       Rest, and recover from your injuries.
     responses:

@@ -16,7 +16,7 @@ nodes:
     responses: []
   allow_enter:
     text: |
-      [c=888|The guard nods at you.]
+      [c=6868FF|#target_name#] - [c=888|The guard nods at you.]
       
       The Council sent word to expect you.  What you seek is inside the mines.
       
@@ -30,7 +30,7 @@ nodes:
               func: guard_open_gate
   start01:
     text: |
-      [c=888|The guard looks at you.]
+      [c=6868FF|#target_name#] - [c=888|The guard looks at you.]
       
       I'm afraid there has been a disturbance in the mines.  No access is allowed at this time.
     responses:
@@ -38,7 +38,7 @@ nodes:
         to: start02
   start02:
     text: |
-      [c=888|The guard looks off to indicate he is done with you.]
+      [c=6868FF|#target_name#] - [c=888|The guard looks off to indicate he is done with you.]
     responses:
       - text: "Why are the mines closed?"
         to: ask_why
@@ -47,13 +47,13 @@ nodes:
       - text: "Very well.  Farewell."
   ask_why:
     text: |
-      As I said, there has been a disturbance.  More than that, I cannot say.
+      [c=6868FF|#target_name#] - As I said, there has been a disturbance.  More than that, I cannot say.
     responses:
       - text: "[c=888|Continue]"
         to: start02
   ask_enter:
     text: |
-      My orders are clear.  No admittance.
+      [c=6868FF|#target_name#] - My orders are clear.  No admittance.
     responses:
       - text: "[c=888|Continue]"
         to: start02

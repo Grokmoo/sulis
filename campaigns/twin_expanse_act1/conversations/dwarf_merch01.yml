@@ -4,7 +4,7 @@ initial_nodes:
 nodes:
   start01:
     text: |
-      Get your supplies here!
+      [c=6868FF|#target_name#] - Get your supplies here!
     responses:
       - text: "Yes, I'll have a look."
         on_select:
@@ -25,7 +25,7 @@ nodes:
       - text: "Nothing for now."
   ask_mines:
     text: |
-      They are just up the road, at the North end of town.
+      [c=6868FF|#target_name#] - They are just up the road, at the North end of town.
     responses:
       - text: "[c=888|Continue]"
         to: start01

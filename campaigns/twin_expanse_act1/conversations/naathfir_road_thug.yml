@@ -4,7 +4,7 @@ initial_nodes:
 nodes:
   start01:
     text: |
-      [c=888|One of the thugs before you, presumably the leader, addresses you.]
+      [c=6868FF|#target_name#] - [c=888|One of the thugs before you, presumably the leader, addresses you.]
       
       Well, well, well, what have we here?  Fresh meat?
     on_view:
@@ -19,12 +19,12 @@ nodes:
         to: ask_deal
   ask_pass:
     text: |
-      You just want to pass through?  How cute.  At, em boys!
+      [c=6868FF|#target_name#] - You just want to pass through?  How cute.  At, em boys!
     responses:
       - text: "[c=800|Fight]"
   ask_deal:
     text: |
-      You mean like a deal?  I've got one!  Your money, and your life!
+      [c=6868FF|#target_name#] - You mean like a deal?  I've got one!  Your money, and your life!
     responses:
       - text: "[c=800|Fight]"
       

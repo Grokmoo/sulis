@@ -4,7 +4,7 @@ initial_nodes:
 nodes:
   start01:
     text: |
-      [c=888|Councillor Berkeley's mannerisms seem somehow different than before.]
+      [c=6868FF|#target_name#] - [c=888|Councillor Berkeley's mannerisms seem somehow different than before.]
       
       I am glad to see you return, #player_name#.  You have done well.  Very well indeed.
     responses:
@@ -12,7 +12,7 @@ nodes:
         to: start02
   start02:
     text: |
-      Yes, I know.  I am surprised, and impressed that you dealt with Omonar so easily.  He has never before failed.
+      [c=6868FF|#target_name#] - Yes, I know.  I am surprised, and impressed that you dealt with Omonar so easily.  He has never before failed.
     responses:
       - text: "What do you mean?  What's going on?"
         to: start03
@@ -22,7 +22,7 @@ nodes:
         to: start03
   start03:
     text: |
-      [c=888|Berkeley produces the completed Aegis - Staff, Tailpiece, and Gem.]
+      [c=6868FF|#target_name#] - [c=888|Berkeley produces the completed Aegis - Staff, Tailpiece, and Gem.]
       
       You caused me quite a bit of consternation, when you took the staff.  All my plans, ruined - or so I thought.
       
@@ -32,23 +32,25 @@ nodes:
         to: start04
   start04:
     text: |
-      [c=888|Councilman Chaero interjects.]
+      [c=68FF68|Councilman Chaero]
       
       Berkeley, what is the meaning of this!
+    switch_speaker: rose_lake_cc2
     responses:
       - text: "[c=888|Continue]"
         to: start05
   start05:
     text: |
-      [c=888|Berkeley just smiles.]
+      [c=6868FF|#target_name#] - [c=888|Berkeley just smiles.]
       
       Councillors - I'm afraid your services will no longer be required.
+    switch_speaker: rose_lake_cc0
     responses:
       - text: "[c=888|Continue]"
         to: start06
   start06:
     text: |
-      [c=888|He gestures with his staff, and each Councillor falls in turn, hit by some invisible blow.]
+      [c=6868FF|#target_name#] - [c=888|He gestures with his staff, and each Councillor falls in turn, hit by some invisible blow.]
     on_view:
       - fire_script:
           id: rose_lake
@@ -58,7 +60,7 @@ nodes:
         to: start07
   start07:
     text: |
-      [c=888|He turns his gaze, and the Aegis towards you.  You try to move or call out, but find yourself completely frozen.]
+      [c=6868FF|#target_name#] - [c=888|He turns his gaze, and the Aegis towards you.  You try to move or call out, but find yourself completely frozen.]
       
       As for you.  You may yet prove useful.  I think I will keep you in hand - for the moment.  Just make sure you don't overstay your welcome.
     responses:

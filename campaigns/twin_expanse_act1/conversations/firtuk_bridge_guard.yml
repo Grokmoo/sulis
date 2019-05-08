@@ -11,7 +11,7 @@ nodes:
     responses: []
   start01:
     text: |
-      [c=888|The guard eyes you suspciously.]
+      [c=6868FF|#target_name#] - [c=888|The guard eyes you suspciously.]
       
       Halt!  The bridge to Rose Lake is closed.
     on_view:
@@ -23,7 +23,7 @@ nodes:
         to: main
   main:
     text: |
-      [c=888|The guard eyes you suspciously.]
+      [c=6868FF|#target_name#] - [c=888|The guard eyes you suspciously.]
     responses:
       - text: "I have my pass right here."
         to_view:
@@ -38,7 +38,7 @@ nodes:
       - text: "I'll just be leaving, then."
   has_pass:
     text: |
-      [c=888|The guard looks surprised.]
+      [c=6868FF|#target_name#] - [c=888|The guard looks surprised.]
       
       Seems to be authentic.  You can pass.
     responses:
@@ -46,7 +46,7 @@ nodes:
         to: has_pass2
   has_pass2:
     text: |
-      Just don't cause any trouble.
+      [c=6868FF|#target_name#] - Just don't cause any trouble.
     on_view:
       - fire_script:
           id: firtuk_bridge
@@ -57,19 +57,19 @@ nodes:
           - target_flag: open_bridge_complete
   ask_why:
     text: |
-      Trouble in the city.  I'm afraid I can't say any more.  Our orders come directly from the Council of Five.
+      [c=6868FF|#target_name#] - Trouble in the city.  I'm afraid I can't say any more.  Our orders come directly from the Council of Five.
     responses:
       - text: "[c=888|Continue]"
         to: main
   ask_2:
     text: |
-      Unfortunately, I cannot help you.  The bridge is closed.
+      [c=6868FF|#target_name#] - Unfortunately, I cannot help you.  The bridge is closed.
     responses:
       - text: "[c=888|Continue]"
         to: main
   ask_pass:
     text: |
-      Only VIPs or those on official government business may pass.  You meet neither of those conditions.
+      [c=6868FF|#target_name#] - Only VIPs or those on official government business may pass.  You meet neither of those conditions.
     on_view:
       - fire_script:
           id: firtuk_bridge

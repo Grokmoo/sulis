@@ -4,7 +4,7 @@ initial_nodes:
 nodes:
   start01:
     text: |
-      [c=888|Before you stands a shadowy figure.]
+      [c=6868FF|#target_name#] - [c=888|Before you stands a shadowy figure.]
       
       Right on time.
       
@@ -14,7 +14,7 @@ nodes:
         to: start02
   start02:
     text: |
-      I'm afraid you are much too late.  We have already taken the Aegis tailpiece from these mines, and the gem from Rose Lake.  And the staff - that's being secured as we speak.
+      [c=6868FF|#target_name#] - I'm afraid you are much too late.  We have already taken the Aegis tailpiece from these mines, and the gem from Rose Lake.  And the staff - that's being secured as we speak.
       
       All three pieces are ours.  You have lost.  And now, you will die.
     responses:
@@ -25,7 +25,7 @@ nodes:
       - text: "[c=800|Fight] It is you who will die."
   start03:
     text: |
-      [c=888|He laughs.]
+      [c=6868FF|#target_name#] - [c=888|He laughs.]
       
       You truly know so little of who you are fighting?  Simply pathetic.
       

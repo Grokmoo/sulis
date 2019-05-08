@@ -4,7 +4,7 @@ initial_nodes:
 nodes:
   start01:
     text: |
-      [c=888|This large man stands outside of a large blacksmith's shop.]
+      [c=6868FF|#target_name#] - [c=888|This large man stands outside of a large blacksmith's shop.]
       
       What can I get for you?
     responses:
@@ -29,12 +29,12 @@ nodes:
       - text: "Nothing today."
   thug_already_asked:
     text: |
-      Go bother someone else.  I've got nothing more to say.
+      [c=6868FF|#target_name#] - Go bother someone else.  I've got nothing more to say.
     responses:
       - text: "[c=888|Leave]"
   thug01:
     text: |
-      [c=888|The Smith pauses just a bit longer than natural in answering.]
+      [c=6868FF|#target_name#] - [c=888|The Smith pauses just a bit longer than natural in answering.]
       
       You mean Gethruk's crew?  Yeah I know about em.  Why are you so interested?
     on_view:
@@ -58,13 +58,13 @@ nodes:
         to: thug02d
   thug02a:
     text: |
-      Yeah, good luck with that.  I'm afraid I can't help you.
+      [c=6868FF|#target_name#] - Yeah, good luck with that.  I'm afraid I can't help you.
     responses:
       - text: "[c=888|Continue]"
         to: thug03
   thug02b:
     text: |
-      [c=888|He looks skeptical.]
+      [c=6868FF|#target_name#] - [c=888|He looks skeptical.]
       
       Oh really?  Help everyone you say?
     responses:
@@ -72,7 +72,7 @@ nodes:
         to: thug03
   thug02c:
     text: |
-      [c=888|The smith laughs.]
+      [c=6868FF|#target_name#] - [c=888|The smith laughs.]
       
       I don't think you should be saying that so loudly around here.  Folk won't take too kindly.
     responses:
@@ -80,13 +80,13 @@ nodes:
         to: thug03
   thug02d:
     text: |
-      So you ain't got a reason to ask then?  Why bother asking?
+      [c=6868FF|#target_name#] - So you ain't got a reason to ask then?  Why bother asking?
     responses:
       - text: "[c=888|Continue]"
         to: thug03
   thug03:
     text: |
-      [c=888|The smith waits for your response.]
+      [c=6868FF|#target_name#] - [c=888|The smith waits for your response.]
     responses:
       - text: "Just tell me what I need to know."
         on_select:
@@ -105,7 +105,7 @@ nodes:
       - text: "Sorry I bothered you.  Farewell."
   thug_response_check:
     text: |
-      [c=888|The smith considers for a moment.]
+      [c=6868FF|#target_name#] - [c=888|The smith considers for a moment.]
     responses:
       - text: "[c=888|Continue]"
         to_view:
@@ -117,13 +117,13 @@ nodes:
         to: thug_reject
   thug_reject:
     text: |
-      I'm sorry, I can't help you.
+      [c=6868FF|#target_name#] - I'm sorry, I can't help you.
     responses:
       - text: "Very well then.  Farewell."
       - text: "I know you are hiding something - and I'm going to find out what it is."
   thug_accept:
     text: |
-      [c=888|He looks around shiftily.]
+      [c=6868FF|#target_name#] - [c=888|He looks around shiftily.]
       
       Ok, but you didn't hear this from me.  They've got a hideout just south of town in a cave.  I'll mark it on your map.
     on_view:

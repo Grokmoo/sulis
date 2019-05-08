@@ -10,7 +10,7 @@ initial_nodes:
 nodes:
   start01:
     text: |
-      [c=888|This human Ciedar motions for you to approach.]
+      [c=6868FF|#target_name#] - [c=888|This human Ciedar motions for you to approach.]
       
       Hello.  I'm Jhilsara.  I've got a proposition for you.
     on_view:
@@ -22,13 +22,13 @@ nodes:
         to: start02
   start02:
     text: |
-      Very good.  You've heard about the goblin raids, yes?  There's quite a bit of gold for whoever can put a stop to them.
+      [c=6868FF|#target_name#] - Very good.  You've heard about the goblin raids, yes?  There's quite a bit of gold for whoever can put a stop to them.
     responses:
       - text: "[c=888|Continue]"
         to: start03
   start03:
     text: |
-      I propose we join up.  I am a formidable mage, and you don't look like a pushover yourself.
+      [c=6868FF|#target_name#] - I propose we join up.  I am a formidable mage, and you don't look like a pushover yourself.
       
       Together, we'll make short work of any goblins.
     responses:
@@ -40,14 +40,14 @@ nodes:
         to: reject
   reject:
     text: |
-      Alright, no hard feelings.  I'll be here for a while yet if you change your mind.
+      [c=6868FF|#target_name#] - Alright, no hard feelings.  I'll be here for a while yet if you change your mind.
     on_view:
       - target_flag: rejected
     responses:
       - text: "Farewell, then."
   maybe:
     text: |
-      Look, I'm not going to beg.  I just think we might make a good team.
+      [c=6868FF|#target_name#] - Look, I'm not going to beg.  I just think we might make a good team.
     responses:
       - text: "Alright, Agreed."
         to: join
@@ -55,7 +55,7 @@ nodes:
         to: reject
   join:
     text: |
-      Great.  I'm ready when you are.
+      [c=6868FF|#target_name#] - Great.  I'm ready when you are.
     on_view:
       - target_flag: joined
       - fire_script:
@@ -65,7 +65,7 @@ nodes:
       - text: "[c=888|Leave]"
   reconsider:
     text: |
-      Have you reconsidered my offer to join up?
+      [c=6868FF|#target_name#] - Have you reconsidered my offer to join up?
     responses:
       - text: "Yes, lets go."
         to: join
@@ -73,6 +73,6 @@ nodes:
         to: reject
   questions:
     text: |
-      What is it?
+      [c=6868FF|#target_name#] - What is it?
     responses:
       - text: "Nothing right now, Jhilsara."

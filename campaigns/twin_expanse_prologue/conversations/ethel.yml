@@ -4,7 +4,7 @@ initial_nodes:
 nodes:
   start:
     text: |
-      Hey.  Interested in making any trades?
+      [c=6868FF|#target_name#] - Hey.  Interested in making any trades?
     on_view:
       - target_flag: already_talked
     responses:

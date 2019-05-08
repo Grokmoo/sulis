@@ -7,7 +7,7 @@ initial_nodes:
 nodes:
   start01:
     text: |
-      [c=888|This man wears robes that are too ornate for a commoner, and speaks with the air of authority.]
+      [c=6868FF|#target_name#] - [c=888|This man wears robes that are too ornate for a commoner, and speaks with the air of authority.]
       
       Hello, I don't believe we've met.  I am Aldius Fenk, mayor of this town.
     on_view:
@@ -17,14 +17,15 @@ nodes:
         to: start02
   start02:
     text: |
-      Well met, #player_name#.  Are you here about the raids, or is there something else?
+      [c=6868FF|#target_name#] - Well met, #player_name#.  Are you here about the raids, or is there something else?
     responses:
       - text: "I had questions."
         to: questions
       - text: "What's this about the raids?"
         to: raids
   questions:
-    text: "What can I help you with?"
+    text: |
+      [c=6868FF|#target_name#] - What can I help you with?
     responses:
       - text: "I was with Tervald's group.  We were ambushed by goblins and I am the only survivor."
         to: tervald
@@ -54,13 +55,14 @@ nodes:
           - not_player_flag: leader_of_beasts_reported
       - text: "Nothing, farewell."
   raids_complete:
-    text: "That is wonderful news.  Tell me the details!"
+    text: |
+      [c=6868FF|#target_name#] - That is wonderful news.  Tell me the details!
     responses:
       - text: "[c=888|Tell him of Irhan and the note with the plans to destroy Wellswood.]"
         to: raids_complete2
   raids_complete2:
     text: |
-      We are fortunate you were able to deal with Irhan before he completed his plans.
+      [c=6868FF|#target_name#] - We are fortunate you were able to deal with Irhan before he completed his plans.
       
       But this news worries me greatly.  It sounds like there is some larger plot at work.
     responses:
@@ -68,7 +70,7 @@ nodes:
         to: raids_complete3
   raids_complete3:
     text: |
-      Take this pass.  It will allow you to enter Rose Lake.  Bring what you know to the Council of Five.  They will know how to handle this.
+      [c=6868FF|#target_name#] - Take this pass.  It will allow you to enter Rose Lake.  Bring what you know to the Council of Five.  They will know how to handle this.
       
       Oh, and don't forget your reward.
     on_view:
@@ -78,14 +80,16 @@ nodes:
     responses:
       - text: "Thank you.  Farewell."
   ask_pass:
-    text: "I'm afraid its not so simple.  I can only provide a pass if you are on official government business."
+    text: |
+      [c=6868FF|#target_name#] - I'm afraid its not so simple.  I can only provide a pass if you are on official government business.
     responses:
       - text: "I see.  I had other questions."
         to: questions
       - text: "Surely there is something you can do?"
         to: ask_pass2
   ask_pass2:
-    text: "I'll tell you what - if you do something about these raids, then I'll see what I can do."
+    text: |
+      [c=6868FF|#target_name#] - I'll tell you what - if you do something about these raids, then I'll see what I can do.
     on_view:
       - fire_script:
           id: firtuk_bridge
@@ -96,7 +100,8 @@ nodes:
       - text: "I'll think about it.  I had other questions."
         to: questions
   gethruk_cleared:
-    text: "That's fantastic news!  Please accept this small token of our appreciation."
+    text: |
+      [c=6868FF|#target_name#] - That's fantastic news!  Please accept this small token of our appreciation.
     responses:
       - text: "[c=888|Continue]"
         on_select:
@@ -106,20 +111,22 @@ nodes:
           - target_flag: thugs_cleared
         to: questions
   tervald:
-    text: "That's terrible news!  Tervald was a skilled warrior and good friend.  He will be missed."
+    text: |
+      [c=6868FF|#target_name#] - That's terrible news!  Tervald was a skilled warrior and good friend.  He will be missed.
     responses:
       - text: "[c=888|Continue]"
         to: questions
         on_select:
           - target_flag: tervald_notified
   crime:
-    text: "I assume you mean Gethruk's gang?  The town guard may be a bit stretched, but they will have no problem putting down those rats, have no doubt."
+    text: |
+      [c=6868FF|#target_name#] - I assume you mean Gethruk's gang?  The town guard may be a bit stretched, but they will have no problem putting down those rats, have no doubt.
     responses:
       - text: "[c=888|Continue]"
         to: questions
   raids:
     text: |
-      The goblins have become bolder of late, and many of our farms have been destroyed and people killed.
+      [c=6868FF|#target_name#] - The goblins have become bolder of late, and many of our farms have been destroyed and people killed.
       
       We've even heard rumors of trolls traveling with the goblins!
     responses:
@@ -127,7 +134,7 @@ nodes:
         to: raids02
   raids02:
     text: |
-      Someone or something is organzing the goblin tribes.  Normally, we could call on Rose Lake at times like these, but they have rejected my messengers.  I need skilled warriors to track down and eliminate the leader or leaders of this uprising.
+      [c=6868FF|#target_name#] - Someone or something is organzing the goblin tribes.  Normally, we could call on Rose Lake at times like these, but they have rejected my messengers.  I need skilled warriors to track down and eliminate the leader or leaders of this uprising.
       
       I am putting out a general call for aid - and a substantial reward.
     responses:
@@ -139,7 +146,7 @@ nodes:
               func: goblin_raids_start
   raids03:
     text: |
-      Do you have any questions?
+      [c=6868FF|#target_name#] - Do you have any questions?
     responses:
       - text: "Rose Lake won't render aid?"
         to: rose_lake_aid
@@ -152,7 +159,7 @@ nodes:
       - text: "Nothing right now.  Farewell."
   goblin_raids_leads:
     text: |
-      We honestly have very little to go on.  We don't even know whether there is a single chieftan organizing this or some outside group.
+      [c=6868FF|#target_name#] - We honestly have very little to go on.  We don't even know whether there is a single chieftan organizing this or some outside group.
       
       The best place to start looking is in Wellswood forest and the surrounding hills.  It is goblin country though, so be prepared.
     responses:
@@ -164,13 +171,13 @@ nodes:
               func: goblin_raids_leads
   goblin_raids_reward:
     text: |
-      I can't name numbers yet but any assistance will be met with our undying gratitude and a substantial sum as well.
+      [c=6868FF|#target_name#] - I can't name numbers yet but any assistance will be met with our undying gratitude and a substantial sum as well.
     responses:
       - text: "[c=888|Continue]"
         to: raids03
   rose_lake_aid:
     text: |
-      Most of the people here have a rather dim view of Rose Lake's propensity to help us.  But, they have helped in the past.  They are currently going through some political turmoil that is blocking that.
+      [c=6868FF|#target_name#] - Most of the people here have a rather dim view of Rose Lake's propensity to help us.  But, they have helped in the past.  They are currently going through some political turmoil that is blocking that.
     responses:
       - text: "[c=888|Continue]"
         to: raids03

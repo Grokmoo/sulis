@@ -14,7 +14,7 @@ nodes:
         to: start02
   start02:
     text: |
-      The goblins set some sort of trap for us.  I think we have to assume Torvald is dead.
+      [c=6868FF|#target_name#] - The goblins set some sort of trap for us.  I think we have to assume Torvald is dead.
     responses:
       - text: |
           So what now?
@@ -24,21 +24,21 @@ nodes:
         to: start03b
   start03b:
     text: |
-      Agreed.
+      [c=6868FF|#target_name#] - Agreed.
     responses:
       - text: |
           [c=888|Continue]
         to: start03
   start03:
     text: |
-      It doesn't look like we can go back, at least not in any rush.  And I doubt we have much time before those goblins are back here.
+      [c=6868FF|#target_name#] - It doesn't look like we can go back, at least not in any rush.  And I doubt we have much time before those goblins are back here.
     responses:
       - text: |
           [c=888|Continue]
         to: start04
   start04:
     text: |
-      #player_name#, I think you are the best choice to lead us out of this.  You've certainly shown more initiative then anyone else in the group.
+      [c=6868FF|#target_name#] - #player_name#, I think you are the best choice to lead us out of this.  You've certainly shown more initiative then anyone else in the group.
       
       [c=888|It looks like the matter has been quickly settled.]
     responses:

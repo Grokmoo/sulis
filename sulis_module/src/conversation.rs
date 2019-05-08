@@ -41,6 +41,9 @@ struct Node {
     text: String,
 
     #[serde(default)]
+    switch_speaker: Option<String>,
+
+    #[serde(default)]
     on_view: Vec<OnTrigger>,
     responses: Vec<Response>,
 }
@@ -103,6 +106,13 @@ impl Conversation {
         match self.nodes.get(node) {
             None => panic!("Invalid node"),
             Some(ref node) => &node.on_view,
+        }
+    }
+
+    pub fn switch_speaker(&self, node: &str) -> &Option<String> {
+        match self.nodes.get(node) {
+            None => panic!("Invalid node"),
+            Some(ref node) => &node.switch_speaker,
         }
     }
 

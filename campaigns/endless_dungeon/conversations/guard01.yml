@@ -4,7 +4,7 @@ initial_nodes:
 nodes:
   start01:
     text: |
-      [c=888|The guard seems friendly enough.]
+      [c=6868FF|#target_name#] - [c=888|The guard seems friendly enough.]
       
       Welcome to Moonmouth.
     responses:
@@ -12,7 +12,7 @@ nodes:
         to: main
   main:
     text: |
-      [c=888|He awaits your question.]
+      [c=6868FF|#target_name#] - [c=888|He awaits your question.]
     responses:
       - text: "What can you tell me about the Dungeon?"
         to: dungeon_ask
@@ -25,7 +25,7 @@ nodes:
       - text: "Farewell."
   dungeon_ask:
     text: |
-      Well, not much is known, to be honest.  Some months back, a rockslide revealed a cave in the side of the hill.  Some folks went inside, and found the entrance.
+      [c=6868FF|#target_name#] - Well, not much is known, to be honest.  Some months back, a rockslide revealed a cave in the side of the hill.  Some folks went inside, and found the entrance.
       
       They say it goes on forever.  I don't know about that, but it is certainly mighty big.
     responses:
@@ -33,19 +33,19 @@ nodes:
         to: main
   location_ask:
     text: |
-      Just head South into town and turn to the East.  You can't miss it.
+      [c=6868FF|#target_name#] - Just head South into town and turn to the East.  You can't miss it.
     responses:
       - text: "[c=888|Continue]"
         to: main
   history_ask:
     text: |
-      Well, Moonmouth has always just been a tiny fishing village, nothing of note, really.  All that has changed since the dungeon was discovered.  Town's been overrun with adventurers of all types.
+      [c=6868FF|#target_name#] - Well, Moonmouth has always just been a tiny fishing village, nothing of note, really.  All that has changed since the dungeon was discovered.  Town's been overrun with adventurers of all types.
     responses:
       - text: "[c=888|Continue]"
         to: main
   danger_ask:
     text: |
-      I reckon so.  An awful lot of people have gone in, and never come back out.  Types that can handle themselves, too.
+      [c=6868FF|#target_name#] - I reckon so.  An awful lot of people have gone in, and never come back out.  Types that can handle themselves, too.
       
       Myself, I haven't been inside and don't intend to.
     responses:

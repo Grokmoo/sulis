@@ -22,14 +22,15 @@ nodes:
       - text: "It isn't all good - there is an awful lot of walking - and talking to boring strangers."
         to: neg02
   has_note:
-    text: "I wish I were an adventurer!"
+    text: |
+      [c=6868FF|#target_name#] - I wish I were an adventurer!
     responses:
       - text: "[c=f00|Show her the note of the adventurer who died in the Wellswood.] Take a look at this."
         to: has_note02
       - text: "Whatever.  Farewell."
   has_note02:
     text: |
-      [c=888|As she reads the note, her mood quickly becomes more somber.]
+      [c=6868FF|#target_name#] - [c=888|As she reads the note, her mood quickly becomes more somber.]
       
       I...I'm not sure what to say.  You've given me a lot to think about.
     on_view:
@@ -47,7 +48,7 @@ nodes:
     responses: []
   start01:
     text: |
-      [c=888|This woman seems more excitable than the others around here.]
+      [c=6868FF|#target_name#] - [c=888|This woman seems more excitable than the others around here.]
       
       Hey - are you an adventurer?
     on_view:
@@ -64,11 +65,11 @@ nodes:
         to: affirm
   affirm:
     text: |
-      I knew it!  I wish I was like you!  Fighting evil, righting wrongs.  It all sounds so exciting!
+      [c=6868FF|#target_name#] - I knew it!  I wish I was like you!  Fighting evil, righting wrongs.  It all sounds so exciting!
     responses: *adventurer_responses
   neg:
     text: |
-      Don't be coy with me!  I already know you are!
+      [c=6868FF|#target_name#] - Don't be coy with me!  I already know you are!
       
       I wish I were like you!  Fighting evil, righting wrongs.  It all sounds so exciting!
     responses: *adventurer_responses

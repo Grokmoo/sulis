@@ -4,7 +4,7 @@ initial_nodes:
 nodes:
   start01:
     text: |
-      [c=888|As you approach the cave, the men at the entrance call to you.]
+      [c=6868FF|#target_name#] - [c=888|As you approach the cave, the men at the entrance call to you.]
       
       Hey!  I don't know you!  What are you doing here?
     responses:
@@ -16,7 +16,7 @@ nodes:
         to: start_combat
   start_combat:
     text: |
-      You aren't going anywhere.  Take them!
+      [c=6868FF|#target_name#] - You aren't going anywhere.  Take them!
     responses:
       - text: "[c=f00|Fight!]"
         on_select:
@@ -25,7 +25,7 @@ nodes:
               func: set_thugs_hostile
   start_combat2:
     text: |
-      We'll see about that!  Take them!
+      [c=6868FF|#target_name#] - We'll see about that!  Take them!
     responses:
       - text: "[c=f00|Fight!]"
         on_select:
@@ -34,7 +34,7 @@ nodes:
               func: set_thugs_hostile
   start_combat3:
     text: |
-      I'm afraid not.  Kill them!
+      [c=6868FF|#target_name#] - I'm afraid not.  Kill them!
     responses:
       - text: "[c=f00|Fight!]"
         on_select:
@@ -43,7 +43,7 @@ nodes:
               func: set_thugs_hostile
   speak01:
     text: |
-      Oh?  And what would you want to talk about?
+      [c=6868FF|#target_name#] - Oh?  And what would you want to talk about?
     responses:
       - text: I want to find a peaceful solution to the crimes there.
         to: speak02
@@ -53,7 +53,7 @@ nodes:
         to: start_combat2
   speak02:
     text: |
-      Ha!  Why should we let you in?
+      [c=6868FF|#target_name#] - Ha!  Why should we let you in?
     responses:
       - text: Because if you don't I will kill you.
         to: start_combat2
@@ -65,7 +65,7 @@ nodes:
         to: speak03
   speak03:
     text: |
-      Fine.  [c=888|He takes the coins.]  But don't cause any trouble.
+      [c=6868FF|#target_name#] - Fine.  [c=888|He takes the coins.]  But don't cause any trouble.
     responses:
       - text: "[c=888|Leave]"
     on_view:

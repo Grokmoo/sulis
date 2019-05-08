@@ -7,7 +7,7 @@ initial_nodes:
 nodes:
   start01:
     text: |
-      [c=888|The man looks you over carefully.]
+      [c=6868FF|#target_name#] - [c=888|The man looks you over carefully.]
       
       I see you are up.  Looking much better.
     on_view:
@@ -17,7 +17,7 @@ nodes:
         to: main
   main:
     text: |
-      [c=888|The farmer waits for your question.]
+      [c=6868FF|#target_name#] - [c=888|He waits for your question.]
     responses:
       - text: "I assume I have you to thank for my rescue?"
         to: rescue
@@ -28,7 +28,7 @@ nodes:
       - text: "Nothing for now.  Farewell."
   rescue:
     text: |
-      Yeah, I pulled you out of the rocks.  Found you up the cliffside a ways north of town.
+      [c=6868FF|#target_name#] - Yeah, I pulled you out of the rocks.  Found you up the cliffside a ways north of town.
       
       Brought you back here in my wagon.  That was almost a week ago now.
     on_view:
@@ -40,7 +40,7 @@ nodes:
         to: rescue_main
   rescue_main:
     text: |
-      [c=888|The farmer waits for your question.]
+      [c=6868FF|#target_name#] - [c=888|He waits for your question.]
     responses:
       - text: "How did you manage to find me?  It was a large rockslide I was in."
         to: luck
@@ -51,25 +51,25 @@ nodes:
       - text: "That's all for now.  Farewell."
   luck:
     text: |
-      I honestly don't know - I guess you are just really lucky.  I had wandered further from town than I usually do, when I spotted you laying in some rocks.
+      [c=6868FF|#target_name#] - I honestly don't know - I guess you are just really lucky.  I had wandered further from town than I usually do, when I spotted you laying in some rocks.
     responses:
       - text: "[c=888|Continue]"
         to: rescue_main
   companions:
     text: |
-      I did look around but I didn't see anyone else.  You were real lucky to survive what you did.  If there were others with you, I wouldn't count on finding them in one piece.
+      [c=6868FF|#target_name#] - I did look around but I didn't see anyone else.  You were real lucky to survive what you did.  If there were others with you, I wouldn't count on finding them in one piece.
     responses:
       - text: "[c=888|Continue]"
         to: rescue_main
   location:
     text: |
-      We're in the town of Wellswood.  Well, the main town is that way.  [c=888|The farmer points East.]
+      [c=6868FF|#target_name#] - We're in the town of Wellswood.  Well, the main town is that way.  [c=888|The farmer points East.]
     responses:
       - text: "[c=888|Continue]"
         to: main
   threaten:
     text: |
-      That was Gethruk, a local thug.  He runs a gang that has been making life difficult for us farmers.  Small time extortion, mostly.
+      [c=6868FF|#target_name#] - That was Gethruk, a local thug.  He runs a gang that has been making life difficult for us farmers.  Small time extortion, mostly.
     responses:
       - text: "Why doesn't someone stop him?"
         to: stop_gethruk
@@ -81,7 +81,7 @@ nodes:
         to: main
   stop_gethruk:
     text: |
-      Someone should.  The town guard is short handed these days with all the goblin raids.  Can't say I blame them for not sparing men on a local problem.
+      [c=6868FF|#target_name#] - Someone should.  The town guard is short handed these days with all the goblin raids.  Can't say I blame them for not sparing men on a local problem.
     responses:
       - text: "I see.  I had other questions."
         to: main

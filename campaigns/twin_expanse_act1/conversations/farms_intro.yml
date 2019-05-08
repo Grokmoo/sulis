@@ -4,9 +4,10 @@ initial_nodes:
 nodes:
   start01:
     text: |
-      [c=888|As you step outside the door you see a rough looking man holding a large dagger, threatening a farmer.]
+      [c=6868FF|Gethruk] - [c=888|As you step outside the door you see a rough looking man holding a large dagger, threatening a farmer.]
       
       You will pay if you know what's good for you, hear?
+    switch_speaker: gethruk
     responses:
       - text: "[c=888|Say nothing.]"
         to: start02
@@ -14,7 +15,7 @@ nodes:
         to: start02
   start02:
     text: |
-      Who the hell is this?  You didn't tell me you had guests.  Where are your manners?
+      [c=6868FF|Gethruk] - Who the hell is this?  You didn't tell me you had guests.  Where are your manners?
       
       [c=888|The farmer starts to stammer a response.]
     responses:
@@ -24,19 +25,19 @@ nodes:
         to: start03b
   start03a:
     text: |
-      You are new in town so I'll let that one go.  But you had best learn not to talk to me like that.
+      [c=6868FF|Gethruk] - You are new in town so I'll let that one go.  But you had best learn not to talk to me like that.
     responses:
       - text: "[c=888|Continue]"
         to: start04
   start03b:
     text: |
-      I guess no good deed really does go unpunished, eh?
+      [c=6868FF|Gethruk] - I guess no good deed really does go unpunished, eh?
     responses:
       - text: "[c=888|Continue]"
         to: start04
   start04:
     text: |
-      [c=888|The man addresses the farmer:] Don't forget our arrangment.
+      [c=6868FF|Gethruk] - [c=888|The man addresses the farmer:] Don't forget our arrangment.
       
       [c=888|Before you can get in another word, he is off.]
     on_view:

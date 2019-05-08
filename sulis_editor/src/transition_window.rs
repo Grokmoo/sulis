@@ -65,7 +65,7 @@ impl WidgetKind for TransitionWindow {
         self
     }
 
-    fn on_remove(&mut self) {
+    fn on_remove(&mut self, _widget: &Rc<RefCell<Widget>>) {
         self.top_bar.borrow_mut().state.set_enabled(true);
     }
 

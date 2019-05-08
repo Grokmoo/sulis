@@ -82,7 +82,7 @@ impl WidgetKind for DialogWindow {
         true
     }
 
-    fn on_remove(&mut self) {
+    fn on_remove(&mut self, _widget: &Rc<RefCell<Widget>>) {
         self.entity.borrow_mut().actor.listeners.remove(NAME);
     }
 
@@ -95,16 +95,6 @@ impl WidgetKind for DialogWindow {
 
         let cur_text = self.convo.text(&self.cur_node);
         let responses = self.convo.responses(&self.cur_node);
-
-        if let Some(ref speaker) = self.convo.switch_speaker(&self.cur_node) {
-            if let Some(speaker) = entity_with_id(speaker.to_string()) {
-                let speaker = &speaker.borrow().location;
-                let cb = OnTrigger::ScrollView(speaker.x, speaker.y);
-                GameState::add_ui_callback(vec![cb], &self.pc, &self.entity);
-            } else {
-                warn!("Attempted to switch to invalid speaker '{}'", speaker);
-            }
-        }
 
         let node_widget = Widget::with_theme(self.node.clone(), "node");
         {
@@ -147,7 +137,7 @@ impl WidgetKind for DialogWindow {
                     continue;
                 }
 
-                let response_button = ResponseButton::new(&response, &self.pc);
+                let response_button = ResponseButton::new(&self.convo, &response, &self.pc);
                 let widget = Widget::with_defaults(response_button);
                 Widget::add_child_to(&responses_widget, widget);
             }
@@ -162,15 +152,18 @@ struct ResponseButton {
     to: Option<String>,
     on_select: Vec<OnTrigger>,
     pc: Rc<RefCell<EntityState>>,
+    convo: Rc<Conversation>,
 }
 
 impl ResponseButton {
-    fn new(response: &Response, pc: &Rc<RefCell<EntityState>>) -> Rc<RefCell<ResponseButton>> {
+    fn new(convo: &Rc<Conversation>, response: &Response,
+           pc: &Rc<RefCell<EntityState>>) -> Rc<RefCell<ResponseButton>> {
         Rc::new(RefCell::new(ResponseButton {
             text: response.text.to_string(),
             to: response.to.clone(),
             on_select: response.on_select.clone(),
             pc: Rc::clone(&pc),
+            convo: Rc::clone(convo),
         }))
     }
 }
@@ -205,11 +198,30 @@ impl WidgetKind for ResponseButton {
 
         activate(widget, &self.on_select, &window.pc, &window.entity);
 
+        let (_, view) = Widget::parent_mut::<RootView>(&parent);
+        let (area, _) = view.area_view();
+
         match self.to {
             None => {
                 parent.borrow_mut().mark_for_removal();
+
+                area.borrow_mut().set_active_entity(None);
             }
             Some(ref to) => {
+                if let Some(ref speaker) = self.convo.switch_speaker(&to) {
+                    if let Some(speaker) = entity_with_id(speaker.to_string()) {
+                        let (x, y) = {
+                            let speaker = &speaker.borrow().location;
+                            (speaker.x, speaker.y)
+                        };
+                        let cb = OnTrigger::ScrollView(x, y);
+                        GameState::add_ui_callback(vec![cb], &self.pc, &speaker);
+                        area.borrow_mut().set_active_entity(Some(Rc::clone(&speaker)));
+                    } else {
+                        warn!("Attempted to switch to invalid speaker '{}'", speaker);
+                    }
+                }
+
                 window.cur_node = to.to_string();
                 parent.borrow_mut().invalidate_children();
             }
@@ -239,6 +251,7 @@ pub fn show_convo(
         let (root, view) = Widget::parent_mut::<RootView>(widget);
         let (area, _) = view.area_view();
         area.borrow_mut().clear_mouse_state();
+        area.borrow_mut().set_active_entity(Some(Rc::clone(&target)));
 
         let (x, y) = {
             let loc = &target.borrow().location;

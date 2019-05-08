@@ -112,7 +112,7 @@ pub trait WidgetKind {
     /// This method is called before this WidgetKind is added to its parent widget.
     /// It returns a vector of 'Widget's that will be added as children to the
     /// parent widget.  If you implement this but do not need to add any children,
-    /// returning 'Vec::with_capacity(0)' is best.
+    /// returning 'Vec::new()' is best.
     /// Widgets are added according to their order in the vector.
     fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         Vec::with_capacity(0)
@@ -123,7 +123,7 @@ pub trait WidgetKind {
     /// when a widget is removed from the tree.  Note that this is called when
     /// the actual removal takes place, not when the widget is first marked
     /// for removal.
-    fn on_remove(&mut self) {}
+    fn on_remove(&mut self, _widget: &Rc<RefCell<Widget>>) {}
 
     fn super_on_mouse_press(&self, widget: &Rc<RefCell<Widget>>, _kind: ClickKind) {
         widget

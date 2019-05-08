@@ -285,7 +285,7 @@ impl ItemButton {
 impl WidgetKind for ItemButton {
     widget_kind!(ITEM_BUTTON_NAME);
 
-    fn on_remove(&mut self) {
+    fn on_remove(&mut self, _widget: &Rc<RefCell<Widget>>) {
         self.remove_item_window();
     }
 

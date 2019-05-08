@@ -335,7 +335,7 @@ impl WidgetKind for GroupPane {
         widget.do_base_layout();
     }
 
-    fn on_remove(&mut self) {
+    fn on_remove(&mut self, _widget: &Rc<RefCell<Widget>>) {
         for ability in self.abilities.iter() {
             if let Some(ref mut state) = self
                 .entity

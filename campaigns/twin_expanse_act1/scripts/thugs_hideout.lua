@@ -1,13 +1,15 @@
 function hideout_entrance(parent)
   game:cancel_blocking_anims()
   game:scroll_view(34, 26)
-  game:start_conversation("thugs_hideout_enter", parent)
+  local thug = game:entity_with_id("thug04")
+  game:start_conversation("thugs_hideout_enter", thug)
 end
 
 function gethruk_talk(parent)
   game:cancel_blocking_anims()
   game:scroll_view(57, 57)
-  game:start_conversation("gethruk_boss", parent)
+  local gethruk = game:entity_with_id("gethruk_boss")
+  game:start_conversation("gethruk_boss", gethruk)
 end
 
 function set_thugs_hostile()

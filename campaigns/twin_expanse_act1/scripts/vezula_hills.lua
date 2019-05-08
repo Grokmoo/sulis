@@ -1,7 +1,8 @@
 function find_rockslide(parent)
   game:cancel_blocking_anims()
   game:scroll_view(60, 80)
-  game:start_conversation("vezula_hills_rockslide", parent)
+  local kaelwyn = game:entity_with_id("kaelwyn")
+  game:start_conversation("vezula_hills_rockslide", kaelwyn)
 end
 
 function rockslide_final_fate(parent)

@@ -19,5 +19,5 @@ function on_activate_irhan(parent)
   local irhan = game:entity_with_id("irhan")
   irhan:teleport_to({x = 20, y = 34})
   
-  game:start_conversation("irhan", parent)
+  game:start_conversation("irhan", irhan)
 end

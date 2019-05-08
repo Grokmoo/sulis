@@ -64,6 +64,7 @@ pub struct AreaView {
     scroll: Scrollable,
     hover_sprite: Option<HoverSprite>,
     selection_box_start: Option<(f32, f32)>,
+    active_entity: Option<Rc<RefCell<EntityState>>>,
     feedback_text_params: area_feedback_text::Params,
 
     area_mouseover: Option<Rc<RefCell<AreaMouseover>>>,
@@ -98,6 +99,7 @@ impl AreaView {
             targeter_tile: None,
             selection_box_image: None,
             selection_box_start: None,
+            active_entity: None,
             feedback_text_params: area_feedback_text::Params::default(),
             area_mouseover: None,
             area_mouseover_widget: None,
@@ -635,6 +637,10 @@ impl AreaView {
         self.scroll.change(delta_x, delta_y)
     }
 
+    pub fn set_active_entity(&mut self, entity: Option<Rc<RefCell<EntityState>>>) {
+        self.active_entity = entity;
+    }
+
     pub fn clear_mouse_state(&mut self) {
         self.hover_sprite = None;
         self.selection_box_start = None;
@@ -952,11 +958,17 @@ impl WidgetKind for AreaView {
             renderer.draw(draw_list);
         }
 
-        for selected in GameState::selected() {
-            self.draw_selection(&selected, renderer, scale_x, scale_y, widget, millis);
-        }
-        for entity in self.select_party_in_box(widget).iter() {
-            self.draw_selection(&entity, renderer, scale_x, scale_y, widget, millis);
+        let active_entity = self.active_entity.clone();
+        if let Some(ref entity) = active_entity {
+            self.draw_selection(entity, renderer, scale_x, scale_y, widget, millis);
+        } else {
+            for selected in GameState::selected() {
+                self.draw_selection(&selected, renderer, scale_x, scale_y, widget, millis);
+            }
+
+            for entity in self.select_party_in_box(widget).iter() {
+                self.draw_selection(&entity, renderer, scale_x, scale_y, widget, millis);
+            }
         }
 
         self.draw_entities_props(
@@ -1152,6 +1164,12 @@ impl WidgetKind for AreaView {
             _ => (),
         }
 
+        true
+    }
+
+    fn on_mouse_enter(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
+        self.set_active_entity(None);
+        self.super_on_mouse_enter(widget);
         true
     }
 

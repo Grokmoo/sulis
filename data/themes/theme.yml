@@ -526,8 +526,8 @@ themes:
           node:
             relative:
               width: Max
-            size: [0, -8]
-            position: [0, 8]
+            size: [0, 0]
+            position: [0, 0]
             text_params:
               font: "normal"
               scale: 5.0

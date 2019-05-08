@@ -50,7 +50,7 @@ impl WidgetKind for InventoryWindow {
         widget.do_base_layout();
     }
 
-    fn on_remove(&mut self) {
+    fn on_remove(&mut self, _widget: &Rc<RefCell<Widget>>) {
         self.entity.borrow_mut().actor.listeners.remove(NAME);
         debug!("Removed inventory window.");
     }

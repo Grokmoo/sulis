@@ -13,6 +13,7 @@ nodes:
       [c=6868FF|Thug] - [c=888|The thug who seems to be the leader speaks.]
       
       So, where is it?
+    switch_speaker: thug01
     on_view:
       - fire_script:
           id: wellswood

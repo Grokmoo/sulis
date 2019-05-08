@@ -14,7 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::cell::{Ref, RefCell};
+use std::cell::{RefCell};
 use std::io::Error;
 use std::mem;
 use std::rc::Rc;
@@ -494,12 +494,12 @@ impl Widget {
         if readd {
             parent.borrow_mut().modal_child = None;
             for child in parent.borrow_mut().children.iter() {
-                let child_ref = child.borrow_mut();
-                child_ref.kind.borrow_mut().on_remove();
+                let kind = Rc::clone(&child.borrow().kind);
+                kind.borrow_mut().on_remove(&child);
             }
             parent.borrow_mut().children.clear();
             let kind = Rc::clone(&parent.borrow().kind);
-            kind.borrow_mut().on_remove();
+            kind.borrow_mut().on_remove(&parent);
             let children = kind.borrow_mut().on_add(&parent);
             Widget::add_children_to(parent, children);
             parent.borrow_mut().marked_for_readd = false;
@@ -517,14 +517,15 @@ impl Widget {
         }
     }
 
-    fn recursive_on_remove(widget_ref: &Ref<Widget>) {
-        let len = widget_ref.children.len();
+    fn recursive_on_remove(widget: &Rc<RefCell<Widget>>) {
+        let len = widget.borrow().children.len();
         for i in 0..len {
-            let child = Rc::clone(&widget_ref.children[i]);
-            Widget::recursive_on_remove(&child.borrow());
+            let child = Rc::clone(&widget.borrow().children[i]);
+            Widget::recursive_on_remove(&child);
         }
 
-        widget_ref.kind.borrow_mut().on_remove();
+        let kind = Rc::clone(&widget.borrow().kind);
+        kind.borrow_mut().on_remove(&widget);
     }
 
     fn find_new_modal_child(parent: &Rc<RefCell<Widget>>) -> Option<Rc<RefCell<Widget>>> {
@@ -544,15 +545,16 @@ impl Widget {
     }
 
     pub fn check_children_removal(parent: &Rc<RefCell<Widget>>) {
-        parent.borrow_mut().children.retain(|widget| {
-            let widget_ref = widget.borrow();
-            if widget_ref.marked_for_removal {
-                Widget::recursive_on_remove(&widget_ref);
-                false
-            } else {
-                true
+        let len = parent.borrow().children.len();
+        for i in (0..len).rev() {
+            let child = Rc::clone(&parent.borrow().children[i]);
+
+            let marked = child.borrow().marked_for_removal;
+            if marked {
+                Widget::recursive_on_remove(&child);
+                parent.borrow_mut().children.remove(i);
             }
-        });
+        }
 
         let parent = parent.borrow();
         let len = parent.children.len();

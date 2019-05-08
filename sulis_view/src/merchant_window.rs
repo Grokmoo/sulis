@@ -57,7 +57,7 @@ impl WidgetKind for MerchantWindow {
         widget.do_base_layout();
     }
 
-    fn on_remove(&mut self) {
+    fn on_remove(&mut self, _widget: &Rc<RefCell<Widget>>) {
         let area_state = GameState::area_state();
         let mut area_state = area_state.borrow_mut();
 

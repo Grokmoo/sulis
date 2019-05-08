@@ -1,7 +1,8 @@
 function tour_guide(parent)
   game:cancel_blocking_anims()
   game:scroll_view(14, 113)
-  game:start_conversation("rose_lake_tour_guide", game:player())
+  local guide = game:entity_with_id("rose_lake_guide")
+  game:start_conversation("rose_lake_tour_guide", guide)
 end
 
 function council_secretary_suggestion(parent)
@@ -57,7 +58,7 @@ function arzel_fight_init(parent)
   local arzel = game:entity_with_id("arzel")
   arzel:set_faction("Hostile")
   
-  game:start_conversation("arzel", parent)
+  game:start_conversation("arzel", arzel)
 end
 
 function arzel_spawn(parent)

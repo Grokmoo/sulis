@@ -776,8 +776,6 @@ impl PortraitPane {
 impl WidgetKind for PortraitPane {
     widget_kind!("portrait_pane");
 
-    fn on_remove(&mut self) {}
-
     fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         GameState::add_party_listener(ChangeListener::invalidate("portrait_pane", &widget));
 

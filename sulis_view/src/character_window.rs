@@ -69,7 +69,7 @@ impl WidgetKind for CharacterWindow {
         widget.do_base_layout();
     }
 
-    fn on_remove(&mut self) {
+    fn on_remove(&mut self, _widget: &Rc<RefCell<Widget>>) {
         self.character.borrow_mut().actor.listeners.remove(NAME);
         debug!("Removed character window.");
     }

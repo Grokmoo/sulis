@@ -355,7 +355,7 @@ impl GameState {
         selected.push(Rc::clone(&pc_state));
 
         Ok(GameState {
-            user_zoom: 1.0,
+            user_zoom: Config::default_zoom(),
             areas,
             area_state,
             path_finder,

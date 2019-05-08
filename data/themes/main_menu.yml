@@ -515,7 +515,7 @@ themes:
           ui_scale_title:
             from: options_window.content_title
             text: "UI Scale"
-            position: [0, 80]
+            position: [-30, 80]
             relative:
               x: Center
           ui_scale_content:
@@ -523,7 +523,7 @@ themes:
             relative:
               x: Center
             size: [50, 8]
-            position: [0, 85]
+            position: [-30, 85]
             children:
               small:
                 from: button
@@ -542,6 +542,29 @@ themes:
                 size: [23, 0]
                 custom:
                   tooltip: "Standard size buttons, text, and other UI elements."
+          default_zoom_title:
+            from: options_window.content_title
+            kind: Label
+            text: "Default Zoom"
+            position: [30, 80]
+            relative:
+              x: Center
+          default_zoom_content:
+            from: options_window.content_sub_content
+            layout: BoxHorizontal
+            layout_spacing: { top: 0, bottom: 0, left: 0, right: 2 }
+            relative:
+              x: Center
+            size: [50, 8]
+            position: [30, 85]
+            children:
+              default_zoom_button:
+                from: button
+                relative:
+                  height: Max
+                size: [8, 0]
+                custom:
+                  tooltip: "Set the default zoom level when playing."
           anim_speed_title:
             from: options_window.content_title
             text: "Animation Speed"

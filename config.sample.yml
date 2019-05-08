@@ -30,6 +30,8 @@ display:
     # Larger values make animations take longer
     animation_base_time_millis: 50
 
+    default_zoom: 1.4
+
     # The name of the default font used to render text when no font is specified
     default_font: normal
 
@@ -39,17 +41,17 @@ display:
 resources:
     # all resources are subdirectories under this
     directory: data
-    
+
     # campaigns are stored here
     campaigns_directory: campaigns
-    
+
     # mods are stored here
     mods_directory: mods
 
 input:
     # whether moving the mouse to the screen edge will scroll the view
     edge_scrolling: false
-    
+
     # scrolling rate for all scrolling methods
     scroll_speed: 1.5
 

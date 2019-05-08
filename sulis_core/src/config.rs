@@ -113,6 +113,10 @@ impl Config {
         CONFIG.with(|c| c.borrow().display.frame_rate)
     }
 
+    pub fn default_zoom() -> f32 {
+        CONFIG.with(|c| c.borrow().display.default_zoom)
+    }
+
     pub fn animation_base_time_millis() -> u32 {
         CONFIG.with(|c| c.borrow().display.animation_base_time_millis)
     }
@@ -227,6 +231,7 @@ pub struct DisplayConfig {
     pub monitor: usize,
     pub frame_rate: u32,
     pub animation_base_time_millis: u32,
+    pub default_zoom: f32,
     pub width: i32,
     pub height: i32,
     pub width_pixels: u32,

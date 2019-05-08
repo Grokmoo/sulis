@@ -41,6 +41,7 @@ pub struct Options {
     cur_display_conf: usize,
     cur_ui_scale: (i32, i32),
     cur_resolution: (u32, u32),
+    cur_default_zoom: f32,
     cur_anim_speed: u32,
     cur_scroll_speed: f32,
     cur_edge_scrolling: bool,
@@ -71,6 +72,7 @@ impl Options {
 
             cur_display_mode: config.display.mode,
             cur_display_conf,
+            cur_default_zoom: config.display.default_zoom,
             cur_resolution: (config.display.width_pixels, config.display.height_pixels),
             cur_anim_speed: config.display.animation_base_time_millis,
             cur_scroll_speed: config.input.scroll_speed,
@@ -105,6 +107,7 @@ impl Options {
         config.display.height_pixels = self.cur_resolution.1;
         config.display.width = self.cur_ui_scale.0;
         config.display.height = self.cur_ui_scale.1;
+        config.display.default_zoom = self.cur_default_zoom;
 
         config.input.scroll_speed = self.cur_scroll_speed;
         config.input.edge_scrolling = self.cur_edge_scrolling;
@@ -273,6 +276,27 @@ impl Options {
         Widget::add_child_to(&ui_scale_content, normal);
         Widget::add_child_to(&ui_scale_content, small);
 
+        let zoom_content = Widget::empty("default_zoom_content");
+        let mut zoom_found = false;
+        for zoom in DEFAULT_ZOOMS.iter() {
+            let zoom = *zoom;
+            let button = Widget::with_theme(Button::empty(), "default_zoom_button");
+            button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
+                let (parent, options) = Widget::parent_mut::<Options>(widget);
+                options.cur_default_zoom = zoom;
+                parent.borrow_mut().invalidate_children();
+            })));
+            if zoom == self.cur_default_zoom {
+                button.borrow_mut().state.set_active(true);
+                zoom_found = true;
+            }
+            Widget::add_child_to(&zoom_content, button);
+        }
+
+        if !zoom_found {
+            info!("Default zoom set to non standard value {}", self.cur_default_zoom);
+        }
+
         let anim_speed_title = Widget::with_theme(Label::empty(), "anim_speed_title");
 
         let anim_speed_content = Widget::empty("anim_speed_content");
@@ -319,6 +343,7 @@ impl Options {
             fast_label,
             anim_speed_title,
             anim_speed_content,
+            zoom_content,
         ]
     }
 
@@ -435,6 +460,7 @@ impl Options {
 const UI_SCALE_NORMAL: (i32, i32) = (320, 180);
 const UI_SCALE_SMALL: (i32, i32) = (368, 207);
 const ANIM_SPEEDS: [u32; 5] = [75, 50, 35, 25, 15];
+const DEFAULT_ZOOMS: [f32; 5] = [1.0, 1.2, 1.4, 1.6, 1.8];
 const SCROLL_SPEEDS: [f32; 7] = [0.75, 1.0, 1.5, 2.25, 3.5, 5.0, 7.0];
 
 impl WidgetKind for Options {

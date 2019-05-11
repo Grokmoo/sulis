@@ -25,7 +25,8 @@ use sulis_core::util::Point;
 use sulis_module::{Ability, Module, ObjectSize};
 
 use crate::script::{targeter, ScriptItemKind, TargeterData};
-use crate::{AreaState, EntityState, GameState, Script, TurnManager};
+use crate::{AreaState, EntityState, GameState, Script, TurnManager,
+    SelectionArea, SelectionAreaImageSet};
 
 #[derive(Clone)]
 pub enum Shape {
@@ -736,6 +737,7 @@ pub struct AreaTargeter {
     shape: Shape,
     show_mouseover: bool,
     free_select: Option<f32>,
+    free_selection_area: Option<SelectionArea>,
     free_select_must_be_passable: Option<Rc<ObjectSize>>,
     allow_affected_points_impass: bool,
     allow_affected_points_invis: bool,
@@ -806,6 +808,11 @@ impl AreaTargeter {
             }
         };
 
+        let free_selection_area = match data.free_select {
+            None => None,
+            Some(radius) => Some(SelectionArea::new(radius)),
+        };
+
         AreaTargeter {
             on_target_select_func: data.on_target_select_func.to_string(),
             on_target_select_custom_target: match data.on_target_select_custom_target {
@@ -819,6 +826,7 @@ impl AreaTargeter {
             max_effectable: data.max_effectable,
             cancel: false,
             free_select: data.free_select,
+            free_selection_area,
             free_select_must_be_passable,
             allow_affected_points_impass: data.allow_affected_points_impass,
             allow_affected_points_invis: data.allow_affected_points_invis,
@@ -958,9 +966,10 @@ impl AreaTargeter {
     }
 
     pub fn draw(
-        &self,
+        &mut self,
         renderer: &mut GraphicsRenderer,
         tile: &Rc<Image>,
+        selection_set: &SelectionAreaImageSet,
         x_offset: f32,
         y_offset: f32,
         scale_x: f32,
@@ -1002,6 +1011,14 @@ impl AreaTargeter {
         }
         draw_list.set_scale(scale_x, scale_y);
         renderer.draw(draw_list);
+
+        if let Some(ref mut sel) = self.free_selection_area {
+            let x_offset = x_offset - self.parent.borrow().location.x as f32;
+            let y_offset = y_offset - self.parent.borrow().location.y as f32;
+            let mut draw_list = sel.get_draw_list(selection_set, x_offset, y_offset, millis);
+            draw_list.set_scale(scale_x, scale_y);
+            renderer.draw(draw_list);
+        }
     }
 
     pub fn on_mouse_move(

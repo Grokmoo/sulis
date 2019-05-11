@@ -415,6 +415,24 @@ groups:
       bg_bottom_left_hint_to_click5:   [0, 10]
       bg_bottom_middle_hint_to_click5: [5, 10]
       bg_bottom_right_hint_to_click5:  [10, 10]
+  selection_area:
+    size: [16, 16]
+    position: [32, 304]
+    simple_image_gen_scale: 16
+    areas:
+      selection_area_outer_nw: [0, 0]
+      selection_area_outer_n: [16, 0]
+      selection_area_outer_ne: [32, 0]
+      selection_area_outer_w: [0, 16]
+      selection_area_center: [16, 16]
+      selection_area_outer_e: [32, 16]
+      selection_area_outer_sw: [0, 32]
+      selection_area_outer_s: [16, 32]
+      selection_area_outer_se: [32, 32]
+      selection_area_inner_nw: [64, 0]
+      selection_area_inner_ne: [80, 0]
+      selection_area_inner_sw: [64, 16]
+      selection_area_inner_se: [80, 16]
   elev:
     size: [16, 16]
     position: [74, 512]

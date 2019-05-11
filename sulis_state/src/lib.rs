@@ -102,6 +102,9 @@ pub use self::save_file::SaveFileMetaData;
 mod save_state;
 pub use self::save_state::SaveState;
 
+mod selection_area;
+pub use self::selection_area::{SelectionArea, SelectionAreaImageSet};
+
 pub mod script;
 pub use self::script::{Script, ScriptCallback, ScriptState};
 

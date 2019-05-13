@@ -14,6 +14,7 @@ function on_activate(parent, ability)
   local targets = parent:targets():hostile():visible_within(dists[stats.armor_kind])
   
   local targeter = parent:create_targeter(ability)
+  targeter:set_selection_radius(dists[stats.armor_kind])
   targeter:add_all_selectable(targets)
   targeter:add_all_effectable(targets)
   targeter:activate()

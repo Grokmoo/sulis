@@ -8,6 +8,7 @@ function on_activate(parent, ability)
   local targets = parent:targets():hostile():visible()
   
   local targeter = parent:create_targeter(ability)
+  targeter:set_selection_radius(3.5)
   targeter:set_free_select(3.5)
   targeter:set_free_select_must_be_passable(parent:size_str())
   targeter:set_shape_line_segment(parent:size_str(), parent:x(), parent:y())

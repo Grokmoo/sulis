@@ -737,7 +737,7 @@ pub struct AreaTargeter {
     shape: Shape,
     show_mouseover: bool,
     free_select: Option<f32>,
-    free_selection_area: Option<SelectionArea>,
+    selection_area: Option<SelectionArea>,
     free_select_must_be_passable: Option<Rc<ObjectSize>>,
     allow_affected_points_impass: bool,
     allow_affected_points_invis: bool,
@@ -808,9 +808,19 @@ impl AreaTargeter {
             }
         };
 
-        let free_selection_area = match data.free_select {
-            None => None,
-            Some(radius) => Some(SelectionArea::new(radius)),
+        let selection_area = match data.selection_area {
+            targeter::SelectionArea::None => None,
+            targeter::SelectionArea::Radius(radius) =>
+                Some(SelectionArea::new(radius, &parent.borrow())),
+            targeter::SelectionArea::Visible => {
+                let area = GameState::area_state();
+                let r = area.borrow().area.area.vis_dist;
+                Some(SelectionArea::new(r as f32, &parent.borrow()))
+            },
+            targeter::SelectionArea::Reachable => {
+                let r = parent.borrow().actor.stats.attack_distance();
+                Some(SelectionArea::new(r, &parent.borrow()))
+            },
         };
 
         AreaTargeter {
@@ -826,7 +836,7 @@ impl AreaTargeter {
             max_effectable: data.max_effectable,
             cancel: false,
             free_select: data.free_select,
-            free_selection_area,
+            selection_area,
             free_select_must_be_passable,
             allow_affected_points_impass: data.allow_affected_points_impass,
             allow_affected_points_invis: data.allow_affected_points_invis,
@@ -1012,7 +1022,7 @@ impl AreaTargeter {
         draw_list.set_scale(scale_x, scale_y);
         renderer.draw(draw_list);
 
-        if let Some(ref mut sel) = self.free_selection_area {
+        if let Some(ref mut sel) = self.selection_area {
             let x_offset = x_offset - self.parent.borrow().location.x as f32;
             let y_offset = y_offset - self.parent.borrow().location.y as f32;
             let mut draw_list = sel.get_draw_list(selection_set, x_offset, y_offset, millis);

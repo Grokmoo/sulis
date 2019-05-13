@@ -2,6 +2,7 @@ function on_activate(parent, ability)
   local targets = parent:targets()
   
   local targeter = parent:create_targeter(ability)
+  targeter:set_selection_radius(9.0)
   targeter:set_free_select(9.0)
   targeter:set_shape_object_size("3by3")
   targeter:add_all_effectable(targets)

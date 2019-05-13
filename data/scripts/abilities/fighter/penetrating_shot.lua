@@ -10,6 +10,7 @@ function on_activate(parent, ability)
   local targets = parent:targets():without_self()
   
   local targeter = parent:create_targeter(ability)
+  targeter:set_selection_radius(line_len)
   targeter:set_free_select(line_len)
   targeter:set_shape_line("1by1", parent:x(), parent:y(), line_len)
   targeter:add_all_effectable(targets)

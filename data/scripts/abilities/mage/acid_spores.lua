@@ -4,6 +4,7 @@ function on_activate(parent, ability)
   local targets = parent:targets():hostile()
   
   local targeter = parent:create_targeter(ability)
+  targeter:set_selection_radius(15.0)
   targeter:set_free_select(15.0)
   -- targeter:set_free_select_must_be_passable("1by1")
   targeter:set_shape_circle(radius)

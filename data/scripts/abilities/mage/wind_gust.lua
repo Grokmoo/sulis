@@ -4,6 +4,7 @@ function on_activate(parent, ability)
   local targets = parent:targets():without_self()
   
   targeter = parent:create_targeter(ability)
+  targeter:set_selection_radius(max_dist)
   targeter:set_free_select(max_dist * 2)
   targeter:set_shape_cone(parent:center_x(), parent:center_y(), 1.0, max_dist, math.pi / 4) 
   targeter:add_all_effectable(targets)

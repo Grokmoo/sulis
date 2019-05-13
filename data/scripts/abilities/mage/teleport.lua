@@ -5,6 +5,7 @@ function on_activate(parent, ability)
   local targets = parent:targets():visible_within(range)
   
   local targeter = parent:create_targeter(ability)
+  targeter:set_selection_radius(range)
   targeter:add_all_selectable(targets)
   targeter:add_all_effectable(targets)
   targeter:set_callback_fn("on_target")
@@ -18,6 +19,7 @@ function on_target(parent, ability, targets)
   local range = 7 + stats.caster_level / 2
 
   local targeter = parent:create_targeter(ability)
+  targeter:set_selection_radius(range + 2)
   targeter:set_free_select(range + 2)
   targeter:set_free_select_must_be_passable(parent:size_str())
   targeter:set_shape_object_size(parent:size_str())

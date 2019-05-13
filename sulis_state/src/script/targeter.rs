@@ -28,6 +28,14 @@ pub enum Kind {
     Item(ScriptItemKind),
 }
 
+#[derive(Clone)]
+pub enum SelectionArea {
+    Radius(f32),
+    Visible,
+    Reachable,
+    None,
+}
+
 /// Created by calling `create_targeter` on a `ScriptEntity`.  A targeter
 /// allows the player (or ai script) to select a specific target from a list
 /// of available targets, or choose a location for an area of effect.
@@ -118,6 +126,17 @@ pub enum Kind {
 /// and subtending the specified `angle`.  The angle is in radians.  `min_radius` specifies
 /// a minimum distance points must be from the origin to be included.  This should be zero
 /// for a true cone.
+///
+/// # `set_selection_radius(r: Float)`
+/// Sets the radius of the selection area to the specified value.  The selection area is
+/// drawn to provide feedback to the user but does not impact selection for the targeter.
+///
+/// # `set_selection_visible()`
+/// Sets the selection area to visible targets.  See `set_selection_radius`.
+///
+/// # `set_selection_reachable()`
+/// Sets the selection area to reachable targets.  See `set_selection_radius`.
+///
 #[derive(Clone)]
 pub struct TargeterData {
     pub kind: Kind,
@@ -129,6 +148,7 @@ pub struct TargeterData {
     pub show_mouseover: bool,
     pub free_select: Option<f32>,
     pub free_select_must_be_passable: Option<String>,
+    pub selection_area: SelectionArea,
     pub allow_affected_points_impass: bool,
     pub impass_blocks_affected_points: bool,
     pub invis_blocks_affected_points: bool,
@@ -147,6 +167,7 @@ impl TargeterData {
             max_effectable: None,
             shape: Shape::Single,
             show_mouseover: true,
+            selection_area: SelectionArea::None,
             free_select: None,
             free_select_must_be_passable: None,
             on_target_select_func: "on_target_select".to_string(),
@@ -338,6 +359,21 @@ impl UserData for TargeterData {
                                (origin_x, origin_y, min_radius, radius, angle):
                                (f32, f32, f32, f32, f32)| {
             targeter.shape = Shape::Cone { origin_x, origin_y, min_radius, radius, angle };
+            Ok(())
+        });
+
+        methods.add_method_mut("set_selection_radius", |_, targeter, radius: f32| {
+            targeter.selection_area = SelectionArea::Radius(radius);
+            Ok(())
+        });
+
+        methods.add_method_mut("set_selection_visible", |_, targeter, ()| {
+            targeter.selection_area = SelectionArea::Visible;
+            Ok(())
+        });
+
+        methods.add_method_mut("set_selection_reachable", |_, targeter, ()| {
+            targeter.selection_area = SelectionArea::Reachable;
             Ok(())
         });
     }

@@ -5,6 +5,7 @@ function on_activate(parent, ability)
   effectable = targets:without_self()
   
   targeter = parent:create_targeter(ability)
+  targeter:set_selection_radius(radius)
   targeter:add_selectable(parent)
   targeter:set_shape_circle(radius)
   targeter:add_all_effectable(effectable)

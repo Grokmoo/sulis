@@ -16,10 +16,14 @@
 
 use std::rc::Rc;
 
+
+use sulis_core::util::Point;
 use sulis_core::io::DrawList;
 use sulis_core::ui::animation_state;
 use sulis_core::image::Image;
 use sulis_core::resource::ResourceSet;
+
+use crate::EntityState;
 
 const NW: u8 = 1;
 const N: u8 = 2;
@@ -36,21 +40,20 @@ pub struct SelectionArea {
 }
 
 impl SelectionArea {
-    pub fn new(radius: f32) -> SelectionArea {
-        let radius = radius + 2.0;
-        let half_width = radius.ceil() as i32 + 1;
+    pub fn new(radius: f32, parent: &EntityState) -> SelectionArea {
+        let half_width = radius.ceil() as i32 + 5;
         let width = (half_width * 2) as usize;
-        let radius_squared = radius * radius;
 
         let mut points = vec![true; width * width];
 
         for y in 0..width {
             for x in 0..width {
-                let (x1, y1) = (x as f32 - half_width as f32, y as f32 - half_width as f32);
+                let (x1, y1) = (x as i32 + parent.location.x - half_width,
+                                y as i32 + parent.location.y - half_width);
+                let p = Point::new(x1, y1);
 
-                if x1 * x1 + y1 * y1 > radius_squared { continue; }
                 let idx = x + y * width;
-                points[idx] = false;
+                points[idx] = parent.dist_to_point(p) > radius;
             }
         }
 
@@ -58,9 +61,7 @@ impl SelectionArea {
         for y in 0..width {
             for x in 0..width {
                 neighbors[x + y * width] = find_neighbors(width, &points, x, y);
-                print!(" {:03}", neighbors[x + y * width]);
             }
-            print!("\n");
         }
 
         SelectionArea {
@@ -136,10 +137,10 @@ impl SelectionAreaImageSet {
             ("outer_s", SE + S + SW),
             ("outer_sw", S + SW + W),
             ("outer_w", SW + W + NW),
-            ("inner_se", SW + W + NW + N + NE),
-            ("inner_sw", NW + N + NE + E + SE),
-            ("inner_nw", NE + E + SE + S + SW),
-            ("inner_ne", SE + S + SW + W + NW),
+            ("outer_se", SW + W + NW + N + NE),
+            ("outer_sw", NW + N + NE + E + SE),
+            ("outer_nw", NE + E + SE + S + SW),
+            ("outer_ne", SE + S + SW + W + NW),
             ("outer_nw", SW + W + NW + N),
             ("outer_ne", SE + N + NE + E),
             ("outer_se", NE + E + SE + S),
@@ -152,6 +153,18 @@ impl SelectionAreaImageSet {
             ("outer_e", E + SE),
             ("outer_w", W + NW),
             ("outer_w", W + SW),
+            ("outer_ne", NW + N + NE + E),
+            ("outer_nw", NW + N + NE + W),
+            ("outer_se", E + SE + S + SW),
+            ("outer_sw", S + SW + W + SE),
+            ("inner_nw", SE),
+            ("inner_ne", SW),
+            ("inner_sw", NE),
+            ("inner_se", NW),
+            ("outer_n", NE + E + SE + S + SW + W + NW),
+            ("outer_s", SW + W + NW + N + NE + E + SE),
+            ("outer_e", SE + S + SW + W + NW + N + NE),
+            ("outer_w", NW + N + NE + E + SE + S + SW),
             ("center", 0),
         ];
 

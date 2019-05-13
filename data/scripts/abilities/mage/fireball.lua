@@ -5,6 +5,7 @@ function on_activate(parent, ability)
   
   local targeter = parent:create_targeter(ability)
   targeter:set_free_select(15.0)
+  targeter:set_selection_radius(15.0)
   targeter:set_shape_object_size("9by9round")
   targeter:invis_blocks_affected_points(true)
   targeter:add_all_effectable(targets)

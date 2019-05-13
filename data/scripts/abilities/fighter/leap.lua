@@ -1,5 +1,6 @@
 function on_activate(parent, ability)
   local targeter = parent:create_targeter(ability)
+  targeter:set_selection_radius(12.0)
   targeter:set_free_select(12.0)
   targeter:set_free_select_must_be_passable(parent:size_str())
   targeter:set_shape_object_size(parent:size_str())

@@ -8,6 +8,7 @@ function on_activate(parent, ability)
   local targets = parent:targets():hostile():attackable()
   
   local targeter = parent:create_targeter(ability)
+  targeter:set_selection_reachable()
   targeter:add_all_selectable(targets)
   targeter:add_all_effectable(targets)
   targeter:activate()

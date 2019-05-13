@@ -35,7 +35,7 @@ use sulis_module::{
     area::{Layer, Tile},
     DamageKind, Module,
 };
-use sulis_state::{area_feedback_text, area_state::PCVisRedraw, SelectionAreaImageSet};
+use sulis_state::{area_feedback_text, area_state::PCVisRedraw, RangeIndicatorImageSet};
 use sulis_state::{AreaDrawable, AreaState, EntityState, EntityTextureCache, GameState};
 
 use crate::{action_kind, window_fade, AreaMouseover, WindowFade};
@@ -59,7 +59,7 @@ pub struct AreaView {
 
     targeter_label: Rc<RefCell<Widget>>,
     targeter_tile: Option<Rc<Image>>,
-    selection_area_image_set: Option<SelectionAreaImageSet>,
+    range_indicator_image_set: Option<RangeIndicatorImageSet>,
     selection_box_image: Option<Rc<Image>>,
 
     scroll: Scrollable,
@@ -98,7 +98,7 @@ impl AreaView {
             layers: Vec::new(),
             scroll: Scrollable::new(),
             targeter_tile: None,
-            selection_area_image_set: None,
+            range_indicator_image_set: None,
             selection_box_image: None,
             selection_box_start: None,
             active_entity: None,
@@ -692,8 +692,8 @@ impl WidgetKind for AreaView {
         let selection_prefix = theme.custom.get("selection_image_prefix")
             .map(|s| s.as_ref()).unwrap_or("selection_area_");
 
-        let image_set = SelectionAreaImageSet::new(selection_prefix.to_string());
-        self.selection_area_image_set = Some(image_set);
+        let image_set = RangeIndicatorImageSet::new(selection_prefix.to_string());
+        self.range_indicator_image_set = Some(image_set);
 
         if let Some(ref image_id) = theme.custom.get("targeter_tile") {
             self.targeter_tile = ResourceSet::image(image_id);
@@ -1019,7 +1019,7 @@ impl WidgetKind for AreaView {
             Some(ref tile) => Rc::clone(tile),
         };
 
-        let image_set = match self.selection_area_image_set {
+        let image_set = match self.range_indicator_image_set {
             None => return,
             Some(ref set) => set,
         };

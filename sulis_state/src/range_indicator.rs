@@ -16,8 +16,6 @@
 
 use std::rc::Rc;
 
-
-use sulis_core::util::Point;
 use sulis_core::io::DrawList;
 use sulis_core::ui::animation_state;
 use sulis_core::image::Image;
@@ -34,13 +32,13 @@ const S: u8 = 32;
 const SW: u8 = 64;
 const W: u8 = 128;
 
-pub struct SelectionArea {
+pub struct RangeIndicator {
     neighbors: Vec<u8>,
     half_width: i32,
 }
 
-impl SelectionArea {
-    pub fn new(radius: f32, parent: &EntityState) -> SelectionArea {
+impl RangeIndicator {
+    pub fn new(radius: f32, parent: &EntityState) -> RangeIndicator {
         let half_width = radius.ceil() as i32 + 5;
         let width = (half_width * 2) as usize;
 
@@ -50,10 +48,10 @@ impl SelectionArea {
             for x in 0..width {
                 let (x1, y1) = (x as i32 + parent.location.x - half_width,
                                 y as i32 + parent.location.y - half_width);
-                let p = Point::new(x1, y1);
+                let (x1, y1) = (x1 as f32 + 0.5, y1 as f32 + 0.5);
 
                 let idx = x + y * width;
-                points[idx] = parent.dist_to_point(p) > radius;
+                points[idx] = parent.dist_to(x1, y1) > radius;
             }
         }
 
@@ -64,13 +62,13 @@ impl SelectionArea {
             }
         }
 
-        SelectionArea {
+        RangeIndicator {
             neighbors,
             half_width,
         }
     }
 
-    pub fn get_draw_list(&mut self, image_set: &SelectionAreaImageSet,
+    pub fn get_draw_list(&mut self, image_set: &RangeIndicatorImageSet,
                          x_offset: f32, y_offset: f32, millis: u32) -> DrawList {
         let mut draw_list = DrawList::empty_sprite();
 
@@ -122,12 +120,12 @@ fn check_idx(width: i32, points: &[bool], x: i32, y: i32) -> bool {
     points[x as usize + y as usize * width as usize]
 }
 
-pub struct SelectionAreaImageSet {
+pub struct RangeIndicatorImageSet {
     images: Vec<Option<Rc<Image>>>,
 }
 
-impl SelectionAreaImageSet {
-    pub fn new(prefix: String) -> SelectionAreaImageSet {
+impl RangeIndicatorImageSet {
+    pub fn new(prefix: String) -> RangeIndicatorImageSet {
         let rules = [
             ("outer_nw", W + NW + N),
             ("outer_n", NW + N + NE),
@@ -178,7 +176,7 @@ impl SelectionAreaImageSet {
             images[rule.neighbors as usize] = Some(rule.image);
         }
 
-        SelectionAreaImageSet {
+        RangeIndicatorImageSet {
             images,
         }
     }

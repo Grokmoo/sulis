@@ -26,7 +26,7 @@ use sulis_module::{Ability, Module, ObjectSize};
 
 use crate::script::{targeter, ScriptItemKind, TargeterData};
 use crate::{AreaState, EntityState, GameState, Script, TurnManager,
-    SelectionArea, SelectionAreaImageSet};
+    RangeIndicator, RangeIndicatorImageSet};
 
 #[derive(Clone)]
 pub enum Shape {
@@ -642,13 +642,14 @@ impl Shape {
     ) -> Vec<Point> {
         let mut points = Vec::new();
 
+        let radius = radius + 1.0;
         let angle = (to.y as f32 - origin_y).atan2(to.x as f32 - origin_x);
         let shift_x = origin_x.fract();
         let shift_y = origin_y.fract();
         let origin_x = origin_x.trunc() as i32;
         let origin_y = origin_y.trunc() as i32;
 
-        let r = (radius + 1.0).ceil() as i32;
+        let r = (radius + 2.0).ceil() as i32;
         for y in -r..r {
             for x in -r..r {
                 let dist = (x as f32 - shift_x).hypot(y as f32 - shift_y);
@@ -737,7 +738,7 @@ pub struct AreaTargeter {
     shape: Shape,
     show_mouseover: bool,
     free_select: Option<f32>,
-    selection_area: Option<SelectionArea>,
+    range_indicator: Option<RangeIndicator>,
     free_select_must_be_passable: Option<Rc<ObjectSize>>,
     allow_affected_points_impass: bool,
     allow_affected_points_invis: bool,
@@ -808,18 +809,18 @@ impl AreaTargeter {
             }
         };
 
-        let selection_area = match data.selection_area {
+        let range_indicator = match data.selection_area {
             targeter::SelectionArea::None => None,
             targeter::SelectionArea::Radius(radius) =>
-                Some(SelectionArea::new(radius, &parent.borrow())),
+                Some(RangeIndicator::new(radius, &parent.borrow())),
             targeter::SelectionArea::Visible => {
                 let area = GameState::area_state();
                 let r = area.borrow().area.area.vis_dist;
-                Some(SelectionArea::new(r as f32, &parent.borrow()))
+                Some(RangeIndicator::new(r as f32 - 1.0, &parent.borrow()))
             },
             targeter::SelectionArea::Reachable => {
-                let r = parent.borrow().actor.stats.attack_distance();
-                Some(SelectionArea::new(r, &parent.borrow()))
+                let r = parent.borrow().actor.stats.attack_distance() + 1.4;
+                Some(RangeIndicator::new(r, &parent.borrow()))
             },
         };
 
@@ -836,7 +837,7 @@ impl AreaTargeter {
             max_effectable: data.max_effectable,
             cancel: false,
             free_select: data.free_select,
-            selection_area,
+            range_indicator,
             free_select_must_be_passable,
             allow_affected_points_impass: data.allow_affected_points_impass,
             allow_affected_points_invis: data.allow_affected_points_invis,
@@ -979,7 +980,7 @@ impl AreaTargeter {
         &mut self,
         renderer: &mut GraphicsRenderer,
         tile: &Rc<Image>,
-        selection_set: &SelectionAreaImageSet,
+        selection_set: &RangeIndicatorImageSet,
         x_offset: f32,
         y_offset: f32,
         scale_x: f32,
@@ -1022,7 +1023,7 @@ impl AreaTargeter {
         draw_list.set_scale(scale_x, scale_y);
         renderer.draw(draw_list);
 
-        if let Some(ref mut sel) = self.selection_area {
+        if let Some(ref mut sel) = self.range_indicator {
             let x_offset = x_offset - self.parent.borrow().location.x as f32;
             let y_offset = y_offset - self.parent.borrow().location.y as f32;
             let mut draw_list = sel.get_draw_list(selection_set, x_offset, y_offset, millis);

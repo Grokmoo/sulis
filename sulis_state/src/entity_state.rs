@@ -523,6 +523,10 @@ impl EntityState {
         true
     }
 
+    pub fn dist_to(&self, x: f32, y: f32) -> f32 {
+        self.dist_internal(x, y, 0.0)
+    }
+
     pub fn dist_to_point(&self, pos: Point) -> f32 {
         self.dist_internal(pos.x as f32, pos.y as f32, (2.0 as f32).sqrt() / 2.0)
     }

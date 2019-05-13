@@ -95,15 +95,15 @@ pub mod quest_state;
 pub use self::quest_state::QuestState;
 pub use self::quest_state::QuestStateSet;
 
+mod range_indicator;
+pub use self::range_indicator::{RangeIndicator, RangeIndicatorImageSet};
+
 pub mod save_file;
 pub use self::save_file::SaveFile;
 pub use self::save_file::SaveFileMetaData;
 
 mod save_state;
 pub use self::save_state::SaveState;
-
-mod selection_area;
-pub use self::selection_area::{SelectionArea, SelectionAreaImageSet};
 
 pub mod script;
 pub use self::script::{Script, ScriptCallback, ScriptState};

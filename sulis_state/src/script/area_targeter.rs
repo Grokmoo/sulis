@@ -25,8 +25,7 @@ use sulis_core::util::Point;
 use sulis_module::{Ability, Module, ObjectSize};
 
 use crate::script::{targeter, ScriptItemKind, TargeterData};
-use crate::{AreaState, EntityState, GameState, Script, TurnManager,
-    RangeIndicator, RangeIndicatorImageSet};
+use crate::{AreaState, EntityState, GameState, Script, TurnManager, RangeIndicator};
 
 #[derive(Clone)]
 pub enum Shape {
@@ -812,15 +811,15 @@ impl AreaTargeter {
         let range_indicator = match data.selection_area {
             targeter::SelectionArea::None => None,
             targeter::SelectionArea::Radius(radius) =>
-                Some(RangeIndicator::new(radius, &parent.borrow())),
+                Some(RangeIndicator::new(radius, &parent)),
             targeter::SelectionArea::Visible => {
                 let area = GameState::area_state();
                 let r = area.borrow().area.area.vis_dist;
-                Some(RangeIndicator::new(r as f32 - 1.0, &parent.borrow()))
+                Some(RangeIndicator::new(r as f32 - 1.0, &parent))
             },
             targeter::SelectionArea::Reachable => {
                 let r = parent.borrow().actor.stats.attack_distance() + 1.4;
-                Some(RangeIndicator::new(r, &parent.borrow()))
+                Some(RangeIndicator::new(r, &parent))
             },
         };
 
@@ -852,6 +851,10 @@ impl AreaTargeter {
             cur_effected: Vec::new(),
             shape: data.shape.clone(),
         }
+    }
+
+    pub fn take_range_indicator(&mut self) -> Option<RangeIndicator> {
+        self.range_indicator.take()
     }
 
     fn draw_target(
@@ -980,7 +983,6 @@ impl AreaTargeter {
         &mut self,
         renderer: &mut GraphicsRenderer,
         tile: &Rc<Image>,
-        selection_set: &RangeIndicatorImageSet,
         x_offset: f32,
         y_offset: f32,
         scale_x: f32,
@@ -1022,14 +1024,6 @@ impl AreaTargeter {
         }
         draw_list.set_scale(scale_x, scale_y);
         renderer.draw(draw_list);
-
-        if let Some(ref mut sel) = self.range_indicator {
-            let x_offset = x_offset - self.parent.borrow().location.x as f32;
-            let y_offset = y_offset - self.parent.borrow().location.y as f32;
-            let mut draw_list = sel.get_draw_list(selection_set, x_offset, y_offset, millis);
-            draw_list.set_scale(scale_x, scale_y);
-            renderer.draw(draw_list);
-        }
     }
 
     pub fn on_mouse_move(

@@ -14,6 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::cell::RefCell;
 use std::rc::Rc;
 
 use sulis_core::io::DrawList;
@@ -33,25 +34,31 @@ const SW: u8 = 64;
 const W: u8 = 128;
 
 pub struct RangeIndicator {
+    parent: Rc<RefCell<EntityState>>,
     neighbors: Vec<u8>,
     half_width: i32,
 }
 
 impl RangeIndicator {
-    pub fn new(radius: f32, parent: &EntityState) -> RangeIndicator {
+    pub fn new(radius: f32, parent: &Rc<RefCell<EntityState>>) -> RangeIndicator {
+        let parent = Rc::clone(parent);
+
         let half_width = radius.ceil() as i32 + 5;
         let width = (half_width * 2) as usize;
 
         let mut points = vec![true; width * width];
 
-        for y in 0..width {
-            for x in 0..width {
-                let (x1, y1) = (x as i32 + parent.location.x - half_width,
-                                y as i32 + parent.location.y - half_width);
-                let (x1, y1) = (x1 as f32 + 0.5, y1 as f32 + 0.5);
+        {
+            let parent = parent.borrow();
+            for y in 0..width {
+                for x in 0..width {
+                    let (x1, y1) = (x as i32 + parent.location.x - half_width,
+                                    y as i32 + parent.location.y - half_width);
+                    let (x1, y1) = (x1 as f32 + 0.5, y1 as f32 + 0.5);
 
-                let idx = x + y * width;
-                points[idx] = parent.dist_to(x1, y1) > radius;
+                    let idx = x + y * width;
+                    points[idx] = parent.dist_to(x1, y1) > radius;
+                }
             }
         }
 
@@ -65,11 +72,14 @@ impl RangeIndicator {
         RangeIndicator {
             neighbors,
             half_width,
+            parent,
         }
     }
 
-    pub fn get_draw_list(&mut self, image_set: &RangeIndicatorImageSet,
+    pub fn get_draw_list(&self, image_set: &RangeIndicatorImageSet,
                          x_offset: f32, y_offset: f32, millis: u32) -> DrawList {
+        let x_offset = x_offset - self.parent.borrow().location.x as f32;
+        let y_offset = y_offset - self.parent.borrow().location.y as f32;
         let mut draw_list = DrawList::empty_sprite();
 
         let half_width_f32 = self.half_width as f32;

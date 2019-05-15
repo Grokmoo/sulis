@@ -19,7 +19,8 @@ use std::collections::{vec_deque::Iter, HashMap, HashSet, VecDeque};
 use std::rc::Rc;
 
 use crate::script::{CallbackData, FuncKind};
-use crate::{AreaState, ChangeListener, ChangeListenerList, Effect, EntityState, GameState};
+use crate::{AreaState, ChangeListener, ChangeListenerList, Effect,
+    EntityState, GameState};
 use sulis_core::util::{gen_rand, Point};
 use sulis_module::{Faction, Module, Time, ROUND_TIME_MILLIS};
 
@@ -356,24 +357,13 @@ impl TurnManager {
         }
 
         let cbs = self.iterate_to_next_entity();
-        self.init_turn_for_current_entity();
-
-        match self.current() {
-            Some(entity) => {
-                if entity.borrow().is_party_member() {
-                    GameState::set_selected_party_member(entity);
-                } else {
-                    GameState::clear_selected_party_member();
-                }
-            }
-            None => unreachable!(),
-        }
+        self.init_turn_for_current_entity(&mut GameState::area_state().borrow_mut());
 
         self.listeners.notify(&self);
         cbs
     }
 
-    fn init_turn_for_current_entity(&mut self) {
+    fn init_turn_for_current_entity(&mut self, area_state: &mut AreaState) {
         let current = match self.order.front() {
             Some(Entry::Entity(index)) => match self.entities[*index] {
                 None => unreachable!(),
@@ -384,6 +374,11 @@ impl TurnManager {
 
         if current.borrow().is_party_member() {
             GameState::set_selected_party_member(Rc::clone(current));
+            area_state.set_default_range_indicator(Some(current),
+                self.is_combat_active());
+        } else {
+            GameState::clear_selected_party_member();
+            area_state.set_range_indicator(None);
         }
 
         let mut current = current.borrow_mut();
@@ -570,7 +565,7 @@ impl TurnManager {
                 self.order.push_back(front);
             }
             area_state.bump_party_overlap(self);
-            self.init_turn_for_current_entity();
+            self.init_turn_for_current_entity(area_state);
         }
 
         self.listeners.notify(&self);
@@ -658,6 +653,9 @@ impl TurnManager {
         if GameState::selected().is_empty() {
             GameState::set_selected_party_member(GameState::player());
         }
+
+        let area = GameState::area_state();
+        area.borrow_mut().set_range_indicator(None);
     }
 
     fn initiate_combat(&mut self) {

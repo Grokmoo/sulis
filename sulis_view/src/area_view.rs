@@ -948,6 +948,20 @@ impl WidgetKind for AreaView {
             millis,
         );
 
+        let image_set = match self.range_indicator_image_set {
+            None => return,
+            Some(ref set) => set,
+        };
+
+        if let Some(ref indicator) = state.range_indicator() {
+            let mut draw_list = indicator.get_draw_list(image_set,
+                                                        self.scroll.x(),
+                                                        self.scroll.y(),
+                                                        millis);
+            draw_list.set_scale(scale_x, scale_y);
+            renderer.draw(draw_list);
+        }
+
         let mut draw_list = DrawList::empty_sprite();
         for transition in state.area.transitions.iter() {
             draw_list.set_scale(scale_x, scale_y);
@@ -1019,16 +1033,10 @@ impl WidgetKind for AreaView {
             Some(ref tile) => Rc::clone(tile),
         };
 
-        let image_set = match self.range_indicator_image_set {
-            None => return,
-            Some(ref set) => set,
-        };
-
         if let Some(ref targeter) = state.targeter() {
             targeter.borrow_mut().draw(
                 renderer,
                 &targeter_tile,
-                &image_set,
                 self.scroll.x(),
                 self.scroll.y(),
                 scale_x,

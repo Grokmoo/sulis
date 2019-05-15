@@ -74,6 +74,7 @@ pub struct AreaState {
     scroll_to_callback: Option<Rc<RefCell<EntityState>>>,
 
     targeter: Option<Rc<RefCell<AreaTargeter>>>,
+    range_indicator: Option<RangeIndicator>,
 }
 
 impl PartialEq for AreaState {
@@ -127,6 +128,7 @@ impl AreaState {
             feedback_text: Vec::new(),
             scroll_to_callback: None,
             targeter: None,
+            range_indicator: None,
             merchants: Vec::new(),
             on_load_fired: false,
         })
@@ -352,6 +354,39 @@ impl AreaState {
         }
     }
 
+    pub fn set_default_range_indicator(&mut self,
+                                       entity: Option<&Rc<RefCell<EntityState>>>,
+                                       is_combat_active: bool) {
+        let entity = match entity {
+            None => {
+                self.set_range_indicator(None);
+                return;
+            },
+            Some(entity) => entity,
+        };
+
+        if !entity.borrow().is_party_member() {
+            self.set_range_indicator(None);
+            return;
+        }
+
+        if is_combat_active {
+            let radius = entity.borrow().actor.stats.attack_distance() + 0.5;
+            let indicator = RangeIndicator::new(radius, entity);
+            self.set_range_indicator(Some(indicator));
+        } else {
+            self.set_range_indicator(None);
+        }
+    }
+
+    pub fn range_indicator(&self) -> Option<&RangeIndicator> {
+        self.range_indicator.as_ref()
+    }
+
+    pub fn set_range_indicator(&mut self, range_indicator: Option<RangeIndicator>) {
+        self.range_indicator = range_indicator;
+    }
+
     pub fn targeter(&mut self) -> Option<Rc<RefCell<AreaTargeter>>> {
         match self.targeter {
             None => None,
@@ -359,7 +394,8 @@ impl AreaState {
         }
     }
 
-    pub(crate) fn set_targeter(&mut self, targeter: AreaTargeter) {
+    pub(crate) fn set_targeter(&mut self, mut targeter: AreaTargeter) {
+        self.set_range_indicator(targeter.take_range_indicator());
         self.targeter = Some(Rc::new(RefCell::new(targeter)));
     }
 
@@ -1361,6 +1397,9 @@ impl AreaState {
 
         if remove_targeter {
             self.targeter.take();
+            self.set_default_range_indicator(
+                GameState::selected().first(), GameState::is_combat_active()
+                );
         }
     }
 

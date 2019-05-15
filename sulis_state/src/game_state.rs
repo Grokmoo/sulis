@@ -1098,13 +1098,11 @@ impl GameState {
         let on_moved_cbs = mgr.borrow_mut().update_on_moved_in_surface();
         script_callback::fire_on_moved_in_surface(on_moved_cbs);
 
-        STATE.with(|s| {
-            let mut state = s.borrow_mut();
-            let state = state.as_mut().unwrap();
-
-            let mut area_state = state.area_state.borrow_mut();
+        {
+            let area_state = GameState::area_state();
+            let mut area_state = area_state.borrow_mut();
             area_state.update();
-        });
+        }
 
         if GameState::check_clear_anims() {
             ANIMATIONS.with(|a| a.borrow_mut().clear_all_blocking_anims());

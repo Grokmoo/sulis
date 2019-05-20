@@ -429,7 +429,7 @@ impl AreaModel {
                 ToKind::CurArea { .. } => "to Current Area".to_string(),
                 ToKind::Area { ref id, .. } => format!("to {}", id),
                 ToKind::WorldMap => "to World Map".to_string(),
-                ToKind::FindLink { .. } => "Error".to_string(),
+                ToKind::FindLink { ref id, .. } => format!("to {}", id),
             };
 
             let (mut draw_list, _) = font_renderer.get_draw_list(&text, x, y, 1.0);

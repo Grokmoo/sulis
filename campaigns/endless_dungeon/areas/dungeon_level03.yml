@@ -1,13 +1,13 @@
 ---
-id: dungeon_level01
-name: Dungeon Level 1
+id: dungeon_level03
+name: Dungeon Level 3
 generator:
   id: cave
   transitions:
-    - to: dungeon_entrance
+    - to: dungeon_level02
       kind: level_up
       hover_text: "Up"
-    - to: dungeon_level02
+    - to: dwarven_enclave
       kind: level_down
       hover_text: "Down"
   props:
@@ -17,9 +17,9 @@ generator:
             weight: 1
           chest_small_level1_misc:
             weight: 1
-          chest_xl_level1_armor:
+          chest_xl_level5_armor:
             weight: 1
-          chest_xl_level1_weapons:
+          chest_xl_level5_weapons:
             weight: 1
         spacing: 8
         placement_attempts: 100
@@ -29,9 +29,9 @@ generator:
     passes:
       - kinds:
           goblins_level2:
-            weight: 2
-          goblins_level1:
             weight: 1
+          goblins_level3:
+            weight: 2
         spacing: 20
         chance_per_room: 75 
         allowable_regions: [ Room ]

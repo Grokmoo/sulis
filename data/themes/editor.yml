@@ -673,18 +673,23 @@ themes:
           cur_area_button:
             from: button
             text: "Cur Area"
-            size: [20, 8]
-            position: [53, 10]
+            size: [17, 8]
+            position: [51, 10]
           area_button:
             from: button
             text: "Other Area"
             size: [20, 8]
-            position: [75, 10]
+            position: [69, 10]
           world_map_button:
             from: button
             text: "World Map"
             size: [20, 8]
-            position: [97, 10]
+            position: [90, 10]
+          find_link_button:
+            from: button
+            text: "Find Link"
+            size: [17, 8]
+            position: [111, 10]
           from_label:
             from: label
             text: "From Point"

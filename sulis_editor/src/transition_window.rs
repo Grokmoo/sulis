@@ -92,7 +92,7 @@ impl WidgetKind for TransitionWindow {
                 ToKind::CurArea { x, y } => (String::new(), x, y),
                 ToKind::Area { ref id, x, y } => (id.to_string(), x, y),
                 ToKind::WorldMap => (String::new(), 0, 0),
-                ToKind::FindLink { .. } => (String::new(), 0, 0),
+                ToKind::FindLink { ref id, x_offset, y_offset} => (id.to_string(), x_offset, y_offset),
             };
 
             let max = MAX_AREA_SIZE - 1;
@@ -166,19 +166,21 @@ impl WidgetKind for TransitionWindow {
 
             let cur_area_button = Widget::with_theme(Button::empty(), "cur_area_button");
             let area_button = Widget::with_theme(Button::empty(), "area_button");
+            let find_link_button = Widget::with_theme(Button::empty(), "find_link_button");
             let world_map_button = Widget::with_theme(Button::empty(), "world_map_button");
 
             match transition.to {
                 ToKind::CurArea { .. } => cur_area_button.borrow_mut().state.set_active(true),
                 ToKind::Area { .. } => area_button.borrow_mut().state.set_active(true),
                 ToKind::WorldMap => world_map_button.borrow_mut().state.set_active(true),
-                ToKind::FindLink { .. } => (),
+                ToKind::FindLink { .. } => find_link_button.borrow_mut().state.set_active(true),
             }
 
             let refs = vec![
                 Rc::clone(&cur_area_button),
                 Rc::clone(&area_button),
                 Rc::clone(&world_map_button),
+                Rc::clone(&find_link_button),
             ];
             let refs_clone = refs.clone();
             for widget in refs {
@@ -198,6 +200,7 @@ impl WidgetKind for TransitionWindow {
             let world_map_ref = Rc::clone(&world_map_button);
             let area_ref = Rc::clone(&area_button);
             let cur_area_ref = Rc::clone(&cur_area_button);
+            let find_link_ref = Rc::clone(&find_link_button);
             apply
                 .borrow_mut()
                 .state
@@ -230,6 +233,12 @@ impl WidgetKind for TransitionWindow {
                         };
                     } else if cur_area_ref.borrow().state.is_active() {
                         transition.to = ToKind::CurArea { x: to.x, y: to.y };
+                    } else if find_link_ref.borrow().state.is_active() {
+                        transition.to = ToKind::FindLink {
+                            id: to_area_str,
+                            x_offset: to.x,
+                            y_offset: to.y,
+                        };
                     }
 
                     for child in sizes_ref.borrow().children.iter() {
@@ -251,7 +260,7 @@ impl WidgetKind for TransitionWindow {
                     }
                 })));
 
-            widgets.append(&mut vec![cur_area_button, area_button, world_map_button]);
+            widgets.append(&mut vec![cur_area_button, area_button, world_map_button, find_link_button]);
             widgets.append(&mut vec![
                 to_area,
                 from_label,

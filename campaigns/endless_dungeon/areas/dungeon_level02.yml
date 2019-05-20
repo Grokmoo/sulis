@@ -1,13 +1,13 @@
 ---
-id: dungeon_level01
-name: Dungeon Level 1
+id: dungeon_level02
+name: Dungeon Level 2
 generator:
   id: cave
   transitions:
-    - to: dungeon_entrance
+    - to: dungeon_level01
       kind: level_up
       hover_text: "Up"
-    - to: dungeon_level02
+    - to: dungeon_level03
       kind: level_down
       hover_text: "Down"
   props:
@@ -29,8 +29,8 @@ generator:
     passes:
       - kinds:
           goblins_level2:
-            weight: 2
-          goblins_level1:
+            weight: 1
+          goblins_level3:
             weight: 1
         spacing: 20
         chance_per_room: 75 

@@ -1,0 +1,20 @@
+id: dwarf_enc_smith
+initial_nodes:
+  - id: start01
+nodes:
+  start01:
+    text: |
+      [c=6868FF|#target_name#] - [c=888|This dwarf stands ready by the anvil.]
+      
+      What can I get for you?
+    responses:
+      - text: "Lets see what you have."
+        on_select:
+          - show_merchant:
+              id: dwarf_enc_smith
+              loot_list: dwarf_enc_smith
+              buy_frac: 1.0
+              sell_frac: 0.25
+              refresh_time:
+                hour: 24
+      - text: "Nothing today."

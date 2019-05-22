@@ -1,0 +1,28 @@
+---
+id: dwarf_enc_05
+name: Dwarf
+race: dwarf
+sex: Male
+attributes:
+  str: 10
+  dex: 10
+  end: 10
+  per: 10
+  int: 10
+  wis: 10
+conversation: ~
+faction: Neutral
+images:
+  Foreground: empty
+  Background: creatures/dwarf07
+  Shadow: empty
+hue: 0.7000000476837158
+inventory:
+  equipped: {}
+  quick: {}
+  pc_starting_coins: 0
+  pc_starting_items: []
+levels:
+  fighter: 1
+abilities: []
+ai: ~

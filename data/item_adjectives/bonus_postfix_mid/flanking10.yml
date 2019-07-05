@@ -1,0 +1,15 @@
+id: flanking10
+name: Flanking
+name_postfix: " of Flanking"
+item_status_icon: gui/status_flanking
+value_modifier: 1.4
+value_add: 1000
+bonus_modifier: 1.0
+penalty_modifier: 1.0
+attack_damage_modifier: 1.0
+attack_bonus_modifier: 1.0
+attack_penalty_modifier: 1.0
+bonuses:
+  - kind:
+      flanking_angle: 25
+attack_bonuses: {}

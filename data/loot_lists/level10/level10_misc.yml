@@ -1,0 +1,12 @@
+id: level10_misc
+probability_entries:
+  coin:
+    weight: 100
+    quantity: [200, 500]
+sub_lists:
+  level10_usable:
+    weight: 50
+  level10_crafting:
+    weight: 50
+  level10_accessories:
+    weight: 30

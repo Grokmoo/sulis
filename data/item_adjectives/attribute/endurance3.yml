@@ -1,0 +1,15 @@
+id: endurance3
+name: Endurance
+name_postfix: " of Endurance"
+item_status_icon: gui/status_endurance
+value_modifier: 2.0
+value_add: 4000
+bonus_modifier: 1.0
+penalty_modifier: 1.0
+attack_damage_modifier: 1.0
+attack_bonus_modifier: 1.0
+attack_penalty_modifier: 1.0
+bonuses:
+  - kind:
+      attribute: { attribute: Endurance, amount: 3 }
+attack_bonuses: {}

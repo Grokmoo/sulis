@@ -1,0 +1,51 @@
+id: level10_misc_merchant
+generate: {}
+weighted_entries: {}
+sub_lists:
+  level10_accessories:
+    weight: 100
+    quantity: [4, 8]
+probability_entries:
+  poison_vial:
+    weight: 50
+    quantity: [3, 5]
+  potion_elements:
+    weight: 50
+  healing_kit:
+    weight: 50
+  potion_healing:
+    weight: 80
+    quantity: [10, 20]
+  potion_mind:
+    weight: 50
+  potion_power:
+    weight: 50
+  potion_spellpower:
+    weight: 50
+  belt_leather:
+    weight: 50
+  cloak:
+    weight: 50
+  craft_gem01:
+    weight: 50
+  craft_gem02:
+    weight: 50
+  craft_gem03:
+    weight: 50
+  craft_gem04:
+    weight: 50
+  craft_gem05:
+    weight: 50
+  craft_gem06:
+    weight: 20
+  craft_gem07:
+    weight: 10
+  craft_gem08:
+    weight: 10
+  craft_gem09:
+    weight: 10
+  craft_gem10:
+    weight: 10
+  craft_bottle:
+    weight: 90
+    quantity: [5, 10]

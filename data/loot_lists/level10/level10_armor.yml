@@ -1,0 +1,210 @@
+id: level10_armor
+probability_entries: {}
+# format is number of items: weight
+# i.e. 2: 1 means generate 2 items with weight 1
+generate:
+  1: 4
+  2: 2
+  3: 1
+weighted_entries:
+  torso_robe:
+    weight: 5
+    adjective1:
+      fine: 4
+      exceptional: 6
+    adjective2:
+      fine: 5
+      will10: 2
+      intellect2: 2
+  helm_hood:
+    weight: 5
+    adjective1:
+      fine: 4
+      exceptional: 6
+    adjective2:
+      fine: 5
+      concealment10: 2
+      wisdom2: 2
+  helm_hat:
+    weight: 5
+    adjective1:
+      fine: 4
+      exceptional: 6
+    adjective2:
+      fine: 5
+      reflex10: 2
+      dexterity2: 2
+  boots_leather:
+    weight: 5
+    adjective1:
+      fine: 5
+      exceptional: 5
+    adjective2:
+      fine: 7
+      movement10: 2
+      flanking10: 2
+      initiative2: 2
+  boots_mail:
+    weight: 3
+    adjective1:
+      fine: 7
+      exceptional: 3
+    adjective2:
+      fine: 7
+      movement10: 2
+      flanking10: 2
+      initiative2: 2
+  boots_plate:
+    weight: 2
+    adjective1:
+      fine: 8
+      exceptional: 2
+    adjective2:
+      fine: 7
+      movement10: 2
+      flanking10: 2
+      initiative2: 2
+  gloves_leather:
+    weight: 5
+    adjective1:
+      fine: 5
+      exceptional: 5
+    adjective2:
+      fine: 5
+      reflex10: 2
+      dexterity2: 2
+  gloves_mail:
+    weight: 3
+    adjective1:
+      fine: 7
+      exceptional: 3
+    adjective2:
+      fine: 5
+      reflex10: 2
+      dexterity2: 2
+  gloves_plate:
+    weight: 2
+    adjective1:
+      fine: 8
+      exceptional: 2
+    adjective2:
+      fine: 5
+      reflex10: 2
+      dexterity2: 2
+  helm_leather:
+    weight: 5
+    adjective1:
+      fine: 5
+      exceptional: 5
+    adjective2:
+      fine: 5
+      perception2: 2
+      accuracy10: 2
+  helm_mail:
+    weight: 3
+    adjective1:
+      fine: 7
+      exceptional: 3
+    adjective2:
+      fine: 5
+      perception2: 2
+      accuracy10: 2
+  helm_plate:
+    weight: 2
+    adjective1:
+      fine: 8
+      exceptional: 2
+    adjective2:
+      fine: 5
+      perception2: 2
+      accuracy10: 2
+  legs_leather:
+    weight: 5
+    adjective1:
+      fine: 5
+      exceptional: 5
+    adjective2:
+      fine: 5
+      movement10: 2
+      endurance2: 2
+  legs_mail:
+    weight: 3
+    adjective1:
+      fine: 7
+      exceptional: 3
+    adjective2:
+      fine: 5
+      movement10: 2
+      endurance2: 2
+  legs_plate:
+    weight: 2
+    adjective1:
+      fine: 8
+      exceptional: 2
+    adjective2:
+      fine: 5
+      movement10: 2
+      endurance2: 2
+  torso_leather:
+    weight: 5
+    adjective1:
+      fine: 5
+      exceptional: 5
+    adjective2:
+      fine: 5
+      fortitude10: 2
+      strength2: 2
+  torso_mail:
+    weight: 3
+    adjective1:
+      fine: 7
+      exceptional: 3
+    adjective2:
+      fine: 5
+      fortitude10: 2
+      strength2: 2
+  torso_plate:
+    weight: 2
+    adjective1:
+      fine: 8
+      exceptional: 2
+    adjective2:
+      fine: 5
+      fortitude10: 2
+      strength2: 2
+  shield_small:
+    weight: 5
+    adjective1:
+      fine: 5
+      exceptional: 5
+    adjective2:
+      fine: 5
+      defense10: 2
+      reflex10: 2
+  shield_heater:
+    weight: 5
+    adjective1:
+      fine: 7
+      exceptional: 3
+    adjective2:
+      fine: 5
+      defense10: 2
+      reflex10: 2
+  shield_kite:
+    weight: 5
+    adjective1:
+      fine: 7
+      exceptional: 3
+    adjective2:
+      fine: 5
+      defense10: 2
+      reflex10: 2
+  shield_large:
+    weight: 3
+    adjective1:
+      fine: 8
+      exceptional: 2
+    adjective2:
+      fine: 5
+      defense10: 2
+      reflex10: 2

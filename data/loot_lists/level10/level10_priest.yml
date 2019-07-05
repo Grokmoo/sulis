@@ -1,0 +1,47 @@
+id: level10_priest
+generate: {}
+weighted_entries: {}
+sub_lists:
+  level10_accessories:
+    weight: 100
+    quantity: [4, 8]
+probability_entries:
+  torso_robe:
+    weight: 80
+    adjective1:
+      fine: 8
+      exceptional: 2
+    adjective2:
+      fine: 5
+      will10: 2
+      intellect2: 2
+  helm_hood:
+    weight: 80
+    adjective1:
+      fine: 8
+      exceptional: 2
+    adjective2:
+      fine: 5
+      concealment10: 2
+      wisdom2: 2
+  healing_kit:
+    weight: 90
+    quantity: [5, 12]
+  potion_healing:
+    weight: 90
+    quantity: [5, 12]
+  potion_power:
+    weight: 75
+    quantity: [2, 4]
+  potion_mind:
+    weight: 75
+    quantity: [2, 4]
+  potion_elements:
+    weight: 75
+    quantity: [2, 4]
+  poison_vial:
+    weight: 75
+    quantity: [1, 4]
+  potion_spellpower:
+    weight: 75
+    quantity: [4, 8]

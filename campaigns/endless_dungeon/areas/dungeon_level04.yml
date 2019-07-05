@@ -1,15 +1,12 @@
 ---
-id: dungeon_entrance
-name: Dungeon Entrance
+id: dungeon_level04
+name: Dungeon Level 4
 generator:
   id: cave
   transitions:
-    - to: dungeon_level01
-      kind: level_down
-      hover_text: "Down"
-    - to: moonmouth
+    - to: dwarven_enclave
       kind: level_up
-      hover_text: "To Outside"
+      hover_text: "Up"
   props:
     passes:
       - kinds:
@@ -17,9 +14,9 @@ generator:
             weight: 1
           chest_small_level1_misc:
             weight: 1
-          chest_xl_level1_armor:
+          chest_xl_level5_armor:
             weight: 1
-          chest_xl_level1_weapons:
+          chest_xl_level5_weapons:
             weight: 1
         spacing: 8
         placement_attempts: 100
@@ -28,7 +25,9 @@ generator:
   encounters:
     passes:
       - kinds:
-          goblins_level1:
+          spiders_level3:
+            weight: 3
+          goblins_level5:
             weight: 1
         spacing: 20
         chance_per_room: 75 

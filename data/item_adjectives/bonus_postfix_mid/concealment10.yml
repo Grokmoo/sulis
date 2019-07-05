@@ -1,0 +1,15 @@
+id: concealment10
+name: Concealment
+name_postfix: " of Concealment"
+item_status_icon: gui/status_darkness
+value_modifier: 1.4
+value_add: 1000
+bonus_modifier: 1.0
+penalty_modifier: 1.0
+attack_damage_modifier: 1.0
+attack_bonus_modifier: 1.0
+attack_penalty_modifier: 1.0
+bonuses:
+  - kind:
+      concealment: 10
+attack_bonuses: {}

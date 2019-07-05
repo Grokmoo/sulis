@@ -1,0 +1,355 @@
+id: level10_weapons
+probability_entries: {}
+# format is number of items: weight
+# i.e. 2: 1 means generate 2 items with weight 1
+generate:
+  1: 4
+  2: 1
+weighted_entries:
+  battleaxe:
+    weight: 5
+    adjective1:
+      fine: 5
+      exceptional: 5
+    adjective2:
+      fine: 7
+      weapon_accuracy10: 1
+      acid10: 1
+      cold10: 1
+      fire10: 1
+      shock10: 1
+      crits10: 1
+      damage10: 1
+  club:
+    weight: 8
+    adjective2:
+      fine: 7
+      weapon_accuracy10: 1
+      acid10: 1
+      cold10: 1
+      fire10: 1
+      shock10: 1
+      crits10: 1
+      damage10: 1
+  crossbow:
+    weight: 3
+    adjective1:
+      fine: 5
+      exceptional: 5
+    adjective2:
+      fine: 7
+      ranged_accuracy10: 1
+      acid10: 1
+      cold10: 1
+      fire10: 1
+      shock10: 1
+      crits10: 1
+      damage10: 1
+  dagger:
+    weight: 8
+    adjective1:
+      fine: 5
+      exceptional: 5
+    adjective2:
+      fine: 7
+      weapon_accuracy10: 1
+      acid10: 1
+      cold10: 1
+      fire10: 1
+      shock10: 1
+      crits10: 1
+      damage10: 1
+  flail:
+    weight: 3
+    adjective1:
+      fine: 5
+      exceptional: 5
+    adjective2:
+      fine: 7
+      weapon_accuracy10: 1
+      acid10: 1
+      cold10: 1
+      fire10: 1
+      shock10: 1
+      crits10: 1
+      damage10: 1
+  greataxe:
+    weight: 2
+    adjective1:
+      fine: 5
+      exceptional: 5
+    adjective2:
+      fine: 7
+      weapon_accuracy10: 1
+      acid10: 1
+      cold10: 1
+      fire10: 1
+      shock10: 1
+      crits10: 1
+      damage10: 1
+  greathammer:
+    weight: 2
+    adjective1:
+      fine: 5
+      exceptional: 5
+    adjective2:
+      fine: 7
+      weapon_accuracy10: 1
+      acid10: 1
+      cold10: 1
+      fire10: 1
+      shock10: 1
+      crits10: 1
+      damage10: 1
+  greatsword:
+    weight: 2
+    adjective1:
+      fine: 5
+      exceptional: 5
+    adjective2:
+      fine: 7
+      weapon_accuracy10: 1
+      acid10: 1
+      cold10: 1
+      fire10: 1
+      shock10: 1
+      crits10: 1
+      damage10: 1
+  hatchet:
+    weight: 8
+    adjective1:
+      fine: 5
+      exceptional: 5
+    adjective2:
+      fine: 7
+      weapon_accuracy10: 1
+      acid10: 1
+      cold10: 1
+      fire10: 1
+      shock10: 1
+      crits10: 1
+      damage10: 1
+  longbow:
+    weight: 2
+    adjective1:
+      fine: 5
+      exceptional: 5
+    adjective2:
+      fine: 7
+      ranged_accuracy10: 1
+      acid10: 1
+      cold10: 1
+      fire10: 1
+      shock10: 1
+      crits10: 1
+      damage10: 1
+  longspear:
+    weight: 3
+    adjective1:
+      fine: 5
+      exceptional: 5
+    adjective2:
+      fine: 7
+      weapon_accuracy10: 1
+      acid10: 1
+      cold10: 1
+      fire10: 1
+      shock10: 1
+      crits10: 1
+      damage10: 1
+  longsword:
+    weight: 3
+    adjective1:
+      fine: 5
+      exceptional: 5
+    adjective2:
+      fine: 7
+      weapon_accuracy10: 1
+      acid10: 1
+      cold10: 1
+      fire10: 1
+      shock10: 1
+      crits10: 1
+      damage10: 1
+  mace:
+    weight: 5
+    adjective1:
+      fine: 5
+      exceptional: 5
+    adjective2:
+      fine: 7
+      weapon_accuracy10: 1
+      acid10: 1
+      cold10: 1
+      fire10: 1
+      shock10: 1
+      crits10: 1
+      damage10: 1
+  morningstar:
+    weight: 3
+    adjective1:
+      fine: 5
+      exceptional: 5
+    adjective2:
+      fine: 7
+      weapon_accuracy10: 1
+      acid10: 1
+      cold10: 1
+      fire10: 1
+      shock10: 1
+      crits10: 1
+      damage10: 1
+  quarterstaff:
+    weight: 8
+    adjective1:
+      fine: 5
+      exceptional: 5
+    adjective2:
+      fine: 7
+      weapon_accuracy10: 1
+      acid10: 1
+      cold10: 1
+      fire10: 1
+      shock10: 1
+      crits10: 1
+      damage10: 1
+  druid_staff:
+    weight: 8
+    adjective1:
+      fine: 5
+      exceptional: 5
+    adjective2:
+      fine: 7
+      weapon_accuracy10: 1
+      acid10: 1
+      cold10: 1
+      fire10: 1
+      shock10: 1
+      crits10: 1
+      damage10: 1
+  shortbow:
+    weight: 5
+    adjective1:
+      fine: 5
+      exceptional: 5
+    adjective2:
+      fine: 7
+      ranged_accuracy10: 1
+      acid10: 1
+      cold10: 1
+      fire10: 1
+      shock10: 1
+      crits10: 1
+      damage10: 1
+  shortspear:
+    weight: 8
+    adjective1:
+      fine: 5
+      exceptional: 5
+    adjective2:
+      fine: 7
+      weapon_accuracy10: 1
+      acid10: 1
+      cold10: 1
+      fire10: 1
+      shock10: 1
+      crits10: 1
+      damage10: 1
+  shortsword:
+    weight: 5
+    adjective1:
+      fine: 5
+      exceptional: 5
+    adjective2:
+      fine: 7
+      weapon_accuracy10: 1
+      acid10: 1
+      cold10: 1
+      fire10: 1
+      shock10: 1
+      crits10: 1
+      damage10: 1
+  warhammer:
+    weight: 5
+    adjective1:
+      fine: 5
+      exceptional: 5
+    adjective2:
+      fine: 7
+      weapon_accuracy10: 1
+      acid10: 1
+      cold10: 1
+      fire10: 1
+      shock10: 1
+      crits10: 1
+      damage10: 1
+  sickle:
+    weight: 8
+    adjective1:
+      fine: 5
+      exceptional: 5
+    adjective2:
+      fine: 7
+      weapon_accuracy10: 1
+      acid10: 1
+      cold10: 1
+      fire10: 1
+      shock10: 1
+      crits10: 1
+      damage10: 1
+  sabre:
+    weight: 3
+    adjective1:
+      fine: 5
+      exceptional: 5
+    adjective2:
+      fine: 7
+      weapon_accuracy10: 1
+      acid10: 1
+      cold10: 1
+      fire10: 1
+      shock10: 1
+      crits10: 1
+      damage10: 1
+  scimitar:
+    weight: 2
+    adjective1:
+      fine: 5
+      exceptional: 5
+    adjective2:
+      fine: 7
+      weapon_accuracy10: 1
+      acid10: 1
+      cold10: 1
+      fire10: 1
+      shock10: 1
+      crits10: 1
+      damage10: 1
+  halberd:
+    weight: 2
+    adjective1:
+      fine: 5
+      exceptional: 5
+    adjective2:
+      fine: 7
+      weapon_accuracy10: 1
+      acid10: 1
+      cold10: 1
+      fire10: 1
+      shock10: 1
+      crits10: 1
+      damage10: 1
+  glaive:
+    weight: 2
+    adjective1:
+      fine: 5
+      exceptional: 5
+    adjective2:
+      fine: 7
+      weapon_accuracy10: 1
+      acid10: 1
+      cold10: 1
+      fire10: 1
+      shock10: 1
+      crits10: 1
+      damage10: 1

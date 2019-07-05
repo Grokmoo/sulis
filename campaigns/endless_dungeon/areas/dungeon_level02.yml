@@ -2,7 +2,7 @@
 id: dungeon_level02
 name: Dungeon Level 2
 generator:
-  id: cave
+  id: dungeon
   transitions:
     - to: dungeon_level01
       kind: level_up

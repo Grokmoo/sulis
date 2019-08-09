@@ -1,0 +1,9 @@
+id: lava_elementals_level7
+auto_spawn: true
+min_gen_actors: 3
+max_gen_actors: 3
+entries:
+  - id: earth_elemental_level07
+    weight: 1
+  - id: fire_elemental_level07
+    weight: 1

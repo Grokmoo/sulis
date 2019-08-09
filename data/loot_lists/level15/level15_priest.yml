@@ -1,0 +1,47 @@
+id: level15_priest
+generate: {}
+weighted_entries: {}
+sub_lists:
+  level15_accessories:
+    weight: 100
+    quantity: [4, 8]
+probability_entries:
+  torso_robe:
+    weight: 80
+    adjective1:
+      exceptional: 8
+      masterwork: 2
+    adjective2:
+      exceptional: 5
+      will15: 2
+      intellect3: 2
+  helm_hood:
+    weight: 80
+    adjective1:
+      exceptional: 8
+      masterwork: 2
+    adjective2:
+      exceptional: 5
+      concealment15: 2
+      wisdom3: 2
+  healing_kit:
+    weight: 90
+    quantity: [5, 12]
+  potion_healing:
+    weight: 90
+    quantity: [5, 12]
+  potion_power:
+    weight: 75
+    quantity: [2, 4]
+  potion_mind:
+    weight: 75
+    quantity: [2, 4]
+  potion_elements:
+    weight: 75
+    quantity: [2, 4]
+  poison_vial:
+    weight: 75
+    quantity: [1, 4]
+  potion_spellpower:
+    weight: 75
+    quantity: [4, 8]

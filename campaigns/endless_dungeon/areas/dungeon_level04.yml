@@ -7,6 +7,9 @@ generator:
     - to: dwarven_enclave
       kind: level_up
       hover_text: "Up"
+    - to: dungeon_level05
+      kind: level_down
+      hover_text: "Down"
   props:
     passes:
       - kinds:

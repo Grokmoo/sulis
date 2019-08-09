@@ -12,7 +12,7 @@ weighted_entries:
       fine: 5
       exceptional: 5
     adjective2:
-      fine: 7
+      none: 7
       weapon_accuracy10: 1
       acid10: 1
       cold10: 1
@@ -23,7 +23,7 @@ weighted_entries:
   club:
     weight: 8
     adjective2:
-      fine: 7
+      none: 7
       weapon_accuracy10: 1
       acid10: 1
       cold10: 1
@@ -37,7 +37,7 @@ weighted_entries:
       fine: 5
       exceptional: 5
     adjective2:
-      fine: 7
+      none: 7
       ranged_accuracy10: 1
       acid10: 1
       cold10: 1
@@ -51,7 +51,7 @@ weighted_entries:
       fine: 5
       exceptional: 5
     adjective2:
-      fine: 7
+      none: 7
       weapon_accuracy10: 1
       acid10: 1
       cold10: 1
@@ -65,7 +65,7 @@ weighted_entries:
       fine: 5
       exceptional: 5
     adjective2:
-      fine: 7
+      none: 7
       weapon_accuracy10: 1
       acid10: 1
       cold10: 1
@@ -79,7 +79,7 @@ weighted_entries:
       fine: 5
       exceptional: 5
     adjective2:
-      fine: 7
+      none: 7
       weapon_accuracy10: 1
       acid10: 1
       cold10: 1
@@ -93,7 +93,7 @@ weighted_entries:
       fine: 5
       exceptional: 5
     adjective2:
-      fine: 7
+      none: 7
       weapon_accuracy10: 1
       acid10: 1
       cold10: 1
@@ -107,7 +107,7 @@ weighted_entries:
       fine: 5
       exceptional: 5
     adjective2:
-      fine: 7
+      none: 7
       weapon_accuracy10: 1
       acid10: 1
       cold10: 1
@@ -121,7 +121,7 @@ weighted_entries:
       fine: 5
       exceptional: 5
     adjective2:
-      fine: 7
+      none: 7
       weapon_accuracy10: 1
       acid10: 1
       cold10: 1
@@ -135,7 +135,7 @@ weighted_entries:
       fine: 5
       exceptional: 5
     adjective2:
-      fine: 7
+      none: 7
       ranged_accuracy10: 1
       acid10: 1
       cold10: 1
@@ -149,7 +149,7 @@ weighted_entries:
       fine: 5
       exceptional: 5
     adjective2:
-      fine: 7
+      none: 7
       weapon_accuracy10: 1
       acid10: 1
       cold10: 1
@@ -163,7 +163,7 @@ weighted_entries:
       fine: 5
       exceptional: 5
     adjective2:
-      fine: 7
+      none: 7
       weapon_accuracy10: 1
       acid10: 1
       cold10: 1
@@ -177,7 +177,7 @@ weighted_entries:
       fine: 5
       exceptional: 5
     adjective2:
-      fine: 7
+      none: 7
       weapon_accuracy10: 1
       acid10: 1
       cold10: 1
@@ -191,7 +191,7 @@ weighted_entries:
       fine: 5
       exceptional: 5
     adjective2:
-      fine: 7
+      none: 7
       weapon_accuracy10: 1
       acid10: 1
       cold10: 1
@@ -205,7 +205,7 @@ weighted_entries:
       fine: 5
       exceptional: 5
     adjective2:
-      fine: 7
+      none: 7
       weapon_accuracy10: 1
       acid10: 1
       cold10: 1
@@ -219,7 +219,7 @@ weighted_entries:
       fine: 5
       exceptional: 5
     adjective2:
-      fine: 7
+      none: 7
       weapon_accuracy10: 1
       acid10: 1
       cold10: 1
@@ -233,7 +233,7 @@ weighted_entries:
       fine: 5
       exceptional: 5
     adjective2:
-      fine: 7
+      none: 7
       ranged_accuracy10: 1
       acid10: 1
       cold10: 1
@@ -247,7 +247,7 @@ weighted_entries:
       fine: 5
       exceptional: 5
     adjective2:
-      fine: 7
+      none: 7
       weapon_accuracy10: 1
       acid10: 1
       cold10: 1
@@ -261,7 +261,7 @@ weighted_entries:
       fine: 5
       exceptional: 5
     adjective2:
-      fine: 7
+      none: 7
       weapon_accuracy10: 1
       acid10: 1
       cold10: 1
@@ -275,7 +275,7 @@ weighted_entries:
       fine: 5
       exceptional: 5
     adjective2:
-      fine: 7
+      none: 7
       weapon_accuracy10: 1
       acid10: 1
       cold10: 1
@@ -289,7 +289,7 @@ weighted_entries:
       fine: 5
       exceptional: 5
     adjective2:
-      fine: 7
+      none: 7
       weapon_accuracy10: 1
       acid10: 1
       cold10: 1
@@ -303,7 +303,7 @@ weighted_entries:
       fine: 5
       exceptional: 5
     adjective2:
-      fine: 7
+      none: 7
       weapon_accuracy10: 1
       acid10: 1
       cold10: 1
@@ -317,7 +317,7 @@ weighted_entries:
       fine: 5
       exceptional: 5
     adjective2:
-      fine: 7
+      none: 7
       weapon_accuracy10: 1
       acid10: 1
       cold10: 1
@@ -331,7 +331,7 @@ weighted_entries:
       fine: 5
       exceptional: 5
     adjective2:
-      fine: 7
+      none: 7
       weapon_accuracy10: 1
       acid10: 1
       cold10: 1
@@ -345,7 +345,7 @@ weighted_entries:
       fine: 5
       exceptional: 5
     adjective2:
-      fine: 7
+      none: 7
       weapon_accuracy10: 1
       acid10: 1
       cold10: 1

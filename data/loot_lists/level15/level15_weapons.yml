@@ -1,0 +1,355 @@
+id: level15_weapons
+probability_entries: {}
+# format is number of items: weight
+# i.e. 2: 1 means generate 2 items with weight 1
+generate:
+  1: 4
+  2: 1
+weighted_entries:
+  battleaxe:
+    weight: 5
+    adjective1:
+      exceptional: 5
+      masterwork: 5
+    adjective2:
+      none: 7
+      weapon_accuracy15: 1
+      acid15: 1
+      cold15: 1
+      fire15: 1
+      shock15: 1
+      crits15: 1
+      damage15: 1
+  club:
+    weight: 8
+    adjective2:
+      none: 7
+      weapon_accuracy15: 1
+      acid15: 1
+      cold15: 1
+      fire15: 1
+      shock15: 1
+      crits15: 1
+      damage15: 1
+  crossbow:
+    weight: 3
+    adjective1:
+      exceptional: 5
+      masterwork: 5
+    adjective2:
+      none: 7
+      ranged_accuracy15: 1
+      acid15: 1
+      cold15: 1
+      fire15: 1
+      shock15: 1
+      crits15: 1
+      damage15: 1
+  dagger:
+    weight: 8
+    adjective1:
+      exceptional: 5
+      masterwork: 5
+    adjective2:
+      none: 7
+      weapon_accuracy15: 1
+      acid15: 1
+      cold15: 1
+      fire15: 1
+      shock15: 1
+      crits15: 1
+      damage15: 1
+  flail:
+    weight: 3
+    adjective1:
+      exceptional: 5
+      masterwork: 5
+    adjective2:
+      none: 7
+      weapon_accuracy15: 1
+      acid15: 1
+      cold15: 1
+      fire15: 1
+      shock15: 1
+      crits15: 1
+      damage15: 1
+  greataxe:
+    weight: 2
+    adjective1:
+      exceptional: 5
+      masterwork: 5
+    adjective2:
+      none: 7
+      weapon_accuracy15: 1
+      acid15: 1
+      cold15: 1
+      fire15: 1
+      shock15: 1
+      crits15: 1
+      damage15: 1
+  greathammer:
+    weight: 2
+    adjective1:
+      exceptional: 5
+      masterwork: 5
+    adjective2:
+      none: 7
+      weapon_accuracy15: 1
+      acid15: 1
+      cold15: 1
+      fire15: 1
+      shock15: 1
+      crits15: 1
+      damage15: 1
+  greatsword:
+    weight: 2
+    adjective1:
+      exceptional: 5
+      masterwork: 5
+    adjective2:
+      none: 7
+      weapon_accuracy15: 1
+      acid15: 1
+      cold15: 1
+      fire15: 1
+      shock15: 1
+      crits15: 1
+      damage15: 1
+  hatchet:
+    weight: 8
+    adjective1:
+      exceptional: 5
+      masterwork: 5
+    adjective2:
+      none: 7
+      weapon_accuracy15: 1
+      acid15: 1
+      cold15: 1
+      fire15: 1
+      shock15: 1
+      crits15: 1
+      damage15: 1
+  longbow:
+    weight: 2
+    adjective1:
+      exceptional: 5
+      masterwork: 5
+    adjective2:
+      none: 7
+      ranged_accuracy15: 1
+      acid15: 1
+      cold15: 1
+      fire15: 1
+      shock15: 1
+      crits15: 1
+      damage15: 1
+  longspear:
+    weight: 3
+    adjective1:
+      exceptional: 5
+      masterwork: 5
+    adjective2:
+      none: 7
+      weapon_accuracy15: 1
+      acid15: 1
+      cold15: 1
+      fire15: 1
+      shock15: 1
+      crits15: 1
+      damage15: 1
+  longsword:
+    weight: 3
+    adjective1:
+      exceptional: 5
+      masterwork: 5
+    adjective2:
+      none: 7
+      weapon_accuracy15: 1
+      acid15: 1
+      cold15: 1
+      fire15: 1
+      shock15: 1
+      crits15: 1
+      damage15: 1
+  mace:
+    weight: 5
+    adjective1:
+      exceptional: 5
+      masterwork: 5
+    adjective2:
+      none: 7
+      weapon_accuracy15: 1
+      acid15: 1
+      cold15: 1
+      fire15: 1
+      shock15: 1
+      crits15: 1
+      damage15: 1
+  morningstar:
+    weight: 3
+    adjective1:
+      exceptional: 5
+      masterwork: 5
+    adjective2:
+      none: 7
+      weapon_accuracy15: 1
+      acid15: 1
+      cold15: 1
+      fire15: 1
+      shock15: 1
+      crits15: 1
+      damage15: 1
+  quarterstaff:
+    weight: 8
+    adjective1:
+      exceptional: 5
+      masterwork: 5
+    adjective2:
+      none: 7
+      weapon_accuracy15: 1
+      acid15: 1
+      cold15: 1
+      fire15: 1
+      shock15: 1
+      crits15: 1
+      damage15: 1
+  druid_staff:
+    weight: 8
+    adjective1:
+      exceptional: 5
+      masterwork: 5
+    adjective2:
+      none: 7
+      weapon_accuracy15: 1
+      acid15: 1
+      cold15: 1
+      fire15: 1
+      shock15: 1
+      crits15: 1
+      damage15: 1
+  shortbow:
+    weight: 5
+    adjective1:
+      exceptional: 5
+      masterwork: 5
+    adjective2:
+      none: 7
+      ranged_accuracy15: 1
+      acid15: 1
+      cold15: 1
+      fire15: 1
+      shock15: 1
+      crits15: 1
+      damage15: 1
+  shortspear:
+    weight: 8
+    adjective1:
+      exceptional: 5
+      masterwork: 5
+    adjective2:
+      none: 7
+      weapon_accuracy15: 1
+      acid15: 1
+      cold15: 1
+      fire15: 1
+      shock15: 1
+      crits15: 1
+      damage15: 1
+  shortsword:
+    weight: 5
+    adjective1:
+      exceptional: 5
+      masterwork: 5
+    adjective2:
+      none: 7
+      weapon_accuracy15: 1
+      acid15: 1
+      cold15: 1
+      fire15: 1
+      shock15: 1
+      crits15: 1
+      damage15: 1
+  warhammer:
+    weight: 5
+    adjective1:
+      exceptional: 5
+      masterwork: 5
+    adjective2:
+      none: 7
+      weapon_accuracy15: 1
+      acid15: 1
+      cold15: 1
+      fire15: 1
+      shock15: 1
+      crits15: 1
+      damage15: 1
+  sickle:
+    weight: 8
+    adjective1:
+      exceptional: 5
+      masterwork: 5
+    adjective2:
+      none: 7
+      weapon_accuracy15: 1
+      acid15: 1
+      cold15: 1
+      fire15: 1
+      shock15: 1
+      crits15: 1
+      damage15: 1
+  sabre:
+    weight: 3
+    adjective1:
+      exceptional: 5
+      masterwork: 5
+    adjective2:
+      none: 7
+      weapon_accuracy15: 1
+      acid15: 1
+      cold15: 1
+      fire15: 1
+      shock15: 1
+      crits15: 1
+      damage15: 1
+  scimitar:
+    weight: 2
+    adjective1:
+      exceptional: 5
+      masterwork: 5
+    adjective2:
+      none: 7
+      weapon_accuracy15: 1
+      acid15: 1
+      cold15: 1
+      fire15: 1
+      shock15: 1
+      crits15: 1
+      damage15: 1
+  halberd:
+    weight: 2
+    adjective1:
+      exceptional: 5
+      masterwork: 5
+    adjective2:
+      none: 7
+      weapon_accuracy15: 1
+      acid15: 1
+      cold15: 1
+      fire15: 1
+      shock15: 1
+      crits15: 1
+      damage15: 1
+  glaive:
+    weight: 2
+    adjective1:
+      exceptional: 5
+      masterwork: 5
+    adjective2:
+      none: 7
+      weapon_accuracy15: 1
+      acid15: 1
+      cold15: 1
+      fire15: 1
+      shock15: 1
+      crits15: 1
+      damage15: 1

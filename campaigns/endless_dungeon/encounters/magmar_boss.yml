@@ -1,0 +1,11 @@
+id: magmar_boss
+auto_spawn: true
+min_gen_actors: 0
+max_gen_actors: 0
+entries:
+  - id: ancient_red_dragon
+    always: true
+  - id: fire_elemental_level07
+    always: true
+  - id: earth_elemental_level07
+    always: true

@@ -1,0 +1,14 @@
+id: damage15
+name: Damage
+name_postfix: " of Slaying"
+item_status_icon: gui/status_damage
+value_modifier: 1.7
+value_add: 4000
+bonus_modifier: 1.0
+penalty_modifier: 1.0
+attack_damage_modifier: 1.0
+attack_bonus_modifier: 1.0
+attack_penalty_modifier: 1.0
+bonuses: []
+attack_bonuses:
+  damage: { min: 6, max: 9 }

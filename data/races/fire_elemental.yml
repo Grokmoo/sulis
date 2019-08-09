@@ -1,12 +1,12 @@
-id: earth_elemental
+id: fire_elemental
 name: "Earth Elemental"
 description: "Monster"
 size: 3by3
 movement_rate: 0.8
 base_stats:
-  - kind: { attribute: { attribute: Strength, amount: 4 } }
-  - kind: { attribute: { attribute: Dexterity, amount: -3 } }
-  - kind: { attribute: { attribute: Endurance, amount: 4 } }
+  - kind: { attribute: { attribute: Strength, amount: 2 } }
+  - kind: { attribute: { attribute: Dexterity, amount: 6 } }
+  - kind: { attribute: { attribute: Endurance, amount: 2 } }
   - kind: { hit_points: 40 }
   - kind: { melee_accuracy: 30 }
   - kind: { ranged_accuracy: 30 }
@@ -16,26 +16,24 @@ base_stats:
   - kind: { reflex: 30 }
   - kind: { will: 30 }
   - kind: { reach: 1.0 }
-  - kind: { resistance: { kind: "Slashing", amount: 65 } }
-  - kind: { resistance: { kind: "Piercing", amount: 65 } }
-  - kind: { resistance: { kind: "Fire", amount: 25 } }
-  - kind: { resistance: { kind: "Shock", amount: 25 } }
-  - kind: { resistance: { kind: "Cold", amount: 25 } }
-  - kind: { armor: 18 }
+  - kind: { resistance: { kind: "Shock", amount: 50 } }
+  - kind: { resistance: { kind: "Acid", amount: 50 } }
+  - kind: { resistance: { kind: "Fire", amount: 100 } }
+  - kind: { armor: 12 }
 base_attack:
   damage:
-    min: 18
-    max: 25
-    kind: Crushing
+    min: 15
+    max: 20
+    kind: Fire
   kind: #Melee
-    reach: 1.0
+    reach: 2.0
   bonuses: {}
 default_images:
   Male:
-    Background: creatures/elemental_earth
+    Background: creatures/elemental_fire
     Shadow: creatures/4x4_medium_shadow
   Female:
-    Background: creatures/elemental_earth
+    Background: creatures/elemental_fire
     Shadow: creatures/4x4_medium_shadow
 ticker_offset: [0.0, 1.5]
 image_layer_offset_scale: 16

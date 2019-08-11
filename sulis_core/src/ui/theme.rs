@@ -292,7 +292,9 @@ impl ThemeSet {
 
     fn compute_theme_id_recursive(&self, theme: &Rc<Theme>, id: &str) -> Option<String> {
         for child_id in theme.children.iter() {
-            if child_id == id {
+            let subname = compute_theme_subname(child_id);
+
+            if subname == id {
                 return Some(format!("{}.{}", theme.id, id));
             }
 
@@ -310,6 +312,23 @@ impl ThemeSet {
 
         None
     }
+}
+
+fn compute_theme_subname(id: &str) -> &str {
+    let mut i = id.len() - 1;
+    for c in id.chars().rev() {
+        if c == '.' {
+            i += 1;
+            if i == id.len() {
+                panic!("Invalid theme subname");
+            }
+            break;
+        }
+
+        i -= 1;
+    }
+
+    &id[i..]
 }
 
 /// Expands all references to text args in the given string. Text args are

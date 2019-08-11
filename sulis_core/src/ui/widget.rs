@@ -632,7 +632,57 @@ impl Widget {
             Widget::check_children(&child)?;
         }
 
+        Widget::reorder_and_set_theme_id_recursive(parent);
         Ok(())
+    }
+
+    // moves children to theme created containers as appropriate
+    fn reorder_and_set_theme_id_recursive(parent: &Rc<RefCell<Widget>>) {
+        // TODO this isn't actually recursive and only handles one layer of containers
+        let parent_theme = ResourceSet::theme(&parent.borrow().theme_id);
+
+        let mut not_found: Vec<_> = Vec::new();
+
+        let len = parent.borrow().children.len();
+        for i in (0..len).rev() {
+            let child = Rc::clone(&parent.borrow().children[i]);
+
+            let theme_id = format!("{}.{}", parent_theme.id, child.borrow().theme_subname);
+
+            if ResourceSet::has_theme(&theme_id) {
+                child.borrow_mut().theme_id = theme_id;
+                continue;
+            }
+
+            not_found.push(i);
+        }
+
+        for not_found_idx in not_found {
+            let not_found_child = Rc::clone(&parent.borrow().children[not_found_idx]);
+            let len = parent.borrow().children.len();
+            for i in 0..len {
+                let child = Rc::clone(&parent.borrow().children[i]);
+
+                if !ResourceSet::has_theme(&child.borrow().theme_id) { continue; }
+                let child_theme = ResourceSet::theme(&child.borrow().theme_id);
+
+                match child_theme.kind {
+                    theme::Kind::Container => (),
+                    _ => continue,
+                }
+
+                let theme_id = format!("{}.{}.{}", parent_theme.id, child.borrow().theme_subname,
+                    not_found_child.borrow().theme_subname);
+
+                if ResourceSet::has_theme(&theme_id) {
+                    not_found_child.borrow_mut().theme_id = theme_id;
+                    not_found_child.borrow_mut().parent = Some(Rc::clone(&child));
+                    parent.borrow_mut().children.remove(not_found_idx);
+                    child.borrow_mut().children.push(not_found_child);
+                    break;
+                }
+            }
+        }
     }
 
     pub fn dispatch_event(widget: &Rc<RefCell<Widget>>, event: Event) -> bool {

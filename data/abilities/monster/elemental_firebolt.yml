@@ -1,0 +1,19 @@
+id: elemental_firebolt
+name: "Firebolt"
+icon: abilities/firebolt
+description: |
+  You launch a bolt of elemental fire at a single enemy target.  It is most effective against lightly armored targets.
+active:
+  script: "firebolt"
+  group: "Special"
+  ap: 2000
+  duration:
+    Instant
+  cooldown: 3
+  ai:
+    priority: 30
+    kind: Damage
+    group: Single
+    range: Visible
+  short_description: |
+    Deal fire damage to one opponent.

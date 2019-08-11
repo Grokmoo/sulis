@@ -107,6 +107,26 @@ upgrades:
     group_uses_per_encounter:
       - [ Druid, 6 ]
       - [ Special, ~ ]
+  16:
+    ability_choices: [ druid, general ]
+    group_uses_per_encounter:
+      - [ Druid, 6 ]
+      - [ Special, ~ ]
+  17:
+    ability_choices: [ druid, general ]
+    group_uses_per_encounter:
+      - [ Druid, 6 ]
+      - [ Special, ~ ]
+  18:
+    ability_choices: [ druid, general ]
+    group_uses_per_encounter:
+      - [ Druid, 6 ]
+      - [ Special, ~ ]
+  19:
+    ability_choices: [ druid, general ]
+    group_uses_per_encounter:
+      - [ Druid, 6 ]
+      - [ Special, ~ ]
 kits:
   - name: Avenger
     default_attributes:

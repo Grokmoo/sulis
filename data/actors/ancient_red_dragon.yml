@@ -1,5 +1,4 @@
 id: ancient_red_dragon
-ai: ai_basic
 name: Ancient Red Dragon
 faction: Hostile
 images: {}
@@ -19,4 +18,11 @@ reward:
   xp: 500
   loot: level5_misc
   loot_chance: 100
-abilities: []
+abilities:
+  - deadly_caster
+  - fire_master
+  - heal
+  - ward
+  - fire_shield
+  - red_dragon_breath
+ai: ai_basic

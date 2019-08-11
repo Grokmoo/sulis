@@ -130,6 +130,34 @@ upgrades:
       - [ Modes, ~ ]
       - [ Mechanics, ~ ]
       - [ Special, ~ ]
+  16:
+    ability_choices: [ rogue, general ]
+    group_uses_per_encounter:
+      - [ Rogue, 6 ]
+      - [ Modes, ~ ]
+      - [ Mechanics, ~ ]
+      - [ Special, ~ ]
+  17:
+    ability_choices: [ rogue, general ]
+    group_uses_per_encounter:
+      - [ Rogue, 6 ]
+      - [ Modes, ~ ]
+      - [ Mechanics, ~ ]
+      - [ Special, ~ ]
+  18:
+    ability_choices: [ rogue, general ]
+    group_uses_per_encounter:
+      - [ Rogue, 6 ]
+      - [ Modes, ~ ]
+      - [ Mechanics, ~ ]
+      - [ Special, ~ ]
+  19:
+    ability_choices: [ rogue, general ]
+    group_uses_per_encounter:
+      - [ Rogue, 6 ]
+      - [ Modes, ~ ]
+      - [ Mechanics, ~ ]
+      - [ Special, ~ ]
 kits:
   - name: Swashbuckler
     default_attributes:

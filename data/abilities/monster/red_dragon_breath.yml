@@ -1,0 +1,19 @@
+id: red_dragon_breath
+name: "Red Dragon Breath"
+icon: abilities/flaming_fingers
+description: |
+  The dragon breaths a cone of fire on its enemies.
+active:
+  script: "red_dragon_breath"
+  group: "Special"
+  ap: 3000
+  duration:
+    Instant
+  cooldown: 4
+  ai:
+    priority: 30
+    kind: Damage
+    group: Multiple
+    range: Short
+  short_description: |
+    Deal fire damage to all opponents in an arc.

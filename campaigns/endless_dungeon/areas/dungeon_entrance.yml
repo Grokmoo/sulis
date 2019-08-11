@@ -2,7 +2,7 @@
 id: dungeon_entrance
 name: Dungeon Entrance
 generator:
-  id: lava
+  id: cave
   transitions:
     - to: dungeon_level01
       kind: level_down

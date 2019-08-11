@@ -229,6 +229,20 @@ upgrades:
       - [ "2nd Circle", 2 ]
       - [ "3rd Circle", 2 ]
       - [ "4th Circle", 2 ]
+  19:
+    ability_choices: [ mage, general ]
+    group_uses_per_encounter:
+      - [ "Cantrips", 4 ]
+      - [ "1st Circle", 2 ]
+      - [ "2nd Circle", 2 ]
+      - [ "3rd Circle", 2 ]
+      - [ "4th Circle", 2 ]
+      - [ Special, ~ ]
+    group_uses_per_day:
+      - [ "1st Circle", 2 ]
+      - [ "2nd Circle", 2 ]
+      - [ "3rd Circle", 2 ]
+      - [ "4th Circle", 2 ]
 kits:
   - name: Mage
     default_attributes:

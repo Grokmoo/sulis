@@ -8,7 +8,7 @@ rooms:
   min_size: [2, 2]
   max_size: [4, 3]
   min_spacing: 2
-  room_placement_attempts: 40
+  room_placement_attempts: 100
   winding_chance: 80
   extra_connection_chance: 20
   dead_end_keep_chance: 10

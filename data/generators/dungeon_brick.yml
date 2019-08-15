@@ -1,0 +1,58 @@
+id: dungeon_brick
+wall_kinds:
+  interior_brick:
+    weight: 1
+grid_width: 2
+grid_height: 3
+rooms:
+  min_size: [2, 2]
+  max_size: [5, 4]
+  min_spacing: 2
+  room_placement_attempts: 100
+  winding_chance: 70
+  extra_connection_chance: 10
+  dead_end_keep_chance: 5
+  invert: false
+  gen_corridors: true
+  room_edge_overfill_chance: 30
+  corridor_edge_overfill_chance: 0
+terrain:
+  base_kinds:
+    interior_dirt:
+      weight: 1
+    interior_stone:
+      weight: 1
+  patch_passes:
+    - kinds:
+        interior_wood01:
+          weight: 1
+        interior_wood02:
+          weight: 1
+        interior_tile:
+          weight: 1
+      min_size: [2, 2]
+      max_size: [10, 10]
+      spacing: 2
+      placement_attempts: 10
+      edge_underfill_chance: 0
+      allowable_regions: [ Wall, Corridor, Room, Doorway ]
+props:
+  passes: []
+encounters:
+  passes: []
+features:
+  fixed: []
+  passes: []
+transitions:
+  spacing: 10
+  kinds:
+    level_down:
+      feature: stairs_down
+      feature_offset: [-1, -1]
+      size: "4by4"
+      transition_offset: [1, 5]
+    level_up:
+      feature: stairs_up
+      feature_offset: [-1, -1]
+      size: "4by4"
+      transition_offset: [1, 5]

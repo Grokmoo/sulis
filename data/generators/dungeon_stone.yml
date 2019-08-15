@@ -1,16 +1,14 @@
-id: dungeon
+id: dungeon_stone
 wall_kinds:
-  interior_brick:
-    weight: 1
   interior_stone_ceil:
     weight: 1
 grid_width: 2
-grid_height: 3
+grid_height: 4
 rooms:
   min_size: [2, 2]
-  max_size: [5, 4]
+  max_size: [5, 3]
   min_spacing: 2
-  room_placement_attempts: 30
+  room_placement_attempts: 100
   winding_chance: 70
   extra_connection_chance: 10
   dead_end_keep_chance: 5

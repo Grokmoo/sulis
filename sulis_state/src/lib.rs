@@ -80,7 +80,6 @@ mod merchant_state;
 pub use self::merchant_state::MerchantState;
 
 mod path_finder;
-use self::path_finder::PathFinder;
 
 mod party_stash;
 pub use self::party_stash::PartyStash;

@@ -25,7 +25,7 @@ use sulis_core::io::GraphicsRenderer;
 use sulis_core::util::{self, invalid_data_error, ExtInt, Point};
 use sulis_module::on_trigger::QuestEntryState;
 use sulis_module::{
-    area::{Trigger, TriggerKind, ToKind},
+    area::{PathFinder, Trigger, TriggerKind, ToKind},
     Actor, Module, ObjectSize, OnTrigger, Time,
 };
 
@@ -33,8 +33,9 @@ use crate::animation::{self, particle_generator::Param, Anim, AnimSaveState, Ani
 use crate::script::{script_cache, script_callback, Script, ScriptCallback, ScriptEntity};
 use crate::{
     AreaState, ChangeListener, ChangeListenerList, Effect, EntityState, Formation,
-    ItemList, ItemState, Location, PartyStash, PathFinder, QuestStateSet,
+    ItemList, ItemState, Location, PartyStash, QuestStateSet,
     SaveState, TurnManager, UICallback, WorldMapState, AI, MOVE_TO_THRESHOLD,
+    path_finder::find_path,
 };
 
 thread_local! {
@@ -1301,14 +1302,14 @@ impl GameState {
             let start_time = time::Instant::now();
             let path = {
                 let area_state = state.area_state.borrow();
-                match state.path_finder.find(
+                match find_path(
+                    &mut state.path_finder,
                     &area_state,
-                    entity.borrow(),
+                    &entity.borrow(),
                     entities_to_ignore,
-                    true,
                     x,
                     y,
-                    dist,
+                    dist
                 ) {
                     None => return None,
                     Some(path) => path,
@@ -1359,11 +1360,11 @@ impl GameState {
             let area_state = state.area_state.borrow();
 
             let start_time = time::Instant::now();
-            let val = match state.path_finder.find(
+            let val = match find_path(
+                &mut state.path_finder,
                 &area_state,
-                entity.borrow(),
+                &entity.borrow(),
                 entities_to_ignore,
-                false,
                 x,
                 y,
                 dist,

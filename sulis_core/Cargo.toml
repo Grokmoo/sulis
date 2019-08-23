@@ -5,15 +5,15 @@ authors = ["Jared Stephen <grok_moo@yahoo.com>"]
 edition = "2018"
 
 [dependencies]
-dirs = "1.0"
+dirs = "2.0"
 backtrace = "0.3"
-flexi_logger = "0.11"
-image = "0.21"
-glium = "0.24"
+flexi_logger = "0.14"
+image = "0.22"
+glium = "0.25"
 lazy_static = "1.0"
 log = "0.4"
-rand = "0.6"
-rand_pcg = { version = "0.1", features = [ "serde1" ] }
+rand = "0.7"
+rand_pcg = { version = "0.2", features = [ "serde1" ] }
 serde = "1.0"
 serde_derive = "1.0"
 serde_yaml = "0.8"

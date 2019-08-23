@@ -20,7 +20,6 @@ use std::rc::Rc;
 use std::str::FromStr;
 
 use serde::{Deserialize, Deserializer};
-use serde_derive::Deserialize;
 
 use crate::ui::{theme::*, Border, Color, LayoutKind};
 use crate::util::{Point, Size};

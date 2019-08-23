@@ -204,7 +204,7 @@ fn draw_to_surface<T: glium::Surface>(
 
 impl<'a> GraphicsRenderer for GliumRenderer<'a> {
     fn set_scissor(&mut self, pos: Point, size: Size) {
-        let window_size = match self.display.display.gl_window().get_inner_size() {
+        let window_size = match self.display.display.gl_window().window().get_inner_size() {
             None => {
                 error!("Unable to query display size");
                 return;
@@ -383,7 +383,7 @@ impl GliumDisplay {
             // would be very hard to solve in the general case, maybe just allow a configured
             // logical position
             let logical_position = physical_position.to_logical(monitor.get_hidpi_factor());
-            display.gl_window().set_position(logical_position);
+            display.gl_window().window().set_position(logical_position);
             hidpi_factor = monitor.get_hidpi_factor();
         }
 
@@ -424,7 +424,7 @@ impl GliumDisplay {
             Err(e) => return glium_error(e),
         };
 
-        display.gl_window().hide_cursor(true);
+        display.gl_window().window().hide_cursor(true);
 
         let (ui_x, ui_y) = Config::ui_size();
 
@@ -495,7 +495,7 @@ impl IO for GliumDisplay {
     fn process_input(&mut self, root: Rc<RefCell<Widget>>) {
         let (ui_x, ui_y) = Config::ui_size();
         let mut mouse_move: Option<(f32, f32)> = None;
-        let display_size = match self.display.gl_window().get_inner_size() {
+        let display_size = match self.display.gl_window().window().get_inner_size() {
             None => {
                 util::error_and_exit("Unable to get logical display size");
                 unreachable!();

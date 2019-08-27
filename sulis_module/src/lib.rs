@@ -140,6 +140,8 @@ use self::object_size::ObjectSizeBuilder;
 use self::prop::PropBuilder;
 use self::race::RaceBuilder;
 
+pub const MOVE_TO_THRESHOLD: f32 = 0.4;
+
 thread_local! {
     static MODULE: RefCell<Module> = RefCell::new(Module::default());
 }

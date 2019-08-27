@@ -22,15 +22,15 @@ use std::{self, f32, u32};
 
 use rlua::{self, Context, UserData, UserDataMethods};
 
-use crate::{ai, animation, script::*, MOVE_TO_THRESHOLD};
-use crate::{area_feedback_text::ColorKind, ActorState, EntityState, GameState, Location};
 use sulis_core::config::Config;
 use sulis_core::resource::ResourceSet;
 use sulis_core::util::ExtInt;
 use sulis_module::{
     Actor, Attack, AttackKind, Attribute, DamageKind, Faction, HitFlags, HitKind, ImageLayer,
-    InventoryBuilder,
+    InventoryBuilder, MOVE_TO_THRESHOLD,
 };
+use crate::{ai, animation, script::*};
+use crate::{area_feedback_text::ColorKind, ActorState, EntityState, GameState, Location};
 
 /// Represents a single entity for Lua scripts.  Also can represent an invalid,
 /// non-existant entity in some cases.  Many script functions pass a parent

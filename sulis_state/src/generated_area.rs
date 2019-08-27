@@ -96,7 +96,10 @@ impl GeneratedArea {
 
         let mut path_grids = HashMap::new();
         for size in Module::all_sizes() {
-            let path_grid = PathFinderGrid::new(Rc::clone(&size), &layer_set);
+            let path_grid = PathFinderGrid::new(Rc::clone(&size),
+                                                layer_set.width,
+                                                layer_set.height,
+                                                &layer_set.layers);
             path_grids.insert(size.id.to_string(), path_grid);
         }
 

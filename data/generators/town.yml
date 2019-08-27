@@ -1,4 +1,5 @@
 id: town
+min_passable_size: 2by2
 wall_kinds:
   roof_thatched:
     weight: 1

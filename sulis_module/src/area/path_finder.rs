@@ -20,10 +20,9 @@ use std::{f32, ptr};
 
 use hashbrown::{HashMap, HashSet};
 
-use crate::Area;
 use sulis_core::util::{self, Point};
 
-const MAX_ITERATIONS: i32 = 1000;
+const MAX_ITERATIONS: i32 = 2_000;
 
 pub trait LocationChecker {
     fn goal(&self, x: f32, y: f32) -> (f32, f32);
@@ -43,14 +42,12 @@ pub struct PathFinder {
 
     goal_x: f32,
     goal_y: f32,
+
+    max_iterations: i32,
 }
 
 impl PathFinder {
-    pub fn new(area: &Area) -> PathFinder {
-        let width = area.width;
-        let height = area.height;
-
-        debug!("Initializing pathfinder for {}", area.id);
+    pub fn new(width: i32, height: i32) -> PathFinder {
         PathFinder {
             width,
             height,
@@ -61,7 +58,12 @@ impl PathFinder {
             came_from: HashMap::default(),
             goal_x: 0.0,
             goal_y: 0.0,
+            max_iterations: MAX_ITERATIONS,
         }
+    }
+
+    pub fn set_max_iterations(&mut self, iterations: i32) {
+        self.max_iterations = iterations;
     }
 
     /// Finds a path within the given `AreaState`, from the position of `requester`
@@ -77,7 +79,7 @@ impl PathFinder {
     /// checks if a path exists, returning Some if it does, None if not
     pub fn find<T: LocationChecker>(
         &mut self,
-        checker: T,
+        checker: &T,
         start_x: i32,
         start_y: i32,
         dest_x: f32,
@@ -136,7 +138,7 @@ impl PathFinder {
         let loop_start_time = time::Instant::now();
 
         let mut iterations = 0;
-        while iterations < MAX_ITERATIONS && !self.open.is_empty() {
+        while iterations < self.max_iterations && !self.open.is_empty() {
             let (current_f_score, current) = self.find_lowest_f_score_in_open_set();
             if self.is_goal(current, dest_dist_squared) {
                 trace!(

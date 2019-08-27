@@ -1,4 +1,5 @@
 id: lava
+min_passable_size: 2by2
 wall_kinds:
   cave_top:
     weight: 1

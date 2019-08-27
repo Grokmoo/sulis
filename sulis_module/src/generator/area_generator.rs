@@ -14,19 +14,22 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::io::Error;
+use std::io::{Error, ErrorKind};
 use std::rc::Rc;
 use std::collections::HashMap;
 
 use sulis_core::util::{Point, ReproducibleRandom};
-use crate::{Module, area::{Tile, Layer, GeneratorParams, TransitionBuilder}};
+use crate::MOVE_TO_THRESHOLD;
+use crate::{Module, ObjectSize, area::{Tile, Layer, LocationChecker,
+    GeneratorParams, TransitionBuilder, PathFinder}};
 use crate::generator::{WeightedList, WallKinds, RoomParams, TerrainParams, PropParams,
     EncounterParams, GeneratorBuilder, GenModel, Maze, TerrainGen, PropGen, EncounterGen,
     TileKind, TileIter, TilesModel, GeneratorOutput, FeatureParams, FeatureGen,
-    TransitionParams, TransitionGen, TransitionOutput};
+    TransitionParams, TransitionGen, TransitionOutput, LayerListLocationChecker};
 
 pub struct AreaGenerator {
     pub id: String,
+    min_passable_size: Rc<ObjectSize>,
     wall_kinds: WallKinds,
     grid_width: u32,
     grid_height: u32,
@@ -42,9 +45,14 @@ impl AreaGenerator {
     pub fn new(builder: GeneratorBuilder, module: &Module) -> Result<AreaGenerator, Error> {
         let wall_kinds_list = WeightedList::new(builder.wall_kinds, "WallKind",
                                                 |id| module.wall_kind(id))?;
+        let min_passable_size = Rc::clone(module.sizes.get(&builder.min_passable_size).ok_or(
+            Error::new(ErrorKind::InvalidInput, format!("Invalid size {} in {}",
+                                                        builder.min_passable_size, builder.id))
+        )?);
 
         Ok(AreaGenerator {
             id: builder.id,
+            min_passable_size,
             wall_kinds: WallKinds { kinds: wall_kinds_list },
             grid_width: builder.grid_width,
             grid_height: builder.grid_height,
@@ -105,6 +113,8 @@ impl AreaGenerator {
         info!("Tile generation complete.  Pre-Gen layers {:?}", model.rand());
         let layers = self.create_layers(width, height, &model.model)?;
 
+        self.check_connectivity(&layers, &model, &maze)?;
+
         info!("Generating features {:?}", model.rand());
         let mut gen = FeatureGen::new(&mut model, &layers, &self.feature_params, &maze);
         gen.generate()?;
@@ -125,6 +135,62 @@ impl AreaGenerator {
             props,
             encounters,
         })
+    }
+
+    fn check_connectivity(&self, layers: &[Layer], model: &GenModel,
+                          maze: &Maze) -> Result<(), Error>{
+        let location_checker = LayerListLocationChecker::new(model.area_width,
+                                                             model.area_height,
+                                                             layers,
+                                                             Rc::clone(&self.min_passable_size));
+        let mut path_finder = PathFinder::new(model.area_width, model.area_height);
+        path_finder.set_max_iterations(100_000);
+
+        // first, find an open spot in each generated room
+        let mut open = Vec::new();
+
+        for room in maze.rooms() {
+            let (min_x, min_y) = model.from_region_coords(room.x, room.y);
+            let (max_x, max_y) = model.from_region_coords(room.x + room.width,
+                                                          room.y + room.height);
+
+            // find an open spot in the room
+            let mut open_spot: Option<Point> = None;
+            for y in min_y..max_y {
+                for x in min_x..max_x {
+                    if location_checker.passable(x, y) {
+                        open_spot = Some(Point::new(x, y));
+                        break;
+                    }
+                }
+            }
+
+            let open_spot = match open_spot {
+                None => return Err(Error::new(ErrorKind::InvalidInput,
+                    "unable to locate open point in room for given size")),
+                Some(p) => p,
+            };
+
+
+            open.push(open_spot);
+        }
+
+        if open.len() < 2 { return Ok(()); }
+
+        // check for a path between each open spot in sequence
+        for i in 0..(open.len() - 1) {
+            let (start_x, start_y) = (open[i].x, open[i].y);
+            let (end_x, end_y) = (open[i + 1].x, open[i + 1].y);
+            let (end_x, end_y) = (end_x as f32, end_y as f32);
+
+            // if path_finder.find(&location_checker, start_x, start_y, end_x, end_y,
+            //                     MOVE_TO_THRESHOLD).is_none() {
+            //     return Err(Error::new(ErrorKind::InvalidInput,
+            //         format!("Unable to path between generated rooms {} and {}", i, i + 1)));
+            // }
+        }
+
+        Ok(())
     }
 
     fn create_layers(&self, width: i32, height: i32,

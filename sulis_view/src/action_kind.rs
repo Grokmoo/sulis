@@ -20,9 +20,9 @@ use std::rc::Rc;
 use crate::{RootView};
 use sulis_core::ui::{animation_state, Widget};
 use sulis_core::util::Point;
-use sulis_module::{area::ToKind, Faction, Module, ObjectSize, Time, OnTrigger};
+use sulis_module::{area::ToKind, Faction, Module, ObjectSize, Time, OnTrigger, MOVE_TO_THRESHOLD};
 use sulis_state::{
-    AreaState, EntityState, GameState, PropState, ScriptCallback, MOVE_TO_THRESHOLD,
+    AreaState, EntityState, GameState, PropState, ScriptCallback,
 };
 
 pub fn get_action(x_f32: f32, y_f32: f32) -> Box<ActionKind> {

@@ -84,7 +84,7 @@ pub fn find_path(path_finder: &mut PathFinder,
                  dest_dist: f32) -> Option<Vec<Point>> {
     let checker = StateLocationChecker::new(area_state, entity, entities_to_ignore);
 
-    path_finder.find(checker, entity.location.x, entity.location.y,
+    path_finder.find(&checker, entity.location.x, entity.location.y,
                      dest_x, dest_y, dest_dist)
 }
 

@@ -17,7 +17,7 @@
 use std::fmt;
 use std::rc::Rc;
 
-use crate::area::LayerSet;
+use crate::area::Layer;
 use crate::ObjectSize;
 
 pub struct PathFinderGrid {
@@ -45,10 +45,7 @@ impl fmt::Debug for PathFinderGrid {
 }
 
 impl PathFinderGrid {
-    pub fn new(size: Rc<ObjectSize>, layer_set: &LayerSet) -> PathFinderGrid {
-        let width = layer_set.width;
-        let height = layer_set.height;
-
+    pub fn new(size: Rc<ObjectSize>, width: i32, height: i32, layers: &[Layer]) -> PathFinderGrid {
         let mut passable = vec![false; (width * height) as usize];
 
         for y in 0..height {
@@ -59,12 +56,36 @@ impl PathFinderGrid {
                         is_passable = false;
                         break;
                     }
-                    if !layer_set.is_passable(p.x, p.y) {
+
+                    if layers.iter().any(|layer| {
+                        !layer.is_passable(p.x, p.y)
+                    }) {
                         is_passable = false;
                         break;
                     }
                 }
                 passable[(x + y * width) as usize] = is_passable;
+            }
+        }
+
+        for ref layer in layers.iter() {
+            for &(point, ref tile) in layer.impass_override_tiles.iter() {
+                let start_x = point.x;
+                let start_y = point.y;
+                let end_x = start_x + tile.width;
+                let end_y = start_y + tile.height;
+
+                for y in start_y..end_y {
+                    for x in start_x..end_x {
+                        passable[(x + y * width) as usize] = true;
+                    }
+                }
+
+                for p in tile.impass.iter() {
+                    let x = p.x + start_x;
+                    let y = p.y + start_y;
+                    passable[(x + y * width) as usize] = false;
+                }
             }
         }
 

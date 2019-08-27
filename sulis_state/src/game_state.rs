@@ -26,7 +26,7 @@ use sulis_core::util::{self, invalid_data_error, ExtInt, Point};
 use sulis_module::on_trigger::QuestEntryState;
 use sulis_module::{
     area::{PathFinder, Trigger, TriggerKind, ToKind},
-    Actor, Module, ObjectSize, OnTrigger, Time,
+    Actor, Module, ObjectSize, OnTrigger, Time, MOVE_TO_THRESHOLD,
 };
 
 use crate::animation::{self, particle_generator::Param, Anim, AnimSaveState, AnimState};
@@ -34,7 +34,7 @@ use crate::script::{script_cache, script_callback, Script, ScriptCallback, Scrip
 use crate::{
     AreaState, ChangeListener, ChangeListenerList, Effect, EntityState, Formation,
     ItemList, ItemState, Location, PartyStash, QuestStateSet,
-    SaveState, TurnManager, UICallback, WorldMapState, AI, MOVE_TO_THRESHOLD,
+    SaveState, TurnManager, UICallback, WorldMapState, AI,
     path_finder::find_path,
 };
 
@@ -99,7 +99,9 @@ impl GameState {
                 )),
             }?;
 
-            let path_finder = PathFinder::new(&area_state.borrow().area.area);
+            let width = area_state.borrow().area.area.width;
+            let height = area_state.borrow().area.area.height;
+            let path_finder = PathFinder::new(width, height);
 
             let mut entities = HashMap::new();
             let mut selected = Vec::new();
@@ -344,7 +346,10 @@ impl GameState {
 
         pc_state.borrow_mut().actor.init_turn();
 
-        let path_finder = PathFinder::new(&area_state.borrow().area.area);
+        let width = area_state.borrow().area.area.width;
+        let height = area_state.borrow().area.area.height;
+
+        let path_finder = PathFinder::new(width, height);
 
         let mut areas: HashMap<String, Rc<RefCell<AreaState>>> = HashMap::new();
         areas.insert(campaign.starting_area.to_string(), Rc::clone(&area_state));
@@ -846,7 +851,9 @@ impl GameState {
             STATE.with(|state| {
                 let mut state = state.borrow_mut();
                 let state = state.as_mut().unwrap();
-                let path_finder = PathFinder::new(&area.borrow().area.area);
+                let width = area.borrow().area.area.width;
+                let height = area.borrow().area.area.height;
+                let path_finder = PathFinder::new(width, height);
                 state.path_finder = path_finder;
                 state.area_state = area;
             });

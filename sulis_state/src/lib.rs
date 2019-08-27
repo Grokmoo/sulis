@@ -116,8 +116,6 @@ use std::rc::Rc;
 
 use sulis_module::{Actor, Module, OnTrigger};
 
-pub const MOVE_TO_THRESHOLD: f32 = 0.4;
-
 #[derive(Debug)]
 pub enum NextGameStep {
     Exit,

@@ -1,4 +1,5 @@
 id: dungeon_stone
+min_passable_size: 2by2
 wall_kinds:
   interior_stone_ceil:
     weight: 1

@@ -54,21 +54,18 @@ use crate::{WallKind, ObjectSize};
 
 pub struct LayerListLocationChecker {
     grid: PathFinderGrid,
-    min_passable_size: Point,
 }
 impl LayerListLocationChecker {
     pub fn new(width: i32, height: i32, layers: &[Layer],
                size: Rc<ObjectSize>) -> LayerListLocationChecker {
-        let min_passable_size = Point::new(size.width, size.height);
         let grid = PathFinderGrid::new(size, width, height, layers);
-        LayerListLocationChecker { grid, min_passable_size }
+        LayerListLocationChecker { grid }
     }
 }
 
 impl LocationChecker for LayerListLocationChecker {
     fn goal(&self, x: f32, y: f32) -> (f32, f32) {
-        (x - (self.min_passable_size.x / 2) as f32,
-        y - (self.min_passable_size.y / 2) as f32)
+        (x, y)
     }
 
     fn passable(&self, x: i32, y: i32) -> bool {

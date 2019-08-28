@@ -144,7 +144,7 @@ impl AreaGenerator {
                                                              layers,
                                                              Rc::clone(&self.min_passable_size));
         let mut path_finder = PathFinder::new(model.area_width, model.area_height);
-        path_finder.set_max_iterations(100_000);
+        path_finder.set_max_iterations(10_000);
 
         // first, find an open spot in each generated room
         let mut open = Vec::new();
@@ -177,17 +177,46 @@ impl AreaGenerator {
 
         if open.len() < 2 { return Ok(()); }
 
+        // print!("  ");
+        // for i in 0..13 {
+        //     print!("{:3}       ", i*10);
+        // }
+        // print!("\n");
+        // for y in 0..model.area_height {
+        //     print!("{:03} ", y);
+        //     for x in 0..model.area_width {
+        //         let mut open_found = false;
+        //         for p in open.iter() {
+        //             if p.x == x && p.y == y {
+        //                 print!("O");
+        //                 open_found = true;
+        //                 break;
+        //             }
+        //         }
+        //
+        //         if open_found { continue; }
+        //
+        //         if location_checker.passable(x, y) {
+        //             print!(" ");
+        //         } else {
+        //             print!("X");
+        //         }
+        //     }
+        //     print!("\n");
+        // }
+
         // check for a path between each open spot in sequence
         for i in 0..(open.len() - 1) {
             let (start_x, start_y) = (open[i].x, open[i].y);
             let (end_x, end_y) = (open[i + 1].x, open[i + 1].y);
             let (end_x, end_y) = (end_x as f32, end_y as f32);
 
-            // if path_finder.find(&location_checker, start_x, start_y, end_x, end_y,
-            //                     MOVE_TO_THRESHOLD).is_none() {
-            //     return Err(Error::new(ErrorKind::InvalidInput,
-            //         format!("Unable to path between generated rooms {} and {}", i, i + 1)));
-            // }
+            // print!("Find from {},{} to {},{}\n", start_x, start_y, end_x, end_y);
+            if path_finder.find(&location_checker, start_x, start_y, end_x, end_y,
+                                MOVE_TO_THRESHOLD).is_none() {
+                return Err(Error::new(ErrorKind::InvalidInput,
+                    format!("Unable to path between generated rooms {} and {}", i, i + 1)));
+            }
         }
 
         Ok(())

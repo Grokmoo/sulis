@@ -316,7 +316,7 @@ impl RootView {
         widget: &Rc<RefCell<Widget>>,
         name: &str,
         desired_state: bool,
-        cb: &Fn() -> Option<Rc<RefCell<WidgetKind>>>,
+        cb: &dyn Fn() -> Option<Rc<RefCell<dyn WidgetKind>>>,
     ) {
         match Widget::get_child_with_name(widget, name) {
             None => {

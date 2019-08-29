@@ -20,7 +20,7 @@ use std::rc::Rc;
 use crate::ui::{Widget, WidgetKind};
 
 pub struct Callback {
-    cb: Rc<Fn(&Rc<RefCell<Widget>>, &mut WidgetKind)>,
+    cb: Rc<dyn Fn(&Rc<RefCell<Widget>>, &mut dyn WidgetKind)>,
 }
 
 impl Clone for Callback {
@@ -38,17 +38,17 @@ impl Callback {
         }
     }
 
-    pub fn new(f: Rc<Fn(&Rc<RefCell<Widget>>, &mut WidgetKind)>) -> Callback {
+    pub fn new(f: Rc<dyn Fn(&Rc<RefCell<Widget>>, &mut dyn WidgetKind)>) -> Callback {
         Callback { cb: f }
     }
 
-    pub fn with_widget(f: Rc<Fn(&Rc<RefCell<Widget>>)>) -> Callback {
+    pub fn with_widget(f: Rc<dyn Fn(&Rc<RefCell<Widget>>)>) -> Callback {
         Callback {
             cb: Rc::new(move |widget, _kind| f(widget)),
         }
     }
 
-    pub fn with(f: Box<Fn()>) -> Callback {
+    pub fn with(f: Box<dyn Fn()>) -> Callback {
         Callback {
             cb: Rc::new(move |_w, _k| f()),
         }
@@ -66,7 +66,7 @@ impl Callback {
         }
     }
 
-    pub fn call(&self, widget: &Rc<RefCell<Widget>>, kind: &mut WidgetKind) {
+    pub fn call(&self, widget: &Rc<RefCell<Widget>>, kind: &mut dyn WidgetKind) {
         (self.cb)(widget, kind);
     }
 }

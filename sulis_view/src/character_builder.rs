@@ -72,11 +72,11 @@ pub struct CharacterBuilder {
     pub(in crate::character_builder) next: Rc<RefCell<Widget>>,
     pub(in crate::character_builder) prev: Rc<RefCell<Widget>>,
     pub(in crate::character_builder) finish: Rc<RefCell<Widget>>,
-    builder_panes: Vec<Rc<RefCell<BuilderPane>>>,
+    builder_panes: Vec<Rc<RefCell<dyn BuilderPane>>>,
     builder_pane_index: usize,
     // we rely on the builder panes in the above vec having the same
     // index in the children vec of this widget
-    builder_set: Rc<BuilderSet>,
+    builder_set: Rc<dyn BuilderSet>,
 
     pub race: Option<Rc<Race>>,
     pub class: Option<Rc<Class>>,
@@ -104,7 +104,7 @@ impl CharacterBuilder {
         CharacterBuilder::with(Rc::new(LevelUpBuilder { pc }))
     }
 
-    fn with(builder_set: Rc<BuilderSet>) -> Rc<RefCell<CharacterBuilder>> {
+    fn with(builder_set: Rc<dyn BuilderSet>) -> Rc<RefCell<CharacterBuilder>> {
         let next = Widget::with_theme(Button::empty(), "next");
         next.borrow_mut()
             .state
@@ -184,10 +184,10 @@ impl WidgetKind for CharacterBuilder {
     fn get_name(&self) -> &str {
         NAME
     }
-    fn as_any(&self) -> &Any {
+    fn as_any(&self) -> &dyn Any {
         self
     }
-    fn as_any_mut(&mut self) -> &mut Any {
+    fn as_any_mut(&mut self) -> &mut dyn Any {
         self
     }
 

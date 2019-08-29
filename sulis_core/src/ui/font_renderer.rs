@@ -22,7 +22,7 @@ use std::rc::Rc;
 pub trait FontRenderer {
     fn render(
         &self,
-        renderer: &mut GraphicsRenderer,
+        renderer: &mut dyn GraphicsRenderer,
         pos_x: f32,
         pos_y: f32,
         widget_state: &WidgetState,
@@ -55,7 +55,7 @@ impl LineRenderer {
 impl FontRenderer for LineRenderer {
     fn render(
         &self,
-        renderer: &mut GraphicsRenderer,
+        renderer: &mut dyn GraphicsRenderer,
         pos_x: f32,
         pos_y: f32,
         widget_state: &WidgetState,

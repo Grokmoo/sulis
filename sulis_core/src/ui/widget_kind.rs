@@ -82,14 +82,14 @@ pub trait WidgetKind {
 
     fn draw(
         &mut self,
-        _renderer: &mut GraphicsRenderer,
+        _renderer: &mut dyn GraphicsRenderer,
         _pixel_size: Point,
         _widget: &Widget,
         _millis: u32,
     ) {
     }
 
-    fn end_draw(&mut self, _renderer: &mut GraphicsRenderer) {}
+    fn end_draw(&mut self, _renderer: &mut dyn GraphicsRenderer) {}
 
     fn layout(&mut self, widget: &mut Widget) {
         widget.do_base_layout();
@@ -97,9 +97,9 @@ pub trait WidgetKind {
 
     fn get_name(&self) -> &str;
 
-    fn as_any(&self) -> &Any;
+    fn as_any(&self) -> &dyn Any;
 
-    fn as_any_mut(&mut self) -> &mut Any;
+    fn as_any_mut(&mut self) -> &mut dyn Any;
 
     /// Whether this Widget kind wants keyboard focus.  When a widget is receiving keyboard
     /// focus, it gets character events, allowing the user to type into the widget.  By default,

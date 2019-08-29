@@ -1138,7 +1138,7 @@ impl GameState {
     }
 
     pub fn draw_above_entities(
-        renderer: &mut GraphicsRenderer,
+        renderer: &mut dyn GraphicsRenderer,
         offset_x: f32,
         offset_y: f32,
         scale_x: f32,
@@ -1152,7 +1152,7 @@ impl GameState {
     }
 
     pub fn draw_below_entities(
-        renderer: &mut GraphicsRenderer,
+        renderer: &mut dyn GraphicsRenderer,
         offset_x: f32,
         offset_y: f32,
         scale_x: f32,
@@ -1285,7 +1285,7 @@ impl GameState {
         x: f32,
         y: f32,
         dist: f32,
-        cb: Option<Box<ScriptCallback>>,
+        cb: Option<Box<dyn ScriptCallback>>,
     ) -> bool {
         if entity.borrow().actor.stats.move_disabled {
             return false;

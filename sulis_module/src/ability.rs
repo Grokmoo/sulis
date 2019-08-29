@@ -68,7 +68,7 @@ pub struct Ability {
     pub id: String,
     pub name: String,
     pub description: String,
-    pub icon: Rc<Image>,
+    pub icon: Rc<dyn Image>,
     pub active: Option<Active>,
     pub bonuses: BonusList,
     pub prereqs: Option<PrereqList>,

@@ -92,7 +92,7 @@ impl ImageLayer {
 
 #[derive(Clone, Debug)]
 pub struct ImageLayerSet {
-    images: HashMap<Sex, HashMap<ImageLayer, Rc<Image>>>,
+    images: HashMap<Sex, HashMap<ImageLayer, Rc<dyn Image>>>,
 }
 
 impl ImageLayerSet {
@@ -121,7 +121,7 @@ impl ImageLayerSet {
 
     /// Returns a reference to the image for this sex and ImageLayer,
     /// or None if no such image exists.
-    pub fn get(&self, sex: Sex, layer: ImageLayer) -> Option<&Rc<Image>> {
+    pub fn get(&self, sex: Sex, layer: ImageLayer) -> Option<&Rc<dyn Image>> {
         match self.images.get(&sex) {
             None => None,
             Some(sex_map) => sex_map.get(&layer),
@@ -135,7 +135,7 @@ impl ImageLayerSet {
         sex: Sex,
         hair: Option<Color>,
         skin: Option<Color>,
-    ) -> Vec<(f32, f32, Option<Color>, Rc<Image>)> {
+    ) -> Vec<(f32, f32, Option<Color>, Rc<dyn Image>)> {
         let mut list = Vec::new();
 
         match self.images.get(&sex) {
@@ -163,8 +163,8 @@ impl ImageLayerSet {
         race: &Rc<Race>,
         hair: Option<Color>,
         skin: Option<Color>,
-        insert: HashMap<ImageLayer, Rc<Image>>,
-    ) -> Vec<(f32, f32, Option<Color>, Rc<Image>)> {
+        insert: HashMap<ImageLayer, Rc<dyn Image>>,
+    ) -> Vec<(f32, f32, Option<Color>, Rc<dyn Image>)> {
         let mut list = Vec::new();
 
         match self.images.get(&sex) {
@@ -202,7 +202,7 @@ impl ImageLayerSet {
     }
 
     fn append(
-        images: &mut HashMap<Sex, HashMap<ImageLayer, Rc<Image>>>,
+        images: &mut HashMap<Sex, HashMap<ImageLayer, Rc<dyn Image>>>,
         sex: Sex,
         refs: HashMap<ImageLayer, String>,
     ) -> Result<(), Error> {
@@ -235,8 +235,8 @@ fn get_color(layer: ImageLayer, hair: Option<Color>, skin: Option<Color>) -> Opt
 }
 
 fn insert_for_race_sex(
-    list: &mut Vec<(f32, f32, Option<Color>, Rc<Image>)>,
-    insert: &HashMap<ImageLayer, Rc<Image>>,
+    list: &mut Vec<(f32, f32, Option<Color>, Rc<dyn Image>)>,
+    insert: &HashMap<ImageLayer, Rc<dyn Image>>,
     sex: Sex,
     race: &Rc<Race>,
     layer: ImageLayer,

@@ -38,7 +38,7 @@ use crate::util::{size, Size};
 pub trait Image: Debug {
     fn draw(
         &self,
-        renderer: &mut GraphicsRenderer,
+        renderer: &mut dyn GraphicsRenderer,
         state: &AnimationState,
         x: f32,
         y: f32,
@@ -73,7 +73,7 @@ pub struct EmptyImage {}
 impl Image for EmptyImage {
     fn draw(
         &self,
-        _renderer: &mut GraphicsRenderer,
+        _renderer: &mut dyn GraphicsRenderer,
         _state: &AnimationState,
         _x: f32,
         _y: f32,

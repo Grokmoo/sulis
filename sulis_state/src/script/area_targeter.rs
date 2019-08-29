@@ -981,8 +981,8 @@ impl AreaTargeter {
 
     pub fn draw(
         &mut self,
-        renderer: &mut GraphicsRenderer,
-        tile: &Rc<Image>,
+        renderer: &mut dyn GraphicsRenderer,
+        tile: &Rc<dyn Image>,
         x_offset: f32,
         y_offset: f32,
         scale_x: f32,

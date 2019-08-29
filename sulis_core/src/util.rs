@@ -339,9 +339,9 @@ pub fn error_and_exit(error: &str) {
 }
 
 pub fn main_loop(
-    io: &mut Box<IO>,
+    io: &mut Box<dyn IO>,
     root: Rc<RefCell<Widget>>,
-    updater: Box<MainLoopUpdater>,
+    updater: Box<dyn MainLoopUpdater>,
 ) -> Result<(), Error> {
     let fpms = (1000.0 / (Config::frame_rate() as f32)) as u64;
     let frame_time = time::Duration::from_millis(fpms);

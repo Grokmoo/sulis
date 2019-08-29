@@ -1031,7 +1031,7 @@ impl UserData for ScriptEntity {
             let parent = entity.try_unwrap()?;
             let target = target.try_unwrap()?;
 
-            let cb: Option<Box<ScriptCallback>> = match callback {
+            let cb: Option<Box<dyn ScriptCallback>> = match callback {
                 None => None,
                 Some(cb) => Some(Box::new(cb)),
             };
@@ -1055,7 +1055,7 @@ impl UserData for ScriptEntity {
             let target = target.try_unwrap()?;
             let damage_kind = DamageKind::from_str(&damage_kind);
             let attack_kind = AttackKind::from_str(&attack_kind, &accuracy_kind);
-            let mut cbs: Vec<Box<ScriptCallback>> = Vec::new();
+            let mut cbs: Vec<Box<dyn ScriptCallback>> = Vec::new();
             if let Some(cb) = cb {
                 cbs.push(Box::new(cb));
             }

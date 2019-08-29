@@ -28,7 +28,7 @@ use crate::widgets::Label;
 
 pub struct Widget {
     pub state: WidgetState,
-    pub kind: Rc<RefCell<WidgetKind>>,
+    pub kind: Rc<RefCell<dyn WidgetKind>>,
     pub children: Vec<Rc<RefCell<Widget>>>,
     pub theme: Rc<Theme>,
     theme_id: String,
@@ -52,7 +52,7 @@ impl Widget {
         self.modal_child.is_some()
     }
 
-    pub fn draw(&self, renderer: &mut GraphicsRenderer, pixel_size: Point, millis: u32) {
+    pub fn draw(&self, renderer: &mut dyn GraphicsRenderer, pixel_size: Point, millis: u32) {
         if !self.state.visible {
             return;
         }
@@ -177,7 +177,7 @@ impl Widget {
 }
 
 impl Widget {
-    fn new(kind: Rc<RefCell<WidgetKind>>, theme: &str) -> Rc<RefCell<Widget>> {
+    fn new(kind: Rc<RefCell<dyn WidgetKind>>, theme: &str) -> Rc<RefCell<Widget>> {
         let widget = Widget {
             state: WidgetState::new(),
             kind: Rc::clone(&kind),
@@ -200,12 +200,12 @@ impl Widget {
         widget
     }
 
-    pub fn with_defaults(widget: Rc<RefCell<WidgetKind>>) -> Rc<RefCell<Widget>> {
+    pub fn with_defaults(widget: Rc<RefCell<dyn WidgetKind>>) -> Rc<RefCell<Widget>> {
         let name = widget.borrow().get_name().to_string();
         Widget::new(widget, &name)
     }
 
-    pub fn with_theme(widget: Rc<RefCell<WidgetKind>>, theme: &str) -> Rc<RefCell<Widget>> {
+    pub fn with_theme(widget: Rc<RefCell<dyn WidgetKind>>, theme: &str) -> Rc<RefCell<Widget>> {
         Widget::new(widget, theme)
     }
 
@@ -275,14 +275,14 @@ impl Widget {
         };
         unsafe { mem::transmute::<&mut T, &'a mut T>(result) }
     }
-    pub fn downcast<'a, T: WidgetKind + 'static>(kind: &'a WidgetKind) -> &'a T {
+    pub fn downcast<'a, T: WidgetKind + 'static>(kind: &'a dyn WidgetKind) -> &'a T {
         match kind.as_any().downcast_ref::<T>() {
             None => panic!("Failed to downcast kind"),
             Some(result) => result,
         }
     }
 
-    pub fn downcast_mut<'a, T: WidgetKind + 'static>(kind: &'a mut WidgetKind) -> &'a mut T {
+    pub fn downcast_mut<'a, T: WidgetKind + 'static>(kind: &'a mut dyn WidgetKind) -> &'a mut T {
         match kind.as_any_mut().downcast_mut::<T>() {
             None => panic!("Failed to downcast kind"),
             Some(result) => result,
@@ -410,7 +410,7 @@ impl Widget {
         root.keyboard_focus_child = None;
     }
 
-    pub fn fire_callback(widget: &Rc<RefCell<Widget>>, kind: &mut WidgetKind) {
+    pub fn fire_callback(widget: &Rc<RefCell<Widget>>, kind: &mut dyn WidgetKind) {
         let cb = match widget.borrow().state.callback {
             None => return,
             Some(ref cb) => cb.clone(),
@@ -445,7 +445,7 @@ impl Widget {
 
     pub fn set_mouse_over(
         widget: &Rc<RefCell<Widget>>,
-        mouse_over: Rc<RefCell<WidgetKind>>,
+        mouse_over: Rc<RefCell<dyn WidgetKind>>,
         x: i32,
         y: i32,
     ) {

@@ -26,7 +26,7 @@ use crate::util::{invalid_data_error, Size};
 #[derive(Debug)]
 pub struct TimerImage {
     id: String,
-    frames: Vec<Rc<Image>>,
+    frames: Vec<Rc<dyn Image>>,
     frame_time_millis: u32,
     size: Size,
 }
@@ -34,9 +34,9 @@ pub struct TimerImage {
 impl TimerImage {
     pub fn new(
         builder: TimerImageBuilder,
-        images: &HashMap<String, Rc<Image>>,
-    ) -> Result<Rc<Image>, Error> {
-        let mut frames: Vec<Rc<Image>> = Vec::new();
+        images: &HashMap<String, Rc<dyn Image>>,
+    ) -> Result<Rc<dyn Image>, Error> {
+        let mut frames: Vec<Rc<dyn Image>> = Vec::new();
 
         if builder.frames.is_empty() {
             return invalid_data_error("Timer image must have 1 or more frames.");
@@ -74,7 +74,7 @@ impl TimerImage {
         }))
     }
 
-    fn get_cur_frame(&self, millis: u32) -> &Rc<Image> {
+    fn get_cur_frame(&self, millis: u32) -> &Rc<dyn Image> {
         let total_frame_time = self.frame_time_millis * self.frames.len() as u32;
         let offset = millis % total_frame_time;
         let index = (offset / self.frame_time_millis) as usize;
@@ -90,7 +90,7 @@ impl Image for TimerImage {
 
     fn draw(
         &self,
-        renderer: &mut GraphicsRenderer,
+        renderer: &mut dyn GraphicsRenderer,
         state: &AnimationState,
         x: f32,
         y: f32,

@@ -131,7 +131,7 @@ fn check_idx(width: i32, points: &[bool], x: i32, y: i32) -> bool {
 }
 
 pub struct RangeIndicatorImageSet {
-    images: Vec<Option<Rc<Image>>>,
+    images: Vec<Option<Rc<dyn Image>>>,
 }
 
 impl RangeIndicatorImageSet {
@@ -193,7 +193,7 @@ impl RangeIndicatorImageSet {
 }
 
 struct ImageRule {
-    image: Rc<Image>,
+    image: Rc<dyn Image>,
     neighbors: u8,
 }
 

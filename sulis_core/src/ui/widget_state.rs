@@ -31,12 +31,12 @@ pub struct WidgetState {
     size: Size,
     border: Border,
     pub mouse_is_inside: bool,
-    pub background: Option<Rc<Image>>,
-    pub foreground: Option<Rc<Image>>,
+    pub background: Option<Rc<dyn Image>>,
+    pub foreground: Option<Rc<dyn Image>>,
     pub animation_state: AnimationState,
     pub text: String,
     pub text_params: TextParams,
-    pub text_renderer: Option<Box<FontRenderer>>,
+    pub text_renderer: Option<Box<dyn FontRenderer>>,
     pub font: Option<Rc<Font>>,
     pub is_modal: bool,
     pub modal_remove_on_click_outside: bool,
@@ -216,11 +216,11 @@ impl WidgetState {
         self.animation_state = state.clone();
     }
 
-    pub fn set_background(&mut self, image: Option<Rc<Image>>) {
+    pub fn set_background(&mut self, image: Option<Rc<dyn Image>>) {
         self.background = image;
     }
 
-    pub fn set_foreground(&mut self, image: Option<Rc<Image>>) {
+    pub fn set_foreground(&mut self, image: Option<Rc<dyn Image>>) {
         self.foreground = image;
     }
 

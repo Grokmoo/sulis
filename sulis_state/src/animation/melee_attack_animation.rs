@@ -99,11 +99,11 @@ pub(in crate::animation) fn cleanup(owner: &Rc<RefCell<EntityState>>) {
 
 pub(in crate::animation) struct MeleeAttackAnimModel {
     defender: Rc<RefCell<EntityState>>,
-    callbacks: Vec<Box<ScriptCallback>>,
+    callbacks: Vec<Box<dyn ScriptCallback>>,
     vector: (f32, f32),
     pub(in crate::animation) has_attacked: bool,
     attack_func: Box<
-        Fn(
+        dyn Fn(
             &Rc<RefCell<EntityState>>,
             &Rc<RefCell<EntityState>>,
         ) -> Vec<(HitKind, HitFlags, Vec<(DamageKind, u32)>)>,
@@ -114,9 +114,9 @@ pub fn new(
     attacker: &Rc<RefCell<EntityState>>,
     defender: &Rc<RefCell<EntityState>>,
     duration_millis: u32,
-    callbacks: Vec<Box<ScriptCallback>>,
+    callbacks: Vec<Box<dyn ScriptCallback>>,
     attack_func: Box<
-        Fn(
+        dyn Fn(
             &Rc<RefCell<EntityState>>,
             &Rc<RefCell<EntityState>>,
         ) -> Vec<(HitKind, HitFlags, Vec<(DamageKind, u32)>)>,

@@ -79,7 +79,7 @@ impl AnimState {
         &mut self,
         to_add: Vec<Anim>,
         elapsed: u32,
-    ) -> (Vec<Box<ScriptCallback>>, Vec<Box<ScriptCallback>>) {
+    ) -> (Vec<Box<dyn ScriptCallback>>, Vec<Box<dyn ScriptCallback>>) {
         let mut update_cbs = Vec::new();
         let mut complete_cbs = Vec::new();
 
@@ -149,7 +149,7 @@ impl AnimState {
 
     pub fn draw_below_entities(
         &self,
-        renderer: &mut GraphicsRenderer,
+        renderer: &mut dyn GraphicsRenderer,
         offset_x: f32,
         offset_y: f32,
         scale_x: f32,
@@ -164,7 +164,7 @@ impl AnimState {
 
     pub fn draw_above_entities(
         &self,
-        renderer: &mut GraphicsRenderer,
+        renderer: &mut dyn GraphicsRenderer,
         offset_x: f32,
         offset_y: f32,
         scale_x: f32,
@@ -256,8 +256,8 @@ impl AnimState {
     fn update_vec(
         vec: &mut Vec<Anim>,
         elapsed: u32,
-        update_cbs: &mut Vec<Box<ScriptCallback>>,
-        complete_cbs: &mut Vec<Box<ScriptCallback>>,
+        update_cbs: &mut Vec<Box<dyn ScriptCallback>>,
+        complete_cbs: &mut Vec<Box<dyn ScriptCallback>>,
     ) {
         let mut i = 0;
         while i < vec.len() {
@@ -279,8 +279,8 @@ pub struct Anim {
     pub(in crate::animation) elapsed: u32,
     pub(in crate::animation) duration_millis: ExtInt,
     marked_for_removal: Rc<Cell<bool>>,
-    completion_callbacks: Vec<Box<ScriptCallback>>,
-    update_callbacks: Vec<(u32, Box<ScriptCallback>)>, // sorted by the first field, time in secs
+    completion_callbacks: Vec<Box<dyn ScriptCallback>>,
+    update_callbacks: Vec<(u32, Box<dyn ScriptCallback>)>, // sorted by the first field, time in secs
     pub(in crate::animation) owner: Rc<RefCell<EntityState>>,
     pub(in crate::animation) removal_effect: Option<usize>, // used only for save/load purposes
 }
@@ -295,7 +295,7 @@ pub(in crate::animation) enum AnimKind {
     /// An animation that adds or overrides image layers on an entity
     /// while active
     EntityImageLayer {
-        images: HashMap<ImageLayer, Rc<Image>>,
+        images: HashMap<ImageLayer, Rc<dyn Image>>,
     },
 
     /// An animation that changes the color of an entity while active
@@ -349,7 +349,7 @@ impl Anim {
     pub fn new_entity_image_layer(
         owner: &Rc<RefCell<EntityState>>,
         duration_millis: ExtInt,
-        images: HashMap<ImageLayer, Rc<Image>>,
+        images: HashMap<ImageLayer, Rc<dyn Image>>,
     ) -> Anim {
         Anim::new(
             owner,
@@ -515,8 +515,8 @@ impl Anim {
 
     fn get_completion_callbacks(
         &mut self,
-        update_cbs: &mut Vec<Box<ScriptCallback>>,
-        complete_cbs: &mut Vec<Box<ScriptCallback>>,
+        update_cbs: &mut Vec<Box<dyn ScriptCallback>>,
+        complete_cbs: &mut Vec<Box<dyn ScriptCallback>>,
     ) {
         for cb in self.update_callbacks.drain(..) {
             update_cbs.push(cb.1);
@@ -607,7 +607,7 @@ impl Anim {
 
     pub fn draw(
         &self,
-        renderer: &mut GraphicsRenderer,
+        renderer: &mut dyn GraphicsRenderer,
         offset_x: f32,
         offset_y: f32,
         scale_x: f32,
@@ -640,11 +640,11 @@ impl Anim {
         }
     }
 
-    pub fn add_completion_callback(&mut self, callback: Box<ScriptCallback>) {
+    pub fn add_completion_callback(&mut self, callback: Box<dyn ScriptCallback>) {
         self.completion_callbacks.push(callback);
     }
 
-    pub fn add_update_callback(&mut self, callback: Box<ScriptCallback>, time_millis: u32) {
+    pub fn add_update_callback(&mut self, callback: Box<dyn ScriptCallback>, time_millis: u32) {
         self.update_callbacks.push((time_millis, callback));
 
         self.update_callbacks.sort_by(|a, b| {

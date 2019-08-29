@@ -30,7 +30,7 @@ pub struct ItemAdjective {
     pub name: String,
 
     #[serde(deserialize_with = "deserialize_image")]
-    pub item_status_icon: Rc<Image>,
+    pub item_status_icon: Rc<dyn Image>,
 
     pub name_prefix: Option<String>,
     pub name_postfix: Option<String>,

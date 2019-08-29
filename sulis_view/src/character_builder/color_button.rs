@@ -26,7 +26,7 @@ use sulis_core::util::Point;
 
 pub struct ColorButton {
     color: Color,
-    icon: Option<Rc<Image>>,
+    icon: Option<Rc<dyn Image>>,
 }
 
 impl ColorButton {
@@ -40,11 +40,11 @@ impl WidgetKind for ColorButton {
         "color_button"
     }
 
-    fn as_any(&self) -> &Any {
+    fn as_any(&self) -> &dyn Any {
         self
     }
 
-    fn as_any_mut(&mut self) -> &mut Any {
+    fn as_any_mut(&mut self) -> &mut dyn Any {
         self
     }
 
@@ -58,7 +58,7 @@ impl WidgetKind for ColorButton {
 
     fn draw(
         &mut self,
-        renderer: &mut GraphicsRenderer,
+        renderer: &mut dyn GraphicsRenderer,
         _pixel_size: Point,
         widget: &Widget,
         millis: u32,

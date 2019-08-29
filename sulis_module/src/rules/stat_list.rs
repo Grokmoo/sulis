@@ -222,7 +222,7 @@ impl StatList {
         self.attacks[0].is_ranged()
     }
 
-    pub fn get_ranged_projectile(&self) -> Option<Rc<Image>> {
+    pub fn get_ranged_projectile(&self) -> Option<Rc<dyn Image>> {
         if !self.attack_is_ranged() {
             return None;
         }

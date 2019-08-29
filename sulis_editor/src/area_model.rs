@@ -353,7 +353,7 @@ impl AreaModel {
 
     pub fn draw(
         &self,
-        renderer: &mut GraphicsRenderer,
+        renderer: &mut dyn GraphicsRenderer,
         x: f32,
         y: f32,
         scale_x: f32,

@@ -30,12 +30,12 @@ const NAME: &str = "input_field";
 pub struct InputField {
     pub text: String,
     label: Rc<RefCell<Label>>,
-    carat: Option<Rc<Image>>,
+    carat: Option<Rc<dyn Image>>,
     carat_width: f32,
     carat_height: f32,
     carat_offset: f32,
     enter_callback: Option<Callback>,
-    key_press_callback: Option<Rc<Fn(&Rc<RefCell<Widget>>, &mut InputField, InputAction)>>,
+    key_press_callback: Option<Rc<dyn Fn(&Rc<RefCell<Widget>>, &mut InputField, InputAction)>>,
     ignore_next: bool, // hack to prevent console from receiving a character
 }
 
@@ -60,7 +60,7 @@ impl InputField {
 
     pub fn set_key_press_callback(
         &mut self,
-        cb: Rc<Fn(&Rc<RefCell<Widget>>, &mut InputField, InputAction)>,
+        cb: Rc<dyn Fn(&Rc<RefCell<Widget>>, &mut InputField, InputAction)>,
     ) {
         self.key_press_callback = Some(cb);
     }
@@ -90,10 +90,10 @@ impl WidgetKind for InputField {
     fn get_name(&self) -> &str {
         NAME
     }
-    fn as_any(&self) -> &Any {
+    fn as_any(&self) -> &dyn Any {
         self
     }
-    fn as_any_mut(&mut self) -> &mut Any {
+    fn as_any_mut(&mut self) -> &mut dyn Any {
         self
     }
 
@@ -167,7 +167,7 @@ impl WidgetKind for InputField {
 
     fn draw(
         &mut self,
-        renderer: &mut GraphicsRenderer,
+        renderer: &mut dyn GraphicsRenderer,
         pixel_size: Point,
         widget: &Widget,
         millis: u32,

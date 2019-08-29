@@ -434,11 +434,11 @@ impl EntityState {
     pub fn attack(
         entity: &Rc<RefCell<EntityState>>,
         target: &Rc<RefCell<EntityState>>,
-        callback: Option<Box<ScriptCallback>>,
+        callback: Option<Box<dyn ScriptCallback>>,
         remove_ap: bool,
     ) {
         let time = Config::animation_base_time_millis();
-        let cbs: Vec<Box<ScriptCallback>> = callback.into_iter().collect();
+        let cbs: Vec<Box<dyn ScriptCallback>> = callback.into_iter().collect();
         if entity.borrow().actor.stats.attack_is_melee() {
             let anim = animation::melee_attack_animation::new(
                 entity,
@@ -620,7 +620,7 @@ impl EntityState {
 
     pub fn draw_no_pos(
         &self,
-        renderer: &mut GraphicsRenderer,
+        renderer: &mut dyn GraphicsRenderer,
         scale_x: f32,
         scale_y: f32,
         x: f32,
@@ -646,11 +646,11 @@ impl EntityState {
 }
 
 pub trait AreaDrawable {
-    fn cache(&mut self, renderer: &mut GraphicsRenderer, texture_cache: &mut EntityTextureCache);
+    fn cache(&mut self, renderer: &mut dyn GraphicsRenderer, texture_cache: &mut EntityTextureCache);
 
     fn draw(
         &self,
-        renderer: &mut GraphicsRenderer,
+        renderer: &mut dyn GraphicsRenderer,
         scale_x: f32,
         scale_y: f32,
         x: f32,
@@ -663,7 +663,7 @@ pub trait AreaDrawable {
 }
 
 impl AreaDrawable for EntityState {
-    fn cache(&mut self, renderer: &mut GraphicsRenderer, texture_cache: &mut EntityTextureCache) {
+    fn cache(&mut self, renderer: &mut dyn GraphicsRenderer, texture_cache: &mut EntityTextureCache) {
         if self.texture_cache_slot.is_none() {
             self.texture_cache_slot = Some(texture_cache.add_entity(&self, renderer));
             self.actor.check_texture_cache_invalid();
@@ -677,7 +677,7 @@ impl AreaDrawable for EntityState {
 
     fn draw(
         &self,
-        renderer: &mut GraphicsRenderer,
+        renderer: &mut dyn GraphicsRenderer,
         scale_x: f32,
         scale_y: f32,
         x: f32,

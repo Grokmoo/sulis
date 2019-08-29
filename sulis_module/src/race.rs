@@ -52,7 +52,7 @@ pub struct Race {
     image_layer_offsets: HashMap<ImageLayer, (f32, f32)>,
     image_layer_postfix: HashMap<Sex, String>,
 
-    editor_creator_images: Vec<(ImageLayer, Vec<Rc<Image>>)>,
+    editor_creator_images: Vec<(ImageLayer, Vec<Rc<dyn Image>>)>,
 }
 
 impl fmt::Display for Race {
@@ -173,11 +173,11 @@ impl Race {
         !self.editor_creator_images.is_empty()
     }
 
-    pub fn editor_creator_images(&self) -> Vec<(ImageLayer, Vec<Rc<Image>>)> {
+    pub fn editor_creator_images(&self) -> Vec<(ImageLayer, Vec<Rc<dyn Image>>)> {
         self.editor_creator_images.clone()
     }
 
-    pub fn image_for_sex(&self, sex: Sex, image: &Rc<Image>) -> Rc<Image> {
+    pub fn image_for_sex(&self, sex: Sex, image: &Rc<dyn Image>) -> Rc<dyn Image> {
         match self.image_layer_postfix.get(&sex) {
             None => Rc::clone(image),
             Some(ref postfix) => {

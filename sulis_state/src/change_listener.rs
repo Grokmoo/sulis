@@ -49,12 +49,12 @@ impl<T> ChangeListenerList<T> {
 }
 
 pub struct ChangeListener<T> {
-    cb: Box<Fn(&T)>,
+    cb: Box<dyn Fn(&T)>,
     id: String,
 }
 
 impl<T> ChangeListener<T> {
-    pub fn new(id: &str, cb: Box<Fn(&T)>) -> ChangeListener<T> {
+    pub fn new(id: &str, cb: Box<dyn Fn(&T)>) -> ChangeListener<T> {
         ChangeListener {
             cb,
             id: id.to_string(),

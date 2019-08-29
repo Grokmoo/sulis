@@ -28,7 +28,7 @@ use sulis_module::{Actor, Module};
 use sulis_state::{GameState, NextGameStep, SaveState};
 use sulis_view::{main_menu, RootView};
 
-fn init() -> Box<IO> {
+fn init() -> Box<dyn IO> {
     // CONFIG will be lazily initialized here; if it fails it
     // prints an error and exits
     util::setup_logger();
@@ -40,7 +40,7 @@ fn init() -> Box<IO> {
     create_io()
 }
 
-fn create_io() -> Box<IO> {
+fn create_io() -> Box<dyn IO> {
     Cursor::update_max();
 
     info!("Setting up display adapter.");
@@ -80,7 +80,7 @@ fn load_resources() {
     }
 }
 
-fn main_menu(io: &mut Box<IO>) -> NextGameStep {
+fn main_menu(io: &mut Box<dyn IO>) -> NextGameStep {
     let view = main_menu::MainMenu::new(io.get_display_configurations());
     let loop_updater = main_menu::LoopUpdater::new(&view);
     let root = ui::create_ui_tree(view.clone());
@@ -97,7 +97,7 @@ fn main_menu(io: &mut Box<IO>) -> NextGameStep {
     }
 }
 
-fn new_campaign(io: &mut Box<IO>, pc_actor: Rc<Actor>) -> NextGameStep {
+fn new_campaign(io: &mut Box<dyn IO>, pc_actor: Rc<Actor>) -> NextGameStep {
     info!("Initializing game state.");
     if let Err(e) = GameState::init(pc_actor) {
         error!("{}", e);
@@ -107,7 +107,7 @@ fn new_campaign(io: &mut Box<IO>, pc_actor: Rc<Actor>) -> NextGameStep {
     run_campaign(io)
 }
 
-fn load_campaign(io: &mut Box<IO>, save_state: SaveState) -> NextGameStep {
+fn load_campaign(io: &mut Box<dyn IO>, save_state: SaveState) -> NextGameStep {
     info!("Loading game state.");
     if let Err(e) = GameState::load(save_state) {
         error!("{}", e);
@@ -117,7 +117,7 @@ fn load_campaign(io: &mut Box<IO>, save_state: SaveState) -> NextGameStep {
     run_campaign(io)
 }
 
-fn run_campaign(io: &mut Box<IO>) -> NextGameStep {
+fn run_campaign(io: &mut Box<dyn IO>) -> NextGameStep {
     let view = RootView::new();
     let loop_updater = sulis_view::GameMainLoopUpdater::new(&view);
     let root = ui::create_ui_tree(view.clone());

@@ -34,7 +34,7 @@ pub struct Cursor {
     pub yf: f32,
 
     pub button_down: Option<ClickKind>,
-    pub image: Option<Rc<Image>>,
+    pub image: Option<Rc<dyn Image>>,
     pub state: AnimationState,
 }
 
@@ -53,7 +53,7 @@ thread_local! {
 }
 
 impl Cursor {
-    pub fn draw(renderer: &mut GraphicsRenderer, millis: u32) {
+    pub fn draw(renderer: &mut dyn GraphicsRenderer, millis: u32) {
         CURSOR.with(|cursor| {
             let mut cursor = cursor.borrow_mut();
 
@@ -98,7 +98,7 @@ impl Cursor {
         });
     }
 
-    pub fn set_cursor_image(image: Option<Rc<Image>>) {
+    pub fn set_cursor_image(image: Option<Rc<dyn Image>>) {
         CURSOR.with(|cursor| {
             let mut cursor = cursor.borrow_mut();
             cursor.image = image;

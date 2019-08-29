@@ -33,7 +33,7 @@ pub struct WindowFade {
     elapsed_millis: u32,
     fade_millis: u32,
     pause_millis: u32,
-    fill: Option<Rc<Image>>,
+    fill: Option<Rc<dyn Image>>,
     frac: f32,
 
     mode: Mode,
@@ -108,7 +108,7 @@ impl WidgetKind for WindowFade {
 
     fn draw(
         &mut self,
-        renderer: &mut GraphicsRenderer,
+        renderer: &mut dyn GraphicsRenderer,
         _pixel_size: Point,
         widget: &Widget,
         millis: u32,

@@ -365,7 +365,7 @@ pub(in crate::animation) fn draw(
     state: &GeneratorState,
     model: &GeneratorModel,
     owner: &Rc<RefCell<EntityState>>,
-    renderer: &mut GraphicsRenderer,
+    renderer: &mut dyn GraphicsRenderer,
     offset_x: f32,
     offset_y: f32,
     scale_x: f32,
@@ -414,7 +414,7 @@ pub(in crate::animation) fn draw(
     }
 }
 
-pub fn new(owner: &Rc<RefCell<EntityState>>, image: Rc<Image>, model: GeneratorModel) -> Anim {
+pub fn new(owner: &Rc<RefCell<EntityState>>, image: Rc<dyn Image>, model: GeneratorModel) -> Anim {
     let state = GeneratorState {
         image,
         particles: Vec::new(),
@@ -425,7 +425,7 @@ pub fn new(owner: &Rc<RefCell<EntityState>>, image: Rc<Image>, model: GeneratorM
     Anim::new_pgen(owner, model.duration_millis, model, state)
 }
 pub(in crate::animation) struct GeneratorState {
-    pub(in crate::animation) image: Rc<Image>,
+    pub(in crate::animation) image: Rc<dyn Image>,
     pub(in crate::animation) particles: Vec<Particle>,
     pub(in crate::animation) gen_overflow: f32,
     pub(in crate::animation) previous_secs: f32,

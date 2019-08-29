@@ -56,11 +56,11 @@ pub struct Item {
     pub id: String,
     pub name: String,
     pub kind: ItemKind,
-    pub icon: Rc<Image>,
+    pub icon: Rc<dyn Image>,
     pub equippable: Option<Equippable>,
     pub prereqs: Option<PrereqList>,
-    image: Option<HashMap<ImageLayer, Rc<Image>>>,
-    alternate_image: Option<HashMap<ImageLayer, Rc<Image>>>,
+    image: Option<HashMap<ImageLayer, Rc<dyn Image>>>,
+    alternate_image: Option<HashMap<ImageLayer, Rc<dyn Image>>>,
     pub value: i32,
     pub weight: i32,
     pub usable: Option<Usable>,
@@ -82,7 +82,7 @@ pub struct Item {
 fn build_hash_map(
     id: &str,
     input: Option<HashMap<ImageLayer, String>>,
-) -> Result<Option<HashMap<ImageLayer, Rc<Image>>>, Error> {
+) -> Result<Option<HashMap<ImageLayer, Rc<dyn Image>>>, Error> {
     match input {
         Some(input_images) => {
             let mut output = HashMap::new();
@@ -256,14 +256,14 @@ impl Item {
         }
     }
 
-    pub fn alt_image_iter(&self) -> Option<Iter<ImageLayer, Rc<Image>>> {
+    pub fn alt_image_iter(&self) -> Option<Iter<ImageLayer, Rc<dyn Image>>> {
         match self.alternate_image {
             None => None,
             Some(ref image) => Some(image.iter()),
         }
     }
 
-    pub fn image_iter(&self) -> Option<Iter<ImageLayer, Rc<Image>>> {
+    pub fn image_iter(&self) -> Option<Iter<ImageLayer, Rc<dyn Image>>> {
         match self.image {
             None => None,
             Some(ref image) => Some(image.iter()),

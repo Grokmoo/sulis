@@ -284,7 +284,8 @@ impl TilesModel {
         };
 
         let tiles = &self.terrain_kind(terrain);
-        self.add(self.gen_choice(tiles), x, y);
+        let choice = self.gen_choice(tiles);
+        self.add(choice, x, y);
     }
 
     pub fn check_add_terrain_border(&mut self, x: i32, y: i32) {

@@ -315,7 +315,7 @@ pub struct Vertex {
 
 implement_vertex!(Vertex, position, tex_coords);
 
-pub fn create() -> Result<Box<IO>, Error> {
+pub fn create() -> Result<Box<dyn IO>, Error> {
     match Config::display_adapter() {
         IOAdapter::Auto => get_auto_adapter(),
         IOAdapter::Glium => get_glium_adapter(),
@@ -323,17 +323,17 @@ pub fn create() -> Result<Box<IO>, Error> {
 }
 
 #[cfg(not(target_os = "windows"))]
-pub fn get_auto_adapter() -> Result<Box<IO>, Error> {
+pub fn get_auto_adapter() -> Result<Box<dyn IO>, Error> {
     get_glium_adapter()
 }
 
-pub fn get_glium_adapter() -> Result<Box<IO>, Error> {
+pub fn get_glium_adapter() -> Result<Box<dyn IO>, Error> {
     let adapter = glium_adapter::GliumDisplay::new()?;
 
     Ok(Box::new(adapter))
 }
 
 #[cfg(target_os = "windows")]
-pub fn get_auto_adapter() -> Result<Box<IO>, Error> {
+pub fn get_auto_adapter() -> Result<Box<dyn IO>, Error> {
     get_glium_adapter()
 }

@@ -90,10 +90,10 @@ impl<T: Display + Clone> WidgetKind for ListBox<T> {
     fn get_name(&self) -> &str {
         NAME
     }
-    fn as_any(&self) -> &Any {
+    fn as_any(&self) -> &dyn Any {
         self
     }
-    fn as_any_mut(&mut self) -> &mut Any {
+    fn as_any_mut(&mut self) -> &mut dyn Any {
         self
     }
 

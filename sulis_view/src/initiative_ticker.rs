@@ -103,7 +103,7 @@ impl WidgetKind for TickerLabel {
 
     fn draw(
         &mut self,
-        renderer: &mut GraphicsRenderer,
+        renderer: &mut dyn GraphicsRenderer,
         _pixel_size: Point,
         widget: &Widget,
         _millis: u32,

@@ -34,12 +34,12 @@ pub struct Params {
     pub heal_color: Color,
     pub damage_colors: [Color; 8],
 
-    pub concealment_icon: Rc<Image>,
-    pub backstab_icon: Rc<Image>,
-    pub flanking_icon: Rc<Image>,
-    pub crit_icon: Rc<Image>,
-    pub hit_icon: Rc<Image>,
-    pub graze_icon: Rc<Image>,
+    pub concealment_icon: Rc<dyn Image>,
+    pub backstab_icon: Rc<dyn Image>,
+    pub flanking_icon: Rc<dyn Image>,
+    pub crit_icon: Rc<dyn Image>,
+    pub hit_icon: Rc<dyn Image>,
+    pub graze_icon: Rc<dyn Image>,
 }
 
 impl Default for Params {
@@ -174,7 +174,7 @@ impl AreaFeedbackText {
     // it is assumed that the params being passed in here do not change
     pub fn draw(
         &mut self,
-        renderer: &mut GraphicsRenderer,
+        renderer: &mut dyn GraphicsRenderer,
         params: &Params,
         offset_x: f32,
         offset_y: f32,

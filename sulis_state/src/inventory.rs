@@ -410,7 +410,7 @@ impl Inventory {
         result
     }
 
-    pub fn get_image_layers(&self) -> HashMap<ImageLayer, Rc<Image>> {
+    pub fn get_image_layers(&self) -> HashMap<ImageLayer, Rc<dyn Image>> {
         let mut layers = HashMap::new();
 
         for (slot, item_state) in self.equipped.iter() {

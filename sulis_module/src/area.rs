@@ -69,7 +69,7 @@ pub struct Transition {
     pub size: Rc<ObjectSize>,
     pub to: ToKind,
     pub hover_text: String,
-    pub image_display: Rc<Image>,
+    pub image_display: Rc<dyn Image>,
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone)]

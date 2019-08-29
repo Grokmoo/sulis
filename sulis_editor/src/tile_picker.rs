@@ -50,7 +50,7 @@ impl TilePicker {
 impl EditorMode for TilePicker {
     fn draw_mode(
         &mut self,
-        renderer: &mut GraphicsRenderer,
+        renderer: &mut dyn GraphicsRenderer,
         _model: &AreaModel,
         x: f32,
         y: f32,
@@ -148,11 +148,11 @@ impl WidgetKind for TilePicker {
         NAME
     }
 
-    fn as_any(&self) -> &Any {
+    fn as_any(&self) -> &dyn Any {
         self
     }
 
-    fn as_any_mut(&mut self) -> &mut Any {
+    fn as_any_mut(&mut self) -> &mut dyn Any {
         self
     }
 

@@ -30,7 +30,7 @@ use crate::widgets::{
 pub struct MutuallyExclusiveListBox<T: Display + Clone + 'static> {
     list_box: ListBox<T>,
     active_entry: Option<Entry<T>>,
-    cb: Rc<Fn(Option<&Entry<T>>)>,
+    cb: Rc<dyn Fn(Option<&Entry<T>>)>,
 }
 
 impl<T: Display + Clone + 'static> MutuallyExclusiveListBox<T> {
@@ -44,7 +44,7 @@ impl<T: Display + Clone + 'static> MutuallyExclusiveListBox<T> {
 
     pub fn with_callback(
         entries: Vec<Entry<T>>,
-        cb: Rc<Fn(Option<&Entry<T>>)>,
+        cb: Rc<dyn Fn(Option<&Entry<T>>)>,
     ) -> Rc<RefCell<MutuallyExclusiveListBox<T>>> {
         Rc::new(RefCell::new(MutuallyExclusiveListBox {
             list_box: ListBox { entries },
@@ -74,10 +74,10 @@ impl<T: Display + Clone> WidgetKind for MutuallyExclusiveListBox<T> {
     fn get_name(&self) -> &str {
         list_box::NAME
     }
-    fn as_any(&self) -> &Any {
+    fn as_any(&self) -> &dyn Any {
         self
     }
-    fn as_any_mut(&mut self) -> &mut Any {
+    fn as_any_mut(&mut self) -> &mut dyn Any {
         self
     }
 

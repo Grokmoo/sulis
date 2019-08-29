@@ -37,7 +37,7 @@ pub struct WorldMapLocation {
     pub id: String,
     pub name: String,
     pub position: (f32, f32),
-    pub icon: Rc<Image>,
+    pub icon: Rc<dyn Image>,
     pub initially_enabled: bool,
     pub initially_visible: bool,
 

@@ -51,7 +51,7 @@ impl WidgetKind for BasicMouseover {
 
     fn draw(
         &mut self,
-        renderer: &mut GraphicsRenderer,
+        renderer: &mut dyn GraphicsRenderer,
         pixel_size: Point,
         widget: &Widget,
         millis: u32,

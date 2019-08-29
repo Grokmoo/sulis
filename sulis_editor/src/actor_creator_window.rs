@@ -34,7 +34,7 @@ pub const NAME: &str = "actor_creator_window";
 
 pub struct ActorCreatorWindow {
     selected_race: Option<Rc<Race>>,
-    selected_images: HashMap<ImageLayer, (usize, Rc<Image>)>,
+    selected_images: HashMap<ImageLayer, (usize, Rc<dyn Image>)>,
     selected_hue: f32,
     selected_faction: Faction,
     selected_sex: Sex,
@@ -239,17 +239,17 @@ impl WidgetKind for ActorCreatorWindow {
         NAME
     }
 
-    fn as_any(&self) -> &Any {
+    fn as_any(&self) -> &dyn Any {
         self
     }
 
-    fn as_any_mut(&mut self) -> &mut Any {
+    fn as_any_mut(&mut self) -> &mut dyn Any {
         self
     }
 
     fn draw(
         &mut self,
-        renderer: &mut GraphicsRenderer,
+        renderer: &mut dyn GraphicsRenderer,
         _pixel_size: Point,
         _widget: &Widget,
         millis: u32,
@@ -309,7 +309,7 @@ impl WidgetKind for ActorCreatorWindow {
         }
 
         let window_ref = Rc::clone(&widget);
-        let cb: Rc<Fn(Option<&list_box::Entry<Rc<Race>>>)> = Rc::new(move |active_entry| {
+        let cb: Rc<dyn Fn(Option<&list_box::Entry<Rc<Race>>>)> = Rc::new(move |active_entry| {
             let window = Widget::kind_mut::<ActorCreatorWindow>(&window_ref);
             match active_entry {
                 None => window.selected_race = None,

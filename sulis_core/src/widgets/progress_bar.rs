@@ -30,7 +30,7 @@ const NAME: &str = "progress_bar";
 
 pub struct ProgressBar {
     fraction: f32,
-    bar: Option<Rc<Image>>,
+    bar: Option<Rc<dyn Image>>,
     label: Rc<RefCell<Label>>,
 }
 
@@ -62,10 +62,10 @@ impl WidgetKind for ProgressBar {
     fn get_name(&self) -> &str {
         NAME
     }
-    fn as_any(&self) -> &Any {
+    fn as_any(&self) -> &dyn Any {
         self
     }
-    fn as_any_mut(&mut self) -> &mut Any {
+    fn as_any_mut(&mut self) -> &mut dyn Any {
         self
     }
 
@@ -86,7 +86,7 @@ impl WidgetKind for ProgressBar {
 
     fn draw(
         &mut self,
-        renderer: &mut GraphicsRenderer,
+        renderer: &mut dyn GraphicsRenderer,
         pixel_size: Point,
         widget: &Widget,
         millis: u32,

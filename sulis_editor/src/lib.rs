@@ -96,7 +96,7 @@ impl MainLoopUpdater for EditorMainLoopUpdater {
 pub trait EditorMode: WidgetKind {
     fn draw_mode(
         &mut self,
-        renderer: &mut GraphicsRenderer,
+        renderer: &mut dyn GraphicsRenderer,
         model: &AreaModel,
         x: f32,
         y: f32,
@@ -131,11 +131,11 @@ impl WidgetKind for EditorView {
         NAME
     }
 
-    fn as_any(&self) -> &Any {
+    fn as_any(&self) -> &dyn Any {
         self
     }
 
-    fn as_any_mut(&mut self) -> &mut Any {
+    fn as_any_mut(&mut self) -> &mut dyn Any {
         self
     }
 
@@ -305,7 +305,7 @@ impl WidgetKind for EditorView {
             picker.borrow_mut().state.set_visible(false);
         }
 
-        let picker_kinds: Vec<Rc<RefCell<EditorMode>>> = vec![
+        let picker_kinds: Vec<Rc<RefCell<dyn EditorMode>>> = vec![
             tile_picker_kind,
             terrain_picker_kind,
             wall_picker_kind,

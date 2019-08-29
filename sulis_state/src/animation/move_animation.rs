@@ -99,7 +99,7 @@ pub(in crate::animation) fn update(
 
 pub(in crate::animation) fn draw(
     model: &MoveAnimModel,
-    renderer: &mut GraphicsRenderer,
+    renderer: &mut dyn GraphicsRenderer,
     offset_x: f32,
     offset_y: f32,
     scale_x: f32,

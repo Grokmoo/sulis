@@ -80,7 +80,7 @@ impl TerrainPicker {
 impl EditorMode for TerrainPicker {
     fn draw_mode(
         &mut self,
-        renderer: &mut GraphicsRenderer,
+        renderer: &mut dyn GraphicsRenderer,
         _model: &AreaModel,
         x_offset: f32,
         y_offset: f32,
@@ -210,10 +210,10 @@ impl WidgetKind for TerrainPicker {
     fn get_name(&self) -> &str {
         NAME
     }
-    fn as_any(&self) -> &Any {
+    fn as_any(&self) -> &dyn Any {
         self
     }
-    fn as_any_mut(&mut self) -> &mut Any {
+    fn as_any_mut(&mut self) -> &mut dyn Any {
         self
     }
 

@@ -98,7 +98,7 @@ pub(in crate::animation) fn cleanup(owner: &Rc<RefCell<EntityState>>) {
 
 pub(in crate::animation) fn draw(
     model: &RangedAttackAnimModel,
-    renderer: &mut GraphicsRenderer,
+    renderer: &mut dyn GraphicsRenderer,
     offset_x: f32,
     offset_y: f32,
     scale_x: f32,
@@ -125,7 +125,7 @@ pub(in crate::animation) fn draw(
 pub fn new(
     attacker: &Rc<RefCell<EntityState>>,
     defender: &Rc<RefCell<EntityState>>,
-    callbacks: Vec<Box<ScriptCallback>>,
+    callbacks: Vec<Box<dyn ScriptCallback>>,
     duration_millis: u32,
 ) -> Anim {
     let mut start_pos = (
@@ -167,6 +167,6 @@ pub(in crate::animation) struct RangedAttackAnimModel {
     start_pos: (f32, f32),
     cur_pos: (f32, f32),
     pub(in crate::animation) has_attacked: bool,
-    projectile: Option<Rc<Image>>,
-    callbacks: Vec<Box<ScriptCallback>>,
+    projectile: Option<Rc<dyn Image>>,
+    callbacks: Vec<Box<dyn ScriptCallback>>,
 }

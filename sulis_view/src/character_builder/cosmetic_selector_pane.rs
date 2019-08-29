@@ -45,7 +45,7 @@ pub struct CosmeticSelectorPane {
     hair_color: Option<Color>,
     skin_color: Option<Color>,
     hue: Option<f32>,
-    portrait: Option<Rc<Image>>,
+    portrait: Option<Rc<dyn Image>>,
 
     preview_image: Option<Rc<LayeredImage>>,
 }
@@ -81,7 +81,7 @@ impl CosmeticSelectorPane {
             Ok(image) => image,
         };
 
-        let mut insert: HashMap<ImageLayer, Rc<Image>> = HashMap::new();
+        let mut insert: HashMap<ImageLayer, Rc<dyn Image>> = HashMap::new();
         for (slot, item) in self.items.iter() {
             if *slot == Slot::Head {
                 continue;
@@ -209,16 +209,16 @@ impl WidgetKind for CosmeticSelectorPane {
     fn get_name(&self) -> &str {
         NAME
     }
-    fn as_any(&self) -> &Any {
+    fn as_any(&self) -> &dyn Any {
         self
     }
-    fn as_any_mut(&mut self) -> &mut Any {
+    fn as_any_mut(&mut self) -> &mut dyn Any {
         self
     }
 
     fn draw(
         &mut self,
-        renderer: &mut GraphicsRenderer,
+        renderer: &mut dyn GraphicsRenderer,
         _pixel_size: Point,
         _widget: &Widget,
         millis: u32,
@@ -595,7 +595,7 @@ fn hue_to_color(hue: f32) -> Color {
 }
 
 fn portrait_selector_button_callback(
-    portrait: &Rc<Image>,
+    portrait: &Rc<dyn Image>,
     pane_widget: &Rc<RefCell<Widget>>,
 ) -> Callback {
     let pane_widget_ref = Rc::clone(pane_widget);

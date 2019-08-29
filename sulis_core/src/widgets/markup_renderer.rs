@@ -408,7 +408,7 @@ impl MarkupRenderer {
 impl FontRenderer for MarkupRenderer {
     fn render(
         &self,
-        renderer: &mut GraphicsRenderer,
+        renderer: &mut dyn GraphicsRenderer,
         _pos_x: f32,
         _pos_y: f32,
         _widget_state: &WidgetState,

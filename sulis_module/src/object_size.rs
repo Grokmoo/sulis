@@ -28,7 +28,7 @@ pub struct ObjectSize {
     pub height: i32,
     pub diagonal: f32,
     pub cursor_sprite: Rc<Sprite>,
-    pub selection_image: Rc<Image>,
+    pub selection_image: Rc<dyn Image>,
     relative_points: Vec<Point>,
 }
 

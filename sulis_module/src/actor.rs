@@ -102,7 +102,7 @@ pub struct Actor {
     pub name: String,
     faction: Faction,
     pub conversation: Option<Rc<Conversation>>,
-    pub portrait: Option<Rc<Image>>,
+    pub portrait: Option<Rc<dyn Image>>,
     pub race: Rc<Race>,
     pub sex: Sex,
     pub attributes: AttributeList,
@@ -399,7 +399,7 @@ impl Actor {
 
     pub fn draw(
         &self,
-        renderer: &mut GraphicsRenderer,
+        renderer: &mut dyn GraphicsRenderer,
         scale_x: f32,
         scale_y: f32,
         x: f32,

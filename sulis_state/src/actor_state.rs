@@ -42,7 +42,7 @@ pub struct ActorState {
     image: LayeredImage,
     pub(crate) ability_states: HashMap<String, AbilityState>,
     texture_cache_invalid: bool,
-    anim_image_layers: HashMap<ImageLayer, Rc<Image>>,
+    anim_image_layers: HashMap<ImageLayer, Rc<dyn Image>>,
     p_stats: PStats,
 }
 
@@ -183,7 +183,7 @@ impl ActorState {
         actor_state
     }
 
-    pub fn add_anim_image_layers(&mut self, images: &HashMap<ImageLayer, Rc<Image>>) {
+    pub fn add_anim_image_layers(&mut self, images: &HashMap<ImageLayer, Rc<dyn Image>>) {
         let mut change = false;
         for (layer, ref image) in images.iter() {
             if let Some(img) = self.anim_image_layers.get(layer) {
@@ -201,7 +201,7 @@ impl ActorState {
         }
     }
 
-    pub fn remove_anim_image_layers(&mut self, images: &HashMap<ImageLayer, Rc<Image>>) {
+    pub fn remove_anim_image_layers(&mut self, images: &HashMap<ImageLayer, Rc<dyn Image>>) {
         for ref layer in images.keys() {
             self.anim_image_layers.remove(*layer);
         }
@@ -489,7 +489,7 @@ impl ActorState {
 
     pub fn draw(
         &self,
-        renderer: &mut GraphicsRenderer,
+        renderer: &mut dyn GraphicsRenderer,
         scale_x: f32,
         scale_y: f32,
         x: f32,
@@ -501,7 +501,7 @@ impl ActorState {
 
     pub fn draw_to_texture(
         &self,
-        renderer: &mut GraphicsRenderer,
+        renderer: &mut dyn GraphicsRenderer,
         texture_id: &str,
         scale_x: f32,
         scale_y: f32,

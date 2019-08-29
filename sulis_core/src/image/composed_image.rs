@@ -29,7 +29,7 @@ const GRID_LEN: i32 = GRID_DIM * GRID_DIM;
 
 #[derive(Debug)]
 pub struct ComposedImage {
-    images: Vec<Rc<Image>>,
+    images: Vec<Rc<dyn Image>>,
     id: String,
     size: Size,
     middle_size: Size,
@@ -38,8 +38,8 @@ pub struct ComposedImage {
 fn get_images_from_grid(
     grid: Vec<String>,
     resources: &ResourceSet,
-) -> Result<Vec<Rc<Image>>, Error> {
-    let mut images_vec: Vec<Rc<Image>> = Vec::new();
+) -> Result<Vec<Rc<dyn Image>>, Error> {
+    let mut images_vec: Vec<Rc<dyn Image>> = Vec::new();
     for id in grid {
         let image = resources.images.get(&id);
         if let None = image {
@@ -57,11 +57,11 @@ fn get_images_from_inline(
     grid: Vec<String>,
     sub_image_data: SubImageData,
     resources: &mut ResourceSet,
-) -> Result<Vec<Rc<Image>>, Error> {
+) -> Result<Vec<Rc<dyn Image>>, Error> {
     let size = sub_image_data.size;
     let spritesheet = sub_image_data.spritesheet;
 
-    let mut images: Vec<Rc<Image>> = Vec::new();
+    let mut images: Vec<Rc<dyn Image>> = Vec::new();
     for id in grid {
         let image_display = format!("{}/{}", spritesheet, id);
         let builder = SimpleImageBuilder {
@@ -81,7 +81,7 @@ impl ComposedImage {
     pub fn new(
         builder: ComposedImageBuilder,
         resources: &mut ResourceSet,
-    ) -> Result<Rc<Image>, Error> {
+    ) -> Result<Rc<dyn Image>, Error> {
         if builder.grid.len() as i32 != GRID_LEN {
             return invalid_data_error(&format!("Composed image grid must be length {}", GRID_LEN));
         }
@@ -220,7 +220,7 @@ impl Image for ComposedImage {
 
     fn draw(
         &self,
-        renderer: &mut GraphicsRenderer,
+        renderer: &mut dyn GraphicsRenderer,
         state: &AnimationState,
         x: f32,
         y: f32,

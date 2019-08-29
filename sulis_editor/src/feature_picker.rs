@@ -28,7 +28,7 @@ use crate::{AreaModel, EditorMode};
 
 const NAME: &str = "feature_picker";
 
-fn draw(feature: &Rc<Feature>, renderer: &mut GraphicsRenderer,
+fn draw(feature: &Rc<Feature>, renderer: &mut dyn GraphicsRenderer,
         x: f32, y: f32, s_x: f32, s_y: f32) {
     for (tile, p) in &feature.preview {
         let mut draw_list = DrawList::from_sprite_f32(
@@ -60,7 +60,7 @@ impl FeaturePicker {
 impl EditorMode for FeaturePicker {
     fn draw_mode(
         &mut self,
-        renderer: &mut GraphicsRenderer,
+        renderer: &mut dyn GraphicsRenderer,
         _model: &AreaModel,
         x: f32,
         y: f32,
@@ -123,11 +123,11 @@ impl WidgetKind for FeaturePicker {
         NAME
     }
 
-    fn as_any(&self) -> &Any {
+    fn as_any(&self) -> &dyn Any {
         self
     }
 
-    fn as_any_mut(&mut self) -> &mut Any {
+    fn as_any_mut(&mut self) -> &mut dyn Any {
         self
     }
 

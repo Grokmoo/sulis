@@ -58,9 +58,9 @@ pub struct AreaView {
     entity_texture_cache: EntityTextureCache,
 
     targeter_label: Rc<RefCell<Widget>>,
-    targeter_tile: Option<Rc<Image>>,
+    targeter_tile: Option<Rc<dyn Image>>,
     range_indicator_image_set: Option<RangeIndicatorImageSet>,
-    selection_box_image: Option<Rc<Image>>,
+    selection_box_image: Option<Rc<dyn Image>>,
 
     scroll: Scrollable,
     hover_sprite: Option<HoverSprite>,
@@ -173,7 +173,7 @@ impl AreaView {
 
     fn draw_layer_to_texture(
         &self,
-        renderer: &mut GraphicsRenderer,
+        renderer: &mut dyn GraphicsRenderer,
         layer: &Layer,
         texture_id: &str,
     ) {
@@ -210,7 +210,7 @@ impl AreaView {
 
     fn draw_visibility_to_texture(
         &self,
-        renderer: &mut GraphicsRenderer,
+        renderer: &mut dyn GraphicsRenderer,
         vis_sprite: &Rc<Sprite>,
         explored_sprite: &Rc<Sprite>,
         area_state: &RefMut<AreaState>,
@@ -263,7 +263,7 @@ impl AreaView {
 
     fn draw_vis_to_texture(
         &self,
-        renderer: &mut GraphicsRenderer,
+        renderer: &mut dyn GraphicsRenderer,
         vis_sprite: &Rc<Sprite>,
         explored_sprite: &Rc<Sprite>,
         area_state: &RefMut<AreaState>,
@@ -304,7 +304,7 @@ impl AreaView {
     }
 
     fn draw_list_to_texture(
-        renderer: &mut GraphicsRenderer,
+        renderer: &mut dyn GraphicsRenderer,
         draw_list: DrawList,
         texture_id: &str,
     ) {
@@ -328,7 +328,7 @@ impl AreaView {
 
     fn draw_layer(
         &self,
-        renderer: &mut GraphicsRenderer,
+        renderer: &mut dyn GraphicsRenderer,
         scale_x: f32,
         scale_y: f32,
         widget: &Widget,
@@ -351,7 +351,7 @@ impl AreaView {
 
     fn draw_entities_props(
         &mut self,
-        renderer: &mut GraphicsRenderer,
+        renderer: &mut dyn GraphicsRenderer,
         scale_x: f32,
         scale_y: f32,
         color: Color,
@@ -360,7 +360,7 @@ impl AreaView {
         millis: u32,
     ) {
         // let start_time = time::Instant::now();
-        let mut to_draw: Vec<&AreaDrawable> = Vec::new();
+        let mut to_draw: Vec<&dyn AreaDrawable> = Vec::new();
 
         for prop_state in state.prop_iter() {
             to_draw.push(&*prop_state);
@@ -399,7 +399,7 @@ impl AreaView {
     fn draw_selection(
         &mut self,
         selected: &Rc<RefCell<EntityState>>,
-        renderer: &mut GraphicsRenderer,
+        renderer: &mut dyn GraphicsRenderer,
         scale_x: f32,
         scale_y: f32,
         widget: &Widget,
@@ -815,7 +815,7 @@ impl WidgetKind for AreaView {
 
     fn draw(
         &mut self,
-        renderer: &mut GraphicsRenderer,
+        renderer: &mut dyn GraphicsRenderer,
         pixel_size: Point,
         widget: &Widget,
         millis: u32,

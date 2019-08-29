@@ -23,14 +23,14 @@ use crate::util::Size;
 
 #[derive(Debug)]
 pub struct LayeredImage {
-    layers: Vec<(f32, f32, Option<Color>, Rc<Image>)>,
+    layers: Vec<(f32, f32, Option<Color>, Rc<dyn Image>)>,
     hue: Option<f32>,
     size: Size,
 }
 
 impl LayeredImage {
     pub fn new(
-        images: Vec<(f32, f32, Option<Color>, Rc<Image>)>,
+        images: Vec<(f32, f32, Option<Color>, Rc<dyn Image>)>,
         swap_hue: Option<f32>,
     ) -> LayeredImage {
         let mut max_x = 0.0;
@@ -57,7 +57,7 @@ impl LayeredImage {
     fn draw_layer(
         &self,
         color: &Option<Color>,
-        image: &Rc<Image>,
+        image: &Rc<dyn Image>,
         x: f32,
         y: f32,
         scale_x: f32,
@@ -81,7 +81,7 @@ impl LayeredImage {
 
     pub fn draw_to_texture(
         &self,
-        renderer: &mut GraphicsRenderer,
+        renderer: &mut dyn GraphicsRenderer,
         texture_id: &str,
         scale_x: f32,
         scale_y: f32,
@@ -104,7 +104,7 @@ impl LayeredImage {
 
     pub fn draw(
         &self,
-        renderer: &mut GraphicsRenderer,
+        renderer: &mut dyn GraphicsRenderer,
         scale_x: f32,
         scale_y: f32,
         x: f32,
@@ -142,7 +142,7 @@ impl Image for LayeredImage {
 
     fn draw(
         &self,
-        _renderer: &mut GraphicsRenderer,
+        _renderer: &mut dyn GraphicsRenderer,
         _state: &AnimationState,
         _x: f32,
         _y: f32,

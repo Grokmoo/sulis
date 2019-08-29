@@ -382,7 +382,7 @@ fn is_friendly(_lua: Context, set: &ScriptEntitySet) -> Result<ScriptEntitySet> 
 fn filter_entities<T: Copy>(
     set: &ScriptEntitySet,
     t: T,
-    filter: &Fn(&Rc<RefCell<EntityState>>, &Rc<RefCell<EntityState>>, T) -> bool,
+    filter: &dyn Fn(&Rc<RefCell<EntityState>>, &Rc<RefCell<EntityState>>, T) -> bool,
 ) -> Result<ScriptEntitySet> {
     let parent = ScriptEntity::new(set.parent);
     let parent = parent.try_unwrap()?;

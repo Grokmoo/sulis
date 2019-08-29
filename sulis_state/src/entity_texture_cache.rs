@@ -37,7 +37,7 @@ pub struct EntityTextureSlot {
 }
 
 impl EntityTextureSlot {
-    pub fn redraw_entity(&self, entity: &EntityState, renderer: &mut GraphicsRenderer) {
+    pub fn redraw_entity(&self, entity: &EntityState, renderer: &mut dyn GraphicsRenderer) {
         let scale = self.slot_size as i32;
         renderer.clear_texture_region(
             &self.texture_id,
@@ -60,7 +60,7 @@ impl EntityTextureSlot {
 
     pub fn draw(
         &self,
-        renderer: &mut GraphicsRenderer,
+        renderer: &mut dyn GraphicsRenderer,
         x: f32,
         y: f32,
         offset_x: f32,
@@ -133,7 +133,7 @@ impl EntityTextureCache {
     pub fn add_entity(
         &mut self,
         entity: &EntityState,
-        renderer: &mut GraphicsRenderer,
+        renderer: &mut dyn GraphicsRenderer,
     ) -> EntityTextureSlot {
         let width = entity.size.width + BORDER_SIZE * 2;
         let height = entity.size.height + BORDER_SIZE * 2;

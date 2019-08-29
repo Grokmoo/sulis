@@ -25,7 +25,7 @@ use sulis_state::{
     AreaState, EntityState, GameState, PropState, ScriptCallback,
 };
 
-pub fn get_action(x_f32: f32, y_f32: f32) -> Box<ActionKind> {
+pub fn get_action(x_f32: f32, y_f32: f32) -> Box<dyn ActionKind> {
     let (x, y) = (x_f32 as i32, y_f32 as i32);
     let area_state = GameState::area_state();
     if !area_state.borrow().area.area.coords_valid(x, y) {
@@ -56,7 +56,7 @@ pub fn get_action(x_f32: f32, y_f32: f32) -> Box<ActionKind> {
     Box::new(InvalidAction {})
 }
 
-fn get_prop_or_transition_action(x: i32, y: i32) -> Option<Box<ActionKind>> {
+fn get_prop_or_transition_action(x: i32, y: i32) -> Option<Box<dyn ActionKind>> {
     let area_state = GameState::area_state();
     let area_state = area_state.borrow();
 
@@ -106,7 +106,7 @@ struct SelectAction {
 }
 
 impl SelectAction {
-    fn create_if_valid(x: f32, y: f32) -> Option<Box<ActionKind>> {
+    fn create_if_valid(x: f32, y: f32) -> Option<Box<dyn ActionKind>> {
         let area_state = GameState::area_state();
         let area_state = area_state.borrow();
         let target = match area_state.get_entity_at(x as i32, y as i32) {
@@ -153,7 +153,7 @@ struct DialogAction {
 }
 
 impl DialogAction {
-    fn create_if_valid(x: i32, y: i32) -> Option<Box<ActionKind>> {
+    fn create_if_valid(x: i32, y: i32) -> Option<Box<dyn ActionKind>> {
         if GameState::is_combat_active() {
             return None;
         }
@@ -232,7 +232,7 @@ struct DoorPropAction {
 }
 
 impl DoorPropAction {
-    fn create_if_valid(index: usize, prop_state: &PropState) -> Option<Box<ActionKind>> {
+    fn create_if_valid(index: usize, prop_state: &PropState) -> Option<Box<dyn ActionKind>> {
         if !prop_state.is_door() || !prop_state.is_enabled() {
             return None;
         }
@@ -284,7 +284,7 @@ struct LootPropAction {
 }
 
 impl LootPropAction {
-    fn create_if_valid(index: usize, prop_state: &PropState) -> Option<Box<ActionKind>> {
+    fn create_if_valid(index: usize, prop_state: &PropState) -> Option<Box<dyn ActionKind>> {
         if GameState::is_combat_active() {
             return None;
         }
@@ -349,7 +349,7 @@ struct TransitionAction {
 }
 
 impl TransitionAction {
-    fn create_if_valid(x: i32, y: i32, area_state: &AreaState) -> Option<Box<ActionKind>> {
+    fn create_if_valid(x: i32, y: i32, area_state: &AreaState) -> Option<Box<dyn ActionKind>> {
         if GameState::is_combat_active() {
             return None;
         }
@@ -462,7 +462,7 @@ fn get_attack_target(area_state: &AreaState, x: i32, y: i32) -> Option<Rc<RefCel
 }
 
 impl AttackAction {
-    fn create_if_valid(x: i32, y: i32) -> Option<Box<ActionKind>> {
+    fn create_if_valid(x: i32, y: i32) -> Option<Box<dyn ActionKind>> {
         let area_state = GameState::area_state();
         let area_state = area_state.borrow();
         let target = match get_attack_target(&area_state, x, y) {
@@ -525,7 +525,7 @@ impl ActionKind for AttackAction {
 }
 
 struct ActionCallback {
-    action: Rc<RefCell<Box<ActionKind>>>,
+    action: Rc<RefCell<Box<dyn ActionKind>>>,
     widget: Rc<RefCell<Widget>>,
 }
 
@@ -537,7 +537,7 @@ impl ScriptCallback for ActionCallback {
 
 struct MoveThenAction {
     move_action: MoveAction,
-    cb_action: Option<Box<ActionKind>>,
+    cb_action: Option<Box<dyn ActionKind>>,
     cursor_state: animation_state::Kind,
 }
 
@@ -547,9 +547,9 @@ impl MoveThenAction {
         pos: Point,
         size: &Rc<ObjectSize>,
         dist: f32,
-        cb_action: Box<ActionKind>,
+        cb_action: Box<dyn ActionKind>,
         cursor_state: animation_state::Kind,
-    ) -> Option<Box<ActionKind>> {
+    ) -> Option<Box<dyn ActionKind>> {
         let (px, py) = (pos.x as f32, pos.y as f32);
 
         let x = px + (size.width / 2) as f32;
@@ -602,7 +602,7 @@ struct MoveAction {
     x: f32,
     y: f32,
     dist: f32,
-    cb: Option<Box<ScriptCallback>>,
+    cb: Option<Box<dyn ScriptCallback>>,
 }
 
 fn entities_to_ignore() -> Vec<usize> {
@@ -654,7 +654,7 @@ impl MoveAction {
         })
     }
 
-    fn create_if_valid(x: f32, y: f32, dist: Option<f32>) -> Option<Box<ActionKind>> {
+    fn create_if_valid(x: f32, y: f32, dist: Option<f32>) -> Option<Box<dyn ActionKind>> {
         match MoveAction::new_if_valid(x, y, dist) {
             None => None,
             Some(action) => Some(Box::new(action)),

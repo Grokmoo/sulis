@@ -31,7 +31,7 @@ pub struct SimpleImage {
 }
 
 impl SimpleImage {
-    pub fn new(builder: SimpleImageBuilder, resources: &ResourceSet) -> Result<Rc<Image>, Error> {
+    pub fn new(builder: SimpleImageBuilder, resources: &ResourceSet) -> Result<Rc<dyn Image>, Error> {
         let sprite = resources.sprite_internal(&builder.image_display)?;
 
         Ok(Rc::new(SimpleImage {
@@ -45,7 +45,7 @@ impl SimpleImage {
 impl Image for SimpleImage {
     fn draw(
         &self,
-        renderer: &mut GraphicsRenderer,
+        renderer: &mut dyn GraphicsRenderer,
         _state: &AnimationState,
         x: f32,
         y: f32,

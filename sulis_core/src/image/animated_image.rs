@@ -26,15 +26,15 @@ use crate::util::{invalid_data_error, Size};
 #[derive(Debug)]
 pub struct AnimatedImage {
     id: String,
-    images: Vec<(AnimationState, Rc<Image>)>,
+    images: Vec<(AnimationState, Rc<dyn Image>)>,
     size: Size,
 }
 
 impl AnimatedImage {
     pub fn new(
         builder: AnimatedImageBuilder,
-        images: &HashMap<String, Rc<Image>>,
-    ) -> Result<Rc<Image>, Error> {
+        images: &HashMap<String, Rc<dyn Image>>,
+    ) -> Result<Rc<dyn Image>, Error> {
         let mut images_vec = Vec::new();
 
         if builder.states.is_empty() {
@@ -90,7 +90,7 @@ impl Image for AnimatedImage {
 
     fn draw(
         &self,
-        renderer: &mut GraphicsRenderer,
+        renderer: &mut dyn GraphicsRenderer,
         state: &AnimationState,
         x: f32,
         y: f32,

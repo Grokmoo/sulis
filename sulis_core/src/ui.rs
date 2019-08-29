@@ -19,8 +19,8 @@ pub mod macros {
     #[macro_export]
     macro_rules! widget_kind {
         ($name:expr) => {
-            fn as_any(&self) -> &Any { self }
-            fn as_any_mut(&mut self) -> &mut Any { self }
+            fn as_any(&self) -> &dyn Any { self }
+            fn as_any_mut(&mut self) -> &mut dyn Any { self }
             fn get_name(&self) -> &str { $name }
         }
     }
@@ -69,7 +69,7 @@ use std::rc::Rc;
 
 use crate::util::{Point, Size};
 
-pub fn create_ui_tree(kind: Rc<RefCell<WidgetKind>>) -> Rc<RefCell<Widget>> {
+pub fn create_ui_tree(kind: Rc<RefCell<dyn WidgetKind>>) -> Rc<RefCell<Widget>> {
     debug!("Creating UI tree.");
     let root = Widget::with_defaults(kind);
     Widget::setup_root(&root);

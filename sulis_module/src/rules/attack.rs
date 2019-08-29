@@ -192,7 +192,7 @@ impl Attack {
         }
     }
 
-    pub fn get_ranged_projectile(&self) -> Option<Rc<Image>> {
+    pub fn get_ranged_projectile(&self) -> Option<Rc<dyn Image>> {
         match self.kind {
             Ranged { ref projectile, .. } => ResourceSet::image(projectile),
             _ => None,

@@ -48,7 +48,7 @@ impl VisPicker {
 impl EditorMode for VisPicker {
     fn draw_mode(
         &mut self,
-        renderer: &mut GraphicsRenderer,
+        renderer: &mut dyn GraphicsRenderer,
         model: &AreaModel,
         x_offset: f32,
         y_offset: f32,
@@ -94,11 +94,11 @@ impl WidgetKind for VisPicker {
         NAME
     }
 
-    fn as_any(&self) -> &Any {
+    fn as_any(&self) -> &dyn Any {
         self
     }
 
-    fn as_any_mut(&mut self) -> &mut Any {
+    fn as_any_mut(&mut self) -> &mut dyn Any {
         self
     }
 

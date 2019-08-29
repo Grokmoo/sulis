@@ -109,7 +109,7 @@ pub struct GliumDisplay {
 
 struct GliumTexture {
     texture: SrgbTexture2d,
-    sampler_fn: Box<Fn(Sampler<SrgbTexture2d>) -> Sampler<SrgbTexture2d>>,
+    sampler_fn: Box<dyn Fn(Sampler<SrgbTexture2d>) -> Sampler<SrgbTexture2d>>,
 }
 
 pub struct GliumRenderer<'a> {
@@ -240,7 +240,7 @@ impl<'a> GraphicsRenderer for GliumRenderer<'a> {
         let image = RawImage2d::from_raw_rgba_reversed(&image.into_raw(), dims);
         let texture = SrgbTexture2d::new(&self.display.display, image).unwrap();
 
-        let sampler_fn: Box<Fn(Sampler<SrgbTexture2d>) -> Sampler<SrgbTexture2d>> =
+        let sampler_fn: Box<dyn Fn(Sampler<SrgbTexture2d>) -> Sampler<SrgbTexture2d>> =
             Box::new(move |sampler| {
                 sampler
                     .magnify_filter(get_mag_filter(mag_filter))

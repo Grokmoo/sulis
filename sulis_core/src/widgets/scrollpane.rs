@@ -78,7 +78,7 @@ impl WidgetKind for ScrollPane {
 
     fn draw(
         &mut self,
-        renderer: &mut GraphicsRenderer,
+        renderer: &mut dyn GraphicsRenderer,
         _pixel_size: Point,
         widget: &Widget,
         _millis: u32,
@@ -133,7 +133,7 @@ impl WidgetKind for ScrollPane {
             .set_size(Size::new(w, self.content_height + scroll));
     }
 
-    fn end_draw(&mut self, renderer: &mut GraphicsRenderer) {
+    fn end_draw(&mut self, renderer: &mut dyn GraphicsRenderer) {
         renderer.clear_scissor();
     }
 

@@ -44,8 +44,8 @@ pub enum Interactive {
 pub struct Prop {
     pub id: String,
     pub name: String,
-    pub icon: Rc<Image>,
-    pub image: Rc<Image>,
+    pub icon: Rc<dyn Image>,
+    pub image: Rc<dyn Image>,
     pub size: Rc<ObjectSize>,
     pub impass: Vec<Point>,
     pub invis: Vec<Point>,

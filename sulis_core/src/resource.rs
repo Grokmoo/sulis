@@ -57,7 +57,7 @@ thread_local! {
 #[derive(Default)]
 pub struct ResourceSet {
     pub(crate) themes: ThemeSet,
-    pub(crate) images: HashMap<String, Rc<Image>>,
+    pub(crate) images: HashMap<String, Rc<dyn Image>>,
     pub(crate) spritesheets: HashMap<String, Rc<Spritesheet>>,
     pub(crate) fonts: HashMap<String, Rc<Font>>,
 }
@@ -170,7 +170,7 @@ impl ResourceSet {
         })
     }
 
-    pub fn image_else_empty(id: &str) -> Rc<Image> {
+    pub fn image_else_empty(id: &str) -> Rc<dyn Image> {
         RESOURCE_SET.with(|r| match get_resource(id, &r.borrow().images) {
             None => {
                 warn!("No image with id '{}' found", id);
@@ -180,7 +180,7 @@ impl ResourceSet {
         })
     }
 
-    pub fn empty_image() -> Rc<Image> {
+    pub fn empty_image() -> Rc<dyn Image> {
         RESOURCE_SET
             .with(|r| get_resource("empty", &r.borrow().images))
             .unwrap()
@@ -220,7 +220,7 @@ impl ResourceSet {
         RESOURCE_SET.with(|r| get_resource(id, &r.borrow().fonts))
     }
 
-    pub fn image(id: &str) -> Option<Rc<Image>> {
+    pub fn image(id: &str) -> Option<Rc<dyn Image>> {
         RESOURCE_SET.with(|r| get_resource(id, &r.borrow().images))
     }
 
@@ -341,7 +341,7 @@ pub fn subdirs<P: AsRef<Path>>(path: P) -> Result<Vec<PathBuf>, Error> {
     Ok(result)
 }
 
-pub fn deserialize_image<'de, D>(deserializer: D) -> Result<Rc<Image>, D::Error>
+pub fn deserialize_image<'de, D>(deserializer: D) -> Result<Rc<dyn Image>, D::Error>
 where
     D: Deserializer<'de>,
 {

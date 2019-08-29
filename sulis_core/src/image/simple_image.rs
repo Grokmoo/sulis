@@ -31,7 +31,10 @@ pub struct SimpleImage {
 }
 
 impl SimpleImage {
-    pub fn new(builder: SimpleImageBuilder, resources: &ResourceSet) -> Result<Rc<dyn Image>, Error> {
+    pub fn new(
+        builder: SimpleImageBuilder,
+        resources: &ResourceSet,
+    ) -> Result<Rc<dyn Image>, Error> {
         let sprite = resources.sprite_internal(&builder.image_display)?;
 
         Ok(Rc::new(SimpleImage {

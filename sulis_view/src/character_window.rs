@@ -41,9 +41,7 @@ pub const NAME: &str = "character_window";
 
 enum ActivePane {
     Character,
-    Ability {
-        show_passives: bool,
-    },
+    Ability { show_passives: bool },
     Effect,
 }
 
@@ -138,7 +136,9 @@ impl WidgetKind for CharacterWindow {
             .state
             .add_callback(Callback::new(Rc::new(|widget, _| {
                 let (parent, window) = Widget::parent_mut::<CharacterWindow>(widget);
-                window.active_pane = ActivePane::Ability { show_passives: true };
+                window.active_pane = ActivePane::Ability {
+                    show_passives: true,
+                };
                 parent.borrow_mut().invalidate_children();
             })));
 
@@ -299,14 +299,17 @@ pub fn create_abilities_pane(pc: &ActorState, show_passive: bool) -> Rc<RefCell<
 
     let passive = Widget::with_theme(Button::empty(), "show_passives");
     passive.borrow_mut().state.set_active(show_passive);
-    passive.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-        let result = !show_passive;
-        let (parent, window) = Widget::parent_mut::<CharacterWindow>(&widget);
-        window.active_pane = ActivePane::Ability {
-            show_passives: result,
-        };
-        parent.borrow_mut().invalidate_children();
-    })));
+    passive
+        .borrow_mut()
+        .state
+        .add_callback(Callback::new(Rc::new(move |widget, _| {
+            let result = !show_passive;
+            let (parent, window) = Widget::parent_mut::<CharacterWindow>(&widget);
+            window.active_pane = ActivePane::Ability {
+                show_passives: result,
+            };
+            parent.borrow_mut().invalidate_children();
+        })));
     Widget::add_child_to(&abilities, passive);
 
     let details_scroll = ScrollPane::new();
@@ -317,7 +320,9 @@ pub fn create_abilities_pane(pc: &ActorState, show_passive: bool) -> Rc<RefCell<
     let scrollpane = ScrollPane::new();
     let list = Widget::with_theme(scrollpane.clone(), "list");
     for ability in pc.actor.abilities.iter() {
-        if !show_passive && ability.ability.active.is_none() { continue; }
+        if !show_passive && ability.ability.active.is_none() {
+            continue;
+        }
 
         let level = ability.level;
         let ability = &ability.ability;
@@ -409,11 +414,14 @@ pub fn create_details_text_box(pc: &ActorState, is_pc: bool) -> Rc<RefCell<Widge
     {
         if is_pc {
             let export = Widget::with_theme(Button::empty(), "export");
-            export.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-                let player = GameState::player();
-                widget.borrow_mut().state.set_enabled(false);
-                export_character(&player.borrow().actor);
-            })));
+            export
+                .borrow_mut()
+                .state
+                .add_callback(Callback::new(Rc::new(|widget, _| {
+                    let player = GameState::player();
+                    widget.borrow_mut().state.set_enabled(false);
+                    export_character(&player.borrow().actor);
+                })));
             Widget::add_child_to(&details, export);
         }
 

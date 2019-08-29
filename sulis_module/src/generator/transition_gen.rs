@@ -15,13 +15,18 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::collections::HashMap;
-use std::io::{ErrorKind, Error};
+use std::io::{Error, ErrorKind};
 use std::rc::Rc;
 
-use sulis_core::util::{ReproducibleRandom, Point};
-use crate::{Module, ObjectSize,
-    area::{TransitionBuilder, ToKind, TransitionAreaParams, tile::{Tile, Feature}}};
-use crate::generator::{Rect, overlaps_any};
+use crate::generator::{overlaps_any, Rect};
+use crate::{
+    area::{
+        tile::{Feature, Tile},
+        ToKind, TransitionAreaParams, TransitionBuilder,
+    },
+    Module, ObjectSize,
+};
+use sulis_core::util::{Point, ReproducibleRandom};
 
 pub struct TransitionGen<'a> {
     width: i32,
@@ -30,8 +35,7 @@ pub struct TransitionGen<'a> {
 }
 
 impl<'a> TransitionGen<'a> {
-    pub(crate) fn new(width: i32, height: i32,
-                      params: &'a TransitionParams) -> TransitionGen<'a> {
+    pub(crate) fn new(width: i32, height: i32, params: &'a TransitionParams) -> TransitionGen<'a> {
         TransitionGen {
             width,
             height,
@@ -39,30 +43,35 @@ impl<'a> TransitionGen<'a> {
         }
     }
 
-    pub fn generate(&mut self, random: &mut ReproducibleRandom,
-                    transitions: &[TransitionAreaParams])
-        -> Result<Vec<TransitionOutput>, Error> {
-
+    pub fn generate(
+        &mut self,
+        random: &mut ReproducibleRandom,
+        transitions: &[TransitionAreaParams],
+    ) -> Result<Vec<TransitionOutput>, Error> {
         let mut gened = Vec::new();
         let mut out = Vec::new();
         for transition in transitions {
-            let kind = self.params.kinds.get(&transition.kind).ok_or(
-                Error::new(ErrorKind::InvalidInput, format!("Invalid transition kind '{}'",
-                                                            transition.kind))
-            )?;
+            let kind = self.params.kinds.get(&transition.kind).ok_or(Error::new(
+                ErrorKind::InvalidInput,
+                format!("Invalid transition kind '{}'", transition.kind),
+            ))?;
 
             // keep trying until we succeed.  we always want to place transitions
             let mut placed = false;
             for _ in 0..1000 {
-                let data = TransitionData::gen(random,
-                                               self.width,
-                                               self.height,
-                                               kind.size.width,
-                                               kind.size.height,
-                                               &transition.to,
-                                               &kind.feature);
+                let data = TransitionData::gen(
+                    random,
+                    self.width,
+                    self.height,
+                    kind.size.width,
+                    kind.size.height,
+                    &transition.to,
+                    &kind.feature,
+                );
 
-                if overlaps_any(&data, &gened, self.params.spacing as i32) { continue; }
+                if overlaps_any(&data, &gened, self.params.spacing as i32) {
+                    continue;
+                }
 
                 let mut tiles_out = Vec::new();
                 if let Some(feature) = &kind.feature {
@@ -95,7 +104,10 @@ impl<'a> TransitionGen<'a> {
             }
 
             if !placed {
-                return Err(Error::new(ErrorKind::InvalidData, "Unable to place transition"));
+                return Err(Error::new(
+                    ErrorKind::InvalidData,
+                    "Unable to place transition",
+                ));
             }
         }
 
@@ -119,24 +131,44 @@ struct TransitionData<'a> {
 }
 
 impl<'a> TransitionData<'a> {
-    fn gen(random: &mut ReproducibleRandom,
-           max_x: i32, max_y: i32, w: i32, h: i32,
-           to: &'a str,
-           feature: &Option<Rc<Feature>>) -> TransitionData<'a> {
+    fn gen(
+        random: &mut ReproducibleRandom,
+        max_x: i32,
+        max_y: i32,
+        w: i32,
+        h: i32,
+        to: &'a str,
+        feature: &Option<Rc<Feature>>,
+    ) -> TransitionData<'a> {
         let feature = feature.clone();
         // the tile buffer keeps transitions off the edge of the usable space
         let x = random.gen(8, max_x - w - 16);
         let y = random.gen(8, max_y - h - 16);
 
-        TransitionData { feature, to, x, y, w, h }
+        TransitionData {
+            feature,
+            to,
+            x,
+            y,
+            w,
+            h,
+        }
     }
 }
 
 impl<'a> Rect for TransitionData<'a> {
-    fn x(&self) -> i32 { self.x }
-    fn y(&self) -> i32 { self.y }
-    fn w(&self) -> i32 { self.w }
-    fn h(&self) -> i32 { self.h }
+    fn x(&self) -> i32 {
+        self.x
+    }
+    fn y(&self) -> i32 {
+        self.y
+    }
+    fn w(&self) -> i32 {
+        self.w
+    }
+    fn h(&self) -> i32 {
+        self.h
+    }
 }
 
 pub(crate) struct TransitionParams {
@@ -145,31 +177,41 @@ pub(crate) struct TransitionParams {
 }
 
 impl TransitionParams {
-    pub(crate) fn new(builder: TransitionParamsBuilder,
-                      module: &Module) -> Result<TransitionParams, Error> {
+    pub(crate) fn new(
+        builder: TransitionParamsBuilder,
+        module: &Module,
+    ) -> Result<TransitionParams, Error> {
         let mut kinds = HashMap::new();
 
         for (id, kind) in builder.kinds {
             let feature = match kind.feature {
                 None => None,
-                Some(feature_id) => {
-                    Some(module.features.get(&feature_id).map(|f| Rc::clone(f)).ok_or(
-                        Error::new(ErrorKind::InvalidInput, format!("Invalid feature '{}'",
-                                                                    feature_id))
-                    )?)
-                }
+                Some(feature_id) => Some(
+                    module
+                        .features
+                        .get(&feature_id)
+                        .map(|f| Rc::clone(f))
+                        .ok_or(Error::new(
+                            ErrorKind::InvalidInput,
+                            format!("Invalid feature '{}'", feature_id),
+                        ))?,
+                ),
             };
 
-            let size = module.sizes.get(&kind.size).ok_or(
-                Error::new(ErrorKind::InvalidInput, format!("Invalid size '{}'", kind.size))
-            )?;
+            let size = module.sizes.get(&kind.size).ok_or(Error::new(
+                ErrorKind::InvalidInput,
+                format!("Invalid size '{}'", kind.size),
+            ))?;
 
-            kinds.insert(id, TransitionKind {
-                feature,
-                feature_offset: kind.feature_offset,
-                transition_offset: kind.transition_offset,
-                size: Rc::clone(size),
-            });
+            kinds.insert(
+                id,
+                TransitionKind {
+                    feature,
+                    feature_offset: kind.feature_offset,
+                    transition_offset: kind.transition_offset,
+                    size: Rc::clone(size),
+                },
+            );
         }
 
         Ok(TransitionParams {

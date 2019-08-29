@@ -14,11 +14,11 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::{f32};
+use std::f32;
 
 use crate::{AreaState, EntityState};
-use sulis_core::util::{Point};
-use sulis_module::{area::{LocationChecker, PathFinderGrid, PathFinder}};
+use sulis_core::util::Point;
+use sulis_module::area::{LocationChecker, PathFinder, PathFinderGrid};
 
 pub struct StateLocationChecker<'a, 'b> {
     width: i32,
@@ -30,9 +30,11 @@ pub struct StateLocationChecker<'a, 'b> {
 }
 
 impl<'a, 'b> StateLocationChecker<'a, 'b> {
-    pub fn new(area_state: &'a AreaState, requester: &'b EntityState,
-               mut entities_to_ignore: Vec<usize>) -> StateLocationChecker<'a, 'b> {
-
+    pub fn new(
+        area_state: &'a AreaState,
+        requester: &'b EntityState,
+        mut entities_to_ignore: Vec<usize>,
+    ) -> StateLocationChecker<'a, 'b> {
         let width = area_state.area.width;
         let grid = &area_state.area.path_grid(&requester.size());
         let prop_grid = &area_state.prop_pass_grid;
@@ -50,23 +52,30 @@ impl<'a, 'b> StateLocationChecker<'a, 'b> {
     }
 }
 
-
 impl<'a, 'b> LocationChecker for StateLocationChecker<'a, 'b> {
     fn goal(&self, x: f32, y: f32) -> (f32, f32) {
-        (x - (self.requester.size.width / 2) as f32,
-         y - (self.requester.size.height / 2) as f32)
+        (
+            x - (self.requester.size.width / 2) as f32,
+            y - (self.requester.size.height / 2) as f32,
+        )
     }
 
     fn passable(&self, x: i32, y: i32) -> bool {
-        if !self.grid.is_passable(x, y) { return false; }
+        if !self.grid.is_passable(x, y) {
+            return false;
+        }
 
         self.requester.points(x, y).all(|p| {
             let index = (p.x + p.y * self.width) as usize;
 
-            if !self.prop_grid[index] { return false; }
+            if !self.prop_grid[index] {
+                return false;
+            }
 
             for i in self.entity_grid[index].iter() {
-                if !self.entities_to_ignore.contains(i) { return false; }
+                if !self.entities_to_ignore.contains(i) {
+                    return false;
+                }
             }
 
             true
@@ -74,17 +83,23 @@ impl<'a, 'b> LocationChecker for StateLocationChecker<'a, 'b> {
     }
 }
 
-
-pub fn find_path(path_finder: &mut PathFinder,
-                 area_state: &AreaState,
-                 entity: &EntityState,
-                 entities_to_ignore: Vec<usize>,
-                 dest_x: f32,
-                 dest_y: f32,
-                 dest_dist: f32) -> Option<Vec<Point>> {
+pub fn find_path(
+    path_finder: &mut PathFinder,
+    area_state: &AreaState,
+    entity: &EntityState,
+    entities_to_ignore: Vec<usize>,
+    dest_x: f32,
+    dest_y: f32,
+    dest_dist: f32,
+) -> Option<Vec<Point>> {
     let checker = StateLocationChecker::new(area_state, entity, entities_to_ignore);
 
-    path_finder.find(&checker, entity.location.x, entity.location.y,
-                     dest_x, dest_y, dest_dist)
+    path_finder.find(
+        &checker,
+        entity.location.x,
+        entity.location.y,
+        dest_x,
+        dest_y,
+        dest_dist,
+    )
 }
-

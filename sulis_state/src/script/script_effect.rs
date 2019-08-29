@@ -808,8 +808,11 @@ fn apply(effect_data: &ScriptEffect) -> Result<()> {
                 }
             }
             let area = GameState::area_state();
-            effect.set_surface_for_area(&area.borrow().area.area.id,
-                &points, *squares_to_fire_on_moved);
+            effect.set_surface_for_area(
+                &area.borrow().area.area.id,
+                &points,
+                *squares_to_fire_on_moved,
+            );
             info!(
                 "Add surface to '{}' with duration {}",
                 area.borrow().area.area.name,

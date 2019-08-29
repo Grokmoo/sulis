@@ -18,8 +18,8 @@ use std::any::Any;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use sulis_core::util::Point;
 use sulis_core::ui::{animation_state, Callback, Widget, WidgetKind};
+use sulis_core::util::Point;
 use sulis_core::widgets::{Button, TextArea};
 use sulis_module::{Module, Time};
 use sulis_state::GameState;
@@ -178,8 +178,11 @@ impl WidgetKind for WorldMapWindow {
                         };
 
                         GameState::transition_to(
-                            Some(area_id), Some(Point::new(x, y)), Point::default(), travel_time
-                            );
+                            Some(area_id),
+                            Some(Point::new(x, y)),
+                            Point::default(),
+                            travel_time,
+                        );
                         let root = Widget::get_root(&widget);
                         root.borrow_mut().invalidate_children();
                     })));

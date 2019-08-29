@@ -281,11 +281,14 @@ impl Options {
         for zoom in DEFAULT_ZOOMS.iter() {
             let zoom = *zoom;
             let button = Widget::with_theme(Button::empty(), "default_zoom_button");
-            button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-                let (parent, options) = Widget::parent_mut::<Options>(widget);
-                options.cur_default_zoom = zoom;
-                parent.borrow_mut().invalidate_children();
-            })));
+            button
+                .borrow_mut()
+                .state
+                .add_callback(Callback::new(Rc::new(move |widget, _| {
+                    let (parent, options) = Widget::parent_mut::<Options>(widget);
+                    options.cur_default_zoom = zoom;
+                    parent.borrow_mut().invalidate_children();
+                })));
             if zoom == self.cur_default_zoom {
                 button.borrow_mut().state.set_active(true);
                 zoom_found = true;
@@ -294,7 +297,10 @@ impl Options {
         }
 
         if !zoom_found {
-            info!("Default zoom set to non standard value {}", self.cur_default_zoom);
+            info!(
+                "Default zoom set to non standard value {}",
+                self.cur_default_zoom
+            );
         }
 
         let anim_speed_title = Widget::with_theme(Label::empty(), "anim_speed_title");

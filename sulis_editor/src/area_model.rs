@@ -25,8 +25,8 @@ use sulis_core::resource::{read_single_resource, write_to_file, ResourceSet, Spr
 use sulis_core::ui::{animation_state, LineRenderer};
 use sulis_core::util::{Point, Size};
 use sulis_module::area::*;
+use sulis_module::generator::{is_removal, TilesModel};
 use sulis_module::{Actor, Encounter, Module, Prop};
-use sulis_module::generator::{TilesModel, is_removal};
 
 pub struct AreaModel {
     pub config: EditorConfig,
@@ -565,7 +565,8 @@ impl AreaModel {
                     continue;
                 }
 
-                self.tiles.add(Rc::clone(&tile), position[0] as i32, position[1] as i32);
+                self.tiles
+                    .add(Rc::clone(&tile), position[0] as i32, position[1] as i32);
             }
         }
 

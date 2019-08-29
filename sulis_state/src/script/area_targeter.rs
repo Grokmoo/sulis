@@ -25,7 +25,7 @@ use sulis_core::util::Point;
 use sulis_module::{Ability, Module, ObjectSize};
 
 use crate::script::{targeter, ScriptItemKind, TargeterData};
-use crate::{AreaState, EntityState, GameState, Script, TurnManager, RangeIndicator};
+use crate::{AreaState, EntityState, GameState, RangeIndicator, Script, TurnManager};
 
 #[derive(Clone)]
 pub enum Shape {
@@ -810,17 +810,16 @@ impl AreaTargeter {
 
         let range_indicator = match data.selection_area {
             targeter::SelectionArea::None => None,
-            targeter::SelectionArea::Radius(radius) =>
-                Some(RangeIndicator::new(radius, &parent)),
+            targeter::SelectionArea::Radius(radius) => Some(RangeIndicator::new(radius, &parent)),
             targeter::SelectionArea::Visible => {
                 let area = GameState::area_state();
                 let r = area.borrow().area.area.vis_dist;
                 Some(RangeIndicator::new(r as f32 - 1.0, &parent))
-            },
+            }
             targeter::SelectionArea::Reachable => {
                 let r = parent.borrow().actor.stats.attack_distance() + 1.4;
                 Some(RangeIndicator::new(r, &parent))
-            },
+            }
         };
 
         AreaTargeter {

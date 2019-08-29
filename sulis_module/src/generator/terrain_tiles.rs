@@ -18,11 +18,11 @@ use std::collections::HashMap;
 use std::io::Error;
 use std::rc::Rc;
 
-use sulis_core::util::{unable_to_create_error};
 use crate::{
     area::tile::{EdgeRules, TerrainKind, TerrainRules, Tile},
     Module,
 };
+use sulis_core::util::unable_to_create_error;
 
 #[derive(Clone)]
 pub struct TerrainTiles {

@@ -124,11 +124,11 @@ use sulis_core::util::invalid_data_error;
 
 use self::ability::AbilityBuilder;
 use self::ability_list::AbilityListBuilder;
-use self::area::{AreaBuilder, Tile};
 use self::area::{
-    tile::{TerrainKind, TerrainRules, WallKind, WallRules, Feature},
+    tile::{Feature, TerrainKind, TerrainRules, WallKind, WallRules},
     Tileset,
 };
+use self::area::{AreaBuilder, Tile};
 use self::campaign::CampaignBuilder;
 use self::class::ClassBuilder;
 use self::conversation::ConversationBuilder;
@@ -498,15 +498,19 @@ impl Module {
                     );
                 }
 
-                tiles_list.features.drain().for_each(|f| feature_builders.push(f));
+                tiles_list
+                    .features
+                    .drain()
+                    .for_each(|f| feature_builders.push(f));
             }
 
             for (id, feature_builder) in feature_builders {
-                insert_if_ok("feature",
-                             id.to_string(),
-                             Feature::new(id, feature_builder, &module),
-                             &mut module.features,
-                             );
+                insert_if_ok(
+                    "feature",
+                    id.to_string(),
+                    Feature::new(id, feature_builder, &module),
+                    &mut module.features,
+                );
             }
 
             for (id, builder) in builder_set.ai_builders {
@@ -598,8 +602,12 @@ impl Module {
             }
 
             for (id, builder) in builder_set.generator_builders {
-                insert_if_ok("generator", id,
-                             AreaGenerator::new(builder, &module), &mut module.generators);
+                insert_if_ok(
+                    "generator",
+                    id,
+                    AreaGenerator::new(builder, &module),
+                    &mut module.generators,
+                );
             }
 
             builder_set.area_builders

@@ -57,9 +57,7 @@ impl PathFinderGrid {
                         break;
                     }
 
-                    if layers.iter().any(|layer| {
-                        !layer.is_passable(p.x, p.y)
-                    }) {
+                    if layers.iter().any(|layer| !layer.is_passable(p.x, p.y)) {
                         is_passable = false;
                         break;
                     }

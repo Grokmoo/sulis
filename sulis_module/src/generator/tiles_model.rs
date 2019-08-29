@@ -16,11 +16,11 @@
 
 use std::rc::Rc;
 
+use crate::area::{Tile, MAX_AREA_SIZE};
+use crate::generator::{TerrainTiles, WallTiles};
+use crate::Module;
 use sulis_core::config::Config;
 use sulis_core::util::{gen_rand, Point};
-use crate::Module;
-use crate::area::{MAX_AREA_SIZE, Tile};
-use crate::generator::{TerrainTiles, WallTiles};
 
 pub struct TilesModel {
     pub grid_width: i32,
@@ -561,14 +561,7 @@ impl TilesModel {
         }
     }
 
-    fn is_wall_border(
-        &self,
-        self_elev: u8,
-        x: i32,
-        y: i32,
-        delta_x: i32,
-        delta_y: i32,
-    ) -> bool {
+    fn is_wall_border(&self, self_elev: u8, x: i32, y: i32, delta_x: i32, delta_y: i32) -> bool {
         let x = x + delta_x;
         let y = y + delta_y;
         if x < 0 || x >= MAX_AREA_SIZE || y < 0 || y >= MAX_AREA_SIZE {

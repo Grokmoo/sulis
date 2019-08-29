@@ -15,13 +15,13 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::collections::HashMap;
-use std::io::{Error};
+use std::io::Error;
 use std::rc::Rc;
 
 use sulis_core::util::invalid_data_error;
 
 use crate::area::{AreaBuilder, Layer, PropData, Tile};
-use crate::{Module};
+use crate::Module;
 
 pub struct LayerSet {
     pub width: i32,
@@ -34,12 +34,17 @@ pub struct LayerSet {
 }
 
 impl LayerSet {
-    pub fn new(builder: &AreaBuilder, props: &Vec<PropData>, mut layers: Vec<Layer>) -> Result<LayerSet, Error> {
+    pub fn new(
+        builder: &AreaBuilder,
+        props: &Vec<PropData>,
+        mut layers: Vec<Layer>,
+    ) -> Result<LayerSet, Error> {
         let width = builder.width as i32;
         let height = builder.height as i32;
         let dim = (width * height) as usize;
 
-        if layers.is_empty() { // layers have not been generated
+        if layers.is_empty() {
+            // layers have not been generated
             LayerSet::validate_tiles(builder)?;
 
             let mut layer_tiles: HashMap<String, Vec<Vec<Rc<Tile>>>> = HashMap::new();
@@ -72,8 +77,12 @@ impl LayerSet {
 
             for layer_id in builder.layers.iter() {
                 let tiles = layer_tiles.remove(layer_id).unwrap();
-                let layer = Layer::new(builder.width as i32, builder.height as i32,
-                                       layer_id.to_string(), tiles)?;
+                let layer = Layer::new(
+                    builder.width as i32,
+                    builder.height as i32,
+                    layer_id.to_string(),
+                    tiles,
+                )?;
                 layers.push(layer);
             }
         }
@@ -188,7 +197,10 @@ impl LayerSet {
                     continue;
                 }
 
-                return invalid_data_error(&format!("Point array length is not 2 in '{}'", tile_id));
+                return invalid_data_error(&format!(
+                    "Point array length is not 2 in '{}'",
+                    tile_id
+                ));
             }
         }
 

@@ -18,8 +18,8 @@ use std::io::Error;
 use std::rc::Rc;
 
 use crate::{
-    generator::EdgesList,
     area::tile::{Tile, WallKind, WallRules},
+    generator::EdgesList,
     Module,
 };
 

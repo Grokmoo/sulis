@@ -36,28 +36,34 @@ mod terrain_tiles;
 pub use self::terrain_tiles::{EdgesList, TerrainTiles};
 
 mod tiles_model;
-pub use self::tiles_model::{TilesModel, is_removal};
+pub use self::tiles_model::{is_removal, TilesModel};
 
 mod transition_gen;
-use self::transition_gen::{TransitionGen, TransitionParams, TransitionParamsBuilder, TransitionOutput};
+use self::transition_gen::{
+    TransitionGen, TransitionOutput, TransitionParams, TransitionParamsBuilder,
+};
 
 mod wall_tiles;
-pub use self::wall_tiles::{WallTiles};
+pub use self::wall_tiles::WallTiles;
 
-use std::rc::Rc;
-use std::collections::{HashMap};
+use std::collections::HashMap;
 use std::io::{Error, ErrorKind};
+use std::rc::Rc;
 
+use crate::area::{EncounterDataBuilder, Layer, LocationChecker, PathFinderGrid, PropDataBuilder};
+use crate::{ObjectSize, WallKind};
 use sulis_core::util::{Point, ReproducibleRandom};
-use crate::area::{Layer, PropDataBuilder, EncounterDataBuilder, LocationChecker, PathFinderGrid};
-use crate::{WallKind, ObjectSize};
 
 pub struct LayerListLocationChecker {
     grid: PathFinderGrid,
 }
 impl LayerListLocationChecker {
-    pub fn new(width: i32, height: i32, layers: &[Layer],
-               size: Rc<ObjectSize>) -> LayerListLocationChecker {
+    pub fn new(
+        width: i32,
+        height: i32,
+        layers: &[Layer],
+        size: Rc<ObjectSize>,
+    ) -> LayerListLocationChecker {
         let grid = PathFinderGrid::new(size, width, height, layers);
         LayerListLocationChecker { grid }
     }
@@ -79,14 +85,21 @@ pub struct WeightedList<T> {
 }
 
 impl<T> WeightedList<T> {
-    pub fn new<F>(kinds: HashMap<String, WeightedEntry>, name: &str, getter: F)
-        -> Result<WeightedList<T>, Error> where F: Fn(&str) -> Option<T> {
+    pub fn new<F>(
+        kinds: HashMap<String, WeightedEntry>,
+        name: &str,
+        getter: F,
+    ) -> Result<WeightedList<T>, Error>
+    where
+        F: Fn(&str) -> Option<T>,
+    {
         let mut entries = Vec::new();
         let mut total_weight = 0;
         for (id, entry) in kinds {
-            let t = getter(&id).ok_or(
-                Error::new(ErrorKind::InvalidInput, format!("Invalid {} '{}'", name, id))
-            )?;
+            let t = getter(&id).ok_or(Error::new(
+                ErrorKind::InvalidInput,
+                format!("Invalid {} '{}'", name, id),
+            ))?;
 
             total_weight += entry.weight;
             entries.push((id, t, entry.weight));
@@ -95,8 +108,10 @@ impl<T> WeightedList<T> {
         entries.sort_by(|a, b| a.0.cmp(&b.0));
 
         if total_weight == 0 || entries.len() == 0 {
-            return Err(Error::new(ErrorKind::InvalidInput,
-                format!("Must specify at least one {}", name)));
+            return Err(Error::new(
+                ErrorKind::InvalidInput,
+                format!("Must specify at least one {}", name),
+            ));
         }
 
         Ok(WeightedList {
@@ -105,8 +120,12 @@ impl<T> WeightedList<T> {
         })
     }
 
-    pub fn len(&self) -> usize { self.entries.len() }
-    pub fn is_empty(&self) -> bool { self.entries.is_empty() }
+    pub fn len(&self) -> usize {
+        self.entries.len()
+    }
+    pub fn is_empty(&self) -> bool {
+        self.entries.is_empty()
+    }
 
     pub fn pick(&self, rand: &mut ReproducibleRandom) -> &T {
         if self.entries.len() == 1 || self.total_weight == 1 {
@@ -167,15 +186,19 @@ pub(crate) struct GenModel {
 }
 
 impl GenModel {
-    fn new(width: i32,
-           height: i32,
-           rand: ReproducibleRandom,
-           gen_grid_width: i32,
-           gen_grid_height: i32) -> GenModel {
+    fn new(
+        width: i32,
+        height: i32,
+        rand: ReproducibleRandom,
+        gen_grid_width: i32,
+        gen_grid_height: i32,
+    ) -> GenModel {
         let model = TilesModel::new();
         let gen_grid_size = Point::new(gen_grid_width, gen_grid_height);
-        let total_grid_size = Point::new(gen_grid_size.x * model.grid_width,
-                                         gen_grid_size.y * model.grid_height);
+        let total_grid_size = Point::new(
+            gen_grid_size.x * model.grid_width,
+            gen_grid_size.y * model.grid_height,
+        );
         GenModel {
             model,
             area_width: width,
@@ -187,30 +210,36 @@ impl GenModel {
     }
 
     fn region_size(&self) -> (u32, u32) {
-        let x = (self.area_width - 2 * self.model.grid_width)
-            / self.total_grid_size.x;
-        let y = (self.area_height - 2 * self.model.grid_height)
-            / self.total_grid_size.y;
+        let x = (self.area_width - 2 * self.model.grid_width) / self.total_grid_size.x;
+        let y = (self.area_height - 2 * self.model.grid_height) / self.total_grid_size.y;
         (x as u32, y as u32)
     }
 
     fn to_region_coords(&self, x: i32, y: i32) -> (i32, i32) {
-        ((x - self.model.grid_width) / self.total_grid_size.x,
-         (y - self.model.grid_height) / self.total_grid_size.y)
+        (
+            (x - self.model.grid_width) / self.total_grid_size.x,
+            (y - self.model.grid_height) / self.total_grid_size.y,
+        )
     }
 
     fn from_region_coords(&self, x: i32, y: i32) -> (i32, i32) {
-        (x * self.total_grid_size.x + self.model.grid_width,
-         y * self.total_grid_size.y + self.model.grid_height)
+        (
+            x * self.total_grid_size.x + self.model.grid_width,
+            y * self.total_grid_size.y + self.model.grid_height,
+        )
     }
 
     fn tiles(&self) -> TileIter {
         TileIter::new(self)
     }
 
-    pub fn rand(&self) -> &ReproducibleRandom { &self.rand }
+    pub fn rand(&self) -> &ReproducibleRandom {
+        &self.rand
+    }
 
-    pub fn rand_mut(&mut self) -> &mut ReproducibleRandom { &mut self.rand }
+    pub fn rand_mut(&mut self) -> &mut ReproducibleRandom {
+        &mut self.rand
+    }
 }
 
 pub struct TileIter {
@@ -255,7 +284,9 @@ impl Iterator for TileIter {
     type Item = Point;
 
     fn next(&mut self) -> Option<Point> {
-        if self.y >= self.max_y { return None; }
+        if self.y >= self.max_y {
+            return None;
+        }
 
         let ret_val = Some(Point::new(self.x, self.y));
 
@@ -332,16 +363,16 @@ impl RegionKinds {
             src.contains(&RegionKind::Doorway),
         ];
 
-        RegionKinds {
-            allowed
-        }
+        RegionKinds { allowed }
     }
 
     pub(crate) fn check_coords(&self, maze: &Maze, p1: Point, p2: Point) -> bool {
         for y in p1.y..=p2.y {
             for x in p1.x..=p2.x {
                 let t = maze.tile_checked(x, y);
-                if !self.is_allowable(t) { return false; }
+                if !self.is_allowable(t) {
+                    return false;
+                }
             }
         }
 
@@ -352,7 +383,13 @@ impl RegionKinds {
         let index = match kind {
             Some(TileKind::Wall) => 0,
             Some(TileKind::Corridor(_)) => 1,
-            Some(TileKind::Room { transition, .. }) => if transition { 3 } else { 2 },
+            Some(TileKind::Room { transition, .. }) => {
+                if transition {
+                    3
+                } else {
+                    2
+                }
+            }
             Some(TileKind::DoorWay) => 4,
             None => return false,
         };
@@ -363,7 +400,9 @@ impl RegionKinds {
 
 pub fn overlaps_any<T: Rect>(rect: &T, others: &[T], spacing: i32) -> bool {
     for other in others {
-        if rect.overlaps(other, spacing) { return true; }
+        if rect.overlaps(other, spacing) {
+            return true;
+        }
     }
     false
 }
@@ -375,8 +414,12 @@ pub trait Rect {
     fn h(&self) -> i32;
 
     fn contains(&self, p: Point) -> bool {
-        if p.x < self.x() || p.x > self.x() + self.w() { return false; }
-        if p.y < self.y() || p.y > self.y() + self.h() { return false; }
+        if p.x < self.x() || p.x > self.x() + self.w() {
+            return false;
+        }
+        if p.y < self.y() || p.y > self.y() + self.h() {
+            return false;
+        }
 
         true
     }
@@ -404,7 +447,9 @@ pub trait Rect {
             for xi in 0..self.w() {
                 let x = self.x() + xi;
                 let y = self.y() + yi;
-                if !self.point_is_passable(x, y, layers) { return false; }
+                if !self.point_is_passable(x, y, layers) {
+                    return false;
+                }
             }
         }
 
@@ -413,7 +458,9 @@ pub trait Rect {
 
     fn point_is_passable(&self, x: i32, y: i32, layers: &[Layer]) -> bool {
         for layer in layers {
-            if !layer.is_passable(x, y) { return false; }
+            if !layer.is_passable(x, y) {
+                return false;
+            }
         }
 
         true

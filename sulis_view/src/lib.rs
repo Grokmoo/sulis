@@ -552,8 +552,9 @@ impl WidgetKind for RootView {
                     let target = GameState::player();
                     match area.on_rest {
                         OnRest::Disabled { ref message } => {
-                            let mut text =
-                                area_state.borrow_mut().create_feedback_text(&target.borrow());
+                            let mut text = area_state
+                                .borrow_mut()
+                                .create_feedback_text(&target.borrow());
                             text.add_entry(message.to_string(), ColorKind::Info);
                             area_state.borrow_mut().add_feedback_text(text);
                         }

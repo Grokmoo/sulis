@@ -35,7 +35,7 @@ use std::{thread, time};
 
 use backtrace::Backtrace;
 use flexi_logger::{opt_format, Duplicate, Logger};
-use rand::{self, distributions::uniform::SampleUniform, Rng, seq::SliceRandom};
+use rand::{self, distributions::uniform::SampleUniform, seq::SliceRandom, Rng};
 use rand_pcg::Pcg64Mcg;
 use serde_yaml;
 
@@ -72,7 +72,7 @@ impl ReproducibleRandom {
         // TODO only seed with u64 for now because serde_yaml doesn't serialize u128 correctly
         let seed = match seed {
             Some(s) => s,
-            None => rand::thread_rng().gen::<u64>() as u128
+            None => rand::thread_rng().gen::<u64>() as u128,
         };
 
         ReproducibleRandom {
@@ -89,7 +89,9 @@ impl ReproducibleRandom {
         values.shuffle(&mut self.gen);
     }
 
-    pub fn seed(&self) -> u128 { self.seed }
+    pub fn seed(&self) -> u128 {
+        self.seed
+    }
 }
 
 impl std::fmt::Debug for ReproducibleRandom {

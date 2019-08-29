@@ -17,10 +17,10 @@
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use sulis_core::io::DrawList;
-use sulis_core::ui::animation_state;
 use sulis_core::image::Image;
+use sulis_core::io::DrawList;
 use sulis_core::resource::ResourceSet;
+use sulis_core::ui::animation_state;
 
 use crate::EntityState;
 
@@ -52,8 +52,10 @@ impl RangeIndicator {
             let parent = parent.borrow();
             for y in 0..width {
                 for x in 0..width {
-                    let (x1, y1) = (x as i32 + parent.location.x - half_width,
-                                    y as i32 + parent.location.y - half_width);
+                    let (x1, y1) = (
+                        x as i32 + parent.location.x - half_width,
+                        y as i32 + parent.location.y - half_width,
+                    );
                     let (x1, y1) = (x1 as f32 + 0.5, y1 as f32 + 0.5);
 
                     let idx = x + y * width;
@@ -76,8 +78,13 @@ impl RangeIndicator {
         }
     }
 
-    pub fn get_draw_list(&self, image_set: &RangeIndicatorImageSet,
-                         x_offset: f32, y_offset: f32, millis: u32) -> DrawList {
+    pub fn get_draw_list(
+        &self,
+        image_set: &RangeIndicatorImageSet,
+        x_offset: f32,
+        y_offset: f32,
+        millis: u32,
+    ) -> DrawList {
         let x_offset = x_offset - self.parent.borrow().location.x as f32;
         let y_offset = y_offset - self.parent.borrow().location.y as f32;
         let mut draw_list = DrawList::empty_sprite();
@@ -89,14 +96,15 @@ impl RangeIndicator {
                 let n = self.neighbors[x + y * width];
 
                 if let Some(ref image) = image_set.images[n as usize] {
-                    image.append_to_draw_list(&mut draw_list,
-                                              &animation_state::NORMAL,
-                                              x as f32 - x_offset - half_width_f32,
-                                              y as f32 - y_offset - half_width_f32,
-                                              1.0,
-                                              1.0,
-                                              millis
-                                              );
+                    image.append_to_draw_list(
+                        &mut draw_list,
+                        &animation_state::NORMAL,
+                        x as f32 - x_offset - half_width_f32,
+                        y as f32 - y_offset - half_width_f32,
+                        1.0,
+                        1.0,
+                        millis,
+                    );
                 }
             }
         }
@@ -110,22 +118,42 @@ fn find_neighbors(width: usize, points: &[bool], x: usize, y: usize) -> u8 {
 
     let (x, y, w) = (x as i32, y as i32, width as i32);
 
-    if check_idx(w, points, x, y) { return 255; }
+    if check_idx(w, points, x, y) {
+        return 255;
+    }
 
-    if check_idx(w, points, x - 1, y) { total += W; }
-    if check_idx(w, points, x - 1, y - 1) { total += NW; }
-    if check_idx(w, points, x, y - 1) { total += N; }
-    if check_idx(w, points, x + 1, y - 1) { total += NE; }
-    if check_idx(w, points, x + 1, y) { total += E; }
-    if check_idx(w, points, x + 1, y + 1) { total += SE; }
-    if check_idx(w, points, x, y + 1) { total += S; }
-    if check_idx(w, points, x - 1, y + 1) { total += SW; }
+    if check_idx(w, points, x - 1, y) {
+        total += W;
+    }
+    if check_idx(w, points, x - 1, y - 1) {
+        total += NW;
+    }
+    if check_idx(w, points, x, y - 1) {
+        total += N;
+    }
+    if check_idx(w, points, x + 1, y - 1) {
+        total += NE;
+    }
+    if check_idx(w, points, x + 1, y) {
+        total += E;
+    }
+    if check_idx(w, points, x + 1, y + 1) {
+        total += SE;
+    }
+    if check_idx(w, points, x, y + 1) {
+        total += S;
+    }
+    if check_idx(w, points, x - 1, y + 1) {
+        total += SW;
+    }
 
     total
 }
 
 fn check_idx(width: i32, points: &[bool], x: i32, y: i32) -> bool {
-    if x < 0 || y < 0 || x >= width || y >= width { return false; }
+    if x < 0 || y < 0 || x >= width || y >= width {
+        return false;
+    }
 
     points[x as usize + y as usize * width as usize]
 }
@@ -186,9 +214,7 @@ impl RangeIndicatorImageSet {
             images[rule.neighbors as usize] = Some(rule.image);
         }
 
-        RangeIndicatorImageSet {
-            images,
-        }
+        RangeIndicatorImageSet { images }
     }
 }
 
@@ -204,12 +230,10 @@ impl ImageRule {
             None => {
                 warn!("No image found for selection area {}", id);
                 return None;
-            }, Some(image) => image,
+            }
+            Some(image) => image,
         };
 
-        Some(ImageRule {
-            image,
-            neighbors,
-        })
+        Some(ImageRule { image, neighbors })
     }
 }

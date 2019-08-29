@@ -25,17 +25,16 @@ use sulis_core::io::GraphicsRenderer;
 use sulis_core::util::{self, invalid_data_error, ExtInt, Point};
 use sulis_module::on_trigger::QuestEntryState;
 use sulis_module::{
-    area::{PathFinder, Trigger, TriggerKind, ToKind},
+    area::{PathFinder, ToKind, Trigger, TriggerKind},
     Actor, Module, ObjectSize, OnTrigger, Time, MOVE_TO_THRESHOLD,
 };
 
 use crate::animation::{self, particle_generator::Param, Anim, AnimSaveState, AnimState};
 use crate::script::{script_cache, script_callback, Script, ScriptCallback, ScriptEntity};
 use crate::{
-    AreaState, ChangeListener, ChangeListenerList, Effect, EntityState, Formation,
-    ItemList, ItemState, Location, PartyStash, QuestStateSet,
-    SaveState, TurnManager, UICallback, WorldMapState, AI,
-    path_finder::find_path,
+    path_finder::find_path, AreaState, ChangeListener, ChangeListenerList, Effect, EntityState,
+    Formation, ItemList, ItemState, Location, PartyStash, QuestStateSet, SaveState, TurnManager,
+    UICallback, WorldMapState, AI,
 };
 
 thread_local! {
@@ -122,7 +121,9 @@ impl GameState {
 
             for index in save_state.selected {
                 match entities.get(&index) {
-                    None => return invalid_data_error(&format!("Invalid selected index {}", index)),
+                    None => {
+                        return invalid_data_error(&format!("Invalid selected index {}", index))
+                    }
                     Some(ref entity) => selected.push(Rc::clone(entity)),
                 }
             }
@@ -319,8 +320,8 @@ impl GameState {
             "Setting up PC {}, with {:?}",
             &pc.name, &campaign.starting_location
         );
-        let location = Location::from_point(&campaign.starting_location,
-                                            &area_state.borrow().area.area);
+        let location =
+            Location::from_point(&campaign.starting_location, &area_state.borrow().area.area);
 
         if !location.coords_valid(location.x, location.y) {
             error!("Starting location coordinates must be valid for the starting area.");
@@ -764,7 +765,7 @@ impl GameState {
                     if id == from {
                         return Some(transition.from);
                     }
-                },
+                }
                 _ => (),
             }
         }
@@ -773,7 +774,9 @@ impl GameState {
     }
 
     fn preload_area(area_id: &str) -> Result<(), Error> {
-        if let Some(_) = GameState::get_area_state(area_id) { return Ok(()); }
+        if let Some(_) = GameState::get_area_state(area_id) {
+            return Ok(());
+        }
 
         let area_state = GameState::setup_area_state(area_id)?;
 
@@ -786,11 +789,12 @@ impl GameState {
         Ok(())
     }
 
-
-    pub fn transition_to(area_id: Option<&str>,
-                         p: Option<Point>,
-                         offset: Point,
-                         travel_time: Time) {
+    pub fn transition_to(
+        area_id: Option<&str>,
+        p: Option<Point>,
+        offset: Point,
+        travel_time: Time,
+    ) {
         info!("Area transition to {:?} at {:?}", area_id, p);
 
         // perform area preload if area is not already loaded
@@ -811,14 +815,16 @@ impl GameState {
                 }
 
                 (GameState::area_state(), p.unwrap())
-            },
+            }
             Some(id) => {
                 // transition to another area
                 let state = GameState::get_area_state(id).unwrap();
 
                 if Rc::ptr_eq(&state, &GameState::area_state()) {
-                    error!("Area transition to already loaded area, but not intra area: {}",
-                            state.borrow().area.area.id);
+                    error!(
+                        "Area transition to already loaded area, but not intra area: {}",
+                        state.borrow().area.area.id
+                    );
                     return;
                 }
 
@@ -832,7 +838,8 @@ impl GameState {
                             None => {
                                 error!("Error finding linked coordinates for transition {}", id);
                                 return;
-                            }, Some(loc) => loc,
+                            }
+                            Some(loc) => loc,
                         }
                     }
                 };
@@ -841,8 +848,11 @@ impl GameState {
         };
 
         if !GameState::check_location(&location, &area) {
-            error!("Invalid transition location to {:?} in {}",
-                   location, area.borrow().area.area.id);
+            error!(
+                "Invalid transition location to {:?} in {}",
+                location,
+                area.borrow().area.area.id
+            );
             return;
         }
 
@@ -1316,7 +1326,7 @@ impl GameState {
                     entities_to_ignore,
                     x,
                     y,
-                    dist
+                    dist,
                 ) {
                     None => return None,
                     Some(path) => path,

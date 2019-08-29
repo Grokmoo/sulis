@@ -14,14 +14,19 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::rc::Rc;
-use std::io::Error;
 use std::collections::HashMap;
+use std::io::Error;
+use std::rc::Rc;
 
+use crate::generator::{
+    maze::Room, overlaps_any, GenModel, Maze, Rect, RegionKind, RegionKinds, WeightedEntry,
+    WeightedList,
+};
+use crate::{
+    area::{EncounterDataBuilder, Layer},
+    Encounter, Module,
+};
 use sulis_core::util::{Point, Size};
-use crate::{Module, Encounter, area::{Layer, EncounterDataBuilder}};
-use crate::generator::{GenModel, WeightedEntry, WeightedList, Maze, RegionKind, RegionKinds,
-    maze::Room, Rect, overlaps_any};
 
 pub struct EncounterGen<'a, 'b> {
     model: &'b mut GenModel,
@@ -30,10 +35,12 @@ pub struct EncounterGen<'a, 'b> {
 }
 
 impl<'a, 'b> EncounterGen<'a, 'b> {
-    pub(crate) fn new(model: &'b mut GenModel,
-                      _layers: &'b [Layer],
-                      params: &'a EncounterParams,
-                      maze: &'b Maze) -> EncounterGen<'a, 'b> {
+    pub(crate) fn new(
+        model: &'b mut GenModel,
+        _layers: &'b [Layer],
+        params: &'a EncounterParams,
+        maze: &'b Maze,
+    ) -> EncounterGen<'a, 'b> {
         EncounterGen {
             model,
             params,
@@ -41,26 +48,36 @@ impl<'a, 'b> EncounterGen<'a, 'b> {
         }
     }
 
-    pub(crate) fn generate(&mut self,
-        addn_passes: &[EncounterPass]) -> Result<Vec<EncounterDataBuilder>, Error> {
+    pub(crate) fn generate(
+        &mut self,
+        addn_passes: &[EncounterPass],
+    ) -> Result<Vec<EncounterDataBuilder>, Error> {
         let mut encounters = Vec::new();
 
         for pass in self.params.passes.iter().chain(addn_passes) {
             for room in self.maze.rooms() {
                 let encounter = pass.kinds.pick(&mut self.model.rand);
 
-                if self.model.rand.gen(1, 101) > pass.chance_per_room { continue; }
+                if self.model.rand.gen(1, 101) > pass.chance_per_room {
+                    continue;
+                }
 
-
-                let data = EncounterData::gen(&mut self.model, encounter, room,
-                                              pass.size.x, pass.size.y);
+                let data =
+                    EncounterData::gen(&mut self.model, encounter, room, pass.size.x, pass.size.y);
 
                 let p1 = Point::from(self.model.to_region_coords(data.x, data.y));
-                let p2 = Point::from(self.model.to_region_coords(data.x + data.w, data.y + data.h));
+                let p2 = Point::from(
+                    self.model
+                        .to_region_coords(data.x + data.w, data.y + data.h),
+                );
 
-                if !pass.allowable_regions.check_coords(&self.maze, p1, p2) { continue; }
+                if !pass.allowable_regions.check_coords(&self.maze, p1, p2) {
+                    continue;
+                }
 
-                if overlaps_any(&data, &encounters, pass.spacing as i32) { continue; }
+                if overlaps_any(&data, &encounters, pass.spacing as i32) {
+                    continue;
+                }
 
                 encounters.push(data);
             }
@@ -87,22 +104,41 @@ struct EncounterData {
 }
 
 impl Rect for EncounterData {
-    fn x(&self) -> i32 { self.x }
-    fn y(&self) -> i32 { self.y }
-    fn w(&self) -> i32 { self.w }
-    fn h(&self) -> i32 { self.h }
+    fn x(&self) -> i32 {
+        self.x
+    }
+    fn y(&self) -> i32 {
+        self.y
+    }
+    fn w(&self) -> i32 {
+        self.w
+    }
+    fn h(&self) -> i32 {
+        self.h
+    }
 }
 
 impl EncounterData {
-    fn gen(model: &mut GenModel, encounter: &Rc<Encounter>,
-           room: &Room, w: i32, h: i32) -> EncounterData {
+    fn gen(
+        model: &mut GenModel,
+        encounter: &Rc<Encounter>,
+        room: &Room,
+        w: i32,
+        h: i32,
+    ) -> EncounterData {
         let encounter = Rc::clone(encounter);
         let (min_x, min_y) = model.from_region_coords(room.x, room.y);
         let (max_x, max_y) = model.from_region_coords(room.x + room.width, room.y + room.height);
         let x = model.rand.gen(min_x, max_x - w);
         let y = model.rand.gen(min_y, max_y - h);
 
-        EncounterData { encounter, x, y, w, h }
+        EncounterData {
+            encounter,
+            x,
+            y,
+            w,
+            h,
+        }
     }
 }
 
@@ -111,9 +147,13 @@ pub struct EncounterParams {
 }
 
 impl EncounterParams {
-    pub(crate) fn with_module(builder: EncounterParamsBuilder,
-                              module: &Module) -> Result<EncounterParams, Error> {
-        EncounterParams::build(builder, |id| module.encounters.get(id).map(|e| Rc::clone(e)))
+    pub(crate) fn with_module(
+        builder: EncounterParamsBuilder,
+        module: &Module,
+    ) -> Result<EncounterParams, Error> {
+        EncounterParams::build(builder, |id| {
+            module.encounters.get(id).map(|e| Rc::clone(e))
+        })
     }
 
     pub(crate) fn new(builder: EncounterParamsBuilder) -> Result<EncounterParams, Error> {
@@ -121,8 +161,9 @@ impl EncounterParams {
     }
 
     fn build<F>(builder: EncounterParamsBuilder, f: F) -> Result<EncounterParams, Error>
-        where F: Fn(&str) -> Option<Rc<Encounter>> {
-
+    where
+        F: Fn(&str) -> Option<Rc<Encounter>>,
+    {
         let mut passes = Vec::new();
 
         for pass in builder.passes {

@@ -15,13 +15,17 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::collections::HashMap;
-use std::io::{ErrorKind, Error};
+use std::io::{Error, ErrorKind};
 use std::rc::Rc;
 
-use sulis_core::util::{Point};
-use crate::{Module, area::{Layer, tile::{Feature}}};
-use crate::generator::{GenModel, Maze, WeightedEntry, WeightedList, RegionKind,
-    RegionKinds, Rect, overlaps_any};
+use crate::generator::{
+    overlaps_any, GenModel, Maze, Rect, RegionKind, RegionKinds, WeightedEntry, WeightedList,
+};
+use crate::{
+    area::{tile::Feature, Layer},
+    Module,
+};
+use sulis_core::util::Point;
 
 pub struct FeatureGen<'a, 'b> {
     model: &'b mut GenModel,
@@ -31,10 +35,12 @@ pub struct FeatureGen<'a, 'b> {
 }
 
 impl<'a, 'b> FeatureGen<'a, 'b> {
-    pub(crate) fn new(model: &'b mut GenModel,
-                      layers: &'b [Layer],
-                      params: &'a FeatureParams,
-                      maze: &'b Maze) -> FeatureGen<'a, 'b> {
+    pub(crate) fn new(
+        model: &'b mut GenModel,
+        layers: &'b [Layer],
+        params: &'a FeatureParams,
+        maze: &'b Maze,
+    ) -> FeatureGen<'a, 'b> {
         FeatureGen {
             model,
             layers,
@@ -58,15 +64,23 @@ impl<'a, 'b> FeatureGen<'a, 'b> {
                 let data = FeatureData::gen(&mut self.model, w, h, feature);
 
                 let p1 = Point::from(self.model.to_region_coords(data.x, data.y));
-                let p2 = Point::from(self.model.to_region_coords(data.x + data.w(),
-                                                                 data.y + data.h()));
+                let p2 = Point::from(
+                    self.model
+                        .to_region_coords(data.x + data.w(), data.y + data.h()),
+                );
 
-                if !pass.allowable_regions.check_coords(&self.maze, p1, p2) { continue; }
+                if !pass.allowable_regions.check_coords(&self.maze, p1, p2) {
+                    continue;
+                }
 
-                if overlaps_any(&data, &features, pass.spacing as i32) { continue; }
+                if overlaps_any(&data, &features, pass.spacing as i32) {
+                    continue;
+                }
 
                 if pass.require_passable {
-                    if !data.is_passable(&self.layers) { continue; }
+                    if !data.is_passable(&self.layers) {
+                        continue;
+                    }
                 }
 
                 features.push(data);
@@ -77,7 +91,9 @@ impl<'a, 'b> FeatureGen<'a, 'b> {
             let feature = data.feature;
             let (base_x, base_y) = (data.x, data.y);
             for (tile, p) in feature.rand_entry() {
-                self.model.model.add(Rc::clone(tile), base_x + p.x, base_y + p.y);
+                self.model
+                    .model
+                    .add(Rc::clone(tile), base_x + p.x, base_y + p.y);
             }
         }
 
@@ -105,10 +121,18 @@ impl FeatureData {
 }
 
 impl Rect for FeatureData {
-    fn x(&self) -> i32 { self.x }
-    fn y(&self) -> i32 { self.y }
-    fn w(&self) -> i32 { self.feature.size.width }
-    fn h(&self) -> i32 { self.feature.size.height }
+    fn x(&self) -> i32 {
+        self.x
+    }
+    fn y(&self) -> i32 {
+        self.y
+    }
+    fn w(&self) -> i32 {
+        self.feature.size.width
+    }
+    fn h(&self) -> i32 {
+        self.feature.size.height
+    }
 }
 
 pub(crate) struct FeatureParams {
@@ -117,13 +141,16 @@ pub(crate) struct FeatureParams {
 }
 
 impl FeatureParams {
-    pub(crate) fn new(builder: FeatureParamsBuilder,
-                      module: &Module) -> Result<FeatureParams, Error> {
+    pub(crate) fn new(
+        builder: FeatureParamsBuilder,
+        module: &Module,
+    ) -> Result<FeatureParams, Error> {
         let mut passes = Vec::new();
 
         for pass in builder.passes {
-            let kinds = WeightedList::new(pass.kinds, "Feature",
-                                          |id| module.features.get(id).map(|f| Rc::clone(f)))?;
+            let kinds = WeightedList::new(pass.kinds, "Feature", |id| {
+                module.features.get(id).map(|f| Rc::clone(f))
+            })?;
             let regions = RegionKinds::new(pass.allowable_regions);
 
             passes.push(FeaturePass {
@@ -137,11 +164,15 @@ impl FeatureParams {
 
         let mut fixed = Vec::new();
         for (id, p) in builder.fixed {
-            let feature = module.features.get(&id).ok_or(
-                Error::new(ErrorKind::InvalidInput, format!("Invalid feature '{}' in gen fixed.",
-                                                            id))
-            )?;
-            fixed.push(FeatureData { feature: Rc::clone(feature), x: p.x, y: p.y });
+            let feature = module.features.get(&id).ok_or(Error::new(
+                ErrorKind::InvalidInput,
+                format!("Invalid feature '{}' in gen fixed.", id),
+            ))?;
+            fixed.push(FeatureData {
+                feature: Rc::clone(feature),
+                x: p.x,
+                y: p.y,
+            });
         }
 
         Ok(FeatureParams { passes, fixed })

@@ -28,15 +28,21 @@ use crate::{AreaModel, EditorMode};
 
 const NAME: &str = "feature_picker";
 
-fn draw(feature: &Rc<Feature>, renderer: &mut dyn GraphicsRenderer,
-        x: f32, y: f32, s_x: f32, s_y: f32) {
+fn draw(
+    feature: &Rc<Feature>,
+    renderer: &mut dyn GraphicsRenderer,
+    x: f32,
+    y: f32,
+    s_x: f32,
+    s_y: f32,
+) {
     for (tile, p) in &feature.preview {
         let mut draw_list = DrawList::from_sprite_f32(
             &tile.image_display,
             x + p.x as f32,
             y + p.y as f32,
             tile.width as f32,
-            tile.height as f32
+            tile.height as f32,
         );
         draw_list.set_scale(s_x, s_y);
         renderer.draw(draw_list);
@@ -78,8 +84,14 @@ impl EditorMode for FeaturePicker {
             Some(pos) => pos,
         };
 
-        draw(feature, renderer, x + pos.x as f32, y + pos.y as f32,
-             scale_x, scale_y);
+        draw(
+            feature,
+            renderer,
+            x + pos.x as f32,
+            y + pos.y as f32,
+            scale_x,
+            scale_y,
+        );
     }
 
     fn cursor_size(&self) -> (i32, i32) {

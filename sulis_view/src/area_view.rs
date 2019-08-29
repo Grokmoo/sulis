@@ -689,8 +689,11 @@ impl WidgetKind for AreaView {
         widget.do_base_layout();
 
         let theme = &widget.theme;
-        let selection_prefix = theme.custom.get("selection_image_prefix")
-            .map(|s| s.as_ref()).unwrap_or("selection_area_");
+        let selection_prefix = theme
+            .custom
+            .get("selection_image_prefix")
+            .map(|s| s.as_ref())
+            .unwrap_or("selection_area_");
 
         let image_set = RangeIndicatorImageSet::new(selection_prefix.to_string());
         self.range_indicator_image_set = Some(image_set);
@@ -740,7 +743,6 @@ impl WidgetKind for AreaView {
         if let Some(ref image_id) = theme.custom.get("feedback_icon_concealment") {
             self.feedback_text_params.concealment_icon = ResourceSet::image_else_empty(image_id);
         }
-
 
         if let Some(ref image_id) = theme.custom.get("feedback_icon_backstab") {
             self.feedback_text_params.backstab_icon = ResourceSet::image_else_empty(image_id);
@@ -954,10 +956,8 @@ impl WidgetKind for AreaView {
         };
 
         if let Some(ref indicator) = state.range_indicator() {
-            let mut draw_list = indicator.get_draw_list(image_set,
-                                                        self.scroll.x(),
-                                                        self.scroll.y(),
-                                                        millis);
+            let mut draw_list =
+                indicator.get_draw_list(image_set, self.scroll.x(), self.scroll.y(), millis);
             draw_list.set_scale(scale_x, scale_y);
             renderer.draw(draw_list);
         }
@@ -1056,7 +1056,7 @@ impl WidgetKind for AreaView {
                 widget,
                 VISIBILITY_TEX_ID,
                 color::WHITE,
-                );
+            );
         }
 
         if let Some(ref image) = self.selection_box_image {
@@ -1090,7 +1090,7 @@ impl WidgetKind for AreaView {
                 p.y as f32 - self.scroll.y(),
                 scale_x,
                 scale_y,
-                millis
+                millis,
             );
         }
     }

@@ -17,7 +17,7 @@
 use std::io::Error;
 use std::rc::Rc;
 
-use crate::area::{Tile};
+use crate::area::Tile;
 use sulis_core::resource::{ResourceSet, Spritesheet};
 use sulis_core::util::{invalid_data_error, Point};
 

@@ -22,6 +22,8 @@ use std::{self, f32, u32};
 
 use rlua::{self, Context, UserData, UserDataMethods};
 
+use crate::{ai, animation, script::*};
+use crate::{area_feedback_text::ColorKind, ActorState, EntityState, GameState, Location};
 use sulis_core::config::Config;
 use sulis_core::resource::ResourceSet;
 use sulis_core::util::ExtInt;
@@ -29,8 +31,6 @@ use sulis_module::{
     Actor, Attack, AttackKind, Attribute, DamageKind, Faction, HitFlags, HitKind, ImageLayer,
     InventoryBuilder, MOVE_TO_THRESHOLD,
 };
-use crate::{ai, animation, script::*};
-use crate::{area_feedback_text::ColorKind, ActorState, EntityState, GameState, Location};
 
 /// Represents a single entity for Lua scripts.  Also can represent an invalid,
 /// non-existant entity in some cases.  Many script functions pass a parent
@@ -1180,7 +1180,9 @@ impl UserData for ScriptEntity {
             let parent = entity.try_unwrap()?;
             parent.borrow_mut().actor.add_hp(amount);
             let area_state = GameState::area_state();
-            let mut text = area_state.borrow_mut().create_feedback_text(&parent.borrow());
+            let mut text = area_state
+                .borrow_mut()
+                .create_feedback_text(&parent.borrow());
             text.add_entry(format!("{}", amount), ColorKind::Heal);
             area_state.borrow_mut().add_feedback_text(text);
 

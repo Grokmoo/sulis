@@ -156,8 +156,11 @@ struct ResponseButton {
 }
 
 impl ResponseButton {
-    fn new(convo: &Rc<Conversation>, response: &Response,
-           pc: &Rc<RefCell<EntityState>>) -> Rc<RefCell<ResponseButton>> {
+    fn new(
+        convo: &Rc<Conversation>,
+        response: &Response,
+        pc: &Rc<RefCell<EntityState>>,
+    ) -> Rc<RefCell<ResponseButton>> {
         Rc::new(RefCell::new(ResponseButton {
             text: response.text.to_string(),
             to: response.to.clone(),
@@ -216,7 +219,8 @@ impl WidgetKind for ResponseButton {
                         };
                         let cb = OnTrigger::ScrollView(x, y);
                         GameState::add_ui_callback(vec![cb], &self.pc, &speaker);
-                        area.borrow_mut().set_active_entity(Some(Rc::clone(&speaker)));
+                        area.borrow_mut()
+                            .set_active_entity(Some(Rc::clone(&speaker)));
                     } else {
                         warn!("Attempted to switch to invalid speaker '{}'", speaker);
                     }
@@ -251,7 +255,8 @@ pub fn show_convo(
         let (root, view) = Widget::parent_mut::<RootView>(widget);
         let (area, _) = view.area_view();
         area.borrow_mut().clear_mouse_state();
-        area.borrow_mut().set_active_entity(Some(Rc::clone(&target)));
+        area.borrow_mut()
+            .set_active_entity(Some(Rc::clone(&target)));
 
         let (x, y) = {
             let loc = &target.borrow().location;

@@ -15,14 +15,15 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::collections::HashMap;
-use std::io::{Error};
+use std::io::Error;
 
-use sulis_core::ui::Border;
-use sulis_core::util::{Point};
-use crate::Module;
 use crate::area::tile::TerrainKind;
-use crate::generator::{GenModel, WeightedEntry, WeightedList, Maze,
-    RegionKind, RegionKinds, Rect, overlaps_any};
+use crate::generator::{
+    overlaps_any, GenModel, Maze, Rect, RegionKind, RegionKinds, WeightedEntry, WeightedList,
+};
+use crate::Module;
+use sulis_core::ui::Border;
+use sulis_core::util::Point;
 
 pub struct TerrainGen<'a, 'b> {
     model: &'b mut GenModel,
@@ -31,9 +32,11 @@ pub struct TerrainGen<'a, 'b> {
 }
 
 impl<'a, 'b> TerrainGen<'a, 'b> {
-    pub(crate) fn new(model: &'b mut GenModel,
-                      params: &'a TerrainParams,
-                      maze: &'b Maze) -> TerrainGen<'a, 'b> {
+    pub(crate) fn new(
+        model: &'b mut GenModel,
+        params: &'a TerrainParams,
+        maze: &'b Maze,
+    ) -> TerrainGen<'a, 'b> {
         TerrainGen {
             model,
             params,
@@ -63,19 +66,23 @@ impl<'a, 'b> TerrainGen<'a, 'b> {
         trace!("Performing patch pass");
         let skip = patches.len();
         for _ in 0..pass.placement_attempts {
-
             let (w, h) = (self.model.area_width, self.model.area_height);
             let patch = Feature::gen(&mut self.model, w, h, pass);
 
             let (x1, y1) = self.model.to_region_coords(patch.x * gw, patch.y * gh);
-            let (x2, y2) = self.model.to_region_coords((patch.x + patch.w) * gw,
-                                                       (patch.y + patch.h) * gh);
+            let (x2, y2) = self
+                .model
+                .to_region_coords((patch.x + patch.w) * gw, (patch.y + patch.h) * gh);
             let p1 = Point::from((x1, y1));
             let p2 = Point::from((x2, y2));
 
-            if !pass.allowable_regions.check_coords(&self.maze, p1, p2) { continue; }
+            if !pass.allowable_regions.check_coords(&self.maze, p1, p2) {
+                continue;
+            }
 
-            if overlaps_any(&patch, &patches, pass.spacing as i32) { continue; }
+            if overlaps_any(&patch, &patches, pass.spacing as i32) {
+                continue;
+            }
 
             patches.push(patch);
         }
@@ -84,13 +91,22 @@ impl<'a, 'b> TerrainGen<'a, 'b> {
             let picks = pass.kinds.pick(&mut self.model.rand);
             let terrain = self.get_terrain_tiles(picks);
 
-            self.do_patch_area(patch, terrain, pass.edge_underfill_chance,
-                                 pass.border_walls_by);
+            self.do_patch_area(
+                patch,
+                terrain,
+                pass.edge_underfill_chance,
+                pass.border_walls_by,
+            );
         }
     }
 
-    fn do_patch_area(&mut self, patch: &Feature, terrain: Option<usize>,
-                       chance: u32, border_walls_by: Option<Border>) {
+    fn do_patch_area(
+        &mut self,
+        patch: &Feature,
+        terrain: Option<usize>,
+        chance: u32,
+        border_walls_by: Option<Border>,
+    ) {
         let mut accum = 0;
 
         // north
@@ -129,8 +145,13 @@ impl<'a, 'b> TerrainGen<'a, 'b> {
         }
     }
 
-    fn set_terrain(&mut self, x: i32, y: i32, border_walls_by: Option<Border>,
-                   terrain: Option<usize>) {
+    fn set_terrain(
+        &mut self,
+        x: i32,
+        y: i32,
+        border_walls_by: Option<Border>,
+        terrain: Option<usize>,
+    ) {
         let model = &mut self.model.model;
 
         if let Some(border) = border_walls_by {
@@ -140,9 +161,13 @@ impl<'a, 'b> TerrainGen<'a, 'b> {
                     let yi = (y + y_off) * model.grid_height;
 
                     // model only relies on xi + yi * width > 0
-                    if xi < 0 || yi < 0 { continue; }
+                    if xi < 0 || yi < 0 {
+                        continue;
+                    }
 
-                    if model.is_wall(xi, yi) { return; }
+                    if model.is_wall(xi, yi) {
+                        return;
+                    }
                 }
             }
         }
@@ -161,10 +186,18 @@ impl<'a, 'b> TerrainGen<'a, 'b> {
             false
         } else {
             if self.model.rand.gen(1, 101) < chance {
-                if *accum > 1 { *accum += 1; } else { *accum = 1; }
+                if *accum > 1 {
+                    *accum += 1;
+                } else {
+                    *accum = 1;
+                }
                 true
             } else {
-                if *accum < -1 { *accum -= 1; } else { *accum = -1; }
+                if *accum < -1 {
+                    *accum -= 1;
+                } else {
+                    *accum = -1;
+                }
                 false
             }
         }
@@ -201,14 +234,18 @@ pub(crate) struct FeaturePass {
 }
 
 impl TerrainParams {
-    pub(crate) fn new(builder: TerrainParamsBuilder, module: &Module) -> Result<TerrainParams, Error> {
-        let base_kinds = WeightedList::new(builder.base_kinds, "TerrainKind",
-                                           |id| module.terrain_kind(id))?;
+    pub(crate) fn new(
+        builder: TerrainParamsBuilder,
+        module: &Module,
+    ) -> Result<TerrainParams, Error> {
+        let base_kinds = WeightedList::new(builder.base_kinds, "TerrainKind", |id| {
+            module.terrain_kind(id)
+        })?;
 
         let mut passes = Vec::new();
         for pass_bldr in builder.patch_passes {
-            let kinds = WeightedList::new(pass_bldr.kinds, "TerrainKind",
-                                          |id| module.terrain_kind(id))?;
+            let kinds =
+                WeightedList::new(pass_bldr.kinds, "TerrainKind", |id| module.terrain_kind(id))?;
 
             passes.push(FeaturePass {
                 kinds,
@@ -224,11 +261,10 @@ impl TerrainParams {
 
         Ok(TerrainParams {
             base_kinds,
-            patch_passes: passes
+            patch_passes: passes,
         })
     }
 }
-
 
 #[derive(Debug, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -257,11 +293,19 @@ struct Feature {
     h: i32,
 }
 
-impl Rect for Feature{
-    fn x(&self) -> i32 { self.x }
-    fn y(&self) -> i32 { self.y }
-    fn w(&self) -> i32 { self.w }
-    fn h(&self) -> i32 { self.h }
+impl Rect for Feature {
+    fn x(&self) -> i32 {
+        self.x
+    }
+    fn y(&self) -> i32 {
+        self.y
+    }
+    fn w(&self) -> i32 {
+        self.w
+    }
+    fn h(&self) -> i32 {
+        self.h
+    }
 }
 
 impl Feature {

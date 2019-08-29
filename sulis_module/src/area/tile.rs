@@ -18,15 +18,15 @@ use std::collections::{HashMap, HashSet};
 use std::io::Error;
 use std::rc::Rc;
 
-use sulis_core::resource::{ResourceSet, Sprite};
-use sulis_core::util::{invalid_data_error, unable_to_create_error, Point, Size, gen_rand};
 use crate::Module;
+use sulis_core::resource::{ResourceSet, Sprite};
+use sulis_core::util::{gen_rand, invalid_data_error, unable_to_create_error, Point, Size};
 
 #[derive(Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct FeatureBuilder {
     pub entries: Vec<FeatureEntry>,
-    pub size: Size
+    pub size: Size,
 }
 
 #[derive(Deserialize, Debug)]
@@ -54,7 +54,8 @@ impl Feature {
                     None => {
                         warn!("No tile '{}' found for feature '{}'", tile_id, id);
                         return unable_to_create_error("feature", &id);
-                    }, Some(tile) => Rc::clone(tile),
+                    }
+                    Some(tile) => Rc::clone(tile),
                 };
 
                 tiles.push((tile, p));

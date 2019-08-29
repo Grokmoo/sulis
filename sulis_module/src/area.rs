@@ -41,9 +41,8 @@ use sulis_core::image::Image;
 use sulis_core::resource::{ResourceSet, Sprite};
 use sulis_core::util::{unable_to_create_error, Point, Size};
 
+use crate::generator::{EncounterParams, EncounterParamsBuilder, PropParams, PropParamsBuilder};
 use crate::{Encounter, ItemListEntrySaveState, Module, ObjectSize, OnTrigger, Prop};
-use crate::generator::{EncounterParams, EncounterParamsBuilder,
-    PropParams, PropParamsBuilder};
 
 pub const MAX_AREA_SIZE: i32 = 128;
 
@@ -137,7 +136,6 @@ impl Area {
 
         let mut transitions: Vec<Transition> = Vec::new();
         for (index, t_builder) in builder.transitions.iter().enumerate() {
-
             let image = match ResourceSet::image(&t_builder.image_display) {
                 None => {
                     warn!(
@@ -467,7 +465,9 @@ where
     let vec_u8 = base64::decode(&input.entries).map_err(|err| Error::custom(err.to_string()))?;
 
     let mut out = Vec::new();
-    if vec_u8.is_empty() { return Ok(out); }
+    if vec_u8.is_empty() {
+        return Ok(out);
+    }
 
     let mut i = 0;
     loop {
@@ -550,7 +550,9 @@ where
 
         let mut result_vec: Vec<Vec<u16>> = Vec::new();
         let mut i = 0;
-        if vec_u8.is_empty() { continue; }
+        if vec_u8.is_empty() {
+            continue;
+        }
         loop {
             if i + 4 > vec_u8.len() {
                 return Err(Error::custom("Invalid encoded base64 string"));
@@ -620,10 +622,21 @@ pub struct TriggerBuilder {
 #[derive(Deserialize, Serialize, Debug, Clone)]
 #[serde(deny_unknown_fields)]
 pub enum ToKind {
-    Area { id: String, x: i32, y: i32 },
-    CurArea { x: i32, y: i32 },
+    Area {
+        id: String,
+        x: i32,
+        y: i32,
+    },
+    CurArea {
+        x: i32,
+        y: i32,
+    },
     WorldMap,
-    FindLink { id: String, x_offset: i32, y_offset: i32 },
+    FindLink {
+        id: String,
+        x_offset: i32,
+        y_offset: i32,
+    },
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone)]

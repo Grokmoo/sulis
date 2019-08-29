@@ -397,7 +397,11 @@ impl PropState {
 }
 
 impl AreaDrawable for PropState {
-    fn cache(&mut self, _renderer: &mut dyn GraphicsRenderer, _texture_cache: &mut EntityTextureCache) {
+    fn cache(
+        &mut self,
+        _renderer: &mut dyn GraphicsRenderer,
+        _texture_cache: &mut EntityTextureCache,
+    ) {
     }
 
     fn draw(

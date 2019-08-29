@@ -17,13 +17,11 @@
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use crate::{RootView};
+use crate::RootView;
 use sulis_core::ui::{animation_state, Widget};
 use sulis_core::util::Point;
-use sulis_module::{area::ToKind, Faction, Module, ObjectSize, Time, OnTrigger, MOVE_TO_THRESHOLD};
-use sulis_state::{
-    AreaState, EntityState, GameState, PropState, ScriptCallback,
-};
+use sulis_module::{area::ToKind, Faction, Module, ObjectSize, OnTrigger, Time, MOVE_TO_THRESHOLD};
+use sulis_state::{AreaState, EntityState, GameState, PropState, ScriptCallback};
 
 pub fn get_action(x_f32: f32, y_f32: f32) -> Box<dyn ActionKind> {
     let (x, y) = (x_f32 as i32, y_f32 as i32);
@@ -427,12 +425,16 @@ impl ActionKind for TransitionAction {
                 let (root, view) = Widget::parent_mut::<RootView>(widget);
                 view.set_map_window(&root, true, true);
                 return true;
-            },
-            ToKind::FindLink { ref id, x_offset, y_offset } => {
+            }
+            ToKind::FindLink {
+                ref id,
+                x_offset,
+                y_offset,
+            } => {
                 GameState::transition_to(Some(id), None, Point::new(x_offset, y_offset), time);
                 let root = Widget::get_root(widget);
                 root.borrow_mut().invalidate_children();
-            },
+            }
         }
         false
     }
@@ -715,7 +717,9 @@ impl ActionKind for InvalidAction {
         animation_state::Kind::MouseInvalid
     }
 
-    fn fire_action(&mut self, _widget: &Rc<RefCell<Widget>>) -> bool { false }
+    fn fire_action(&mut self, _widget: &Rc<RefCell<Widget>>) -> bool {
+        false
+    }
 
     fn get_hover_info(&self) -> Option<(Rc<ObjectSize>, i32, i32)> {
         None

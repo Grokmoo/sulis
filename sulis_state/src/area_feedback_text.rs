@@ -17,11 +17,11 @@
 use std::rc::Rc;
 use std::time::Instant;
 
-use sulis_core::image::Image;
 use sulis_core::config::Config;
+use sulis_core::image::Image;
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::resource::{Font, ResourceSet};
-use sulis_core::ui::{Color, LineRenderer, animation_state};
+use sulis_core::ui::{animation_state, Color, LineRenderer};
 use sulis_core::util::{self, Point};
 use sulis_module::DamageKind;
 
@@ -132,7 +132,7 @@ impl AreaFeedbackText {
         self.entries.push(Entry {
             text: String::new(),
             icon: Some(icon),
-            color_kind
+            color_kind,
         });
     }
 
@@ -180,7 +180,7 @@ impl AreaFeedbackText {
         offset_y: f32,
         scale_x: f32,
         scale_y: f32,
-        millis: u32
+        millis: u32,
     ) {
         // creating the line renderer here is not ideal but is a low cost operation
         let font_renderer = LineRenderer::new(&params.font);
@@ -188,7 +188,6 @@ impl AreaFeedbackText {
             self.text_width =
                 params.font.get_width(&self.total_text) as f32 / params.font.line_height as f32;
         }
-
 
         let mut pos_x = offset_x + self.pos_x - params.scale * self.text_width / 2.0;
         if pos_x < 0.0 {
@@ -209,7 +208,6 @@ impl AreaFeedbackText {
             };
             color.a = color.a * self.alpha;
 
-
             if let Some(icon) = entry.icon {
                 let w = params.scale / 1.5;
                 let h = params.scale / 1.5;
@@ -225,15 +223,21 @@ impl AreaFeedbackText {
                 };
 
                 let mut draw_list = DrawList::empty_sprite();
-                image.append_to_draw_list(&mut draw_list, state,
-                                          pos_x, pos_y + params.scale * 0.15,
-                                          w, h, millis);
+                image.append_to_draw_list(
+                    &mut draw_list,
+                    state,
+                    pos_x,
+                    pos_y + params.scale * 0.15,
+                    w,
+                    h,
+                    millis,
+                );
                 draw_list.set_scale(scale_x, scale_y);
                 draw_list.set_color(color);
                 renderer.draw(draw_list);
 
-                pos_x += 1.5 * params.scale / params.font.line_height as f32 *
-                    params.font.get_char_width('w') as f32;
+                pos_x += 1.5 * params.scale / params.font.line_height as f32
+                    * params.font.get_char_width('w') as f32;
             } else {
                 let (mut draw_list, next_x) =
                     font_renderer.get_draw_list(&entry.text, pos_x, pos_y, params.scale);

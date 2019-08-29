@@ -14,14 +14,18 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::rc::Rc;
-use std::io::Error;
 use std::collections::HashMap;
+use std::io::Error;
+use std::rc::Rc;
 
-use sulis_core::util::{Point};
-use crate::{Module, Prop, area::{Layer, PropDataBuilder}};
-use crate::generator::{GenModel, WeightedEntry, WeightedList, Maze, RegionKind, RegionKinds,
-    Rect, overlaps_any};
+use crate::generator::{
+    overlaps_any, GenModel, Maze, Rect, RegionKind, RegionKinds, WeightedEntry, WeightedList,
+};
+use crate::{
+    area::{Layer, PropDataBuilder},
+    Module, Prop,
+};
+use sulis_core::util::Point;
 
 pub struct PropGen<'a, 'b> {
     model: &'b mut GenModel,
@@ -31,10 +35,12 @@ pub struct PropGen<'a, 'b> {
 }
 
 impl<'a, 'b> PropGen<'a, 'b> {
-    pub(crate) fn new(model: &'b mut GenModel,
-                      layers: &'b [Layer],
-                      params: &'a PropParams,
-                      maze: &'b Maze) -> PropGen<'a, 'b> {
+    pub(crate) fn new(
+        model: &'b mut GenModel,
+        layers: &'b [Layer],
+        params: &'a PropParams,
+        maze: &'b Maze,
+    ) -> PropGen<'a, 'b> {
         PropGen {
             model,
             layers,
@@ -43,8 +49,10 @@ impl<'a, 'b> PropGen<'a, 'b> {
         }
     }
 
-    pub(crate) fn generate(&mut self,
-                           addn_passes: &[PropPass]) -> Result<Vec<PropDataBuilder>, Error> {
+    pub(crate) fn generate(
+        &mut self,
+        addn_passes: &[PropPass],
+    ) -> Result<Vec<PropDataBuilder>, Error> {
         let mut props = Vec::new();
 
         for pass in self.params.passes.iter().chain(addn_passes) {
@@ -54,16 +62,24 @@ impl<'a, 'b> PropGen<'a, 'b> {
                 let data = PropData::gen(&mut self.model, w, h, prop);
 
                 if pass.require_passable {
-                    if !data.is_passable(&self.layers) { continue; }
+                    if !data.is_passable(&self.layers) {
+                        continue;
+                    }
                 }
 
                 let p1 = Point::from(self.model.to_region_coords(data.x, data.y));
-                let p2 = Point::from(self.model.to_region_coords(data.x + data.w(),
-                                                                 data.y + data.h()));
+                let p2 = Point::from(
+                    self.model
+                        .to_region_coords(data.x + data.w(), data.y + data.h()),
+                );
 
-                if !pass.allowable_regions.check_coords(&self.maze, p1, p2) { continue; }
+                if !pass.allowable_regions.check_coords(&self.maze, p1, p2) {
+                    continue;
+                }
 
-                if overlaps_any(&data, &props, pass.spacing as i32) { continue; }
+                if overlaps_any(&data, &props, pass.spacing as i32) {
+                    continue;
+                }
 
                 props.push(data);
             }
@@ -90,10 +106,18 @@ struct PropData {
 }
 
 impl Rect for PropData {
-    fn x(&self) -> i32 { self.x }
-    fn y(&self) -> i32 { self.y }
-    fn w(&self) -> i32 { self.prop.size.width }
-    fn h(&self) -> i32 { self.prop.size.height }
+    fn x(&self) -> i32 {
+        self.x
+    }
+    fn y(&self) -> i32 {
+        self.y
+    }
+    fn w(&self) -> i32 {
+        self.prop.size.width
+    }
+    fn h(&self) -> i32 {
+        self.prop.size.height
+    }
 }
 
 impl PropData {
@@ -113,8 +137,10 @@ pub struct PropParams {
 }
 
 impl PropParams {
-    pub(crate) fn with_module(builder: PropParamsBuilder,
-                              module: &Module) -> Result<PropParams, Error> {
+    pub(crate) fn with_module(
+        builder: PropParamsBuilder,
+        module: &Module,
+    ) -> Result<PropParams, Error> {
         PropParams::build(builder, |id| module.props.get(id).map(|p| Rc::clone(p)))
     }
 
@@ -123,7 +149,9 @@ impl PropParams {
     }
 
     fn build<F>(builder: PropParamsBuilder, f: F) -> Result<PropParams, Error>
-        where F: Fn(&str) -> Option<Rc<Prop>> {
+    where
+        F: Fn(&str) -> Option<Rc<Prop>>,
+    {
         let mut passes = Vec::new();
 
         for pass in builder.passes {
@@ -165,5 +193,5 @@ pub struct PropPassBuilder {
     allowable_regions: Vec<RegionKind>,
 
     #[serde(default)]
-    require_passable: bool
+    require_passable: bool,
 }

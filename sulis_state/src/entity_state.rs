@@ -98,8 +98,7 @@ impl EntityState {
             Some(area) => Ok(area),
         }?;
 
-        let location = Location::new(save.location.x, save.location.y,
-                                     &area.borrow().area.area);
+        let location = Location::new(save.location.x, save.location.y, &area.borrow().area.area);
 
         let size = match Module::object_size(&save.size) {
             None => invalid_data_error(&format!("Invalid size '{}' for actor", save.size)),
@@ -646,7 +645,11 @@ impl EntityState {
 }
 
 pub trait AreaDrawable {
-    fn cache(&mut self, renderer: &mut dyn GraphicsRenderer, texture_cache: &mut EntityTextureCache);
+    fn cache(
+        &mut self,
+        renderer: &mut dyn GraphicsRenderer,
+        texture_cache: &mut EntityTextureCache,
+    );
 
     fn draw(
         &self,
@@ -663,7 +666,11 @@ pub trait AreaDrawable {
 }
 
 impl AreaDrawable for EntityState {
-    fn cache(&mut self, renderer: &mut dyn GraphicsRenderer, texture_cache: &mut EntityTextureCache) {
+    fn cache(
+        &mut self,
+        renderer: &mut dyn GraphicsRenderer,
+        texture_cache: &mut EntityTextureCache,
+    ) {
         if self.texture_cache_slot.is_none() {
             self.texture_cache_slot = Some(texture_cache.add_entity(&self, renderer));
             self.actor.check_texture_cache_invalid();

@@ -92,7 +92,11 @@ impl WidgetKind for TransitionWindow {
                 ToKind::CurArea { x, y } => (String::new(), x, y),
                 ToKind::Area { ref id, x, y } => (id.to_string(), x, y),
                 ToKind::WorldMap => (String::new(), 0, 0),
-                ToKind::FindLink { ref id, x_offset, y_offset} => (id.to_string(), x_offset, y_offset),
+                ToKind::FindLink {
+                    ref id,
+                    x_offset,
+                    y_offset,
+                } => (id.to_string(), x_offset, y_offset),
             };
 
             let max = MAX_AREA_SIZE - 1;
@@ -260,7 +264,12 @@ impl WidgetKind for TransitionWindow {
                     }
                 })));
 
-            widgets.append(&mut vec![cur_area_button, area_button, world_map_button, find_link_button]);
+            widgets.append(&mut vec![
+                cur_area_button,
+                area_button,
+                world_map_button,
+                find_link_button,
+            ]);
             widgets.append(&mut vec![
                 to_area,
                 from_label,

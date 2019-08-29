@@ -14,16 +14,18 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::io::{ErrorKind, Error};
 use std::collections::HashMap;
+use std::io::{Error, ErrorKind};
 use std::rc::Rc;
 
 use sulis_core::resource::ResourceSet;
-use sulis_core::util::{self, ReproducibleRandom, unable_to_create_error};
-use sulis_module::Module;
-use sulis_module::area::{Area, LayerSet, Tile, PathFinderGrid, PropData,
-    EncounterData, Transition, TransitionBuilder, create_prop};
+use sulis_core::util::{self, unable_to_create_error, ReproducibleRandom};
+use sulis_module::area::{
+    create_prop, Area, EncounterData, LayerSet, PathFinderGrid, PropData, Tile, Transition,
+    TransitionBuilder,
+};
 use sulis_module::generator::AreaGenerator;
+use sulis_module::Module;
 
 pub struct GeneratedArea {
     pub area: Rc<Area>,
@@ -56,18 +58,22 @@ impl GeneratedArea {
 
             let params = area.generator.as_ref().unwrap();
 
-            let output = pregen.generator.generate(area.width,
-                                                   area.height,
-                                                   pregen.rand,
-                                                   params,
-                                                   &transition_builders,
-                                                   pregen.tiles_to_add)?;
+            let output = pregen.generator.generate(
+                area.width,
+                area.height,
+                pregen.rand,
+                params,
+                &transition_builders,
+                pregen.tiles_to_add,
+            )?;
             layers = output.layers;
             generated_props = output.props;
             generated_encounters = output.encounters;
 
-            info!("Area generation complete in {} secs",
-                  util::format_elapsed_secs(start_time.elapsed()));
+            info!(
+                "Area generation complete in {} secs",
+                util::format_elapsed_secs(start_time.elapsed())
+            );
         }
 
         let mut props: Vec<_> = area.props.iter().map(|p| p.clone()).collect();
@@ -81,7 +87,7 @@ impl GeneratedArea {
                 None => {
                     warn!("No encounter '{}' found", builder.id);
                     return unable_to_create_error("area", &area.id);
-                },
+                }
                 Some(enc) => enc,
             };
             encounters.push(EncounterData {
@@ -96,23 +102,27 @@ impl GeneratedArea {
 
         let mut path_grids = HashMap::new();
         for size in Module::all_sizes() {
-            let path_grid = PathFinderGrid::new(Rc::clone(&size),
-                                                layer_set.width,
-                                                layer_set.height,
-                                                &layer_set.layers);
+            let path_grid = PathFinderGrid::new(
+                Rc::clone(&size),
+                layer_set.width,
+                layer_set.height,
+                &layer_set.layers,
+            );
             path_grids.insert(size.id.to_string(), path_grid);
         }
 
         let mut transitions = Vec::new();
         for (index, t_builder) in transition_builders.into_iter().enumerate() {
             let img_id = &t_builder.image_display;
-            let image = ResourceSet::image(img_id).ok_or(
-                Error::new(ErrorKind::InvalidInput, format!("No image '{}' found", img_id))
-            )?;
+            let image = ResourceSet::image(img_id).ok_or(Error::new(
+                ErrorKind::InvalidInput,
+                format!("No image '{}' found", img_id),
+            ))?;
 
-            let size = Module::size(&t_builder.size).ok_or(
-                Error::new(ErrorKind::InvalidInput, format!("No size '{}' found", t_builder.size))
-            )?;
+            let size = Module::size(&t_builder.size).ok_or(Error::new(
+                ErrorKind::InvalidInput,
+                format!("No size '{}' found", t_builder.size),
+            ))?;
 
             let p = t_builder.from;
             if !p.in_bounds(area.width, area.height) {
@@ -174,15 +184,18 @@ impl PregenOutput {
             Some(params) => params,
         };
 
-        let generator = Module::generator(&params.id).ok_or(
-            Error::new(ErrorKind::InvalidInput, format!("Generator '{}' not found", params.id))
-        )?;
+        let generator = Module::generator(&params.id).ok_or(Error::new(
+            ErrorKind::InvalidInput,
+            format!("Generator '{}' not found", params.id),
+        ))?;
 
         let (w, h) = (area.width, area.height);
         let transition_out = generator.generate_transitions(w, h, &mut rand, &params)?;
 
-        info!("Area pregen complete in {} secs",
-              util::format_elapsed_secs(start_time.elapsed()));
+        info!(
+            "Area pregen complete in {} secs",
+            util::format_elapsed_secs(start_time.elapsed())
+        );
 
         let mut transitions = Vec::new();
         let mut tiles_out = Vec::new();
@@ -199,5 +212,7 @@ impl PregenOutput {
         }))
     }
 
-    pub fn seed(&self) -> u128 { self.rand.seed() }
+    pub fn seed(&self) -> u128 {
+        self.rand.seed()
+    }
 }

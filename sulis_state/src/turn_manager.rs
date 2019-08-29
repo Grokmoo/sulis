@@ -19,8 +19,7 @@ use std::collections::{vec_deque::Iter, HashMap, HashSet, VecDeque};
 use std::rc::Rc;
 
 use crate::script::{CallbackData, FuncKind};
-use crate::{AreaState, ChangeListener, ChangeListenerList, Effect,
-    EntityState, GameState};
+use crate::{AreaState, ChangeListener, ChangeListenerList, Effect, EntityState, GameState};
 use sulis_core::util::{gen_rand, Point};
 use sulis_module::{Faction, Module, Time, ROUND_TIME_MILLIS};
 
@@ -374,8 +373,7 @@ impl TurnManager {
 
         if current.borrow().is_party_member() {
             GameState::set_selected_party_member(Rc::clone(current));
-            area_state.set_default_range_indicator(Some(current),
-                self.is_combat_active());
+            area_state.set_default_range_indicator(Some(current), self.is_combat_active());
         } else {
             GameState::clear_selected_party_member();
             area_state.set_range_indicator(None);
@@ -607,11 +605,13 @@ impl TurnManager {
     }
 
     fn check_combat_run_away(&self) -> bool {
-        let run_away_dist = Module::rules().combat_run_away_vis_factor *
-            GameState::area_state().borrow().area.area.vis_dist as f32;
+        let run_away_dist = Module::rules().combat_run_away_vis_factor
+            * GameState::area_state().borrow().area.area.vis_dist as f32;
 
-        let party_pos: Vec<_> = GameState::party().into_iter().
-            map(|e| e.borrow().location.to_point()).collect();
+        let party_pos: Vec<_> = GameState::party()
+            .into_iter()
+            .map(|e| e.borrow().location.to_point())
+            .collect();
 
         for entity in self.entities.iter() {
             let entity = match entity {
@@ -619,7 +619,9 @@ impl TurnManager {
                 Some(ref entity) => entity,
             };
             let entity = entity.borrow();
-            if !entity.is_ai_active() { continue; }
+            if !entity.is_ai_active() {
+                continue;
+            }
 
             for p in &party_pos {
                 if p.dist(&entity.location.to_point()) < run_away_dist {

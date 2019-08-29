@@ -163,8 +163,7 @@ impl AreaState {
                 Some(prop) => Ok(prop),
             }?;
 
-            let location = Location::from_point(&prop_save_state.location,
-                                                &area_state.area.area);
+            let location = Location::from_point(&prop_save_state.location, &area_state.area.area);
 
             let prop_data = PropData {
                 prop,
@@ -319,7 +318,9 @@ impl AreaState {
         }
 
         for (index, spawn) in auto_spawn.into_iter().enumerate() {
-            if spawn { self.spawn_encounter(index, true); }
+            if spawn {
+                self.spawn_encounter(index, true);
+            }
         }
     }
 
@@ -354,14 +355,16 @@ impl AreaState {
         }
     }
 
-    pub fn set_default_range_indicator(&mut self,
-                                       entity: Option<&Rc<RefCell<EntityState>>>,
-                                       is_combat_active: bool) {
+    pub fn set_default_range_indicator(
+        &mut self,
+        entity: Option<&Rc<RefCell<EntityState>>>,
+        is_combat_active: bool,
+    ) {
         let entity = match entity {
             None => {
                 self.set_range_indicator(None);
                 return;
-            },
+            }
             Some(entity) => entity,
         };
 
@@ -484,7 +487,9 @@ impl AreaState {
     pub fn spawn_encounter_at(&mut self, x: i32, y: i32) -> bool {
         let mut enc_index = None;
         for (index, data) in self.area.encounters.iter().enumerate() {
-            if data.location.x != x || data.location.y != y { continue; }
+            if data.location.x != x || data.location.y != y {
+                continue;
+            }
 
             enc_index = Some(index);
             break;
@@ -504,12 +509,19 @@ impl AreaState {
             let enc_data = &self.area.encounters[enc_index];
 
             let mgr = GameState::turn_manager();
-            let ai_group = mgr.borrow_mut().get_next_ai_group(&self.area.area.id, enc_index);
+            let ai_group = mgr
+                .borrow_mut()
+                .get_next_ai_group(&self.area.area.id, enc_index);
             if respect_debug && !Config::debug().encounter_spawning {
                 return;
             }
             let encounter = &enc_data.encounter;
-            (encounter.gen_actors(), enc_data.location, enc_data.size, ai_group)
+            (
+                encounter.gen_actors(),
+                enc_data.location,
+                enc_data.size,
+                ai_group,
+            )
         };
 
         for (actor, unique_id) in actors {
@@ -563,11 +575,7 @@ impl AreaState {
                     continue;
                 }
 
-                if !self
-                    .area
-                    .path_grid(&actor.race.size.id)
-                    .is_passable(x, y)
-                {
+                if !self.area.path_grid(&actor.race.size.id).is_passable(x, y) {
                     continue;
                 }
 
@@ -1398,8 +1406,9 @@ impl AreaState {
         if remove_targeter {
             self.targeter.take();
             self.set_default_range_indicator(
-                GameState::selected().first(), GameState::is_combat_active()
-                );
+                GameState::selected().first(),
+                GameState::is_combat_active(),
+            );
         }
     }
 
@@ -1587,8 +1596,12 @@ impl AreaState {
                 }
             }
 
-            if area_pos_valid { break; }
-            if area_pos.y == 0 { break; }
+            if area_pos_valid {
+                break;
+            }
+            if area_pos.y == 0 {
+                break;
+            }
         }
         let width = target.size.width as f32;
         let pos_x = area_pos.x as f32 + width / 2.0;
@@ -1598,7 +1611,9 @@ impl AreaState {
     }
 
     pub fn add_feedback_text(&mut self, text: AreaFeedbackText) {
-        if text.is_empty() { return; }
+        if text.is_empty() {
+            return;
+        }
 
         self.feedback_text.push(text);
     }

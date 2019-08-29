@@ -14,7 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::cell::{RefCell};
+use std::cell::RefCell;
 use std::io::Error;
 use std::mem;
 use std::rc::Rc;
@@ -663,7 +663,9 @@ impl Widget {
             for i in 0..len {
                 let child = Rc::clone(&parent.borrow().children[i]);
 
-                if !ResourceSet::has_theme(&child.borrow().theme_id) { continue; }
+                if !ResourceSet::has_theme(&child.borrow().theme_id) {
+                    continue;
+                }
                 let child_theme = ResourceSet::theme(&child.borrow().theme_id);
 
                 match child_theme.kind {
@@ -671,8 +673,12 @@ impl Widget {
                     _ => continue,
                 }
 
-                let theme_id = format!("{}.{}.{}", parent_theme.id, child.borrow().theme_subname,
-                    not_found_child.borrow().theme_subname);
+                let theme_id = format!(
+                    "{}.{}.{}",
+                    parent_theme.id,
+                    child.borrow().theme_subname,
+                    not_found_child.borrow().theme_subname
+                );
 
                 if ResourceSet::has_theme(&theme_id) {
                     not_found_child.borrow_mut().theme_id = theme_id;
@@ -706,7 +712,10 @@ impl Widget {
             let child = Rc::clone(widget.borrow().keyboard_focus_child.as_ref().unwrap());
             let child_kind = Rc::clone(&child.borrow().kind);
 
-            trace!("Dispatch to keyboard focus child: {}", child.borrow().theme_id);
+            trace!(
+                "Dispatch to keyboard focus child: {}",
+                child.borrow().theme_id
+            );
             match event.kind {
                 event::Kind::CharTyped(c) => {
                     return child_kind.borrow_mut().on_char_typed(&child, c);

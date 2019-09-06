@@ -253,7 +253,7 @@ impl AreaGenerator {
             let (end_x, end_y) = (open[i + 1].x, open[i + 1].y);
             let (end_x, end_y) = (end_x as f32, end_y as f32);
 
-            // print!("Find from {},{} to {},{}\n", start_x, start_y, end_x, end_y);
+            // print!("===PATH=== Find from {},{} to {},{}\n", start_x, start_y, end_x, end_y);
             if path_finder
                 .find(
                     &location_checker,
@@ -265,10 +265,12 @@ impl AreaGenerator {
                 )
                 .is_none()
             {
-                return Err(Error::new(
-                    ErrorKind::InvalidInput,
-                    format!("Unable to path between generated rooms {} and {}", i, i + 1),
-                ));
+
+                warn!("Unable to path between generated rooms {} and {}", i, i + 1);
+                // return Err(Error::new(
+                //     ErrorKind::InvalidInput,
+                //     format!("Unable to path between generated rooms {} and {}", i, i + 1),
+                // ));
             }
         }
 

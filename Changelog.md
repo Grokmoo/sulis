@@ -5,6 +5,32 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html) is used with major version changes for breaking save game and data format compatibility.
 
+## [0.3.0] - 2019-09-09
+This version is save compatible with 0.2.x.
+### Added
+- Procedural dungeon generator and a dungeon crawl campaign, The Endless Dungeon
+- It is now possible to run away from combat (as long as you are fast enough)
+- on_tick and and on_round script triggers
+- Logger output in user config file is more flexible
+- Feature editor type in the Editor
+- The default zoom level is now configurable
+- Attacks and abilities now show their range when being activated
+
+### Changed
+- Better combat feedback and icons to represent different attack types
+- Improved character sheet
+- Dialog window has a much improved UI flow and better focus
+- Better lua script sandboxing and instruction counting
+- Improved script performance
+- Rewrote theme system from scratch for more extensibility and integration into resources system
+- Reorganized code to remove under-utilized modules
+
+### Fixed
+- Hide ability was not working correctly with attacks
+- UI tweaks to improve movement to neighboring tiles
+- Fixed mouseover flicker that occurred on some display drivers
+- Several Keyboard focus issues fixed
+
 ## [0.2.2] - 2019-01-19
 This version remains save compatible with 0.2.x.
 ### Added

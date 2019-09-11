@@ -146,6 +146,9 @@ themes:
             from: character_builder.ability_selector_pane.abilities_pane
             background: druid_abilities
             size: [128, 128]
+          abilities_pane_warlock:
+            from: character_builder.ability_selector_pane.abilities_pane
+            size: [128, 128]
           abilities_pane_general:
             from: character_builder.ability_selector_pane.abilities_pane
             background: general_abilities

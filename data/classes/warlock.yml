@@ -1,0 +1,191 @@
+id: warlock
+name: Warlock
+description: |
+  Warlocks are powerful magic users who have developed their skills under the tutelage of isolated masters or largely on their own.  They do not possess the rigor or pure skill of the Mage, but are also not limited by structures such as the Circles of Magic.  In addition to an array of hexes, charms, and transmutations, warlocks also can cast a limited number of powerful Invocations each day.  Each invocation greatly enhances the user's power in a variety of ways.
+bonuses_per_level:
+  - kind:
+      hit_points: 4
+  - kind:
+      melee_accuracy: 3
+  - kind:
+      ranged_accuracy: 3
+  - kind:
+      spell_accuracy: 3
+  - kind:
+      defense: 2
+  - kind:
+      fortitude: 2
+  - kind:
+      reflex: 2
+  - kind:
+      will: 3
+  - kind:
+      initiative: 1
+  - kind:
+      caster_level: 1
+starting_abilities:
+  - armor_light
+  - weapon_axe
+  - weapon_crossbow
+  - weapon_bow
+  - weapon_spear
+  - weapon_mace
+  - weapon_simple
+upgrades:
+  1:
+    ability_choices: []
+    group_uses_per_encounter:
+      - [ Warlock, 3 ]
+      - [ Special, ~ ]
+    group_uses_per_day:
+      - [ "Invocations", 1 ]
+  2:
+    ability_choices: [ warlock ]
+    group_uses_per_encounter:
+      - [ Warlock, 4 ]
+      - [ Special, ~ ]
+    group_uses_per_day:
+      - [ "Invocations", 1 ]
+  3:
+    ability_choices: [ warlock, general ]
+    group_uses_per_encounter:
+      - [ Warlock, 4 ]
+      - [ Special, ~ ]
+    group_uses_per_day:
+      - [ "Invocations", 2 ]
+  4:
+    ability_choices: [ warlock ]
+    group_uses_per_encounter:
+      - [ Warlock, 5 ]
+      - [ Special, ~ ]
+    group_uses_per_day:
+      - [ "Invocations", 2 ]
+  5:
+    ability_choices: [ warlock, general ]
+    group_uses_per_encounter:
+      - [ Warlock, 5 ]
+      - [ Special, ~ ]
+    group_uses_per_day:
+      - [ "Invocations", 2 ]
+  6:
+    ability_choices: [ warlock ]
+    group_uses_per_encounter:
+      - [ Warlock, 5 ]
+      - [ Special, ~ ]
+    group_uses_per_day:
+      - [ "Invocations", 3 ]
+  7:
+    ability_choices: [ warlock, general ]
+    group_uses_per_encounter:
+      - [ Warlock, 6 ]
+      - [ Special, ~ ]
+    group_uses_per_day:
+      - [ "Invocations", 3 ]
+  8:
+    ability_choices: [ warlock ]
+    group_uses_per_encounter:
+      - [ Warlock, 6 ]
+      - [ Special, ~ ]
+    group_uses_per_day:
+      - [ "Invocations", 3 ]
+  9:
+    ability_choices: [ warlock, general ]
+    group_uses_per_encounter:
+      - [ Warlock, 6 ]
+      - [ Special, ~ ]
+    group_uses_per_day:
+      - [ "Invocations", 4 ]
+  10:
+    ability_choices: [ warlock ]
+    group_uses_per_encounter:
+      - [ Warlock, 7 ]
+      - [ Special, ~ ]
+    group_uses_per_day:
+      - [ "Invocations", 4 ]
+  11:
+    ability_choices: [ warlock, general ]
+    group_uses_per_encounter:
+      - [ Warlock, 7 ]
+      - [ Special, ~ ]
+    group_uses_per_day:
+      - [ "Invocations", 4 ]
+  12:
+    ability_choices: [ warlock ]
+    group_uses_per_encounter:
+      - [ Warlock, 7 ]
+      - [ Special, ~ ]
+    group_uses_per_day:
+      - [ "Invocations", 5 ]
+  13:
+    ability_choices: [ warlock, general ]
+    group_uses_per_encounter:
+      - [ Warlock, 8 ]
+      - [ Special, ~ ]
+    group_uses_per_day:
+      - [ "Invocations", 5 ]
+  14:
+    ability_choices: [ warlock ]
+    group_uses_per_encounter:
+      - [ Warlock, 8 ]
+      - [ Special, ~ ]
+    group_uses_per_day:
+      - [ "Invocations", 5 ]
+  15:
+    ability_choices: [ warlock, general ]
+    group_uses_per_encounter:
+      - [ Warlock, 8 ]
+      - [ Special, ~ ]
+    group_uses_per_day:
+      - [ "Invocations", 6 ]
+  16:
+    ability_choices: [ warlock, general ]
+    group_uses_per_encounter:
+      - [ Warlock, 9 ]
+      - [ Special, ~ ]
+    group_uses_per_day:
+      - [ "Invocations", 6 ]
+  17:
+    ability_choices: [ warlock, general ]
+    group_uses_per_encounter:
+      - [ Warlock, 9 ]
+      - [ Special, ~ ]
+    group_uses_per_day:
+      - [ "Invocations", 6 ]
+  18:
+    ability_choices: [ warlock, general ]
+    group_uses_per_encounter:
+      - [ Warlock, 9 ]
+      - [ Special, ~ ]
+    group_uses_per_day:
+      - [ "Invocations", 6 ]
+  19:
+    ability_choices: [ warlock, general ]
+    group_uses_per_encounter:
+      - [ Warlock, 9 ]
+      - [ Special, ~ ]
+    group_uses_per_day:
+      - [ "Invocations", 6 ]
+kits:
+  - name: Warlock
+    default_attributes:
+      str: 10
+      dex: 13
+      end: 13
+      per: 17
+      int: 13
+      wis: 14
+    starting_inventory:
+      equipped:
+        HeldMain: { id: shortspear }
+        HeldOff: { id: shield_small }
+        Feet: { id: boots_leather }
+        Torso: { id: torso_leather }
+        Legs: { id: legs_pants }
+        Head: { id: helm_hood }
+      quick:
+        Usable1: { id: potion_healing }
+        Usable2: { id: potion_mind }
+      pc_starting_coins: 500
+    description: |
+      A generic warlock.
+

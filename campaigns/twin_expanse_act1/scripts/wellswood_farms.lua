@@ -1,5 +1,5 @@
 function on_area_load(parent)
-  local target = game:entity_with_id("farmer")
+  local target = game:entity_with_id("gethruk")
   game:start_conversation("farms_intro", target)
 end
 

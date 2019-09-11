@@ -34,7 +34,7 @@ use sulis_state::{
 
 use crate::{
     ap_bar, character_window, window_fade, ConfirmationWindow, CutsceneWindow, GameOverWindow,
-    LoadingScreen, RootView, ScriptMenu, UIBlocker, WindowFade,
+    AreaView, LoadingScreen, RootView, ScriptMenu, UIBlocker, WindowFade,
 };
 
 pub const NAME: &str = "dialog_window";
@@ -169,6 +169,28 @@ impl ResponseButton {
             convo: Rc::clone(convo),
         }))
     }
+
+    fn check_switch_speaker(&self, node: &str, area: &Rc<RefCell<AreaView>>) {
+        let speaker = match self.convo.switch_speaker(node) {
+            None => return,
+            Some(ref speaker) => speaker,
+        };
+
+        let speaker = match entity_with_id(speaker.to_string()) {
+            None => {
+                warn!("Attempted to switch to invalid speaker '{}'", speaker);
+                return;
+            }, Some(speaker) => speaker,
+        };
+
+        let (x, y) = {
+            let speaker = &speaker.borrow().location;
+            (speaker.x, speaker.y)
+        };
+        let cb = OnTrigger::ScrollView(x, y);
+        GameState::add_ui_callback(vec![cb], &self.pc, &speaker);
+        area.borrow_mut().set_active_entity(Some(Rc::clone(&speaker)));
+    }
 }
 
 impl WidgetKind for ResponseButton {
@@ -207,27 +229,12 @@ impl WidgetKind for ResponseButton {
         match self.to {
             None => {
                 parent.borrow_mut().mark_for_removal();
-
                 area.borrow_mut().set_active_entity(None);
             }
             Some(ref to) => {
-                if let Some(ref speaker) = self.convo.switch_speaker(&to) {
-                    if let Some(speaker) = entity_with_id(speaker.to_string()) {
-                        let (x, y) = {
-                            let speaker = &speaker.borrow().location;
-                            (speaker.x, speaker.y)
-                        };
-                        let cb = OnTrigger::ScrollView(x, y);
-                        GameState::add_ui_callback(vec![cb], &self.pc, &speaker);
-                        area.borrow_mut()
-                            .set_active_entity(Some(Rc::clone(&speaker)));
-                    } else {
-                        warn!("Attempted to switch to invalid speaker '{}'", speaker);
-                    }
-                }
-
+                self.check_switch_speaker(to, &area);
                 window.cur_node = to.to_string();
-                parent.borrow_mut().invalidate_children();
+                parent.borrow_mut().invalidate_children()
             }
         }
 

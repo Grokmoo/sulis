@@ -1,0 +1,21 @@
+id: vampiric_touch
+name: "Vampiric Touch"
+icon: abilities/vampiric_touch
+description: |
+  You touch a target and drain life essence from them, transfering it to you.  The target is damaged while you are healed.
+active:
+  script: "vampiric_touch"
+  group: "Warlock"
+  ap: 2000
+  duration:
+    Instant
+  cooldown: 3
+  ai:
+    priority: 10
+    kind: Damage
+    group: Single
+    range: Reach
+  short_description: |
+    Damage a target while healing yourself.
+prereqs:
+  total_level: 2

@@ -1,2 +1,6 @@
 id: warlock
-abilities: []
+abilities:
+  - id: vampiric_touch
+    position: [0, 0]
+  - id: hex
+    position: [0, 1]

@@ -34,6 +34,7 @@ function on_effect_applied(parent, ability, targets, effect)
   -- game:log(effect:name() .. " applied to " .. parent:name() .. " with tag " .. effect:tag())
   
   local matching_tags = {
+    hex = true,
     sleep = true,
     nauseate = true,
     sundered_armor = true,

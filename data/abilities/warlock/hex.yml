@@ -1,0 +1,21 @@
+id: hex
+name: "Hex"
+icon: abilities/hex
+description: |
+  You utter a curse which affects all hostiles in a small area around you.  They suffer decreased attack and defensive stats for the duration.
+active:
+  script: "hex"
+  group: "Warlock"
+  ap: 2000
+  duration:
+    Rounds: 3
+  cooldown: 5
+  ai:
+    priority: 20
+    kind: Debuff
+    group: Multiple
+    range: Short
+  short_description: |
+    Nearby enemies suffer decreased attack and defense.
+prereqs:
+  total_level: 2

@@ -635,3 +635,4 @@ groups:
       fighter_abilities: [0, 1536, 512, 512]
       rogue_abilities: [512, 1536, 512, 512]
       druid_abilities: [1024, 1024, 512, 512]
+      warlock_abilities: [1024, 1536, 512, 512]

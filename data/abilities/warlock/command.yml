@@ -1,0 +1,21 @@
+id: command
+name: "Command"
+icon: abilities/command
+description: |
+  A psychic suggestion is implanted in the target's mind.  For the duration of the spell, every time they attack the caster they must succeed at a Will check or suffer a massive penalty to attack.
+active:
+  script: "command"
+  group: "Warlock"
+  ap: 2000
+  duration:
+    Rounds: 3
+  cooldown: 5
+  ai:
+    priority: 20
+    kind: Debuff
+    group: Single
+    range: Visible
+  short_description: |
+    One target suffers great difficulty attacking the caster.
+prereqs:
+  total_level: 2

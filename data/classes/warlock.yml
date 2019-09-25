@@ -1,7 +1,7 @@
 id: warlock
 name: Warlock
 description: |
-  Warlocks are powerful magic users who have developed their skills under the tutelage of isolated masters or largely on their own.  They do not possess the rigor or pure skill of the Mage, but are also not limited by structures such as the Circles of Magic.  In addition to an array of hexes, charms, and transmutations, warlocks also can cast a limited number of powerful Invocations each day.  Each invocation greatly enhances the user's power in a variety of ways.
+  Warlocks are powerful magic users who have developed their skills under the tutelage of isolated masters or largely on their own.  They do not possess the rigor or pure skill of the Mage, but are also not limited by structures such as the Circles of Magic.  In addition to an array of hexes, charms, and illusions, warlocks also can cast a limited number of powerful Invocations each day.  Each invocation greatly enhances the user's power in a variety of ways.
 bonuses_per_level:
   - kind:
       hit_points: 4

@@ -75,6 +75,7 @@ groups:
       shroom_spores: [7, 5]
       spore_cloud: [8, 5]
       vampiric_touch: [9, 5]
+      illusory_locus: [10, 5]
       
       flaming_fingers: [0, 6]
       fire_shield: [1, 6]
@@ -114,6 +115,7 @@ groups:
       rupture: [11, 8]
       mechanical_mastery: [12, 8]
       hex: [13, 8]
+      command: [14, 8]
       
       weapon_simple: [0, 9]
       weapon_small_sword: [1, 9]

@@ -35,6 +35,7 @@ function on_effect_applied(parent, ability, targets, effect)
   
   local matching_tags = {
     hex = true,
+	charm = true,
     sleep = true,
     nauseate = true,
     sundered_armor = true,

@@ -1,0 +1,12 @@
+id: charm
+frame_time_millis: 70
+frames:
+  - particles/charm01
+  - particles/charm02
+  - particles/charm03
+  - particles/charm04
+  - particles/charm05
+  - particles/charm06
+  - particles/charm07
+  - particles/charm08
+  - particles/charm09

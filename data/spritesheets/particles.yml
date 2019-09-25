@@ -344,3 +344,16 @@ groups:
       eye03: [40, 0]
       eye04: [60, 0]
       eye05: [80, 0]
+  charm:
+    size: [64, 64]
+    position: [0, 680]
+    areas:
+      charm01: [0, 0]
+      charm02: [64, 0]
+      charm03: [128, 0]
+      charm04: [192, 0]
+      charm05: [256, 0]
+      charm06: [320, 0]
+      charm07: [384, 0]
+      charm08: [448, 0]
+      charm09: [512, 0]

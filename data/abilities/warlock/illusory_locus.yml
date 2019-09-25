@@ -1,0 +1,21 @@
+id: illusory_locus
+name: "Illusory Locus"
+icon: abilities/illusory_locus
+description: |
+  To all nearby hostiles, your location seems to shift randomly about in a small radius.  Attacks made against you frequently miss entirely, as opponents attack the wrong place entirely.
+active:
+  script: "illusory_locus"
+  group: "Warlock"
+  ap: 2000
+  duration:
+    Rounds: 3
+  cooldown: 4
+  ai:
+    priority: 10
+    kind: Buff
+    group: Single
+    range: Personal
+  short_description: |
+    Attacks against you have a chance to randomly miss.
+prereqs:
+  total_level: 2

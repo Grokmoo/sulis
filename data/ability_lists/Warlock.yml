@@ -4,3 +4,7 @@ abilities:
     position: [0, 0]
   - id: hex
     position: [0, 1]
+  - id: command
+    position: [0, 2]
+  - id: illusory_locus
+    position: [0, 3]

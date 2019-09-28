@@ -19,6 +19,7 @@ function on_target_select(parent, ability, targets)
   target:remove_effects_with_tag("blind")
   target:remove_effects_with_tag("disease")
   target:remove_effects_with_tag("rupture")
+  target:remove_effects_with_tag("fear")
   
   local anim = target:create_particle_generator("particles/circle20", 2.0)
   anim:set_position(anim:param(target:x() + 0.5), anim:param(target:y()))

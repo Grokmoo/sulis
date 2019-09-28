@@ -1,0 +1,21 @@
+id: charm
+name: "Charm"
+icon: abilities/charm
+description: |
+  A single nearby target temporarily switches sides and fights their former allies.  You do not have direct control over the charmed target.
+active:
+  script: "charm"
+  group: "Warlock"
+  ap: 3000
+  duration:
+    Rounds: 2
+  cooldown: 5
+  ai:
+    priority: 10
+    kind: Debuff
+    group: Single
+    range: Short
+  short_description: |
+    A single nearby hostile temporarily switches sides.
+prereqs:
+  total_level: 2

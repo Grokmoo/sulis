@@ -2,7 +2,7 @@ id: purify
 name: "Purify"
 icon: abilities/purify
 description: |
-  Nature's warm embrace flows into the target, instantly healing an array of afflictions, including Nauseate, Cripple, Blind, Slow, Rupture, and Disease.
+  Nature's warm embrace flows into the target, instantly healing an array of afflictions, including Fear, Nauseate, Cripple, Blind, Slow, Rupture, and Disease.
 active:
   script: "purify"
   group: "Druid"

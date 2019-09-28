@@ -1,0 +1,21 @@
+id: psychic_knife
+name: "Psychic Knife"
+icon: abilities/psychic_knife
+description: |
+  You target a nearby creature's mind with psychic energy.  You make an attack against the target's Will Resistance, doing raw damage that cannot be reduced by armor or damage resistance.
+active:
+  script: "psychic_knife"
+  group: "Warlock"
+  ap: 2000
+  duration:
+   Instant
+  cooldown: 3
+  ai:
+    priority: 30
+    kind: Damage
+    group: Single
+    range: Visible
+  short_description: |
+    One target suffers raw damage.
+prereqs:
+  total_level: 2

@@ -1,0 +1,21 @@
+id: terror
+name: "Terror"
+icon: abilities/terror
+description: |
+  You touch a nearby target and fill their mind with terror.  Terrified targets will generally attempt to flee, and regardless cannot make attacks.
+active:
+  script: "terror"
+  group: "Warlock"
+  ap: 2000
+  duration:
+    Rounds: 2
+  cooldown: 3
+  ai:
+    priority: 10
+    kind: Debuff
+    group: Single
+    range: Reach
+  short_description: |
+    Terrify a single target.
+prereqs:
+  total_level: 2

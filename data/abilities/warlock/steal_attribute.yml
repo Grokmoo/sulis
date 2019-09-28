@@ -1,0 +1,21 @@
+id: steal_attribute
+name: "Steal Attribute"
+icon: abilities/steal_attribute
+description: |
+  You touch a target and drain one attribute of your choice, boosting that same attribute on yourself by the same amount.
+active:
+  script: "steal_attribute"
+  group: "Warlock"
+  ap: 2000
+  duration:
+    Rounds: 4
+  cooldown: 5
+  ai:
+    priority: 10
+    kind: Damage
+    group: Single
+    range: Reach
+  short_description: |
+    Reduce one attribute of a target while raising your own.
+prereqs:
+  total_level: 2

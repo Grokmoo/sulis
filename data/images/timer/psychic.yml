@@ -1,0 +1,12 @@
+id: psychic
+frame_time_millis: 70
+frames:
+  - particles/psychic01
+  - particles/psychic02
+  - particles/psychic03
+  - particles/psychic04
+  - particles/psychic05
+  - particles/psychic06
+  - particles/psychic07
+  - particles/psychic08
+  - particles/psychic09

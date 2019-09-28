@@ -8,3 +8,11 @@ abilities:
     position: [0, 2]
   - id: illusory_locus
     position: [0, 3]
+  - id: psychic_knife
+    position: [0, 4]
+  - id: terror
+    position: [0, 5]
+  - id: charm
+    position: [0, 6]
+  - id: steal_attribute
+    position: [0, 7]

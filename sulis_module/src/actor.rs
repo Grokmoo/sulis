@@ -52,6 +52,14 @@ impl Faction {
             _ => None,
         }
     }
+
+    pub fn to_str(&self) -> String {
+        match &self {
+            Faction::Hostile => "Hostile",
+            Faction::Neutral => "Neutral",
+            Faction::Friendly => "Friendly",
+        }.to_owned()
+    }
 }
 
 #[derive(Debug, Clone)]

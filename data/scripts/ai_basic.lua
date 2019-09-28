@@ -5,6 +5,11 @@ function ai_action(parent)
     local hostiles = parent:targets():hostile()
     local friendlies = parent:targets():friendly():to_table()
 
+    if parent:has_effect_with_tag("fear") then
+	    attempt_run_away(parent, hostiles:visible():to_table())
+	    return parent:state_end()
+	end
+
 	if check_swap_weapons(parent, hostiles).done then
 		return parent:state_wait(10)
 	end
@@ -56,6 +61,41 @@ function ai_action(parent)
 		return parent:state_end()
 	else
 		return parent:state_wait(10)
+	end
+end
+
+function attempt_run_away(parent, hostiles)
+	local parent_x = parent:x()
+	local parent_y = parent:y()
+
+    -- calculate mean of the angles using the atan2 of sin and cos formula
+	local total_x_component = 0.0
+	local total_y_component = 0.0
+	
+	for i = 1, #hostiles do
+	    local target = hostiles[i]
+		local angle = game:atan2(parent_x - target:x(), parent_y - target:y())
+	    total_y_component = total_y_component + math.sin(angle)
+		total_x_component = total_x_component + math.cos(angle)
+	end
+
+    local average_angle = game:atan2(total_x_component / #hostiles, total_y_component / #hostiles)
+	
+	local angle_cos = math.cos(average_angle + math.pi)
+	local angle_sin = math.sin(average_angle + math.pi)
+	
+	-- try to move in the direction some distance away
+	-- if unable, try moving in the general direction with less and less accuracy
+	local x_diff = math.floor(angle_cos * 12 + 0.5)
+	local y_diff = math.floor(angle_sin * 12 + 0.5)
+	  
+	local x = parent:x() - x_diff
+	local y = parent:y() - y_diff
+	
+	for thresh = 1, 10 do
+	  if parent:move_towards_point(x, y, thresh) then
+	    return { done=true }
+	  end
 	end
 end
 

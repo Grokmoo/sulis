@@ -50,6 +50,9 @@ groups:
   web:
     areas:
       web16: [448, 48, 16, 16]
+  heart:
+    areas:
+      heart19: [465, 47, 19, 19]
   misc:
     areas:
       circle16: [0, 0, 16, 16]
@@ -357,3 +360,16 @@ groups:
       charm07: [384, 0]
       charm08: [448, 0]
       charm09: [512, 0]
+  psychic:
+    size: [64, 64]
+    position: [0, 744]
+    areas:
+      psychic01: [0, 0]
+      psychic02: [64, 0]
+      psychic03: [128, 0]
+      psychic04: [192, 0]
+      psychic05: [256, 0]
+      psychic06: [320, 0]
+      psychic07: [384, 0]
+      psychic08: [448, 0]
+      psychic09: [512, 0]

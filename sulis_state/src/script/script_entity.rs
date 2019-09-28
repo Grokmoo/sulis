@@ -85,6 +85,9 @@ use sulis_module::{
 /// # `remove_from_party()`
 /// Removes this entity from the player's party
 ///
+/// # `get_faction() -> String`
+/// Returns the ID of the faction that this entity currently belongs to
+///
 /// # `set_faction(faction: String)`
 /// Sets this entity to the specified `faction`.  Valid factions are currently
 /// `Hostile`, `Neutral`, or `Friendly`.  Hostiles will attack the player and
@@ -588,6 +591,12 @@ impl UserData for ScriptEntity {
             let entity = entity.try_unwrap()?;
             GameState::remove_party_member(entity);
             Ok(())
+        });
+
+        methods.add_method("get_faction", |_, entity, ()| {
+            let entity = entity.try_unwrap()?;
+            let entity = entity.borrow();
+            Ok(entity.actor.faction().to_str())
         });
 
         methods.add_method("set_faction", |_, entity, faction: String| {

@@ -1,0 +1,33 @@
+id: phantasm
+name: Phantasm
+description: Phantasm
+size: 2by2
+movement_rate: 1.0
+base_stats:
+  - kind: { resistance: { kind: "Slashing", amount: 100 } }
+  - kind: { resistance: { kind: "Piercing", amount: 100 } }
+  - kind: { resistance: { kind: "Crushing", amount: 100 } }
+  - kind: { resistance: { kind: "Acid", amount: 100 } }
+  - kind: { resistance: { kind: "Fire", amount: 100 } }
+  - kind: { resistance: { kind: "Cold", amount: 100 } }
+  - kind: { resistance: { kind: "Shock", amount: 100 } }
+  - kind: { resistance: { kind: "Raw", amount: 100 } }
+base_attack:
+  damage:
+    min: 8
+    max: 12
+    kind: Crushing
+  kind: #Melee
+    reach: 0.5
+  bonuses: {}
+default_images:
+  Male:
+    Background: creatures/human31
+  Female:
+    Background: creatures/human31
+ticker_offset: [0.5, 2]
+image_layer_offset_scale: 16
+image_layer_offsets:
+  Background: [-8,-18]
+image_layer_postfix:
+  Female: "_female"

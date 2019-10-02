@@ -60,6 +60,21 @@ impl Faction {
             Faction::Friendly => "Friendly",
         }.to_owned()
     }
+
+    pub fn is_hostile(&self, other: &Faction) -> bool {
+        if self == &Faction::Neutral { return false; }
+        if other == &Faction::Neutral { return false; }
+
+        self != other
+    }
+
+
+    pub fn is_friendly(&self, other: &Faction) -> bool {
+        if self == &Faction::Neutral { return false; }
+        if other == &Faction::Neutral { return false; }
+
+        self == other
+    }
 }
 
 #[derive(Debug, Clone)]

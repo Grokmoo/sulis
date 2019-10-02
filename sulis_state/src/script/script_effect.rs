@@ -176,6 +176,7 @@ fn check_for_bonus(effect: &ScriptAppliedEffect, kind: String) -> bool {
         "crit_multiplier" => CritMultiplier(0.0),
         "movement_rate" => MovementRate(0.0),
         "attack_cost" => AttackCost(0),
+        "caster_level" => CasterLevel(0),
         "hidden" => Hidden,
         "free_ability_group_use" => FreeAbilityGroupUse,
         "abilities_disabled" => AbilitiesDisabled,
@@ -296,7 +297,8 @@ impl UserData for ScriptAppliedEffect {
 /// `melee_accuracy`, `ranged_accuracy`, `spell_accuracy`, `defense`, `fortitude`,
 /// `reflex`, `will`, `concealment`, `concealment_ignore`, `crit_chance`,
 /// `hit_threshold`, `graze_threshold`, `graze_multiplier`, `hit_multiplier`,
-/// `crit_multiplier`, `movement_rate`, `attack_cost`, `ability_ap_cost`
+/// `crit_multiplier`, `movement_rate`, `attack_cost`, `ability_ap_cost`,
+/// `caster_level`
 ///
 /// # `add_damage(min: Float, max: Float, ap: Float (Optional), when: String (Optional))`
 /// Adds a damage bonus of the specified amount (from `min` to `max` randomly, with `ap`
@@ -714,6 +716,7 @@ fn add_num_bonus(
         "crit_multiplier" => CritMultiplier(amount),
         "movement_rate" => MovementRate(amount),
         "attack_cost" => AttackCost(amount_int),
+        "caster_level" => CasterLevel(amount_int),
         _ => {
             warn!("Attempted to add num bonus with invalid type '{}'", name);
             return Ok(());

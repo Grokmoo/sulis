@@ -77,6 +77,8 @@ groups:
       vampiric_touch: [9, 5]
       illusory_locus: [10, 5]
       terror: [11, 5]
+      phantasm: [12, 5]
+      block_pain: [13, 5]
       
       flaming_fingers: [0, 6]
       fire_shield: [1, 6]
@@ -129,6 +131,7 @@ groups:
       perception_training: [7, 9]
       charm: [8, 9]
       steal_attribute: [9, 9]
+      mind_shock: [10, 9]
       
       intellect_training: [0, 10]
       wisdom_training: [1, 10]

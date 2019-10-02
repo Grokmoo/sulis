@@ -23,6 +23,7 @@ use rlua::{self, Context, UserData, UserDataMethods};
 
 use crate::script::{Result, ScriptActiveSurface, ScriptEntity};
 use crate::{EntityState, GameState};
+use sulis_module::Faction;
 use sulis_core::util::{gen_rand, invalid_data_error};
 
 /// Represents a set of ScriptEntities, which can be created from a variety of
@@ -99,6 +100,14 @@ use sulis_core::util::{gen_rand, invalid_data_error};
 /// # `friendly() -> ScriptEntitySet`
 /// Creates a new ScriptEntitySet with all the data from this set, except only targets
 /// that are friendly to the parent are present.
+///
+/// # `hostile_to(faction: String) -> ScriptEntitySet`
+/// Creates a new ScriptEntitySet filtered to only those targets that are hostile to
+/// the specified Faction
+///
+/// # `friendly_to(faction: String) -> ScriptEntitySet`
+/// Creates a new ScriptEntitySet filtered to only those targets that are friendly to
+/// the specified Faction
 ///
 /// # `reachable() -> ScriptEntitySet`
 /// Creates a new ScriptEntitySet with all the data from this set, except only targets
@@ -315,6 +324,8 @@ impl UserData for ScriptEntitySet {
         methods.add_method("visible", |lua, set, ()| {
             visible_within(lua, set, std::f32::MAX)
         });
+        methods.add_method("hostile_to", |lua, set, faction| hostile_to(lua, set, faction));
+        methods.add_method("friendly_to", |lua, set, faction| friendly_to(lua, set, faction));
         methods.add_method("hostile", |lua, set, ()| is_hostile(lua, set));
         methods.add_method("friendly", |lua, set, ()| is_friendly(lua, set));
         methods.add_method("reachable", &reachable);
@@ -364,6 +375,39 @@ fn threatening(_lua: Context, set: &ScriptEntitySet, _args: ()) -> Result<Script
 fn reachable(_lua: Context, set: &ScriptEntitySet, _args: ()) -> Result<ScriptEntitySet> {
     filter_entities(set, (), &|parent, entity, _| {
         parent.borrow().can_reach(entity)
+    })
+}
+
+fn hostile_to(_lua: Context, set: &ScriptEntitySet, faction: String) -> Result<ScriptEntitySet> {
+    let faction = match Faction::from_str(&faction) {
+        None => {
+            warn!("Attempted to check hostile_to invalid faction {}", faction);
+            return Err(rlua::Error::FromLuaConversionError {
+                from: "String",
+                to: "Faction",
+                message: Some("Invalid faction ID".to_string())
+            });
+        }, Some(faction) => faction,
+    };
+    filter_entities(set, (), &|_, entity, _| {
+        faction.is_hostile(&entity.borrow().actor.faction())
+    })
+}
+
+fn friendly_to(_lua: Context, set: &ScriptEntitySet, faction: String) -> Result<ScriptEntitySet> {
+    let faction = match Faction::from_str(&faction) {
+        None => {
+            warn!("Attempted to check friendly_to invalid faction {}", faction);
+            return Err(rlua::Error::FromLuaConversionError {
+                from: "String",
+                to: "Faction",
+                message: Some("Invalid faction ID".to_string())
+            });
+        }, Some(faction) => faction,
+    };
+
+    filter_entities(set, (), &|_, entity, _| {
+        faction.is_friendly(&entity.borrow().actor.faction())
     })
 }
 

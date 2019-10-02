@@ -376,14 +376,7 @@ impl EntityState {
         let self_faction = self.actor.faction();
         let other_faction = other.borrow().actor.faction();
 
-        if let Faction::Neutral = self_faction {
-            return false;
-        }
-        if let Faction::Neutral = other_faction {
-            return false;
-        }
-
-        self_faction != other_faction
+        self_faction.is_hostile(&other_faction)
     }
 
     pub(crate) fn is_marked_for_removal(&self) -> bool {

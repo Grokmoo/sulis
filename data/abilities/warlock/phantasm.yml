@@ -1,0 +1,19 @@
+id: phantasm
+name: "Phantasm"
+icon: abilities/phantasm
+description: |
+  A terrifying illusion is created at a location of the caster's choice on the battlefield.  Each round, all nearby enemies must attempt a Will check or be terrified.  The phantasm is illusory and cannot be destroyed.
+active:
+  script: "phantasm"
+  group: Warlock
+  ap: 3000
+  duration:
+    Rounds: 3
+  cooldown: 6
+  ai:
+    priority: 30
+    kind: Debuff
+    group: Multiple
+    range: Visible
+  short_description: |
+    Create a terrifying phantasm that frightens enemies for several turns.

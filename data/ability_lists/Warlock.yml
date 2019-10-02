@@ -16,3 +16,9 @@ abilities:
     position: [0, 6]
   - id: steal_attribute
     position: [0, 7]
+  - id: phantasm
+    position: [1, 5]
+  - id: mind_shock
+    position: [1, 1]
+  - id: block_pain
+    position: [1, 2]

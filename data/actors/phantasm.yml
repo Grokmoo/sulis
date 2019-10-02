@@ -1,0 +1,17 @@
+id: phantasm
+ai: ~
+name: Phantasm
+faction: Neutral
+images: {}
+race: phantasm
+attributes:
+  str: 10
+  dex: 10
+  end: 1
+  per: 10
+  int: 10
+  wis: 10
+levels:
+  mage: 1
+inventory: {}
+abilities: []

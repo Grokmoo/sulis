@@ -1,0 +1,21 @@
+id: mind_shock
+name: "Mind Shock"
+icon: abilities/mind_shock
+description: |
+  A wave of psychic energy radiates out from the caster, stunning all nearby opponents.
+active:
+  script: "mind_shock"
+  group: "Warlock"
+  ap: 2000
+  duration:
+    Rounds: 2
+  cooldown: 5
+  ai:
+    priority: 10
+    kind: Debuff
+    group: Multiple
+    range: Short
+  short_description: |
+    Stun nearby opponents
+prereqs:
+  total_level: 2

@@ -1,0 +1,22 @@
+id: disintegrate
+name: "Disintegrate"
+icon: abilities/disintegrate
+description: |
+  You project a line of energy from your fingertips, doing massive shock and piercing damage to all targets in the path.
+active:
+  script: "disintegrate"
+  group: "Warlock"
+  ap: 3000
+  duration:
+   Instant
+  cooldown: 5
+  ai:
+    priority: 20
+    kind: Damage
+    group: Multiple
+    range: Visible
+  short_description: |
+    Targets in a line suffer massive damage.
+prereqs:
+  total_level: 11
+  abilities: [ feedback, psychic_knife ]

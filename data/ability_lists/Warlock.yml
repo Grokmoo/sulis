@@ -1,24 +1,46 @@
 id: warlock
 abilities:
   - id: vampiric_touch
-    position: [0, 0]
-  - id: hex
-    position: [0, 1]
-  - id: command
-    position: [0, 2]
-  - id: illusory_locus
-    position: [0, 3]
-  - id: psychic_knife
-    position: [0, 4]
-  - id: terror
-    position: [0, 5]
-  - id: charm
-    position: [0, 6]
+    position: [3, 0]
   - id: steal_attribute
-    position: [0, 7]
+    position: [4, 1]
+  - id: draining_field
+    position: [5, 2]
+  - id: hex
+    position: [2, 2]
+  
+  - id: psychic_yell
+    position: [0, 3]
+  - id: command
+    position: [1, 3]
+  - id: terror
+    position: [2, 4]
+  - id: charm
+    position: [3, 3]
+
+  - id: secret_strike
+    position: [2, 7]
+  - id: illusory_locus
+    position: [2, 6]
   - id: phantasm
+    position: [3, 4]
+  - id: shadow_warrior
     position: [1, 5]
+
+  - id: imbue_weapon
+    position: [7, 3]
+  - id: psychic_knife
+    position: [6, 3]
   - id: mind_shock
-    position: [1, 1]
+    position: [5, 3]
+  - id: disintegrate
+    position: [4, 4]
+    
   - id: block_pain
-    position: [1, 2]
+    position: [6, 6]
+  - id: feedback
+    position: [4, 5]
+  - id: clear_thoughts
+    position: [5, 7]
+  - id: assay
+    position: [5, 6]

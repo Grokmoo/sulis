@@ -18,4 +18,5 @@ active:
   short_description: |
     Terrify a single target.
 prereqs:
-  total_level: 2
+  total_level: 4
+  abilities: [ command ]

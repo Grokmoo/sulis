@@ -2,20 +2,21 @@ id: hex
 name: "Hex"
 icon: abilities/hex
 description: |
-  You utter a curse which affects all hostiles in a small area around you.  They suffer decreased attack and defensive stats for the duration.
+  You utter a curse against a nearby enemy target.  They become unable to use any special abilities or spells for the duration.
 active:
   script: "hex"
   group: "Warlock"
   ap: 2000
   duration:
-    Rounds: 3
+    Rounds: 2
   cooldown: 5
   ai:
     priority: 20
     kind: Debuff
-    group: Multiple
+    group: Single
     range: Short
   short_description: |
-    Nearby enemies suffer decreased attack and defense.
+    A nearby target becomes unable to use spells or abilities.
 prereqs:
-  total_level: 2
+  total_level: 4
+  abilities: [ vampiric_touch ]

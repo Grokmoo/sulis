@@ -19,3 +19,4 @@ active:
     One target suffers great difficulty attacking the caster.
 prereqs:
   total_level: 2
+  abilities: [ psychic_yell ]

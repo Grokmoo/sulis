@@ -26,6 +26,7 @@ groups:
       shield_slam: [3, 1]
       chameleon: [4, 1]
       luck: [5, 1]
+      imbue_weapon: [6, 1]
       
       acid_spores: [0, 2]
       acid_weapon: [1, 2]
@@ -53,6 +54,7 @@ groups:
       guardian: [6, 3]
       minor_heal: [7, 3]
       restoration: [8, 3]
+      draining_field: [9, 3]
       
       expediate: [0, 4]
       beast_shape: [1, 4]
@@ -79,6 +81,7 @@ groups:
       terror: [11, 5]
       phantasm: [12, 5]
       block_pain: [13, 5]
+      feedback: [14, 5]
       
       flaming_fingers: [0, 6]
       fire_shield: [1, 6]
@@ -132,6 +135,11 @@ groups:
       charm: [8, 9]
       steal_attribute: [9, 9]
       mind_shock: [10, 9]
+      clear_thoughts: [11, 9]
+      assay: [12, 9]
+      shadow_warrior: [13, 9]
+      disintegrate: [14, 9]
+      secret_strike: [15, 9]
       
       intellect_training: [0, 10]
       wisdom_training: [1, 10]
@@ -141,6 +149,7 @@ groups:
       acrobatic_fighting: [5, 10]
       shield_combat: [6, 10]
       armored_combat: [7, 10]
+      psychic_yell: [8, 10]
       
       healthy: [0, 11]
       helping_hand: [1, 11]

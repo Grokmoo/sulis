@@ -1,0 +1,8 @@
+id: slash
+frame_time_millis: 70
+frames:
+  - particles/slash1
+  - particles/slash2
+  - particles/slash3
+  - particles/slash4
+  - particles/slash5

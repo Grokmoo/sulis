@@ -1,0 +1,22 @@
+id: shadow_warrior
+name: "Shadow Warrior"
+icon: abilities/shadow_warrior
+description: |
+  You create one or more illusory shadow warriors in a specified region.  The illusions are completely under your control, and can move, distract, and block enemies.  Direct attacks will dispel the illusion.
+active:
+  script: "shadow_warrior"
+  group: Warlock
+  ap: 3000
+  duration:
+    Rounds: 4
+  cooldown: 8
+  ai:
+    priority: 30
+    kind: Special
+    group: Multiple
+    range: Visible
+  short_description: |
+    Summon a powerful nature spirit to fight for you.
+prereqs:
+  total_level: 7
+  abilities: [ illusory_locus ]

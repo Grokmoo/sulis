@@ -18,4 +18,5 @@ active:
   short_description: |
     Reduce one attribute of a target while raising your own.
 prereqs:
-  total_level: 2
+  total_level: 3
+  abilities: [ vampiric_touch ]

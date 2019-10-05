@@ -18,4 +18,5 @@ active:
   short_description: |
     A single nearby hostile temporarily switches sides.
 prereqs:
-  total_level: 2
+  total_level: 9
+  abilities: [ command, hex ]

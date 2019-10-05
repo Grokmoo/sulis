@@ -1,0 +1,22 @@
+id: assay
+name: "Assay"
+icon: abilities/assay
+description: |
+  Peering into the mind and soul of an opponent, you reveal all of its most guarded weaknesses.  All defenses of the target decrease substantially for the duration of the spell.  There is no resistance check for this spell.
+active:
+  script: "assay"
+  group: "Warlock"
+  ap: 2000
+  duration:
+    Rounds: 3
+  cooldown: 5
+  ai:
+    priority: 20
+    kind: Debuff
+    group: Single
+    range: Visible
+  short_description: |
+    Lower all defenses of one target.
+prereqs:
+  total_level: 4
+  abilities: [ block_pain]

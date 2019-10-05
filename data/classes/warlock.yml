@@ -1,7 +1,7 @@
 id: warlock
 name: Warlock
 description: |
-  Warlocks are powerful magic users who have developed their skills under the tutelage of isolated masters or largely on their own.  They do not possess the rigor or pure skill of the Mage, but are also not limited by structures such as the Circles of Magic.  In addition to an array of hexes, charms, and illusions, warlocks also can cast a limited number of powerful Invocations each day.  Each invocation greatly enhances the user's power in a variety of ways.
+  Warlocks are powerful magic users who have developed their skills under the tutelage of isolated masters or largely on their own.  They do not possess the rigor or pure skill of the Mage, but are also not limited by structures such as the Circles of Magic.  Warlocks gain access to a variety of hexes, charms, and illusions.  Their spell casting is only limited by their own internal pool of power which improves as they gain experience.
 bonuses_per_level:
   - kind:
       hit_points: 4
@@ -31,6 +31,9 @@ starting_abilities:
   - weapon_spear
   - weapon_mace
   - weapon_simple
+  - imbue_weapon
+  - secret_strike
+  - psychic_yell
 upgrades:
   1:
     ability_choices: []
@@ -187,5 +190,5 @@ kits:
         Usable2: { id: potion_mind }
       pc_starting_coins: 500
     description: |
-      A generic warlock.
+      A warlock with a variety of abilities for both ranged and close combat.
 

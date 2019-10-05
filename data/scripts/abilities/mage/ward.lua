@@ -34,6 +34,7 @@ function on_effect_applied(parent, ability, targets, effect)
   -- game:log(effect:name() .. " applied to " .. parent:name() .. " with tag " .. effect:tag())
   
   local matching_tags = {
+    assay = true,
     charm = true,
     fear = true,
     hex = true,

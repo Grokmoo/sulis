@@ -1,0 +1,22 @@
+id: draining_field
+name: "Draining Field"
+icon: abilities/draining_field
+description: |
+  You create a field of negative energy, sucking the lifeforce out of all who enter.  All targets within the field suffer a small amount of Raw damage each turn.
+active:
+  script: "draining_field"
+  group: "Warlock"
+  ap: 3000
+  duration:
+    Rounds: 3
+  cooldown: 5
+  ai:
+    priority: 10
+    kind: Damage
+    group: Multiple
+    range: Short
+  short_description: |
+    Continually deal raw damage to all targets in an area.
+prereqs:
+  total_level: 6
+  abilities: [ vampiric_touch ]

@@ -19,3 +19,4 @@ active:
     One target suffers raw damage.
 prereqs:
   total_level: 2
+  abilities: [ imbue_weapon ]

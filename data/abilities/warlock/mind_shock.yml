@@ -18,4 +18,5 @@ active:
   short_description: |
     Stun nearby opponents
 prereqs:
-  total_level: 2
+  total_level: 9
+  abilities: [ psychic_knife, draining_field ]

@@ -1,0 +1,19 @@
+id: psychic_yell
+name: "Psychic Yell"
+icon: abilities/psychic_yell
+description: |
+  You implant a very loud psychic noise in the minds of nearby opponents, distracting them.  This decreases their movement rate and defenses.
+active:
+  script: "psychic_yell"
+  group: "Warlock"
+  ap: 1000
+  duration:
+    Rounds: 1
+  cooldown: 4
+  ai:
+    priority: 20
+    kind: Debuff
+    group: Multiple
+    range: Short
+  short_description: |
+    Decrease movement rate and defense of nearby enemies.

@@ -1,0 +1,22 @@
+id: clear_thoughts
+name: "Clear Thoughts"
+icon: abilities/clear_thoughts
+description: |
+  All nearby allies have their emotions calmed and thoughts cleared.  This immediately removes a variety of negative mind-altering effects, as well as providing a large Will Resistance bonus to protect against any further attacks.
+active:
+  script: "clear_thoughts"
+  group: "Warlock"
+  ap: 2000
+  duration:
+    Rounds: 3
+  cooldown: 5
+  ai:
+    priority: 20
+    kind: Buff
+    group: Multiple
+    range: Short
+  short_description: |
+    Protect allies from mind based attacks.
+prereqs:
+  total_level: 4
+  abilities: [ block_pain]

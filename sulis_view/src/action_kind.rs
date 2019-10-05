@@ -476,8 +476,10 @@ impl AttackAction {
             Some(pc) => Rc::clone(pc),
         };
 
-        if !pc.borrow().actor.has_ap_to_attack() {
-            return None;
+        {
+            let pc = pc.borrow();
+            if !pc.actor.has_ap_to_attack() { return None; }
+            if pc.actor.stats.attack_disabled { return None; }
         }
 
         if pc.borrow().can_attack(&target, &area_state) {

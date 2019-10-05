@@ -17,3 +17,6 @@ active:
     range: Visible
   short_description: |
     Create a terrifying phantasm that frightens enemies for several turns.
+prereqs:
+  total_level: 9
+  abilities: [ terror, illusory_locus ]

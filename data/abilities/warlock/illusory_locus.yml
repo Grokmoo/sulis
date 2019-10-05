@@ -19,3 +19,4 @@ active:
     Attacks against you have a chance to randomly miss.
 prereqs:
   total_level: 2
+  abilities: [ secret_strike ]

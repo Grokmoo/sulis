@@ -1,0 +1,19 @@
+id: imbue_weapon
+name: "Imbue Weapon"
+icon: abilities/imbue_weapon
+description: |
+  You channel psychic energy into the target's weapon, imbuing it with extra Raw damage that cannot be resisted.
+active:
+  script: "imbue_weapon"
+  group: "Warlock"
+  ap: 1000
+  duration:
+    Rounds: 3
+  cooldown: 4
+  ai:
+    priority: 30
+    kind: Buff
+    group: Single
+    range: Short
+  short_description: |
+    Imbues the target's weapon with raw damage.

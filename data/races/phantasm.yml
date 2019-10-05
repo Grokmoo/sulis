@@ -4,9 +4,6 @@ description: Phantasm
 size: 2by2
 movement_rate: 1.0
 base_stats:
-  - kind: { resistance: { kind: "Slashing", amount: 100 } }
-  - kind: { resistance: { kind: "Piercing", amount: 100 } }
-  - kind: { resistance: { kind: "Crushing", amount: 100 } }
   - kind: { resistance: { kind: "Acid", amount: 100 } }
   - kind: { resistance: { kind: "Fire", amount: 100 } }
   - kind: { resistance: { kind: "Cold", amount: 100 } }

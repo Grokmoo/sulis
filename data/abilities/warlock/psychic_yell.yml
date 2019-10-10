@@ -7,6 +7,9 @@ active:
   script: "psychic_yell"
   group: "Warlock"
   ap: 1000
+  class_stats:
+    warlock:
+      Power: 5
   duration:
     Rounds: 1
   cooldown: 4

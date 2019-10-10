@@ -7,6 +7,9 @@ active:
   script: "illusory_locus"
   group: "Warlock"
   ap: 2000
+  class_stats:
+    warlock:
+      Power: 10
   duration:
     Rounds: 3
   cooldown: 4

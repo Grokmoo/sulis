@@ -7,6 +7,9 @@ active:
   script: "charm"
   group: "Warlock"
   ap: 3000
+  class_stats:
+    warlock:
+      Power: 40
   duration:
     Rounds: 2
   cooldown: 5

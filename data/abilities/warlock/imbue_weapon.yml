@@ -7,6 +7,9 @@ active:
   script: "imbue_weapon"
   group: "Warlock"
   ap: 1000
+  class_stats:
+    warlock:
+      Power: 5
   duration:
     Rounds: 3
   cooldown: 4

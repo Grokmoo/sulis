@@ -18,7 +18,7 @@ use std::collections::HashMap;
 use std::rc::Rc;
 
 use sulis_core::util::ExtInt;
-use sulis_module::{Actor, Faction, Module, StatList};
+use sulis_module::{Ability, Actor, Class, Faction, Module, StatList};
 
 /// Persistent Stats, that are not computed from the base StatList, are
 /// saved, and may persist between actions
@@ -42,10 +42,16 @@ pub struct PStats {
 
     pub(crate) current_group_uses_per_encounter: HashMap<String, ExtInt>,
     pub(crate) current_group_uses_per_day: HashMap<String, ExtInt>,
+
+    #[serde(default)]
+    pub(crate) current_class_stats: HashMap<String, ExtInt>,
     pub(crate) faction: Faction,
 
     #[serde(default)]
     disabled: bool,
+
+    #[serde(skip)]
+    base_class: Option<Rc<Class>>,
 }
 
 impl PStats {
@@ -61,9 +67,56 @@ impl PStats {
             threatening: Vec::new(),
             current_group_uses_per_encounter: HashMap::new(),
             current_group_uses_per_day: HashMap::new(),
+            current_class_stats: HashMap::new(),
             faction: actor.faction(),
             disabled: false,
+            base_class: Some(actor.base_class()),
         }
+    }
+
+    pub fn load(&mut self, base_class: Rc<Class>) {
+        self.base_class = Some(base_class);
+    }
+
+    pub fn remove_class_stats(&mut self, ability: &Ability) {
+        let active = match &ability.active {
+            None => return,
+            Some(active) => active,
+        };
+
+        let stats = match active.class_stats.get(&self.base_class.as_ref().unwrap().id) {
+            None => return,
+            Some(stats) => stats,
+        };
+        for (stat, amount) in stats {
+            if *amount == 0 { continue; }
+
+            let cur = *self.current_class_stats.get(stat).unwrap_or(&ExtInt::Int(0));
+            self.current_class_stats.insert(stat.to_string(), cur - *amount);
+        }
+    }
+
+    pub fn has_required_class_stats(&self, ability: &Ability) -> bool {
+        let active = match &ability.active {
+            None => return true,
+            Some(active) => active,
+        };
+
+        let stats = match active.class_stats.get(&self.base_class.as_ref().unwrap().id) {
+            None => return true,
+            Some(stats) => stats,
+        };
+        for (stat, amount) in stats {
+            if *amount == 0 { continue; }
+            let cur = match self.current_class_stats.get(stat) {
+                None => return false,
+                Some(cur) => cur,
+            };
+
+            if cur.less_than(*amount) { return false; }
+        }
+
+        true
     }
 
     pub fn set_disabled(&mut self, disabled: bool) {
@@ -186,6 +239,14 @@ impl PStats {
                 .insert(group.to_string(), *amount);
         }
 
+        let base_class = self.base_class.as_ref().unwrap();
+        for class_stat in base_class.stats.iter() {
+            if !class_stat.reset_per_day { continue; }
+
+            let amount = stats.class_stat_max(&class_stat.id);
+            self.current_class_stats.insert(class_stat.id.to_string(), amount);
+        }
+
         self.end_encounter(stats);
     }
 
@@ -195,6 +256,14 @@ impl PStats {
         for (ref group, amount) in stats.uses_per_encounter_iter() {
             self.current_group_uses_per_encounter
                 .insert(group.to_string(), *amount);
+        }
+
+        let base_class = self.base_class.as_ref().unwrap();
+        for class_stat in base_class.stats.iter() {
+            if !class_stat.reset_per_encounter { continue; }
+
+            let amount = stats.class_stat_max(&class_stat.id);
+            self.current_class_stats.insert(class_stat.id.to_string(), amount);
         }
 
         self.init_turn(stats);

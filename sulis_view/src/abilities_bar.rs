@@ -497,6 +497,17 @@ impl WidgetKind for AbilityButton {
                 let ap = active.ap / Module::rules().display_ap;
                 hover.state.add_text_arg("activate_ap", &ap.to_string());
 
+                let class = self.entity.borrow_mut().actor.actor.base_class();
+                if let Some(class_stats) = active.class_stats.get(&class.id) {
+                    for stat in &class.stats {
+                        if !stat.display { continue; }
+                        if let Some(amount) = class_stats.get(&stat.id) {
+                            hover.state.add_text_arg("class_stat_name", &stat.name);
+                            hover.state.add_text_arg("class_stat_amount", &amount.to_string());
+                        }
+                    }
+                }
+
                 match active.duration {
                     Duration::Rounds(rounds) => {
                         hover.state.add_text_arg("duration", &rounds.to_string())

@@ -872,6 +872,10 @@ fn add_bonus(
                 amount,
             );
         }
+        ClassStat { id, amount } => {
+            add(state, "class_stat_id", id);
+            add(state, "class_stat_amount", amount);
+        }
         ArmorProficiency(armor_kind) => {
             add(
                 state,

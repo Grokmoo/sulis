@@ -7,6 +7,9 @@ active:
   script: "hex"
   group: "Warlock"
   ap: 2000
+  class_stats:
+    warlock:
+      Power: 20
   duration:
     Rounds: 2
   cooldown: 5

@@ -31,7 +31,7 @@ use sulis_module::{
     AccuracyKind, Attack, AttackKind, BonusList, DamageKind, HitFlags, HitKind, ItemKind,
     QuickSlot, Slot, StatList, WeaponStyle,
 };
-use sulis_module::{Actor, ActorBuilder, Faction, ImageLayer, Module};
+use sulis_module::{Ability, Actor, ActorBuilder, Faction, ImageLayer, Module};
 
 pub struct ActorState {
     pub actor: Rc<Actor>,
@@ -102,6 +102,8 @@ impl ActorState {
 
         let mut inventory = Inventory::empty();
         inventory.load(save.equipped, save.quick)?;
+
+        save.p_stats.load(actor.base_class());
 
         Ok(ActorState {
             actor,
@@ -271,6 +273,10 @@ impl ActorState {
         }
     }
 
+    pub fn current_class_stat(&self, id: &str) -> ExtInt {
+        *self.p_stats.current_class_stats.get(id).unwrap_or(&ExtInt::Int(0))
+    }
+
     pub fn current_uses_per_day(&self, ability_group: &str) -> ExtInt {
         *self
             .p_stats
@@ -366,6 +372,10 @@ impl ActorState {
                     return false;
                 }
 
+                if !self.p_stats.has_required_class_stats(&state.ability) {
+                    return false;
+                }
+
                 state.is_available()
             }
         }
@@ -384,6 +394,10 @@ impl ActorState {
                 }
 
                 if !self.group_has_uses(&state.group) {
+                    return false;
+                }
+
+                if !self.p_stats.has_required_class_stats(&state.ability) {
                     return false;
                 }
 
@@ -971,6 +985,11 @@ impl ActorState {
         self.listeners.notify(&self);
     }
 
+    pub(crate) fn remove_class_stats(&mut self, ability: &Ability) {
+        self.p_stats.remove_class_stats(ability);
+        self.listeners.notify(&self);
+    }
+
     pub(crate) fn remove_ap(&mut self, ap: u32) {
         self.p_stats.remove_ap(ap);
         self.listeners.notify(&self);
@@ -1068,6 +1087,10 @@ impl ActorState {
 
             for (ref group_id, amount) in class.group_uses_per_day(level).iter() {
                 self.stats.add_single_group_uses_per_day(group_id, *amount);
+            }
+
+            for (stat_id, amount) in class.stats_max(level) {
+                self.stats.add_single_class_stat_max(stat_id, amount);
             }
         }
 

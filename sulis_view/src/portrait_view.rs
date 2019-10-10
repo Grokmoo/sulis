@@ -66,6 +66,28 @@ impl WidgetKind for PortraitView {
             .state
             .add_text_arg("max_hp", &entity.actor.stats.max_hp.to_string());
 
+        let class_stat_bar = match entity.actor.actor.base_class().displayed_class_stat() {
+            None => {
+                let widget = Widget::empty("class_stat_bar");
+                widget.borrow_mut().state.set_visible(false);
+                widget
+            },
+            Some(ref stat) => {
+                let cur = entity.actor.current_class_stat(&stat.id);
+                let max = entity.actor.stats.class_stat_max(&stat.id);
+                let frac = cur.divide(&max);
+                let bar = Widget::with_theme(ProgressBar::new(frac), "class_stat_bar");
+
+                {
+                    let state = &mut bar.borrow_mut().state;
+                    state.add_text_arg("cur_stat", &cur.to_string());
+                    state.add_text_arg("max_stat", &max.to_string());
+                    state.add_text_arg("stat_name", &stat.name);
+                }
+                bar
+            }
+        };
+
         let entity_ref = Rc::clone(&self.entity);
         let level_up = Widget::with_theme(Button::empty(), "level_up");
         level_up
@@ -118,7 +140,7 @@ impl WidgetKind for PortraitView {
             Widget::add_child_to(&icons, icon_widget);
         }
 
-        vec![portrait, hp_bar, level_up, icons]
+        vec![portrait, hp_bar, class_stat_bar, level_up, icons]
     }
 
     fn on_mouse_enter(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {

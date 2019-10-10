@@ -37,6 +37,7 @@ pub struct Upgrades {
     pub ability_choices: Vec<Rc<AbilityList>>,
     pub group_uses_per_encounter: Vec<(String, ExtInt)>,
     pub group_uses_per_day: Vec<(String, ExtInt)>,
+    pub stats: HashMap<String, ExtInt>,
 }
 
 #[derive(Debug)]
@@ -48,6 +49,7 @@ pub struct Class {
     upgrades: HashMap<u32, Upgrades>,
     starting_abilities: Vec<Rc<Ability>>,
     pub kits: Vec<Kit>,
+    pub stats: Vec<ClassStat>,
 }
 
 impl PartialEq for Class {
@@ -75,11 +77,20 @@ impl Class {
 
             let group_uses_per_day = upgrades_builder.group_uses_per_day;
             let group_uses_per_encounter = upgrades_builder.group_uses_per_encounter;
+            let stats = upgrades_builder.stats;
+
+            for (id, _) in &stats {
+                if !builder.stats.iter().any(|stat| id == &stat.id) {
+                    warn!("Unable to find stat for class upgrades: '{}'", id);
+                    return unable_to_create_error("class", &builder.id);
+                }
+            }
 
             let upgrades_for_level = Upgrades {
                 ability_choices,
                 group_uses_per_encounter,
                 group_uses_per_day,
+                stats,
             };
 
             upgrades.insert(level, upgrades_for_level);
@@ -111,7 +122,17 @@ impl Class {
             kits: builder.kits,
             upgrades,
             starting_abilities: abilities,
+            stats: builder.stats,
         })
+    }
+
+    pub fn displayed_class_stat(&self) -> Option<&ClassStat> {
+        for stat in &self.stats {
+            if stat.display {
+                return Some(stat);
+            }
+        }
+        None
     }
 
     pub fn starting_abilities(&self) -> Vec<Rc<Ability>> {
@@ -122,6 +143,14 @@ impl Class {
         match self.upgrades.get(&level) {
             None => Vec::new(),
             Some(upgrades) => upgrades.ability_choices.clone(),
+        }
+    }
+
+
+    pub fn stats_max(&self, level: u32) -> HashMap<String, ExtInt> {
+        match self.upgrades.get(&level) {
+            None => HashMap::new(),
+            Some(upgrades) => upgrades.stats.clone(),
         }
     }
 
@@ -143,6 +172,16 @@ impl Class {
 
 #[derive(Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
+pub struct ClassStat {
+    pub id: String,
+    pub name: String,
+    pub display: bool,
+    pub reset_per_encounter: bool,
+    pub reset_per_day: bool,
+}
+
+#[derive(Deserialize, Debug)]
+#[serde(deny_unknown_fields)]
 pub struct UpgradesBuilder {
     ability_choices: Vec<String>,
 
@@ -151,6 +190,9 @@ pub struct UpgradesBuilder {
 
     #[serde(default)]
     group_uses_per_day: Vec<(String, ExtInt)>,
+
+    #[serde(default)]
+    stats: HashMap<String, ExtInt>,
 }
 
 #[derive(Deserialize, Debug)]
@@ -163,4 +205,7 @@ pub struct ClassBuilder {
     pub upgrades: HashMap<u32, UpgradesBuilder>,
     pub starting_abilities: Vec<String>,
     pub kits: Vec<Kit>,
+
+    #[serde(default)]
+    pub stats: Vec<ClassStat>,
 }

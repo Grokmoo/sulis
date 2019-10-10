@@ -7,6 +7,9 @@ active:
   script: "draining_field"
   group: "Warlock"
   ap: 3000
+  class_stats:
+    warlock:
+      Power: 50
   duration:
     Rounds: 3
   cooldown: 5

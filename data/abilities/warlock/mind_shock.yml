@@ -7,6 +7,9 @@ active:
   script: "mind_shock"
   group: "Warlock"
   ap: 2000
+  class_stats:
+    warlock:
+      Power: 40
   duration:
     Rounds: 2
   cooldown: 5

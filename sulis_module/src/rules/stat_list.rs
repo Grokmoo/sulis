@@ -81,6 +81,7 @@ pub struct StatList {
     pub caster_level: i32,
     group_uses_per_encounter: HashMap<String, ExtInt>,
     group_uses_per_day: HashMap<String, ExtInt>,
+    class_stats: HashMap<String, ExtInt>,
 }
 
 impl StatList {
@@ -132,7 +133,12 @@ impl StatList {
             caster_level: 0,
             group_uses_per_encounter: HashMap::new(),
             group_uses_per_day: HashMap::new(),
+            class_stats: HashMap::new(),
         }
+    }
+
+    pub fn class_stat_max(&self, stat: &str) -> ExtInt {
+        self.class_stats.get(stat).copied().unwrap_or(ExtInt::Int(0))
     }
 
     pub fn uses_per_day_iter(&self) -> impl Iterator<Item = (&String, &ExtInt)> {
@@ -256,6 +262,22 @@ impl StatList {
             .insert(group_id.to_string(), new_uses);
     }
 
+    pub fn add_single_class_stat_i32(&mut self, stat_id: &str, amount: i32) {
+        let cur_amount = *self.class_stats.get(stat_id).unwrap_or(&ExtInt::Int(0));
+        let new_amount = if amount >= 0 {
+            cur_amount + (amount as u32)
+        } else {
+            cur_amount + (-amount as u32)
+        };
+        self.class_stats.insert(stat_id.to_string(), new_amount);
+    }
+
+    pub fn add_single_class_stat_max(&mut self, stat_id: String, amount: ExtInt) {
+        let cur_amount = *self.class_stats.get(&stat_id).unwrap_or(&ExtInt::Int(0));
+        let new_amount = cur_amount + amount;
+        self.class_stats.insert(stat_id, new_amount);
+    }
+
     /// Adds the bonuses from the specified BonusList to this stat list.
     pub fn add(&mut self, bonuses: &BonusList) {
         self.add_multiple(bonuses, 1);
@@ -345,6 +367,7 @@ impl StatList {
                 self.add_single_group_uses_per_encounter(group, *amount)
             }
             GroupUsesPerDay { group, amount } => self.add_single_group_uses_per_day(group, *amount),
+            ClassStat { id, amount } => self.add_single_class_stat_i32(id, *amount),
         }
     }
 

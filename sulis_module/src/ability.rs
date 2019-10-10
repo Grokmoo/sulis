@@ -14,6 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::collections::HashMap;
 use std::hash::{Hash, Hasher};
 use std::io::Error;
 use std::rc::Rc;
@@ -61,6 +62,7 @@ pub struct Active {
     pub cooldown: u32,
     pub short_description: String,
     pub ai: AIData,
+    pub class_stats: HashMap<String, HashMap<String, u32>>,
 }
 
 #[derive(Debug)]
@@ -134,6 +136,7 @@ impl Ability {
                     group,
                     short_description: active.short_description,
                     ai: active.ai,
+                    class_stats: active.class_stats,
                 })
             }
         };
@@ -208,6 +211,9 @@ pub struct ActiveBuilder {
     cooldown: Option<u32>,
     short_description: String,
     ai: AIData,
+
+    #[serde(default)]
+    class_stats: HashMap<String, HashMap<String, u32>>,
 }
 
 #[derive(Deserialize, Debug, Clone, Copy)]

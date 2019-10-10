@@ -7,6 +7,9 @@ active:
   script: "assay"
   group: "Warlock"
   ap: 2000
+  class_stats:
+    warlock:
+      Power: 20
   duration:
     Rounds: 3
   cooldown: 5

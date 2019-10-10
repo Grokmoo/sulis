@@ -53,7 +53,7 @@ themes:
         border: { top: 1, bottom: 1, left: 2, right: 2 }
         background: 80_transparent_fill
         text: |
-          [s=6.0|#name#]   [s=5.0;c=f00|AP: #activate_ap#]
+          [s=6.0|#name#]   [s=5.0;c=f00|AP: #activate_ap#][?class_stat_name|[s=5.0;c=f0f|   #class_stat_name#: #class_stat_amount#]]
           [s=5.0|#short_description#]
         size: [60, 12]
         relative:
@@ -186,6 +186,19 @@ themes:
                     text: "#cur_hp# / #max_hp#"
                     text_params:
                       scale: 7.0
+                      horizontal_alignment: Center
+                  class_stat_bar:
+                    from: progress_bar
+                    custom:
+                      bar_image: purple_fill
+                    relative:
+                      y: Max
+                      width: Max
+                    size: [-2, 5]
+                    position: [2, -7]
+                    text: "#stat_name#: #cur_stat# / #max_stat#"
+                    text_params:
+                      scale: 5.0
                       horizontal_alignment: Center
                   level_up:
                     from: button
@@ -1232,7 +1245,8 @@ themes:
             text: |
               [s=8|#name#][?prereqs_not_met;c=f00|  Prereqs not Met][?owned_level;c=0f0|  Owned - Level #owned_level#]
               [s=9|]
-              [?active;s=7;c=f00|Active - AP: #activate_ap#
+              [?active;s=7;c=f00|Active - AP: #activate_ap#[?class_stat_name|
+              [s=6;c=f0f|#class_stat_name#: #class_stat_amount#]]
               [s=6;c=fff|[?duration|Duration: #duration# Rounds][?mode|Mode][?instant|Duration: Instantaneous][?permanent|Permanent]
               ][?cooldown;s=6;c=fff|Cooldown: #cooldown# Rounds]
               ][?passive;s=7;c=0ff|Passive]
@@ -1494,6 +1508,7 @@ themes:
           ][?ability_group_0|#ability_group_0# ability uses per encounter: #ability_group_0_uses_per_encounter#
           ][?ability_group_1|#ability_group_1# ability uses per encounter: #ability_group_1_uses_per_encounter#
           ][?ability_group_2|#ability_group_2# ability uses per encounter: #ability_group_2_uses_per_encounter#
+          ][?class_stat_id|[c=f0f|#class_stat_id#: #class_stat_amount#]
           ][?str|Strength: #str#
           ][?dex|Dexterity: #dex#
           ][?end|Endurance: #end#

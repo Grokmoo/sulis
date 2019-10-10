@@ -210,6 +210,23 @@ impl PartialOrd for ExtInt {
 }
 
 impl ExtInt {
+    pub fn divide(&self, other: &ExtInt) -> f32 {
+        match self {
+            ExtInt::Int(amount) => {
+                match other {
+                    ExtInt::Int(other_amount) => *amount as f32 / *other_amount as f32,
+                    ExtInt::Infinity => 0.0,
+                }
+            },
+            ExtInt::Infinity => {
+                match other {
+                    ExtInt::Int(_) => 0.0,
+                    ExtInt::Infinity => 1.0,
+                }
+            }
+        }
+    }
+
     pub fn is_zero(&self) -> bool {
         match self {
             ExtInt::Int(amount) => *amount == 0,

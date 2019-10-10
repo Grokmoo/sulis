@@ -7,6 +7,9 @@ active:
   script: "feedback"
   group: "Warlock"
   ap: 3000
+  class_stats:
+    warlock:
+      Power: 40
   duration:
     Instant
   cooldown: 4

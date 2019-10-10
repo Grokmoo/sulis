@@ -7,6 +7,9 @@ active:
   script: "disintegrate"
   group: "Warlock"
   ap: 3000
+  class_stats:
+    warlock:
+      Power: 80
   duration:
    Instant
   cooldown: 5

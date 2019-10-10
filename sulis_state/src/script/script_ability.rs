@@ -381,6 +381,7 @@ fn activate(
         let bonus = entity.borrow().actor.stats.bonus_ability_action_point_cost;
         let ap = cmp::max(0, ability.ap as i32 - bonus);
         entity.borrow_mut().actor.remove_ap(ap as u32);
+        entity.borrow_mut().actor.remove_class_stats(&ability.to_ability());
     }
 
     let area = GameState::area_state();

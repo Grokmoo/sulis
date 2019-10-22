@@ -177,7 +177,7 @@ kits:
         Head: { id: helm_hat }
       quick:
         Usable1: { id: potion_healing }
-        Usable2: { id: potion_power }
+        Usable2: { id: potion_body }
         Usable3: { id: potion_mind }
       pc_starting_coins: 300
     description: |
@@ -200,7 +200,7 @@ kits:
         Head: { id: helm_hat }
       quick:
         Usable1: { id: potion_healing }
-        Usable2: { id: potion_power }
+        Usable2: { id: potion_body }
         Usable3: { id: potion_mind }
         AltHeldMain: { id: dagger }
       pc_starting_coins: 300
@@ -225,7 +225,7 @@ kits:
         Cloak: { id: cloak }
       quick:
         Usable1: { id: potion_healing }
-        Usable2: { id: potion_power }
+        Usable2: { id: potion_body }
         Usable3: { id: potion_mind }
         AltHeldMain: { id: dagger }
       pc_starting_coins: 400

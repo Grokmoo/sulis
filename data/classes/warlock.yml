@@ -49,7 +49,7 @@ upgrades:
     group_uses_per_day:
       - [ "Invocations", 1 ]
     stats:
-      Power: 10
+      Power: 30
   2:
     ability_choices: [ warlock ]
     group_uses_per_encounter:
@@ -58,7 +58,7 @@ upgrades:
     group_uses_per_day:
       - [ "Invocations", ~ ]
     stats:
-      Power: 20
+      Power: 40
   3:
     ability_choices: [ warlock, general ]
     group_uses_per_encounter:
@@ -67,7 +67,7 @@ upgrades:
     group_uses_per_day:
       - [ "Invocations", ~ ]
     stats:
-      Power: 30
+      Power: 50
   4:
     ability_choices: [ warlock ]
     group_uses_per_encounter:
@@ -76,7 +76,7 @@ upgrades:
     group_uses_per_day:
       - [ "Invocations", ~ ]
     stats:
-      Power: 40
+      Power: 60
   5:
     ability_choices: [ warlock, general ]
     group_uses_per_encounter:
@@ -85,7 +85,7 @@ upgrades:
     group_uses_per_day:
       - [ "Invocations", ~ ]
     stats:
-      Power: 50
+      Power: 70
   6:
     ability_choices: [ warlock ]
     group_uses_per_encounter:
@@ -94,7 +94,7 @@ upgrades:
     group_uses_per_day:
       - [ "Invocations", ~ ]
     stats:
-      Power: 60
+      Power: 80
   7:
     ability_choices: [ warlock, general ]
     group_uses_per_encounter:
@@ -103,7 +103,7 @@ upgrades:
     group_uses_per_day:
       - [ "Invocations", ~ ]
     stats:
-      Power: 70
+      Power: 90
   8:
     ability_choices: [ warlock ]
     group_uses_per_encounter:
@@ -112,7 +112,7 @@ upgrades:
     group_uses_per_day:
       - [ "Invocations", ~ ]
     stats:
-      Power: 80
+      Power: 100
   9:
     ability_choices: [ warlock, general ]
     group_uses_per_encounter:
@@ -121,7 +121,7 @@ upgrades:
     group_uses_per_day:
       - [ "Invocations", ~ ]
     stats:
-      Power: 90
+      Power: 110
   10:
     ability_choices: [ warlock ]
     group_uses_per_encounter:
@@ -130,7 +130,7 @@ upgrades:
     group_uses_per_day:
       - [ "Invocations", ~ ]
     stats:
-      Power: 100
+      Power: 120
   11:
     ability_choices: [ warlock, general ]
     group_uses_per_encounter:
@@ -139,7 +139,7 @@ upgrades:
     group_uses_per_day:
       - [ "Invocations", ~ ]
     stats:
-      Power: 110
+      Power: 130
   12:
     ability_choices: [ warlock ]
     group_uses_per_encounter:
@@ -148,7 +148,7 @@ upgrades:
     group_uses_per_day:
       - [ "Invocations", ~ ]
     stats:
-      Power: 120
+      Power: 140
   13:
     ability_choices: [ warlock, general ]
     group_uses_per_encounter:
@@ -157,7 +157,7 @@ upgrades:
     group_uses_per_day:
       - [ "Invocations", ~ ]
     stats:
-      Power: 130
+      Power: 150
   14:
     ability_choices: [ warlock ]
     group_uses_per_encounter:
@@ -166,7 +166,7 @@ upgrades:
     group_uses_per_day:
       - [ "Invocations", ~ ]
     stats:
-      Power: 140
+      Power: 160
   15:
     ability_choices: [ warlock, general ]
     group_uses_per_encounter:
@@ -175,7 +175,7 @@ upgrades:
     group_uses_per_day:
       - [ "Invocations", ~ ]
     stats:
-      Power: 150
+      Power: 170
   16:
     ability_choices: [ warlock, general ]
     group_uses_per_encounter:
@@ -184,7 +184,7 @@ upgrades:
     group_uses_per_day:
       - [ "Invocations", ~ ]
     stats:
-      Power: 160
+      Power: 180
   17:
     ability_choices: [ warlock, general ]
     group_uses_per_encounter:
@@ -193,7 +193,7 @@ upgrades:
     group_uses_per_day:
       - [ "Invocations", ~ ]
     stats:
-      Power: 170
+      Power: 190
   18:
     ability_choices: [ warlock, general ]
     group_uses_per_encounter:
@@ -202,7 +202,7 @@ upgrades:
     group_uses_per_day:
       - [ "Invocations", ~ ]
     stats:
-      Power: 180
+      Power: 200
   19:
     ability_choices: [ warlock, general ]
     group_uses_per_encounter:
@@ -211,7 +211,7 @@ upgrades:
     group_uses_per_day:
       - [ "Invocations", ~ ]
     stats:
-      Power: 190
+      Power: 210
 kits:
   - name: Warlock
     default_attributes:
@@ -231,8 +231,11 @@ kits:
         Head: { id: helm_hood }
       quick:
         Usable1: { id: potion_healing }
-        Usable2: { id: potion_mind }
+        Usable2: { id: potion_power }
       pc_starting_coins: 500
+      pc_starting_items:
+        - quantity: 1
+          item: { id: potion_power }
     description: |
       A warlock with a variety of abilities for both ranged and close combat.
 

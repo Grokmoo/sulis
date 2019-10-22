@@ -11,6 +11,9 @@ probability_entries:
   potion_power:
     weight: 75
     quantity: [1, 2]
+  potion_body:
+    weight: 75
+    quantity: [1, 2]
   potion_mind:
     weight: 75
     quantity: [1, 2]

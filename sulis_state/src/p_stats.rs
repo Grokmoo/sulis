@@ -211,6 +211,23 @@ impl PStats {
         }
     }
 
+    pub fn add_class_stat(&mut self, stat: &str, amount: u32, max: ExtInt) {
+        let amount = match self.current_class_stats.get(stat) {
+            None => ExtInt::Int(amount),
+            Some(cur) => {
+                if cur.is_infinite() { return; }
+                *cur + amount
+            }
+        };
+        let amount = ExtInt::min(amount, max);
+        self.current_class_stats.insert(stat.to_string(), amount);
+    }
+
+    pub fn remove_class_stat(&mut self, stat: &str, amount: u32) {
+        let cur = *self.current_class_stats.get(stat).unwrap_or(&ExtInt::Int(0));
+        self.current_class_stats.insert(stat.to_string(), cur - amount);
+    }
+
     pub fn add_hp(&mut self, hp: u32, max: i32) {
         let hp = hp as i32;
         self.hp += hp;

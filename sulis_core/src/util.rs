@@ -210,6 +210,14 @@ impl PartialOrd for ExtInt {
 }
 
 impl ExtInt {
+    pub fn max(a: ExtInt, b: ExtInt) -> ExtInt {
+        if a > b { a } else { b }
+    }
+
+    pub fn min(a: ExtInt, b: ExtInt) -> ExtInt {
+        if a > b { b } else { a }
+    }
+
     pub fn divide(&self, other: &ExtInt) -> f32 {
         match self {
             ExtInt::Int(amount) => {

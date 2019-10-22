@@ -312,6 +312,13 @@ use sulis_module::{
 /// Adds the specified number of hit points to this entity.  The entity's maximum hit
 /// points cannot be exceeded in this way.
 ///
+/// # `add_class_stat(stat: String, amount: Float)`
+/// Adds the specified amount of the specified stat for this entity.  The entity's maximum
+/// class stat cannot be exceeded.
+///
+/// # `remove_class_stat(stat: String, amount: Float)`
+/// Removes the specified amount of the class stat for this entity.
+///
 /// # `get_overflow_ap() -> Int`
 /// Returns the current amount of overflow ap for this entity.  This is AP that will become
 /// available as bonus AP (up to the maximum per round AP) on this entity's next turn.
@@ -1195,6 +1202,28 @@ impl UserData for ScriptEntity {
             text.add_entry(format!("{}", amount), ColorKind::Heal);
             area_state.borrow_mut().add_feedback_text(text);
 
+            Ok(())
+        });
+
+        methods.add_method("add_class_stat", |_, entity, (stat, amount): (String, f32)| {
+            let amount = amount as u32;
+            let parent = entity.try_unwrap()?;
+            parent.borrow_mut().actor.add_class_stat(&stat, amount);
+            let area_state = GameState::area_state();
+            let mut text = area_state.borrow_mut().create_feedback_text(&parent.borrow());
+            text.add_entry(format!("{}", amount), ColorKind::Heal);
+            area_state.borrow_mut().add_feedback_text(text);
+            Ok(())
+        });
+
+        methods.add_method("remove_class_stat", |_, entity, (stat, amount): (String, f32)| {
+            let amount = amount as u32;
+            let parent = entity.try_unwrap()?;
+            parent.borrow_mut().actor.remove_class_stat(&stat, amount);
+            let area_state = GameState::area_state();
+            let mut text = area_state.borrow_mut().create_feedback_text(&parent.borrow());
+            text.add_entry(format!("{}", amount), ColorKind::Hit);
+            area_state.borrow_mut().add_feedback_text(text);
             Ok(())
         });
 

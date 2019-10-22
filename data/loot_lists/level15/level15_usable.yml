@@ -14,6 +14,8 @@ weighted_entries:
     weight: 50
   potion_mind:
     weight: 10
+  potion_body:
+    weight: 10
   potion_power:
     weight: 10
   potion_spellpower:

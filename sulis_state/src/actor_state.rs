@@ -1005,6 +1005,18 @@ impl ActorState {
         self.listeners.notify(&self);
     }
 
+
+    pub(crate) fn remove_class_stat(&mut self, stat: &str, amount: u32) {
+        self.p_stats.remove_class_stat(stat, amount);
+        self.listeners.notify(&self);
+    }
+
+    pub(crate) fn add_class_stat(&mut self, stat: &str, amount: u32) {
+        let max = self.stats.class_stat_max(stat);
+        self.p_stats.add_class_stat(stat, amount, max);
+        self.listeners.notify(&self);
+    }
+
     pub fn elapse_time(&mut self, millis_elapsed: u32, all_effects: &Vec<Option<Effect>>) {
         for (_, ability_state) in self.ability_states.iter_mut() {
             ability_state.update(millis_elapsed);

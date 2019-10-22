@@ -17,6 +17,8 @@ weighted_entries:
     weight: 50
   potion_mind:
     weight: 10
+  potion_body:
+    weight: 10
   potion_power:
     weight: 10
   potion_spellpower:
@@ -576,6 +578,9 @@ probability_entries:
     weight: 90
     quantity: [3, 8]
   potion_power:
+    weight: 75
+    quantity: [3, 4]
+  potion_body:
     weight: 75
     quantity: [1, 2]
   potion_mind:

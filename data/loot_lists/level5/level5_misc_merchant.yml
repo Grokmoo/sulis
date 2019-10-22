@@ -18,6 +18,8 @@ probability_entries:
     quantity: [3, 5]
   potion_mind:
     weight: 50
+  potion_body:
+    weight: 50
   potion_power:
     weight: 50
   potion_spellpower:

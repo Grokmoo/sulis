@@ -158,10 +158,10 @@ kits:
         Legs: { id: legs_pants }
       quick:
         Usable1: { id: potion_healing }
-        Usable2: { id: potion_power }
+        Usable2: { id: potion_body }
       pc_starting_items:
        - quantity: 1
-         item: { id: potion_power }
+         item: { id: potion_body }
       pc_starting_coins: 200
     description: |
       A battle hardened warrior who prefers large weapons and close quarters combat.  They can deal out tremendous damage to any foes who dare to enter the melee.
@@ -181,11 +181,11 @@ kits:
         Legs: { id: legs_pants }
       quick:
         Usable1: { id: potion_healing }
-        Usable2: { id: potion_power }
+        Usable2: { id: potion_body }
         AltHeldMain: { id: dagger }
       pc_starting_items:
         - quantity: 1
-          item: { id: potion_power }
+          item: { id: potion_body }
       pc_starting_coins: 200
     description: |
       An expert with ranged weapons, who prefers to keep their distance from enemies where possible, using their skills to take down the most dangerous targets from afar.
@@ -207,10 +207,10 @@ kits:
         Hands: { id: gloves_leather }
       quick:
         Usable1: { id: potion_healing }
-        Usable2: { id: potion_power }
+        Usable2: { id: potion_body }
       pc_starting_items:
         - quantity: 1
-          item: { id: potion_power }
+          item: { id: potion_body }
       pc_starting_coins: 100
     description: |
       A fighter who will typically use heavy armor and a large shield.  While certainly capable of dishing out punishment, their primary role on the battlefield is often to protect their compatriots.

@@ -17,7 +17,7 @@ inventory:
     HeldMain: { id: hatchet }
     Torso: { id: torso_leather }
   quick:
-    Usable1: { id: potion_power }
+    Usable1: { id: potion_body }
 reward:
   xp: 15
   loot: level1_misc

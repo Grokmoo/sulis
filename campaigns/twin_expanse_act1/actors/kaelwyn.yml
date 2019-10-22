@@ -48,7 +48,7 @@ inventory:
       id: potion_healing
       adjectives: []
     Usable2:
-      id: potion_power
+      id: potion_body
       adjectives: []
   pc_starting_coins: 200
   pc_starting_items:

@@ -18,3 +18,5 @@ usable:
 prereqs:
   levels:
     mage: 1
+    druid: 1
+    warlock: 1

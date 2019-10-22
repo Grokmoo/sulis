@@ -1,8 +1,8 @@
 id: potion_power
 name: Potion of Power
-icon: inventory/potion01_blue
+icon: inventory/potion01_purple
 weight: 50
-value: 300
+value: 600
 usable:
   consumable: true
   script: potion_power
@@ -14,4 +14,7 @@ usable:
     kind: Buff
     group: Single
     range: Personal
-  short_description: "Temporarily increases your physical attributes."
+  short_description: "Replenishes a Warlock's personal power pool."
+prereqs:
+  levels:
+    warlock: 1

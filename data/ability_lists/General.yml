@@ -68,17 +68,20 @@ abilities:
   
   - id: armored_casting
     position: [6, 0]
-  - id: zealous_caster
-    position: [7, 0]
   - id: deadly_caster
-    position: [6, 2.5]
+    position: [6, 1.5]
   - id: ice_master
-    position: [7, 1]
+    position: [7, 0]
   - id: fire_master
-    position: [7, 2]
+    position: [7, 1]
   - id: lightning_master
-    position: [7, 3]
+    position: [7, 2]
   - id: acid_master
-    position: [7, 4]
+    position: [7, 3]
   - id: practiced_caster
+    position: [6, 3]
+    
+  - id: zealous_caster
+    position: [6, 4]
+  - id: powerful_warlock
     position: [6, 5]

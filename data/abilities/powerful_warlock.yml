@@ -1,0 +1,22 @@
+id: powerful_warlock
+name: "Powerful Warlock"
+icon: abilities/powerful_warlock
+description: |
+  You gain an additional 10 Power in your warlock pool.
+bonuses:
+  - kind:
+      class_stat: { id: "Power", amount: 10 }
+prereqs:
+  levels:
+    warlock: 3
+upgrades:
+  - description: |
+      You gain a further additional 10 Power.
+    bonuses:
+      - kind:
+          class_stat: { id: "Power", amount: 10 }
+  - description: |
+      You gain a further additional 10 Power.
+    bonuses:
+      - kind:
+          class_stat: { id: "Power", amount: 10 }

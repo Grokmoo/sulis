@@ -150,6 +150,7 @@ groups:
       shield_combat: [6, 10]
       armored_combat: [7, 10]
       psychic_yell: [8, 10]
+      powerful_warlock: [9, 10]
       
       healthy: [0, 11]
       helping_hand: [1, 11]

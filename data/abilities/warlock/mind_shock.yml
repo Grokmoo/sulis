@@ -11,7 +11,7 @@ active:
     warlock:
       Power: 40
   duration:
-    Rounds: 2
+    Instant
   cooldown: 5
   ai:
     priority: 10
@@ -23,3 +23,6 @@ active:
 prereqs:
   total_level: 9
   abilities: [ psychic_knife, draining_field ]
+upgrades:
+  - description: |
+      The mind shock removes more AP and has a larger radius.

@@ -23,3 +23,6 @@ active:
 prereqs:
   total_level: 2
   abilities: [ psychic_yell ]
+upgrades:
+  - description: |
+      The target now suffers raw damage when attacking the caster and failing their Will check.

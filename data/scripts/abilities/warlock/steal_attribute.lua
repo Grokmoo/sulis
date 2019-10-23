@@ -78,6 +78,28 @@ function on_target_select(parent, ability, targets)
   local effect = parent:create_effect(ability:name(), ability:duration())
   effect:add_attribute_bonus(attr, amount)
   
+  if parent:ability_level(ability) > 1 then
+    if attr == "Strength" then
+	  effect:add_attribute_bonus("Dexterity", amount / 2)
+	  effect:add_attribute_bonus("Endurance", amount / 2)
+	elseif attr == "Dexterity" then
+	  effect:add_attribute_bonus("Perception", amount / 2)
+	  effect:add_attribute_bonus("Endurance", amount / 2)
+	elseif attr == "Endurance" then
+	  effect:add_attribute_bonus("Strength", amount / 2)
+	  effect:add_attribute_bonus("Dexterity", amount / 2)
+	elseif attr == "Perception" then
+	  effect:add_attribute_bonus("Intellect", amount / 2)
+	  effect:add_attribute_bonus("Dexterity", amount / 2)
+	elseif attr == "Intellect" then
+	  effect:add_attribute_bonus("Perception", amount / 2)
+	  effect:add_attribute_bonus("Wisdom", amount / 2)
+	elseif attr == "Wisdom" then
+	  effect:add_attribute_bonus("Perception", amount / 2)
+	  effect:add_attribute_bonus("Intellect", amount / 2)
+	end
+  end
+  
   local anim = parent:create_particle_generator("arrow_up")
   anim:set_moves_with_parent()
   anim:set_position(anim:param(-0.5), anim:param(-1.5))

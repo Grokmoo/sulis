@@ -36,6 +36,8 @@ function apply_effect(parent, ability, target)
   target:remove_effects_with_tag("dazzle")
   target:remove_effects_with_tag("sleep")
 
+  if parent:ability_level(ability) < 2 then return end
+
   local stats = parent:stats()
   local amount = 20 + stats.caster_level + stats.intellect_bonus / 2
   

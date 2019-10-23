@@ -9,7 +9,7 @@ active:
   ap: 3000
   class_stats:
     warlock:
-      Power: 80
+      Power: 60
   duration:
    Instant
   cooldown: 5

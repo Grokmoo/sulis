@@ -23,3 +23,6 @@ active:
 prereqs:
   total_level: 3
   abilities: [ vampiric_touch ]
+upgrades:
+  - description: |
+      You gain a smaller boost to other attributes in addition to the primary one.

@@ -23,3 +23,6 @@ active:
 prereqs:
   total_level: 2
   abilities: [ secret_strike ]
+upgrades:
+  - description: |
+      Attacks have a greater chance of missing entirely.  Opponents who miss in such a manner are confused and suffer decreased attack for one turn.

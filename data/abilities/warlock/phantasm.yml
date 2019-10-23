@@ -9,7 +9,7 @@ active:
   ap: 3000
   class_stats:
     warlock:
-      Power: 80
+      Power: 60
   duration:
     Rounds: 3
   cooldown: 6
@@ -23,3 +23,6 @@ active:
 prereqs:
   total_level: 9
   abilities: [ terror, illusory_locus ]
+upgrades:
+  - description: |
+      The area of effect of the phantasm is significantly increased.

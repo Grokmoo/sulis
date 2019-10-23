@@ -2,7 +2,7 @@ id: block_pain
 name: "Block Pain"
 icon: abilities/block_pain
 description: |
-  A nearby ally (but not the caster) gains a psychic block on pain, resisting damage through sheer force of will.  They gain damage resistance that scales based on their Will Resistance, and also heal over time.
+  A nearby ally (but not the caster) gains a psychic block on pain, resisting damage through sheer force of will.  They gain damage resistance that scales based on their Will Resistance.
 active:
   script: "block_pain"
   group: "Warlock"
@@ -22,3 +22,6 @@ active:
     Grant armor and healing to a nearby ally.
 prereqs:
   total_level: 2
+upgrades:
+  - description: |
+      The targeted ally now also heals over time while the effect is active.

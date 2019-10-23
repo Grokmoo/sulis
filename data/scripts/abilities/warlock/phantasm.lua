@@ -47,8 +47,13 @@ function on_round_elapsed(parent, ability)
 end
 
 function check_terrify(parent, ability)
+    local radius = 7.0
+    if parent:ability_level(ability) > 1 then
+      radius = 10.0
+    end
+
   local faction = parent:get_flag("__phantasm_faction")
-  local targets = parent:targets():hostile_to(faction):visible_within(8)
+  local targets = parent:targets():hostile_to(faction):visible_within(radius)
   
   local targets = targets:to_table()
   for i = 1, #targets do

@@ -39,8 +39,10 @@ function on_target_select(parent, ability, targets)
 end
 
 function apply_heal(parent, ability, targets)
+  if parent:ability_level(ability) < 2 then return end
+
   local stats = parent:stats()
   local target = targets:first()
   
-  target:heal_damage(10 + stats.caster_level / 3 + stats.wisdom_bonus / 3)
+  target:heal_damage(10 + stats.caster_level / 3 + stats.intellect_bonus / 3)
 end

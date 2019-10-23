@@ -75,4 +75,9 @@ function charm_check(parent, ability, targets)
   effect:add_num_bonus("ranged_accuracy", penalty)
   effect:add_num_bonus("spell_accuracy", penalty)
   effect:apply()
+  
+  if caster:ability_level(ability) > 1 then
+    local amount = penalty / -10
+    parent:take_damage(caster, amount, amount, "Raw")
+  end
 end

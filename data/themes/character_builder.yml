@@ -142,6 +142,10 @@ themes:
             children:
               ability_button:
                 size: [10, 10]
+          abilities_pane_bard:
+            from: character_builder.ability_selector_pane.abilities_pane
+            background: bard_abilities
+            size: [128, 128]
           abilities_pane_druid:
             from: character_builder.ability_selector_pane.abilities_pane
             background: druid_abilities

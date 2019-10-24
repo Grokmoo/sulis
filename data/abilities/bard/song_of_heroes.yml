@@ -1,0 +1,19 @@
+id: song_of_heroes
+name: "Song of Heroes"
+icon: abilities/song_of_heroes
+description: |
+  You sing the bardic song of heroes, which provides a small bonus to all defenses for nearby allies.
+active:
+  script: "song_of_heroes"
+  group: "Songs"
+  ap: 1000
+  duration:
+    Mode
+  cooldown: 1
+  ai:
+    priority: 10
+    kind: Buff
+    group: Multiple
+    range: Short
+  short_description: |
+    A song that enhances and protects nearby allies.

@@ -99,16 +99,6 @@ impl WidgetKind for Label {
         false
     }
 
-    fn on_mouse_enter(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
-        self.super_on_mouse_exit(widget);
-        false
-    }
-
-    fn on_mouse_exit(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
-        self.super_on_mouse_exit(widget);
-        false
-    }
-
     // TODO refactor tooltip code into a common case somewhere
     fn on_mouse_move(&mut self, widget: &Rc<RefCell<Widget>>, _dx: f32, _dy: f32) -> bool {
         if self.tooltip.is_empty() {

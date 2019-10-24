@@ -1,0 +1,8 @@
+id: note
+frame_time_millis: 200
+frames:
+  - particles/note01
+  - particles/note02
+  - particles/note03
+  - particles/note04
+  - particles/note05

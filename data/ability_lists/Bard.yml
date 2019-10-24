@@ -1,0 +1,4 @@
+id: bard
+abilities:
+  - id: song_of_heroes
+    position: [0, 0]

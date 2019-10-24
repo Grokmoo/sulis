@@ -19,12 +19,12 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 use crate::image::Image;
-use crate::io::{DrawList, GraphicsRenderer};
+use crate::io::{DrawList, GraphicsRenderer, event::ClickKind};
 use crate::resource::ResourceSet;
-use crate::ui::{LineRenderer, Widget, WidgetKind};
+use crate::ui::{theme, LineRenderer, Widget, WidgetKind};
 use crate::util::Point;
-
-use crate::widgets::Label;
+use crate::widget_kind;
+use crate::widgets::{Label, TextArea};
 
 const NAME: &str = "progress_bar";
 
@@ -32,6 +32,7 @@ pub struct ProgressBar {
     fraction: f32,
     bar: Option<Rc<dyn Image>>,
     label: Rc<RefCell<Label>>,
+    tooltip: String,
 }
 
 impl ProgressBar {
@@ -40,6 +41,7 @@ impl ProgressBar {
             bar: None,
             fraction: limit(fraction),
             label: Label::empty(),
+            tooltip: String::new(),
         }))
     }
 
@@ -59,14 +61,55 @@ fn limit(fraction: f32) -> f32 {
 }
 
 impl WidgetKind for ProgressBar {
-    fn get_name(&self) -> &str {
-        NAME
+    widget_kind![NAME];
+
+    fn on_mouse_press(&mut self, widget: &Rc<RefCell<Widget>>, kind: ClickKind) -> bool {
+        self.super_on_mouse_press(widget, kind);
+        false
     }
-    fn as_any(&self) -> &dyn Any {
-        self
+
+    fn on_mouse_release(&mut self, widget: &Rc<RefCell<Widget>>, kind: ClickKind) -> bool {
+        self.super_on_mouse_release(widget, kind);
+        false
     }
-    fn as_any_mut(&mut self) -> &mut dyn Any {
-        self
+
+    fn on_mouse_drag(
+        &mut self,
+        _widget: &Rc<RefCell<Widget>>,
+        _kind: ClickKind,
+        _delta_x: f32,
+        _delta_y: f32,
+    ) -> bool {
+        false
+    }
+
+    fn on_mouse_enter(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
+        self.super_on_mouse_exit(widget);
+        false
+    }
+
+    fn on_mouse_exit(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
+        self.super_on_mouse_exit(widget);
+        false
+    }
+
+    // TODO refactor tooltip code into a common case somewhere
+    fn on_mouse_move(&mut self, widget: &Rc<RefCell<Widget>>, _dx: f32, _dy: f32) -> bool {
+        if self.tooltip.is_empty() {
+            return false;
+        }
+
+        let tooltip = Widget::with_theme(TextArea::empty(), "tooltip");
+        tooltip.borrow_mut().state.add_text_arg("0", &self.tooltip);
+
+        let (x, y) = {
+            let state = &widget.borrow().state;
+            (state.position().x, state.position().y)
+        };
+
+        Widget::set_mouse_over_widget(widget, tooltip, x, y);
+
+        true
     }
 
     fn layout(&mut self, widget: &mut Widget) {
@@ -81,6 +124,10 @@ impl WidgetKind for ProgressBar {
 
         if let Some(ref image_id) = widget.theme.custom.get("bar_image") {
             self.bar = ResourceSet::image(image_id);
+        }
+
+        if let Some(tooltip) = widget.theme.custom.get("tooltip") {
+            self.tooltip = theme::expand_text_args(tooltip, &widget.state);
         }
     }
 

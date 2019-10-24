@@ -21,7 +21,7 @@ use std::rc::Rc;
 
 use crate::script::{script_callback::FuncKind, CallbackData};
 use crate::{save_state::EffectSaveState, ChangeListenerList, EntityState};
-use sulis_core::util::{ExtInt, Point};
+use sulis_core::util::{ExtInt, Point, invalid_data_error};
 use sulis_module::{BonusList, ROUND_TIME_MILLIS};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -30,6 +30,9 @@ pub struct Surface {
     pub(crate) area_id: String,
     pub(crate) points: Vec<Point>,
     pub(crate) squares_to_fire_on_moved: u32,
+
+    #[serde(default)]
+    pub(crate) aura: Option<usize>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -75,6 +78,22 @@ impl Effect {
             callbacks.push(Rc::new(cb));
         }
 
+
+        let mut surface = data.surface;
+        if let Some(ref mut surface) = surface {
+            if let Some(aura) = surface.aura.take() {
+                match entities.get(&aura) {
+                    None => {
+                        return invalid_data_error(
+                            &format!("Invalid aura parent {} for effect", aura)
+                        );
+                    }, Some(ref entity) => {
+                        surface.aura = Some(entity.borrow().index());
+                    }
+                }
+            }
+        }
+
         Ok(Effect {
             name: data.name,
             tag: data.tag,
@@ -82,7 +101,7 @@ impl Effect {
             total_duration: data.total_duration,
             bonuses: data.bonuses,
             deactivate_with_ability: data.deactivate_with_ability,
-            surface: data.surface,
+            surface: surface,
             entity: data.entity,
             icon: data.icon,
 
@@ -140,12 +159,14 @@ impl Effect {
         area: &str,
         points: &Vec<Point>,
         squares_to_fire_on_moved: u32,
+        aura: Option<usize>,
     ) {
         let area_id = area.to_string();
         self.surface = Some(Surface {
             area_id,
             points: points.clone(),
             squares_to_fire_on_moved,
+            aura,
         })
     }
 

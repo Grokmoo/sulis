@@ -27,7 +27,7 @@ use sulis_module::{
 
 use crate::script::{
     script_color_animation, script_image_layer_animation, script_particle_generator,
-    script_scale_animation, CallbackData, Result, ScriptAbility, ScriptCallback,
+    script_scale_animation, CallbackData, Result, ScriptAbility, ScriptCallback, ScriptEntity,
     ScriptColorAnimation, ScriptImageLayerAnimation, ScriptParticleGenerator, ScriptScaleAnimation,
 };
 use crate::{effect, Effect, GameState};
@@ -67,6 +67,7 @@ enum Kind {
     Surface {
         points: Vec<(i32, i32)>,
         squares_to_fire_on_moved: u32,
+        aura: Option<usize>,
     },
 }
 
@@ -253,6 +254,10 @@ impl UserData for ScriptAppliedEffect {
 /// must move within a surface in order to trigger an `OnMovedInSurface` script
 /// event.
 ///
+/// # `set_aura(aura_parent: ScriptEntity)`
+/// Only has an effect on surfaces.  Sets whether this effect is an aura.  Auras
+/// are surfaces that move along with the parent.
+///
 /// # `add_image_layer_anim(anim: ScriptImageLayerAnimation)`
 /// Adds the specified `anim` to this effect.  The anim will have `apply()` called
 /// when this effect has `apply()` called.  It will be removed when this effect is
@@ -362,11 +367,13 @@ pub struct ScriptEffect {
 }
 
 impl ScriptEffect {
-    pub fn new_surface(points: Vec<(i32, i32)>, name: &str, duration: ExtInt) -> ScriptEffect {
+    pub fn new_surface(points: Vec<(i32, i32)>, name: &str,
+        duration: ExtInt) -> ScriptEffect {
         ScriptEffect {
             kind: Kind::Surface {
                 points,
                 squares_to_fire_on_moved: 1,
+                aura: None,
             },
             name: name.to_string(),
             tag: "default".to_string(),
@@ -414,6 +421,18 @@ impl UserData for ScriptEffect {
                 },
                 Kind::Surface { ref mut squares_to_fire_on_moved, .. } => {
                     *squares_to_fire_on_moved = squares;
+                }
+            }
+            Ok(())
+        });
+        methods.add_method_mut("set_aura", |_, effect, aura_parent: ScriptEntity| {
+            match effect.kind {
+                Kind::Entity(_) => {
+                    warn!("Attempted to set is_aura on non-surface effect.");
+                },
+                Kind::Surface { ref mut aura, .. } => {
+                    let index = aura_parent.try_unwrap_index()?;
+                    *aura = Some(index);
                 }
             }
             Ok(())
@@ -800,6 +819,7 @@ fn apply(effect_data: &ScriptEffect) -> Result<()> {
         Kind::Surface {
             points,
             squares_to_fire_on_moved,
+            aura,
         } => {
             let points: Vec<_> = points.iter().map(|(x, y)| Point::new(*x, *y)).collect();
             for pgen in effect_data.pgens.iter() {
@@ -815,6 +835,7 @@ fn apply(effect_data: &ScriptEffect) -> Result<()> {
                 &area.borrow().area.area.id,
                 &points,
                 *squares_to_fire_on_moved,
+                *aura,
             );
             info!(
                 "Add surface to '{}' with duration {}",

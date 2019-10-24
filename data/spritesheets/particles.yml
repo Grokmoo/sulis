@@ -347,6 +347,15 @@ groups:
       eye03: [40, 0]
       eye04: [60, 0]
       eye05: [80, 0]
+  note:
+    size: [16, 16]
+    position: [362, 147]
+    areas:
+      note01: [0, 0]
+      note02: [16, 0]
+      note03: [32, 0]
+      note04: [48, 0]
+      note05: [64, 0]
   charm:
     size: [64, 64]
     position: [0, 680]

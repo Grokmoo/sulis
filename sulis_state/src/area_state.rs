@@ -1086,9 +1086,10 @@ impl AreaState {
         }
     }
 
-    pub(crate) fn entities_with_points(&self, points: &Vec<Point>) -> Vec<usize> {
+    pub(crate) fn entities_with_points(&self, points: &[Point]) -> Vec<usize> {
         let mut result = HashSet::new();
         for p in points {
+            if !self.area.area.coords_valid(p.x, p.y) { continue; }
             for entity in self.entity_grid[(p.x + p.y * self.area.width) as usize].iter() {
                 result.insert(*entity);
             }
@@ -1098,11 +1099,12 @@ impl AreaState {
     }
 
     #[must_use]
-    pub(crate) fn remove_surface(&mut self, index: usize, points: &Vec<Point>) -> HashSet<usize> {
-        info!("Removing surface {} from area", index);
+    pub(crate) fn remove_surface(&mut self, index: usize, points: &[Point]) -> HashSet<usize> {
+        debug!("Removing surface {} from area", index);
 
         let mut entities = HashSet::new();
         for p in points {
+            if !self.area.area.coords_valid(p.x, p.y) { continue; }
             self.surface_grid[(p.x + p.y * self.area.width) as usize].retain(|i| *i != index);
             for entity in self.entity_grid[(p.x + p.y * self.area.width) as usize].iter() {
                 entities.insert(*entity);
@@ -1115,18 +1117,12 @@ impl AreaState {
     }
 
     #[must_use]
-    pub(crate) fn add_surface(&mut self, index: usize, points: Vec<Point>) -> HashSet<usize> {
+    pub(crate) fn add_surface(&mut self, index: usize, points: &[Point]) -> HashSet<usize> {
         self.surfaces.push(index);
 
         let mut entities = HashSet::new();
         for p in points {
-            if !self.area.area.coords_valid(p.x, p.y) {
-                warn!(
-                    "Attempted to add surface with invalid coordinate {},{}",
-                    p.x, p.y
-                );
-                continue;
-            }
+            if !self.area.area.coords_valid(p.x, p.y) { continue; }
 
             self.surface_grid[(p.x + p.y * self.area.width) as usize].push(index);
 
@@ -1289,7 +1285,38 @@ impl AreaState {
         old_y: i32,
         mgr: &mut TurnManager,
     ) {
+        let d_x = old_x - entity.borrow().location.x;
+        let d_y = old_y - entity.borrow().location.y;
+
         let entity_index = entity.borrow().index();
+
+        let aura_indices = mgr.auras_for(entity_index);
+        for aura_index in aura_indices {
+            let aura = mgr.effect_mut(aura_index);
+            let surface = match aura.surface {
+                None => continue,
+                Some(ref mut surface) => surface,
+            };
+            let old_entities = self.remove_surface(aura_index, &surface.points);
+            for ref mut p in surface.points.iter_mut() {
+                p.x -= d_x;
+                p.y -= d_y;
+            }
+            let new_entities = self.add_surface(aura_index, &surface.points);
+
+            debug!("Update aura: {}: {}", aura_index, aura.name);
+
+            for entity in old_entities.difference(&new_entities) {
+                // remove from entities in old but not in new
+                mgr.remove_from_surface(*entity, aura_index);
+            }
+
+            for entity in new_entities.difference(&old_entities) {
+                // add to entities in new but not old
+                mgr.add_to_surface(*entity, aura_index);
+            }
+        }
+
         let old_surfaces = self.clear_entity_points(&entity.borrow(), old_x, old_y);
         let new_surfaces = self.add_entity_points(&entity.borrow());
 
@@ -1311,8 +1338,6 @@ impl AreaState {
         let is_pc = entity.borrow().is_party_member();
 
         if is_pc {
-            let d_x = old_x - entity.borrow().location.x;
-            let d_y = old_y - entity.borrow().location.y;
             self.pc_vis_partial_redraw(d_x, d_y);
             self.compute_pc_visibility(&entity, d_x, d_y);
             self.update_view_visibility();

@@ -187,19 +187,36 @@ themes:
                     text_params:
                       scale: 7.0
                       horizontal_alignment: Center
+                    custom:
+                      tooltip: "Hit Points"
                   class_stat_bar:
                     from: progress_bar
                     custom:
                       bar_image: purple_fill
+                      tooltip: "#stat_name#"
                     relative:
                       y: Max
                       width: Max
                     size: [-2, 5]
                     position: [2, -7]
-                    text: "#stat_name#: #cur_stat# / #max_stat#"
+                    text: "#cur_stat# / #max_stat#"
                     text_params:
                       scale: 5.0
                       horizontal_alignment: Center
+                  icons:
+                    relative:
+                      width: Max
+                      height: Max
+                    size: [-7, -12]
+                    layout: Grid
+                    layout_spacing: { top: 0, bottom: 1, left: 0, right: 1 }
+                    children:
+                      icon:
+                        size: [6, 6]
+                        background: bg_base
+                        foreground: "#icon#"
+                        custom:
+                          tooltip: "#text#"
                   level_up:
                     from: button
                     text: "+"
@@ -210,20 +227,6 @@ themes:
                     relative:
                       x: Max
                     size: [7, 7]
-                  icons:
-                    relative:
-                      width: Max
-                      height: Max
-                    size: [-7, 0]
-                    layout: Grid
-                    layout_spacing: { top: 0, bottom: 1, left: 0, right: 1 }
-                    children:
-                      icon:
-                        size: [6, 6]
-                        background: bg_base
-                        foreground: "#icon#"
-                        custom:
-                          tooltip: "#text#"
           quick_item_bar:
             relative:
               height: Max

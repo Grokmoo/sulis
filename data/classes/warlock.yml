@@ -46,8 +46,6 @@ upgrades:
     group_uses_per_encounter:
       - [ Warlock, 3 ]
       - [ Special, ~ ]
-    group_uses_per_day:
-      - [ "Invocations", 1 ]
     stats:
       Power: 30
   2:
@@ -55,8 +53,6 @@ upgrades:
     group_uses_per_encounter:
       - [ Warlock, 4 ]
       - [ Special, ~ ]
-    group_uses_per_day:
-      - [ "Invocations", ~ ]
     stats:
       Power: 40
   3:
@@ -64,8 +60,6 @@ upgrades:
     group_uses_per_encounter:
       - [ Warlock, 4 ]
       - [ Special, ~ ]
-    group_uses_per_day:
-      - [ "Invocations", ~ ]
     stats:
       Power: 50
   4:
@@ -73,8 +67,6 @@ upgrades:
     group_uses_per_encounter:
       - [ Warlock, 5 ]
       - [ Special, ~ ]
-    group_uses_per_day:
-      - [ "Invocations", ~ ]
     stats:
       Power: 60
   5:
@@ -82,8 +74,6 @@ upgrades:
     group_uses_per_encounter:
       - [ Warlock, 5 ]
       - [ Special, ~ ]
-    group_uses_per_day:
-      - [ "Invocations", ~ ]
     stats:
       Power: 70
   6:
@@ -91,8 +81,6 @@ upgrades:
     group_uses_per_encounter:
       - [ Warlock, 5 ]
       - [ Special, ~ ]
-    group_uses_per_day:
-      - [ "Invocations", ~ ]
     stats:
       Power: 80
   7:
@@ -100,8 +88,6 @@ upgrades:
     group_uses_per_encounter:
       - [ Warlock, 6 ]
       - [ Special, ~ ]
-    group_uses_per_day:
-      - [ "Invocations", ~ ]
     stats:
       Power: 90
   8:
@@ -109,8 +95,6 @@ upgrades:
     group_uses_per_encounter:
       - [ Warlock, 6 ]
       - [ Special, ~ ]
-    group_uses_per_day:
-      - [ "Invocations", ~ ]
     stats:
       Power: 100
   9:
@@ -118,8 +102,6 @@ upgrades:
     group_uses_per_encounter:
       - [ Warlock, 6 ]
       - [ Special, ~ ]
-    group_uses_per_day:
-      - [ "Invocations", ~ ]
     stats:
       Power: 110
   10:
@@ -127,8 +109,6 @@ upgrades:
     group_uses_per_encounter:
       - [ Warlock, 7 ]
       - [ Special, ~ ]
-    group_uses_per_day:
-      - [ "Invocations", ~ ]
     stats:
       Power: 120
   11:
@@ -136,8 +116,6 @@ upgrades:
     group_uses_per_encounter:
       - [ Warlock, 7 ]
       - [ Special, ~ ]
-    group_uses_per_day:
-      - [ "Invocations", ~ ]
     stats:
       Power: 130
   12:
@@ -145,8 +123,6 @@ upgrades:
     group_uses_per_encounter:
       - [ Warlock, 7 ]
       - [ Special, ~ ]
-    group_uses_per_day:
-      - [ "Invocations", ~ ]
     stats:
       Power: 140
   13:
@@ -154,8 +130,6 @@ upgrades:
     group_uses_per_encounter:
       - [ Warlock, 8 ]
       - [ Special, ~ ]
-    group_uses_per_day:
-      - [ "Invocations", ~ ]
     stats:
       Power: 150
   14:
@@ -163,8 +137,6 @@ upgrades:
     group_uses_per_encounter:
       - [ Warlock, 8 ]
       - [ Special, ~ ]
-    group_uses_per_day:
-      - [ "Invocations", ~ ]
     stats:
       Power: 160
   15:
@@ -172,8 +144,6 @@ upgrades:
     group_uses_per_encounter:
       - [ Warlock, 8 ]
       - [ Special, ~ ]
-    group_uses_per_day:
-      - [ "Invocations", ~ ]
     stats:
       Power: 170
   16:
@@ -181,8 +151,6 @@ upgrades:
     group_uses_per_encounter:
       - [ Warlock, 9 ]
       - [ Special, ~ ]
-    group_uses_per_day:
-      - [ "Invocations", ~ ]
     stats:
       Power: 180
   17:
@@ -190,8 +158,6 @@ upgrades:
     group_uses_per_encounter:
       - [ Warlock, 9 ]
       - [ Special, ~ ]
-    group_uses_per_day:
-      - [ "Invocations", ~ ]
     stats:
       Power: 190
   18:
@@ -199,8 +165,6 @@ upgrades:
     group_uses_per_encounter:
       - [ Warlock, 9 ]
       - [ Special, ~ ]
-    group_uses_per_day:
-      - [ "Invocations", ~ ]
     stats:
       Power: 200
   19:
@@ -208,8 +172,6 @@ upgrades:
     group_uses_per_encounter:
       - [ Warlock, 9 ]
       - [ Special, ~ ]
-    group_uses_per_day:
-      - [ "Invocations", ~ ]
     stats:
       Power: 210
 kits:
@@ -218,8 +180,8 @@ kits:
       str: 10
       dex: 13
       end: 13
-      per: 17
-      int: 13
+      per: 13
+      int: 17
       wis: 14
     starting_inventory:
       equipped:

@@ -56,6 +56,7 @@ pub struct TurnManager {
     entities: Vec<Option<Rc<RefCell<EntityState>>>>,
     pub(crate) effects: Vec<Option<Effect>>,
     surfaces: Vec<usize>,
+    auras: HashMap<usize, Vec<usize>>,
     effects_remove_next_update: Vec<usize>,
     entities_move_callback_next_update: HashSet<usize>,
     combat_active: bool,
@@ -76,6 +77,7 @@ impl Default for TurnManager {
             entities: Vec::new(),
             effects: Vec::new(),
             surfaces: Vec::new(),
+            auras: HashMap::new(),
             effects_remove_next_update: Vec::new(),
             entities_move_callback_next_update: HashSet::new(),
             listeners: ChangeListenerList::default(),
@@ -177,6 +179,16 @@ impl TurnManager {
         }
 
         self.effects[index].as_ref()
+    }
+
+    pub fn auras_for(&self, entity_index: usize) -> Vec<usize> {
+        let mut effects = Vec::new();
+        if let Some(auras) = self.auras.get(&entity_index) {
+            for effect_index in auras {
+                effects.push(*effect_index);
+            }
+        }
+        effects
     }
 
     pub fn effect_iter(&self) -> EffectIterator {
@@ -728,7 +740,7 @@ impl TurnManager {
     pub(crate) fn add_to_surface(&mut self, entity_index: usize, surface_index: usize) {
         let entity = self.entity(entity_index);
         let surface = self.effect_mut(surface_index);
-        info!(
+        debug!(
             "Add '{}' from surface {}",
             entity.borrow().actor.actor.name,
             surface_index
@@ -746,7 +758,7 @@ impl TurnManager {
             Some(entity) => entity,
         };
         assert!(self.effects[surface_index].is_some());
-        info!(
+        debug!(
             "Remove '{}' from surface {}",
             entity.borrow().actor.actor.name,
             surface_index
@@ -832,9 +844,17 @@ impl TurnManager {
         cbs: Vec<CallbackData>,
         removal_markers: Vec<Rc<Cell<bool>>>,
     ) -> usize {
+        let aura_parent = match &effect.surface {
+            None => None,
+            Some(surface) => surface.aura,
+        };
         let index = self.add_effect_internal(effect, cbs, removal_markers);
         self.surfaces.push(index);
-        let entities = area_state.borrow_mut().add_surface(index, points);
+        if let Some(aura_parent) = aura_parent {
+            let auras_for_parent = self.auras.entry(aura_parent).or_insert(Vec::new());
+            (*auras_for_parent).push(index);
+        }
+        let entities = area_state.borrow_mut().add_surface(index, &points);
 
         for entity in entities {
             self.add_to_surface(entity, index);
@@ -909,6 +929,10 @@ impl TurnManager {
         });
 
         self.surfaces.retain(|e| *e != index);
+        for (_, ref mut aura_vec) in self.auras.iter_mut() {
+            aura_vec.retain(|e| *e != index);
+            // TODO could remove the entry from self.auras here if the vec is empty
+        }
 
         cbs
     }

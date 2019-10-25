@@ -85,6 +85,12 @@ use sulis_module::{
 /// # `remove_from_party()`
 /// Removes this entity from the player's party
 ///
+/// # `is_hostile(other: ScriptEntity) -> Bool`
+/// Returns true if this entity is hostile to the specified entity, false otherwise
+///
+/// # `is_friendly(other: ScriptEntity) -> Bool`
+/// Returns true if this entity is friendly to the specified entity, false otherwise
+///
 /// # `get_faction() -> String`
 /// Returns the ID of the faction that this entity currently belongs to
 ///
@@ -598,6 +604,20 @@ impl UserData for ScriptEntity {
             let entity = entity.try_unwrap()?;
             GameState::remove_party_member(entity);
             Ok(())
+        });
+
+        methods.add_method("is_hostile", |_, entity, other: ScriptEntity| {
+            let entity = entity.try_unwrap()?;
+            let other = other.try_unwrap()?;
+            let result = entity.borrow().is_hostile(&other);
+            Ok(result)
+        });
+
+        methods.add_method("is_friendly", |_, entity, other: ScriptEntity| {
+            let entity = entity.try_unwrap()?;
+            let other = other.try_unwrap()?;
+            let result = entity.borrow().is_friendly(&other);
+            Ok(result)
         });
 
         methods.add_method("get_faction", |_, entity, ()| {

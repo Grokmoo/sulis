@@ -190,7 +190,12 @@ pub struct EffectSaveState {
 
     #[serde(default)]
     pub(crate) icon: Option<effect::Icon>,
+
+    #[serde(default="default_true")]
+    pub(crate) ui_visible: bool,
 }
+
+fn default_true() -> bool { true }
 
 impl EffectSaveState {
     pub fn new(effect: &Effect, index: usize) -> EffectSaveState {
@@ -212,6 +217,7 @@ impl EffectSaveState {
             bonuses: effect.bonuses.clone(),
             callbacks,
             icon: effect.icon.clone(),
+            ui_visible: effect.ui_visible,
         }
     }
 }

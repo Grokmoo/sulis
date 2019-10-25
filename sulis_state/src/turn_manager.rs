@@ -18,7 +18,7 @@ use std::cell::{Cell, RefCell};
 use std::collections::{vec_deque::Iter, HashMap, HashSet, VecDeque};
 use std::rc::Rc;
 
-use crate::script::{CallbackData, FuncKind};
+use crate::script::{CallbackData, FuncKind, TriggeredCallback};
 use crate::{AreaState, ChangeListener, ChangeListenerList, Effect, EntityState, GameState};
 use sulis_core::util::{gen_rand, Point};
 use sulis_module::{Faction, Module, Time, ROUND_TIME_MILLIS};
@@ -59,6 +59,7 @@ pub struct TurnManager {
     auras: HashMap<usize, Vec<usize>>,
     effects_remove_next_update: Vec<usize>,
     entities_move_callback_next_update: HashSet<usize>,
+    triggered_cbs_next_update: Vec<TriggeredCallback>,
     combat_active: bool,
 
     pub time_listeners: ChangeListenerList<Time>,
@@ -80,6 +81,7 @@ impl Default for TurnManager {
             auras: HashMap::new(),
             effects_remove_next_update: Vec::new(),
             entities_move_callback_next_update: HashSet::new(),
+            triggered_cbs_next_update: Vec::new(),
             listeners: ChangeListenerList::default(),
             time_listeners: ChangeListenerList::default(),
             order: VecDeque::new(),
@@ -148,6 +150,7 @@ impl TurnManager {
         self.effects.clear();
         self.surfaces.clear();
         self.effects_remove_next_update.clear();
+        self.triggered_cbs_next_update.clear();
         self.combat_active = false;
         self.listeners = ChangeListenerList::default();
         self.time_listeners = ChangeListenerList::default();
@@ -155,6 +158,11 @@ impl TurnManager {
         self.cur_ai_group_index = 0;
         self.ai_groups.clear();
         self.total_elapsed_millis = total_elapsed_millis;
+    }
+
+    pub(crate) fn finish_load(&mut self) {
+        // remove triggers that were created in the loading process
+        self.triggered_cbs_next_update.clear();
     }
 
     pub fn effect_mut_checked(&mut self, index: usize) -> Option<&mut Effect> {
@@ -246,14 +254,20 @@ impl TurnManager {
     }
 
     #[must_use]
-    pub fn update_on_moved_in_surface(&mut self) -> Vec<(Rc<CallbackData>, usize)> {
+    pub fn drain_triggered_cbs(&mut self) ->
+        Vec<TriggeredCallback> {
         let mut result = Vec::new();
-
         for index in self.surfaces.iter() {
-            // can't use the method because of borrow checker
             let effect = self.effects[*index].as_mut().unwrap();
+            for (cb, entity_index) in effect.update_on_moved_in_surface() {
+                result.push(TriggeredCallback::with_target(
+                        cb, FuncKind::OnMovedInSurface, entity_index,
+                ));
+            }
+        }
 
-            result.append(&mut effect.update_on_moved_in_surface());
+        for cb in self.triggered_cbs_next_update.drain(..) {
+            result.push(cb);
         }
 
         result
@@ -273,19 +287,17 @@ impl TurnManager {
     }
 
     #[must_use]
-    pub fn update(
-        &mut self,
-        elapsed_millis: u32,
-    ) -> (Vec<Rc<CallbackData>>, Vec<Rc<CallbackData>>) {
+    pub fn update(&mut self, elapsed_millis: u32) -> Vec<TriggeredCallback> {
         // need to do an additional copy to satisfy the borrow checker here
         let to_remove: Vec<usize> = self.effects_remove_next_update.drain(..).collect();
 
-        let mut removal_cbs = Vec::new();
+        let mut cbs = Vec::new();
         for index in to_remove {
-            removal_cbs.append(&mut self.remove_effect(index));
+            for cb in self.remove_effect(index) {
+                cbs.push(TriggeredCallback::new(cb, FuncKind::OnRemoved));
+            }
         }
 
-        let mut turn_cbs = Vec::new();
         let elapsed_millis = if !self.combat_active {
             elapsed_millis
         } else {
@@ -294,13 +306,20 @@ impl TurnManager {
 
         let new_round = self.add_millis(elapsed_millis);
         if new_round {
-            add_campaign_elapsed_callback(&mut turn_cbs);
+            let mut cec_cbs = Vec::new();
+            add_campaign_elapsed_callback(&mut cec_cbs);
+            for cb in cec_cbs {
+                cbs.push(TriggeredCallback::new(cb, FuncKind::OnRoundElapsed));
+            }
         }
 
         // removal just replaces some with none, so we can safely iterate
         for index in 0..self.effects.len() {
-            let (is_removal, mut effect_cbs) = self.update_effect(index, elapsed_millis);
-            turn_cbs.append(&mut effect_cbs);
+            let (is_removal, effect_cbs) = self.update_effect(index, elapsed_millis);
+            for cb in effect_cbs {
+                cbs.push(TriggeredCallback::new(Rc::clone(&cb), FuncKind::OnRoundElapsed));
+                cbs.push(TriggeredCallback::new(cb, FuncKind::OnSurfaceRoundElapsed));
+            }
             if is_removal {
                 self.queue_remove_effect(index);
             }
@@ -310,7 +329,7 @@ impl TurnManager {
             let (remove, cb) = self.update_entity(index, elapsed_millis, new_round);
 
             if let Some(cb) = cb {
-                turn_cbs.push(cb);
+                cbs.push(TriggeredCallback::new(cb, FuncKind::OnRoundElapsed));
             }
 
             if remove {
@@ -318,7 +337,7 @@ impl TurnManager {
             }
         }
 
-        (turn_cbs, removal_cbs)
+        cbs
     }
 
     #[must_use]
@@ -739,7 +758,7 @@ impl TurnManager {
 
     pub(crate) fn add_to_surface(&mut self, entity_index: usize, surface_index: usize) {
         let entity = self.entity(entity_index);
-        let surface = self.effect_mut(surface_index);
+        let surface = self.effects[surface_index].as_mut().unwrap();
         debug!(
             "Add '{}' from surface {}",
             entity.borrow().actor.actor.name,
@@ -750,6 +769,12 @@ impl TurnManager {
             .actor
             .add_effect(surface_index, surface.bonuses().clone());
         surface.increment_squares_moved(entity_index);
+
+        for cb in surface.callbacks.iter() {
+            let cb = TriggeredCallback::with_target(Rc::clone(&cb), FuncKind::OnEnteredSurface,
+                entity_index);
+            self.triggered_cbs_next_update.push(cb);
+        }
     }
 
     pub(crate) fn remove_from_surface(&mut self, entity_index: usize, surface_index: usize) {
@@ -757,13 +782,19 @@ impl TurnManager {
             None => return,
             Some(entity) => entity,
         };
-        assert!(self.effects[surface_index].is_some());
+        let surface = self.effects[surface_index].as_mut().unwrap();
         debug!(
             "Remove '{}' from surface {}",
             entity.borrow().actor.actor.name,
             surface_index
         );
         entity.borrow_mut().actor.remove_effect(surface_index);
+
+        for cb in surface.callbacks.iter() {
+            let cb = TriggeredCallback::with_target(Rc::clone(&cb), FuncKind::OnExitedSurface,
+                entity_index);
+            self.triggered_cbs_next_update.push(cb);
+        }
     }
 
     pub fn readd_entity(&mut self, entity: &Rc<RefCell<EntityState>>) {

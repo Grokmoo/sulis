@@ -30,12 +30,6 @@ use crate::{EntityState, GameState, Script};
 use sulis_core::util::invalid_data_error;
 use sulis_module::{on_trigger::Kind, DamageKind, HitKind, Module};
 
-pub fn fire_on_removed(cbs: Vec<Rc<CallbackData>>) {
-    for cb in cbs {
-        cb.on_removed();
-    }
-}
-
 pub fn fire_round_elapsed(cbs: Vec<Rc<CallbackData>>) {
     for cb in cbs {
         cb.on_round_elapsed();
@@ -43,9 +37,47 @@ pub fn fire_round_elapsed(cbs: Vec<Rc<CallbackData>>) {
     }
 }
 
-pub fn fire_on_moved_in_surface(cbs: Vec<(Rc<CallbackData>, usize)>) {
-    for (cb, target) in cbs {
-        cb.on_moved_in_surface(target);
+pub struct TriggeredCallback {
+    cb: Rc<CallbackData>,
+    target: usize,
+    func: FuncKind,
+}
+
+impl TriggeredCallback {
+    pub fn new(cb: Rc<CallbackData>, func: FuncKind) -> TriggeredCallback {
+        TriggeredCallback {
+            cb,
+            target: 0,
+            func,
+        }
+    }
+
+    pub fn with_target(cb: Rc<CallbackData>, func: FuncKind, target: usize) -> TriggeredCallback {
+        TriggeredCallback {
+            cb,
+            target,
+            func,
+        }
+    }
+}
+
+pub fn fire_cbs(cbs: Vec<TriggeredCallback>) {
+    for cb in cbs {
+        let target = cb.target;
+        let func = cb.func;
+        let cb = cb.cb;
+        match func {
+            FuncKind::OnMovedInSurface => cb.on_moved_in_surface(target),
+            FuncKind::OnEnteredSurface => cb.on_entered_surface(target),
+            FuncKind::OnExitedSurface => cb.on_exited_surface(target),
+            FuncKind::OnRemoved => cb.on_removed(),
+            FuncKind::OnMoved => cb.on_moved(),
+            FuncKind::OnRoundElapsed => cb.on_round_elapsed(),
+            FuncKind::OnSurfaceRoundElapsed => cb.on_surface_round_elapsed(),
+            _ => {
+                warn!("Surface callback of kind {:?} is not being called.", func);
+            }
+        }
     }
 }
 
@@ -108,6 +140,12 @@ pub enum FuncKind {
     /// Called each time an entity moves within a given surface.  Controlled by
     /// `set_squares_to_fire_on_moved`
     OnMovedInSurface,
+
+    /// Called when an entity enters a surface
+    OnEnteredSurface,
+
+    /// Called when an entity exits a surface
+    OnExitedSurface,
 }
 
 /// A trait representing a callback that will fire a script when called.  In lua scripts,
@@ -158,6 +196,10 @@ pub trait ScriptCallback {
     fn on_surface_round_elapsed(&self) {}
 
     fn on_moved_in_surface(&self, _target: usize) {}
+
+    fn on_entered_surface(&self, _target: usize) {}
+
+    fn on_exited_surface(&self, _target: usize) {}
 }
 
 /// A callback that can be passed to various functions to be executed later.
@@ -189,6 +231,8 @@ pub trait ScriptCallback {
 /// # `set_on_moved_fn(func: String)`
 /// # `set_on_surface_round_elapsed_fn(func: String)`
 /// # `set_on_moved_in_surface_fn(func: String)`
+/// # `set_on_entered_surface_fn(func: String)`
+/// # `set_on_exited_surface_fn(func: String)`
 /// Each of these methods causes a specified lua `func` to be called when the condition is met,
 /// as described in `FuncKind`.  Multiple of these methods may be added to one
 /// Callback.
@@ -203,12 +247,8 @@ pub struct CallbackData {
 }
 
 impl CallbackData {
-    pub fn clear_funcs_except(&mut self, func: FuncKind) {
-        let value = self.funcs.remove(&func);
-        self.funcs.clear();
-        if let Some(value) = value {
-            self.funcs.insert(func, value);
-        }
+    pub fn clear_funcs_except(&mut self, keep: &[FuncKind]) {
+        self.funcs.retain(|func, _| keep.contains(func));
     }
 
     pub fn kind(&self) -> Kind {
@@ -437,6 +477,22 @@ impl CallbackData {
             }
         }
     }
+
+    fn exec_surface_script(&self, kind: FuncKind, target: Option<usize>) {
+        if self.funcs.get(&kind).is_none() {
+            return;
+        }
+
+        let targets = match compute_surface_targets(self.effect, self.parent, target) {
+            Some(targets) => targets,
+            None => {
+                warn!("Unable to fire {:?}", kind);
+                return;
+            }
+        };
+
+        self.exec_standard_script(targets, kind);
+    }
 }
 
 impl ScriptCallback for CallbackData {
@@ -483,34 +539,28 @@ impl ScriptCallback for CallbackData {
     /// when called, this computes the current target set and sends it to
     /// the lua function based on the surface state
     fn on_surface_round_elapsed(&self) {
-        if self.funcs.get(&FuncKind::OnSurfaceRoundElapsed).is_none() {
-            return;
-        }
-
-        let targets = match compute_surface_targets(self.effect, self.parent, None) {
-            Some(targets) => targets,
-            None => {
-                warn!("Unable to fire on surface_round_elapsed");
-                return;
-            }
-        };
-        self.exec_standard_script(targets, FuncKind::OnSurfaceRoundElapsed);
+        self.exec_surface_script(FuncKind::OnSurfaceRoundElapsed, None);
     }
 
     fn on_moved_in_surface(&self, target: usize) {
-        if self.funcs.get(&FuncKind::OnMovedInSurface).is_none() {
+        self.exec_surface_script(FuncKind::OnMovedInSurface, Some(target));
+    }
+
+    fn on_entered_surface(&self, target: usize) {
+        self.exec_surface_script(FuncKind::OnEnteredSurface, Some(target));
+    }
+
+    fn on_exited_surface(&self, target: usize) {
+        // since it is called after the surface has been removed in some cases
+        // we cannot preserve the surface info for on_exited_surface scripts
+        if self.funcs.get(&FuncKind::OnExitedSurface).is_none() {
             return;
         }
 
-        let targets = match compute_surface_targets(self.effect, self.parent, Some(target)) {
-            Some(targets) => targets,
-            None => {
-                warn!("Unable to fire on_moved_in_surface");
-                return;
-            }
-        };
+        let mut targets = ScriptEntitySet::with_parent(self.parent);
+        targets.indices.push(Some(target));
 
-        self.exec_standard_script(targets, FuncKind::OnMovedInSurface);
+        self.exec_standard_script(targets, FuncKind::OnExitedSurface);
     }
 
     fn after_defense(
@@ -683,6 +733,12 @@ impl UserData for CallbackData {
         });
         methods.add_method_mut("set_on_moved_in_surface_fn", |_, cb, func: String| {
             cb.add_func(FuncKind::OnMovedInSurface, func)
+        });
+        methods.add_method_mut("set_on_entered_surface_fn", |_, cb, func: String| {
+            cb.add_func(FuncKind::OnEnteredSurface, func)
+        });
+        methods.add_method_mut("set_on_exited_surface_fn", |_, cb, func: String| {
+            cb.add_func(FuncKind::OnExitedSurface, func)
         });
     }
 }

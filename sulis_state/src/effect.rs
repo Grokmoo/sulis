@@ -31,7 +31,6 @@ pub struct Surface {
     pub(crate) points: Vec<Point>,
     pub(crate) squares_to_fire_on_moved: u32,
 
-    #[serde(default)]
     pub(crate) aura: Option<usize>,
 }
 
@@ -45,6 +44,8 @@ pub struct Icon {
 pub struct Effect {
     pub name: String,
     pub tag: String,
+
+    pub ui_visible: bool,
 
     pub(crate) cur_duration: u32,
     pub(crate) total_duration: ExtInt,
@@ -97,6 +98,7 @@ impl Effect {
         Ok(Effect {
             name: data.name,
             tag: data.tag,
+            ui_visible: data.ui_visible,
             cur_duration: data.cur_duration,
             total_duration: data.total_duration,
             bonuses: data.bonuses,
@@ -122,6 +124,7 @@ impl Effect {
         Effect {
             name: name.to_string(),
             tag: tag.to_string(),
+            ui_visible: true,
             cur_duration: 0,
             total_duration: duration,
             bonuses,
@@ -150,7 +153,7 @@ impl Effect {
             // frequently - from the script that is resulting in a call to this
             // func.  in that case, using make_mut to clone on write should be fine.
             let cb = Rc::make_mut(cb);
-            cb.clear_funcs_except(FuncKind::OnRemoved);
+            cb.clear_funcs_except(&vec![FuncKind::OnRemoved, FuncKind::OnExitedSurface]);
         }
     }
 

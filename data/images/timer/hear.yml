@@ -1,0 +1,8 @@
+id: hear
+frame_time_millis: 200
+frames:
+  - particles/hear01
+  - particles/hear02
+  - particles/hear03
+  - particles/hear04
+  - particles/hear05

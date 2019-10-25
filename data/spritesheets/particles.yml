@@ -356,6 +356,15 @@ groups:
       note03: [32, 0]
       note04: [48, 0]
       note05: [64, 0]
+  hear:
+    size: [16, 16]
+    position: [362, 163]
+    areas:
+      hear01: [0, 0]
+      hear02: [16, 0]
+      hear03: [32, 0]
+      hear04: [48, 0]
+      hear05: [64, 0]
   charm:
     size: [64, 64]
     position: [0, 680]

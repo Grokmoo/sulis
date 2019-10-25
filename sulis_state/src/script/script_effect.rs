@@ -285,6 +285,10 @@ impl UserData for ScriptAppliedEffect {
 /// Sets this effect to be removed whenever the specified `ability` is deactivated.
 /// The ability must be a mode.
 ///
+/// # `set_ui_visible(visible: Boolean)`
+/// Sets whether this effect will show up in the UI listing of effects.  The default
+/// is true.
+///
 /// # `set_tag(tag: String)`
 /// Sets a tag to identify this effect as being of a particular type to other scripts.
 /// Most notably, this is used when calling `remove_effects_with_tag` on a `ScriptEntity`
@@ -355,6 +359,7 @@ pub struct ScriptEffect {
     kind: Kind,
     name: String,
     tag: String,
+    ui_visible: bool,
     duration: ExtInt,
     deactivate_with_ability: Option<String>,
     pub bonuses: BonusList,
@@ -377,6 +382,7 @@ impl ScriptEffect {
             },
             name: name.to_string(),
             tag: "default".to_string(),
+            ui_visible: true,
             deactivate_with_ability: None,
             duration,
             icon: None,
@@ -394,6 +400,7 @@ impl ScriptEffect {
             kind: Kind::Entity(parent),
             name: name.to_string(),
             tag: "default".to_string(),
+            ui_visible: true,
             deactivate_with_ability: None,
             duration,
             icon: None,
@@ -466,6 +473,10 @@ impl UserData for ScriptEffect {
         });
         methods.add_method_mut("set_tag", |_, effect, tag: String| {
             effect.tag = tag;
+            Ok(())
+        });
+        methods.add_method_mut("set_ui_visible", |_, effect, vis: bool| {
+            effect.ui_visible = vis;
             Ok(())
         });
         methods.add_method_mut("add_num_bonus", &add_num_bonus);
@@ -761,6 +772,7 @@ fn apply(effect_data: &ScriptEffect) -> Result<()> {
         effect_data.bonuses.clone(),
         effect_data.deactivate_with_ability.clone(),
     );
+    effect.ui_visible = effect_data.ui_visible;
     if let Some(icon) = &effect_data.icon {
         effect.set_icon(icon.icon.clone(), icon.text.clone());
     }

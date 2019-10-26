@@ -876,33 +876,57 @@ impl GameState {
         // clean up animations and surfaces
         GameState::set_clear_anims();
 
-        STATE.with(|state| {
-            let mut state = state.borrow_mut();
-            let state = state.as_mut().unwrap();
+        let mgr = GameState::turn_manager();
+        let party = GameState::party();
+        for entity in &party {
+            let area = {
+                let area_id = &entity.borrow().location.area_id;
+                GameState::get_area_state(area_id).unwrap()
+            };
 
-            let mgr = GameState::turn_manager();
-            {
-                for entity in state.party.iter() {
-                    let entity_index = entity.borrow().index();
-                    let area_id = entity.borrow().location.area_id.to_string();
-                    let area = &state.areas.get(&area_id).unwrap();
-                    let surfaces = area.borrow_mut().remove_entity(&entity, &mgr.borrow());
+            let surfaces = area.borrow_mut().remove_entity(&entity, &mgr.borrow());
+            let entity_index = entity.borrow().index();
+            for surface in surfaces {
+                mgr.borrow_mut().remove_from_surface(entity_index, surface);
+            }
+        }
 
-                    for surface in surfaces {
-                        mgr.borrow_mut().remove_from_surface(entity_index, surface);
+        let area_state = GameState::area_state();
+
+        // remove party auras from old area
+        {
+            let mut mgr = mgr.borrow_mut();
+            for entity in &party {
+                let area = {
+                    let id = &entity.borrow().location.area_id;
+                    GameState::get_area_state(id).unwrap()
+                };
+                let mut area = area.borrow_mut();
+
+                let entity_index = entity.borrow().index();
+                let aura_indices = mgr.auras_for(entity_index);
+                for aura_index in aura_indices {
+                    let aura = mgr.effect_mut(aura_index);
+                    let surface = match aura.surface {
+                        None => continue,
+                        Some(ref mut surface) => surface,
+                    };
+
+                    let to_remove = area.remove_surface(aura_index, &surface.points);
+                    for entity in to_remove {
+                        mgr.remove_from_surface(entity, aura_index);
                     }
                 }
             }
-        });
+        }
 
         let pc = GameState::player();
         let mgr = GameState::turn_manager();
         mgr.borrow_mut().add_time(travel_time);
 
         // find transition locations for all party members
-        let area_state = GameState::area_state();
         let base_location = Location::new(x, y, &area_state.borrow().area.area);
-        for entity in GameState::party() {
+        for entity in &party {
             entity.borrow_mut().clear_pc_vis();
             let mut cur_location = base_location.clone();
             GameState::find_transition_location(
@@ -910,13 +934,38 @@ impl GameState {
                 &entity.borrow().size,
                 &area_state.borrow(),
             );
-            info!(
-                "Transitioning {} to {},{}",
-                entity.borrow().actor.actor.name,
-                cur_location.x,
-                cur_location.y
+            info!("Transitioning {} to {},{}", entity.borrow().actor.actor.name,
+                cur_location.x, cur_location.y
             );
             let index = entity.borrow().index();
+
+            // move this entity's auras to the new area
+            {
+                let mut area = area_state.borrow_mut();
+                let mgr = GameState::turn_manager();
+                let mut mgr = mgr.borrow_mut();
+
+                let dx = entity.borrow().location.x - cur_location.x;
+                let dy = entity.borrow().location.y - cur_location.y;
+
+                let aura_indices = mgr.auras_for(index);
+                for aura_index in aura_indices {
+                    let aura = mgr.effect_mut(aura_index);
+                    let surface = match aura.surface {
+                        None => continue,
+                        Some(ref mut surface) => surface,
+                    };
+                    for ref mut p in surface.points.iter_mut() {
+                        p.x -= dx;
+                        p.y -= dy;
+                    }
+
+                    let to_add = area.add_surface(aura_index, &surface.points);
+                    for entity in to_add {
+                        mgr.add_to_surface(entity, aura_index);
+                    }
+                }
+            }
 
             match area_state
                 .borrow_mut()

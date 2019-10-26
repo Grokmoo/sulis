@@ -31,6 +31,7 @@ pub struct Surface {
     pub(crate) points: Vec<Point>,
     pub(crate) squares_to_fire_on_moved: u32,
 
+    #[serde(default)]
     pub(crate) aura: Option<usize>,
 }
 

@@ -222,6 +222,12 @@ impl Script {
         }
     }
 
+    pub fn ability_on_deactivate(parent: &Rc<RefCell<EntityState>>, ability: &Rc<Ability>) {
+        if let Err(e) = script_cache::ability_on_deactivate(parent, ability) {
+            warn!("Error in ability on_deactivate: {}", e);
+        }
+    }
+
     pub fn ability_on_activate(parent: &Rc<RefCell<EntityState>>, ability: &Rc<Ability>) {
         if let Err(e) = script_cache::ability_on_activate(parent, ability) {
             warn!("Error in ability on_activate: {}", e);

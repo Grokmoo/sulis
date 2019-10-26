@@ -9,6 +9,10 @@ function on_activate(parent, ability)
   end
 end
 
+function on_deactivate(parent, ability)
+  ability:deactivate(parent)
+end
+
 function activate_no_ap(parent, ability)
   activate_no_check(parent, ability)
   ability:activate(parent, false)
@@ -39,7 +43,7 @@ function on_moved(parent, ability)
     game:say_line("Spotted!", parent)
 	ability:deactivate(parent)
 	game:cancel_blocking_anims()
-	game:run_script_delayed("hide", "on_deactivate", 0.1)
+	game:run_script_delayed("hide", "check_ai_activation", 0.1)
   end
 end
 
@@ -47,11 +51,11 @@ function on_round_elapsed(parent, ability)
   if check_spotted(parent, ability) then
     game:say_line("Spotted!", parent)
 	ability:deactivate(parent)
-	game:run_script_delayed("hide", "on_deactivate", 0.1)
+	game:run_script_delayed("hide", "check_ai_activation", 0.1)
   end
 end
 
-function on_deactivate(parent)
+function check_ai_activation(parent)
   game:check_ai_activation(parent)
 end
 
@@ -64,7 +68,7 @@ end
 
 function after_attack(parent, ability)
   deactivate(parent, ability)
-  game:run_script_delayed("hide", "on_deactivate", 0.1)
+  game:run_script_delayed("hide", "check_ai_activation", 0.1)
 end
 
 function check_spotted(parent, ability)

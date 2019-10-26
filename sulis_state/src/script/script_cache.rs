@@ -167,6 +167,11 @@ pub fn ability_on_activate(parent: &Rc<RefCell<EntityState>>, ability: &Rc<Abili
     )
 }
 
+pub fn ability_on_deactivate(parent: &Rc<RefCell<EntityState>>, ability: &Rc<Ability>) -> Result<()> {
+    let t: Option<usize> = None;
+    ability_script(parent, ability, ScriptEntitySet::new(parent, &Vec::new()), t, "on_deactivate")
+}
+
 pub fn ability_on_target_select(
     parent: &Rc<RefCell<EntityState>>,
     ability: &Rc<Ability>,

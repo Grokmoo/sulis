@@ -7,6 +7,11 @@ abilities:
   - id: song_of_survival
     position: [5, 0]
     
+  - id: funeral_dirge
+    position: [0, 5]
+  - id: disharmonious_melody
+    position: [1, 5]
+    
   - id: driving_rhythm
     position: [0, 7]
   - id: syncopated_rhythm

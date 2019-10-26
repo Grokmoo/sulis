@@ -16,6 +16,25 @@ function on_activate(parent, ability)
   targeter:activate()
 end
 
+function on_deactivate(parent, ability)
+  ability:deactivate(parent)
+
+  -- deactivate any currently active melodies along with the main song
+  melodies = { "funeral_dirge", "disharmonious_melody" }
+  for i = 1, #melodies do
+	local melody_ability = parent:get_ability(melodies[i])
+	if melody_ability ~= nil then
+	  if melody_ability:is_active_mode(parent) then
+	    local anim = parent:wait_anim(0.0)
+	    local cb = melody_ability:create_callback(parent)
+        cb:set_on_anim_complete_fn("on_deactivate")
+        anim:set_completion_callback(cb)
+        anim:activate()
+	  end
+	end
+  end
+end
+
 function reactivate(parent, ability, targets)
   create_song(parent, ability, targets)
   ability:activate(parent, false) -- don't use AP
@@ -110,7 +129,10 @@ function on_round_elapsed(parent, ability, targets)
   end
 end
 
-function create_hear_anim(target, effect)
+function create_hear_anim(parent, target, effect)
+  -- don't create hear animation on caster
+  if parent:id() == target:id() then return end
+
   local anim = target:create_particle_generator("hear")
   anim:set_moves_with_parent()
   anim:set_position(anim:param(-0.5), anim:param(-1.5))
@@ -120,7 +142,13 @@ function create_hear_anim(target, effect)
   anim:set_particle_position_dist(anim:dist_param(anim:uniform_dist(-0.7, 0.7), anim:uniform_dist(-0.1, 0.1)),
                                   anim:dist_param(anim:fixed_dist(0.0), anim:uniform_dist(-1.0, -1.5)))
   anim:set_particle_duration_dist(anim:fixed_dist(1.0))
-  set_anim_color(anim)
+  
+  if parent:is_hostile(target) then
+    anim:set_color(anim:param(1.0), anim:param(0.0), anim:param(0.0), anim:param(0.5))
+  else
+    anim:set_color(anim:param(0.0), anim:param(1.0), anim:param(1.0), anim:param(0.5))
+  end
+  
   effect:add_anim(anim)
 end
 

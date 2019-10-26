@@ -545,10 +545,7 @@ impl WidgetKind for AbilityButton {
         if self.entity.borrow().actor.can_activate(&self.ability.id) {
             Script::ability_on_activate(&self.entity, &self.ability);
         } else if self.entity.borrow().actor.can_toggle(&self.ability.id) {
-            self.entity
-                .borrow_mut()
-                .actor
-                .deactivate_ability_state(&self.ability.id);
+            Script::ability_on_deactivate(&self.entity, &self.ability);
         }
 
         true

@@ -13,6 +13,10 @@ function on_activate(parent, ability)
   menu:show()
 end
 
+function on_deactivate(parent, ability)
+  ability:deactivate(parent)
+end
+
 function spell_select1(parent, ability, targets, selection)
   parent:set_flag("__sequencer_type", selection:value())
 

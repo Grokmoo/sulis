@@ -12,6 +12,10 @@ function on_activate(parent, ability)
   menu:show()
 end
 
+function on_deactivate(parent, ability)
+  ability:deactivate(parent)
+end
+
 function spell_select(parent, ability, targets, selection)
   parent:set_flag("__contingency_trigger_condition", selection:value())
 

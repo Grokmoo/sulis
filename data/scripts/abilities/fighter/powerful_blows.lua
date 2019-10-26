@@ -27,3 +27,7 @@ function on_activate(parent, ability)
 
   ability:activate(parent)
 end
+
+function on_deactivate(parent, ability)
+  ability:deactivate(parent)
+end

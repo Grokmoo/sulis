@@ -13,20 +13,20 @@ end
 function on_entered(parent, ability, targets)
   local target = targets:first()
   
-  if parent:is_friendly(target) then return end
-  
   local effect = target:create_effect(ability:name())
   effect:set_tag(SONG_NAME)
   
-  factor = 1 + parent:get_num_flag("bard_bonus_factor")
+  if parent:is_hostile(target) then
+    factor = 1 + parent:get_num_flag("bard_bonus_factor")
+    
+    local stats = parent:stats()
+    local bonus = (10 + stats.caster_level / 2 + stats.perception_bonus / 2) * -0.015 * factor
+    effect:add_num_bonus("crit_multiplier", bonus * 1.5)
+    effect:add_num_bonus("hit_multiplier", bonus)
+    effect:add_num_bonus("graze_multiplier", bonus * 0.75)
+  end
   
-  local stats = parent:stats()
-  local bonus = (10 + stats.caster_level / 2 + stats.perception_bonus / 2) * -0.015 * factor
-  effect:add_num_bonus("crit_multiplier", bonus * 1.5)
-  effect:add_num_bonus("hit_multiplier", bonus)
-  effect:add_num_bonus("graze_multiplier", bonus * 0.75)
-  
-  create_hear_anim(target, effect)
+  create_hear_anim(parent, target, effect)
   
   effect:apply()
 end

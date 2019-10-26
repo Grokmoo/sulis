@@ -1,5 +1,3 @@
--- This file is included in the bard rhythms
-
 function on_activate(parent, ability)
   local songs = { "song_of_heroes", "song_of_curses", "song_of_survival" }
   
@@ -19,16 +17,16 @@ function on_activate(parent, ability)
     return
   end
   
-  song_ability:deactivate(parent) -- call deactivate directly, bypassing the on_deactivate script on the ability
-  parent:set_flag("bard_rhythm", RHYTHM_TYPE)
+  local surface = parent:create_surface(ability:name(), points)
+  surface:set_tag("funeral_dirge")
+  surface:deactivate_with(ability)
+  surface:set_ui_visible(false)
+  surface:set_aura(parent)
+  local cb = ability:create_callback(parent)
+  cb:set_on_surface_round_elapsed_fn("on_round_elapsed")
+  surface:add_callback(cb)
+  surface:apply()
   
-  local cb = song_ability:create_callback(parent)
-  cb:add_affected_points(points)
-  cb:set_on_anim_complete_fn("reactivate")
-  local anim = parent:wait_anim(0.25)
-  anim:set_completion_callback(cb)
-  anim:activate()
-
   local gen = parent:create_particle_generator("note", 1.0)
   gen:set_initial_gen(20.0)
   gen:set_position(gen:param(parent:center_x()), gen:param(parent:center_y() - 0.5))
@@ -39,6 +37,29 @@ function on_activate(parent, ability)
   gen:set_particle_duration_dist(gen:fixed_dist(1.0))
   gen:set_alpha(gen:param(1.0, -1.0))
   gen:activate()
-
+  
+  local effect = parent:create_effect(ability:name())
+  effect:set_tag("funeral_dirge")
+  effect:deactivate_with(ability)
+  effect:add_num_bonus("ap", -1 * game:ap_display_factor())
+  effect:apply()
+  
   ability:activate(parent)
+end
+
+function on_deactivate(parent, ability)
+  ability:deactivate(parent)
+end
+
+function on_round_elapsed(parent, ability, targets)
+  local stats = parent:stats()
+  local min_damage = (1 + stats.caster_level / 4 + stats.perception_bonus / 2)
+
+  local targets = targets:to_table()
+  for i = 1, #targets do
+    local target = targets[i]
+	if parent:is_hostile(target) then
+	  target:take_damage(parent, min_damage, min_damage * 2, "Piercing", 4)
+	end
+  end
 end

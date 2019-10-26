@@ -29,6 +29,10 @@ function on_activate(parent, ability)
   ability:activate(parent)
 end
 
+function on_deactivate(parent, ability)
+  ability:deactivate(parent)
+end
+
 function after_defense(parent, ability, targets, hit)
   if hit:total_damage() < 1 then return end
 

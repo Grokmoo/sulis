@@ -167,6 +167,8 @@ groups:
       shielded_mastery: [6, 11]
       dual_wielding_mastery: [7, 11]
       progressive_rhythm: [8, 11]
+      funeral_dirge: [9, 11]
+      disharmonious_melody: [10, 11]
       
       improved_initiative: [0, 12]
       tough_skin: [1, 12]

@@ -6,8 +6,8 @@ stats:
   - id: Inspiration
     name: Inspiration
     display: true
-    reset_per_encounter: false
-    reset_per_day: true
+    reset_per_encounter: true
+    reset_per_day: false
 bonuses_per_level:
   - kind:
       hit_points: 4

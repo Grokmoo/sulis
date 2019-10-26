@@ -340,15 +340,7 @@ impl UserData for ScriptAbility {
             }
         });
         methods.add_method("activate", &activate);
-        methods.add_method("deactivate", |_, ability, target: ScriptEntity| {
-            ability.error_if_not_active()?;
-            let target = target.try_unwrap()?;
-            target
-                .borrow_mut()
-                .actor
-                .deactivate_ability_state(&ability.id);
-            Ok(())
-        });
+        methods.add_method("deactivate", &deactivate);
         methods.add_method("cooldown", |_, ability, (target, rounds): (ScriptEntity, u32)| {
             ability.error_if_not_active()?;
             let target = target.try_unwrap()?;
@@ -383,6 +375,13 @@ impl UserData for ScriptAbility {
             Ok(ai_data)
         });
     }
+}
+
+fn deactivate(_lua: Context, ability: &ScriptAbility, target: ScriptEntity) -> Result<()> {
+    ability.error_if_not_active()?;
+    let target = target.try_unwrap()?;
+    target.borrow_mut().actor.deactivate_ability_state(&ability.id);
+    Ok(())
 }
 
 fn activate(

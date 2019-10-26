@@ -64,7 +64,7 @@ function on_entered(parent, ability, targets)
   
   local stats = parent:stats()
   local bonus = (10 + stats.caster_level / 2 + stats.perception_bonus / 2)
-  effect:add_num_bonus("melee_accuracy", -bonus * 10)
+  effect:add_num_bonus("melee_accuracy", -bonus)
   effect:add_num_bonus("ranged_accuracy", -bonus)
   effect:add_num_bonus("will", -bonus)
   

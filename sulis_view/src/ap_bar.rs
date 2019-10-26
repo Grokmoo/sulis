@@ -33,14 +33,18 @@ pub fn check_end_turn(widget: &Rc<RefCell<Widget>>) {
     {
         let mgr = GameState::turn_manager();
         let mgr = mgr.borrow();
-        if let Some(entity) = mgr.current() {
-            let entity = entity.borrow();
-            if entity.is_party_member()
-                && entity.actor.ap() < entity.actor.get_move_ap_cost(1)
-                && !entity.actor.has_ap_to_attack()
-            {
-                end_turn = true;
-            }
+
+        let entity = match mgr.current() {
+            None => return,
+            Some(entity) => entity,
+        };
+        let entity = entity.borrow();
+        if !entity.is_party_member() { return; }
+
+        if !entity.actor.started_turn_with_no_ap_for_actions() &&
+            !entity.actor.has_ap_for_any_action() {
+            end_turn = true;
+            info!("{} has no AP left.  Ending turn.", entity.actor.actor.name);
         }
     }
 

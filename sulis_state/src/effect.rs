@@ -186,6 +186,17 @@ impl Effect {
         self.entity = Some(entity);
     }
 
+    pub fn is_surface(&self) -> bool {
+        self.surface.is_some()
+    }
+
+    pub fn is_aura(&self) -> bool {
+        match &self.surface {
+            None => false,
+            Some(surface) => surface.aura.is_some(),
+        }
+    }
+
     pub fn surface(&self) -> Option<(&str, &Vec<Point>)> {
         match self.surface {
             None => None,

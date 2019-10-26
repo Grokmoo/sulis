@@ -44,6 +44,7 @@ pub struct ActorState {
     texture_cache_invalid: bool,
     anim_image_layers: HashMap<ImageLayer, Rc<dyn Image>>,
     p_stats: PStats,
+    started_turn_with_no_ap_for_actions: bool,
 }
 
 impl ActorState {
@@ -116,6 +117,7 @@ impl ActorState {
             texture_cache_invalid: false,
             p_stats: save.p_stats,
             anim_image_layers: HashMap::new(),
+            started_turn_with_no_ap_for_actions: false,
         })
     }
 
@@ -152,6 +154,7 @@ impl ActorState {
             texture_cache_invalid: false,
             p_stats: PStats::new(&actor),
             anim_image_layers: HashMap::new(),
+            started_turn_with_no_ap_for_actions: false,
         };
 
         actor_state.compute_stats();
@@ -183,6 +186,10 @@ impl ActorState {
         }
 
         actor_state
+    }
+
+    pub fn started_turn_with_no_ap_for_actions(&self) -> bool {
+        self.started_turn_with_no_ap_for_actions
     }
 
     pub fn add_anim_image_layers(&mut self, images: &HashMap<ImageLayer, Rc<dyn Image>>) {
@@ -360,12 +367,12 @@ impl ActorState {
         match self.ability_states.get(id) {
             None => false,
             Some(ref state) => {
-                if self.p_stats.ap() < state.activate_ap() {
-                    return false;
-                }
-
                 if state.is_active_mode() {
                     return true;
+                }
+
+                if self.p_stats.ap() < state.activate_ap() {
+                    return false;
                 }
 
                 if !self.group_has_uses(&state.group) {
@@ -547,6 +554,10 @@ impl ActorState {
 
     pub fn has_ap_to_attack(&self) -> bool {
         self.p_stats.ap() >= self.stats.attack_cost as u32
+    }
+
+    pub fn has_ap_for_any_action(&self) -> bool {
+        self.ap() >= self.get_move_ap_cost(1) || self.has_ap_to_attack()
     }
 
     fn is_sneak_attack(
@@ -1057,11 +1068,13 @@ impl ActorState {
 
     pub fn init_turn(&mut self) {
         debug!(
-            "Init turn for '{}' with overflow ap of {}",
-            self.actor.name,
-            self.overflow_ap()
+            "Init turn for '{}' with overflow ap of {}", self.actor.name, self.overflow_ap()
         );
         self.p_stats.init_turn(&self.stats);
+
+        self.started_turn_with_no_ap_for_actions = !self.has_ap_for_any_action();
+        debug!("Initial AP: {}", self.ap());
+
         self.listeners.notify(&self);
     }
 

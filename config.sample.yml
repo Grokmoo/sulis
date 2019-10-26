@@ -30,6 +30,8 @@ display:
     # Larger values make animations take longer
     animation_base_time_millis: 50
 
+    # The default map / area zoom level.  Larger values zoom in closer,
+    # making characters and objects larger.
     default_zoom: 1.4
 
     # The name of the default font used to render text when no font is specified

@@ -386,8 +386,17 @@ pub fn create_effects_pane(pc: &mut ActorState) -> Rc<RefCell<Widget>> {
 
 fn add_effect_text_args(effect: &Effect, widget_state: &mut WidgetState) {
     widget_state.add_text_arg("name", effect.name());
+
+    if effect.is_aura() {
+        widget_state.add_text_arg("is_aura", "true");
+    } else if effect.is_surface() {
+        widget_state.add_text_arg("is_surface", "true");
+    } else {
+        widget_state.add_text_arg("is_effect", "true");
+    }
+
     match effect.remaining_duration_rounds() {
-        ExtInt::Infinity => widget_state.add_text_arg("active_mode", "true"),
+        ExtInt::Infinity => widget_state.add_text_arg("infinite_duration", "true"),
         ExtInt::Int(_) => {
             widget_state.add_text_arg(
                 "total_duration",

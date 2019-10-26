@@ -1494,7 +1494,9 @@ themes:
           [?usable_description|AP: #usable_ap# [?consumable;c=f00|    Consumable]
           [?usable_duration|Duration: #usable_duration# Rounds][?usable_instant|Duration: Instantaneous]
           [s=4.0|#usable_description#]
-          ][?active_mode;c=f00|Active Mode
+          ][?is_aura;c=f00|Aura
+          ][?is_surface;c=f00|Surface
+          ][?is_effect;?infinite_duration;c=f00|Active Mode
           ][s=5|[?total_duration;c=f00|#remaining_duration# of #total_duration# Rounds Remaining
           ][?prereqs_not_met;c=f00|Prereqs not Met
           ][?prof_not_met;s=5.0;c=f00|Proficiency Not Met

@@ -2,7 +2,7 @@ id: song_of_heroes
 name: "Song of Heroes"
 icon: abilities/song_of_heroes
 description: |
-  You sing the bardic song of heroes, which provides a small bonus to all defenses for nearby allies.
+  You sing the bardic song of heroes, which provides a bonus to accuracy for nearby allies.  Singing the song costs one AP per turn while it is active.
 active:
   script: "song_of_heroes"
   group: "Songs"
@@ -16,4 +16,4 @@ active:
     group: Multiple
     range: Short
   short_description: |
-    A song that enhances and protects nearby allies.
+    A song that enhances the offense of nearby allies.

@@ -31,6 +31,14 @@
 //!    targeter.
 //! 4. Item Scripts: Similar to ability scripts, but called when using an item.  The entry point is
 //!    `on_activate(parent, item)`.
+//!
+//! Since standard Lua methods for referencing other script files will not work, Sulis includes
+//! a simple facility to include the contents of a script into another script.  This is done
+//! with a line in the target script:
+//! --INCLUDE <other_script_id>
+//! The entire contents of the referenced script will be placed into the script file in place
+//! of the --INCLUDE directive at evaluation time.
+//! --INCLUDE directives are only evaluated one level deep at this time.
 
 mod area_targeter;
 pub use self::area_targeter::AreaTargeter;

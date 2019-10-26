@@ -1,0 +1,23 @@
+id: progressive_rhythm
+name: "Progressive Rhythm"
+icon: abilities/progressive_rhythm
+description: |
+  You utilize a rhythm with a progressive and cyclic build-up in intensity.  You suffer significant penalties to movement rate, attack, and defense, but your song is significantly stronger.
+active:
+  script: "progressive_rhythm"
+  group: "Rhythm"
+  ap: 1000
+  class_stats:
+    bard:
+      Inspiration: 20
+  duration:
+    Instant
+  cooldown: 3
+  combat_only: true
+  ai:
+    priority: 20
+    kind: Special
+    group: Multiple
+    range: Short
+  short_description: |
+    Enhance the primary effect of your song but suffer movement, defense, and attack penalties.

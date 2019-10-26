@@ -240,6 +240,10 @@ impl UserData for ScriptAbilitySet {
 /// Normally, you will verify that this is an active mode with `is_active_mode` before
 /// calling this method.
 ///
+/// # `cooldown(target: ScriptEntity, round: Int)`
+/// Sets the active cooldown for this ability without actually activating it.  This
+/// prevents the parent from using the ability for the specified number of rounds.
+///
 /// # `name() -> String`
 /// Returns the name of this ability as defined in its resource file.
 ///
@@ -343,6 +347,20 @@ impl UserData for ScriptAbility {
                 .borrow_mut()
                 .actor
                 .deactivate_ability_state(&ability.id);
+            Ok(())
+        });
+        methods.add_method("cooldown", |_, ability, (target, rounds): (ScriptEntity, u32)| {
+            ability.error_if_not_active()?;
+            let target = target.try_unwrap()?;
+            let mut target = target.borrow_mut();
+            match target.actor.ability_state(&ability.id) {
+                None => {
+                    warn!("Target does not own specified ability");
+                },
+                Some(ref mut ability_state) => {
+                    ability_state.set_cooldown_rounds(rounds);
+                }
+            }
             Ok(())
         });
         methods.add_method("name", |_, ability, ()| Ok(ability.name.to_string()));

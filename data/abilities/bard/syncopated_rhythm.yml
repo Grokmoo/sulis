@@ -1,0 +1,23 @@
+id: syncopated_rhythm
+name: "Syncopated Rhythm"
+icon: abilities/syncopated_rhythm
+description: |
+  You create your music using an unexpected and complex rhythm.  This costs a large amount of Inspiration but significantly enhances the current effects.
+active:
+  script: "syncopated_rhythm"
+  group: "Rhythm"
+  ap: 1000
+  class_stats:
+    bard:
+      Inspiration: 60
+  duration:
+    Instant
+  cooldown: 3
+  combat_only: true
+  ai:
+    priority: 20
+    kind: Special
+    group: Multiple
+    range: Short
+  short_description: |
+    Enhance your song at the cost of inspiration.

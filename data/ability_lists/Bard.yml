@@ -1,4 +1,17 @@
 id: bard
 abilities:
   - id: song_of_heroes
-    position: [0, 0]
+    position: [1, 0]
+  - id: song_of_curses
+    position: [3, 0]
+  - id: song_of_survival
+    position: [5, 0]
+    
+  - id: driving_rhythm
+    position: [0, 7]
+  - id: syncopated_rhythm
+    position: [1, 7]
+  - id: downbeat_rhythm
+    position: [2, 7]
+  - id: progressive_rhythm
+    position: [3, 7]

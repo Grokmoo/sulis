@@ -10,6 +10,7 @@ active:
   duration:
     Rounds: 2
   cooldown: 4
+  combat_only: true
   ai:
     priority: 30
     kind: Buff

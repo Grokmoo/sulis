@@ -955,6 +955,7 @@ impl GameState {
                         None => continue,
                         Some(ref mut surface) => surface,
                     };
+                    surface.area_id = area.area.area.id.to_string();
                     for ref mut p in surface.points.iter_mut() {
                         p.x -= dx;
                         p.y -= dy;

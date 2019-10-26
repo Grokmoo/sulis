@@ -11,6 +11,7 @@ active:
   duration:
     Instant
   cooldown: 3
+  combat_only: true
   ai:
     priority: 20
     kind: Damage

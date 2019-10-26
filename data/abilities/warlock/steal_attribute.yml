@@ -13,6 +13,7 @@ active:
   duration:
     Rounds: 4
   cooldown: 5
+  combat_only: true
   ai:
     priority: 10
     kind: Damage

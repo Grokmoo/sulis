@@ -108,6 +108,7 @@ pub use self::rules::{
     QuickSlot, Resistance, Rules, Slot, StatList, Time, WeaponKind, WeaponStyle, ROUND_TIME_MILLIS,
 };
 
+use std::time;
 use std::cell::RefCell;
 use std::collections::HashMap;
 use std::ffi::OsStr;
@@ -120,7 +121,7 @@ use std::rc::Rc;
 use sulis_core::config::{self, Config};
 use sulis_core::resource::*;
 use sulis_core::serde_yaml;
-use sulis_core::util::invalid_data_error;
+use sulis_core::util::{self, invalid_data_error};
 
 use self::ability::AbilityBuilder;
 use self::ability_list::AbilityListBuilder;
@@ -443,6 +444,7 @@ impl Module {
 
             module.rules = Some(Rc::new(rules));
             module.scripts = read_to_string(&dirs, "scripts");
+            expand_include_directives(&mut module.scripts);
 
             module.root_dir = Some(dirs[1].to_string());
 
@@ -903,4 +905,66 @@ impl ModuleBuilder {
             generator_builders: read_builders(resources, Generator)?,
         })
     }
+}
+
+struct IncludeExpansion {
+    start_index: usize,
+    end_index: usize,
+    script_id: String,
+}
+
+fn expand_include_directives(scripts: &mut HashMap<String, String>) {
+    let start_time = time::Instant::now();
+
+    // since we need a mutable reference to one entry and immutable refs to any other
+    // entry this would be very difficult without a clone
+    let scripts_src = scripts.clone();
+
+    let include_len = "--INCLUDE".len();
+
+    for (id, script) in scripts {
+        // first find all the expansions for this script
+        let mut expansions = Vec::new();
+        for (index, _) in script.match_indices("--INCLUDE") {
+            expansions.push(IncludeExpansion {
+                start_index: index,
+                end_index: 0,
+                script_id: String::new(),
+            });
+        }
+
+        for mut expansion in &mut expansions {
+            let substr = &script[(expansion.start_index + include_len)..];
+            let mut iter = substr.lines();
+            let id = match iter.next() {
+                None => {
+                    error!("Invalid --INCLUDE directive, no script specified.");
+                    return;
+                },
+                Some(id) => id,
+            };
+            expansion.end_index = expansion.start_index + include_len + id.len();
+            expansion.script_id = id.trim().to_string();
+        }
+
+        // start from the last and work forward, expanding each entry
+        for exp in expansions.into_iter().rev() {
+            debug!("Found script expansion in {}: '{}' at {} to {}", id, exp.script_id,
+                exp.start_index, exp.end_index);
+
+            let src = match scripts_src.get(&exp.script_id) {
+                None => {
+                    error!("Invalid --INCLUDE direction, script '{}' does not exist",
+                        exp.script_id);
+                    return;
+                },
+                Some(src) => src,
+            };
+
+            script.replace_range(exp.start_index..exp.end_index, src);
+
+        }
+    }
+
+    info!("Expanded scripts in {}", util::format_elapsed_secs(start_time.elapsed()));
 }

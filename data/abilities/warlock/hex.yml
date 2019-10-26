@@ -13,6 +13,7 @@ active:
   duration:
     Rounds: 2
   cooldown: 5
+  combat_only: true
   ai:
     priority: 20
     kind: Debuff

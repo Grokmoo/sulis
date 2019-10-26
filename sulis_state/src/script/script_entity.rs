@@ -165,9 +165,14 @@ use sulis_module::{
 /// Returns true if this entity has one or more active effects with the specified tag,
 /// false otherwise.
 ///
-/// # `get_effect_with_tag(tag: String) -> Tablei of ScriptAppliedEffect`
+/// # `get_effects_with_tag(tag: String) -> Table of ScriptAppliedEffect`
 /// Returns an array-like table containing all of the effects currently applied to this
 /// entity with the specified tag.
+///
+/// # `get_auras_with_tag(tag: String) -> Table of ScriptAppliedEffect`
+/// Returns an array-like table containing all auras owned by this entity with the
+/// specified tag.  Note that this includes only owned auras, not auras from another
+/// entity that are affected this entity.
 ///
 /// # `remove_effects_with_tag(tag: String)`
 /// Removes all currently active effects applied to this entity that have the specified tag.
@@ -358,6 +363,10 @@ use sulis_module::{
 /// # `has_ability(ability_id: String) -> Bool`
 /// Returns true if this entity possesses the ability with the specified `ability_id`, false
 /// otherwise.
+///
+/// # `get_abilities_with_group(group_id: String) -> Table<ScriptAbility>`
+/// Returns an array table with all the active abilities owned by this entity with
+/// the specified ability group.
 ///
 /// # `get_ability(ability_id: String) -> ScriptAbility`
 /// Returns a `ScriptAbility` representing the ability with the specified `ability_id`.  Throws
@@ -767,6 +776,23 @@ impl UserData for ScriptEntity {
                 result.push(sae);
             }
 
+            Ok(result)
+        });
+
+        methods.add_method("get_auras_with_tag", |_, entity, tag: String| {
+            let entity_index = entity.try_unwrap_index()?;
+            let mgr = GameState::turn_manager();
+            let mgr = mgr.borrow();
+
+            let indices = mgr.auras_for(entity_index);
+
+            let mut result = Vec::new();
+            for effect_index in indices {
+                let effect = mgr.effect(effect_index);
+                if effect.tag != tag { continue; }
+                let sae = ScriptAppliedEffect::new(effect, effect_index);
+                result.push(sae);
+            }
             Ok(result)
         });
 
@@ -1325,6 +1351,19 @@ impl UserData for ScriptEntity {
             }
 
             Ok(Some(ScriptAbility::from(&ability)))
+        });
+
+        methods.add_method("get_abilities_with_group", |_, entity, group: String| {
+            let entity = entity.try_unwrap()?;
+            let actor = &entity.borrow().actor;
+
+            let mut table = Vec::new();
+            for (_, state) in &actor.ability_states {
+                if state.group != group { continue; }
+                table.push(ScriptAbility::from(&state.ability));
+            }
+
+            Ok(table)
         });
 
         methods.add_method("ability_level", |_, entity, ability: ScriptAbility| {

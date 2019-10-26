@@ -17,29 +17,32 @@
 use std::rc::Rc;
 use std::u32;
 
-use crate::ChangeListenerList;
 use sulis_core::util::ExtInt;
 use sulis_module::{ability::Duration, Ability, ROUND_TIME_MILLIS};
+use crate::{GameState, ChangeListenerList};
 
 pub struct AbilityState {
     pub ability: Rc<Ability>,
     pub group: String,
     pub(crate) remaining_duration: ExtInt,
+    pub combat_only: bool,
     cur_duration: u32,
     pub listeners: ChangeListenerList<AbilityState>,
 }
 
 impl AbilityState {
     pub fn new(ability: &Rc<Ability>) -> AbilityState {
-        let group = match ability.active {
+        let (group, combat_only) = match ability.active {
             None => panic!(),
-            Some(ref active) => active.group.name(),
+            Some(ref active) =>
+                (active.group.name(), active.combat_only)
         };
 
         AbilityState {
             ability: Rc::clone(ability),
             group,
             remaining_duration: ExtInt::Int(0),
+            combat_only,
             cur_duration: 0,
             listeners: ChangeListenerList::default(),
         }
@@ -61,6 +64,7 @@ impl AbilityState {
     }
 
     pub fn is_available(&self) -> bool {
+        if self.combat_only && !GameState::is_combat_active() { return false; }
         self.remaining_duration.is_zero()
     }
 
@@ -78,6 +82,12 @@ impl AbilityState {
                 }
             },
         };
+        self.cur_duration = 0;
+        self.listeners.notify(&self);
+    }
+
+    pub fn set_cooldown_rounds(&mut self, rounds: u32) {
+        self.remaining_duration = ExtInt::Int(rounds * ROUND_TIME_MILLIS);
         self.cur_duration = 0;
         self.listeners.notify(&self);
     }

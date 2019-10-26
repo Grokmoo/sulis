@@ -14,6 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::collections::HashMap;
 use std::str::FromStr;
 
 use rlua::{Context, UserData, UserDataMethods};
@@ -94,6 +95,10 @@ impl UserData for ScriptMenuSelection {
 ///
 /// # `tag() -> String`
 /// Returns the user defined tag of this effect
+///
+/// # `surface_points() -> Table`
+/// Returns a table of all the affected points for this effect.  Only works
+/// on surfaces.
 ///
 /// # `cur_duration() -> Int`
 /// Returns the number of rounds this effect has currently been active
@@ -211,6 +216,40 @@ impl UserData for ScriptAppliedEffect {
         methods.add_method("name", |_, effect, ()| Ok(effect.name.to_string()));
 
         methods.add_method("tag", |_, effect, ()| Ok(effect.tag.to_string()));
+
+        methods.add_method("surface_points", |_, effect, ()| {
+            let mgr = GameState::turn_manager();
+            let mgr = mgr.borrow();
+            let effect = match mgr.effect_checked(effect.index) {
+                None => {
+                    return Err(rlua::Error::FromLuaConversionError {
+                        from: "ScriptAppliedEffect",
+                        to: "Surface",
+                        message: Some("Called surface_points on invalid effect.".to_string())
+                    });
+                }
+                Some(effect) => effect,
+            };
+
+            let surface = match &effect.surface {
+                None => {
+                    return Err(rlua::Error::FromLuaConversionError {
+                        from: "ScriptAppliedEffect",
+                        to: "Surface",
+                        message: Some("Called surface_points on non-surface effect.".to_string())
+                    });
+                },
+                Some(effect) => effect,
+            };
+
+            let table: Vec<HashMap<&str, i32>> = surface.points.iter().map(|p| {
+                let mut map = HashMap::new();
+                map.insert("x", p.x);
+                map.insert("y", p.y);
+                map
+            }).collect();
+            Ok(table)
+        });
 
         methods.add_method("cur_duration", |_, effect, ()| Ok(effect.cur_duration));
 

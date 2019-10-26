@@ -254,7 +254,7 @@ use sulis_module::{Faction, Module, OnTrigger, Time};
 /// items, and party stash are transfered to the module intact.  Player script state is
 /// not currently transfered, and any other data in the current module is also not
 /// transfered, including the player's party.  This action is performed asynchronously
-/// on the next UI update, the remained of the current script will be executed.
+/// on the next UI update, the remainder of the current script will be executed.
 ///
 /// # `player -> ScriptEntity`
 /// Returns a reference to the player character ScriptEntity.

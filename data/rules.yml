@@ -45,7 +45,12 @@ coins_item: coin
 
 selectable_races: [ dracon, dwarf, elf, human, kimer, rodian, trollkin ]
 selectable_classes: [ fighter, rogue, mage, druid, warlock, bard ]
-ability_groups: [ "Special", "Songs", "Warlock", "Fighter", "Rogue", "Druid", "Modes", "Mechanics", "4th Circle", "3rd Circle", "2nd Circle", "1st Circle", "Cantrips"]
+ability_groups: [
+  "Special",
+  "Songs", "Rhythm", "Melodies", "Verses",
+  "Warlock", "Fighter", "Rogue", "Druid", "Modes", "Mechanics",
+  "4th Circle", "3rd Circle", "2nd Circle", "1st Circle", "Cantrips"
+]
 
 experience_factor: 1.0
 experience_for_level: [100, 300, 600, 1300, 2100, 3100, 4500, 6100, 8200,

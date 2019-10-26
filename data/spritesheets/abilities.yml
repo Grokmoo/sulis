@@ -152,6 +152,11 @@ groups:
       psychic_yell: [8, 10]
       powerful_warlock: [9, 10]
       song_of_heroes: [10, 10]
+      song_of_curses: [11, 10]
+      song_of_survival: [12, 10]
+      driving_rhythm: [13, 10]
+      syncopated_rhythm: [14, 10]
+      downbeat_rhythm: [15, 10]
       
       healthy: [0, 11]
       helping_hand: [1, 11]
@@ -161,6 +166,7 @@ groups:
       melee_mastery: [5, 11]
       shielded_mastery: [6, 11]
       dual_wielding_mastery: [7, 11]
+      progressive_rhythm: [8, 11]
       
       improved_initiative: [0, 12]
       tough_skin: [1, 12]

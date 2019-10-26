@@ -1,0 +1,19 @@
+id: song_of_curses
+name: "Song of Curses"
+icon: abilities/song_of_curses
+description: |
+  You sing the bardic song of curses, which lowers damage output for nearby enemies.  Singing the song costs one AP per turn while it is active.
+active:
+  script: "song_of_curses"
+  group: "Songs"
+  ap: 1000
+  duration:
+    Mode
+  cooldown: 1
+  ai:
+    priority: 10
+    kind: Debuff
+    group: Multiple
+    range: Short
+  short_description: |
+    A song that debilitates nearby enemies.

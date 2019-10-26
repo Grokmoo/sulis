@@ -217,6 +217,10 @@ pub trait ScriptCallback {
 /// Adds the specified `point` to the list of points this callback will provide in its
 /// targets.  The point is a table of the form `{x:x_coord, y: y_coord}`
 ///
+/// # `add_affected_points(points: Table)`
+/// Adds the list of affected points to the affected_points this callback will provide its
+/// targets.  The points is a list of tables of the form `{x: x_coord, y: y_coord}`
+///
 /// # `set_on_effect_applied_fn(func: String)`
 /// # `set_on_menu_select_fn(func: String)`
 /// # `set_on_removed_fn(func: String)`
@@ -689,6 +693,22 @@ impl UserData for CallbackData {
             if let Some(ref mut cb_targets) = cb.targets {
                 cb_targets.selected_point = Some((x, y));
             }
+            Ok(())
+        });
+
+        methods.add_method_mut("add_affected_points", |_, cb, points: Vec<HashMap<String, i32>>| {
+            if let Kind::Script(_) = cb.kind {
+                warn!("Setting targets on global generated callback will have no effect");
+            }
+
+            cb.create_targets_if_missing();
+            if let Some(ref mut cb_targets) = cb.targets {
+                for p in points {
+                    let (x, y) = script_entity::unwrap_point(p)?;
+                    cb_targets.affected_points.push((x, y));
+                }
+            }
+
             Ok(())
         });
 

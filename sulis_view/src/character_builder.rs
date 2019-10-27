@@ -80,6 +80,7 @@ pub struct CharacterBuilder {
 
     pub race: Option<Rc<Race>>,
     pub class: Option<Rc<Class>>,
+    pub kit: Option<usize>,
     pub attributes: Option<AttributeList>,
     pub inventory: Option<InventoryBuilder>,
     pub sex: Option<Sex>,
@@ -149,6 +150,7 @@ impl CharacterBuilder {
             sex: None,
             race: None,
             class: None,
+            kit: None,
             hue: None,
             skin_color: None,
             hair_color: None,
@@ -272,7 +274,8 @@ impl BuilderSet for CharacterCreator {
             Ok(filename) => filename,
         };
 
-        if builder.race.is_none() || builder.class.is_none() || builder.attributes.is_none() {
+        if builder.race.is_none() || builder.class.is_none() ||
+            builder.attributes.is_none() || builder.kit.is_none() {
             warn!("Unable to save character with undefined stats");
             return;
         }
@@ -285,7 +288,12 @@ impl BuilderSet for CharacterCreator {
             abilities.push(ability.id.to_string());
         }
 
-        for ability in builder.class.as_ref().unwrap().starting_abilities() {
+        let class = Rc::clone(builder.class.as_ref().unwrap());
+        for ability in class.starting_abilities() {
+            abilities.push(ability.id.to_string());
+        }
+
+        for ability in &class.kits[builder.kit.unwrap()].starting_abilities {
             abilities.push(ability.id.to_string());
         }
 

@@ -2,6 +2,10 @@ id: mage
 name: Mage
 description: |
   Mages are students of the highly complex system known as the circles of magic.  Although highly sophisticated and powerful, it is extremely rigid with formalized rules, gestures, and phrases developed over thousands of years.  As they gain levels, Mages become incredibly flexible, gaining access to the widest range of spells of any class.
+  
+  However, the most powerful spells a mage knows can only be cast a limited number of times per day, necessitating a measured use of available spell power.
+  
+  Mages start with proficiency in only simple weapons, and no armor.
 bonuses_per_level:
   - kind:
       hit_points: 4
@@ -24,10 +28,6 @@ bonuses_per_level:
   - kind:
       caster_level: 1
 starting_abilities:
-  - minor_heal
-  - flare
-  - expediate
-  - acid_bomb
   - weapon_simple
   - weapon_crossbow
 upgrades:
@@ -38,6 +38,7 @@ upgrades:
       - [ Special, ~ ]
     group_uses_per_day:
       - [ "Cantrips", 3 ]
+      - [ "1st Circle", 1 ]
   2:
     ability_choices: [ mage ]
     group_uses_per_encounter:
@@ -45,7 +46,7 @@ upgrades:
       - [ Special, ~ ]
     group_uses_per_day:
       - [ "Cantrips", 3 ]
-      - [ "1st Circle", 1 ]
+      - [ "1st Circle", 2 ]
   3:
     ability_choices: [ mage, general ]
     group_uses_per_encounter:
@@ -244,11 +245,73 @@ upgrades:
       - [ "3rd Circle", 2 ]
       - [ "4th Circle", 2 ]
 kits:
-  - name: Mage
+  - name: Pyromancer
     default_attributes:
       str: 10
-      dex: 13
-      end: 13
+      dex: 14
+      end: 11
+      per: 15
+      int: 18
+      wis: 12
+    starting_inventory:
+      equipped:
+        HeldMain: { id: quarterstaff }
+        Feet: { id: boots_leather }
+        Torso: { id: torso_robe }
+        Legs: { id: legs_pants }
+        Head: { id: helm_hood }
+      quick:
+        Usable1: { id: potion_healing }
+        Usable2: { id: potion_mind }
+      pc_starting_coins: 400
+    starting_abilities:
+      - firebolt
+      - flare
+      - acid_bomb
+    description: |
+      A mage specializing in fire magic and dealing massive damage quickly.
+      
+      [s=7|Starting Equipment]
+      
+      Quarterstaff
+      Robes
+      400 Coins
+  - name: Aeromancer
+    default_attributes:
+      str: 10
+      dex: 14
+      end: 11
+      per: 16
+      int: 17
+      wis: 12
+    starting_inventory:
+      equipped:
+        HeldMain: { id: quarterstaff }
+        Feet: { id: boots_leather }
+        Torso: { id: torso_robe }
+        Legs: { id: legs_pants }
+        Head: { id: helm_hood }
+      quick:
+        Usable1: { id: potion_healing }
+        Usable2: { id: potion_mind }
+      pc_starting_coins: 400
+    starting_abilities:
+      - wind_gust
+      - expediate
+      - acid_bomb
+    description: |
+      A mage specializing in air magic, always quick and on the attack.
+      
+      [s=7|Starting Equipment]
+      
+      Quarterstaff
+      Robes
+      400 Coins
+  - name: Geomancer
+    default_attributes:
+      str: 11
+      dex: 11
+      end: 14
       per: 15
       int: 17
       wis: 12
@@ -262,7 +325,47 @@ kits:
       quick:
         Usable1: { id: potion_healing }
         Usable2: { id: potion_mind }
-      pc_starting_coins: 600
+      pc_starting_coins: 400
+    starting_abilities:
+      - crush
+      - minor_heal
+      - acid_bomb
     description: |
-      A mage with the capability to cast a variety of spells from the circles of magic.
-
+      A mage with a focus in earth magic, tough and defensive.
+      
+      [s=7|Starting Equipment]
+      
+      Quarterstaff
+      Robes
+      400 Coins
+  - name: Hydromancer
+    default_attributes:
+      str: 10
+      dex: 13
+      end: 14
+      per: 14
+      int: 17
+      wis: 12
+    starting_inventory:
+      equipped:
+        HeldMain: { id: quarterstaff }
+        Feet: { id: boots_leather }
+        Torso: { id: torso_robe }
+        Legs: { id: legs_pants }
+        Head: { id: helm_hood }
+      quick:
+        Usable1: { id: potion_healing }
+        Usable2: { id: potion_mind }
+      pc_starting_coins: 400
+    starting_abilities:
+      - slow
+      - minor_heal
+      - expediate
+    description: |
+      A mage with a specialty in water magic, providing strong healing and support.
+      
+      [s=7|Starting Equipment]
+      
+      Quarterstaff
+      Robes
+      400 Coins

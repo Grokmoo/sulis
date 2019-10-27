@@ -1,0 +1,8 @@
+id: louder_music
+name: "Louder Music"
+icon: abilities/louder_music
+description: |
+  Your music is louder and reaches further than before, covering a larger area of effect.
+upgrades:
+  - description: |
+      Your music now covers an even larger area.

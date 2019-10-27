@@ -1,7 +1,11 @@
 id: warlock
 name: Warlock
 description: |
-  Warlocks are powerful magic users who have developed their skills under the tutelage of isolated masters or largely on their own.  They do not possess the rigor or pure skill of the Mage, but are also not limited by structures such as the Circles of Magic.  Warlocks gain access to a variety of hexes, charms, and illusions.  Their spell casting is only limited by their own internal pool of power which improves as they gain experience.
+  Warlocks are powerful magic users who have developed their skills under the tutelage of isolated masters or largely on their own.  They do not possess the rigor or pure skill of the Mage, but are also not limited by structures such as the Circles of Magic.  Warlocks gain access to a variety of spells, but focus mostly on hexes, charms, and illusions.
+  
+  Their spell casting is only limited by their own internal pool of power which improves as they gain experience.  They can cast any spell at will as long as they have the available Power.
+  
+  Warlocks have proficiency with light armor and most weapons.
 stats:
   - id: Power
     name: Power
@@ -37,9 +41,6 @@ starting_abilities:
   - weapon_spear
   - weapon_mace
   - weapon_simple
-  - imbue_weapon
-  - secret_strike
-  - psychic_yell
 upgrades:
   1:
     ability_choices: []
@@ -175,29 +176,106 @@ upgrades:
     stats:
       Power: 210
 kits:
-  - name: Warlock
+  - name: Artificer
     default_attributes:
       str: 10
-      dex: 13
-      end: 13
-      per: 13
+      dex: 14
+      end: 11
+      per: 14
       int: 17
       wis: 14
     starting_inventory:
       equipped:
-        HeldMain: { id: shortspear }
-        HeldOff: { id: shield_small }
+        HeldMain: { id: crossbow }
         Feet: { id: boots_leather }
-        Torso: { id: torso_leather }
+        Torso: { id: torso_robe }
         Legs: { id: legs_pants }
         Head: { id: helm_hood }
       quick:
         Usable1: { id: potion_healing }
         Usable2: { id: potion_power }
-      pc_starting_coins: 500
+        AltHeldMain: { id: dagger }
+      pc_starting_coins: 150
       pc_starting_items:
         - quantity: 1
           item: { id: potion_power }
+    starting_abilities:
+      - imbue_weapon
+      - secret_strike
     description: |
-      A warlock with a variety of abilities for both ranged and close combat.
-
+      A warlock specializing in illusion and enchantment, who prefers to keep their distance to the enemy.
+      
+      [s=7|Starting Equipment]
+      
+      Crossbow
+      Dagger
+      Robes
+      150 Coins
+  - name: Psionic
+    default_attributes:
+      str: 10
+      dex: 13
+      end: 12
+      per: 13
+      int: 17
+      wis: 15
+    starting_inventory:
+      equipped:
+        HeldMain: { id: shortspear }
+        HeldOff: { id: shield_small }
+        Feet: { id: boots_leather }
+        Torso: { id: torso_robe }
+        Legs: { id: legs_pants }
+        Head: { id: helm_hood }
+      quick:
+        Usable1: { id: potion_healing }
+        Usable2: { id: potion_power }
+      pc_starting_coins: 180
+      pc_starting_items:
+        - quantity: 1
+          item: { id: potion_power }
+    starting_abilities:
+      - secret_strike
+      - psychic_yell
+    description: |
+      A warlock focusing on powerful psychic projections and dominating the wills of others.
+      
+      [s=7|Starting Equipment]
+      
+      Short Spear
+      Robes
+      180 Coins
+  - name: Soul Hexer
+    default_attributes:
+      str: 10
+      dex: 13
+      end: 14
+      per: 14
+      int: 18
+      wis: 11
+    starting_inventory:
+      equipped:
+        HeldMain: { id: handaxe }
+        HeldOff: { id: shield_small }
+        Feet: { id: boots_leather }
+        Torso: { id: torso_robe }
+        Legs: { id: legs_pants }
+        Head: { id: helm_hood }
+      quick:
+        Usable1: { id: potion_healing }
+        Usable2: { id: potion_power }
+      pc_starting_coins: 150
+      pc_starting_items:
+        - quantity: 1
+          item: { id: potion_power }
+    starting_abilities:
+      - vampiric_touch
+    description: |
+      A warlock with a penchant for curses and draining magic and a taste for melee combat.
+      
+      [s=7|Starting Equipment]
+      
+      Handaxe
+      Small Shield
+      Robes
+      150 Coins

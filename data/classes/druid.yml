@@ -1,7 +1,11 @@
 id: druid
 name: Druid
 description: |
-  Druids practice an instinctive, natural magical tradition rooted in the wild, untamed places of Eao.  Druids think of their magic as forming the branches of a tree, with different branches constantly in flux.  They can call upon wild creatures to aid them, and employ powerful transformations to enhance themselves and their allies.
+  Druids practice an instinctive, natural magical tradition rooted in the wild, untamed places of Eao.  Druids think of their magic as forming the branches of a tree, with the different branches constantly in flux.  They can call upon wild creatures to aid them, and employ powerful transformations to enhance themselves and their allies.
+  
+  They are less limited than Mages in when they can cast their spells, but do not have the same wide range of effects.
+  
+  Druids have proficiency in light and medium armor and most weapons.
 bonuses_per_level:
   - kind:
       hit_points: 5
@@ -25,12 +29,12 @@ bonuses_per_level:
       caster_level: 1
 starting_abilities:
   - armor_light
+  - armor_medium
   - weapon_simple
   - weapon_axe
   - weapon_bow
   - weapon_spear
   - weapon_small_sword
-  - summon_animal
 upgrades:
   1:
     ability_choices: [ ]
@@ -128,6 +132,34 @@ upgrades:
       - [ Druid, 6 ]
       - [ Special, ~ ]
 kits:
+  - name: Shifter
+    default_attributes:
+      str: 14
+      dex: 12
+      end: 14
+      per: 12
+      int: 13
+      wis: 15
+    starting_inventory:
+      equipped:
+        HeldMain: { id: druid_staff }
+        Feet: { id: boots_leather }
+        Torso: { id: torso_leather }
+        Legs: { id: legs_pants }
+      quick:
+        Usable1: { id: potion_healing }
+        Usable2: { id: potion_mind }
+      pc_starting_coins: 250
+    starting_abilities:
+      - spirit_claws
+    description: |
+      A druid who makes use of shapeshifting to massively increase their own combat potential.
+      
+      [s=7|Starting Equipment]
+      
+      Staff
+      Partial Leather Armor
+      250 Coins  
   - name: Avenger
     default_attributes:
       str: 14
@@ -147,9 +179,19 @@ kits:
         Usable1: { id: potion_healing }
         Usable2: { id: potion_mind }
         AltHeldMain: { id: druid_staff }
-      pc_starting_coins: 500
+      pc_starting_coins: 150
+    starting_abilities:
+      - spirit_defense
     description: |
-      A druid at home in melee combat.  They typically employ a variety of spells to bolster themselves and allies around them.
+      A druid at home in melee combat.  They typically employ their spells to bolster themselves and allies around them.
+      
+      [s=7|Starting Equipment]
+      
+      Sickle
+      Staff
+      Small Shield
+      Partial Leather Armor
+      150 Coins
   - name: Summoner
     default_attributes:
       str: 10
@@ -168,7 +210,14 @@ kits:
         Usable1: { id: potion_healing }
         Usable2: { id: potion_mind }
         AltHeldMain: { id: shortbow }
-      pc_starting_coins: 400
+      pc_starting_coins: 300
+    starting_abilities:
+      - summon_animal
     description: |
-      A druid who fights from afar, using summoned creatures and spells to support their party.
-
+      A druid who fights from afar, often using summoned creatures and spells to support their party.
+      
+      [s=7|Starting Equipment]
+      
+      Staff
+      Partial Leather Armor
+      300 Coins

@@ -1,7 +1,11 @@
 id: rogue
 name: Rogue
 description: |
-  Rogues have a variety of skills both in and out of combat, making them a valuable addition to any party.  They are usually poorly suited to standing on the front lines of combat, but instead must attack from the flanks and shadows, waiting for the perfect moment before unleashing a devastating strike with surgical precision.
+  Rogues have a variety of skills both in and out of combat, making them a valuable addition to any party.  Typically they are poorly suited to head to head front line fighting.  Instead, they prefer to make devastating flanking attacks from the shadows, waiting for the perfect moment before unleashing a devastating strike with surgical precision.  Many also make use of a variety of traps.
+  
+  Rogues function best in concert with another warrior to distract opponents.  They have many abilities geared at debilitating or doing massive damage to tough individual opponents.
+  
+  Rogues have profiency with light armor and piercing weapons.
 bonuses_per_level:
   - kind:
       hit_points: 7
@@ -20,7 +24,6 @@ bonuses_per_level:
   - kind:
       initiative: 1
 starting_abilities:
-  - hide
   - armor_light
   - weapon_crossbow
   - weapon_bow
@@ -30,7 +33,9 @@ upgrades:
   1:
     ability_choices: []
     group_uses_per_encounter:
+      - [ Rogue, 1 ]
       - [ Modes, ~ ]
+      - [ Mechanics, ~ ]
       - [ Special, ~ ]
   2:
     ability_choices: [ rogue ]
@@ -179,9 +184,17 @@ kits:
         Usable1: { id: potion_healing }
         Usable2: { id: potion_body }
         Usable3: { id: potion_mind }
-      pc_starting_coins: 300
+      pc_starting_coins: 180
+    starting_abilities:
+      - backstab
     description: |
       Not afraid to get their hands dirty on the front lines, the Swashbuckler will use every trick in the book to keep themselves out of harm's way and their enemies in it.  They can be very effective, but are also vulnerable to being overwhelmed.
+      
+      [s=7|Starting Equipment]
+      
+      Short Sword
+      Full Leather Armor
+      180 Coins
   - name: Mechanic
     default_attributes:
       str: 10
@@ -203,9 +216,18 @@ kits:
         Usable2: { id: potion_body }
         Usable3: { id: potion_mind }
         AltHeldMain: { id: dagger }
-      pc_starting_coins: 300
+      pc_starting_coins: 150
+    starting_abilities:
+      - spike_trap
     description: |
-      An expert in locks, traps, and all things mechanical thanks to keen senses and intellect.  Prefers to keep out of harms way in combat, using precise ranged strikes.
+      An expert in locks, traps, and all things mechanical thanks to keen senses and intellect.  They prefer to keep out of harms way in combat, using precise ranged strikes.
+      
+      [s=7|Starting Equipment]
+      
+      Crossbow
+      Dagger
+      Partial Leather Armor
+      150 Coins
   - name: Assassin
     default_attributes:
       str: 13
@@ -228,6 +250,14 @@ kits:
         Usable2: { id: potion_body }
         Usable3: { id: potion_mind }
         AltHeldMain: { id: dagger }
-      pc_starting_coins: 400
+      pc_starting_coins: 200
+    starting_abilities:
+      - hide
     description: |
       Striking from the shadows when least expected, Assassins can bring down the most dangerous targets in seconds, ideally giving their prey no time to react.  They can be quickly brought down themselves, though, if caught out in the open.
+      
+      [s=7|Starting Equipment]
+      
+      Dagger
+      Full Leather Armor
+      200 Coins

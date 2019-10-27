@@ -21,10 +21,11 @@ use std::collections::HashSet;
 use std::rc::Rc;
 
 use sulis_core::io::event;
-use sulis_core::ui::{animation_state, Callback, Widget, WidgetKind};
+use sulis_core::ui::{animation_state, Callback, Widget, WidgetKind, WidgetState};
 use sulis_core::util::{ExtInt, Size};
 use sulis_core::widgets::{Button, Label, TextArea};
 use sulis_module::{
+    Class,
     ability::{AbilityGroup, Duration},
     actor::OwnedAbility,
     Ability, Module,
@@ -485,49 +486,8 @@ impl WidgetKind for AbilityButton {
 
     fn on_mouse_move(&mut self, widget: &Rc<RefCell<Widget>>, _dx: f32, _dy: f32) -> bool {
         let hover = Widget::with_theme(TextArea::empty(), "ability_hover");
-        {
-            let mut hover = hover.borrow_mut();
-            hover.state.disable();
-
-            hover.state.add_text_arg("name", &self.ability.name);
-            hover
-                .state
-                .add_text_arg("description", &self.ability.description);
-            if let Some(ref active) = self.ability.active {
-                let ap = active.ap / Module::rules().display_ap;
-                hover.state.add_text_arg("activate_ap", &ap.to_string());
-
-                let class = self.entity.borrow_mut().actor.actor.base_class();
-                if let Some(class_stats) = active.class_stats.get(&class.id) {
-                    for stat in &class.stats {
-                        if !stat.display { continue; }
-                        if let Some(amount) = class_stats.get(&stat.id) {
-                            hover.state.add_text_arg("class_stat_name", &stat.name);
-                            hover.state.add_text_arg("class_stat_amount", &amount.to_string());
-                        }
-                    }
-                }
-
-                match active.duration {
-                    Duration::Rounds(rounds) => {
-                        hover.state.add_text_arg("duration", &rounds.to_string())
-                    }
-                    Duration::Mode => hover.state.add_text_arg("mode", "true"),
-                    Duration::Instant => hover.state.add_text_arg("instant", "true"),
-                    Duration::Permanent => hover.state.add_text_arg("permanent", "true"),
-                }
-
-                if active.cooldown != 0 {
-                    hover
-                        .state
-                        .add_text_arg("cooldown", &active.cooldown.to_string());
-                }
-
-                hover
-                    .state
-                    .add_text_arg("short_description", &active.short_description);
-            }
-        }
+        let class = self.entity.borrow_mut().actor.actor.base_class();
+        add_hover_text_args(&mut hover.borrow_mut().state, &self.ability, &class);
 
         Widget::set_mouse_over_widget(
             &widget,
@@ -549,5 +509,41 @@ impl WidgetKind for AbilityButton {
         }
 
         true
+    }
+}
+
+pub fn add_hover_text_args(state: &mut WidgetState, ability: &Ability, class: &Class) {
+    state.disable();
+    state.add_text_arg("name", &ability.name);
+    state.add_text_arg("description", &ability.description);
+
+    if let Some(ref active) = ability.active {
+        let ap = active.ap / Module::rules().display_ap;
+        state.add_text_arg("activate_ap", &ap.to_string());
+
+        if let Some(class_stats) = active.class_stats.get(&class.id) {
+            for stat in &class.stats {
+                if !stat.display { continue; }
+                if let Some(amount) = class_stats.get(&stat.id) {
+                    state.add_text_arg("class_stat_name", &stat.name);
+                    state.add_text_arg("class_stat_amount", &amount.to_string());
+                }
+            }
+        }
+
+        match active.duration {
+            Duration::Rounds(rounds) => {
+                state.add_text_arg("duration", &rounds.to_string())
+            }
+            Duration::Mode => state.add_text_arg("mode", "true"),
+            Duration::Instant => state.add_text_arg("instant", "true"),
+            Duration::Permanent => state.add_text_arg("permanent", "true"),
+        }
+
+        if active.cooldown != 0 {
+            state.add_text_arg("cooldown", &active.cooldown.to_string());
+        }
+
+        state.add_text_arg("short_description", &active.short_description);
     }
 }

@@ -85,3 +85,5 @@ abilities:
     position: [6, 4]
   - id: powerful_warlock
     position: [6, 5]
+  - id: inspired_bard
+    position: [7, 4]

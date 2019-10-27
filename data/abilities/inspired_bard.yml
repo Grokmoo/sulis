@@ -1,0 +1,22 @@
+id: inspired_bard
+name: "Inspired Bard"
+icon: abilities/inspired_bard
+description: |
+  You gain an additional 10 Inspiration in your bardic pool.
+bonuses:
+  - kind:
+      class_stat: { id: "Inspiration", amount: 10 }
+prereqs:
+  levels:
+    bard: 3
+upgrades:
+  - description: |
+      You gain a further additional 10 Inspiration.
+    bonuses:
+      - kind:
+          class_stat: { id: "Inspiration", amount: 10 }
+  - description: |
+      You gain a further additional 10 Inspiration.
+    bonuses:
+      - kind:
+          class_stat: { id: "Inspiration", amount: 10 }

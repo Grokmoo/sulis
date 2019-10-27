@@ -22,10 +22,11 @@ use std::rc::Rc;
 
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_core::widgets::{Button, Label, Spinner, TextArea};
-use sulis_module::{Attribute, AttributeList, BonusKind, Class, Module, Race};
+use sulis_module::{Ability, Attribute, AttributeList, BonusKind, Class, Module, Race};
 
 use crate::character_builder::BuilderPane;
 use crate::CharacterBuilder;
+use crate::abilities_bar::add_hover_text_args;
 
 pub const NAME: &str = "attribute_selector_pane";
 
@@ -87,6 +88,7 @@ impl BuilderPane for AttributeSelectorPane {
         }
 
         builder.attributes = None;
+        builder.kit = None;
         builder.prev.borrow_mut().state.set_enabled(true);
         self.calculate_available();
         builder
@@ -108,6 +110,7 @@ impl BuilderPane for AttributeSelectorPane {
             Some(index) => &class.kits[index],
         };
 
+        builder.kit = self.selected_kit;
         builder.attributes = Some(self.attrs);
         builder.inventory = Some(kit.starting_inventory.clone());
         builder.next(&widget);
@@ -194,6 +197,19 @@ impl WidgetKind for AttributeSelectorPane {
             .add_text_arg("name", &selected_kit.name);
         children.push(kit_area);
 
+        let starting_abilities = Widget::empty("starting_abilities");
+        for ability in &selected_kit.starting_abilities {
+            let button = Widget::with_defaults(
+                AbilityButton::new(Rc::clone(ability), Rc::clone(class))
+            );
+            let icon = Widget::with_theme(Label::empty(), "icon");
+            icon.borrow_mut().state.add_text_arg("icon", &ability.icon.id());
+            Widget::add_child_to(&button, icon);
+            Widget::add_child_to(&starting_abilities, button);
+        }
+
+        children.push(starting_abilities);
+
         let mut attr_bonuses: HashMap<Attribute, i32> = HashMap::new();
         for bonus in race.base_stats.iter() {
             match bonus.kind {
@@ -262,5 +278,34 @@ impl WidgetKind for AttributeSelectorPane {
         children.push(amount_label);
 
         children
+    }
+}
+
+struct AbilityButton {
+    class: Rc<Class>,
+    ability: Rc<Ability>,
+}
+
+impl AbilityButton {
+    fn new(ability: Rc<Ability>, class: Rc<Class>) -> Rc<RefCell<AbilityButton>> {
+        Rc::new(RefCell::new(AbilityButton {
+            ability,
+            class,
+        }))
+    }
+}
+
+
+impl WidgetKind for AbilityButton {
+    widget_kind!("ability_button");
+
+    fn on_mouse_move(&mut self, widget: &Rc<RefCell<Widget>>, _dx: f32, _dy: f32) -> bool {
+        let hover = Widget::with_theme(TextArea::empty(), "kit_selector_ability_hover");
+        add_hover_text_args(&mut hover.borrow_mut().state, &self.ability, &self.class);
+
+        Widget::set_mouse_over_widget(&widget, hover, widget.borrow().state.inner_right(),
+            widget.borrow().state.inner_top());
+
+        true
     }
 }

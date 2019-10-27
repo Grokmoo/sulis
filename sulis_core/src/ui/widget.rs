@@ -584,13 +584,6 @@ impl Widget {
             );
 
             let theme = ResourceSet::theme(&parent.theme_id);
-            match theme.kind {
-                theme::Kind::Ref => (),
-                _ => warn!(
-                    "Manually added widget for theme {} with kind {:?}",
-                    theme.id, theme.kind
-                ),
-            }
 
             // add theme specified children
             for id in theme.children.iter() {
@@ -611,8 +604,6 @@ impl Widget {
 
                 {
                     let mut child = child.borrow_mut();
-                    child.theme_id = id.clone();
-                    child.theme = child_theme;
                     child.marked_for_layout = true;
                 }
                 parent.children.push(child);

@@ -236,12 +236,50 @@ themes:
         from: builder_pane
         children:
           title:
-            text: "Customize your Class"
+            text: "Customize your starting attributes"
+          starting_abilities_container:
+            kind: Container
+            background: bg_base
+            relative:
+              width: Max
+            size: [-70, 20]
+            position: [0, 92]
+            border: [2, 2, 2, 2]
+            children:
+              starting_abilities_title:
+                from: label
+                kind: Label
+                relative:
+                  width: Max
+                size: [0, 5]
+                text: Starting Abilities
+                text_params:
+                  scale: 7
+                  horizontal_alignment: Left
+              starting_abilities:
+                relative:
+                  width: Max
+                layout: BoxHorizontal
+                layout_spacing: { top: 0, bottom: 0, left: 0, right: 2 }
+                size: [0, 12]
+                position: [0, 5]
+                children:
+                  ability_button:
+                    from: button
+                    background: background_inner
+                    foreground: ability_overlay
+                    size: [12, 12]
+                    children:
+                      icon:
+                        foreground: "#icon#"
+                        relative:
+                          width: Max
+                          height: Max
           kit_area:
             from: text_area
             background: bg_base
             border: [2, 2, 2, 2]
-            size: [-70, 100]
+            size: [-70, 65]
             relative:
               width: Max
             position: [0, 25]

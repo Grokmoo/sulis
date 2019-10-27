@@ -125,6 +125,19 @@ themes:
         position: [3, -3]
         relative:
           x: Max
+  ability_hover:
+    from: text_area
+    border: { top: 1, bottom: 1, left: 2, right: 2 }
+    background: 80_transparent_fill
+    text: |
+      [s=6.0|#name#]   [!activate_ap;c=0ff|Passive][?activate_ap;s=5.0;c=f00|AP: #activate_ap#][?class_stat_name|[s=5.0;c=f0f|   #class_stat_name#: #class_stat_amount#]]
+      [s=5.0|#short_description#]
+    size: [70, 12]
+    relative:
+      width: Custom
+      height: Custom
+      x: Custom
+      y: Custom
   item_button:
     from: button
     background: empty

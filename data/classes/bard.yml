@@ -1,7 +1,11 @@
 id: bard
 name: Bard
 description: |
-  Bards are traveling poets and musicians who make use of a long and storied magical tradition.  Bards are able to learn a variety of songs, each one with different magical effects.  Songs can be enhanced or modified by adding additional verses or melodies as well as changing rhythms.  While reciting a basic song can be done at any time, Bards rely on a limited pool of inspiration in order to come up with new and exciting variations, maximizing their songs' overall effectiveness.
+  Bards are traveling poets and musicians who make use of a long and storied magical tradition.  Bards are able to learn several different songs, each one with different base magical effects.  Each song can be enhanced or modified by adding verses.  In addition, different melodies and rhythms can be introduced to create a variety of effects.  As new variations are added, the song takes more and more of the bard's attention, so a balance must be made if the bard wants to take other actions in combat.
+  
+  While reciting a basic song can be done at any time, Bards rely on a limited pool of inspiration in order to come up with new and exciting variations, maximizing their songs' overall effectiveness.
+  
+  Bards have proficiency in light armor and most weapons.
 stats:
   - id: Inspiration
     name: Inspiration
@@ -37,7 +41,6 @@ starting_abilities:
   - weapon_spear
   - weapon_mace
   - weapon_simple
-  - song_of_heroes
 upgrades:
   1:
     ability_choices: []
@@ -60,7 +63,7 @@ upgrades:
     stats:
       Inspiration: 110
   3:
-    ability_choices: [ bard ]
+    ability_choices: [ bard, general ]
     group_uses_per_encounter:
       - [ Songs, ~ ]
       - [ Rhythm, ~ ]
@@ -80,7 +83,7 @@ upgrades:
     stats:
       Inspiration: 130
   5:
-    ability_choices: [ bard ]
+    ability_choices: [ bard, general ]
     group_uses_per_encounter:
       - [ Songs, ~ ]
       - [ Rhythm, ~ ]
@@ -100,7 +103,7 @@ upgrades:
     stats:
       Inspiration: 150
   7:
-    ability_choices: [ bard ]
+    ability_choices: [ bard, general ]
     group_uses_per_encounter:
       - [ Songs, ~ ]
       - [ Rhythm, ~ ]
@@ -120,7 +123,7 @@ upgrades:
     stats:
       Inspiration: 170
   9:
-    ability_choices: [ bard ]
+    ability_choices: [ bard, general ]
     group_uses_per_encounter:
       - [ Songs, ~ ]
       - [ Rhythm, ~ ]
@@ -140,7 +143,7 @@ upgrades:
     stats:
       Inspiration: 190
   11:
-    ability_choices: [ bard ]
+    ability_choices: [ bard, general ]
     group_uses_per_encounter:
       - [ Songs, ~ ]
       - [ Rhythm, ~ ]
@@ -160,7 +163,7 @@ upgrades:
     stats:
       Inspiration: 210
   13:
-    ability_choices: [ bard ]
+    ability_choices: [ bard, general ]
     group_uses_per_encounter:
       - [ Songs, ~ ]
       - [ Rhythm, ~ ]
@@ -180,7 +183,7 @@ upgrades:
     stats:
       Inspiration: 230
   15:
-    ability_choices: [ bard ]
+    ability_choices: [ bard, general ]
     group_uses_per_encounter:
       - [ Songs, ~ ]
       - [ Rhythm, ~ ]
@@ -200,7 +203,7 @@ upgrades:
     stats:
       Inspiration: 250
   17:
-    ability_choices: [ bard ]
+    ability_choices: [ bard, general ]
     group_uses_per_encounter:
       - [ Songs, ~ ]
       - [ Rhythm, ~ ]
@@ -220,7 +223,7 @@ upgrades:
     stats:
       Inspiration: 270
   19:
-    ability_choices: [ bard ]
+    ability_choices: [ bard, general ]
     group_uses_per_encounter:
       - [ Songs, ~ ]
       - [ Rhythm, ~ ]
@@ -262,8 +265,17 @@ kits:
         - quantity: 1
           item: { id: potion_body }
       pc_starting_coins: 200
+    starting_abilities:
+      - song_of_heroes
     description: |
-      A bard relying on his quick reflexes and ranged attacks.
+      A bard relying on quick reflexes and ranged attacks.  They prefer to stay back from enemies while bolstering allies and hindering enemies.
+      
+      [s=7|Starting Equipment]
+      
+      Shortbow
+      Dagger
+      Partial Leather Armor
+      200 Coins
   - name: Skald
     default_attributes:
       str: 15
@@ -283,10 +295,18 @@ kits:
       quick:
         Usable1: { id: potion_healing }
         Usable2: { id: potion_power }
-      pc_starting_coins: 500
+      pc_starting_coins: 120
       pc_starting_items:
         - quantity: 1
           item: { id: potion_power }
+    starting_abilities:
+      - song_of_curses
     description: |
-      A bard at home in melee combat.
-
+      A melee focused bard, preferring to wade into combat.  They still make use of their songs but prefer to save more of their available action points for direct attacks.
+      
+      [s=7|Starting Equipment]
+      
+      Short Spear
+      Small Shield
+      Partial Leather Armor
+      120 Coins

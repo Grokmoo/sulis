@@ -2,7 +2,7 @@ id: crush
 name: "Crush"
 icon: abilities/crush
 description: |
-  A large chunk of stone erupts from the ground, damaging a single target with Crushing damage.
+  A large chunk of stone erupts from the ground, dealing moderate Crushing damage to a single target.
 active:
   script: "crush"
   group: "1st Circle"
@@ -18,5 +18,3 @@ active:
     range: Visible
   short_description: |
     Deal crushing damage to a single target.
-prereqs:
-  total_level: 2

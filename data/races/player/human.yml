@@ -1,9 +1,9 @@
 id: human
 name: Human
 description: |
-  Tough and adaptable, Humans are the most populous race in the known world.  In the thousand years since the Sundering, Humans have spread and colonized vast stretches of all over Eao.
+  Tough and adaptable, Humans are the most populous race in the known world.  In the thousand years since the Sundering, Humans have spread and colonized vast stretches of all over Eao.  While often looked down upon by the older races, they have proven themselves time and again fiercesome and intelligent warriors, conquerors, and diplomats.
   
-  Human adventurers of all roles can be found frequently throughout the Twin Expanse and beyond.
+  Human adventurers of all classes can be found frequently throughout the Twin Expanse and beyond.
 size: 2by2
 movement_rate: 1.0
 pc_death_prop: pc_dead_med

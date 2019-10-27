@@ -23,13 +23,13 @@ use sulis_core::util::{unable_to_create_error, ExtInt};
 
 use crate::{Ability, AbilityList, InventoryBuilder, Module};
 
-#[derive(Deserialize, Serialize, Debug)]
-#[serde(deny_unknown_fields)]
+#[derive(Debug)]
 pub struct Kit {
     pub name: String,
     pub description: String,
     pub default_attributes: AttributeList,
     pub starting_inventory: InventoryBuilder,
+    pub starting_abilities: Vec<Rc<Ability>>,
 }
 
 #[derive(Debug)]
@@ -114,12 +114,36 @@ impl Class {
             abilities.push(ability);
         }
 
+        let mut kits = Vec::new();
+        for kit_builder in builder.kits {
+            let mut abilities = Vec::new();
+            for ability_id in kit_builder.starting_abilities {
+                let ability = match module.abilities.get(&ability_id) {
+                    None => {
+                        warn!("Unable to find ability '{}'", ability_id);
+                        return unable_to_create_error("class", &builder.id);
+                    }
+                    Some(ref ability) => Rc::clone(ability),
+                };
+
+                abilities.push(ability);
+            }
+
+            kits.push(Kit {
+                name: kit_builder.name,
+                description: kit_builder.description,
+                default_attributes: kit_builder.default_attributes,
+                starting_inventory: kit_builder.starting_inventory,
+                starting_abilities: abilities,
+            });
+        }
+
         Ok(Class {
             id: builder.id,
             name: builder.name,
             description: builder.description,
             bonuses_per_level: builder.bonuses_per_level,
-            kits: builder.kits,
+            kits,
             upgrades,
             starting_abilities: abilities,
             stats: builder.stats,
@@ -180,6 +204,16 @@ pub struct ClassStat {
     pub reset_per_day: bool,
 }
 
+#[derive(Deserialize, Serialize, Debug)]
+#[serde(deny_unknown_fields)]
+pub struct KitBuilder {
+    pub name: String,
+    pub description: String,
+    pub default_attributes: AttributeList,
+    pub starting_inventory: InventoryBuilder,
+    pub starting_abilities: Vec<String>,
+}
+
 #[derive(Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct UpgradesBuilder {
@@ -204,7 +238,7 @@ pub struct ClassBuilder {
     pub bonuses_per_level: BonusList,
     pub upgrades: HashMap<u32, UpgradesBuilder>,
     pub starting_abilities: Vec<String>,
-    pub kits: Vec<Kit>,
+    pub kits: Vec<KitBuilder>,
 
     #[serde(default)]
     pub stats: Vec<ClassStat>,

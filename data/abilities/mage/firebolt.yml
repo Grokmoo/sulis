@@ -2,7 +2,7 @@ id: firebolt
 name: "Firebolt"
 icon: abilities/firebolt
 description: |
-  You launch a bolt of elemental fire at a single enemy target.  It is most effective against lightly armored targets.
+  You launch a bolt of elemental fire at a single enemy target, dealing significant damage.  It is most effective against lightly armored targets.
 active:
   script: "firebolt"
   group: "1st Circle"
@@ -18,5 +18,3 @@ active:
     range: Visible
   short_description: |
     Deal fire damage to one opponent.
-prereqs:
-  total_level: 2

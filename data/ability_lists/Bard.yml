@@ -13,10 +13,13 @@ abilities:
     position: [1, 5]
     
   - id: driving_rhythm
-    position: [0, 7]
+    position: [0, 6]
   - id: syncopated_rhythm
-    position: [1, 7]
+    position: [1, 6]
   - id: downbeat_rhythm
-    position: [2, 7]
+    position: [2, 6]
   - id: progressive_rhythm
-    position: [3, 7]
+    position: [3, 6]
+
+  - id: louder_music
+    position: [0, 7]

@@ -3,7 +3,7 @@ name: Rodian
 description: |
   Distrusted by most due to their appearance and reputation for thievery, Rodians nonetheless maintain a vast, loosely connected underground empire stretching across the known world and beyond.  Rodians are a common sight in the large cities of other races.  They are very fast and agile, but lack the Strength of the larger races.
   
-  Rodians can be found occupying any profession, but Rogues are probably the most common.
+  Rodians can be found occupying any profession, but Rogues are probably the most common.  Many Rodians also have a taste for music and become Bards.
 size: 2by2
 movement_rate: 1.0
 pc_death_prop: pc_dead_small

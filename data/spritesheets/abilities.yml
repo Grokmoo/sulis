@@ -169,6 +169,8 @@ groups:
       progressive_rhythm: [8, 11]
       funeral_dirge: [9, 11]
       disharmonious_melody: [10, 11]
+      louder_music: [11, 11]
+      inspired_bard: [12, 11]
       
       improved_initiative: [0, 12]
       tough_skin: [1, 12]

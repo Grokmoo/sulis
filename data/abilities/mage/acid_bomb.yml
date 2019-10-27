@@ -2,7 +2,7 @@ id: acid_bomb
 name: "Acid Bomb"
 icon: abilities/acid_bomb
 description: |
-  A nearby target must make a reflex resistance check or be doused in acid, suffering damage over time.
+  A nearby target must make a reflex resistance check or be doused in acid, suffering a small amount of Acid damage over time.
 active:
   script: "acid_bomb"
   group: "Cantrips"

@@ -1,8 +1,11 @@
 id: fighter
 name: Fighter
 description: |
-  Fighters are experts in all forms of martial combat, and, as they gain experience, frequently masters in more than one.  They have solid training in a large variety of weapons and equipment.
+  Fighters are experts in all forms of martial combat, and, as they gain experience, frequently masters in more than one.  They have solid training in a large variety of weapons and equipment.  This includes both ranged and melee combat styles.
+  
   On the battlefield, they can both protect more fragile comrades as well as leap into the fray themselves.
+  
+  Fighters have proficiency in light and medium armor, and all weapons.
 bonuses_per_level:
   - kind:
       hit_points: 10
@@ -23,7 +26,6 @@ bonuses_per_level:
 starting_abilities:
   - armor_light
   - armor_medium
-  - armor_heavy
   - weapon_axe
   - weapon_crossbow
   - weapon_bow
@@ -163,8 +165,16 @@ kits:
        - quantity: 1
          item: { id: potion_body }
       pc_starting_coins: 200
+    starting_abilities:
+      - mighty_blow
     description: |
       A battle hardened warrior who prefers large weapons and close quarters combat.  They can deal out tremendous damage to any foes who dare to enter the melee.
+      
+      [s=8|Starting Equipment]
+      
+      Battleaxe
+      Partial Leather Armor
+      200 Coins
   - name: Archer
     default_attributes:
       str: 13
@@ -187,8 +197,17 @@ kits:
         - quantity: 1
           item: { id: potion_body }
       pc_starting_coins: 200
+    starting_abilities:
+      - precise_shot
     description: |
       An expert with ranged weapons, who prefers to keep their distance from enemies where possible, using their skills to take down the most dangerous targets from afar.
+      
+      [s=8|Starting Equipment]
+      
+      Shortbow
+      Dagger
+      Partial Leather Armor
+      200 Coins
   - name: Defender
     default_attributes:
       str: 16
@@ -212,5 +231,15 @@ kits:
         - quantity: 1
           item: { id: potion_body }
       pc_starting_coins: 100
+    starting_abilities:
+      - defender
+      - armor_heavy
     description: |
       A fighter who will typically use heavy armor and a large shield.  While certainly capable of dishing out punishment, their primary role on the battlefield is often to protect their compatriots.
+      
+      [s=7|Starting Equipment]
+      
+      Short Sword
+      Small Shield
+      Full Leather Armor
+      100 Coins

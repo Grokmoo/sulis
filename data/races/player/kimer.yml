@@ -3,7 +3,7 @@ name: Kimer
 description: |
   An ancient and proud people, their massive cities are cloistered away far from prying eyes in the ocean depths.  Occasionally, however, some wander-lusted Kimer make their way into the realms of the other races.  They must maintain a base level of moisture on their bodies to survive, and suffer vulnerability to Shock damage because of this.
   
-  Kimer are well suited to be Mages, Fighters, or any other role.
+  Kimer are well suited to be Mages or Druids due to their mental abilities, but can be effective in most any role.
 size: 2by2
 movement_rate: 1.0
 pc_death_prop: pc_dead_med

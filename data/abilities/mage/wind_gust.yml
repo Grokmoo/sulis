@@ -18,5 +18,3 @@ active:
   combat_only: true
   short_description: |
     Knock back all enemies in an arc.
-prereqs:
-  total_level: 2

@@ -21,5 +21,3 @@ active:
     range: Reach
   short_description: |
     Damage a target while healing yourself.
-prereqs:
-  total_level: 2

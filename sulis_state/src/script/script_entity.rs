@@ -377,6 +377,9 @@ use sulis_module::{
 /// does not possess the ability, one if it possesses just the base ability, and larger numbers
 /// depending on the number of upgrades possessed.
 ///
+/// # `ability_level_from_id(ability_id: String) -> Int`
+/// Returns the level of the ability with the specified ID.  See `ability_level`
+///
 /// # `has_active_mode() -> Bool`
 /// Returns true if this entity has at least one currently active mode ability, false
 /// otherwise.
@@ -1364,6 +1367,16 @@ impl UserData for ScriptEntity {
             }
 
             Ok(table)
+        });
+
+        methods.add_method("ability_level_from_id", |_, entity, ability_id: String| {
+            let entity = entity.try_unwrap()?;
+            let entity = entity.borrow();
+
+            match entity.actor.actor.ability_level(&ability_id) {
+                None => Ok(0),
+                Some(level) => Ok(level + 1),
+            }
         });
 
         methods.add_method("ability_level", |_, entity, ability: ScriptAbility| {

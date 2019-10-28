@@ -131,6 +131,7 @@ themes:
           title:
             text: "Select an Ability"
           help_label:
+            position: [150, 2]
             custom:
               tooltip: |
                 Selecting new abilities is the primary way you customize and grow your character.

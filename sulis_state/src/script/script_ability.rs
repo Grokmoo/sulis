@@ -227,6 +227,9 @@ impl UserData for ScriptAbilitySet {
 /// scripts in the `ability` field, and can also be obtained by iterating
 /// over a `ScriptEntitySet`
 ///
+/// # `id() -> String`
+/// Returns the unique ID of this ability.
+///
 /// # `is_active_mode(target: ScriptEntity) -> Bool`
 /// Returns true if this ability is a mode that is currently active on the `target`,
 /// false otherwise.
@@ -330,6 +333,10 @@ impl ScriptAbility {
 
 impl UserData for ScriptAbility {
     fn add_methods<'lua, M: UserDataMethods<'lua, Self>>(methods: &mut M) {
+        methods.add_method("id", |_, ability, ()| {
+            Ok(ability.id.to_string())
+        });
+
         methods.add_method("is_active_mode", |_, ability, target: ScriptEntity| {
             ability.error_if_not_active()?;
             let target = target.try_unwrap()?;

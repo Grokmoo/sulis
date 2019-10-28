@@ -1,0 +1,23 @@
+id: tune_of_unity
+name: "Tune of Unity"
+icon: abilities/tune_of_unity
+description: |
+  You add a melody into your bardsong, bolstering allied cooperation.  Allies are more easily able to flank opponents as long as they remain in the area of the bardsong.  They also gain bonus initiative and ignore some concealment on hostiles.
+active:
+  script: "tune_of_unity"
+  group: "Melodies"
+  ap: 2000
+  class_stats:
+    bard:
+      Inspiration: 20
+  duration:
+    Mode
+  cooldown: 3
+  combat_only: true
+  ai:
+    priority: 20
+    kind: Special
+    group: Multiple
+    range: Short
+  short_description: |
+    Grant cooperative bonuses to all allies in your bardsong area.

@@ -11,6 +11,8 @@ abilities:
     position: [0, 5]
   - id: disharmonious_melody
     position: [1, 5]
+  - id: tune_of_unity
+    position: [2, 5]
     
   - id: driving_rhythm
     position: [0, 6]

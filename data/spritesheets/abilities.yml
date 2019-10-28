@@ -171,6 +171,7 @@ groups:
       disharmonious_melody: [10, 11]
       louder_music: [11, 11]
       inspired_bard: [12, 11]
+      tune_of_unity: [13, 11]
       
       improved_initiative: [0, 12]
       tough_skin: [1, 12]

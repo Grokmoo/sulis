@@ -10,7 +10,7 @@ function on_activate(parent, ability)
   
   local targeter = parent:create_targeter(ability)
   targeter:add_selectable(parent)
-  targeter:set_shape_circle(8.0)
+  targeter:set_shape_circle(8.0 + parent:ability_level_from_id("louder_music") * 2)
   targeter:add_all_effectable(targets)
   targeter:invis_blocks_affected_points(true)
   targeter:activate()

@@ -54,7 +54,7 @@ inventory:
   pc_starting_items:
     - quantity: 1
       item:
-        id: potion_power
+        id: potion_body
         adjectives: []
 levels:
   fighter: 5

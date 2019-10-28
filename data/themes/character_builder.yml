@@ -17,6 +17,15 @@ themes:
           width: Max
         text_params:
           scale: 8.0
+      help_label:
+        from: label
+        kind: Label
+        text: "?"
+        text_params:
+          scale: 8.0
+        background: bg_base
+        size: [7, 7]
+        position: [125, 2]
   character_builder:
     size: [240, 170]
     border: { top: 6, bottom: 8, right: 6, left: 6 }
@@ -84,6 +93,10 @@ themes:
         children:
           title:
             text: "Select your Race"
+          help_label:
+            custom:
+              tooltip: |
+                Each race has unique strengths and weaknesses, making them more or less suited for any given class - but any combination is possible.
           race_pane:
             from: game.race_pane
             background: bg_base
@@ -117,6 +130,10 @@ themes:
         children:
           title:
             text: "Select an Ability"
+          help_label:
+            custom:
+              tooltip: |
+                Selecting new abilities is the primary way you customize and grow your character.
           ability_pane:
             from: game.ability_pane
             position: [140, 10]
@@ -208,6 +225,10 @@ themes:
         children:
           title:
             text: "Select your Class"
+          help_label:
+            custom:
+              tooltip: |
+                Your primary profession and role, your class is the single largest determiner of what type of character you will be.
           class_pane:
             from: game.class_pane
             background: bg_base
@@ -236,7 +257,11 @@ themes:
         from: builder_pane
         children:
           title:
-            text: "Customize your starting attributes"
+            text: "Customize your Class"
+          help_label:
+            custom:
+              tooltip: |
+                These choices determine your character's starting capabilities, but do not restrict you from branching out or changing course later on.
           starting_abilities_container:
             kind: Container
             background: bg_base
@@ -462,7 +487,11 @@ themes:
             size: [25, 6]
             position: [2, 135]
           title:
-            text: "Customize your Backstory"
+            text: "Create your Backstory"
+          help_label:
+            custom:
+              tooltip: |
+                A backstory helps to provide each character unique flavor, and can also unlock different options in dialog.
           node:
             border: [2, 2, 2, 2]
             background: bg_rounded
@@ -501,6 +530,10 @@ themes:
         children:
           title:
             text: "Customize your Appearance"
+          help_label:
+            custom:
+              tooltip: |
+                The choices on this screen are purely cosmetic and will not impact your character in any other way.
           name_label:
             from: label
             text: "Name"

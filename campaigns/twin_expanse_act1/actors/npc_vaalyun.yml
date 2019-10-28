@@ -46,7 +46,7 @@ inventory:
       adjectives: []
   quick:
     Usable2:
-      id: potion_power
+      id: potion_body
       adjectives: []
     AltHeldMain:
       id: shortsword

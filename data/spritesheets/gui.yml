@@ -638,3 +638,5 @@ groups:
       druid_abilities: [1024, 1024, 512, 512]
       warlock_abilities: [1024, 1536, 512, 512]
       bard_abilities: [1536, 1024, 512, 512]
+      
+      blank_round_button: [415, 0, 71, 71]

@@ -13,6 +13,12 @@ abilities:
     position: [1, 5]
   - id: tune_of_unity
     position: [2, 5]
+  - id: theme_of_slaughter
+    position: [3, 5]
+  - id: inconspicuous_melody
+    position: [4, 5]
+  - id: stalwart_tune
+    position: [5, 5]
     
   - id: driving_rhythm
     position: [0, 6]

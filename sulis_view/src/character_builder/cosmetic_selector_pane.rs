@@ -305,7 +305,7 @@ impl WidgetKind for CosmeticSelectorPane {
             .state
             .add_callback(Callback::new(Rc::new(|widget, _| {
                 let (parent, cosmetic_pane) = Widget::parent_mut::<CosmeticSelectorPane>(widget);
-                cosmetic_pane.sex = Sex::Female;
+                cosmetic_pane.sex = Sex::Male;
                 cosmetic_pane.beard_index = None;
                 parent.borrow_mut().invalidate_children();
             })));

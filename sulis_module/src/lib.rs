@@ -437,7 +437,7 @@ impl Module {
             module.scripts.clear();
             module.generators.clear();
             module.features.clear();
-            module.terrain_rules = None;;
+            module.terrain_rules = None;
             module.terrain_kinds.clear();
             module.wall_rules = None;
             module.wall_kinds.clear();

@@ -172,6 +172,8 @@ groups:
       louder_music: [11, 11]
       inspired_bard: [12, 11]
       tune_of_unity: [13, 11]
+      theme_of_slaughter: [14, 11]
+      inconspicuous_melody: [15, 11]
       
       improved_initiative: [0, 12]
       tough_skin: [1, 12]
@@ -181,6 +183,7 @@ groups:
       backflip: [5, 12]
       rapid_strikes: [6, 12]
       flanker: [7, 12]
+      stalwart_tune: [8, 12]
       
       backstab: [0, 13]
       smoke_bomb: [1, 13]

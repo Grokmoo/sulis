@@ -1,0 +1,23 @@
+id: inconspicuous_melody
+name: "Inconspicuous Melody"
+icon: abilities/inconspicuous_melody
+description: |
+  You add in a hidden, subtle theme that most will not notice at first.  Allies in the area of effect of your bardsong gain concealment against attacks.
+active:
+  script: "inconspicuous_melody"
+  group: "Melodies"
+  ap: 2000
+  class_stats:
+    bard:
+      Inspiration: 20
+  duration:
+    Mode
+  cooldown: 3
+  combat_only: true
+  ai:
+    priority: 20
+    kind: Special
+    group: Multiple
+    range: Short
+  short_description: |
+    All allies in range of your bardsong gain concealment.

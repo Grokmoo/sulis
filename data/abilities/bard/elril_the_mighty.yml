@@ -1,0 +1,23 @@
+id: elril_the_mighty
+name: "Elril the Mighty"
+icon: abilities/elril_the_mighty
+description: |
+  Elril was one of the greatest mages who ever lived, and one of the founders of the formalized Circles of Magic.  He lived thousands of years before the Sundering in Ogrua.
+  
+  This verse improves the spell casting of nearby allies with a caster level bonus and additional damage.
+active:
+  script: "elril_the_mighty"
+  group: "Verses"
+  ap: 2000
+  duration:
+    Rounds: 3
+  cooldown: 4
+  combat_only: true
+  requires_active_mode: song_of_heroes
+  ai:
+    priority: 10
+    kind: Buff
+    group: Multiple
+    range: Short
+  short_description: |
+    Provide a bonus to caster level and spell damage to all casting allies.

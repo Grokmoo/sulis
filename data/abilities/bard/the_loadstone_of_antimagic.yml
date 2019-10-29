@@ -1,0 +1,23 @@
+id: the_loadstone_of_antimagic
+name: "The Loadstone of Antimagic"
+icon: abilities/the_loadstone_of_antimagic
+description: |
+  In the deepest depths of the Ufrar Mountains, where no surface dweller has ever set foot, lies the legendary heart of the mountain - the Loadstone of Antimagic.  An artifact so powerful it is said to be able to strip all magical ability away from anyone who touches it - forever.
+  
+  This verse will temporarily prevent nearby hostiles from activating any special abilities.
+active:
+  script: "the_loadstone_of_antimagic"
+  group: "Verses"
+  ap: 2000
+  duration:
+    Rounds: 2
+  cooldown: 4
+  combat_only: true
+  requires_active_mode: song_of_curses
+  ai:
+    priority: 10
+    kind: Buff
+    group: Multiple
+    range: Short
+  short_description: |
+    Temporarily prevents hostiles from activating special abilities.

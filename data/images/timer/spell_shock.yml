@@ -1,0 +1,11 @@
+id: spell_shock
+frame_time_millis: 70
+frames:
+  - particles/spell_shock01
+  - particles/spell_shock02
+  - particles/spell_shock03
+  - particles/spell_shock04
+  - particles/spell_shock05
+  - particles/spell_shock06
+  - particles/spell_shock07
+  - particles/spell_shock08

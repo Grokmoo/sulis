@@ -1,0 +1,23 @@
+id: the_trolls_of_shelsham_woods
+name: "The Trolls of Shelsham Woods"
+icon: abilities/the_trolls_of_shelsham_woods
+description: |
+  While trolls can be found in almost all the forests and jungles of Eao, most famous (and most terrifying) are the trolls of Uqebesh.  A particular clan of trolls in the Shelsham Woods are famed for their regnerative capabilities.  They are said to be able to replace an entire lost limb in minutes, even in the middle of combat.
+  
+  This verse grants all the caster's allies a short burst of hit point regeneration.
+active:
+  script: "the_trolls_of_shelsham_woods"
+  group: "Verses"
+  ap: 2000
+  duration:
+    Rounds: 3
+  cooldown: 4
+  combat_only: true
+  requires_active_mode: song_of_survival
+  ai:
+    priority: 10
+    kind: Buff
+    group: Multiple
+    range: Short
+  short_description: |
+    Provides regeneration to nearby allies.

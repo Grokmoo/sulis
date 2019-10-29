@@ -184,6 +184,12 @@ groups:
       rapid_strikes: [6, 12]
       flanker: [7, 12]
       stalwart_tune: [8, 12]
+      arnad_the_slayer_of_kings: [9, 12]
+      elril_the_mighty: [10, 12]
+      the_loadstone_of_antimagic: [11, 12]
+      yanrick_the_slow: [12, 12]
+      the_trolls_of_shelsham_woods: [13, 12]
+      the_endurance_of_durad_vinsen: [14, 12]
       
       backstab: [0, 13]
       smoke_bomb: [1, 13]

@@ -5,7 +5,22 @@ abilities:
   - id: song_of_curses
     position: [3, 0]
   - id: song_of_survival
-    position: [5, 0]
+    position: [6, 0]
+    
+  - id: arnad_the_slayer_of_kings
+    position:  [0, 1]
+  - id: elril_the_mighty
+    position: [1, 1]
+    
+  - id: the_loadstone_of_antimagic
+    position: [3, 1]
+  - id: yanrick_the_slow
+    position: [4, 1]
+    
+  - id: the_trolls_of_shelsham_woods
+    position: [6, 1]
+  - id: the_endurance_of_durad_vinsen
+    position: [7, 1]
     
   - id: funeral_dirge
     position: [0, 5]

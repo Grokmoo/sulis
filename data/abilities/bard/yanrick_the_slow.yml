@@ -1,0 +1,23 @@
+id: yanrick_the_slow
+name: "Yanrick the Slow"
+icon: abilities/yanrick_the_slow
+description: |
+  Yanrick is the subject of an ancient Kimer legend of a king, cursed to forever chase his beloved through the watery depths, but never reach her.
+  
+  This verse lowers the movement speed of all nearby hostiles.
+active:
+  script: "yanrick_the_slow"
+  group: "Verses"
+  ap: 2000
+  duration:
+    Rounds: 4
+  cooldown: 4
+  combat_only: true
+  requires_active_mode: song_of_curses
+  ai:
+    priority: 10
+    kind: Buff
+    group: Multiple
+    range: Short
+  short_description: |
+    Lowers the movement speed of nearby hostiles.

@@ -18,7 +18,7 @@ use std::rc::Rc;
 use std::u32;
 
 use sulis_core::util::ExtInt;
-use sulis_module::{ability::Duration, Ability, ROUND_TIME_MILLIS};
+use sulis_module::{ability::Duration, Ability, Module, ROUND_TIME_MILLIS};
 use crate::{GameState, ChangeListenerList};
 
 pub struct AbilityState {
@@ -26,16 +26,23 @@ pub struct AbilityState {
     pub group: String,
     pub(crate) remaining_duration: ExtInt,
     pub combat_only: bool,
+    pub requires_active_mode: Option<Rc<Ability>>,
     cur_duration: u32,
     pub listeners: ChangeListenerList<AbilityState>,
 }
 
 impl AbilityState {
     pub fn new(ability: &Rc<Ability>) -> AbilityState {
-        let (group, combat_only) = match ability.active {
+        let (group, combat_only, mode) = match ability.active {
             None => panic!(),
-            Some(ref active) =>
-                (active.group.name(), active.combat_only)
+            Some(ref active) => {
+                let mode = active.requires_active_mode.as_ref().
+                    map_or(None, |id| Module::ability(&id));
+                if mode.is_none() && active.requires_active_mode.is_some() {
+                    warn!("Invalid requires_active_mode for {}", ability.id);
+                }
+                (active.group.name(), active.combat_only, mode)
+            }
         };
 
         AbilityState {
@@ -44,6 +51,7 @@ impl AbilityState {
             remaining_duration: ExtInt::Int(0),
             combat_only,
             cur_duration: 0,
+            requires_active_mode: mode,
             listeners: ChangeListenerList::default(),
         }
     }
@@ -63,7 +71,11 @@ impl AbilityState {
         self.ability.active.as_ref().unwrap().ap
     }
 
-    pub fn is_available(&self) -> bool {
+    pub fn is_available(&self, current_modes: &[&str]) -> bool {
+        if let Some(required_mode) = self.requires_active_mode.as_ref() {
+            if !current_modes.contains(&&required_mode.id[..]) { return false; }
+        }
+
         if self.combat_only && !GameState::is_combat_active() { return false; }
         self.remaining_duration.is_zero()
     }

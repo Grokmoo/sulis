@@ -391,3 +391,15 @@ groups:
       psychic07: [384, 0]
       psychic08: [448, 0]
       psychic09: [512, 0]
+  spell_shock:
+    size: [64, 64]
+    position: [0, 808]
+    areas:
+      spell_shock01: [0, 0]
+      spell_shock02: [64, 0]
+      spell_shock03: [128, 0]
+      spell_shock04: [192, 0]
+      spell_shock05: [256, 0]
+      spell_shock06: [320, 0]
+      spell_shock07: [384, 0]
+      spell_shock08: [448, 0]

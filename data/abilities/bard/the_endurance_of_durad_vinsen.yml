@@ -1,0 +1,23 @@
+id: the_endurance_of_durad_vinsen
+name: "The Endurance of Durad Vinsen"
+icon: abilities/the_endurance_of_durad_vinsen
+description: |
+  Durad Vinsen was a performing Dwarf who traveled much of the known world in the 600s SE.  He was most known for his feats of raw vigor and constitution - such as surviving for a full day floating in Kel's Bay in the heart of winter or outdrinking ten men.
+  
+  This verse provides a large bonus to Endurance to all allies and smaller bonuses to other stats as well.
+active:
+  script: "the_endurance_of_durad_vinsen"
+  group: "Verses"
+  ap: 2000
+  duration:
+    Rounds: 3
+  cooldown: 4
+  combat_only: true
+  requires_active_mode: song_of_survival
+  ai:
+    priority: 10
+    kind: Buff
+    group: Multiple
+    range: Short
+  short_description: |
+    Provide bonus Endurance and other stats to your allies.

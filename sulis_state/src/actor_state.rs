@@ -383,7 +383,7 @@ impl ActorState {
                     return false;
                 }
 
-                state.is_available()
+                state.is_available(&self.current_active_modes())
             }
         }
     }
@@ -408,7 +408,7 @@ impl ActorState {
                     return false;
                 }
 
-                state.is_available()
+                state.is_available(&self.current_active_modes())
             }
         }
     }
@@ -464,6 +464,17 @@ impl ActorState {
                     .insert(state.group.to_string(), per_enc - 1);
             }
         }
+    }
+
+    pub fn current_active_modes(&self) -> Vec<&str> {
+        let mut result = Vec::new();
+        for (_, state) in &self.ability_states {
+            if state.is_active_mode() {
+                result.push(&state.ability.id[..]);
+            }
+        }
+
+        result
     }
 
     pub fn effects_iter<'a>(&'a self) -> impl Iterator<Item = &'a usize> {

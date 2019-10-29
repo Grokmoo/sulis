@@ -51,7 +51,7 @@ function apply_effect(parent, ability, targets)
 
   local anim = target:create_particle_generator("sparkle")
   anim:set_moves_with_parent()
-  anim:set_position(anim:param(-0.5), anim:param(-2.5))
+  anim:set_position(anim:param(0.0), anim:param(-2.5))
   anim:set_particle_size_dist(anim:fixed_dist(0.5), anim:fixed_dist(0.5))
   anim:set_gen_rate(anim:param(6.0))
   anim:set_initial_gen(2.0)

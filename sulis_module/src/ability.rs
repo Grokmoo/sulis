@@ -64,6 +64,7 @@ pub struct Active {
     pub ai: AIData,
     pub class_stats: HashMap<String, HashMap<String, u32>>,
     pub combat_only: bool,
+    pub requires_active_mode: Option<String>,
 }
 
 #[derive(Debug)]
@@ -139,6 +140,7 @@ impl Ability {
                     ai: active.ai,
                     class_stats: active.class_stats,
                     combat_only: active.combat_only,
+                    requires_active_mode: active.requires_active_mode,
                 })
             }
         };
@@ -219,6 +221,9 @@ pub struct ActiveBuilder {
 
     #[serde(default)]
     combat_only: bool,
+
+    #[serde(default)]
+    requires_active_mode: Option<String>,
 }
 
 #[derive(Deserialize, Debug, Clone, Copy)]

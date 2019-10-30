@@ -2,7 +2,7 @@ id: air_shield
 name: "Air Shield"
 icon: abilities/air_shield
 description: |
-  You are surrounded by a ring of air, providing resistance to electrical attacks and a 50% chance to deflect ranged projectiles.
+  You are surrounded by a ring of air, providing resistance to shock attacks and a 50% chance to deflect ranged projectiles.
 active:
   script: "air_shield"
   group: "2nd Circle"
@@ -17,6 +17,6 @@ active:
     group: Single
     range: Personal
   short_description: |
-    Gain resistance to electrical damage, and deflection against ranged attacks.
+    Gain resistance to shock damage, and deflection against ranged attacks.
 prereqs:
   total_level: 5

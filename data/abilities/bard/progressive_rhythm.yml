@@ -21,3 +21,6 @@ active:
     range: Short
   short_description: |
     Enhance the primary effect of your song but suffer movement, defense, and attack penalties.
+prereqs:
+  levels:
+    bard: 8

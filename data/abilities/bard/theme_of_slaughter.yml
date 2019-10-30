@@ -3,13 +3,15 @@ name: "Theme of Slaughter"
 icon: abilities/theme_of_slaughter
 description: |
   You add a threatening melody into your bardsong that focuses on increasing damage output.  Allies are more likely to Crit, and Crits and Hits do bonus damage.
+  
+  Each melody costs an additional 1 AP to maintain per round, beyond the normal cost of the bardsong.
 active:
   script: "theme_of_slaughter"
   group: "Melodies"
   ap: 2000
   class_stats:
     bard:
-      Inspiration: 20
+      Inspiration: 30
   duration:
     Mode
   cooldown: 3
@@ -21,3 +23,6 @@ active:
     range: Short
   short_description: |
     Allies who hear your bardsong gain bonus damage.
+prereqs:
+  levels:
+    bard: 6

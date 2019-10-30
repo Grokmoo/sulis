@@ -1,0 +1,30 @@
+id: wings_of_xel
+name: "Wings of Xel"
+icon: abilities/wings_of_xel
+description: |
+  The Xel are a winged, demon-like race said to dwell in the darkest places of the world.  While incapable of true flight, they can use their wings to make great leaps, descending on unwitting victims from above.
+  
+  All nearby allies gain magical wings which they can use to make short leaps to nearby places.
+active:
+  script: "wings_of_xel"
+  group: "Verses"
+  ap: 2000
+  duration:
+    Rounds: 3
+  cooldown: 4
+  class_stats:
+    bard:
+      Inspiration: 30
+  combat_only: true
+  requires_active_mode: song_of_heroes
+  ai:
+    priority: 10
+    kind: Buff
+    group: Multiple
+    range: Short
+  short_description: |
+    Allies gain magical wings they can use to make short leaps.
+prereqs:
+  abilities: [ song_of_heroes ]
+  levels:
+    bard: 8

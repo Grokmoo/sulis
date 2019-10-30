@@ -3,13 +3,15 @@ name: "Stalwart Tune"
 icon: abilities/stalwart_tune
 description: |
   A powerful magical melody is woven into your bardsong, enhancing the defenses of your nearby allies.  All allies in the effect become immune to being flanked, immune to sneak attacks, and immune to Crits.
+  
+  Each melody costs an additional 1 AP to maintain per round, beyond the normal cost of the bardsong.
 active:
   script: "stalwart_tune"
   group: "Melodies"
   ap: 2000
   class_stats:
     bard:
-      Inspiration: 20
+      Inspiration: 40
   duration:
     Mode
   cooldown: 3
@@ -21,3 +23,6 @@ active:
     range: Short
   short_description: |
     Grant allies defense against crits, sneak attacks, and flankings.
+prereqs:
+  levels:
+    bard: 9

@@ -51,7 +51,7 @@ upgrades:
       - [ Verses, ~ ]
       - [ Special, ~ ]
     stats:
-      Inspiration: 100
+      Inspiration: 10
   2:
     ability_choices: [ bard ]
     group_uses_per_encounter:
@@ -61,7 +61,7 @@ upgrades:
       - [ Verses, ~ ]
       - [ Special, ~ ]
     stats:
-      Inspiration: 110
+      Inspiration: 20
   3:
     ability_choices: [ bard, general ]
     group_uses_per_encounter:
@@ -71,7 +71,7 @@ upgrades:
       - [ Verses, ~ ]
       - [ Special, ~ ]
     stats:
-      Inspiration: 120
+      Inspiration: 30
   4:
     ability_choices: [ bard ]
     group_uses_per_encounter:
@@ -81,7 +81,7 @@ upgrades:
       - [ Verses, ~ ]
       - [ Special, ~ ]
     stats:
-      Inspiration: 130
+      Inspiration: 40
   5:
     ability_choices: [ bard, general ]
     group_uses_per_encounter:
@@ -91,7 +91,7 @@ upgrades:
       - [ Verses, ~ ]
       - [ Special, ~ ]
     stats:
-      Inspiration: 140
+      Inspiration: 50
   6:
     ability_choices: [ bard ]
     group_uses_per_encounter:
@@ -101,7 +101,7 @@ upgrades:
       - [ Verses, ~ ]
       - [ Special, ~ ]
     stats:
-      Inspiration: 150
+      Inspiration: 60
   7:
     ability_choices: [ bard, general ]
     group_uses_per_encounter:
@@ -111,7 +111,7 @@ upgrades:
       - [ Verses, ~ ]
       - [ Special, ~ ]
     stats:
-      Inspiration: 160
+      Inspiration: 70
   8:
     ability_choices: [ bard ]
     group_uses_per_encounter:
@@ -121,7 +121,7 @@ upgrades:
       - [ Verses, ~ ]
       - [ Special, ~ ]
     stats:
-      Inspiration: 170
+      Inspiration: 80
   9:
     ability_choices: [ bard, general ]
     group_uses_per_encounter:
@@ -131,7 +131,7 @@ upgrades:
       - [ Verses, ~ ]
       - [ Special, ~ ]
     stats:
-      Inspiration: 180
+      Inspiration: 90
   10:
     ability_choices: [ bard ]
     group_uses_per_encounter:
@@ -141,7 +141,7 @@ upgrades:
       - [ Verses, ~ ]
       - [ Special, ~ ]
     stats:
-      Inspiration: 190
+      Inspiration: 100
   11:
     ability_choices: [ bard, general ]
     group_uses_per_encounter:
@@ -151,7 +151,7 @@ upgrades:
       - [ Verses, ~ ]
       - [ Special, ~ ]
     stats:
-      Inspiration: 200
+      Inspiration: 110
   12:
     ability_choices: [ bard ]
     group_uses_per_encounter:
@@ -161,7 +161,7 @@ upgrades:
       - [ Verses, ~ ]
       - [ Special, ~ ]
     stats:
-      Inspiration: 210
+      Inspiration: 120
   13:
     ability_choices: [ bard, general ]
     group_uses_per_encounter:
@@ -171,7 +171,7 @@ upgrades:
       - [ Verses, ~ ]
       - [ Special, ~ ]
     stats:
-      Inspiration: 220
+      Inspiration: 130
   14:
     ability_choices: [ bard ]
     group_uses_per_encounter:
@@ -181,7 +181,7 @@ upgrades:
       - [ Verses, ~ ]
       - [ Special, ~ ]
     stats:
-      Inspiration: 230
+      Inspiration: 140
   15:
     ability_choices: [ bard, general ]
     group_uses_per_encounter:
@@ -191,7 +191,7 @@ upgrades:
       - [ Verses, ~ ]
       - [ Special, ~ ]
     stats:
-      Inspiration: 240
+      Inspiration: 150
   16:
     ability_choices: [ bard ]
     group_uses_per_encounter:
@@ -201,7 +201,7 @@ upgrades:
       - [ Verses, ~ ]
       - [ Special, ~ ]
     stats:
-      Inspiration: 250
+      Inspiration: 160
   17:
     ability_choices: [ bard, general ]
     group_uses_per_encounter:
@@ -211,7 +211,7 @@ upgrades:
       - [ Verses, ~ ]
       - [ Special, ~ ]
     stats:
-      Inspiration: 260
+      Inspiration: 170
   18:
     ability_choices: [ bard ]
     group_uses_per_encounter:
@@ -221,7 +221,7 @@ upgrades:
       - [ Verses, ~ ]
       - [ Special, ~ ]
     stats:
-      Inspiration: 270
+      Inspiration: 180
   19:
     ability_choices: [ bard, general ]
     group_uses_per_encounter:
@@ -231,7 +231,7 @@ upgrades:
       - [ Verses, ~ ]
       - [ Special, ~ ]
     stats:
-      Inspiration: 280
+      Inspiration: 190
   20:
     ability_choices: [ bard ]
     group_uses_per_encounter:
@@ -241,15 +241,15 @@ upgrades:
       - [ Verses, ~ ]
       - [ Special, ~ ]
     stats:
-      Inspiration: 290
+      Inspiration: 200
 kits:
   - name: Jack
     default_attributes:
       str: 11
       dex: 16
       end: 12
-      per: 15
-      int: 14
+      per: 17
+      int: 12
       wis: 12
     starting_inventory:
       equipped:
@@ -259,11 +259,11 @@ kits:
         Legs: { id: legs_pants }
       quick:
         Usable1: { id: potion_healing }
-        Usable2: { id: potion_body }
+        Usable2: { id: potion_mind }
         AltHeldMain: { id: dagger }
       pc_starting_items:
         - quantity: 1
-          item: { id: potion_body }
+          item: { id: potion_mind }
       pc_starting_coins: 200
     starting_abilities:
       - song_of_heroes
@@ -276,6 +276,40 @@ kits:
       Dagger
       Partial Leather Armor
       200 Coins
+  - name: Troubadour
+    default_attributes:
+      str: 12
+      dex: 13
+      end: 15
+      per: 16
+      int: 12
+      wis: 12
+    starting_inventory:
+      equipped:
+        HeldMain: { id: shortspear }
+        HeldOff: { id: shield_small }
+        Feet: { id: boots_leather }
+        Torso: { id: torso_leather }
+        Legs: { id: legs_leather }
+        Head: { id: helm_hood }
+      quick:
+        Usable1: { id: potion_healing }
+        Usable2: { id: potion_mind }
+      pc_starting_coins: 100
+      pc_starting_items:
+        - quantity: 1
+          item: { id: potion_mind }
+    starting_abilities:
+      - song_of_survival
+    description: |
+      A more defensive bard.  They prefer songs that protect and heal themselves and their allies, making them more suited to holding the line.
+      
+      [s=7|Starting Equipment]
+      
+      Short Spear
+      Small Shield
+      Partial Leather Armor
+      100 Coins
   - name: Skald
     default_attributes:
       str: 15
@@ -286,7 +320,7 @@ kits:
       wis: 12
     starting_inventory:
       equipped:
-        HeldMain: { id: shortspear }
+        HeldMain: { id: handaxe }
         HeldOff: { id: shield_small }
         Feet: { id: boots_leather }
         Torso: { id: torso_leather }
@@ -294,11 +328,11 @@ kits:
         Head: { id: helm_hood }
       quick:
         Usable1: { id: potion_healing }
-        Usable2: { id: potion_power }
+        Usable2: { id: potion_mind }
       pc_starting_coins: 120
       pc_starting_items:
         - quantity: 1
-          item: { id: potion_power }
+          item: { id: potion_mind }
     starting_abilities:
       - song_of_curses
     description: |
@@ -306,7 +340,7 @@ kits:
       
       [s=7|Starting Equipment]
       
-      Short Spear
+      Handaxe
       Small Shield
       Partial Leather Armor
       120 Coins

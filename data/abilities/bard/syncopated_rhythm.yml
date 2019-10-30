@@ -21,3 +21,6 @@ active:
     range: Short
   short_description: |
     Enhance your song at the cost of inspiration.
+prereqs:
+  levels:
+    bard: 6

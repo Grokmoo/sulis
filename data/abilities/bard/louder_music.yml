@@ -6,3 +6,6 @@ description: |
 upgrades:
   - description: |
       Your music now covers an even larger area.
+prereqs:
+  levels:
+    bard: 5

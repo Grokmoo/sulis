@@ -11,6 +11,7 @@ prereqs:
     mage: 3
     druid: 3
     warlock: 3
+    bard: 3
 upgrades:
   - description: |
       You gain an additional bonus of two to Caster Level.

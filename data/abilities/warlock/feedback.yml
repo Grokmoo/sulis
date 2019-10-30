@@ -2,7 +2,7 @@ id: feedback
 name: "Feedback"
 icon: abilities/feedback
 description: |
-  A psychic feedback loop is created between enemies within the spell effect, doing electrical damage, with the amount of damage increasing with greater numbers of targets.
+  A psychic feedback loop is created between enemies within the spell effect, doing shock damage, with the amount of damage increasing with greater numbers of targets.
 active:
   script: "feedback"
   group: "Warlock"

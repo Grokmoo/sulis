@@ -2,7 +2,7 @@ id: summon_wind_elemental
 name: "Summon Wind Elemental"
 icon: abilities/summon_wind_elemental
 description: |
-  You summon a powerful spirit of the air to fight for you.  It deals electrical damage to your enemies, and is highly resistant to physical damage.
+  You summon a powerful spirit of the air to fight for you.  It deals shock damage to your enemies, and is highly resistant to physical damage.
 active:
   script: "summon_wind_elemental"
   group: Druid

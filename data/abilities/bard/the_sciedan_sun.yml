@@ -1,0 +1,30 @@
+id: the_sciedan_sun
+name: "The Sciedan Sun"
+icon: abilities/the_sciedan_sun
+description: |
+  The interior of the vast Sciedan desert is probably the most inhospitable land in all of Eao.  Massive wind storms blow across the desert, so powerful that they can scour flesh down to the bone.  And the searing heat of the sun is an ever present danger.
+  
+  Nearby hostiles suffer an increased vulnerability to fire, piercing, and shock damage.
+active:
+  script: "the_sciedan_sun"
+  group: "Verses"
+  ap: 2000
+  duration:
+    Rounds: 2
+  cooldown: 4
+  class_stats:
+    bard:
+      Inspiration: 20
+  combat_only: true
+  requires_active_mode: song_of_curses
+  ai:
+    priority: 10
+    kind: Buff
+    group: Multiple
+    range: Short
+  short_description: |
+    Hostiles suffer increased vulnerability to fire, piercing, and shock damage.
+prereqs:
+  abilities: [ song_of_heroes ]
+  levels:
+    bard: 5

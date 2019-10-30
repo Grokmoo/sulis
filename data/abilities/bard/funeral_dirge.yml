@@ -2,14 +2,16 @@ id: funeral_dirge
 name: "Funeral Dirge"
 icon: abilities/funeral_dirge
 description: |
-  You mix a deathly melody into your song.  All hostiles in the area of effect take Piercing damage each round.  This melody costs 1 AP per round to maintain.
+  You mix a deathly melody into your song.  All hostiles in the area of effect take Piercing damage each round.
+  
+  Each melody costs an additional 1 AP to maintain per round, beyond the normal cost of the bardsong.
 active:
   script: "funeral_dirge"
   group: "Melodies"
   ap: 2000
   class_stats:
     bard:
-      Inspiration: 20
+      Inspiration: 30
   duration:
     Mode
   cooldown: 3
@@ -21,3 +23,6 @@ active:
     range: Short
   short_description: |
     All opponents in the area of your bardsong take damage each round.
+prereqs:
+  levels:
+    bard: 7

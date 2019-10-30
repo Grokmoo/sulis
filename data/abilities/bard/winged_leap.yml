@@ -1,0 +1,20 @@
+id: winged_leap
+name: "Winged Leap"
+icon: abilities/winged_leap
+description: |
+  While the Wings of Xel are active, you may use them to leap a short distance.
+active:
+  script: "winged_leap"
+  group: "Special"
+  ap: 1000
+  duration:
+    Instant
+  cooldown: 1
+  combat_only: false
+  ai:
+    priority: 40
+    kind: Special
+    group: Single
+    range: Short
+  short_description: |
+    Leap a short distance using the Wings of Xel.

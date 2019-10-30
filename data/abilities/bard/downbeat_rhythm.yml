@@ -2,7 +2,7 @@ id: downbeat_rhythm
 name: "Downbeat Rhythm"
 icon: abilities/downbeat_rhythm
 description: |
-  Utilizing a slower, less intense tempo, you are able to sing your bardsong without significantly impacting other actions, although the song itself is less effective.  With this rhythm, you can use your bardsong without requiring any AP.
+  Utilizing a slower, less intense tempo, you are able to sing your bardsong without significantly impacting other actions, although the song itself is less effective.  With this rhythm, you can maintain your bardsong without costing any AP.
 active:
   script: "downbeat_rhythm"
   group: "Rhythm"

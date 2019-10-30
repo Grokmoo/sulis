@@ -3,6 +3,8 @@ name: "Inconspicuous Melody"
 icon: abilities/inconspicuous_melody
 description: |
   You add in a hidden, subtle theme that most will not notice at first.  Allies in the area of effect of your bardsong gain concealment against attacks.
+  
+  Each melody costs an additional 1 AP to maintain per round, beyond the normal cost of the bardsong.
 active:
   script: "inconspicuous_melody"
   group: "Melodies"

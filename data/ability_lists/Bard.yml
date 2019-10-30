@@ -1,48 +1,53 @@
 id: bard
-abilities:
+abilities:  
   - id: song_of_heroes
     position: [1, 0]
-  - id: song_of_curses
-    position: [3, 0]
-  - id: song_of_survival
-    position: [6, 0]
-    
   - id: arnad_the_slayer_of_kings
-    position:  [0, 1]
+    position:  [1.0, 1]
   - id: elril_the_mighty
-    position: [1, 1]
-    
-  - id: the_loadstone_of_antimagic
-    position: [3, 1]
-  - id: yanrick_the_slow
-    position: [4, 1]
-    
+    position: [0.5, 2]
+  - id: wings_of_xel
+    position: [1.5, 2.5]
+
+  - id: song_of_survival
+    position: [3.5, 0]
   - id: the_trolls_of_shelsham_woods
-    position: [6, 1]
+    position: [3, 2]
   - id: the_endurance_of_durad_vinsen
-    position: [7, 1]
+    position: [4, 1]
+  - id: the_shield_of_rinly
+    position: [3.5, 3]
+
+  - id: song_of_curses
+    position: [6, 0]
+  - id: the_sciedan_sun
+    position: [5.5, 2]
+  - id: the_loadstone_of_antimagic
+    position: [6, 3]
+  - id: yanrick_the_slow
+    position: [6.5, 1]
     
-  - id: funeral_dirge
-    position: [0, 5]
-  - id: disharmonious_melody
-    position: [1, 5]
   - id: tune_of_unity
-    position: [2, 5]
+    position: [0.5, 4]
   - id: theme_of_slaughter
-    position: [3, 5]
+    position: [1.5, 5]
   - id: inconspicuous_melody
-    position: [4, 5]
+    position: [3, 4]
   - id: stalwart_tune
-    position: [5, 5]
-    
-  - id: driving_rhythm
-    position: [0, 6]
-  - id: syncopated_rhythm
-    position: [1, 6]
+    position: [4, 5]
+  - id: disharmonious_melody
+    position: [5.5, 4]
+  - id: funeral_dirge
+    position: [6.5, 5]
+
   - id: downbeat_rhythm
-    position: [2, 6]
-  - id: progressive_rhythm
+    position: [2, 6] 
+  - id: driving_rhythm
     position: [3, 6]
+  - id: syncopated_rhythm
+    position: [4, 6]
+  - id: progressive_rhythm
+    position: [5, 6]
 
   - id: louder_music
-    position: [0, 7]
+    position: [3.5, 7]

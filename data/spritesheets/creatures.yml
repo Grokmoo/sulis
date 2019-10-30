@@ -273,6 +273,7 @@ groups:
       pc_dead_med: [42, 21]
       pc_dead_small: [45, 21]
       pc_dead_large: [48, 21]
+      wings_of_xel: [51, 21]
       
       helm_plate02: [30, 24]
       helm_plate03: [33, 24]

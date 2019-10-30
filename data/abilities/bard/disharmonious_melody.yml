@@ -3,6 +3,8 @@ name: "Disharmonious Melody"
 icon: abilities/disharmonious_melody
 description: |
   You create a melody that sticks out and distracts from the rest of your song, yet somehow without detracting from it.  All hostiles in the area of your bard song suffer accuracy and will penalties.
+  
+  Each melody costs an additional 1 AP to maintain per round, beyond the normal cost of the bardsong.
 active:
   script: "disharmonious_melody"
   group: "Melodies"

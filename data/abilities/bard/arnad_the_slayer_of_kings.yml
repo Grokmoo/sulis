@@ -4,7 +4,7 @@ icon: abilities/arnad_the_slayer_of_kings
 description: |
   Arnad was mighty warrior from Ajanta during the civil war known as the Rule of the Fifty Kings.  He famously led a charge during that war's largest battle, personally killing at least two of the so-called kings.
   
-  This verse provides a large damage bonus to nearby alies for a short period of time.
+  This verse provides a large damage bonus to nearby allies for a short period of time.
 active:
   script: "arnad_the_slayer_of_kings"
   group: "Verses"
@@ -12,6 +12,9 @@ active:
   duration:
     Rounds: 2
   cooldown: 4
+  class_stats:
+    bard:
+      Inspiration: 10
   combat_only: true
   requires_active_mode: song_of_heroes
   ai:
@@ -21,3 +24,5 @@ active:
     range: Short
   short_description: |
     Provide a damage boost to allies.
+prereqs:
+  abilities: [ song_of_heroes ]

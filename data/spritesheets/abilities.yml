@@ -190,6 +190,7 @@ groups:
       yanrick_the_slow: [12, 12]
       the_trolls_of_shelsham_woods: [13, 12]
       the_endurance_of_durad_vinsen: [14, 12]
+      the_sciedan_sun: [15, 12]
       
       backstab: [0, 13]
       smoke_bomb: [1, 13]
@@ -199,6 +200,9 @@ groups:
       backstab_mastery: [5, 13]
       zealous_caster: [6, 13]
       armored_casting: [7, 13]
+      wings_of_xel: [8, 13]
+      winged_leap: [9, 13]
+      the_shield_of_rinly: [10, 13]
       
       deadly_caster: [0, 14]
       ice_master: [1, 14]

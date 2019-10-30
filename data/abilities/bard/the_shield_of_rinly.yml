@@ -1,0 +1,30 @@
+id: the_shield_of_rinly
+name: "The Shield of Rinly"
+icon: abilities/the_shield_of_rinly
+description: |
+  Rinly was a champion and defender of the coastal city of Pard.  When the city was attacked by a fleet of pirates, it was Rinly and his faithful shield who almost singlehandedly held off their advance past the docks for almost an entire night.  While Rinly lost his life, countless others escaped because of his actions.
+  
+  Nearby allies gain a damage shield effect which absorbs all damage taken by the character, up to a limit based on the Bard's caster strength.
+active:
+  script: "the_shield_of_rinly"
+  group: "Verses"
+  ap: 2000
+  duration:
+    Rounds: 3
+  cooldown: 4
+  class_stats:
+    bard:
+      Inspiration: 40
+  combat_only: true
+  requires_active_mode: song_of_survival
+  ai:
+    priority: 10
+    kind: Buff
+    group: Multiple
+    range: Short
+  short_description: |
+    Nearby allies gain a shield which absorbs damage.
+prereqs:
+  abilities: [ song_of_survival ]
+  levels:
+    bard: 10

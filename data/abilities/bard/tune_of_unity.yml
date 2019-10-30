@@ -3,6 +3,8 @@ name: "Tune of Unity"
 icon: abilities/tune_of_unity
 description: |
   You add a melody into your bardsong, bolstering allied cooperation.  Allies are more easily able to flank opponents as long as they remain in the area of the bardsong.  They also gain bonus initiative and ignore some concealment on hostiles.
+  
+  Each melody costs an additional 1 AP to maintain per round, beyond the normal cost of the bardsong.
 active:
   script: "tune_of_unity"
   group: "Melodies"

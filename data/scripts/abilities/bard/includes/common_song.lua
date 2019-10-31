@@ -20,7 +20,8 @@ function on_deactivate(parent, ability)
   ability:deactivate(parent)
 
   -- deactivate any currently active melodies along with the main song
-  melodies = { "funeral_dirge", "disharmonious_melody" }
+  melodies = { "tune_of_unity", "theme_of_slaughter", "inconspicuous_melody", "stalwart_tune",
+    "disharmonious_melody", "funeral_dirge" }
   for i = 1, #melodies do
 	local melody_ability = parent:get_ability(melodies[i])
 	if melody_ability ~= nil then

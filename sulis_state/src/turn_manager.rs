@@ -32,8 +32,7 @@ fn add_campaign_elapsed_callback(cbs: &mut Vec<Rc<CallbackData>>) {
     let player = GameState::player();
 
     let mut cb = CallbackData::new_trigger(player.borrow().index(), script_data.id);
-    cb.add_func(FuncKind::OnRoundElapsed, script_data.func)
-        .unwrap();
+    cb.add_func(FuncKind::OnRoundElapsed, script_data.func);
 
     cbs.push(Rc::new(cb));
 }
@@ -149,6 +148,7 @@ impl TurnManager {
         self.entities.clear();
         self.effects.clear();
         self.surfaces.clear();
+        self.auras.clear();
         self.effects_remove_next_update.clear();
         self.triggered_cbs_next_update.clear();
         self.combat_active = false;
@@ -670,6 +670,7 @@ impl TurnManager {
                 None => continue,
                 Some(ref entity) => entity,
             };
+
             let mut entity = entity.borrow_mut();
 
             entity.set_ai_active(false);
@@ -679,6 +680,17 @@ impl TurnManager {
             }
 
             entity.actor.end_encounter();
+
+            // end any combat-only modes
+            for (id, state) in &entity.actor.ability_states {
+                if !state.combat_only { continue; }
+                if !state.is_active_mode() { continue; }
+
+                let mut cb = CallbackData::new_ability(entity.index(), id);
+                cb.add_func(FuncKind::OnDeactivated, "on_deactivate".to_string());
+                let cb = TriggeredCallback::new(Rc::new(cb), FuncKind::OnDeactivated);
+                self.triggered_cbs_next_update.push(cb);
+            }
         }
 
         self.add_millis(ROUND_TIME_MILLIS);

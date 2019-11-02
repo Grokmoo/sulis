@@ -555,9 +555,7 @@ fn show_menu(widget: &Rc<RefCell<Widget>>, data: &on_trigger::MenuData) {
         Kind::Entity => CallbackData::new_entity(data.cb_parent),
         Kind::Script(id) => CallbackData::new_trigger(data.cb_parent, id.to_string()),
     };
-    script_cb
-        .add_func(FuncKind::OnMenuSelect, data.cb_func.to_string())
-        .unwrap();
+    script_cb.add_func(FuncKind::OnMenuSelect, data.cb_func.to_string());
 
     let window = ScriptMenu::new(script_cb, data.title.to_string(), data.choices.clone());
     let widget = Widget::with_defaults(window);

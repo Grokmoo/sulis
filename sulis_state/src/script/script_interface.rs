@@ -492,7 +492,7 @@ impl UserData for ScriptInterface {
                 let player = GameState::player();
                 let parent = player.borrow().index();
                 let mut cb_data = CallbackData::new_trigger(parent, script);
-                cb_data.add_func(FuncKind::OnAnimComplete, func)?;
+                cb_data.add_func(FuncKind::OnAnimComplete, func);
 
                 let mut anim = Anim::new_non_blocking_wait(&player, (delay * 1000.0) as u32);
                 anim.add_completion_callback(Box::new(cb_data));

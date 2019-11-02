@@ -502,10 +502,17 @@ impl WidgetKind for AbilityButton {
     fn on_mouse_release(&mut self, widget: &Rc<RefCell<Widget>>, kind: event::ClickKind) -> bool {
         self.super_on_mouse_release(widget, kind);
 
-        if self.entity.borrow().actor.can_activate(&self.ability.id) {
-            Script::ability_on_activate(&self.entity, &self.ability);
-        } else if self.entity.borrow().actor.can_toggle(&self.ability.id) {
-            Script::ability_on_deactivate(&self.entity, &self.ability);
+        let can_activate = self.entity.borrow().actor.can_activate(&self.ability.id);
+        if can_activate {
+            let index = self.entity.borrow().index();
+            Script::ability_on_activate(index, &self.ability);
+            return true;
+        }
+
+        let can_toggle = self.entity.borrow().actor.can_toggle(&self.ability.id);
+        if can_toggle {
+            let index = self.entity.borrow().index();
+            Script::ability_on_deactivate(index, &self.ability);
         }
 
         true

@@ -23,8 +23,8 @@ use std::result;
 use rlua::{UserData, UserDataMethods};
 
 use crate::script::{
-    script_entity, Result, ScriptActiveSurface, ScriptAppliedEffect, ScriptEntity, ScriptEntitySet,
-    ScriptItemKind, ScriptMenuSelection,
+    script_entity, ScriptActiveSurface, ScriptAppliedEffect, ScriptEntity,
+    ScriptEntitySet, ScriptItemKind, ScriptMenuSelection,
 };
 use crate::{EntityState, GameState, Script};
 use sulis_core::util::invalid_data_error;
@@ -74,6 +74,24 @@ pub fn fire_cbs(cbs: Vec<TriggeredCallback>) {
             FuncKind::OnMoved => cb.on_moved(),
             FuncKind::OnRoundElapsed => cb.on_round_elapsed(),
             FuncKind::OnSurfaceRoundElapsed => cb.on_surface_round_elapsed(),
+            FuncKind::OnActivated => {
+                match &cb.kind {
+                    Kind::Ability(id) => {
+                        let ability = Module::ability(id).unwrap();
+                        Script::ability_on_activate(cb.parent, &ability);
+                    },
+                    _ => warn!("OnActivated called with invalid callback kind."),
+                }
+            },
+            FuncKind::OnDeactivated => {
+                match &cb.kind {
+                    Kind::Ability(id) => {
+                        let ability = Module::ability(id).unwrap();
+                        Script::ability_on_deactivate(cb.parent, &ability);
+                    },
+                    _ => warn!("OnDeactivated called with invalid callback kind."),
+                }
+            },
             _ => {
                 warn!("Surface callback of kind {:?} is not being called.", func);
             }
@@ -146,6 +164,12 @@ pub enum FuncKind {
 
     /// Called when an entity exits a surface
     OnExitedSurface,
+
+    /// Called when an ability is activated
+    OnActivated,
+
+    /// Called whena an ability mode is deactivated
+    OnDeactivated,
 }
 
 /// A trait representing a callback that will fire a script when called.  In lua scripts,
@@ -337,9 +361,8 @@ impl CallbackData {
         self.effect = Some(index);
     }
 
-    pub fn add_func(&mut self, kind: FuncKind, name: String) -> Result<()> {
+    pub fn add_func(&mut self, kind: FuncKind, name: String) {
         self.funcs.insert(kind, name);
-        Ok(())
     }
 
     fn create_targets_if_missing(&mut self) {
@@ -713,52 +736,68 @@ impl UserData for CallbackData {
         });
 
         methods.add_method_mut("set_on_effect_applied_fn", |_, cb, func: String| {
-            cb.add_func(FuncKind::OnEffectApplied, func)
+            cb.add_func(FuncKind::OnEffectApplied, func);
+            Ok(())
         });
         methods.add_method_mut("set_on_menu_select_fn", |_, cb, func: String| {
-            cb.add_func(FuncKind::OnMenuSelect, func)
+            cb.add_func(FuncKind::OnMenuSelect, func);
+            Ok(())
         });
         methods.add_method_mut("set_on_removed_fn", |_, cb, func: String| {
-            cb.add_func(FuncKind::OnRemoved, func)
+            cb.add_func(FuncKind::OnRemoved, func);
+            Ok(())
         });
         methods.add_method_mut("set_on_damaged_fn", |_, cb, func: String| {
-            cb.add_func(FuncKind::OnDamaged, func)
+            cb.add_func(FuncKind::OnDamaged, func);
+            Ok(())
         });
         methods.add_method_mut("set_before_attack_fn", |_, cb, func: String| {
-            cb.add_func(FuncKind::BeforeAttack, func)
+            cb.add_func(FuncKind::BeforeAttack, func);
+            Ok(())
         });
         methods.add_method_mut("set_after_attack_fn", |_, cb, func: String| {
-            cb.add_func(FuncKind::AfterAttack, func)
+            cb.add_func(FuncKind::AfterAttack, func);
+            Ok(())
         });
         methods.add_method_mut("set_before_defense_fn", |_, cb, func: String| {
-            cb.add_func(FuncKind::BeforeDefense, func)
+            cb.add_func(FuncKind::BeforeDefense, func);
+            Ok(())
         });
         methods.add_method_mut("set_after_defense_fn", |_, cb, func: String| {
-            cb.add_func(FuncKind::AfterDefense, func)
+            cb.add_func(FuncKind::AfterDefense, func);
+            Ok(())
         });
         methods.add_method_mut("set_on_anim_update_fn", |_, cb, func: String| {
-            cb.add_func(FuncKind::OnAnimUpdate, func)
+            cb.add_func(FuncKind::OnAnimUpdate, func);
+            Ok(())
         });
         methods.add_method_mut("set_on_anim_complete_fn", |_, cb, func: String| {
-            cb.add_func(FuncKind::OnAnimComplete, func)
+            cb.add_func(FuncKind::OnAnimComplete, func);
+            Ok(())
         });
         methods.add_method_mut("set_on_round_elapsed_fn", |_, cb, func: String| {
-            cb.add_func(FuncKind::OnRoundElapsed, func)
+            cb.add_func(FuncKind::OnRoundElapsed, func);
+            Ok(())
         });
         methods.add_method_mut("set_on_moved_fn", |_, cb, func: String| {
-            cb.add_func(FuncKind::OnMoved, func)
+            cb.add_func(FuncKind::OnMoved, func);
+            Ok(())
         });
         methods.add_method_mut("set_on_surface_round_elapsed_fn", |_, cb, func: String| {
-            cb.add_func(FuncKind::OnSurfaceRoundElapsed, func)
+            cb.add_func(FuncKind::OnSurfaceRoundElapsed, func);
+            Ok(())
         });
         methods.add_method_mut("set_on_moved_in_surface_fn", |_, cb, func: String| {
-            cb.add_func(FuncKind::OnMovedInSurface, func)
+            cb.add_func(FuncKind::OnMovedInSurface, func);
+            Ok(())
         });
         methods.add_method_mut("set_on_entered_surface_fn", |_, cb, func: String| {
-            cb.add_func(FuncKind::OnEnteredSurface, func)
+            cb.add_func(FuncKind::OnEnteredSurface, func);
+            Ok(())
         });
         methods.add_method_mut("set_on_exited_surface_fn", |_, cb, func: String| {
-            cb.add_func(FuncKind::OnExitedSurface, func)
+            cb.add_func(FuncKind::OnExitedSurface, func);
+            Ok(())
         });
     }
 }

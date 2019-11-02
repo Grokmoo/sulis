@@ -156,20 +156,26 @@ where
     exec_func(&script, func, (parent, item, targets, arg))
 }
 
-pub fn ability_on_activate(parent: &Rc<RefCell<EntityState>>, ability: &Rc<Ability>) -> Result<()> {
-    let t: Option<usize> = None;
-    ability_script(
-        parent,
-        ability,
-        ScriptEntitySet::new(parent, &Vec::new()),
-        t,
-        "on_activate",
-    )
+pub fn ability_on_activate(parent: usize, ability: &Rc<Ability>) -> Result<()> {
+    let script = get_ability_script_id(ability)?;
+    let parent = ScriptEntity::new(parent);
+    let ability = ScriptAbility::from(ability);
+    exec_func(&script, "on_activate", (parent, ability))
 }
 
-pub fn ability_on_deactivate(parent: &Rc<RefCell<EntityState>>, ability: &Rc<Ability>) -> Result<()> {
-    let t: Option<usize> = None;
-    ability_script(parent, ability, ScriptEntitySet::new(parent, &Vec::new()), t, "on_deactivate")
+pub fn ability_on_deactivate(parent: usize, ability: &Rc<Ability>) -> Result<()> {
+    let script_parent = ScriptEntity::new(parent).try_unwrap()?;
+    match script_parent.borrow().actor.ability_states.get(&ability.id) {
+        None => return Ok(()),
+        Some(state) => {
+            if !state.is_active_mode() { return Ok(()); }
+        }
+    }
+
+    let script = get_ability_script_id(ability)?;
+    let parent = ScriptEntity::new(parent);
+    let ability = ScriptAbility::from(ability);
+    exec_func(&script, "on_deactivate", (parent, ability))
 }
 
 pub fn ability_on_target_select(

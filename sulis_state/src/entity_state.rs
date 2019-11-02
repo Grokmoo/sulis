@@ -201,7 +201,7 @@ impl EntityState {
             let mut cbs = CallbackData::new_entity(self.index);
             for (kind, func) in ai.hooks.iter() {
                 let func = func.to_string();
-                let result = match kind {
+                match kind {
                     ai::FuncKind::OnDamaged => cbs.add_func(script::FuncKind::OnDamaged, func),
                     ai::FuncKind::BeforeAttack => {
                         cbs.add_func(script::FuncKind::BeforeAttack, func)
@@ -213,8 +213,7 @@ impl EntityState {
                     ai::FuncKind::OnRoundElapsed => {
                         cbs.add_func(script::FuncKind::OnRoundElapsed, func)
                     }
-                };
-                result.unwrap();
+                }
             }
             self.ai_callbacks = Some(Rc::new(cbs));
         }

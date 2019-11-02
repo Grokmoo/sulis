@@ -51,7 +51,10 @@ function on_activate(parent, ability)
 end
 
 function on_deactivate(parent, ability)
-  ability:deactivate(parent)
+  -- guard against double call since this is called from the common_song script
+  if ability:is_active_mode(parent) then
+    ability:deactivate(parent)
+  end
 end
 
 function on_entered(parent, ability, targets)

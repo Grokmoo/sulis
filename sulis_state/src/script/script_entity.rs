@@ -730,7 +730,8 @@ impl UserData for ScriptEntity {
                         return Ok(false);
                     }
                 }
-                Script::ability_on_activate(&parent, &ability.to_ability());
+                let index = parent.borrow().index();
+                Script::ability_on_activate(index, &ability.to_ability());
                 Ok(true)
             },
         );

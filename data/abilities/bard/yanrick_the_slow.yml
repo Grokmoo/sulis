@@ -25,4 +25,4 @@ active:
   short_description: |
     Lowers the movement speed of nearby hostiles.
 prereqs:
-  abilities: [ song_of_heroes ]
+  abilities: [ song_of_curses ]

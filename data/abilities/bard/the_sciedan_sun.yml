@@ -25,6 +25,6 @@ active:
   short_description: |
     Hostiles suffer increased vulnerability to fire, piercing, and shock damage.
 prereqs:
-  abilities: [ song_of_heroes ]
+  abilities: [ song_of_curses ]
   levels:
     bard: 5

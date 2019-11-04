@@ -21,7 +21,7 @@ function open_bridge(parent)
   game:toggle_prop_at(34, 39)
   game:toggle_prop_at(34, 41)
   local guard02 = game:entity_with_id("guard02")
-  if not guard02:move_towards_point(36, 41) then
+  if not guard02:move_towards_point(38, 41) then
     game:warn("guard02 unable to move")
   end
   

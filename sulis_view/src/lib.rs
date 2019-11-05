@@ -19,6 +19,9 @@ extern crate sulis_core;
 #[macro_use]
 extern crate log;
 
+mod area_overlay_handler;
+pub use self::area_overlay_handler::AreaOverlayHandler;
+
 mod abilities_bar;
 pub use self::abilities_bar::AbilitiesBar;
 

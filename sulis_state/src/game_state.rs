@@ -1311,7 +1311,7 @@ impl GameState {
     pub fn can_move_towards(
         entity: &Rc<RefCell<EntityState>>,
         target: &Rc<RefCell<EntityState>>,
-    ) -> bool {
+    ) -> Option<Vec<Point>> {
         let (x, y, dist) = GameState::get_target(entity, target);
         GameState::can_move_towards_point(entity, Vec::new(), x, y, dist)
     }
@@ -1324,7 +1324,7 @@ impl GameState {
         GameState::move_towards_point(entity, Vec::new(), x, y, dist, None)
     }
 
-    pub fn can_move_to(entity: &Rc<RefCell<EntityState>>, x: i32, y: i32) -> bool {
+    pub fn can_move_to(entity: &Rc<RefCell<EntityState>>, x: i32, y: i32) -> Option<Vec<Point>> {
         GameState::can_move_towards_point(entity, Vec::new(), x as f32, y as f32, MOVE_TO_THRESHOLD)
     }
 
@@ -1411,14 +1411,14 @@ impl GameState {
         x: f32,
         y: f32,
         dist: f32,
-    ) -> bool {
+    ) -> Option<Vec<Point>> {
         if entity.borrow().actor.stats.move_disabled {
-            return false;
+            return None;
         }
 
         // if entity cannot move even 1 square
         if entity.borrow().actor.ap() < entity.borrow().actor.get_move_ap_cost(1) {
-            return false;
+            return None;
         }
 
         STATE.with(|s| {
@@ -1427,7 +1427,7 @@ impl GameState {
             let area_state = state.area_state.borrow();
 
             let start_time = time::Instant::now();
-            let val = match find_path(
+            let val = find_path(
                 &mut state.path_finder,
                 &area_state,
                 &entity.borrow(),
@@ -1435,10 +1435,7 @@ impl GameState {
                 x,
                 y,
                 dist,
-            ) {
-                None => false,
-                Some(_) => true,
-            };
+            );
             trace!(
                 "Path finding complete in {} secs",
                 util::format_elapsed_secs(start_time.elapsed())

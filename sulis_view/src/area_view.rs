@@ -38,16 +38,7 @@ use sulis_module::{
 use sulis_state::{area_feedback_text, area_state::PCVisRedraw, RangeIndicatorImageSet};
 use sulis_state::{AreaDrawable, AreaState, EntityState, EntityTextureCache, GameState};
 
-use crate::{action_kind, window_fade, AreaMouseover, WindowFade};
-
-struct HoverSprite {
-    pub sprite: Rc<Sprite>,
-    pub x: i32,
-    pub y: i32,
-    pub w: i32,
-    pub h: i32,
-    pub left_click_action_valid: bool,
-}
+use crate::{action_kind, window_fade, WindowFade, AreaOverlayHandler};
 
 const NAME: &'static str = "area";
 
@@ -60,18 +51,14 @@ pub struct AreaView {
     targeter_label: Rc<RefCell<Widget>>,
     targeter_tile: Option<Rc<dyn Image>>,
     range_indicator_image_set: Option<RangeIndicatorImageSet>,
-    selection_box_image: Option<Rc<dyn Image>>,
 
     scroll: Scrollable,
-    hover_sprite: Option<HoverSprite>,
-    selection_box_start: Option<(f32, f32)>,
     active_entity: Option<Rc<RefCell<EntityState>>>,
     feedback_text_params: area_feedback_text::Params,
 
-    area_mouseover: Option<Rc<RefCell<AreaMouseover>>>,
-    area_mouseover_widget: Option<Rc<RefCell<Widget>>>,
-
     scroll_target: Option<(f32, f32)>,
+
+    overlay_handler: AreaOverlayHandler,
 }
 
 const TILE_CACHE_TEXTURE_SIZE: u32 = 2048;
@@ -88,7 +75,6 @@ impl AreaView {
         Rc::new(RefCell::new(AreaView {
             targeter_label: Widget::with_theme(Label::empty(), "targeter_label"),
             scale: (1.0, 1.0),
-            hover_sprite: None,
             cache_invalid: true,
             entity_texture_cache: EntityTextureCache::new(
                 ENTITY_TEX_ID,
@@ -99,14 +85,24 @@ impl AreaView {
             scroll: Scrollable::new(),
             targeter_tile: None,
             range_indicator_image_set: None,
-            selection_box_image: None,
-            selection_box_start: None,
             active_entity: None,
             feedback_text_params: area_feedback_text::Params::default(),
-            area_mouseover: None,
-            area_mouseover_widget: None,
             scroll_target: None,
+            overlay_handler: AreaOverlayHandler::new(),
         }))
+    }
+
+    pub fn clear_mouse_state(&mut self) {
+        self.overlay_handler.clear_mouse_state();
+    }
+
+    pub fn clear_area_mouseover(&mut self) {
+        self.overlay_handler.clear_area_mouseover();
+    }
+
+    pub fn update_cursor_and_hover(&mut self, widget: &Rc<RefCell<Widget>>) {
+        let (x, y) = self.get_cursor_pos(widget);
+        self.overlay_handler.update_cursor_and_hover(widget, x, y);
     }
 
     pub fn center_scroll_on(
@@ -429,209 +425,6 @@ impl AreaView {
         renderer.draw(draw_list);
     }
 
-    fn get_selection_box_coords(&self) -> Option<(f32, f32, f32, f32)> {
-        if let Some((x, y)) = self.selection_box_start {
-            let (x2, y2) = Cursor::get_position_f32();
-            let x_start;
-            let y_start;
-            let x_end;
-            let y_end;
-            if x > x2 {
-                x_start = x2;
-                x_end = x;
-            } else {
-                x_start = x;
-                x_end = x2;
-            }
-            if y > y2 {
-                y_start = y2;
-                y_end = y;
-            } else {
-                y_start = y;
-                y_end = y2;
-            }
-
-            return Some((x_start, y_start, x_end, y_end));
-        }
-
-        None
-    }
-
-    fn select_party_in_box(&self, widget: &Widget) -> Vec<Rc<RefCell<EntityState>>> {
-        let mut party = Vec::new();
-
-        let (x, y, x_end, y_end) = match self.get_selection_box_coords() {
-            None => return party,
-            Some((x, y, x2, y2)) => (x, y, x2, y2),
-        };
-
-        let pos = widget.state.inner_position();
-        let x1 = ((x - pos.x as f32) / self.scale.0 + self.scroll.x()) as i32;
-        let y1 = ((y - pos.y as f32) / self.scale.1 + self.scroll.y()) as i32;
-        let x2 = ((x_end - pos.x as f32) / self.scale.0 + self.scroll.x()) as i32;
-        let y2 = ((y_end - pos.y as f32) / self.scale.1 + self.scroll.y()) as i32;
-
-        for entity in GameState::party().iter() {
-            let loc = &entity.borrow().location;
-            let size = &entity.borrow().size;
-
-            if loc.x >= x2 || x1 >= loc.x + size.width {
-                continue;
-            } else if loc.y >= y2 || y1 >= loc.y + size.height {
-                continue;
-            }
-
-            party.push(Rc::clone(entity));
-        }
-
-        party
-    }
-
-    fn check_mouseover(&self, x: i32, y: i32) -> Option<Rc<RefCell<AreaMouseover>>> {
-        let area_state = GameState::area_state();
-        let targeter = area_state.borrow_mut().targeter();
-
-        if let Some(ref targeter) = targeter {
-            let mut targeter = targeter.borrow_mut();
-            let mouse_over = targeter.on_mouse_move(x, y);
-
-            if let Some(ref entity) = mouse_over {
-                return Some(AreaMouseover::new_entity(entity));
-            } else {
-                return None;
-            }
-        }
-
-        let area_state = area_state.borrow();
-        if let Some(entity) = area_state.get_entity_at(x, y) {
-            Some(AreaMouseover::new_entity(&entity))
-        } else if let Some(_) = self.check_closed_door(x, y, &area_state) {
-            None
-        } else if let Some(transition) = area_state.get_transition_at(x, y) {
-            Some(AreaMouseover::new_transition(&transition.hover_text))
-        } else if let Some(index) = area_state.prop_index_at(x, y) {
-            let interactive = {
-                let prop = area_state.get_prop(index);
-                (prop.is_container() || prop.is_hover()) && prop.is_enabled()
-            };
-
-            if interactive {
-                Some(AreaMouseover::new_prop(index))
-            } else {
-                None
-            }
-        } else {
-            None
-        }
-    }
-
-    fn check_closed_door(
-        &self,
-        x: i32,
-        y: i32,
-        area_state: &AreaState,
-    ) -> Option<Rc<RefCell<AreaMouseover>>> {
-        if let Some(index) = area_state.prop_index_at(x, y) {
-            {
-                let prop = area_state.get_prop(index);
-                if !prop.is_door() || prop.is_active() {
-                    return None;
-                }
-            }
-
-            Some(AreaMouseover::new_prop(index))
-        } else {
-            None
-        }
-    }
-
-    fn set_cursor(&mut self, x: f32, y: f32) {
-        let action = action_kind::get_action(x, y);
-        Cursor::set_cursor_state(action.cursor_state());
-        match action.get_hover_info() {
-            Some((size, x, y)) => {
-                let hover_sprite = HoverSprite {
-                    sprite: Rc::clone(&size.cursor_sprite),
-                    x,
-                    y,
-                    w: size.width,
-                    h: size.height,
-                    left_click_action_valid: true,
-                };
-                self.hover_sprite = Some(hover_sprite);
-            }
-            None => {
-                self.hover_sprite = None;
-            }
-        }
-    }
-
-    pub fn update_cursor_and_hover(&mut self, widget: &Rc<RefCell<Widget>>) {
-        let area_state = GameState::area_state();
-
-        self.hover_sprite = None;
-
-        if let Some(_) = self.selection_box_start {
-            Cursor::set_cursor_state(animation_state::Kind::Normal);
-            return;
-        }
-
-        let (area_x, area_y) = self.get_cursor_pos(widget);
-        match self.check_mouseover(area_x as i32, area_y as i32) {
-            None => {
-                self.clear_area_mouseover();
-            }
-            Some(mouseover) => {
-                let (clear, set_new) = if let Some(ref cur_mouseover) = self.area_mouseover {
-                    if *cur_mouseover.borrow() == *mouseover.borrow() {
-                        (false, false)
-                    } else {
-                        (true, true)
-                    }
-                } else {
-                    (false, true)
-                };
-
-                if clear {
-                    self.clear_area_mouseover();
-                }
-                if set_new {
-                    self.set_new_mouseover(widget, mouseover);
-                }
-            }
-        };
-
-        if area_state.borrow_mut().targeter().is_none() {
-            self.set_cursor(area_x, area_y);
-        }
-    }
-
-    fn set_new_mouseover(
-        &mut self,
-        parent: &Rc<RefCell<Widget>>,
-        mouseover: Rc<RefCell<AreaMouseover>>,
-    ) {
-        self.area_mouseover = Some(Rc::clone(&mouseover));
-        let widget = Widget::with_defaults(mouseover);
-        self.area_mouseover_widget = Some(Rc::clone(&widget));
-
-        let root = Widget::get_root(parent);
-        Widget::add_child_to(&root, widget);
-    }
-
-    pub fn clear_area_mouseover(&mut self) {
-        if let Some(ref widget) = self.area_mouseover_widget {
-            widget.borrow_mut().mark_for_removal();
-
-            // prevent from double drawing if we end up creating
-            // a new mouseover on this frame
-            widget.borrow_mut().state.set_visible(false);
-        }
-
-        self.area_mouseover = None;
-        self.area_mouseover_widget = None;
-    }
-
     pub fn scroll(&mut self, delta_x: f32, delta_y: f32, millis: u32) {
         let speed = Config::scroll_speed() * millis as f32 / 33.0;
         let delta_x = speed * delta_x / self.scale.0;
@@ -641,13 +434,6 @@ impl AreaView {
 
     pub fn set_active_entity(&mut self, entity: Option<Rc<RefCell<EntityState>>>) {
         self.active_entity = entity;
-    }
-
-    pub fn clear_mouse_state(&mut self) {
-        self.hover_sprite = None;
-        self.selection_box_start = None;
-        Cursor::set_cursor_state(animation_state::Kind::Normal);
-        self.clear_area_mouseover();
     }
 }
 
@@ -698,12 +484,10 @@ impl WidgetKind for AreaView {
         let image_set = RangeIndicatorImageSet::new(selection_prefix.to_string());
         self.range_indicator_image_set = Some(image_set);
 
+        self.overlay_handler.apply_theme(theme);
+
         if let Some(ref image_id) = theme.custom.get("targeter_tile") {
             self.targeter_tile = ResourceSet::image(image_id);
-        }
-
-        if let Some(ref image_id) = theme.custom.get("selection_box_image") {
-            self.selection_box_image = ResourceSet::image(image_id);
         }
 
         self.feedback_text_params.scale = theme.get_custom_or_default("feedback_text_scale", 1.0);
@@ -768,7 +552,7 @@ impl WidgetKind for AreaView {
 
     fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         info!("Adding area to widget tree");
-        self.hover_sprite = None;
+        self.overlay_handler = AreaOverlayHandler::new();
 
         let area_state = GameState::area_state();
         let area = &area_state.borrow().area;
@@ -962,6 +746,13 @@ impl WidgetKind for AreaView {
             renderer.draw(draw_list);
         }
 
+        if let Some(mut draw_list) = self.overlay_handler
+            .get_path_draw_list(self.scroll.x(), self.scroll.y(), millis) {
+
+            draw_list.set_scale(scale_x, scale_y);
+            renderer.draw(draw_list);
+        }
+
         let mut draw_list = DrawList::empty_sprite();
         for transition in state.area.transitions.iter() {
             draw_list.set_scale(scale_x, scale_y);
@@ -988,7 +779,9 @@ impl WidgetKind for AreaView {
                 self.draw_selection(&selected, renderer, scale_x, scale_y, widget, millis);
             }
 
-            for entity in self.select_party_in_box(widget).iter() {
+            let scroll = (self.scroll.x(), self.scroll.y());
+            let party = self.overlay_handler.select_party_in_box(widget, self.scale, scroll);
+            for entity in party.iter() {
                 self.draw_selection(&entity, renderer, scale_x, scale_y, widget, millis);
             }
         }
@@ -1013,7 +806,7 @@ impl WidgetKind for AreaView {
             area_color,
         );
 
-        if let Some(ref hover) = self.hover_sprite {
+        if let Some(ref hover) = self.overlay_handler.hover_sprite() {
             let mut draw_list = DrawList::from_sprite_f32(
                 &hover.sprite,
                 (hover.x + p.x) as f32 - self.scroll.x(),
@@ -1059,28 +852,7 @@ impl WidgetKind for AreaView {
             );
         }
 
-        if let Some(ref image) = self.selection_box_image {
-            if let Some((x, y, x_end, y_end)) = self.get_selection_box_coords() {
-                let w = x_end - x;
-                let h = y_end - y;
-
-                if w < 1.0 || h < 1.0 {
-                    return;
-                }
-
-                let mut draw_list = DrawList::empty_sprite();
-                image.append_to_draw_list(
-                    &mut draw_list,
-                    &animation_state::NORMAL,
-                    x,
-                    y,
-                    w,
-                    h,
-                    millis,
-                );
-                renderer.draw(draw_list);
-            }
-        }
+        self.overlay_handler.draw_top(renderer, millis);
 
         for feedback_text in state.feedback_text_iter() {
             feedback_text.draw(
@@ -1116,33 +888,19 @@ impl WidgetKind for AreaView {
                 _ => (),
             }
         } else {
-            let mut fire_action = false;
-            match kind {
-                ClickKind::Left => {
-                    if let Some((x, y, x_end, y_end)) = self.get_selection_box_coords() {
-                        let w = x_end - x;
-                        let h = y_end - y;
-                        if w < 1.0 && h < 1.0 {
-                            fire_action = true;
-                        } else {
-                            GameState::select_party_members(
-                                self.select_party_in_box(&widget.borrow()),
-                            );
-                        }
-                        self.selection_box_start = None;
-                    } else {
-                        fire_action = true;
-                    }
-                }
-                _ => (),
-            }
+            let scroll = (self.scroll.x(), self.scroll.y());
+            let fire_action = match kind {
+                ClickKind::Left =>
+                    self.overlay_handler.handle_left_click(widget, self.scale, scroll),
+                _ => false,
+            };
 
             if fire_action {
                 let mut action = action_kind::get_action(x, y);
                 let clear_mouse_state = action.fire_action(widget);
 
                 if clear_mouse_state {
-                    self.clear_mouse_state();
+                    self.overlay_handler.clear_mouse_state();
                 }
             }
         }
@@ -1176,12 +934,7 @@ impl WidgetKind for AreaView {
                     return true;
                 }
 
-                match self.selection_box_start {
-                    None => {
-                        self.selection_box_start = Some(Cursor::get_position_f32());
-                    }
-                    Some(_) => (),
-                }
+                self.overlay_handler.handle_left_drag();
             }
             _ => (),
         }
@@ -1197,8 +950,7 @@ impl WidgetKind for AreaView {
 
     fn on_mouse_exit(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
         self.super_on_mouse_exit(widget);
-        self.hover_sprite = None;
-        self.selection_box_start = None;
+        self.overlay_handler.on_mouse_exit();
         true
     }
 }

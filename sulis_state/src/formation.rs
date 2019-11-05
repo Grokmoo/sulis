@@ -113,13 +113,13 @@ impl Formation {
 
             for dist_increase in 0..3 {
                 let dist = 0.6 + dist_increase as f32 * 1.0;
-                if !GameState::can_move_towards_point(
+                if GameState::can_move_towards_point(
                     &to_move[index],
                     entities_to_ignore.clone(),
                     x,
                     y,
                     dist,
-                ) {
+                ).is_none() {
                     continue;
                 }
 

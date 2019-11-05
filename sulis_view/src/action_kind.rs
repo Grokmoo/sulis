@@ -91,7 +91,7 @@ fn get_prop_or_transition_action(x: i32, y: i32) -> Option<Box<dyn ActionKind>> 
 pub trait ActionKind {
     fn cursor_state(&self) -> animation_state::Kind;
 
-    fn get_hover_info(&self) -> Option<(Rc<ObjectSize>, i32, i32)>;
+    fn get_hover_info(&self) -> Option<(Rc<ObjectSize>, i32, i32, Vec<(f32, f32)>)>;
 
     /// Fires the action for this ActionKind using the specified parent
     /// widget if needed.  Returns true if the method opens a window / modal
@@ -132,10 +132,10 @@ impl ActionKind for SelectAction {
         animation_state::Kind::MouseSelect
     }
 
-    fn get_hover_info(&self) -> Option<(Rc<ObjectSize>, i32, i32)> {
+    fn get_hover_info(&self) -> Option<(Rc<ObjectSize>, i32, i32, Vec<(f32, f32)>)> {
         let size = Rc::clone(&self.target.borrow().size);
         let point = self.target.borrow().location.to_point();
-        Some((size, point.x, point.y))
+        Some((size, point.x, point.y, Vec::new()))
     }
 
     fn fire_action(&mut self, _widget: &Rc<RefCell<Widget>>) -> bool {
@@ -201,10 +201,10 @@ impl ActionKind for DialogAction {
         animation_state::Kind::MouseDialog
     }
 
-    fn get_hover_info(&self) -> Option<(Rc<ObjectSize>, i32, i32)> {
+    fn get_hover_info(&self) -> Option<(Rc<ObjectSize>, i32, i32, Vec<(f32, f32)>)> {
         let size = Rc::clone(&self.target.borrow().size);
         let point = self.target.borrow().location.to_point();
-        Some((size, point.x, point.y))
+        Some((size, point.x, point.y, Vec::new()))
     }
 
     fn fire_action(&mut self, _widget: &Rc<RefCell<Widget>>) -> bool {
@@ -261,12 +261,12 @@ impl ActionKind for DoorPropAction {
         animation_state::Kind::MouseInteract
     }
 
-    fn get_hover_info(&self) -> Option<(Rc<ObjectSize>, i32, i32)> {
+    fn get_hover_info(&self) -> Option<(Rc<ObjectSize>, i32, i32, Vec<(f32, f32)>)> {
         let area_state = GameState::area_state();
         let area_state = area_state.borrow();
         let prop = area_state.get_prop(self.index);
         let point = prop.location.to_point();
-        Some((Rc::clone(&prop.prop.size), point.x, point.y))
+        Some((Rc::clone(&prop.prop.size), point.x, point.y, Vec::new()))
     }
 
     fn fire_action(&mut self, _widget: &Rc<RefCell<Widget>>) -> bool {
@@ -317,12 +317,12 @@ impl ActionKind for LootPropAction {
         animation_state::Kind::MouseLoot
     }
 
-    fn get_hover_info(&self) -> Option<(Rc<ObjectSize>, i32, i32)> {
+    fn get_hover_info(&self) -> Option<(Rc<ObjectSize>, i32, i32, Vec<(f32, f32)>)> {
         let area_state = GameState::area_state();
         let area_state = area_state.borrow();
         let prop = area_state.get_prop(self.index);
         let point = prop.location.to_point();
-        Some((Rc::clone(&prop.prop.size), point.x, point.y))
+        Some((Rc::clone(&prop.prop.size), point.x, point.y, Vec::new()))
     }
 
     fn fire_action(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
@@ -389,7 +389,7 @@ impl ActionKind for TransitionAction {
         animation_state::Kind::MouseTravel
     }
 
-    fn get_hover_info(&self) -> Option<(Rc<ObjectSize>, i32, i32)> {
+    fn get_hover_info(&self) -> Option<(Rc<ObjectSize>, i32, i32, Vec<(f32, f32)>)> {
         let area_state = GameState::area_state();
         let area_state = area_state.borrow();
         let transition = area_state.get_transition_at(self.x, self.y);
@@ -401,6 +401,7 @@ impl ActionKind for TransitionAction {
             Rc::clone(&transition.size),
             transition.from.x,
             transition.from.y,
+            Vec::new(),
         ))
     }
 
@@ -506,10 +507,10 @@ impl ActionKind for AttackAction {
         animation_state::Kind::MouseAttack
     }
 
-    fn get_hover_info(&self) -> Option<(Rc<ObjectSize>, i32, i32)> {
+    fn get_hover_info(&self) -> Option<(Rc<ObjectSize>, i32, i32, Vec<(f32, f32)>)> {
         let size = Rc::clone(&self.target.borrow().size);
         let point = self.target.borrow().location.to_point();
-        Some((size, point.x, point.y))
+        Some((size, point.x, point.y, Vec::new()))
     }
 
     fn fire_action(&mut self, _widget: &Rc<RefCell<Widget>>) -> bool {
@@ -594,7 +595,7 @@ impl ActionKind for MoveThenAction {
         false
     }
 
-    fn get_hover_info(&self) -> Option<(Rc<ObjectSize>, i32, i32)> {
+    fn get_hover_info(&self) -> Option<(Rc<ObjectSize>, i32, i32, Vec<(f32, f32)>)> {
         match self.cb_action {
             None => None,
             Some(ref action) => action.get_hover_info(),
@@ -607,6 +608,7 @@ struct MoveAction {
     y: f32,
     dist: f32,
     cb: Option<Box<dyn ScriptCallback>>,
+    path: Vec<Point>,
 }
 
 fn entities_to_ignore() -> Vec<usize> {
@@ -645,9 +647,11 @@ impl MoveAction {
 
         let selected = GameState::selected();
 
-        if !GameState::can_move_towards_point(&selected[0], entities_to_ignore(), x, y, dist) {
-            return None;
-        }
+        let path = match GameState::can_move_towards_point(&selected[0],
+            entities_to_ignore(), x, y, dist) {
+            None => return None,
+            Some(path) => path,
+        };
 
         Some(MoveAction {
             selected,
@@ -655,6 +659,7 @@ impl MoveAction {
             y,
             dist,
             cb: None,
+            path,
         })
     }
 
@@ -704,11 +709,18 @@ impl ActionKind for MoveAction {
         false
     }
 
-    fn get_hover_info(&self) -> Option<(Rc<ObjectSize>, i32, i32)> {
+    fn get_hover_info(&self) -> Option<(Rc<ObjectSize>, i32, i32, Vec<(f32, f32)>)> {
         let size = Rc::clone(&self.selected[0].borrow().size);
         let x = self.x as i32 - size.width / 2;
         let y = self.y as i32 - size.height / 2;
-        Some((size, x, y))
+
+        let path = self.path.iter().map(|p| {
+            let x = p.x as f32 + (size.width - 1) as f32 / 2.0;
+            let y = p.y as f32 + (size.height - 1) as f32 / 2.0;
+            (x, y)
+        }).collect();
+
+        Some((size, x, y, path))
     }
 }
 
@@ -723,7 +735,7 @@ impl ActionKind for InvalidAction {
         false
     }
 
-    fn get_hover_info(&self) -> Option<(Rc<ObjectSize>, i32, i32)> {
+    fn get_hover_info(&self) -> Option<(Rc<ObjectSize>, i32, i32, Vec<(f32, f32)>)> {
         None
     }
 }

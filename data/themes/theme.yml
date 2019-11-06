@@ -467,6 +467,9 @@ themes:
           feedback_icon_graze: gui/feedback_graze
           selection_box_image: "bg_selection_box"
           path_point_image: path_point
+          path_point_end_image: path_point_end
+          ap_hover_text_scale: "1.0"
+          ap_hover_text_color: FF0
         children:
           targeter_label:
             from: label

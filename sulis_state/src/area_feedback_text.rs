@@ -28,6 +28,8 @@ use sulis_module::DamageKind;
 pub struct Params {
     pub font: Rc<Font>,
     pub scale: f32,
+    pub ap_scale: f32,
+    pub ap_color: Color,
     pub info_color: Color,
     pub miss_color: Color,
     pub hit_color: Color,
@@ -48,6 +50,8 @@ impl Default for Params {
         Params {
             font: ResourceSet::default_font(),
             scale: 1.0,
+            ap_scale: 1.0,
+            ap_color: LIGHT_GRAY,
             info_color: LIGHT_GRAY,
             miss_color: LIGHT_GRAY,
             hit_color: RED,

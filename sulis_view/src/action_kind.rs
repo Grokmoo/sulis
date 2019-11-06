@@ -14,6 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::cmp;
 use std::cell::RefCell;
 use std::rc::Rc;
 
@@ -88,15 +89,84 @@ fn get_prop_or_transition_action(x: i32, y: i32) -> Option<Box<dyn ActionKind>> 
     TransitionAction::create_if_valid(x, y, &area_state)
 }
 
+pub struct ActionHoverInfo {
+    pub size: Rc<ObjectSize>,
+    pub x: i32,
+    pub y: i32,
+    pub path: Vec<(f32, f32)>,
+    pub ap: i32,
+    pub total_ap: i32,
+}
+
+impl ActionHoverInfo {
+    fn append(base: Option<ActionHoverInfo>,
+        append: Option<ActionHoverInfo>) -> Option<ActionHoverInfo> {
+        match base {
+            None => append,
+            Some(mut base) => {
+                if let Some(append) = append {
+                    base.total_ap = cmp::max(append.total_ap, base.total_ap);
+                    if base.ap + append.ap < base.total_ap {
+                        base.ap = base.ap + append.ap;
+                    } else {
+                        base.ap = append.ap;
+                    }
+                    base.path = append.path;
+                }
+                Some(base)
+            }
+        }
+    }
+
+    fn new(size: &Rc<ObjectSize>, point: Point) -> Option<ActionHoverInfo> {
+        Some(ActionHoverInfo {
+            size: Rc::clone(size),
+            x: point.x,
+            y: point.y,
+            path: Vec::new(),
+            ap: 0,
+            total_ap: 0,
+        })
+    }
+
+    fn with_ap(entity: &EntityState, point: Point, ap: i32) -> Option<ActionHoverInfo> {
+        Some(ActionHoverInfo {
+            size: Rc::clone(&entity.size),
+            x: point.x,
+            y: point.y,
+            path: Vec::new(),
+            ap,
+            total_ap: entity.actor.ap() as i32,
+        })
+    }
+
+    fn with_path(entity: &EntityState, point: Point,
+        path: &[(f32, f32)], ap: i32) -> Option<ActionHoverInfo> {
+
+        let size = Rc::clone(&entity.size);
+        Some(ActionHoverInfo {
+            size,
+            x: point.x,
+            y: point.y,
+            path: path.iter().map(|p| *p).collect(),
+            ap,
+            total_ap: entity.actor.ap() as i32,
+        })
+    }
+}
+
 pub trait ActionKind {
     fn cursor_state(&self) -> animation_state::Kind;
 
-    fn get_hover_info(&self) -> Option<(Rc<ObjectSize>, i32, i32, Vec<(f32, f32)>)>;
+    fn get_hover_info(&self) -> Option<ActionHoverInfo>;
 
     /// Fires the action for this ActionKind using the specified parent
     /// widget if needed.  Returns true if the method opens a window / modal
     /// that should clear the mouse state in the callee, false otherwise
     fn fire_action(&mut self, widget: &Rc<RefCell<Widget>>) -> bool;
+
+    /// Returns the amount of AP that this action will cost the parent to perform
+    fn ap(&self) -> i32 { 0 }
 }
 
 struct SelectAction {
@@ -132,10 +202,9 @@ impl ActionKind for SelectAction {
         animation_state::Kind::MouseSelect
     }
 
-    fn get_hover_info(&self) -> Option<(Rc<ObjectSize>, i32, i32, Vec<(f32, f32)>)> {
-        let size = Rc::clone(&self.target.borrow().size);
+    fn get_hover_info(&self) -> Option<ActionHoverInfo> {
         let point = self.target.borrow().location.to_point();
-        Some((size, point.x, point.y, Vec::new()))
+        ActionHoverInfo::new(&self.target.borrow().size, point)
     }
 
     fn fire_action(&mut self, _widget: &Rc<RefCell<Widget>>) -> bool {
@@ -201,10 +270,9 @@ impl ActionKind for DialogAction {
         animation_state::Kind::MouseDialog
     }
 
-    fn get_hover_info(&self) -> Option<(Rc<ObjectSize>, i32, i32, Vec<(f32, f32)>)> {
-        let size = Rc::clone(&self.target.borrow().size);
+    fn get_hover_info(&self) -> Option<ActionHoverInfo> {
         let point = self.target.borrow().location.to_point();
-        Some((size, point.x, point.y, Vec::new()))
+        ActionHoverInfo::new(&self.target.borrow().size, point)
     }
 
     fn fire_action(&mut self, _widget: &Rc<RefCell<Widget>>) -> bool {
@@ -261,12 +329,12 @@ impl ActionKind for DoorPropAction {
         animation_state::Kind::MouseInteract
     }
 
-    fn get_hover_info(&self) -> Option<(Rc<ObjectSize>, i32, i32, Vec<(f32, f32)>)> {
+    fn get_hover_info(&self) -> Option<ActionHoverInfo> {
         let area_state = GameState::area_state();
         let area_state = area_state.borrow();
         let prop = area_state.get_prop(self.index);
         let point = prop.location.to_point();
-        Some((Rc::clone(&prop.prop.size), point.x, point.y, Vec::new()))
+        ActionHoverInfo::new(&prop.prop.size, point)
     }
 
     fn fire_action(&mut self, _widget: &Rc<RefCell<Widget>>) -> bool {
@@ -317,12 +385,12 @@ impl ActionKind for LootPropAction {
         animation_state::Kind::MouseLoot
     }
 
-    fn get_hover_info(&self) -> Option<(Rc<ObjectSize>, i32, i32, Vec<(f32, f32)>)> {
+    fn get_hover_info(&self) -> Option<ActionHoverInfo> {
         let area_state = GameState::area_state();
         let area_state = area_state.borrow();
         let prop = area_state.get_prop(self.index);
         let point = prop.location.to_point();
-        Some((Rc::clone(&prop.prop.size), point.x, point.y, Vec::new()))
+        ActionHoverInfo::new(&prop.prop.size, point)
     }
 
     fn fire_action(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
@@ -389,7 +457,7 @@ impl ActionKind for TransitionAction {
         animation_state::Kind::MouseTravel
     }
 
-    fn get_hover_info(&self) -> Option<(Rc<ObjectSize>, i32, i32, Vec<(f32, f32)>)> {
+    fn get_hover_info(&self) -> Option<ActionHoverInfo> {
         let area_state = GameState::area_state();
         let area_state = area_state.borrow();
         let transition = area_state.get_transition_at(self.x, self.y);
@@ -397,12 +465,7 @@ impl ActionKind for TransitionAction {
             None => return None,
             Some(ref transition) => transition,
         };
-        Some((
-            Rc::clone(&transition.size),
-            transition.from.x,
-            transition.from.y,
-            Vec::new(),
-        ))
+        ActionHoverInfo::new(&transition.size, transition.from)
     }
 
     fn fire_action(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
@@ -444,6 +507,7 @@ impl ActionKind for TransitionAction {
 struct AttackAction {
     pc: Rc<RefCell<EntityState>>,
     target: Rc<RefCell<EntityState>>,
+    ap: i32,
 }
 
 fn get_attack_target(area_state: &AreaState, x: i32, y: i32) -> Option<Rc<RefCell<EntityState>>> {
@@ -477,18 +541,20 @@ impl AttackAction {
             Some(pc) => Rc::clone(pc),
         };
 
-        {
+        let ap ={
             let pc = pc.borrow();
             if !pc.actor.has_ap_to_attack() { return None; }
             if pc.actor.stats.attack_disabled { return None; }
-        }
+            pc.actor.stats.attack_cost
+        };
 
         if pc.borrow().can_attack(&target, &area_state) {
-            Some(Box::new(AttackAction { pc, target }))
+            Some(Box::new(AttackAction { pc, target, ap }))
         } else {
             let cb_action = Box::new(AttackAction {
                 pc: Rc::clone(&pc),
                 target: Rc::clone(&target),
+                ap,
             });
             return MoveThenAction::create_if_valid(
                 &pc,
@@ -507,10 +573,9 @@ impl ActionKind for AttackAction {
         animation_state::Kind::MouseAttack
     }
 
-    fn get_hover_info(&self) -> Option<(Rc<ObjectSize>, i32, i32, Vec<(f32, f32)>)> {
-        let size = Rc::clone(&self.target.borrow().size);
+    fn get_hover_info(&self) -> Option<ActionHoverInfo> {
         let point = self.target.borrow().location.to_point();
-        Some((size, point.x, point.y, Vec::new()))
+        ActionHoverInfo::with_ap(&self.pc.borrow(), point, self.ap)
     }
 
     fn fire_action(&mut self, _widget: &Rc<RefCell<Widget>>) -> bool {
@@ -527,6 +592,8 @@ impl ActionKind for AttackAction {
         EntityState::attack(&self.pc, &self.target, None, true);
         false
     }
+
+    fn ap(&self) -> i32 { self.ap }
 }
 
 struct ActionCallback {
@@ -553,7 +620,7 @@ impl MoveThenAction {
         size: &Rc<ObjectSize>,
         dist: f32,
         cb_action: Box<dyn ActionKind>,
-        cursor_state: animation_state::Kind,
+        mut cursor_state: animation_state::Kind,
     ) -> Option<Box<dyn ActionKind>> {
         let (px, py) = (pos.x as f32, pos.y as f32);
 
@@ -565,6 +632,13 @@ impl MoveThenAction {
             None => return None,
             Some(move_action) => move_action,
         };
+
+        if GameState::is_combat_active() {
+            let total_ap = cb_action.ap() + move_action.ap();
+            if total_ap > pc.borrow().actor.ap() as i32 {
+                cursor_state = animation_state::Kind::MouseMove;
+            }
+        }
 
         Some(Box::new(MoveThenAction {
             move_action,
@@ -595,11 +669,16 @@ impl ActionKind for MoveThenAction {
         false
     }
 
-    fn get_hover_info(&self) -> Option<(Rc<ObjectSize>, i32, i32, Vec<(f32, f32)>)> {
+    fn get_hover_info(&self) -> Option<ActionHoverInfo> {
         match self.cb_action {
             None => None,
-            Some(ref action) => action.get_hover_info(),
+            Some(ref action) =>
+                ActionHoverInfo::append(action.get_hover_info(), self.move_action.get_hover_info())
         }
+    }
+
+    fn ap(&self) -> i32 {
+        self.move_action.ap + self.cb_action.as_ref().map_or(0, |cb| cb.ap())
     }
 }
 struct MoveAction {
@@ -608,7 +687,9 @@ struct MoveAction {
     y: f32,
     dist: f32,
     cb: Option<Box<dyn ScriptCallback>>,
-    path: Vec<Point>,
+
+    ap: i32,
+    path: Vec<(f32, f32)>,
 }
 
 fn entities_to_ignore() -> Vec<usize> {
@@ -653,6 +734,26 @@ impl MoveAction {
             Some(path) => path,
         };
 
+        let (ap, path) = if path.len() > 0 {
+            let pc = pc.borrow();
+            let cost_per_move = pc.actor.get_move_ap_cost(1) as i32;
+
+            let total_ap =
+                if !GameState::is_combat_active() { std::i32::MAX } else { pc.actor.ap() as i32 };
+            let moves = cmp::min(path.len() as i32 - 1, total_ap / cost_per_move);
+            let ap = moves * cost_per_move;
+
+            (
+                ap,
+                path.iter().skip(1).take(moves as usize).map(|p| {
+                    (p.x as f32 + (pc.size.width as f32 - 1.0) / 2.0,
+                     p.y as f32 + (pc.size.height as f32 - 1.0) / 2.0)
+                }).collect()
+            )
+        } else {
+            (0, Vec::new())
+        };
+
         Some(MoveAction {
             selected,
             x,
@@ -660,6 +761,7 @@ impl MoveAction {
             dist,
             cb: None,
             path,
+            ap,
         })
     }
 
@@ -709,19 +811,14 @@ impl ActionKind for MoveAction {
         false
     }
 
-    fn get_hover_info(&self) -> Option<(Rc<ObjectSize>, i32, i32, Vec<(f32, f32)>)> {
-        let size = Rc::clone(&self.selected[0].borrow().size);
-        let x = self.x as i32 - size.width / 2;
-        let y = self.y as i32 - size.height / 2;
-
-        let path = self.path.iter().map(|p| {
-            let x = p.x as f32 + (size.width - 1) as f32 / 2.0;
-            let y = p.y as f32 + (size.height - 1) as f32 / 2.0;
-            (x, y)
-        }).collect();
-
-        Some((size, x, y, path))
+    fn get_hover_info(&self) -> Option<ActionHoverInfo> {
+        let entity = &self.selected[0].borrow();
+        let p = Point::new(self.x as i32 - entity.size.width / 2,
+            self.y as i32 - entity.size.height / 2);
+        ActionHoverInfo::with_path(entity, p, &self.path, self.ap)
     }
+
+    fn ap(&self) -> i32 { self.ap }
 }
 
 struct InvalidAction {}
@@ -735,7 +832,7 @@ impl ActionKind for InvalidAction {
         false
     }
 
-    fn get_hover_info(&self) -> Option<(Rc<ObjectSize>, i32, i32, Vec<(f32, f32)>)> {
+    fn get_hover_info(&self) -> Option<ActionHoverInfo> {
         None
     }
 }

@@ -17,11 +17,12 @@
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use sulis_core::ui::{Cursor, Widget, animation_state, Theme};
+use sulis_core::ui::{Cursor, LineRenderer, Widget, animation_state, Theme};
 use sulis_core::io::{GraphicsRenderer, DrawList};
 use sulis_core::image::Image;
 use sulis_core::resource::{ResourceSet, Sprite};
-use sulis_state::{AreaState, EntityState, GameState};
+use sulis_module::Module;
+use sulis_state::{AreaState, EntityState, GameState, area_feedback_text::Params};
 use crate::{action_kind, AreaMouseover};
 
 pub struct HoverSprite {
@@ -43,6 +44,8 @@ pub struct AreaOverlayHandler {
 
     path: Vec<(f32, f32)>,
     path_point_image: Option<Rc<dyn Image>>,
+    path_point_end_image: Option<Rc<dyn Image>>,
+    path_ap: Option<i32>,
 }
 
 impl AreaOverlayHandler {
@@ -55,6 +58,8 @@ impl AreaOverlayHandler {
             selection_box_image: None,
             path: Vec::new(),
             path_point_image: None,
+            path_point_end_image: None,
+            path_ap: None,
         }
     }
 
@@ -179,21 +184,26 @@ impl AreaOverlayHandler {
         let action = action_kind::get_action(x, y);
         Cursor::set_cursor_state(action.cursor_state());
         match action.get_hover_info() {
-            Some((size, x, y, path)) => {
+            Some(info) => {
                 let hover_sprite = HoverSprite {
-                    sprite: Rc::clone(&size.cursor_sprite),
-                    x,
-                    y,
-                    w: size.width,
-                    h: size.height,
+                    sprite: Rc::clone(&info.size.cursor_sprite),
+                    x: info.x,
+                    y: info.y,
+                    w: info.size.width,
+                    h: info.size.height,
                     left_click_action_valid: true,
                 };
                 self.hover_sprite = Some(hover_sprite);
-                self.path = path;
+                self.path = info.path;
+                match info.ap {
+                    0 => self.path_ap = None,
+                    ap => self.path_ap = Some(info.total_ap - ap),
+                }
             }
             None => {
                 self.hover_sprite = None;
                 self.path.clear();
+                self.path_ap = None;
             }
         }
     }
@@ -268,6 +278,7 @@ impl AreaOverlayHandler {
         self.hover_sprite = None;
         self.selection_box_start = None;
         self.path.clear();
+        self.path_ap = None;
         Cursor::set_cursor_state(animation_state::Kind::Normal);
         self.clear_area_mouseover();
     }
@@ -280,6 +291,10 @@ impl AreaOverlayHandler {
 
         if let Some(ref image_id) = theme.custom.get("path_point_image") {
             self.path_point_image = ResourceSet::image(image_id);
+        }
+
+        if let Some(ref image_id) = theme.custom.get("path_point_end_image") {
+            self.path_point_end_image = ResourceSet::image(image_id);
         }
     }
 
@@ -298,17 +313,30 @@ impl AreaOverlayHandler {
         if self.path.is_empty() { return None; }
 
         let mut draw_list = DrawList::empty_sprite();
-        for p in &self.path {
+
+        for p in &self.path[0..self.path.len() - 1] {
             let x = p.0 - x_offset;
             let y = p.1 - y_offset;
             image.append_to_draw_list(&mut draw_list, &animation_state::NORMAL,
                 x, y, 1.0, 1.0, millis);
         }
 
+        match self.path_point_end_image {
+            None => (),
+            Some(ref image) => {
+                let last = self.path.last().unwrap();
+                let x = last.0 - x_offset;
+                let y = last.1 - y_offset;
+                image.append_to_draw_list(&mut draw_list, &animation_state::NORMAL,
+                    x, y, 1.0, 1.0, millis);
+            }
+        }
+
         Some(draw_list)
     }
 
-    pub fn draw_top(&self, renderer: &mut dyn GraphicsRenderer, millis: u32) {
+    pub fn draw_top(&self, renderer: &mut dyn GraphicsRenderer, params: &Params,
+        offset: (f32, f32), scale: (f32, f32), millis: u32) {
         if let Some(ref image) = self.selection_box_image {
             if let Some((x, y, x_end, y_end)) = self.get_selection_box_coords() {
                 let w = x_end - x;
@@ -330,6 +358,22 @@ impl AreaOverlayHandler {
                 );
                 renderer.draw(draw_list);
             }
+        }
+
+        if !GameState::is_combat_active() { return; }
+        if let Some(ap) = self.path_ap {
+            let font_rend = LineRenderer::new(&params.font);
+            let text = format!("{:.1} AP", ap as f32 / Module::rules().display_ap as f32);
+            let (x, y) = match &self.hover_sprite {
+                None => (0.0, 0.0),
+                Some(hover) => (hover.x as f32 + offset.0,
+                    hover.y as f32 + hover.h as f32 + offset.1),
+            };
+
+            let (mut draw_list, _) = font_rend.get_draw_list(&text, x, y, params.ap_scale);
+            draw_list.set_color(params.ap_color);
+            draw_list.set_scale(scale.0, scale.1);
+            renderer.draw(draw_list);
         }
     }
 
@@ -367,5 +411,6 @@ impl AreaOverlayHandler {
         self.hover_sprite = None;
         self.selection_box_start = None;
         self.path.clear();
+        self.path_ap = None;
     }
 }

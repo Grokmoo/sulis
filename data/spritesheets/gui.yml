@@ -614,6 +614,7 @@ groups:
       cursor6by5: [274, 821, 96, 80]
       
       path_point: [15, 259, 18, 18]
+      path_point_end: [15, 277, 18, 18]
       
       ball: [16, 148, 32, 32]
       ball_active: [16, 181, 32, 32]

@@ -491,6 +491,10 @@ impl WidgetKind for AreaView {
         }
 
         self.feedback_text_params.scale = theme.get_custom_or_default("feedback_text_scale", 1.0);
+        self.feedback_text_params.ap_scale =
+            theme.get_custom_or_default("ap_hover_text_scale", 1.0);
+        self.feedback_text_params.ap_color =
+            theme.get_custom_or_default("ap_hover_text_color", color::LIGHT_GRAY);
 
         if let Some(ref font_id) = theme.custom.get("feedback_text_font") {
             self.feedback_text_params.font = match ResourceSet::font(font_id) {
@@ -852,14 +856,17 @@ impl WidgetKind for AreaView {
             );
         }
 
-        self.overlay_handler.draw_top(renderer, millis);
+        let offset = (p.x as f32 - self.scroll.x(), p.y as f32 - self.scroll.y());
+        let scale = (scale_x, scale_y);
+        self.overlay_handler.draw_top(renderer, &self.feedback_text_params,
+            offset, scale, millis);
 
         for feedback_text in state.feedback_text_iter() {
             feedback_text.draw(
                 renderer,
                 &self.feedback_text_params,
-                p.x as f32 - self.scroll.x(),
-                p.y as f32 - self.scroll.y(),
+                offset.0,
+                offset.1,
                 scale_x,
                 scale_y,
                 millis,

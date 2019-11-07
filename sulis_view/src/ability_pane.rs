@@ -89,7 +89,7 @@ pub fn add_ability_text_args(state: &mut WidgetState, ability: &Rc<Ability>) {
 
     if let Some(ref active) = ability.active {
         state.add_text_arg("active", "true");
-        let ap = active.ap / Module::rules().display_ap;
+        let ap = Module::rules().to_display_ap(active.ap as i32);
         state.add_text_arg("activate_ap", &ap.to_string());
 
         for (class_id, stats) in &active.class_stats {

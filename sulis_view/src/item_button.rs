@@ -384,7 +384,7 @@ impl WidgetKind for ItemButton {
                 Some(usable) => {
                     let state = &mut item_window.state;
 
-                    let ap = usable.ap / Module::rules().display_ap;
+                    let ap = Module::rules().to_display_ap(usable.ap as i32);
                     state.add_text_arg("usable_ap", &ap.to_string());
                     if usable.consumable {
                         state.add_text_arg("consumable", "true");
@@ -791,7 +791,7 @@ fn add_bonus(
         ActionPoints(amount) => add(
             state,
             "bonus_ap",
-            *amount / Module::rules().display_ap as i32,
+            Module::rules().to_display_ap(*amount),
         ),
         Armor(amount) => armor.add_base(*amount),
         ArmorKind { kind, amount } => armor.add_kind(*kind, *amount),
@@ -847,11 +847,11 @@ fn add_bonus(
         MovementRate(amount) => state.add_text_arg("movement_rate", &format!("{:.2}", amount)),
         CasterLevel(amount) => add(state, "caster_level", amount),
         AttackCost(amount) => {
-            let cost = amount / Module::rules().display_ap as i32;
+            let cost = Module::rules().to_display_ap(*amount);
             add(state, "attack_cost", cost);
         }
         AbilityActionPointCost(amount) => {
-            let cost = amount / Module::rules().display_ap as i32;
+            let cost = Module::rules().to_display_ap(*amount);
             add(state, "ability_ap_cost", cost);
         }
         GroupUsesPerEncounter { group, amount } => {

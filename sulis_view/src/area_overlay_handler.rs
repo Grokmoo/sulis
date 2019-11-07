@@ -305,6 +305,8 @@ impl AreaOverlayHandler {
     pub fn get_path_draw_list(&self, x_offset: f32, y_offset: f32,
         millis: u32) -> Option<DrawList> {
 
+        if !GameState::is_combat_active() { return None; }
+
         let image = match self.path_point_image {
             None => return None,
             Some(ref image) => image,
@@ -363,7 +365,7 @@ impl AreaOverlayHandler {
         if !GameState::is_combat_active() { return; }
         if let Some(ap) = self.path_ap {
             let font_rend = LineRenderer::new(&params.font);
-            let text = format!("{:.1} AP", ap as f32 / Module::rules().display_ap as f32);
+            let text = Module::rules().format_ap(ap);
             let (x, y) = match &self.hover_sprite {
                 None => (0.0, 0.0),
                 Some(hover) => (hover.x as f32 + offset.0,

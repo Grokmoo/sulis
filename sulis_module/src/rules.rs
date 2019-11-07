@@ -115,6 +115,15 @@ pub struct Rules {
 }
 
 impl Rules {
+    pub fn to_display_ap(&self, ap: i32) -> i32 {
+        ap / self.display_ap as i32
+    }
+
+    pub fn format_ap(&self, ap: i32) -> String {
+        let amount = (ap as f32 * 10.0 / self.display_ap as f32).floor();
+        format!("{:.1} AP", amount / 10.0)
+    }
+
     pub fn canonicalize_time(&self, time: &mut Time) {
         let mut millis = time.millis;
         let mut round = time.round;

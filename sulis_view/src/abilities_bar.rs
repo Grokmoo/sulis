@@ -525,7 +525,7 @@ pub fn add_hover_text_args(state: &mut WidgetState, ability: &Ability, class: &C
     state.add_text_arg("description", &ability.description);
 
     if let Some(ref active) = ability.active {
-        let ap = active.ap / Module::rules().display_ap;
+        let ap = Module::rules().to_display_ap(active.ap as i32);
         state.add_text_arg("activate_ap", &ap.to_string());
 
         if let Some(class_stats) = active.class_stats.get(&class.id) {

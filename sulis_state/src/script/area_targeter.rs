@@ -20,12 +20,13 @@ use std::rc::Rc;
 
 use sulis_core::image::Image;
 use sulis_core::io::{DrawList, GraphicsRenderer};
-use sulis_core::ui::{animation_state, color, Cursor};
+use sulis_core::ui::{animation_state, color, Cursor, LineRenderer};
 use sulis_core::util::Point;
 use sulis_module::{Ability, Module, ObjectSize};
 
 use crate::script::{targeter, ScriptItemKind, TargeterData};
-use crate::{AreaState, EntityState, GameState, RangeIndicator, Script, TurnManager};
+use crate::{AreaState, EntityState, GameState, RangeIndicator, Script,
+    TurnManager, area_feedback_text::Params};
 
 #[derive(Clone)]
 pub enum Shape {
@@ -987,7 +988,10 @@ impl AreaTargeter {
         scale_x: f32,
         scale_y: f32,
         millis: u32,
+        params: &Params,
     ) {
+        if !self.parent.borrow().is_party_member() { return; }
+
         let mut draw_list = DrawList::empty_sprite();
 
         for target in self.selectable.iter() {
@@ -1022,6 +1026,48 @@ impl AreaTargeter {
             );
         }
         draw_list.set_scale(scale_x, scale_y);
+        renderer.draw(draw_list);
+
+        match &self.script_source {
+            ScriptSource::Ability(ability) => {
+                if let Some(active) = &ability.active {
+                    self.draw_ap_usage(renderer, params, (scale_x, scale_y),
+                        (x_offset, y_offset), active.ap as i32);
+                }
+            },
+            _ => (),
+        }
+    }
+
+    fn draw_ap_usage(&self, renderer: &mut dyn GraphicsRenderer, params: &Params,
+        scale: (f32, f32), offset: (f32, f32), ap: i32) {
+        if !GameState::is_combat_active() { return; }
+
+        let parent = &self.parent.borrow();
+        let ap = parent.actor.ap() as i32 - ap;
+
+        // compute position to show AP and do nothing if not valid to activate
+        let (x, y) = if self.free_select.is_none() {
+            match &self.cur_target {
+                None => return,
+                Some(target) => {
+                    let target = &target.borrow();
+                    (target.location.x as f32,
+                     target.location.y as f32 + target.size.height as f32)
+                }
+            }
+        } else {
+            if !self.free_select_valid { return; }
+            (self.cursor_pos.x as f32, self.cursor_pos.y as f32 + 1.0)
+        };
+
+        let font_rend = LineRenderer::new(&params.font);
+        let text = Module::rules().format_ap(ap);
+        let x = x - offset.0;
+        let y = y - offset.1;
+        let (mut draw_list, _) = font_rend.get_draw_list(&text, x, y, params.ap_scale);
+        draw_list.set_color(params.ap_color);
+        draw_list.set_scale(scale.0, scale.1);
         renderer.draw(draw_list);
     }
 

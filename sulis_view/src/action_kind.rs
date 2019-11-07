@@ -129,14 +129,15 @@ impl ActionHoverInfo {
         })
     }
 
-    fn with_ap(entity: &EntityState, point: Point, ap: i32) -> Option<ActionHoverInfo> {
+    fn with_ap(entity: &EntityState, point: Point, total_ap: i32,
+        ap: i32) -> Option<ActionHoverInfo> {
         Some(ActionHoverInfo {
             size: Rc::clone(&entity.size),
             x: point.x,
             y: point.y,
             path: Vec::new(),
             ap,
-            total_ap: entity.actor.ap() as i32,
+            total_ap,
         })
     }
 
@@ -575,7 +576,8 @@ impl ActionKind for AttackAction {
 
     fn get_hover_info(&self) -> Option<ActionHoverInfo> {
         let point = self.target.borrow().location.to_point();
-        ActionHoverInfo::with_ap(&self.pc.borrow(), point, self.ap)
+        let total_ap = self.pc.borrow().actor.ap() as i32;
+        ActionHoverInfo::with_ap(&self.target.borrow(), point, total_ap, self.ap)
     }
 
     fn fire_action(&mut self, _widget: &Rc<RefCell<Widget>>) -> bool {

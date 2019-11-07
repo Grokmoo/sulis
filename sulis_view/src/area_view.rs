@@ -839,6 +839,7 @@ impl WidgetKind for AreaView {
                 scale_x,
                 scale_y,
                 millis,
+                &self.feedback_text_params,
             );
         }
 

@@ -1,5 +1,7 @@
 # Sulis
-Sulis is a game and game engine written in Rust.  It is currently in early development.
+Sulis is a game and game engine written in Rust.  The engine is fairly mature and there are currently several available campaigns to play in the game.
+
+![Screenshot](screenshot.png)
 
 ## Standalone Releases
 Standalone binary releases are available for Windows and Linux if you are only interested in playing the game.

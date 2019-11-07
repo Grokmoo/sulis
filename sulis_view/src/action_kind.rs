@@ -629,7 +629,7 @@ impl MoveThenAction {
         let x = px + (size.width / 2) as f32;
         let y = py + (size.height / 2) as f32;
 
-        let dist = dist + (size.diagonal + pc.borrow().size.diagonal) / 2.0;
+        let dist = dist + pc.borrow().size.diagonal;
         let move_action = match MoveAction::new_if_valid(x, y, Some(dist)) {
             None => return None,
             Some(move_action) => move_action,
@@ -714,6 +714,7 @@ impl MoveAction {
             None => return None,
             Some(pc) => Rc::clone(pc),
         };
+
 
         let dist = match dist {
             None => MOVE_TO_THRESHOLD,

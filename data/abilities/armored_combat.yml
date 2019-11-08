@@ -2,7 +2,7 @@ id: armored_combat
 name: "Armored Combat"
 icon: abilities/armored_combat
 description: |
-  You are able to ignore some of the penalties from using medium and heavy armor.
+  You are able to ignore some of the movement and Dexterity penalties from using medium and heavy armor.
 bonuses:
   - kind:
       movement_rate: 0.05
@@ -11,22 +11,40 @@ bonuses:
         slot: Torso
         kind: Medium
   - kind:
-      movement_rate: 0.07
-    when:
-      ArmorEquipped:
-        slot: Torso
-        kind: Heavy
-  - kind:
       movement_rate: 0.03
     when:
       ArmorEquipped:
         slot: Legs
         kind: Medium
   - kind:
+      attribute:  { attribute: Dexterity, amount: 1 }
+    when:
+      ArmorEquipped:
+        slot: Legs
+        kind: Medium
+  - kind:
+      movement_rate: 0.07
+    when:
+      ArmorEquipped:
+        slot: Torso
+        kind: Heavy
+  - kind:
       movement_rate: 0.04
     when:
       ArmorEquipped:
         slot: Legs
+        kind: Heavy
+  - kind:
+      attribute:  { attribute: Dexterity, amount: 1 }
+    when:
+      ArmorEquipped:
+        slot: Legs
+        kind: Heavy
+  - kind:
+      attribute:  { attribute: Dexterity, amount: 1 }
+    when:
+      ArmorEquipped:
+        slot: Torso
         kind: Heavy
 prereqs:
   abilities: [ defender ]

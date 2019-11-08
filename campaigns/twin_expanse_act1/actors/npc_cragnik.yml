@@ -51,16 +51,16 @@ inventory:
       adjectives: []
 levels:
   rogue: 4
-xp: 800
+xp: 600
 abilities:
-  - hide
   - armor_light
   - weapon_crossbow
   - weapon_bow
   - weapon_small_sword
   - weapon_simple
   - backstab
-  - backflip
+  - hide
+  - smoke_bomb
   - speedy
-  - flanker
+  - backflip
   

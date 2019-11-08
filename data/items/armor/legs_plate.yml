@@ -14,7 +14,7 @@ equippable:
     - kind: { armor_kind: { kind: Piercing, amount: 1 } }
     - kind: { armor_kind: { kind: Shock, amount: -3 } }
     - kind: { movement_rate: -0.08 }
-    - kind: { attribute: { attribute: Dexterity, amount: -1 } }
+    - kind: { attribute: { attribute: Dexterity, amount: -2 } }
     - kind: { spell_accuracy: -5 }
 image:
   Legs:

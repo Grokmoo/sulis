@@ -29,7 +29,7 @@ skin_color:
 inventory:
   equipped:
     HeldMain:
-      id: quarterstaff
+      id: crossbow
       adjectives: [ fine ]
     Feet:
       id: boots_leather
@@ -47,17 +47,17 @@ inventory:
     Usable2:
       id: potion_mind
       adjectives: []
-    AltHeldMain: { id: crossbow }
+    AltHeldMain: { id: quarterstaff }
 levels:
   mage: 4
-xp: 800
+xp: 600
 abilities:
-  - minor_heal
-  - flare
-  - expediate
-  - acid_bomb
   - weapon_simple
   - weapon_crossbow
   - firebolt
-  - slow
-  - wind_gust
+  - flare
+  - acid_bomb
+  - shock
+  - heal
+  - tenacious_soul
+  - dazzle

@@ -45,133 +45,133 @@ upgrades:
   1:
     ability_choices: []
     group_uses_per_encounter:
-      - [ Warlock, 3 ]
+      - [ Warlock, ~ ]
       - [ Special, ~ ]
     stats:
       Power: 30
   2:
     ability_choices: [ warlock ]
     group_uses_per_encounter:
-      - [ Warlock, 4 ]
+      - [ Warlock, ~ ]
       - [ Special, ~ ]
     stats:
       Power: 40
   3:
     ability_choices: [ warlock, general ]
     group_uses_per_encounter:
-      - [ Warlock, 4 ]
+      - [ Warlock, ~ ]
       - [ Special, ~ ]
     stats:
       Power: 50
   4:
     ability_choices: [ warlock ]
     group_uses_per_encounter:
-      - [ Warlock, 5 ]
+      - [ Warlock, ~ ]
       - [ Special, ~ ]
     stats:
       Power: 60
   5:
     ability_choices: [ warlock, general ]
     group_uses_per_encounter:
-      - [ Warlock, 5 ]
+      - [ Warlock, ~ ]
       - [ Special, ~ ]
     stats:
       Power: 70
   6:
     ability_choices: [ warlock ]
     group_uses_per_encounter:
-      - [ Warlock, 5 ]
+      - [ Warlock, ~ ]
       - [ Special, ~ ]
     stats:
       Power: 80
   7:
     ability_choices: [ warlock, general ]
     group_uses_per_encounter:
-      - [ Warlock, 6 ]
+      - [ Warlock, ~ ]
       - [ Special, ~ ]
     stats:
       Power: 90
   8:
     ability_choices: [ warlock ]
     group_uses_per_encounter:
-      - [ Warlock, 6 ]
+      - [ Warlock, ~ ]
       - [ Special, ~ ]
     stats:
       Power: 100
   9:
     ability_choices: [ warlock, general ]
     group_uses_per_encounter:
-      - [ Warlock, 6 ]
+      - [ Warlock, ~ ]
       - [ Special, ~ ]
     stats:
       Power: 110
   10:
     ability_choices: [ warlock ]
     group_uses_per_encounter:
-      - [ Warlock, 7 ]
+      - [ Warlock, ~ ]
       - [ Special, ~ ]
     stats:
       Power: 120
   11:
     ability_choices: [ warlock, general ]
     group_uses_per_encounter:
-      - [ Warlock, 7 ]
+      - [ Warlock, ~ ]
       - [ Special, ~ ]
     stats:
       Power: 130
   12:
     ability_choices: [ warlock ]
     group_uses_per_encounter:
-      - [ Warlock, 7 ]
+      - [ Warlock, ~ ]
       - [ Special, ~ ]
     stats:
       Power: 140
   13:
     ability_choices: [ warlock, general ]
     group_uses_per_encounter:
-      - [ Warlock, 8 ]
+      - [ Warlock, ~ ]
       - [ Special, ~ ]
     stats:
       Power: 150
   14:
     ability_choices: [ warlock ]
     group_uses_per_encounter:
-      - [ Warlock, 8 ]
+      - [ Warlock, ~ ]
       - [ Special, ~ ]
     stats:
       Power: 160
   15:
     ability_choices: [ warlock, general ]
     group_uses_per_encounter:
-      - [ Warlock, 8 ]
+      - [ Warlock, ~ ]
       - [ Special, ~ ]
     stats:
       Power: 170
   16:
     ability_choices: [ warlock, general ]
     group_uses_per_encounter:
-      - [ Warlock, 9 ]
+      - [ Warlock, ~ ]
       - [ Special, ~ ]
     stats:
       Power: 180
   17:
     ability_choices: [ warlock, general ]
     group_uses_per_encounter:
-      - [ Warlock, 9 ]
+      - [ Warlock, ~ ]
       - [ Special, ~ ]
     stats:
       Power: 190
   18:
     ability_choices: [ warlock, general ]
     group_uses_per_encounter:
-      - [ Warlock, 9 ]
+      - [ Warlock, ~ ]
       - [ Special, ~ ]
     stats:
       Power: 200
   19:
     ability_choices: [ warlock, general ]
     group_uses_per_encounter:
-      - [ Warlock, 9 ]
+      - [ Warlock, ~ ]
       - [ Special, ~ ]
     stats:
       Power: 210
@@ -194,7 +194,7 @@ kits:
       quick:
         Usable1: { id: potion_healing }
         Usable2: { id: potion_power }
-        AltHeldMain: { id: dagger }
+        AltHeldMain: { id: mace }
       pc_starting_coins: 150
       pc_starting_items:
         - quantity: 1

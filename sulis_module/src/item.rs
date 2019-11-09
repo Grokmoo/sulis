@@ -118,7 +118,8 @@ impl Item {
         let mut all_adjectives = item.builder_adjectives.clone();
         all_adjectives.extend_from_slice(&added_adjectives);
 
-        let (equippable, value) = apply_adjectives(
+        let (equippable, value, prereqs) = apply_adjectives(
+            &item.prereqs,
             &item.original_equippable,
             item.original_value,
             &all_adjectives,
@@ -148,7 +149,7 @@ impl Item {
             value,
             weight: item.weight,
             usable: item.usable.clone(),
-            prereqs: item.prereqs.clone(),
+            prereqs: prereqs,
             original_id: item.original_id.clone(),
             original_value: item.original_value,
             original_equippable: item.original_equippable.clone(),
@@ -203,7 +204,7 @@ impl Item {
 
         let prereqs = match builder.prereqs {
             None => None,
-            Some(list) => Some(PrereqList::new(list, module)?),
+            Some(list) => Some(PrereqList::new(list)?),
         };
 
         let mut adjectives = Vec::new();
@@ -218,8 +219,8 @@ impl Item {
             adjectives.push(adjective);
         }
 
-        let (equippable, value) =
-            apply_adjectives(&builder.equippable, builder.value as i32, &adjectives);
+        let (equippable, value, prereqs) =
+            apply_adjectives(&prereqs, &builder.equippable, builder.value as i32, &adjectives);
 
         Ok(Item {
             id: builder.id.clone(),
@@ -286,10 +287,11 @@ impl Item {
 }
 
 fn apply_adjectives(
+    base_prereqs: &Option<PrereqList>,
     equippable: &Option<Equippable>,
     value: i32,
     adjectives: &Vec<Rc<ItemAdjective>>,
-) -> (Option<Equippable>, i32) {
+) -> (Option<Equippable>, i32, Option<PrereqList>) {
     // first, add bonuses from adjectives and accumulate modifiers
     let mut value_add = 0;
     let mut value_modifier = 1.0;
@@ -299,6 +301,7 @@ fn apply_adjectives(
     let mut attack_bonus_mod = 1.0;
     let mut attack_penalty_mod = 1.0;
 
+    let mut prereqs = base_prereqs.clone();
     let mut equippable = equippable.clone();
     for adjective in adjectives.iter() {
         value_add += adjective.value_add.unwrap_or(0);
@@ -318,6 +321,8 @@ fn apply_adjectives(
                 attack.bonuses.add(&adjective.attack_bonuses);
             }
         }
+
+        prereqs = PrereqList::merge_optional(&prereqs, &adjective.prereqs);
     }
 
     // now apply accumulated bonuses and penalties
@@ -347,7 +352,7 @@ fn apply_adjectives(
         (value as f32 * value_modifier).round() as i32 + value_add,
     );
 
-    (equippable, value)
+    (equippable, value, prereqs)
 }
 
 #[derive(Deserialize, Debug)]

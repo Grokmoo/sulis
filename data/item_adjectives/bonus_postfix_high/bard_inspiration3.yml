@@ -1,0 +1,18 @@
+id: bard_inspiration3
+name: Bard Inspiration
+name_postfix: " of Inspiration"
+item_status_icon: gui/status_bard_inspiration
+value_modifier: 1.7
+value_add: 3000
+bonus_modifier: 1.0
+penalty_modifier: 1.0
+attack_damage_modifier: 1.0
+attack_bonus_modifier: 1.0
+attack_penalty_modifier: 1.0
+bonuses:
+  - kind:
+      class_stat: { id: Inspiration, amount: 30 }
+attack_bonuses: {}
+prereqs:
+  levels:
+    bard: 1

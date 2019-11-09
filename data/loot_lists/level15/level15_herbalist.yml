@@ -9,29 +9,70 @@ probability_entries:
   torso_robe:
     weight: 50
     adjective1:
+      exceptional: 5
       masterwork: 5
     adjective2:
-      masterwork: 5
+      none: 8
       will15: 2
       intellect3: 2
+      mage_ability3: 2
+      warlock_power3: 2
+      resistance_acid3: 2
+      resistance_cold3: 2
+      resistance_shock3: 2
+      resistance_fire3: 2
   helm_hood:
     weight: 50
     adjective1:
+      exceptional: 5
       masterwork: 5
     adjective2:
-      masterwork: 5
+      none: 2
       concealment15: 2
-      wisdom3: 2
+      wisdom2: 2
+      concealment_ignore3: 2
+      action2: 2
+      bard_inspiration3: 2
   helm_hat:
     weight: 50
     adjective1:
+      exceptional: 5
       masterwork: 5
     adjective2:
-      masterwork: 5
+      none: 2
       reflex15: 2
       dexterity3: 2
+      concealment_ignore3: 2
+      action2: 2
+      bard_inspiration3: 2
+  boots_leather:
+    weight: 10
+    adjective1:
+      exceptional: 5
+      masterwork: 5
+    adjective2:
+      none: 2
+      movement15: 2
+      flanking15: 2
+      initiative2: 2
+      reflex15: 2
+      resistance_cold3: 2
   druid_staff:
     weight: 50
+    adjective1:
+      exceptional: 5
+      masterwork: 5
+    adjective2:
+      none: 2
+      weapon_accuracy15: 1
+      acid15: 1
+      cold15: 1
+      fire15: 1
+      shock15: 1
+      crits15: 1
+      damage15: 1
+      reach3: 1
+      concealment_ignore3: 1
   poison_vial:
     weight: 50
     quantity: [3, 5]

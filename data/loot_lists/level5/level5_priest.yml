@@ -9,21 +9,30 @@ probability_entries:
   torso_robe:
     weight: 80
     adjective1:
-      none: 8
-      fine: 2
-    adjective2:
       none: 5
+      fine: 5
+    adjective2:
+      none: 8
       will5: 2
       intellect1: 2
+      mage_ability1: 2
+      warlock_power1: 2
+      resistance_acid1: 2
+      resistance_cold1: 2
+      resistance_shock1: 2
+      resistance_fire1: 2
   helm_hood:
     weight: 80
     adjective1:
-      none: 8
-      fine: 2
-    adjective2:
       none: 5
+      fine: 5
+    adjective2:
+      none: 2
       concealment5: 2
       wisdom1: 2
+      concealment_ignore1: 2
+      action1: 2
+      bard_inspiration1: 2
   healing_kit:
     weight: 90
     quantity: [3, 8]

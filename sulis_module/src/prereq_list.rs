@@ -14,14 +14,13 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::collections::HashMap;
+use std::collections::{HashSet, HashMap};
 use std::io::Error;
 use std::rc::Rc;
 
 use crate::rules::Attribute;
-use sulis_core::util::unable_to_create_error;
 
-use crate::{Actor, Module, Race};
+use crate::{Actor, Module};
 
 #[derive(Debug, Clone)]
 pub struct PrereqList {
@@ -34,13 +33,87 @@ pub struct PrereqList {
     pub levels: Vec<(String, u32)>,
 
     pub total_level: Option<u32>,
-    pub race: Option<Rc<Race>>,
-    pub abilities: Vec<String>, // we can't store the actual ability here because it might
-                                // not be parsed yet
+    pub race: Option<String>,   // we can't store the actual ability or race because they
+    pub abilities: Vec<String>, // might not be read in yet
 }
 
 impl PrereqList {
-    pub fn new(builder: PrereqListBuilder, module: &Module) -> Result<PrereqList, Error> {
+    /// Merges two PrereqList options.  See `merge`
+    pub fn merge_optional(a: &Option<PrereqList>, b: &Option<PrereqList>) -> Option<PrereqList> {
+        match a {
+            None => b.clone(),
+            Some(a) => {
+                match b {
+                    None => Some(a.clone()),
+                    Some(b) => Some(PrereqList::merge(a, b)),
+                }
+            }
+        }
+    }
+
+    /// Create a PrereqList that is the union of the two argument PrereqLists.  The
+    /// new list will be one that requires all prereqs from both arguments to be met.
+    /// Since two different race prereqs cannot be met simultaneously, emits a warning
+    /// and picks the race prereq from `a` in the event that `a` and `b` both have
+    /// different race prereqs.
+    pub fn merge(a: &PrereqList, b: &PrereqList) -> PrereqList {
+        // take the max of all individual attr requirements
+        let mut attributes: HashMap<_, _> =
+            a.attributes.as_ref().map_or(HashMap::new(), |attrs| {
+                attrs.iter().map(|(attr, amount)| (*attr, *amount)).collect()
+            });
+
+        for (attr, amount) in b.attributes.as_ref().unwrap_or(&Vec::new()) {
+            let cur = attributes.get(attr).unwrap_or(&0);
+            let amount = std::cmp::max(*cur, *amount);
+            attributes.insert(*attr, amount);
+        }
+
+        // take the max of all individual level requirements
+        let mut levels: HashMap<_, _> =
+            a.levels.iter().map(|(id, level)| (id.to_string(), *level)).collect();
+        for (id, level) in b.levels.iter() {
+            let cur = *levels.get(id).unwrap_or(&0);
+            let level = std::cmp::max(cur, *level);
+            levels.insert(id.to_string(), level);
+        }
+
+        // take the max of total level requirements
+        let total_level = std::cmp::max(a.total_level.unwrap_or(0), b.total_level.unwrap_or(0));
+        let total_level = if total_level == 0 {
+            None
+        } else {
+            Some(total_level)
+        };
+
+        let race = match &a.race {
+            None => b.race.clone(),
+            Some(race) => {
+                if let Some(race_b) = &b.race {
+                    if race != race_b {
+                        warn!("Merging prereqs with incompatible race requirements: {} and {}",
+                            race, race_b);
+                    }
+                }
+                Some(race.to_string())
+            }
+        };
+
+        // get all unique abilities, use hashset to dedup
+        let mut abilities = a.abilities.clone();
+        abilities.extend(b.abilities.iter().cloned());
+        let abilities: HashSet<_> = abilities.into_iter().collect();
+
+        PrereqList {
+            attributes: Some(attributes.into_iter().collect()),
+            levels: levels.into_iter().collect(),
+            total_level,
+            race,
+            abilities: abilities.into_iter().collect(),
+        }
+    }
+
+    pub fn new(builder: PrereqListBuilder) -> Result<PrereqList, Error> {
         let mut levels = Vec::new();
         if let Some(builder_levels) = builder.levels {
             for (class_id, level) in builder_levels {
@@ -48,23 +121,11 @@ impl PrereqList {
             }
         }
 
-        let race = if let Some(ref race_id) = builder.race {
-            match module.races.get(race_id) {
-                None => {
-                    warn!("No match for race '{}'", race_id);
-                    return unable_to_create_error("prereq_list", "prereqs race");
-                }
-                Some(race) => Some(Rc::clone(race)),
-            }
-        } else {
-            None
-        };
-
         Ok(PrereqList {
             attributes: builder.attributes,
             levels,
             total_level: builder.total_level,
-            race,
+            race: builder.race,
             abilities: builder.abilities.unwrap_or(Vec::new()),
         })
     }
@@ -104,7 +165,7 @@ impl PrereqList {
         }
 
         if let Some(ref race) = self.race {
-            if &actor.race != race {
+            if &actor.race.name != race {
                 return false;
             }
         }

@@ -1,0 +1,24 @@
+id: ability2
+name: Ability
+name_postfix: " of Ability"
+item_status_icon: gui/status_ability_uses
+value_modifier: 1.4
+value_add: 1600
+bonus_modifier: 1.0
+penalty_modifier: 1.0
+attack_damage_modifier: 1.0
+attack_bonus_modifier: 1.0
+attack_penalty_modifier: 1.0
+bonuses:
+  - kind:
+      group_uses_per_encounter: { group: "Fighter", amount: 2 }
+  - kind:
+      group_uses_per_encounter: { group: "Rogue", amount: 2 }
+  - kind:
+      group_uses_per_encounter: { group: "Druid", amount: 2 }
+attack_bonuses: {}
+prereqs:
+  levels:
+    fighter: 1
+    rogue: 1
+    druid: 1

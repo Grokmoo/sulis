@@ -147,7 +147,7 @@ impl Ability {
 
         let prereqs = match builder.prereqs {
             None => None,
-            Some(prereqs) => Some(PrereqList::new(prereqs, module)?),
+            Some(prereqs) => Some(PrereqList::new(prereqs)?),
         };
 
         let mut bonuses = builder.bonuses.unwrap_or_default();

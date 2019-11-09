@@ -79,7 +79,7 @@ pub use self::item::Item;
 pub use self::item::Usable;
 
 pub mod item_adjective;
-pub use self::item_adjective::ItemAdjective;
+pub use self::item_adjective::{ItemAdjective, ItemAdjectiveBuilder};
 
 pub mod loot_list;
 pub use self::loot_list::LootList;
@@ -448,13 +448,9 @@ impl Module {
 
             module.root_dir = Some(dirs[1].to_string());
 
-            for (id, adj) in builder_set.item_adjectives {
-                trace!(
-                    "Inserting resource of type item_adjective with key {} \
-                     into resource set.",
-                    id
-                );
-                module.item_adjectives.insert(id, Rc::new(adj));
+            for (id, builder) in builder_set.item_adjectives {
+                insert_if_ok("item_adjective", id,
+                    ItemAdjective::new(builder), &mut module.item_adjectives);
             }
 
             for (id, quest) in builder_set.quests {
@@ -877,7 +873,7 @@ struct ModuleBuilder {
     tile_builders: HashMap<String, Tileset>,
     generator_builders: HashMap<String, GeneratorBuilder>,
 
-    item_adjectives: HashMap<String, ItemAdjective>,
+    item_adjectives: HashMap<String, ItemAdjectiveBuilder>,
     quests: HashMap<String, Quest>,
 }
 

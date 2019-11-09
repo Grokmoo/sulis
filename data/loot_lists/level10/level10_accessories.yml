@@ -6,31 +6,49 @@ weighted_entries:
   amulet_gold:
     weight: 1
     adjective1:
-      none: 2
+      none: 4
       perception2: 2
       wisdom2: 2
       intellect2: 2
+      caster_level2: 2
+      bard_inspiration2: 2
+      warlock_power2: 2
+      mage_ability2: 2
+      ability2: 2
   amulet_silver:
     weight: 2
     adjective1:
-      none: 2
+      none: 4
       perception2: 2
       wisdom2: 2
       intellect2: 2
+      caster_level2: 2
+      bard_inspiration2: 2
+      warlock_power2: 2
+      mage_ability2: 2
+      ability2: 2
   belt_leather:
     weight: 2
     adjective1:
-      none: 2
+      none: 4
       strength2: 2
       endurance2: 2
       fortitude10: 2
+      hit_points2: 2
+      resistance_crushing2: 2
+      resistance_piercing2: 2
+      resistance_slashing2: 2
   cloak:
     weight: 2
     adjective1:
-      none: 2
+      none: 4
       dexterity2: 2
       concealment10: 2
       defense10: 2
+      resistance_acid2: 2
+      resistance_cold2: 2
+      resistance_shock2: 2
+      resistance_fire2: 2
   ring_copper:
     weight: 2
     adjective1:
@@ -40,6 +58,8 @@ weighted_entries:
       fortitude10: 1
       reflex10: 1
       will10: 1
+      reach2: 1
+      action2: 1
   ring_silver:
     weight: 2
     adjective1:
@@ -49,6 +69,8 @@ weighted_entries:
       fortitude10: 1
       reflex10: 1
       will10: 1
+      reach2: 1
+      action2: 1
   ring_gold:
     weight: 1
     adjective1:
@@ -58,3 +80,5 @@ weighted_entries:
       fortitude10: 1
       reflex10: 1
       will10: 1
+      reach2: 1
+      action2: 1

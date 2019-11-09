@@ -2,177 +2,283 @@ id: level10_smith
 generate: {}
 weighted_entries: {}
 probability_entries:
-  helm_hat:
-    weight: 80
+  torso_robe:
+    weight: 50
     adjective1:
-      fine: 8
-      exceptional: 2
+      exceptional: 4
+      fine: 6
     adjective2:
-      fine: 5
+      none: 5
+      will10: 2
+      intellect2: 2
+      mage_ability2: 2
+      warlock_power2: 2
+      resistance_acid2: 2
+      resistance_cold2: 2
+      resistance_shock2: 2
+      resistance_fire2: 2
+  helm_hood:
+    weight: 50
+    adjective1:
+      exceptional: 4
+      fine: 6
+    adjective2:
+      none: 4
+      concealment10: 2
+      wisdom2: 2
+      concealment_ignore2: 2
+      action2: 2
+      bard_inspiration2: 2
+  helm_hat:
+    weight: 50
+    adjective1:
+      exceptional: 4
+      fine: 6
+    adjective2:
+      none: 4
       reflex10: 2
       dexterity2: 2
+      concealment_ignore2: 2
+      action2: 2
+      bard_inspiration2: 2
   boots_leather:
     weight: 80
     adjective1:
-      fine: 8
-      exceptional: 2
+      exceptional: 5
+      fine: 5
     adjective2:
-      fine: 7
+      none: 4
       movement10: 2
       flanking10: 2
       initiative2: 2
+      reflex10: 2
+      resistance_cold2: 2
   boots_mail:
     weight: 70
     adjective1:
-      fine: 9
-      exceptional: 1
+      exceptional: 7
+      fine: 3
     adjective2:
-      fine: 7
+      none: 4
       movement10: 2
       flanking10: 2
       initiative2: 2
+      reflex10: 2
+      resistance_cold2: 2
   boots_plate:
-    weight: 30
+    weight: 50
+    adjective1:
+      exceptional: 8
+      fine: 2
     adjective2:
-      fine: 7
+      none: 4
       movement10: 2
       flanking10: 2
       initiative2: 2
+      reflex10: 2
+      resistance_cold2: 2
   gloves_leather:
     weight: 80
     adjective1:
-      fine: 8
-      exceptional: 2
-    adjective2:
+      exceptional: 5
       fine: 5
+    adjective2:
+      none: 3
       reflex10: 2
       dexterity2: 2
+      reach2: 2
+      resistance_fire2: 2
   gloves_mail:
     weight: 70
     adjective1:
-      fine: 9
-      exceptional: 1
+      exceptional: 7
+      fine: 3
     adjective2:
-      fine: 5
+      none: 3
       reflex10: 2
       dexterity2: 2
+      reach2: 2
+      resistance_fire2: 2
   gloves_plate:
-    weight: 30
+    weight: 50
+    adjective1:
+      exceptional: 8
+      fine: 2
     adjective2:
-      fine: 5
+      none: 3
       reflex10: 2
       dexterity2: 2
+      reach2: 2
+      resistance_fire2: 2
   helm_leather:
     weight: 80
     adjective1:
-      fine: 8
-      exceptional: 2
-    adjective2:
+      exceptional: 5
       fine: 5
+    adjective2:
+      none: 3
       perception2: 2
       accuracy10: 2
+      concealment_ignore2: 2
+      resistance_acid2: 2
   helm_mail:
     weight: 70
     adjective1:
-      fine: 9
-      exceptional: 1
-  helm_plate:
-    weight: 30
+      exceptional: 7
+      fine: 3
     adjective2:
-      fine: 5
+      none: 3
       perception2: 2
       accuracy10: 2
+      concealment_ignore2: 2
+      resistance_acid2: 2
+  helm_plate:
+    weight: 50
+    adjective1:
+      exceptional: 8
+      fine: 2
+    adjective2:
+      none: 3
+      perception2: 2
+      accuracy10: 2
+      concealment_ignore2: 2
+      resistance_acid2: 2
   legs_leather:
     weight: 80
     adjective1:
-      fine: 8
-      exceptional: 2
-    adjective2:
+      exceptional: 5
       fine: 5
+    adjective2:
+      none: 3
       movement10: 2
       endurance2: 2
+      action2: 2
+      hit_points2: 2
   legs_mail:
     weight: 70
     adjective1:
-      fine: 9
-      exceptional: 1
+      exceptional: 7
+      fine: 3
     adjective2:
-      fine: 5
+      none: 3
       movement10: 2
       endurance2: 2
+      action2: 2
+      hit_points2: 2
   legs_plate:
-    weight: 30
+    weight: 50
+    adjective1:
+      exceptional: 8
+      fine: 2
     adjective2:
-      fine: 5
+      none: 3
       movement10: 2
       endurance2: 2
+      action2: 2
+      hit_points2: 2
   torso_leather:
-    weight: 70
+    weight: 80
     adjective1:
-      fine: 8
-      exceptional: 2
-    adjective2:
+      exceptional: 5
       fine: 5
+    adjective2:
+      none: 5
       fortitude10: 2
       strength2: 2
+      resistance_shock2: 2
+      resistance_crushing2: 2
+      resistance_piercing2: 2
+      resistance_slashing2: 2
   torso_mail:
     weight: 70
     adjective1:
-      fine: 9
-      exceptional: 1
+      exceptional: 7
+      fine: 3
     adjective2:
-      fine: 5
+      none: 5
       fortitude10: 2
       strength2: 2
+      resistance_shock2: 2
+      resistance_crushing2: 2
+      resistance_piercing2: 2
+      resistance_slashing2: 2
   torso_plate:
-    weight: 30
+    weight: 50
+    adjective1:
+      exceptional: 8
+      fine: 2
     adjective2:
-      fine: 5
+      none: 5
       fortitude10: 2
       strength2: 2
+      resistance_shock2: 2
+      resistance_crushing2: 2
+      resistance_piercing2: 2
+      resistance_slashing2: 2
   shield_small:
-    weight: 70
+    weight: 80
     adjective1:
-      fine: 8
-      exceptional: 2
-    adjective2:
+      exceptional: 5
       fine: 5
+    adjective2:
+      none: 5
       defense10: 2
       reflex10: 2
+      reach2: 2
+      action2: 2
+      resistance_crushing2: 2
+      resistance_piercing2: 2
+      resistance_slashing2: 2
+  shield_heater:
+    weight: 70
+    adjective1:
+      exceptional: 7
+      fine: 3
+    adjective2:
+      none: 5
+      defense10: 2
+      reflex10: 2
+      reach2: 2
+      action2: 2
+      resistance_crushing2: 2
+      resistance_piercing2: 2
+      resistance_slashing2: 2
+  shield_kite:
+    weight: 70
+    adjective1:
+      exceptional: 7
+      fine: 3
+    adjective2:
+      none: 5
+      defense10: 2
+      reflex10: 2
+      reach2: 2
+      action2: 2
+      resistance_crushing2: 2
+      resistance_piercing2: 2
+      resistance_slashing2: 2
   shield_large:
     weight: 50
     adjective1:
-      fine: 8
-      exceptional: 2
+      exceptional: 8
+      fine: 2
     adjective2:
-      fine: 5
+      none: 5
       defense10: 2
       reflex10: 2
-  shield_heater:
-    weight: 60
-    adjective1:
-      fine: 8
-      exceptional: 2
-    adjective2:
-      fine: 5
-      defense10: 2
-      reflex10: 2
-  shield_kite:
-    weight: 60
-    adjective1:
-      fine: 8
-      exceptional: 2
-    adjective2:
-      fine: 5
-      defense10: 2
-      reflex10: 2
+      reach2: 2
+      action2: 2
+      resistance_crushing2: 2
+      resistance_piercing2: 2
+      resistance_slashing2: 2
+      
   battleaxe:
-    weight: 50
+    weight: 80
     adjective1:
-      fine: 7
-      exceptional: 3
+      exceptional: 5
+      fine: 5
     adjective2:
-      fine: 7
+      none: 7
       weapon_accuracy10: 1
       acid10: 1
       cold10: 1
@@ -180,10 +286,12 @@ probability_entries:
       shock10: 1
       crits10: 1
       damage10: 1
+      reach2: 1
+      concealment_ignore2: 1
   club:
     weight: 80
     adjective2:
-      fine: 7
+      none: 7
       weapon_accuracy10: 1
       acid10: 1
       cold10: 1
@@ -191,13 +299,15 @@ probability_entries:
       shock10: 1
       crits10: 1
       damage10: 1
+      reach2: 1
+      concealment_ignore2: 1
   crossbow:
-    weight: 50
+    weight: 80
     adjective1:
-      fine: 7
-      exceptional: 3
+      exceptional: 5
+      fine: 5
     adjective2:
-      fine: 7
+      none: 7
       ranged_accuracy10: 1
       acid10: 1
       cold10: 1
@@ -205,13 +315,15 @@ probability_entries:
       shock10: 1
       crits10: 1
       damage10: 1
+      reach2: 1
+      concealment_ignore2: 1
   dagger:
     weight: 80
     adjective1:
-      fine: 7
-      exceptional: 3
+      exceptional: 5
+      fine: 5
     adjective2:
-      fine: 7
+      none: 7
       weapon_accuracy10: 1
       acid10: 1
       cold10: 1
@@ -219,13 +331,15 @@ probability_entries:
       shock10: 1
       crits10: 1
       damage10: 1
+      reach2: 1
+      concealment_ignore2: 1
   flail:
-    weight: 10
+    weight: 60
     adjective1:
-      fine: 7
-      exceptional: 3
+      exceptional: 5
+      fine: 5
     adjective2:
-      fine: 7
+      none: 7
       weapon_accuracy10: 1
       acid10: 1
       cold10: 1
@@ -233,13 +347,15 @@ probability_entries:
       shock10: 1
       crits10: 1
       damage10: 1
+      reach2: 1
+      concealment_ignore2: 1
   greataxe:
-    weight: 10
+    weight: 80
     adjective1:
-      fine: 7
-      exceptional: 3
+      exceptional: 5
+      fine: 5
     adjective2:
-      fine: 7
+      none: 7
       weapon_accuracy10: 1
       acid10: 1
       cold10: 1
@@ -247,13 +363,15 @@ probability_entries:
       shock10: 1
       crits10: 1
       damage10: 1
+      reach2: 1
+      concealment_ignore2: 1
   greathammer:
-    weight: 10
+    weight: 80
     adjective1:
-      fine: 7
-      exceptional: 3
+      exceptional: 5
+      fine: 5
     adjective2:
-      fine: 7
+      none: 7
       weapon_accuracy10: 1
       acid10: 1
       cold10: 1
@@ -261,13 +379,15 @@ probability_entries:
       shock10: 1
       crits10: 1
       damage10: 1
+      reach2: 1
+      concealment_ignore2: 1
   greatsword:
-    weight: 10
+    weight: 80
     adjective1:
-      fine: 7
-      exceptional: 3
+      exceptional: 5
+      fine: 5
     adjective2:
-      fine: 7
+      none: 7
       weapon_accuracy10: 1
       acid10: 1
       cold10: 1
@@ -275,13 +395,15 @@ probability_entries:
       shock10: 1
       crits10: 1
       damage10: 1
+      reach2: 1
+      concealment_ignore2: 1
   hatchet:
     weight: 80
     adjective1:
-      fine: 7
-      exceptional: 3
+      exceptional: 5
+      fine: 5
     adjective2:
-      fine: 7
+      none: 7
       weapon_accuracy10: 1
       acid10: 1
       cold10: 1
@@ -289,13 +411,15 @@ probability_entries:
       shock10: 1
       crits10: 1
       damage10: 1
+      reach2: 1
+      concealment_ignore2: 1
   longbow:
-    weight: 10
+    weight: 80
     adjective1:
-      fine: 7
-      exceptional: 3
+      exceptional: 5
+      fine: 5
     adjective2:
-      fine: 7
+      none: 7
       ranged_accuracy10: 1
       acid10: 1
       cold10: 1
@@ -303,13 +427,15 @@ probability_entries:
       shock10: 1
       crits10: 1
       damage10: 1
+      reach2: 1
+      concealment_ignore2: 1
   longspear:
-    weight: 20
+    weight: 80
     adjective1:
-      fine: 7
-      exceptional: 3
+      exceptional: 5
+      fine: 5
     adjective2:
-      fine: 7
+      none: 7
       weapon_accuracy10: 1
       acid10: 1
       cold10: 1
@@ -317,13 +443,15 @@ probability_entries:
       shock10: 1
       crits10: 1
       damage10: 1
+      reach2: 1
+      concealment_ignore2: 1
   longsword:
-    weight: 20
+    weight: 80
     adjective1:
-      fine: 7
-      exceptional: 3
+      exceptional: 5
+      fine: 5
     adjective2:
-      fine: 7
+      none: 7
       weapon_accuracy10: 1
       acid10: 1
       cold10: 1
@@ -331,13 +459,15 @@ probability_entries:
       shock10: 1
       crits10: 1
       damage10: 1
+      reach2: 1
+      concealment_ignore2: 1
   mace:
-    weight: 50
+    weight: 80
     adjective1:
-      fine: 7
-      exceptional: 3
+      exceptional: 5
+      fine: 5
     adjective2:
-      fine: 7
+      none: 7
       weapon_accuracy10: 1
       acid10: 1
       cold10: 1
@@ -345,13 +475,15 @@ probability_entries:
       shock10: 1
       crits10: 1
       damage10: 1
+      reach2: 1
+      concealment_ignore2: 1
   morningstar:
-    weight: 20
+    weight: 80
     adjective1:
-      fine: 7
-      exceptional: 3
+      exceptional: 5
+      fine: 5
     adjective2:
-      fine: 7
+      none: 7
       weapon_accuracy10: 1
       acid10: 1
       cold10: 1
@@ -359,13 +491,15 @@ probability_entries:
       shock10: 1
       crits10: 1
       damage10: 1
+      reach2: 1
+      concealment_ignore2: 1
   quarterstaff:
     weight: 80
     adjective1:
-      fine: 7
-      exceptional: 3
+      exceptional: 5
+      fine: 5
     adjective2:
-      fine: 7
+      none: 7
       weapon_accuracy10: 1
       acid10: 1
       cold10: 1
@@ -373,13 +507,15 @@ probability_entries:
       shock10: 1
       crits10: 1
       damage10: 1
+      reach2: 1
+      concealment_ignore2: 1
   druid_staff:
     weight: 80
     adjective1:
-      fine: 7
-      exceptional: 3
+      exceptional: 5
+      fine: 5
     adjective2:
-      fine: 7
+      none: 7
       weapon_accuracy10: 1
       acid10: 1
       cold10: 1
@@ -387,13 +523,15 @@ probability_entries:
       shock10: 1
       crits10: 1
       damage10: 1
+      reach2: 1
+      concealment_ignore2: 1
   shortbow:
-    weight: 50
+    weight: 80
     adjective1:
-      fine: 7
-      exceptional: 3
+      exceptional: 5
+      fine: 5
     adjective2:
-      fine: 7
+      none: 7
       ranged_accuracy10: 1
       acid10: 1
       cold10: 1
@@ -401,55 +539,15 @@ probability_entries:
       shock10: 1
       crits10: 1
       damage10: 1
+      reach2: 1
+      concealment_ignore2: 1
   shortspear:
-    weight: 50
+    weight: 80
     adjective1:
-      fine: 7
-      exceptional: 3
-    adjective2:
-      fine: 7
-      weapon_accuracy10: 1
-      acid10: 1
-      cold10: 1
-      fire10: 1
-      shock10: 1
-      crits10: 1
-      damage10: 1
-  shortsword:
-    weight: 50
-    adjective1:
-      fine: 7
-      exceptional: 3
-    adjective2:
-      fine: 7
-      weapon_accuracy10: 1
-      acid10: 1
-      cold10: 1
-      fire10: 1
-      shock10: 1
-      crits10: 1
-      damage10: 1
-  warhammer:
-    weight: 50
-    adjective1:
-      fine: 7
-      exceptional: 3
-    adjective2:
-      fine: 7
-      weapon_accuracy10: 1
-      acid10: 1
-      cold10: 1
-      fire10: 1
-      shock10: 1
-      crits10: 1
-      damage10: 1
-  sickle:
-    weight: 40
-    adjective1:
-      fine: 5
       exceptional: 5
+      fine: 5
     adjective2:
-      fine: 7
+      none: 7
       weapon_accuracy10: 1
       acid10: 1
       cold10: 1
@@ -457,13 +555,63 @@ probability_entries:
       shock10: 1
       crits10: 1
       damage10: 1
+      reach2: 1
+      concealment_ignore2: 1
+  shortsword:
+    weight: 80
+    adjective1:
+      exceptional: 5
+      fine: 5
+    adjective2:
+      none: 7
+      weapon_accuracy10: 1
+      acid10: 1
+      cold10: 1
+      fire10: 1
+      shock10: 1
+      crits10: 1
+      damage10: 1
+      reach2: 1
+      concealment_ignore2: 1
+  warhammer:
+    weight: 80
+    adjective1:
+      exceptional: 5
+      fine: 5
+    adjective2:
+      none: 7
+      weapon_accuracy10: 1
+      acid10: 1
+      cold10: 1
+      fire10: 1
+      shock10: 1
+      crits10: 1
+      damage10: 1
+      reach2: 1
+      concealment_ignore2: 1
+  sickle:
+    weight: 80
+    adjective1:
+      exceptional: 5
+      fine: 5
+    adjective2:
+      none: 7
+      weapon_accuracy10: 1
+      acid10: 1
+      cold10: 1
+      fire10: 1
+      shock10: 1
+      crits10: 1
+      damage10: 1
+      reach2: 1
+      concealment_ignore2: 1
   sabre:
-    weight: 30
+    weight: 60
     adjective1:
-      fine: 7
-      exceptional: 3
+      exceptional: 5
+      fine: 5
     adjective2:
-      fine: 7
+      none: 7
       weapon_accuracy10: 1
       acid10: 1
       cold10: 1
@@ -471,13 +619,15 @@ probability_entries:
       shock10: 1
       crits10: 1
       damage10: 1
+      reach2: 1
+      concealment_ignore2: 1
   scimitar:
-    weight: 10
+    weight: 60
     adjective1:
-      fine: 7
-      exceptional: 3
+      exceptional: 5
+      fine: 5
     adjective2:
-      fine: 7
+      none: 7
       weapon_accuracy10: 1
       acid10: 1
       cold10: 1
@@ -485,13 +635,15 @@ probability_entries:
       shock10: 1
       crits10: 1
       damage10: 1
+      reach2: 1
+      concealment_ignore2: 1
   halberd:
-    weight: 10
+    weight: 60
     adjective1:
-      fine: 8
-      exceptional: 2
+      exceptional: 5
+      fine: 5
     adjective2:
-      fine: 7
+      none: 7
       weapon_accuracy10: 1
       acid10: 1
       cold10: 1
@@ -499,13 +651,15 @@ probability_entries:
       shock10: 1
       crits10: 1
       damage10: 1
+      reach2: 1
+      concealment_ignore2: 1
   glaive:
-    weight: 10
+    weight: 60
     adjective1:
-      fine: 8
-      exceptional: 2
+      exceptional: 5
+      fine: 5
     adjective2:
-      fine: 7
+      none: 7
       weapon_accuracy10: 1
       acid10: 1
       cold10: 1
@@ -513,3 +667,5 @@ probability_entries:
       shock10: 1
       crits10: 1
       damage10: 1
+      reach2: 1
+      concealment_ignore2: 1

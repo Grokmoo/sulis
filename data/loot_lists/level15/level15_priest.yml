@@ -9,21 +9,30 @@ probability_entries:
   torso_robe:
     weight: 80
     adjective1:
-      exceptional: 8
-      masterwork: 2
-    adjective2:
+      masterwork: 5
       exceptional: 5
+    adjective2:
+      none: 8
       will15: 2
       intellect3: 2
+      mage_ability3: 2
+      warlock_power3: 2
+      resistance_acid3: 2
+      resistance_cold3: 2
+      resistance_shock3: 2
+      resistance_fire3: 2
   helm_hood:
     weight: 80
     adjective1:
-      exceptional: 8
-      masterwork: 2
-    adjective2:
       exceptional: 5
+      masterwork: 5
+    adjective2:
+      none: 2
       concealment15: 2
       wisdom3: 2
+      concealment_ignore3: 2
+      action3: 2
+      bard_inspiration3: 2
   healing_kit:
     weight: 90
     quantity: [5, 12]

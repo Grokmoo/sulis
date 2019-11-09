@@ -1,0 +1,15 @@
+id: resistance_piercing2
+name: Piercing Resistance
+name_postfix: " of Piercing Resistance"
+item_status_icon: gui/status_physical_resist
+value_modifier: 1.4
+value_add: 1600
+bonus_modifier: 1.0
+penalty_modifier: 1.0
+attack_damage_modifier: 1.0
+attack_bonus_modifier: 1.0
+attack_penalty_modifier: 1.0
+bonuses:
+  - kind:
+      resistance: { kind: Piercing, amount: 20 }
+attack_bonuses: {}

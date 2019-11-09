@@ -1,0 +1,15 @@
+id: resistance_shock3
+name: Shock Resistance
+name_postfix: " of Shock Resistance"
+item_status_icon: gui/status_shock_resist
+value_modifier: 1.7
+value_add: 3000
+bonus_modifier: 1.0
+penalty_modifier: 1.0
+attack_damage_modifier: 1.0
+attack_bonus_modifier: 1.0
+attack_penalty_modifier: 1.0
+bonuses:
+  - kind:
+      resistance: { kind: Shock, amount: 30 }
+attack_bonuses: {}

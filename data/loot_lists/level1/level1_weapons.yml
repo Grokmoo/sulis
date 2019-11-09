@@ -20,6 +20,8 @@ weighted_entries:
       shock5: 1
       crits5: 1
       damage5: 1
+      reach1: 1
+      concealment_ignore1: 1
   club:
     weight: 10
     adjective2:
@@ -31,6 +33,8 @@ weighted_entries:
       shock5: 1
       crits5: 1
       damage5: 1
+      reach1: 1
+      concealment_ignore1: 1
   crossbow:
     weight: 2
     adjective1:
@@ -45,6 +49,8 @@ weighted_entries:
       shock5: 1
       crits5: 1
       damage5: 1
+      reach1: 1
+      concealment_ignore1: 1
   dagger:
     weight: 10
     adjective1:
@@ -59,6 +65,8 @@ weighted_entries:
       shock5: 1
       crits5: 1
       damage5: 1
+      reach1: 1
+      concealment_ignore1: 1
   flail:
     weight: 2
     adjective1:
@@ -73,6 +81,8 @@ weighted_entries:
       shock5: 1
       crits5: 1
       damage5: 1
+      reach1: 1
+      concealment_ignore1: 1
   greataxe:
     weight: 1
     adjective1:
@@ -87,6 +97,8 @@ weighted_entries:
       shock5: 1
       crits5: 1
       damage5: 1
+      reach1: 1
+      concealment_ignore1: 1
   greathammer:
     weight: 1
     adjective1:
@@ -101,6 +113,8 @@ weighted_entries:
       shock5: 1
       crits5: 1
       damage5: 1
+      reach1: 1
+      concealment_ignore1: 1
   greatsword:
     weight: 1
     adjective1:
@@ -115,6 +129,8 @@ weighted_entries:
       shock5: 1
       crits5: 1
       damage5: 1
+      reach1: 1
+      concealment_ignore1: 1
   hatchet:
     weight: 10
     adjective1:
@@ -129,6 +145,8 @@ weighted_entries:
       shock5: 1
       crits5: 1
       damage5: 1
+      reach1: 1
+      concealment_ignore1: 1
   longbow:
     weight: 1
     adjective1:
@@ -143,6 +161,8 @@ weighted_entries:
       shock5: 1
       crits5: 1
       damage5: 1
+      reach1: 1
+      concealment_ignore1: 1
   longspear:
     weight: 2
     adjective1:
@@ -157,6 +177,8 @@ weighted_entries:
       shock5: 1
       crits5: 1
       damage5: 1
+      reach1: 1
+      concealment_ignore1: 1
   longsword:
     weight: 2
     adjective1:
@@ -171,6 +193,8 @@ weighted_entries:
       shock5: 1
       crits5: 1
       damage5: 1
+      reach1: 1
+      concealment_ignore1: 1
   mace:
     weight: 5
     adjective1:
@@ -185,6 +209,8 @@ weighted_entries:
       shock5: 1
       crits5: 1
       damage5: 1
+      reach1: 1
+      concealment_ignore1: 1
   morningstar:
     weight: 2
     adjective1:
@@ -199,6 +225,8 @@ weighted_entries:
       shock5: 1
       crits5: 1
       damage5: 1
+      reach1: 1
+      concealment_ignore1: 1
   quarterstaff:
     weight: 10
     adjective1:
@@ -213,6 +241,8 @@ weighted_entries:
       shock5: 1
       crits5: 1
       damage5: 1
+      reach1: 1
+      concealment_ignore1: 1
   druid_staff:
     weight: 10
     adjective1:
@@ -227,6 +257,8 @@ weighted_entries:
       shock5: 1
       crits5: 1
       damage5: 1
+      reach1: 1
+      concealment_ignore1: 1
   shortbow:
     weight: 5
     adjective1:
@@ -241,6 +273,8 @@ weighted_entries:
       shock5: 1
       crits5: 1
       damage5: 1
+      reach1: 1
+      concealment_ignore1: 1
   shortspear:
     weight: 10
     adjective1:
@@ -255,6 +289,8 @@ weighted_entries:
       shock5: 1
       crits5: 1
       damage5: 1
+      reach1: 1
+      concealment_ignore1: 1
   shortsword:
     weight: 5
     adjective1:
@@ -269,6 +305,8 @@ weighted_entries:
       shock5: 1
       crits5: 1
       damage5: 1
+      reach1: 1
+      concealment_ignore1: 1
   warhammer:
     weight: 5
     adjective1:
@@ -283,6 +321,8 @@ weighted_entries:
       shock5: 1
       crits5: 1
       damage5: 1
+      reach1: 1
+      concealment_ignore1: 1
   sickle:
     weight: 10
     adjective1:
@@ -297,6 +337,8 @@ weighted_entries:
       shock5: 1
       crits5: 1
       damage5: 1
+      reach1: 1
+      concealment_ignore1: 1
   sabre:
     weight: 3
     adjective1:
@@ -311,6 +353,8 @@ weighted_entries:
       shock5: 1
       crits5: 1
       damage5: 1
+      reach1: 1
+      concealment_ignore1: 1
   scimitar:
     weight: 1
     adjective1:
@@ -325,6 +369,8 @@ weighted_entries:
       shock5: 1
       crits5: 1
       damage5: 1
+      reach1: 1
+      concealment_ignore1: 1
   halberd:
     weight: 1
     adjective1:
@@ -339,6 +385,8 @@ weighted_entries:
       shock5: 1
       crits5: 1
       damage5: 1
+      reach1: 1
+      concealment_ignore1: 1
   glaive:
     weight: 1
     adjective1:
@@ -353,4 +401,6 @@ weighted_entries:
       shock5: 1
       crits5: 1
       damage5: 1
+      reach1: 1
+      concealment_ignore1: 1
 

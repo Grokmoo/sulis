@@ -1,0 +1,15 @@
+id: resistance_cold1
+name: Cold Resistance
+name_postfix: " of Cold Resistance"
+item_status_icon: gui/status_cold_resist
+value_modifier: 1.2
+value_add: 800
+bonus_modifier: 1.0
+penalty_modifier: 1.0
+attack_damage_modifier: 1.0
+attack_bonus_modifier: 1.0
+attack_penalty_modifier: 1.0
+bonuses:
+  - kind:
+      resistance: { kind: Cold, amount: 10 }
+attack_bonuses: {}

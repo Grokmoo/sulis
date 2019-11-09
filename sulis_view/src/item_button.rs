@@ -791,7 +791,7 @@ fn add_bonus(
         ActionPoints(amount) => add(
             state,
             "bonus_ap",
-            Module::rules().to_display_ap(*amount),
+            Module::rules().format_ap(*amount),
         ),
         Armor(amount) => armor.add_base(*amount),
         ArmorKind { kind, amount } => armor.add_kind(*kind, *amount),
@@ -930,8 +930,15 @@ pub fn add_prereq_text_args(prereqs: &PrereqList, state: &mut WidgetState) {
         state.add_text_arg("prereq_total_level", &total_level.to_string());
     }
 
-    if let Some(ref race) = prereqs.race {
-        state.add_text_arg("prereq_race", &race.id);
+    if let Some(ref race_id) = prereqs.race {
+        match Module::race(race_id) {
+            None => {
+                warn!("Invalid race '{}' in prereq list", race_id);
+            },
+            Some(race) => {
+                state.add_text_arg("prereq_race", &race.name);
+            }
+        }
     }
 
     for (index, ref ability_id) in prereqs.abilities.iter().enumerate() {

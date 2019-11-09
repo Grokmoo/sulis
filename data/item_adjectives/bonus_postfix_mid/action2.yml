@@ -1,0 +1,15 @@
+id: action2
+name: Action
+name_postfix: " of Action"
+item_status_icon: gui/status_action
+value_modifier: 1.4
+value_add: 2000
+bonus_modifier: 1.0
+penalty_modifier: 1.0
+attack_damage_modifier: 1.0
+attack_bonus_modifier: 1.0
+attack_penalty_modifier: 1.0
+bonuses:
+  - kind:
+      action_points: 500
+attack_bonuses: {}

@@ -10,201 +10,269 @@ weighted_entries:
   torso_robe:
     weight: 5
     adjective1:
-      exceptional: 4
-      masterwork: 6
-    adjective2:
       exceptional: 5
+      masterwork: 5
+    adjective2:
+      none: 5
       will15: 2
       intellect3: 2
+      mage_ability3: 2
+      warlock_power3: 2
+      resistance_acid3: 2
+      resistance_cold3: 2
+      resistance_shock3: 2
+      resistance_fire3: 2
   helm_hood:
     weight: 5
     adjective1:
-      exceptional: 4
-      masterwork: 6
-    adjective2:
       exceptional: 5
+      masterwork: 5
+    adjective2:
+      none: 4
       concealment15: 2
       wisdom3: 2
+      concealment_ignore3: 2
+      action3: 2
+      bard_inspiration3: 2
   helm_hat:
     weight: 5
     adjective1:
-      exceptional: 4
-      masterwork: 6
-    adjective2:
       exceptional: 5
+      masterwork: 5
+    adjective2:
+      none: 4
       reflex15: 2
       dexterity3: 2
+      concealment_ignore3: 2
+      action3: 2
+      bard_inspiration3: 2
   boots_leather:
     weight: 5
     adjective1:
       exceptional: 5
       masterwork: 5
     adjective2:
-      exceptional: 7
+      none: 4
       movement15: 2
       flanking15: 2
       initiative3: 2
+      reflex15: 2
+      resistance_cold3: 2
   boots_mail:
     weight: 3
     adjective1:
-      exceptional: 7
-      masterwork: 3
+      exceptional: 5
+      masterwork: 5
     adjective2:
-      exceptional: 7
+      none: 4
       movement15: 2
       flanking15: 2
       initiative3: 2
+      reflex15: 2
+      resistance_cold3: 2
   boots_plate:
     weight: 2
     adjective1:
-      exceptional: 8
-      masterwork: 2
+      exceptional: 5
+      masterwork: 5
     adjective2:
-      exceptional: 7
+      none: 4
       movement15: 2
       flanking15: 2
       initiative3: 2
+      reflex15: 2
+      resistance_cold3: 2
   gloves_leather:
     weight: 5
     adjective1:
       exceptional: 5
       masterwork: 5
     adjective2:
-      exceptional: 5
+      none: 3
       reflex15: 2
       dexterity3: 2
+      reach3: 2
+      resistance_fire3: 2
   gloves_mail:
     weight: 3
     adjective1:
-      exceptional: 7
-      masterwork: 3
-    adjective2:
       exceptional: 5
+      masterwork: 5
+    adjective2:
+      none: 3
       reflex15: 2
       dexterity3: 2
+      reach3: 2
+      resistance_fire3: 2
   gloves_plate:
     weight: 2
     adjective1:
-      exceptional: 8
-      masterwork: 2
-    adjective2:
       exceptional: 5
+      masterwork: 5
+    adjective2:
+      none: 3
       reflex15: 2
       dexterity3: 2
+      reach3: 2
+      resistance_fire3: 2
   helm_leather:
     weight: 5
     adjective1:
       exceptional: 5
       masterwork: 5
     adjective2:
-      exceptional: 5
+      none: 3
       perception3: 2
       accuracy15: 2
+      concealment_ignore3: 2
+      resistance_acid3: 2
   helm_mail:
     weight: 3
     adjective1:
-      exceptional: 7
-      masterwork: 3
-    adjective2:
       exceptional: 5
+      masterwork: 5
+    adjective2:
+      none: 3
       perception3: 2
       accuracy15: 2
+      concealment_ignore3: 2
+      resistance_acid3: 2
   helm_plate:
     weight: 2
     adjective1:
-      exceptional: 8
-      masterwork: 2
-    adjective2:
       exceptional: 5
+      masterwork: 5
+    adjective2:
+      none: 3
       perception3: 2
       accuracy15: 2
+      concealment_ignore3: 2
+      resistance_acid3: 2
   legs_leather:
     weight: 5
     adjective1:
       exceptional: 5
       masterwork: 5
     adjective2:
-      exceptional: 5
+      none: 3
       movement15: 2
       endurance3: 2
+      action3: 2
+      hit_points3: 2
   legs_mail:
     weight: 3
     adjective1:
-      exceptional: 7
-      masterwork: 3
-    adjective2:
       exceptional: 5
+      masterwork: 5
+    adjective2:
+      none: 3
       movement15: 2
       endurance3: 2
+      action3: 2
+      hit_points3: 2
   legs_plate:
     weight: 2
     adjective1:
-      exceptional: 8
-      masterwork: 2
-    adjective2:
       exceptional: 5
+      masterwork: 5
+    adjective2:
+      none: 3
       movement15: 2
       endurance3: 2
+      action3: 2
+      hit_points3: 2
   torso_leather:
     weight: 5
     adjective1:
       exceptional: 5
       masterwork: 5
     adjective2:
-      exceptional: 5
+      none: 5
       fortitude15: 2
       strength3: 2
+      resistance_shock3: 2
+      resistance_crushing3: 2
+      resistance_piercing3: 2
+      resistance_slashing3: 2
   torso_mail:
     weight: 3
     adjective1:
-      exceptional: 7
-      masterwork: 3
-    adjective2:
       exceptional: 5
+      masterwork: 5
+    adjective2:
+      none: 5
       fortitude15: 2
       strength3: 2
+      resistance_shock3: 2
+      resistance_crushing3: 2
+      resistance_piercing3: 2
+      resistance_slashing3: 2
   torso_plate:
     weight: 2
     adjective1:
-      exceptional: 8
-      masterwork: 2
-    adjective2:
       exceptional: 5
+      masterwork: 5
+    adjective2:
+      none: 5
       fortitude15: 2
       strength3: 2
+      resistance_shock3: 2
+      resistance_crushing3: 2
+      resistance_piercing3: 2
+      resistance_slashing3: 2
   shield_small:
     weight: 5
     adjective1:
       exceptional: 5
       masterwork: 5
     adjective2:
-      exceptional: 5
+      none: 5
       defense15: 2
       reflex15: 2
+      reach3: 2
+      action3: 2
+      resistance_crushing3: 2
+      resistance_piercing3: 2
+      resistance_slashing3: 2
   shield_heater:
     weight: 5
     adjective1:
-      exceptional: 7
-      masterwork: 3
-    adjective2:
       exceptional: 5
+      masterwork: 5
+    adjective2:
+      none: 5
       defense15: 2
       reflex15: 2
+      reach3: 2
+      action3: 2
+      resistance_crushing3: 2
+      resistance_piercing3: 2
+      resistance_slashing3: 2
   shield_kite:
     weight: 5
     adjective1:
-      exceptional: 7
-      masterwork: 3
-    adjective2:
       exceptional: 5
+      masterwork: 5
+    adjective2:
+      none: 5
       defense15: 2
       reflex15: 2
+      reach3: 2
+      action3: 2
+      resistance_crushing3: 2
+      resistance_piercing3: 2
+      resistance_slashing3: 2
   shield_large:
     weight: 3
     adjective1:
-      exceptional: 8
-      masterwork: 2
-    adjective2:
       exceptional: 5
+      masterwork: 5
+    adjective2:
+      none: 5
       defense15: 2
       reflex15: 2
+      reach3: 2
+      action3: 2
+      resistance_crushing3: 2
+      resistance_piercing3: 2
+      resistance_slashing3: 2

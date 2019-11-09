@@ -9,8 +9,8 @@ weighted_entries:
   battleaxe:
     weight: 5
     adjective1:
-      fine: 5
       exceptional: 5
+      fine: 5
     adjective2:
       none: 7
       weapon_accuracy10: 1
@@ -20,6 +20,8 @@ weighted_entries:
       shock10: 1
       crits10: 1
       damage10: 1
+      reach2: 1
+      concealment_ignore2: 1
   club:
     weight: 8
     adjective2:
@@ -31,11 +33,13 @@ weighted_entries:
       shock10: 1
       crits10: 1
       damage10: 1
+      reach2: 1
+      concealment_ignore2: 1
   crossbow:
     weight: 3
     adjective1:
-      fine: 5
       exceptional: 5
+      fine: 5
     adjective2:
       none: 7
       ranged_accuracy10: 1
@@ -45,11 +49,13 @@ weighted_entries:
       shock10: 1
       crits10: 1
       damage10: 1
+      reach2: 1
+      concealment_ignore2: 1
   dagger:
     weight: 8
     adjective1:
-      fine: 5
       exceptional: 5
+      fine: 5
     adjective2:
       none: 7
       weapon_accuracy10: 1
@@ -59,11 +65,13 @@ weighted_entries:
       shock10: 1
       crits10: 1
       damage10: 1
+      reach2: 1
+      concealment_ignore2: 1
   flail:
     weight: 3
     adjective1:
-      fine: 5
       exceptional: 5
+      fine: 5
     adjective2:
       none: 7
       weapon_accuracy10: 1
@@ -73,11 +81,13 @@ weighted_entries:
       shock10: 1
       crits10: 1
       damage10: 1
+      reach2: 1
+      concealment_ignore2: 1
   greataxe:
     weight: 2
     adjective1:
-      fine: 5
       exceptional: 5
+      fine: 5
     adjective2:
       none: 7
       weapon_accuracy10: 1
@@ -87,11 +97,13 @@ weighted_entries:
       shock10: 1
       crits10: 1
       damage10: 1
+      reach2: 1
+      concealment_ignore2: 1
   greathammer:
     weight: 2
     adjective1:
-      fine: 5
       exceptional: 5
+      fine: 5
     adjective2:
       none: 7
       weapon_accuracy10: 1
@@ -101,11 +113,13 @@ weighted_entries:
       shock10: 1
       crits10: 1
       damage10: 1
+      reach2: 1
+      concealment_ignore2: 1
   greatsword:
     weight: 2
     adjective1:
-      fine: 5
       exceptional: 5
+      fine: 5
     adjective2:
       none: 7
       weapon_accuracy10: 1
@@ -115,11 +129,13 @@ weighted_entries:
       shock10: 1
       crits10: 1
       damage10: 1
+      reach2: 1
+      concealment_ignore2: 1
   hatchet:
     weight: 8
     adjective1:
-      fine: 5
       exceptional: 5
+      fine: 5
     adjective2:
       none: 7
       weapon_accuracy10: 1
@@ -129,11 +145,13 @@ weighted_entries:
       shock10: 1
       crits10: 1
       damage10: 1
+      reach2: 1
+      concealment_ignore2: 1
   longbow:
     weight: 2
     adjective1:
-      fine: 5
       exceptional: 5
+      fine: 5
     adjective2:
       none: 7
       ranged_accuracy10: 1
@@ -143,11 +161,13 @@ weighted_entries:
       shock10: 1
       crits10: 1
       damage10: 1
+      reach2: 1
+      concealment_ignore2: 1
   longspear:
     weight: 3
     adjective1:
-      fine: 5
       exceptional: 5
+      fine: 5
     adjective2:
       none: 7
       weapon_accuracy10: 1
@@ -157,11 +177,13 @@ weighted_entries:
       shock10: 1
       crits10: 1
       damage10: 1
+      reach2: 1
+      concealment_ignore2: 1
   longsword:
     weight: 3
     adjective1:
-      fine: 5
       exceptional: 5
+      fine: 5
     adjective2:
       none: 7
       weapon_accuracy10: 1
@@ -171,11 +193,13 @@ weighted_entries:
       shock10: 1
       crits10: 1
       damage10: 1
+      reach2: 1
+      concealment_ignore2: 1
   mace:
     weight: 5
     adjective1:
-      fine: 5
       exceptional: 5
+      fine: 5
     adjective2:
       none: 7
       weapon_accuracy10: 1
@@ -185,11 +209,13 @@ weighted_entries:
       shock10: 1
       crits10: 1
       damage10: 1
+      reach2: 1
+      concealment_ignore2: 1
   morningstar:
     weight: 3
     adjective1:
-      fine: 5
       exceptional: 5
+      fine: 5
     adjective2:
       none: 7
       weapon_accuracy10: 1
@@ -199,11 +225,13 @@ weighted_entries:
       shock10: 1
       crits10: 1
       damage10: 1
+      reach2: 1
+      concealment_ignore2: 1
   quarterstaff:
     weight: 8
     adjective1:
-      fine: 5
       exceptional: 5
+      fine: 5
     adjective2:
       none: 7
       weapon_accuracy10: 1
@@ -213,11 +241,13 @@ weighted_entries:
       shock10: 1
       crits10: 1
       damage10: 1
+      reach2: 1
+      concealment_ignore2: 1
   druid_staff:
     weight: 8
     adjective1:
-      fine: 5
       exceptional: 5
+      fine: 5
     adjective2:
       none: 7
       weapon_accuracy10: 1
@@ -227,11 +257,13 @@ weighted_entries:
       shock10: 1
       crits10: 1
       damage10: 1
+      reach2: 1
+      concealment_ignore2: 1
   shortbow:
     weight: 5
     adjective1:
-      fine: 5
       exceptional: 5
+      fine: 5
     adjective2:
       none: 7
       ranged_accuracy10: 1
@@ -241,11 +273,13 @@ weighted_entries:
       shock10: 1
       crits10: 1
       damage10: 1
+      reach2: 1
+      concealment_ignore2: 1
   shortspear:
     weight: 8
     adjective1:
-      fine: 5
       exceptional: 5
+      fine: 5
     adjective2:
       none: 7
       weapon_accuracy10: 1
@@ -255,11 +289,13 @@ weighted_entries:
       shock10: 1
       crits10: 1
       damage10: 1
+      reach2: 1
+      concealment_ignore2: 1
   shortsword:
     weight: 5
     adjective1:
-      fine: 5
       exceptional: 5
+      fine: 5
     adjective2:
       none: 7
       weapon_accuracy10: 1
@@ -269,11 +305,13 @@ weighted_entries:
       shock10: 1
       crits10: 1
       damage10: 1
+      reach2: 1
+      concealment_ignore2: 1
   warhammer:
     weight: 5
     adjective1:
-      fine: 5
       exceptional: 5
+      fine: 5
     adjective2:
       none: 7
       weapon_accuracy10: 1
@@ -283,11 +321,13 @@ weighted_entries:
       shock10: 1
       crits10: 1
       damage10: 1
+      reach2: 1
+      concealment_ignore2: 1
   sickle:
     weight: 8
     adjective1:
-      fine: 5
       exceptional: 5
+      fine: 5
     adjective2:
       none: 7
       weapon_accuracy10: 1
@@ -297,11 +337,13 @@ weighted_entries:
       shock10: 1
       crits10: 1
       damage10: 1
+      reach2: 1
+      concealment_ignore2: 1
   sabre:
     weight: 3
     adjective1:
-      fine: 5
       exceptional: 5
+      fine: 5
     adjective2:
       none: 7
       weapon_accuracy10: 1
@@ -311,11 +353,13 @@ weighted_entries:
       shock10: 1
       crits10: 1
       damage10: 1
+      reach2: 1
+      concealment_ignore2: 1
   scimitar:
     weight: 2
     adjective1:
-      fine: 5
       exceptional: 5
+      fine: 5
     adjective2:
       none: 7
       weapon_accuracy10: 1
@@ -325,11 +369,13 @@ weighted_entries:
       shock10: 1
       crits10: 1
       damage10: 1
+      reach2: 1
+      concealment_ignore2: 1
   halberd:
     weight: 2
     adjective1:
-      fine: 5
       exceptional: 5
+      fine: 5
     adjective2:
       none: 7
       weapon_accuracy10: 1
@@ -339,11 +385,13 @@ weighted_entries:
       shock10: 1
       crits10: 1
       damage10: 1
+      reach2: 1
+      concealment_ignore2: 1
   glaive:
     weight: 2
     adjective1:
-      fine: 5
       exceptional: 5
+      fine: 5
     adjective2:
       none: 7
       weapon_accuracy10: 1
@@ -353,3 +401,5 @@ weighted_entries:
       shock10: 1
       crits10: 1
       damage10: 1
+      reach2: 1
+      concealment_ignore2: 1

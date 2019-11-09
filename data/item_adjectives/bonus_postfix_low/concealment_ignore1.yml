@@ -1,0 +1,15 @@
+id: concealment_ignore1
+name: Concealment Ignore
+name_postfix: " of Blind Fighting"
+item_status_icon: gui/status_darkness_ignore
+value_modifier: 1.2
+value_add: 500
+bonus_modifier: 1.0
+penalty_modifier: 1.0
+attack_damage_modifier: 1.0
+attack_bonus_modifier: 1.0
+attack_penalty_modifier: 1.0
+bonuses:
+  - kind:
+      concealment_ignore: 10
+attack_bonuses: {}

@@ -1136,7 +1136,7 @@ themes:
               
               [?0_damage_min;s=6;x=0;y=25|Main Hand]
               [?0_damage_min;s=5;x=0|Damage: #0_damage_min# to #0_damage_max#
-              ][?0_armor_penetration;s=5;x=0|AP: #0_armor_penetration#
+              ][?0_armor_penetration;s=5;x=0|Armor Pen: #0_armor_penetration#
               ][?0_melee_accuracy;s=5;x=0|Accuracy: #0_melee_accuracy#
               ][?0_ranged_accuracy;s=5;x=0|Accuracy: #0_ranged_accuracy#
               ][?0_spell_accuracy;s=5;x=0|Accuracy: #0_spell_accuracy#
@@ -1149,7 +1149,7 @@ themes:
       
               [?1_damage_min;s=6;x=35;y=25|Off Hand]
               [?1_damage_min;s=5;x=35|Damage: #1_damage_min# to #1_damage_max#
-              ][?1_armor_penetration;s=5;x=35|AP: #1_armor_penetration#
+              ][?1_armor_penetration;s=5;x=35|Armor Pen: #1_armor_penetration#
               ][?1_melee_accuracy;s=5;x=0|Accuracy: #1_melee_accuracy#
               ][?1_ranged_accuracy;s=5;x=0|Accuracy: #1_ranged_accuracy#
               ][?1_spell_accuracy;s=5;x=0|Accuracy: #1_spell_accuracy#
@@ -1503,9 +1503,12 @@ themes:
           ][?resistance_shock|Shock Resistance #resistance_shock#%
           ][?resistance_fire|Fire Resistance #resistance_fire#%
           ][?any_accuracy|[s=6|Accuracy:][?melee_accuracy| (Melee #melee_accuracy#)][?ranged_accuracy| (Ranged: #ranged_accuracy#)][?spell_accuracy| (Spell: #spell_accuracy#)]
-          ][?ability_group_0|#ability_group_0# ability uses per encounter: #ability_group_0_uses_per_encounter#
-          ][?ability_group_1|#ability_group_1# ability uses per encounter: #ability_group_1_uses_per_encounter#
-          ][?ability_group_2|#ability_group_2# ability uses per encounter: #ability_group_2_uses_per_encounter#
+          ][?ability_group_0|#ability_group_0_uses_per_encounter# [c=ff0|#ability_group_0#] use per Encounter
+          ][?ability_group_1|#ability_group_1_uses_per_encounter# [c=ff0|#ability_group_1#] use per Encounter
+          ][?ability_group_2|#ability_group_2_uses_per_encounter# [c=ff0|#ability_group_2#] use per Encounter
+          ][?ability_group_0_uses_per_day|#ability_group_0_uses_per_day# [c=ff0|#ability_group_0#] use per Day
+          ][?ability_group_0_uses_per_day|#ability_group_1_uses_per_day# [c=ff0|#ability_group_1#] use per Day
+          ][?ability_group_0_uses_per_day|#ability_group_2_uses_per_day# [c=ff0|#ability_group_2#] use per Day
           ][?class_stat_id|[c=f0f|#class_stat_id#: #class_stat_amount#]
           ][?str|Strength: #str#
           ][?dex|Dexterity: #dex#
@@ -1514,10 +1517,10 @@ themes:
           ][?int|Intelligence: #int#
           ][?wis|Wisdom: #wis#
           ][?caster_level|Caster level: #caster_level#
-          ][?bonus_ap|AP: #bonus_ap#
-          ][?min_damage|Damage: #min_damage# to #max_damage# [c=f00|#damage_kind#]
+          ][?bonus_ap|#bonus_ap#
+          ][?min_damage|Damage: #min_damage# to #max_damage# [c=ff0|#damage_kind#]
           ][?armor_penetration|Armor Penetration: #armor_penetration#
-          ][?attack_min_bonus_damage|Damage: #attack_min_bonus_damage# to #attack_max_bonus_damage# [?attack_bonus_damage_kind;c=f00|#attack_bonus_damage_kind#]
+          ][?attack_min_bonus_damage|Damage: #attack_min_bonus_damage# to #attack_max_bonus_damage# [?attack_bonus_damage_kind;c=ff0|#attack_bonus_damage_kind#]
           ][?attack_melee_accuracy|Melee Accuracy: #attack_melee_accuracy#
           ][?attack_ranged_accuracy|Ranged Accuracy: #attack_ranged_accuracy#
           ][?attack_spell_accuracy|Spell Accuracy: #attack_spell_accuracy#
@@ -1527,9 +1530,9 @@ themes:
           ][?attack_crit_multiplier|Crit Multiplier: #attack_crit_multiplier#
           ][?attack_hit_multiplier|Hit Multiplier: #attack_hit_multiplier#
           ][?attack_graze_multiplier|Graze Multiplier: #attack_graze_multiplier#
-          ][?min_bonus_damage_0|Damage: #min_bonus_damage_0# to #max_bonus_damage_0# [?bonus_damage_kind_0;c=f00|#bonus_damage_kind_0#]
-          ][?min_bonus_damage_1|Damage: #min_bonus_damage_1# to #max_bonus_damage_1# [?bonus_damage_kind_0;c=f00|#bonus_damage_kind_1#]
-          ][?min_bonus_damage_2|Damage: #min_bonus_damage_2# to #max_bonus_damage_2# [?bonus_damage_kind_0;c=f00|#bonus_damage_kind_2#]
+          ][?min_bonus_damage_0|Damage: #min_bonus_damage_0# to #max_bonus_damage_0# [?bonus_damage_kind_0;c=ff0|#bonus_damage_kind_0#]
+          ][?min_bonus_damage_1|Damage: #min_bonus_damage_1# to #max_bonus_damage_1# [?bonus_damage_kind_0;c=ff0|#bonus_damage_kind_1#]
+          ][?min_bonus_damage_2|Damage: #min_bonus_damage_2# to #max_bonus_damage_2# [?bonus_damage_kind_0;c=ff0|#bonus_damage_kind_2#]
           ][?reach|Reach: #reach#
           ][?range|Range: #range#
           ][?bonus_reach|Reach: #bonus_reach#

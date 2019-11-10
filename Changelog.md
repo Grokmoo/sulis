@@ -5,6 +5,27 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html) is used with major version changes for breaking save game and data format compatibility.
 
+## [0.3.1] - 2019-11-09
+
+### Added
+- Two new playable classes - the Warlock and Bard, both with new associated mechanics and stats
+- Signficantly increased item and bonus variety in all loot
+- While in combat, your selected movement path is now previewed before you move
+- While in combat, your remaining AP after a given action is now previewed
+- A number of new scripting hooks and functions added to the Lua interface
+
+### Changed
+- Reworked class kits to give more customization at character creation
+- Reworked the companions in the Twin Expanse to fit together better
+- Improved dialog flow and highlight the current speaker
+- Reworked several abilities in the general ability tree
+- Most abilities can now only be activated in combat
+
+### Fixed
+- Characters with zero AP still get a turn
+- Fixed Male / Female selection in Character Creator (thanks shmutalov!)
+- A number of breaking issues in the Twin Expanse Act 1 were resolved
+
 ## [0.3.0] - 2019-09-09
 This version is save compatible with 0.2.x.
 ### Added

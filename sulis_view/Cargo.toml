@@ -1,6 +1,6 @@
 [package]
 name = "sulis_view"
-version = "0.3.0"
+version = "0.3.1"
 authors = ["Jared Stephen <grok_moo@yahoo.com>"]
 edition = "2018"
 

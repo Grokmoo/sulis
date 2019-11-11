@@ -1,0 +1,23 @@
+id: intro
+initial_nodes:
+  - id: start01
+nodes:
+  start01:
+    text: |
+      [c=888|The world around you quickly becomes blindingly bright, but only moments later returns to normal.
+      
+      Only a moment ago, you were standing in the council chamber of Rose Lake.
+      
+      You are now in a completely unfamiliar place.]
+    responses:
+      - text: |
+          [c=888|Continue]
+        to: start02
+  start02:
+    text: |
+      [c=888|The terrain around you is sand - sand, as far as you can see.  In the distance you can see what looks like a small camp or town.
+      
+      You must discover where you are, and plan a course of action.]
+    responses:
+      - text: |
+          [c=888|Go]

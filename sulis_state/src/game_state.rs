@@ -270,6 +270,12 @@ impl GameState {
     }
 
     pub fn init(pc_actor: Rc<Actor>) -> Result<(), Error> {
+        ANIMATIONS.with(|anims| anims.borrow_mut().clear());
+        CLEAR_ANIMS.with(|c| c.set(false));
+        MODAL_LOCKED.with(|c| c.set(false));
+        ANIMS_TO_ADD.with(|anims| anims.borrow_mut().clear());
+        AI.with(|ai| *ai.borrow_mut() = AI::new());
+
         TURN_MANAGER.with(|mgr| {
             let rules = Module::rules();
             let starting_time = Module::campaign().starting_time;

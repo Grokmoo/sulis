@@ -1,0 +1,128 @@
+id: backstory
+initial_nodes:
+  - id: birth
+nodes:
+  birth:
+    text: |
+      You were born and raised in...
+    responses:
+      - text: |
+          The grasslands of Koswana Bay
+        to: parents
+        on_select:
+          - player_ability: backstory_birth_grasslands
+      - text: |
+          The islands of the Elix Archipelago
+        to: parents
+        on_select:
+          - player_ability: backstory_birth_archipelago
+      - text: |
+          The Sciedan Desert
+        to: parents
+        on_select:
+          - player_ability: backstory_birth_desert
+      - text: |
+          The Mountains of Naath
+        to: parents
+        on_select:
+          - player_ability: backstory_birth_mountains
+      - text: |
+          The frozen tundra of Obeka
+        to: parents
+        on_select:
+          - player_ability: backstory_birth_tundra
+  parents:
+    text: |
+      Your parents were...
+    responses:
+      - text: |
+          Simple farmers
+        to: trait
+        on_select:
+          - player_ability: backstory_family_farmer
+      - text: |
+          Urban tradesmen
+        to: trait
+        on_select:
+          - player_ability: backstory_family_tradesman
+      - text: |
+          Traveling Merchants
+        to: trait
+        on_select:
+          - player_ability: backstory_family_merchant
+      - text: |
+          Priests
+        to: trait
+        on_select:
+          - player_ability: backstory_family_priest
+      - text: |
+          Minor nobles
+        to: trait
+        on_select:
+          - player_ability: backstory_family_noble
+  trait:
+    text: |
+      You had a fairly uneventful childhood, and were prepared to take up the trade of your parents.
+      As you matured, your friends came to know you as something of a...
+    responses:
+      - text: Bookworm
+        to: leaving
+        on_select:
+          - player_ability: backstory_trait_bookworm
+      - text: Bully
+        to: leaving
+        on_select:
+          - player_ability: backstory_trait_bully
+      - text: Flirt
+        to: leaving
+        on_select:
+          - player_ability: backstory_trait_flirt
+      - text: Prankster
+        to: leaving
+        on_select:
+          - player_ability: backstory_trait_prankster
+      - text: Wild Child
+        to: leaving
+        on_select:
+          - player_ability: backstory_trait_wild_child
+  leaving:
+    text: |
+      One day, however, everything in your life changed.
+    responses:
+      - text: |
+          You committed an unforgivable sin and were exiled.
+        to: adventure
+        on_select:
+          - player_ability: backstory_leave_exiled
+      - text: |
+          You were betrayed, framed for a crime you did not commit.  You left instead of facing false justice.
+        to: adventure
+        on_select:
+          - player_ability: backstory_leave_betrayed
+      - text: |
+          Your family went bankrupt.  With no food or money, you decided to make your own way.
+        to: adventure
+        on_select:
+          - player_ability: backstory_leave_bankrupt
+      - text: |
+          Your entire family was killed and you were forced to flee.
+        to: adventure
+        on_select:
+          - player_ability: backstory_leave_parents_killed
+      - text: |
+          You grew restless and decided to leave and forge your own destiny.
+        to: adventure
+        on_select:
+          - player_ability: backstory_leave_restless
+  adventure:
+    text: |
+      On the road for many months and many miles, you began to learn the life of an adventurer.
+      
+      Eventually, you ended up meeting a small group of adventurers in an inn in a region called the Twin Expanse, near the town of Wellswood.
+      
+      In need of money and looking to prove yourself, you decided to join up with them - taking a contract to look into the whereabouts of a missing merchant and his wagon.
+      
+      In your search for the wagon, you narrowly escaped being killed by a large goblin war party, only to be caught in an avalanche.  As luck would have it, you survived.
+      
+      In the city of Rose Lake, you uncovered a terrible conspiracy.  But, upon confronting the leader of the conspiracy, he used a powerful magical artifact known as the Aegis to teleport you to an unknown location...
+    responses: []

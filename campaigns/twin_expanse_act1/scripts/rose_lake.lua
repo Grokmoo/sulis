@@ -149,5 +149,16 @@ function rose_fort_portal(parent)
 end
 
 function rose_fort_end(parent)
-  game:show_game_over_window("Thanks for playing!  You have completed Act 1 of the Twin Expanse.  Please keep an eye out for future content and Act 2 of the campaign.")
+  remove_items({"adventurers_note", "note_to_irhan", "rose_lake_pass", "troll_journal"})
+
+  game:load_module("twin_expanse_act2")
+end
+
+function remove_items(ids)
+  for i = 1, #ids do
+    item = game:find_party_item(ids[i])
+	if item:is_valid() then
+	  game:remove_party_item(item)
+	end
+  end
 end

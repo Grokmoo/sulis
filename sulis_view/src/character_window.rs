@@ -183,16 +183,20 @@ impl WidgetKind for CharacterWindow {
     }
 }
 
-pub fn get_inventory(pc: &ActorState) -> InventoryBuilder {
+pub fn get_inventory(pc: &ActorState, include_stash: bool) -> InventoryBuilder {
     let coins = GameState::party_coins();
 
     let stash = GameState::party_stash();
-    let items = stash
-        .borrow()
-        .items()
-        .iter()
-        .map(|(qty, item)| ItemListEntrySaveState::new(*qty, &item.item))
-        .collect();
+    let items = if include_stash {
+        stash
+            .borrow()
+            .items()
+            .iter()
+            .map(|(qty, item)| ItemListEntrySaveState::new(*qty, &item.item))
+            .collect()
+    } else {
+        Vec::new()
+    };
 
     let equipped = Slot::iter()
         .map(|slot| (*slot, pc.inventory().equipped(*slot)))
@@ -237,7 +241,7 @@ fn export_character(pc: &ActorState) {
         .map(|(class, level)| (class.id.to_string(), *level))
         .collect();
 
-    let inventory = get_inventory(&pc);
+    let inventory = get_inventory(&pc, true);
 
     let actor = ActorBuilder {
         id,

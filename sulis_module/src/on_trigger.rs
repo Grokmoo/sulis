@@ -14,6 +14,8 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::collections::HashMap;
+
 use crate::rules::Time;
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
@@ -113,6 +115,15 @@ pub struct QuestStateData {
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
+#[serde(deny_unknown_fields)]
+pub struct ModuleLoadData {
+    pub module: String,
+    pub party: Vec<usize>,
+    pub include_stash: bool,
+    pub flags: HashMap<String, String>,
+}
+
+#[derive(Deserialize, Serialize, Debug, Clone)]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub enum OnTrigger {
     BlockUI(u32), // block user interface for specified number of millis
@@ -135,7 +146,7 @@ pub enum OnTrigger {
     SayLine(String),
     GameOverWindow(String),
     ScrollView(i32, i32),
-    LoadModule(String),
+    LoadModule(ModuleLoadData),
     ShowConfirm(DialogData),
     ShowMenu(MenuData),
     QuestState(QuestStateData),

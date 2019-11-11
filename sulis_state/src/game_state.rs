@@ -269,7 +269,10 @@ impl GameState {
         Ok(())
     }
 
-    pub fn init(pc_actor: Rc<Actor>) -> Result<(), Error> {
+    pub fn init(pc_actor: Rc<Actor>,
+        party_actors: Vec<Rc<Actor>>,
+        flags: HashMap<String, String>) -> Result<(), Error> {
+
         ANIMATIONS.with(|anims| anims.borrow_mut().clear());
         CLEAR_ANIMS.with(|c| c.set(false));
         MODAL_LOCKED.with(|c| c.set(false));
@@ -283,7 +286,7 @@ impl GameState {
         });
 
         script_cache::setup().map_err(|e| Error::new(ErrorKind::InvalidInput, e))?;
-        let game_state = GameState::new(pc_actor)?;
+        let game_state = GameState::new(pc_actor, party_actors, flags)?;
         STATE.with(|state| {
             *state.borrow_mut() = Some(game_state);
         });
@@ -312,7 +315,10 @@ impl GameState {
         Ok(())
     }
 
-    fn new(pc: Rc<Actor>) -> Result<GameState, Error> {
+    fn new(pc: Rc<Actor>,
+        party_actors: Vec<Rc<Actor>>,
+        flags: HashMap<String, String>) -> Result<GameState, Error> {
+
         let party_coins = pc.inventory.pc_starting_coins();
         let mut party_stash = ItemList::new();
         for (qty, item) in pc.inventory.pc_starting_item_iter() {
@@ -341,7 +347,7 @@ impl GameState {
 
         let index = match area_state
             .borrow_mut()
-            .add_actor(pc, location, None, true, None)
+            .add_actor(pc, location.clone(), None, true, None)
         {
             Err(_) => {
                 error!("Player character starting location must be within bounds and passable.");
@@ -355,6 +361,31 @@ impl GameState {
 
         pc_state.borrow_mut().actor.init_turn();
 
+        let mut party = Vec::new();
+        party.push(Rc::clone(&pc_state));
+
+        for member in party_actors {
+            let mut member_location = location.clone();
+            GameState::find_transition_location(&mut member_location, &member.race.size,
+                &area_state.borrow());
+
+            let index = match area_state.borrow_mut().add_actor(member, member_location,
+                None, true, None) {
+                Err(_) => {
+                    error!("Unable to find start location for party member");
+                    return invalid_data_error("Unable to find start locations.");
+                }, Ok(index) => index,
+            };
+            let member = mgr.borrow_mut().entity(index);
+            member.borrow_mut().actor.init_turn();
+            party.push(member);
+        }
+
+
+        for (flag, value) in &flags {
+            pc_state.borrow_mut().set_custom_flag(flag, value);
+        }
+
         let width = area_state.borrow().area.area.width;
         let height = area_state.borrow().area.area.height;
 
@@ -362,9 +393,6 @@ impl GameState {
 
         let mut areas: HashMap<String, Rc<RefCell<AreaState>>> = HashMap::new();
         areas.insert(campaign.starting_area.to_string(), Rc::clone(&area_state));
-
-        let mut party = Vec::new();
-        party.push(Rc::clone(&pc_state));
 
         let mut selected = Vec::new();
         selected.push(Rc::clone(&pc_state));

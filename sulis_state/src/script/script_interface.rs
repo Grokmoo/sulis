@@ -249,12 +249,10 @@ use sulis_module::{Faction, Module, OnTrigger, Time};
 /// in the current module without loading.  This can be used to show victory
 /// or defeat.  The specified `text` is displayed.
 ///
-/// # `load_module(id: String)`
-/// Causes the module with the specified `id` to be loaded.  The player, their money,
-/// items, and party stash are transfered to the module intact.  Player script state is
-/// not currently transfered, and any other data in the current module is also not
-/// transfered, including the player's party.  This action is performed asynchronously
-/// on the next UI update, the remainder of the current script will be executed.
+/// # `create_module_export(id: String) -> ModuleExport`
+/// Creates a `ModuleExport` object which can be used to configure transfering data
+/// and loading a new campaign/module.  Once it is set up, the new campaign is loaded
+/// by calling `activate` on the returned object.
 ///
 /// # `player -> ScriptEntity`
 /// Returns a reference to the player character ScriptEntity.
@@ -774,11 +772,8 @@ impl UserData for ScriptInterface {
             Ok(())
         });
 
-        methods.add_method("load_module", |_, _, id: String| {
-            let pc = GameState::player();
-            let cb = OnTrigger::LoadModule(id);
-            GameState::add_ui_callback(vec![cb], &pc, &pc);
-            Ok(())
+        methods.add_method("create_module_export", |_, _, id: String| {
+            Ok(ModuleExport::new(id))
         });
 
         methods.add_method("player", |_, _, ()| {

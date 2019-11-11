@@ -6,7 +6,8 @@ function on_enter_ambush(parent, target)
 end
 
 function after_escape_cutscene(parent, target)
-  game:load_module("twin_expanse_act1")
+  local export = game:create_module_export("twin_expanse_act1")
+  export:activate()
 end
 
 function on_area_load(parent)

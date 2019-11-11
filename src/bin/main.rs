@@ -16,6 +16,7 @@
 
 #![windows_subsystem = "windows"]
 
+use std::collections::HashMap;
 use std::rc::Rc;
 
 use log::{error, info};
@@ -97,9 +98,12 @@ fn main_menu(io: &mut Box<dyn IO>) -> NextGameStep {
     }
 }
 
-fn new_campaign(io: &mut Box<dyn IO>, pc_actor: Rc<Actor>) -> NextGameStep {
+fn new_campaign(io: &mut Box<dyn IO>,
+    pc_actor: Rc<Actor>,
+    party_actors: Vec<Rc<Actor>>,
+    flags: HashMap<String, String>) -> NextGameStep {
     info!("Initializing game state.");
-    if let Err(e) = GameState::init(pc_actor) {
+    if let Err(e) = GameState::init(pc_actor, party_actors, flags) {
         error!("{}", e);
         util::error_and_exit("There was a fatal error creating the game state.");
     };
@@ -142,7 +146,8 @@ fn main() {
         use sulis_state::NextGameStep::*;
         next_step = match next_step {
             Exit => break,
-            NewCampaign { pc_actor } => new_campaign(&mut io, pc_actor),
+            NewCampaign { pc_actor } =>
+                new_campaign(&mut io, pc_actor, Vec::new(), HashMap::new()),
             LoadCampaign { save_state } => load_campaign(&mut io, save_state),
             MainMenu => main_menu(&mut io),
             MainMenuReloadResources => {
@@ -151,13 +156,15 @@ fn main() {
             }
             LoadModuleAndNewCampaign {
                 pc_actor,
+                party_actors,
+                flags,
                 module_dir,
             } => {
                 let mut active = ActiveResources::read();
                 active.campaign = Some(module_dir);
                 active.write();
                 load_resources();
-                new_campaign(&mut io, pc_actor)
+                new_campaign(&mut io, pc_actor, party_actors, flags)
             }
             RecreateIO => {
                 io = create_io();

@@ -114,6 +114,8 @@ pub use self::race_pane::RacePane;
 mod script_menu;
 pub use self::script_menu::ScriptMenu;
 
+mod trigger_activator;
+
 mod window_fade;
 pub use self::window_fade::WindowFade;
 
@@ -155,7 +157,7 @@ impl MainLoopUpdater for GameMainLoopUpdater {
         let ui_cb = GameState::update(millis);
 
         if let Some(cb) = ui_cb {
-            dialog_window::activate(root, &cb.on_trigger, &cb.parent, &cb.target);
+            trigger_activator::activate(root, &cb.on_trigger, &cb.parent, &cb.target);
         }
     }
 

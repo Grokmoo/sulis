@@ -127,6 +127,8 @@ pub enum NextGameStep {
     },
     LoadModuleAndNewCampaign {
         pc_actor: Rc<Actor>,
+        party_actors: Vec<Rc<Actor>>,
+        flags: HashMap<String, String>,
         module_dir: String,
     },
     MainMenu,

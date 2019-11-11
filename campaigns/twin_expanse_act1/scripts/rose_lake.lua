@@ -151,7 +151,19 @@ end
 function rose_fort_end(parent)
   remove_items({"adventurers_note", "note_to_irhan", "rose_lake_pass", "troll_journal"})
 
-  game:load_module("twin_expanse_act2")
+  local export = game:create_module_export("twin_expanse_act2")
+  export:set_include_stash(true)
+  export:set_flag("completed_twin_expanse_act1")
+
+  local player = game:player()
+  local party = game:party()
+  for i = 1, #party do
+      local member = party[i]
+      if not member:has_flag("__is_summoned_party_member") and player:id() ~= member:id() then
+          export:add_to_party(party[i])
+      end
+  end
+  export:activate()
 end
 
 function remove_items(ids)

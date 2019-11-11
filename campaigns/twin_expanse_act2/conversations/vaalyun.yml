@@ -1,0 +1,113 @@
+id: vaalyun
+initial_nodes:
+  - id: questions
+    to_view:
+      - target_flag: joined
+  - id: not_joined
+    to_view:
+      - target_flag: already_talked
+  - id: start01
+nodes:
+  start01:
+    text: |
+      [c=6868FF|#target_name#] - [c=888|The elf watches you approach, clearly eager to speak to you.]
+      
+      Thanks for speaking to me.  My name is Vaalyun, formerly of Pard.
+    on_view:
+      - target_flag: already_talked
+    responses:
+      - text: "I am #player_name#.  Pleased to meet you."
+        to: start02
+      - text: "I'm #player_name#."
+        to: start02
+  start02:
+    text: |
+      [c=6868FF|#target_name#] - Yes, I know of you.  You traveled with a group including an elf - Ethel - into the wood searching for a caravan.  Do you know what became of him?
+    responses:
+      - text: "[c=f00|Lie] I don't know."
+        to: start03a
+        on_select:
+          - target_flag: lied_ethel_death
+      - text: "I'm sorry, he is dead."
+        to: start03b
+      - text: "He died."
+        to: start03b
+  start03a:
+    text: |
+      [c=6868FF|#target_name#] - I was afraid you might say that.  In truth, I hold out little hope for his survival.  Still, I would like to know for certain.
+    responses:
+      - text: "[c=888|Continue]"
+        to: start04
+  start03b:
+    text: |
+      It is as I feared.  Thank you for telling me.
+    responses:
+      - text: "[c=888|Continue]"
+        to: start04
+  start04:
+    text: |
+      [c=6868FF|#target_name#] - Ethel was carrying something valuable to me and I would like to recover it.
+      
+      You knew and traveled with him, so I think you are my best chance to do this.  I propose we travel together and attempt to recover this item.
+    on_view:
+      - fire_script:
+          id: wellswood_farms
+          func: vaalyun_quest_start
+    responses:
+      - text: "Agreed.  Lets go find this item."
+        to: join
+      - text: "I agree, but I have some other business to take care of first."
+        to: join_confirm
+      - text: "What is this valuable item?"
+        to: item_ask
+      - text: "I am not eager to face those goblins again.  Sorry."
+        to: join_reject
+      - text: "Not interested."
+        to: join_reject
+  item_ask:
+    text: |
+      [c=6868FF|#target_name#] - It is a personal matter, and would mean nothing to you.  The item is only of value to me.
+      
+      What do you say?
+    responses:
+      - text: "Agreed.  Lets go find this item."
+        to: join
+      - text: "I agree, but I have some other business to take care of first."
+        to: join_confirm
+      - text: "I am not eager to face those goblins again.  Sorry."
+        to: join_reject
+      - text: "Not interested."
+        to: join_reject
+  join_confirm:
+    text: |
+      [c=6868FF|#target_name#] - That is acceptable.  Please do not delay too long - I don't want to lose the trail.
+    responses:
+      - text: "Agreed.  Lets go."
+        to: join
+      - text: "I've changed my mind."
+        to: join_reject
+  join_reject:
+    text: |
+      [c=6868FF|#target_name#] - I am sorry to hear that.  Let me know if you change your mind.
+    responses:
+      - text: "Farewell."
+  join:
+    text: |
+      [c=6868FF|#target_name#] - Excellent.  Lets be off.
+    on_view:
+      - fire_script:
+          id: wellswood_farms
+          func: vaalyun_join
+    responses:
+      - text: "[c=888|Leave]"
+  not_joined:
+    text: |
+      [c=6868FF|#target_name#] - Have you reconsidered?  Should I join you?
+    responses:
+      - text: "Yes.  Let's go."
+        to: join
+      - text: "No. Farewell."
+  questions:
+    text: "Can I help you with something?"
+    responses:
+      - text: "Nothing right now."

@@ -43,6 +43,9 @@
 mod area_targeter;
 pub use self::area_targeter::AreaTargeter;
 
+mod module_export;
+pub use self::module_export::ModuleExport;
+
 mod script_ability;
 pub use self::script_ability::{ScriptAbility, ScriptAbilitySet};
 

@@ -1,0 +1,84 @@
+---
+id: "npc_vaalyun"
+name: Vaalyun
+race: elf
+sex: Male
+portrait: portraits/elf15
+attributes:
+  str: 17
+  dex: 14
+  end: 14
+  per: 13
+  int: 12
+  wis: 10
+conversation: vaalyun
+faction: Friendly
+ai: ai_vaalyun
+images:
+  Hair: creatures/hair08
+hue: 0.3
+hair_color:
+  r: 0.3607843220233917
+  g: 0.20000000298023225
+  b: 0.09019608050584793
+  a: 1.0
+skin_color:
+  r: 1.0
+  g: 0.7803921699523926
+  b: 0.5803921818733215
+  a: 1.0
+inventory:
+  equipped:
+    Feet:
+      id: boots_mail
+      adjectives: [ fine ]
+    HeldMain:
+      id: longsword
+      adjectives: [ fine, accuracy5 ]
+    HeldOff:
+      id: shield_kite
+      adjectives: [ fine, defense5 ]
+    Legs:
+      id: legs_mail
+      adjectives: [ fine ]
+    Torso:
+      id: torso_mail
+      adjectives: [ fine ]
+    Hands:
+      id: gloves_mail
+      adjectives: [ fine ]
+  quick:
+    Usable2:
+      id: potion_body
+      adjectives: []
+    AltHeldMain:
+      id: shortbow
+      adjectives: [ fine ]
+    Usable1:
+      id: potion_healing
+      adjectives: []
+levels:
+  fighter: 8
+xp: 5000
+abilities:
+  - armor_light
+  - armor_medium
+  - weapon_axe
+  - weapon_crossbow
+  - weapon_bow
+  - weapon_small_sword
+  - weapon_large_sword
+  - weapon_spear
+  - weapon_mace
+  - weapon_simple
+  - mighty_blow
+  - leap
+  - defensive_fighting
+  - defender
+  - stunning_blow
+  - whirlwind_attack
+  - armored_combat
+  - deflection
+  - helping_hand
+  - shield_combat
+  - charge_attack

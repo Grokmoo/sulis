@@ -74,6 +74,10 @@ wall_kinds:
     base_tile: _outer_edge_s
     extended: [ cliffs_ext1, cliffs_ext2 ]
     interior_border: false
+  - id: cliffs_sand
+    base_tile: _outer_edge_s
+    extended: [ cliffs_sand_ext1, cliffs_sand_ext2 ]
+    interior_border: false
   - id: cliffs_grass
     base_tile: _outer_edge_s
     extended: [ cliffs_ext1, cliffs_ext2 ]
@@ -82,6 +86,21 @@ wall_kinds:
     base_tile: _outer_edge_s
     fill_tile: _base
     extended: [ cave_wall_ext1, cave_wall_ext2 ]
+    interior_border: false
+  - id: roof_adobe
+    base_tile: _outer_edge_s
+    fill_tile: _base
+    extended: [ roof_adobe_ext1, roof_adobe_ext2 ]
+    interior_border: false
+  - id: roof_adobe_brick
+    base_tile: _outer_edge_s
+    fill_tile: _base
+    extended: [ roof_adobe_brick_ext1, roof_adobe_brick_ext2 ]
+    interior_border: false
+  - id: roof_adobe_flat
+    base_tile: _outer_edge_s
+    fill_tile: _base
+    extended: [ roof_adobe_flat_ext1, roof_adobe_flat_ext2 ]
     interior_border: false
 terrain_rules:
   grid_width: 2
@@ -250,7 +269,7 @@ uniform_sets:
       cobble_stone_base, cobble_stone_base_variant1, cobble_stone_base_variant2, cobble_stone_base_variant3,
       cobble_dirt_base, cobble_dirt_base_variant1, cobble_dirt_base_variant2, cobble_dirt_base_variant3,
       cobble_plain_base, cobble_plain_base_variant1, cobble_plain_base_variant2, cobble_plain_base_variant3,
-      stone_bordered_base, fancy_carpet_base
+      stone_bordered_base, fancy_carpet_base,
     ]
   base2_all_passable:
     layer: terrain_border
@@ -608,9 +627,24 @@ uniform_sets:
       plant11, plant12, plant13, plant14, plant15, plant16, plant17, plant18, plant19, plant20,
       rocks_small, campfire, lilypad03, lilypad04,
       window_small01, window_small02, window_small03, window_small04, window_small05, window_small06, window_small07,
-      bones02,
+      bones02, rocks_sm01, rocks_sm02, rocks_sm03, rocks_sm04, rocks_sm05, rocks_sm06,
+      adobe_window_1_open, adobe_window_2_open, adobe_window_1_closed, adobe_window_2_closed,
+      adobe_stairs_w, adobe_stairs_e, adobe_stairs_single, adobe_stairs_c
     ]
-  object_bin_impass:
+  aerial_pass:
+    layer: aerial
+    size: [2, 2]
+    sprite_prefix: "tileset/"
+    impass: []
+    invis: []
+    tiles: [
+      cacti_med01_top, cacti_med02_top, cacti_med03_top, cacti_med04_top, cacti_med05_top, cacti_med06_top,
+      adobe_door_shade, adobe_window_shade_top_w, adobe_window_shade_mid_w, adobe_window_shade_bot_w,
+      adobe_window_shade_top_e, adobe_window_shade_mid_e, adobe_window_shade_bot_e,
+      adobe_wall_beam_single_w, adobe_wall_beam_double_w, adobe_wall_beam_single_e,
+      adobe_wall_beam_double_e,  adobe_wall_beam_s
+    ]
+  object_1by2_bin:
     layer: object
     size: [2, 4]
     sprite_prefix: "tileset/"
@@ -618,6 +652,24 @@ uniform_sets:
     invis: []
     tiles: [
       veg01_bin, veg02_bin, veg03_bin, veg04_bin, veg05_bin, veg06_bin, bin01
+    ]
+  object_2by1_impass:
+    layer: object
+    size: [4, 2]
+    sprite_prefix: "tileset/"
+    impass: [[0, 0], [1, 0], [0, 1], [1, 1], [2, 0], [2, 1], [3, 0], [3, 1]]
+    invis: []
+    tiles: [
+      adobe_bench_w, adobe_bench_w2
+    ]
+  object_1by2_impass:
+    layer: object
+    size: [2, 4]
+    sprite_prefix: "tileset/"
+    impass: [[0, 0], [1, 0], [0, 1], [1, 1], [0, 2], [0, 3], [1, 2], [1, 3]]
+    invis: []
+    tiles: [
+      adobe_bench_h, adobe_chimney
     ]
   object_farm_2by2_impass:
     layer: object
@@ -640,7 +692,20 @@ uniform_sets:
       fence_e, fence_e_w, fence_w, fence_n, fence_n_s, fence_s, fence_e_s, fence_e_w_s, fence_w_s, fence_e_n_s,
       fence_e_w_n_s, fence_w_n_s, fence_e_n, fence_e_w_n, fence_w_n, fence_gate_w, fence_gate_c, fence_gate_e,
       bridge_top_w1, bridge_top_w2, bridge_top_mid, bridge_top_e1, bridge_top_e2,
-      box_grey_large,  box_grey_small, box_gold_large, box_gold_small, box_red_large, box_red_small, barrel_water
+      box_grey_large,  box_grey_small, box_gold_large, box_gold_small, box_red_large, box_red_small, barrel_water,
+      cacti_small01, cacti_small02, cacti_small03, cacti_small04, cacti_small05, cacti_small06, cacti_small07,
+      cacti_small08, cacti_small09, cacti_small10, cacti_small11, cacti_small12, cacti_small13, cacti_small14,
+      cacti_small15, cacti_med01_bot, cacti_med02_bot, cacti_med03_bot, cacti_med04_bot, cacti_med05_bot,
+      cacti_med06_bot, adobe_bench_c2, adobe_bench_c
+    ]
+  object_center_impass:
+    layer: object
+    size: [4, 4]
+    sprite_prefix: "tileset/"
+    impass: [[1, 1], [2, 1], [1, 2], [2, 2]]
+    invis: []
+    tiles: [
+      rocks_lg01, rocks_lg02, rocks_lg03
     ]
   walls_impass:
     layer: walls
@@ -676,7 +741,9 @@ uniform_sets:
       veg01, veg02, veg03, veg04, veg05, veg06,
       castle01_window01, shield01, shield02, swords01, swords02,
       cobwebs_nw, cobwebs_ne,
-      sign_weapon, sign_bag, sign_helm, sign_bottle, sign_mug, sign_inn, sign_medal, sign_tools, sign_blank
+      sign_weapon, sign_bag, sign_helm, sign_bottle, sign_mug, sign_inn, sign_medal, sign_tools, sign_blank,
+      adobe_crack01, adobe_crack02, adobe_crack03, adobe_crack04, adobe_crack05, adobe_crack06, 
+      adobe_crack07, adobe_crack08, adobe_crack09,
     ]
   decoration2by1:
     layer: decoration
@@ -713,7 +780,8 @@ uniform_sets:
     impass: [[0, 0], [1, 0], [0, 1], [1, 1], [0, 2], [1, 2]]
     invis: []
     tiles: [
-      door_single_01_closed, door_single_02_closed, door_single_03_closed, door_single_04_closed
+      door_single_01_closed, door_single_02_closed, door_single_03_closed, door_single_04_closed,
+      door_single_05_closed
     ]
   interior_pass_2by2:
     layer: object_interior
@@ -1201,16 +1269,16 @@ non_uniform_sets:
         impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
         invis: [[0, 0], [1, 0], [0, 1], [1, 1]]
       outer_edge_sw:
-        impass: [[1, 0]]
+        impass: [[1, 0], [1, 1]]
       outer_edge_s:
-        impass: [[0, 0], [1, 0]]
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
       outer_edge_se:
-        impass: [[0, 0]]
+        impass: [[0, 0], [0, 1]]
       inner_edge_sw:
         impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
       inner_edge_se:
         impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
-  cliffs_walls_top:
+  scalable_walls_top:
     layer: walls_top
     size: [2, 2]
     sprite_prefix: "tileset/"
@@ -1219,7 +1287,98 @@ non_uniform_sets:
         impass: [[1, 0], [1, 1]]
       cliffs_ext1_outer_edge_se:
         impass: [[0, 0], [0, 1]]
-  cliffs:
+      cliffs_sand_ext1_outer_edge_sw:
+        impass: [[1, 0], [1, 1]]
+      cliffs_sand_ext1_outer_edge_se:
+        impass: [[0, 0], [0, 1]]
+
+      roof_adobe_ext1_outer_edge_sw:
+        impass: [[1, 0], [1, 1]]
+      roof_adobe_ext1_outer_edge_se:
+        impass: [[0, 0], [0, 1]]
+      roof_adobe_outer_edge_nw:
+        impass: [[1, 1]]
+      roof_adobe_outer_edge_n:
+        impass: [[0, 1], [1, 1]]
+      roof_adobe_outer_edge_ne:
+        impass: [[0, 1]]
+      roof_adobe_outer_edge_w:
+        impass: [[1, 0], [1, 1]]
+      roof_adobe_outer_edge_e:
+        impass: [[0, 0], [0, 1]]
+      roof_adobe_outer_edge_sw:
+        impass: [[1, 0], [1, 1]]
+      roof_adobe_outer_edge_s:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      roof_adobe_outer_edge_se:
+        impass: [[0, 0], [0, 1]]
+      roof_adobe_inner_edge_nw:
+        impass: [[1, 0], [0, 1], [1, 1]]
+      roof_adobe_inner_edge_ne:
+        impass: [[0, 0], [0, 1], [1, 1]]
+      roof_adobe_inner_edge_sw:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      roof_adobe_inner_edge_se:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      
+      roof_adobe_brick_ext1_outer_edge_sw:
+        impass: [[1, 0], [1, 1]]
+      roof_adobe_brick_ext1_outer_edge_se:
+        impass: [[0, 0], [0, 1]]
+      roof_adobe_brick_outer_edge_nw:
+        impass: [[1, 1]]
+      roof_adobe_brick_outer_edge_n:
+        impass: [[0, 1], [1, 1]]
+      roof_adobe_brick_outer_edge_ne:
+        impass: [[0, 1]]
+      roof_adobe_brick_outer_edge_w:
+        impass: [[1, 0], [1, 1]]
+      roof_adobe_brick_outer_edge_e:
+        impass: [[0, 0], [0, 1]]
+      roof_adobe_brick_outer_edge_sw:
+        impass: [[1, 0], [1, 1]]
+      roof_adobe_brick_outer_edge_s:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      roof_adobe_brick_outer_edge_se:
+        impass: [[0, 0], [0, 1]]
+      roof_adobe_brick_inner_edge_nw:
+        impass: [[1, 0], [0, 1], [1, 1]]
+      roof_adobe_brick_inner_edge_ne:
+        impass: [[0, 0], [0, 1], [1, 1]]
+      roof_adobe_brick_inner_edge_sw:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      roof_adobe_brick_inner_edge_se:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      
+      roof_adobe_flat_ext1_outer_edge_sw:
+        impass: [[1, 0], [1, 1]]
+      roof_adobe_flat_ext1_outer_edge_se:
+        impass: [[0, 0], [0, 1]]
+      roof_adobe_flat_outer_edge_nw:
+        impass: [[1, 1]]
+      roof_adobe_flat_outer_edge_n:
+        impass: [[0, 1], [1, 1]]
+      roof_adobe_flat_outer_edge_ne:
+        impass: [[0, 1]]
+      roof_adobe_flat_outer_edge_w:
+        impass: [[1, 0], [1, 1]]
+      roof_adobe_flat_outer_edge_e:
+        impass: [[0, 0], [0, 1]]
+      roof_adobe_flat_outer_edge_sw:
+        impass: [[1, 0], [1, 1]]
+      roof_adobe_flat_outer_edge_s:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      roof_adobe_flat_outer_edge_se:
+        impass: [[0, 0], [0, 1]]
+      roof_adobe_flat_inner_edge_nw:
+        impass: [[1, 0], [0, 1], [1, 1]]
+      roof_adobe_flat_inner_edge_ne:
+        impass: [[0, 0], [0, 1], [1, 1]]
+      roof_adobe_flat_inner_edge_sw:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      roof_adobe_flat_inner_edge_se:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+  scalable_walls:
     layer: walls
     size: [2, 2]
     sprite_prefix: "tileset/"
@@ -1231,6 +1390,47 @@ non_uniform_sets:
       cliffs_ext2_outer_edge_s:
         impass: []
       cliffs_ext2_outer_edge_se:
+        impass: []
+      cliffs_sand_ext1_outer_edge_s:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      cliffs_sand_ext2_outer_edge_sw:
+        impass: 
+      cliffs_sand_ext2_outer_edge_s:
+        impass: []
+      cliffs_sand_ext2_outer_edge_se:
+        impass: []
+        
+      roof_adobe_base:
+        impass: []
+      roof_adobe_ext1_outer_edge_s:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      roof_adobe_ext2_outer_edge_sw:
+        impass: 
+      roof_adobe_ext2_outer_edge_s:
+        impass: []
+      roof_adobe_ext2_outer_edge_se:
+        impass: []
+      
+      roof_adobe_brick_base:
+        impass: []
+      roof_adobe_brick_ext1_outer_edge_s:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      roof_adobe_brick_ext2_outer_edge_sw:
+        impass: 
+      roof_adobe_brick_ext2_outer_edge_s:
+        impass: []
+      roof_adobe_brick_ext2_outer_edge_se:
+        impass: []
+      
+      roof_adobe_flat_base:
+        impass: []
+      roof_adobe_flat_ext1_outer_edge_s:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      roof_adobe_flat_ext2_outer_edge_sw:
+        impass: 
+      roof_adobe_flat_ext2_outer_edge_s:
+        impass: []
+      roof_adobe_flat_ext2_outer_edge_se:
         impass: []
   cliffs_dark_aerial:
     layer: walls_aerial
@@ -1260,11 +1460,11 @@ non_uniform_sets:
         impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
         invis: [[0, 0], [1, 0], [0, 1], [1, 1]]
       outer_edge_sw:
-        impass: [[1, 0]]
+        impass: [[1, 0], [1, 1]]
       outer_edge_s:
-        impass: [[0, 0], [1, 0]]
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
       outer_edge_se:
-        impass: [[0, 0]]
+        impass: [[0, 0], [0, 1]]
       inner_edge_sw:
         impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
       inner_edge_se:
@@ -1285,11 +1485,11 @@ non_uniform_sets:
       outer_edge_e:
         impass: [[0, 0], [0, 1]]
       outer_edge_sw:
-        impass: [[1, 0]]
+        impass: [[1, 0], [1, 1]]
       outer_edge_s:
-        impass: [[0, 0], [1, 0]]
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
       outer_edge_se:
-        impass: [[0, 0]]
+        impass: [[0, 0], [0, 1]]
       inner_edge_nw:
         impass: [[1, 0], [0, 1], [1, 1]]
       inner_edge_ne:
@@ -1303,30 +1503,30 @@ non_uniform_sets:
         impass: []
       ramp_bot_sw:
         impass: []
-      ramp_mid_sw:
-        impass: [[1, 0]]
       ramp_mid_nw:
         impass: [[0, 0]]
-      ramp_top_nw:
+      ramp_mid_ne:
+        impass: [[1, 0]]
+      ramp_mid_se:
         impass: [[0, 1]]
+      ramp_top_nw:
+        impass: [[0, 0]]
       ramp_top_ne:
-        impass: [[1, 1]]
+        impass: [[1, 0]]
       ramp_top_sw:
         impass: [[1, 1]]
       ramp_top_se:
         impass: [[0, 1]]
-      ramp_mid_nw:
-        impass: [[1, 0]]
       ramp_mid_sw:
-        impass: [[0, 1]]
+        impass: [[1, 1]]
       ramp_bot_e:
         impass: []
       ramp_bot_se:
         impass: []
       ramp_bot_nw:
-        impass: [[0, 0]]
+        impass: []
       ramp_bot_ne:
-        impass: [[1, 0]]
+        impass: []
   cliffs_light:
     layer: walls_top
     size: [2, 2]
@@ -1343,11 +1543,11 @@ non_uniform_sets:
       outer_edge_e:
         impass: [[0, 0], [0, 1]]
       outer_edge_sw:
-        impass: [[1, 0]]
+        impass: [[1, 0], [1, 1]]
       outer_edge_s:
-        impass: [[0, 0], [1, 0]]
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
       outer_edge_se:
-        impass: [[0, 0]]
+        impass: [[0, 0], [0, 1]]
       inner_edge_nw:
         impass: [[1, 0], [0, 1], [1, 1]]
       inner_edge_ne:
@@ -1361,30 +1561,88 @@ non_uniform_sets:
         impass: []
       ramp_bot_sw:
         impass: []
-      ramp_mid_sw:
-        impass: [[1, 0]]
       ramp_mid_nw:
         impass: [[0, 0]]
-      ramp_top_nw:
+      ramp_mid_ne:
+        impass: [[1, 0]]
+      ramp_mid_se:
         impass: [[0, 1]]
+      ramp_top_nw:
+        impass: [[0, 0]]
       ramp_top_ne:
-        impass: [[1, 1]]
+        impass: [[1, 0]]
       ramp_top_sw:
         impass: [[1, 1]]
       ramp_top_se:
         impass: [[0, 1]]
-      ramp_mid_nw:
-        impass: [[1, 0]]
       ramp_mid_sw:
-        impass: [[0, 1]]
+        impass: [[1, 1]]
       ramp_bot_e:
         impass: []
       ramp_bot_se:
         impass: []
       ramp_bot_nw:
-        impass: [[0, 0]]
+        impass: []
       ramp_bot_ne:
+        impass: []
+  cliffs_sand:
+    layer: walls_top
+    size: [2, 2]
+    sprite_prefix: "tileset/cliffs_sand_"
+    tiles:
+      outer_edge_nw:
+        impass: [[1, 1]]
+      outer_edge_n:
+        impass: [[0, 1], [1, 1]]
+      outer_edge_ne:
+        impass: [[0, 1]]
+      outer_edge_w:
+        impass: [[1, 0], [1, 1]]
+      outer_edge_e:
+        impass: [[0, 0], [0, 1]]
+      outer_edge_sw:
+        impass: [[1, 0], [1, 1]]
+      outer_edge_s:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      outer_edge_se:
+        impass: [[0, 0], [0, 1]]
+      inner_edge_nw:
+        impass: [[1, 0], [0, 1], [1, 1]]
+      inner_edge_ne:
+        impass: [[0, 0], [0, 1], [1, 1]]
+      inner_edge_sw:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      inner_edge_se:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      
+      ramp_bot_w:
+        impass: []
+      ramp_bot_sw:
+        impass: []
+      ramp_mid_nw:
+        impass: [[0, 0]]
+      ramp_mid_ne:
         impass: [[1, 0]]
+      ramp_mid_se:
+        impass: [[0, 1]]
+      ramp_top_nw:
+        impass: [[0, 0]]
+      ramp_top_ne:
+        impass: [[1, 0]]
+      ramp_top_sw:
+        impass: [[1, 1]]
+      ramp_top_se:
+        impass: [[0, 1]]
+      ramp_mid_sw:
+        impass: [[1, 1]]
+      ramp_bot_e:
+        impass: []
+      ramp_bot_se:
+        impass: []
+      ramp_bot_nw:
+        impass: []
+      ramp_bot_ne:
+        impass: []
 tiles:
   cliff_entrance_small:
     layer: object
@@ -1991,3 +2249,137 @@ tiles:
     impass: [[1, 0], [2, 0], [3, 0], [4, 0], [1, 1], [2, 1], [3, 1], [4, 1]]
     invis: []
     sprite: tileset/stairs_down_bot
+  dune_med01:
+    layer: object
+    size: [6, 6]
+    sprite: tileset/dune_med01
+  dune_med02:
+    layer: object
+    size: [6, 6]
+    sprite: tileset/dune_med02
+  dune_large01:
+    layer: object
+    size: [6, 8]
+    sprite: tileset/dune_large01
+  dune_small01:
+    layer: object
+    size: [4, 4]
+    sprite: tileset/dune_small01
+  dune_small02:
+    layer: object
+    size: [4, 4]
+    sprite: tileset/dune_small02
+  dune_tiny01:
+    layer: object
+    size: [2, 2]
+    sprite: tileset/dune_tiny01
+  cacti_large01_top:
+    layer: aerial
+    size: [4, 6]
+    sprite: tileset/cacti_large01_top
+  cacti_large02_top:
+    layer: aerial
+    size: [4, 6]
+    sprite: tileset/cacti_large02_top
+  cacti_large01_bot:
+    layer: object
+    size: [4, 2]
+    impass: [[1, 0], [2, 0], [1, 1], [2, 1]]
+    invis: [[1, 0], [2, 0], [1, 1], [2, 1]]
+    sprite: tileset/cacti_large01_bot
+  cacti_large02_bot:
+    layer: object
+    size: [4, 2]
+    impass: [[1, 0], [2, 0], [1, 1], [2, 1]]
+    invis: [[1, 0], [2, 0], [1, 1], [2, 1]]
+    sprite: tileset/cacti_large02_bot
+  adobe_stack_top:
+    layer: aerial
+    size: [8, 2]
+    impass: []
+    invis: []
+    sprite: tileset/adobe_stack_top
+  adobe_stack_bot:
+    layer: object
+    size: [8, 4]
+    pass: [[0, 0], [0, 1], [0, 2], [0, 3], [7, 0], [7, 1], [7, 2], [7, 3], [1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3]]
+    invis: [[2, 0], [3, 0], [4, 0], [5, 0], [2, 1], [3, 1], [4, 1], [5, 1]]
+    sprite: tileset/adobe_stack_bot
+  trellis01_top:
+    layer: aerial
+    size: [6, 8]
+    impass: [[0, 2], [1, 2],  [0, 3], [1, 3], [4, 2], [5, 2], [4, 3], [5, 3]]
+    invis: []
+    sprite: tileset/adobe_trellis01_top
+  trellis_bot:
+    layer: object
+    size: [6, 2]
+    pass: [[2, 0], [2, 1], [3, 0], [3, 1]]
+    invis: []
+    sprite: tileset/adobe_trellis_bot
+  trellis02_top:
+    layer: aerial
+    size: [6, 10]
+    impass: [[0, 4], [1, 4],  [0, 5], [1, 5], [4, 4], [5, 4], [4, 5], [5, 5]]
+    invis: []
+    sprite: tileset/adobe_trellis02_top
+  trellis03_top:
+    layer: aerial
+    size: [6, 8]
+    impass: [[0, 2], [1, 2], [0, 3], [1, 3], [4, 2], [5, 2], [4, 3], [5, 3]]
+    invis: []
+    sprite: tileset/adobe_trellis03_top
+  adobe_post_w_bot:
+    layer: walls_top
+    size: [2, 2]
+    impass: [[0, 0], [0, 1]]
+    invis: []
+    sprite: tileset/adobe_post_w_bot
+  adobe_post_e_bot:
+    layer: walls_top
+    size: [2, 2]
+    impass: [[1, 0], [1, 1]]
+    invis: []
+    sprite: tileset/adobe_post_e_bot
+  adobe_post_c_bot:
+    layer: walls_top
+    size: [2, 2]
+    impass: [[0, 0], [0, 1], [1, 0], [1, 1]]
+    invis: []
+    sprite: tileset/adobe_post_c_bot
+  adobe_post_gap:
+    layer: walls_aerial
+    size: [2, 4]
+    impass: []
+    invis: []
+    sprite: tileset/adobe_post_gap
+  adobe_post_w_top:
+    layer: walls_aerial
+    size: [2, 4]
+    impass: [[0, 2], [0, 3]]
+    invis: []
+    sprite: tileset/adobe_post_w_top
+  adobe_post_e_top:
+    layer: walls_aerial
+    size: [2, 4]
+    impass: [[1, 2], [1, 3]]
+    invis: []
+    sprite: tileset/adobe_post_e_top
+  adobe_post_c_top:
+    layer: walls_aerial
+    size: [2, 4]
+    impass: [[0, 2], [0, 3], [1, 2], [1, 3]]
+    invis: []
+    sprite: tileset/adobe_post_c_top
+  adobe_arch:
+    layer: walls_aerial
+    size: [6, 6]
+    impass: [[0, 2], [0, 3], [0, 4], [0, 5], [5, 2], [5, 3], [5, 4], [5, 5]]
+    invis: [[0, 2], [0, 3], [0, 4], [0, 5], [5, 2], [5, 3], [5, 4], [5, 5]]
+    sprite: tileset/adobe_arch
+  adobe_arch_brick:
+    layer: walls_aerial
+    size: [6, 6]
+    impass: [[0, 2], [0, 3], [0, 4], [0, 5], [5, 2], [5, 3], [5, 4], [5, 5]]
+    invis: [[0, 2], [0, 3], [0, 4], [0, 5], [5, 2], [5, 3], [5, 4], [5, 5]]
+    sprite: tileset/adobe_arch_brick

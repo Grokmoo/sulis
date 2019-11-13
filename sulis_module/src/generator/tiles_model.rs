@@ -413,7 +413,6 @@ impl TilesModel {
             self.add_some(&tiles.edges.inner_ne, x + gw, y);
         } else if e && se {
             self.add_some(&tiles.edges.inner_se, x + gw, y);
-
             for (i, ext) in tiles.extended.iter().enumerate() {
                 let offset = 1 + i as i32;
                 self.add_some(&ext.outer_s, x + gw, y + offset * gh);

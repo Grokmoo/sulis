@@ -30,9 +30,9 @@ function setup_party()
   local player = game:player()
   if player:has_flag("completed_twin_expanse_act1") then return end
   
-  local vaalyun = game:spawn_actor_at("npc_vaalyun", 10, 17)
-  local cragnik = game:spawn_actor_at("npc_cragnik", 13, 12)
-  local jhilsara = game:spawn_actor_at("npc_jhilsara", 6, 12)
+  local vaalyun = game:spawn_actor_at("npc_vaalyun", 10, 119)
+  local cragnik = game:spawn_actor_at("npc_cragnik", 13, 114)
+  local jhilsara = game:spawn_actor_at("npc_jhilsara", 6, 114)
   
   game:add_party_member(vaalyun:id())
   game:add_party_member(cragnik:id())

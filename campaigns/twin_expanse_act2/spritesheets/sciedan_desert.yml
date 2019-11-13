@@ -1,0 +1,7 @@
+id: sciedan_desert
+src: "sciedan_desert.png"
+size: [ 896, 640 ]
+groups:
+  misc:
+    areas:
+      worldmap: [0, 0, 896, 640]

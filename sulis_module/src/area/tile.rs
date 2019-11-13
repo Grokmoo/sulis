@@ -32,8 +32,9 @@ pub struct FeatureBuilder {
 #[derive(Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct FeatureEntry {
+    #[serde(default)]
     weight: u32,
-    tiles: HashMap<String, Point>,
+    tiles: HashMap<String, Vec<Point>>,
 }
 
 pub struct Feature {
@@ -49,16 +50,18 @@ impl Feature {
         for entry in builder.entries {
             let mut tiles = Vec::new();
 
-            for (tile_id, p) in entry.tiles {
+            for (tile_id, ps) in entry.tiles {
                 let tile = match module.tiles.get(&tile_id) {
                     None => {
                         warn!("No tile '{}' found for feature '{}'", tile_id, id);
                         return unable_to_create_error("feature", &id);
                     }
-                    Some(tile) => Rc::clone(tile),
+                    Some(tile) => tile,
                 };
 
-                tiles.push((tile, p));
+                for p in ps {
+                    tiles.push((Rc::clone(tile), p));
+                }
             }
 
             entries.push((tiles, entry.weight));

@@ -3,74 +3,98 @@ features:
   tree_med:
     entries:
       - tiles:
-          tree_med_02: [0, 0]
+          tree_med_02: [[0, 0]]
         weight: 1
       - tiles:
-          tree_med_03: [0, 0]
+          tree_med_03: [[0, 0]]
         weight: 1
       - tiles:
-          tree_med_04: [0, 0]
+          tree_med_04: [[0, 0]]
         weight: 1
     size: [14, 14]
   boxes:
     entries:
       - tiles:
-          props/boxes01: [0, 0]
+          props/boxes01: [[0, 0]]
         weight: 1
       - tiles:
-          props/boxes02: [0, 0]
+          props/boxes02: [[0, 0]]
         weight: 1
       - tiles:
-          props/boxes03: [0, 0]
+          props/boxes03: [[0, 0]]
         weight: 1
       - tiles:
-          props/boxes04: [0, 0]
+          props/boxes04: [[0, 0]]
         weight: 1
       - tiles:
-          props/boxes05: [0, 0]
+          props/boxes05: [[0, 0]]
         weight: 1
     size: [2, 2]
   mushrooms:
     entries:
       - tiles:
-          tileset/mushroom01: [0, 0]
+          tileset/mushroom01: [[0, 0]]
         weight: 1
       - tiles:
-          tileset/mushroom02: [0, 0]
+          tileset/mushroom02: [[0, 0]]
         weight: 1
       - tiles:
-          tileset/mushroom03: [0, 0]
+          tileset/mushroom03: [[0, 0]]
         weight: 1
       - tiles:
-          tileset/mushroom04: [0, 0]
+          tileset/mushroom04: [[0, 0]]
         weight: 1
       - tiles:
-          tileset/mushroom05: [0, 0]
+          tileset/mushroom05: [[0, 0]]
         weight: 1
     size: [4, 2]
   rocks:
     entries:
       - tiles:
-          tileset/rocks01: [0, 0]
+          tileset/rocks01: [[0, 0]]
         weight: 1
       - tiles:
-          tileset/rocks02: [0, 0]
+          tileset/rocks02: [[0, 0]]
         weight: 1
       - tiles:
-          tileset/rocks03: [0, 0]
+          tileset/rocks03: [[0, 0]]
         weight: 1
       - tiles:
-          tileset/rocks04: [0, 0]
+          tileset/rocks04: [[0, 0]]
         weight: 1
       - tiles:
-          tileset/rocks05: [0, 0]
+          tileset/rocks05: [[0, 0]]
         weight: 1
     size: [4, 2]
+  rocks_small:
+    entries:
+      - tiles:
+          tileset/rocks_sm01: [[0, 0]]
+      - tiles:
+          tileset/rocks_sm02: [[0, 0]]
+      - tiles:
+          tileset/rocks_sm03: [[0, 0]]
+      - tiles:
+          tileset/rocks_sm04: [[0, 0]]
+      - tiles:
+          tileset/rocks_sm05: [[0, 0]]
+      - tiles:
+          tileset/rocks_sm06: [[0, 0]]
+    size: [2, 2]
+  rocks_large:
+    entries:
+      - tiles:
+          tileset/rocks_lg01: [[0, 0]]
+      - tiles:
+          tileset/rocks_lg02: [[0, 0]]
+      - tiles:
+          tileset/rocks_lg03: [[0, 0]]
+    size: [4, 4]
   stairs_down:
     entries:
       - tiles:
-          stairs_down_top: [0, 0]
-          stairs_down_bot: [0, 2]
+          stairs_down_top: [[0, 0]]
+          stairs_down_bot: [[0, 2]]
         weight: 1
     size:
       width: 6
@@ -78,9 +102,422 @@ features:
   stairs_up:
     entries:
       - tiles:
-          stairs_up_top: [0, 0]
-          stairs_up_bot: [0, 4]
+          stairs_up_top: [[0, 0]]
+          stairs_up_bot: [[0, 4]]
         weight: 1
     size:
       width: 6
       height: 6
+  cacti_large:
+    entries:
+      - tiles:
+          cacti_large01_top: [[0, 0]]
+          cacti_large01_bot: [[0, 6]]
+        weight: 1
+      - tiles:
+          cacti_large02_top: [[0, 0]]
+          cacti_large02_bot: [[0, 6]]
+        weight: 1
+    size:
+      width: 4
+      height: 8
+  cacti_med:
+    entries:
+      - tiles:
+          tileset/cacti_med01_top: [[0, 0]]
+          tileset/cacti_med01_bot: [[0, 2]]
+      - tiles:
+          tileset/cacti_med02_top: [[0, 0]]
+          tileset/cacti_med02_bot: [[0, 2]]
+      - tiles:
+          tileset/cacti_med03_top: [[0, 0]]
+          tileset/cacti_med03_bot: [[0, 2]]
+      - tiles:
+          tileset/cacti_med04_top: [[0, 0]]
+          tileset/cacti_med04_bot: [[0, 2]]
+      - tiles:
+          tileset/cacti_med05_top: [[0, 0]]
+          tileset/cacti_med05_bot: [[0, 2]]
+      - tiles:
+          tileset/cacti_med06_top: [[0, 0]]
+          tileset/cacti_med06_bot: [[0, 2]]
+    size:
+      width: 2
+      height: 4
+  cacti_small:
+    entries:
+      - tiles:
+          tileset/cacti_small01: [[0, 0]]
+      - tiles:
+          tileset/cacti_small02: [[0, 0]]
+      - tiles:
+          tileset/cacti_small03: [[0, 0]]
+      - tiles: 
+          tileset/cacti_small04: [[0, 0]]
+      - tiles: 
+          tileset/cacti_small05: [[0, 0]]
+      - tiles: 
+          tileset/cacti_small06: [[0, 0]]
+      - tiles: 
+          tileset/cacti_small07: [[0, 0]]
+      - tiles: 
+          tileset/cacti_small08: [[0, 0]]
+      - tiles: 
+          tileset/cacti_small09: [[0, 0]]
+      - tiles: 
+          tileset/cacti_small10: [[0, 0]]
+      - tiles: 
+          tileset/cacti_small11: [[0, 0]]
+      - tiles: 
+          tileset/cacti_small12: [[0, 0]]
+      - tiles: 
+          tileset/cacti_small13: [[0, 0]]
+      - tiles: 
+          tileset/cacti_small14: [[0, 0]]
+      - tiles: 
+          tileset/cacti_small15: [[0, 0]]
+    size:
+      width: 2
+      height: 2
+  desert_ramp_e_small:
+    entries:
+      - tiles:
+          tileset/cliffs_sand_ramp_mid_nw: [[2, 2]]
+          tileset/cliffs_sand_ramp_top_nw: [[4, 0]]
+          tileset/cliffs_sand_ramp_bot_nw: [[0, 4]]
+          tileset/cliffs_sand_outer_edge_s: [[0, 0], [2, 0]]
+          tileset/cliffs_sand_ext1_outer_edge_s: [[0, 2], [8, 2]]
+
+          tileset/cliffs_sand_ramp_mid_sw: [[6, 2]]
+          tileset/cliffs_sand_ramp_top_sw: [[8, 0]]
+          tileset/cliffs_sand_ramp_bot_sw: [[4, 4]]
+          tileset/cliffs_sand_ext2_outer_edge_s: [[6, 4], [8, 4]]
+    size:
+      width: 10
+      height: 6
+  desert_ramp_e_med:
+    entries:
+      - tiles:
+          tileset/cliffs_sand_ramp_mid_nw: [[2, 2]]
+          tileset/cliffs_sand_ramp_top_nw: [[4, 0]]
+          tileset/cliffs_sand_ramp_bot_nw: [[0, 4]]
+          tileset/cliffs_sand_outer_edge_s: [[0, 0], [2, 0]]
+          tileset/cliffs_sand_ext1_outer_edge_s: [[0, 2], [10, 2]]
+
+          tileset/cliffs_sand_ramp_mid_sw: [[8, 2]]
+          tileset/cliffs_sand_ramp_top_sw: [[10, 0]]
+          tileset/cliffs_sand_ramp_bot_sw: [[6, 4]]
+          tileset/cliffs_sand_ext2_outer_edge_s: [[8, 4], [10, 4]]
+    size:
+      width: 12
+      height: 6
+  desert_ramp_e_large:
+    entries:
+      - tiles:
+          tileset/cliffs_sand_ramp_mid_nw: [[2, 2]]
+          tileset/cliffs_sand_ramp_top_nw: [[4, 0]]
+          tileset/cliffs_sand_ramp_bot_nw: [[0, 4]]
+          tileset/cliffs_sand_outer_edge_s: [[0, 0], [2, 0]]
+          tileset/cliffs_sand_ext1_outer_edge_s: [[0, 2], [12, 2]]
+
+          tileset/cliffs_sand_ramp_mid_sw: [[10, 2]]
+          tileset/cliffs_sand_ramp_top_sw: [[12, 0]]
+          tileset/cliffs_sand_ramp_bot_sw: [[8, 4]]
+          tileset/cliffs_sand_ext2_outer_edge_s: [[10, 4], [12, 4]]
+    size:
+      width: 14
+      height: 6
+  desert_ramp_w_small:
+    entries:
+      - tiles:
+          tileset/cliffs_sand_ramp_mid_ne: [[6, 2]]
+          tileset/cliffs_sand_ramp_top_ne: [[4, 0]]
+          tileset/cliffs_sand_ramp_bot_ne: [[8, 4]]
+          tileset/cliffs_sand_outer_edge_s: [[6, 0], [8, 0]]
+          tileset/cliffs_sand_ext1_outer_edge_s: [[0, 2], [8, 2]]
+          tileset/cliffs_sand_ext2_outer_edge_s: [[0, 4], [2, 4]]
+
+          tileset/cliffs_sand_ramp_mid_se: [[2, 2]]
+          tileset/cliffs_sand_ramp_top_se: [[0, 0]]
+          tileset/cliffs_sand_ramp_bot_se: [[4, 4]]
+    size:
+      width: 10
+      height: 6
+  desert_ramp_w_med:
+    entries:
+      - tiles:
+          tileset/cliffs_sand_ramp_mid_ne: [[8, 2]]
+          tileset/cliffs_sand_ramp_top_ne: [[6, 0]]
+          tileset/cliffs_sand_ramp_bot_ne: [[10, 4]]
+          tileset/cliffs_sand_outer_edge_s: [[8, 0], [10, 0]]
+          tileset/cliffs_sand_ext1_outer_edge_s: [[0, 2], [10, 2]]
+          tileset/cliffs_sand_ext2_outer_edge_s: [[0, 4], [2, 4]]
+
+          tileset/cliffs_sand_ramp_mid_se: [[2, 2]]
+          tileset/cliffs_sand_ramp_top_se: [[0, 0]]
+          tileset/cliffs_sand_ramp_bot_se: [[4, 4]]
+    size:
+      width: 12
+      height: 6
+  desert_ramp_w_large:
+    entries:
+      - tiles:
+          tileset/cliffs_sand_ramp_mid_ne: [[10, 2]]
+          tileset/cliffs_sand_ramp_top_ne: [[8, 0]]
+          tileset/cliffs_sand_ramp_bot_ne: [[12, 4]]
+          tileset/cliffs_sand_outer_edge_s: [[10, 0], [12, 0]]
+          tileset/cliffs_sand_ext1_outer_edge_s: [[0, 2], [12, 2]]
+          tileset/cliffs_sand_ext2_outer_edge_s: [[0, 4], [2, 4]]
+
+          tileset/cliffs_sand_ramp_mid_se: [[2, 2]]
+          tileset/cliffs_sand_ramp_top_se: [[0, 0]]
+          tileset/cliffs_sand_ramp_bot_se: [[4, 4]]
+    size:
+      width: 14
+      height: 6
+  grass_ramp_e_small:
+    entries:
+      - tiles:
+          tileset/cliffs_grass_ramp_mid_nw: [[2, 2]]
+          tileset/cliffs_grass_ramp_top_nw: [[4, 0]]
+          tileset/cliffs_grass_ramp_bot_nw: [[0, 4]]
+          tileset/cliffs_grass_outer_edge_s: [[0, 0], [2, 0]]
+          tileset/cliffs_ext1_outer_edge_s: [[0, 2], [8, 2]]
+
+          tileset/cliffs_grass_ramp_mid_sw: [[6, 2]]
+          tileset/cliffs_grass_ramp_top_sw: [[8, 0]]
+          tileset/cliffs_grass_ramp_bot_sw: [[4, 4]]
+          tileset/cliffs_ext2_outer_edge_s: [[6, 4], [8, 4]]
+    size:
+      width: 10
+      height: 6
+  grass_ramp_e_med:
+    entries:
+      - tiles:
+          tileset/cliffs_grass_ramp_mid_nw: [[2, 2]]
+          tileset/cliffs_grass_ramp_top_nw: [[4, 0]]
+          tileset/cliffs_grass_ramp_bot_nw: [[0, 4]]
+          tileset/cliffs_grass_outer_edge_s: [[0, 0], [2, 0]]
+          tileset/cliffs_ext1_outer_edge_s: [[0, 2], [10, 2]]
+
+          tileset/cliffs_grass_ramp_mid_sw: [[8, 2]]
+          tileset/cliffs_grass_ramp_top_sw: [[10, 0]]
+          tileset/cliffs_grass_ramp_bot_sw: [[6, 4]]
+          tileset/cliffs_ext2_outer_edge_s: [[8, 4], [10, 4]]
+    size:
+      width: 12
+      height: 6
+  grass_ramp_e_large:
+    entries:
+      - tiles:
+          tileset/cliffs_grass_ramp_mid_nw: [[2, 2]]
+          tileset/cliffs_grass_ramp_top_nw: [[4, 0]]
+          tileset/cliffs_grass_ramp_bot_nw: [[0, 4]]
+          tileset/cliffs_grass_outer_edge_s: [[0, 0], [2, 0]]
+          tileset/cliffs_ext1_outer_edge_s: [[0, 2], [12, 2]]
+
+          tileset/cliffs_grass_ramp_mid_sw: [[10, 2]]
+          tileset/cliffs_grass_ramp_top_sw: [[12, 0]]
+          tileset/cliffs_grass_ramp_bot_sw: [[8, 4]]
+          tileset/cliffs_ext2_outer_edge_s: [[10, 4], [12, 4]]
+    size:
+      width: 14
+      height: 6
+  grass_ramp_w_small:
+    entries:
+      - tiles:
+          tileset/cliffs_grass_ramp_mid_ne: [[6, 2]]
+          tileset/cliffs_grass_ramp_top_ne: [[4, 0]]
+          tileset/cliffs_grass_ramp_bot_ne: [[8, 4]]
+          tileset/cliffs_grass_outer_edge_s: [[6, 0], [8, 0]]
+          tileset/cliffs_ext1_outer_edge_s: [[0, 2], [8, 2]]
+          tileset/cliffs_ext2_outer_edge_s: [[0, 4], [2, 4]]
+
+          tileset/cliffs_grass_ramp_mid_se: [[2, 2]]
+          tileset/cliffs_grass_ramp_top_se: [[0, 0]]
+          tileset/cliffs_grass_ramp_bot_se: [[4, 4]]
+    size:
+      width: 10
+      height: 6
+  grass_ramp_w_med:
+    entries:
+      - tiles:
+          tileset/cliffs_grass_ramp_mid_ne: [[8, 2]]
+          tileset/cliffs_grass_ramp_top_ne: [[6, 0]]
+          tileset/cliffs_grass_ramp_bot_ne: [[10, 4]]
+          tileset/cliffs_grass_outer_edge_s: [[8, 0], [10, 0]]
+          tileset/cliffs_ext1_outer_edge_s: [[0, 2], [10, 2]]
+          tileset/cliffs_ext2_outer_edge_s: [[0, 4], [2, 4]]
+
+          tileset/cliffs_grass_ramp_mid_se: [[2, 2]]
+          tileset/cliffs_grass_ramp_top_se: [[0, 0]]
+          tileset/cliffs_grass_ramp_bot_se: [[4, 4]]
+    size:
+      width: 12
+      height: 6
+  grass_ramp_w_large:
+    entries:
+      - tiles:
+          tileset/cliffs_grass_ramp_mid_ne: [[10, 2]]
+          tileset/cliffs_grass_ramp_top_ne: [[8, 0]]
+          tileset/cliffs_grass_ramp_bot_ne: [[12, 4]]
+          tileset/cliffs_grass_outer_edge_s: [[10, 0], [12, 0]]
+          tileset/cliffs_ext1_outer_edge_s: [[0, 2], [12, 2]]
+          tileset/cliffs_ext2_outer_edge_s: [[0, 4], [2, 4]]
+
+          tileset/cliffs_grass_ramp_mid_se: [[2, 2]]
+          tileset/cliffs_grass_ramp_top_se: [[0, 0]]
+          tileset/cliffs_grass_ramp_bot_se: [[4, 4]]
+    size:
+      width: 14
+      height: 6
+  cliffs_ramp_e_small:
+    entries:
+      - tiles:
+          tileset/cliffs_light_ramp_mid_nw: [[2, 2]]
+          tileset/cliffs_light_ramp_top_nw: [[4, 0]]
+          tileset/cliffs_light_ramp_bot_nw: [[0, 4]]
+          tileset/cliffs_light_outer_edge_s: [[0, 0], [2, 0]]
+          tileset/cliffs_ext1_outer_edge_s: [[0, 2], [8, 2]]
+
+          tileset/cliffs_light_ramp_mid_sw: [[6, 2]]
+          tileset/cliffs_light_ramp_top_sw: [[8, 0]]
+          tileset/cliffs_light_ramp_bot_sw: [[4, 4]]
+          tileset/cliffs_ext2_outer_edge_s: [[6, 4], [8, 4]]
+    size:
+      width: 10
+      height: 6
+  cliffs_ramp_e_med:
+    entries:
+      - tiles:
+          tileset/cliffs_light_ramp_mid_nw: [[2, 2]]
+          tileset/cliffs_light_ramp_top_nw: [[4, 0]]
+          tileset/cliffs_light_ramp_bot_nw: [[0, 4]]
+          tileset/cliffs_light_outer_edge_s: [[0, 0], [2, 0]]
+          tileset/cliffs_ext1_outer_edge_s: [[0, 2], [10, 2]]
+
+          tileset/cliffs_light_ramp_mid_sw: [[8, 2]]
+          tileset/cliffs_light_ramp_top_sw: [[10, 0]]
+          tileset/cliffs_light_ramp_bot_sw: [[6, 4]]
+          tileset/cliffs_ext2_outer_edge_s: [[8, 4], [10, 4]]
+    size:
+      width: 12
+      height: 6
+  cliffs_ramp_e_large:
+    entries:
+      - tiles:
+          tileset/cliffs_light_ramp_mid_nw: [[2, 2]]
+          tileset/cliffs_light_ramp_top_nw: [[4, 0]]
+          tileset/cliffs_light_ramp_bot_nw: [[0, 4]]
+          tileset/cliffs_light_outer_edge_s: [[0, 0], [2, 0]]
+          tileset/cliffs_ext1_outer_edge_s: [[0, 2], [12, 2]]
+
+          tileset/cliffs_light_ramp_mid_sw: [[10, 2]]
+          tileset/cliffs_light_ramp_top_sw: [[12, 0]]
+          tileset/cliffs_light_ramp_bot_sw: [[8, 4]]
+          tileset/cliffs_ext2_outer_edge_s: [[10, 4], [12, 4]]
+    size:
+      width: 14
+      height: 6
+  cliffs_ramp_w_small:
+    entries:
+      - tiles:
+          tileset/cliffs_light_ramp_mid_ne: [[6, 2]]
+          tileset/cliffs_light_ramp_top_ne: [[4, 0]]
+          tileset/cliffs_light_ramp_bot_ne: [[8, 4]]
+          tileset/cliffs_light_outer_edge_s: [[6, 0], [8, 0]]
+          tileset/cliffs_ext1_outer_edge_s: [[0, 2], [8, 2]]
+          tileset/cliffs_ext2_outer_edge_s: [[0, 4], [2, 4]]
+
+          tileset/cliffs_light_ramp_mid_se: [[2, 2]]
+          tileset/cliffs_light_ramp_top_se: [[0, 0]]
+          tileset/cliffs_light_ramp_bot_se: [[4, 4]]
+    size:
+      width: 10
+      height: 6
+  cliffs_ramp_w_med:
+    entries:
+      - tiles:
+          tileset/cliffs_light_ramp_mid_ne: [[8, 2]]
+          tileset/cliffs_light_ramp_top_ne: [[6, 0]]
+          tileset/cliffs_light_ramp_bot_ne: [[10, 4]]
+          tileset/cliffs_light_outer_edge_s: [[8, 0], [10, 0]]
+          tileset/cliffs_ext1_outer_edge_s: [[0, 2], [10, 2]]
+          tileset/cliffs_ext2_outer_edge_s: [[0, 4], [2, 4]]
+
+          tileset/cliffs_light_ramp_mid_se: [[2, 2]]
+          tileset/cliffs_light_ramp_top_se: [[0, 0]]
+          tileset/cliffs_light_ramp_bot_se: [[4, 4]]
+    size:
+      width: 12
+      height: 6
+  cliffs_ramp_w_large:
+    entries:
+      - tiles:
+          tileset/cliffs_light_ramp_mid_ne: [[10, 2]]
+          tileset/cliffs_light_ramp_top_ne: [[8, 0]]
+          tileset/cliffs_light_ramp_bot_ne: [[12, 4]]
+          tileset/cliffs_light_outer_edge_s: [[10, 0], [12, 0]]
+          tileset/cliffs_ext1_outer_edge_s: [[0, 2], [12, 2]]
+          tileset/cliffs_ext2_outer_edge_s: [[0, 4], [2, 4]]
+
+          tileset/cliffs_light_ramp_mid_se: [[2, 2]]
+          tileset/cliffs_light_ramp_top_se: [[0, 0]]
+          tileset/cliffs_light_ramp_bot_se: [[4, 4]]
+    size:
+      width: 14
+      height: 6
+  adobe_stack:
+    entries:
+      - tiles:
+          adobe_stack_top: [[0, 0]]
+          adobe_stack_bot: [[0, 2]]
+    size:
+      width: 8
+      height: 6
+  trellis01:
+    entries:
+      - tiles:
+          trellis01_top: [[0, 0]]
+          trellis_bot: [[0, 6]]
+    size:
+      width: 6
+      height: 8
+  trellis02:
+    entries:
+      - tiles:
+          trellis02_top: [[0, 0]]
+          trellis_bot: [[0, 8]]
+    size:
+      width: 6
+      height: 10
+  trellis03:
+    entries:
+      - tiles:
+          trellis03_top: [[0, 0]]
+          trellis_bot: [[0, 6]]
+    size:
+      width: 6
+      height: 8
+  adobe_arch:
+    entries:
+      - tiles:
+          adobe_arch: [[0, 0]]
+          tileset/roof_adobe_ext1_outer_edge_sw: [[4, 6]]
+          tileset/roof_adobe_ext2_outer_edge_sw: [[4, 8]]
+          tileset/roof_adobe_ext1_outer_edge_se: [[0, 6]]
+          tileset/roof_adobe_ext2_outer_edge_se: [[0, 8]]
+    size:
+      width: 6
+      height: 10
+  adobe_arch_brick:
+    entries:
+      - tiles:
+          adobe_arch_brick: [[0, 0]]
+          tileset/roof_adobe_brick_ext1_outer_edge_sw: [[4, 6]]
+          tileset/roof_adobe_brick_ext2_outer_edge_sw: [[4, 8]]
+          tileset/roof_adobe_brick_ext1_outer_edge_se: [[0, 6]]
+          tileset/roof_adobe_brick_ext2_outer_edge_se: [[0, 8]]
+    size:
+      width: 6
+      height: 10

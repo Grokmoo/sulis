@@ -1,0 +1,4 @@
+id: props/door_single_wall_05
+states:
+  normal: props/door_single_05_closed
+  active: props/door_single_05_wall_open

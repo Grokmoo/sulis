@@ -1,0 +1,20 @@
+---
+id: theme
+themes:
+  game:
+    children:
+      world_map_window:
+        remove_base_keys: [ size ]
+        size: [226, 166]
+        children:
+          bg:
+            background: sciedan_desert
+          labels:
+            from: text_area
+            relative:
+              width: Max
+              height: Max
+            text: |
+              [x=60.0;y=70.0;f=outlined;s=10.0|Sciedan Desert]
+              [x=165.0;y=20.0;f=outlined;s=7|Mountains of Naath]
+              [x=170.0;y=120.0;f=outlined;s=7|The Twin Expanse]

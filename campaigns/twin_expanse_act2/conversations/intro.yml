@@ -6,18 +6,24 @@ nodes:
     text: |
       [c=888|The world around you quickly becomes blindingly bright, but only moments later returns to normal.
       
-      Only a moment ago, you were standing in the council chamber of Rose Lake.
-      
-      You are now in a completely unfamiliar place.]
+      Only a moment ago, you were standing in the council chamber of Rose Lake.]
     responses:
       - text: |
           [c=888|Continue]
         to: start02
   start02:
     text: |
-      [c=888|The terrain around you is sand - sand, as far as you can see.  In the distance you can see what looks like a small camp or town.
+      [c=888|You take a moment to look around you.
       
-      You must discover where you are, and plan a course of action.]
+      The terrain around you is sand in every direction.  However, you luckily spot what looks to be a town to the North.]
+    responses:
+      - text: |
+          [c=888|Continue]
+  start03:
+    text: |
+      [c=888|Heading towards the town seems to be your only choice at this point.
+      
+      Once you are back in civilization, you can hopefully determine your next course of action.]
     responses:
       - text: |
           [c=888|Go]

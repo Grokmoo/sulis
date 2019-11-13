@@ -226,7 +226,46 @@ groups:
   roof_brick:
     position: [10, 59]
     prefix: roof_brick_
+    from_template: roof 
+  roof_adobe:
+    position: [32, 40]
+    prefix: roof_adobe_
     from_template: roof
+    areas:
+      inner_edge_ne: [0, 4]
+      inner_edge_nw: [2, 4]
+      ext1_outer_edge_sw: [0, 5]
+      ext1_outer_edge_s: [1, 5]
+      ext1_outer_edge_se: [2, 5]
+      ext2_outer_edge_sw: [0, 6]
+      ext2_outer_edge_s: [1, 6]
+      ext2_outer_edge_se: [2, 6]
+  roof_adobe_brick:
+    position: [35, 40]
+    prefix: roof_adobe_brick_
+    from_template: roof
+    areas:
+      inner_edge_ne: [0, 4]
+      inner_edge_nw: [2, 4]
+      ext1_outer_edge_sw: [0, 5]
+      ext1_outer_edge_s: [1, 5]
+      ext1_outer_edge_se: [2, 5]
+      ext2_outer_edge_sw: [0, 6]
+      ext2_outer_edge_s: [1, 6]
+      ext2_outer_edge_se: [2, 6]
+  roof_adobe_flat:
+    position: [38, 40]
+    prefix: roof_adobe_flat_
+    from_template: roof
+    areas:
+      inner_edge_ne: [0, 4]
+      inner_edge_nw: [2, 4]
+      ext1_outer_edge_sw: [0, 5]
+      ext1_outer_edge_s: [1, 5]
+      ext1_outer_edge_se: [2, 5]
+      ext2_outer_edge_sw: [0, 6]
+      ext2_outer_edge_s: [1, 6]
+      ext2_outer_edge_se: [2, 6]
   interior_wood:
     position: [32, 0]
     size: [1, 1]
@@ -409,16 +448,15 @@ groups:
       inner_edge_sw: [3, 1]
       inner_edge_se: [4, 1]
       rocks1: [2, 8]
-  cliffs_grass:
-    position: [21, 28]
+  cliffs_sand:
+    position: [13, 28]
     size: [1, 1]
-    prefix: cliffs_grass_
+    prefix: cliffs_sand_
     areas:
       outer_edge_nw: [0, 0]
       outer_edge_n: [1, 0]
       outer_edge_ne: [2, 0]
       outer_edge_w: [0, 1]
-      base: [1, 1]
       outer_edge_e: [2, 1]
       outer_edge_sw: [0, 2]
       outer_edge_s: [1, 2]
@@ -427,6 +465,46 @@ groups:
       inner_edge_ne: [4, 0]
       inner_edge_sw: [3, 1]
       inner_edge_se: [4, 1]
+      
+      ext1_outer_edge_sw: [0, 3]
+      ext1_outer_edge_s: [1, 3]
+      ext1_outer_edge_se: [2, 3]
+      ext2_outer_edge_sw: [0, 4]
+      ext2_outer_edge_s: [1, 4]
+      ext2_outer_edge_se: [2, 4]
+      
+      ramp_bot_w: [3, 3]
+      ramp_bot_sw: [3, 4]
+      ramp_mid_sw: [4, 4]
+      ramp_mid_nw: [4, 3]
+      ramp_top_nw: [5, 2]
+      ramp_top_ne: [6, 2]
+      ramp_top_sw: [5, 3]
+      ramp_top_se: [6, 3]
+      ramp_mid_ne: [7, 3]
+      ramp_mid_se: [7, 4]
+      ramp_bot_e: [8, 3]
+      ramp_bot_se: [8, 4]
+      ramp_bot_nw: [3, 2]
+      ramp_bot_ne: [4, 2]
+  cliffs_grass:
+    position: [21, 28]
+    size: [1, 1]
+    prefix: cliffs_grass_
+    areas:
+      outer_edge_nw: [3, 0]
+      outer_edge_n: [4, 0]
+      outer_edge_ne: [5, 0]
+      outer_edge_w: [3, 1]
+      outer_edge_e: [5, 1]
+      outer_edge_sw: [3, 2]
+      outer_edge_s: [4, 2]
+      outer_edge_se: [5, 2]
+      
+      inner_edge_nw: [3, 3]
+      inner_edge_ne: [4, 3]
+      inner_edge_sw: [3, 4]
+      inner_edge_se: [4, 4]
       
       ramp_bot_w: [3, 6]
       ramp_bot_sw: [3, 7]
@@ -440,8 +518,8 @@ groups:
       ramp_mid_se: [7, 6]
       ramp_bot_e: [8, 6]
       ramp_bot_se: [8, 7]
-      ramp_bot_nw: [3, 4]
-      ramp_bot_ne: [4, 4]
+      ramp_bot_nw: [5, 6]
+      ramp_bot_ne: [6, 6]
   cliffs_light:
     position: [0, 28]
     size: [1, 1]
@@ -481,8 +559,10 @@ groups:
     areas:
       cliffs_cave_small: [0, 5, 1, 2]
       cliffs_cave_large: [1, 5, 2, 3]
-      cliffs_grass_cave_small: [21, 5, 1, 2]
-      cliffs_grass_cave_large: [22, 5, 2, 3]
+      cliffs_grass_cave_small: [28, 3, 1, 2]
+      cliffs_grass_cave_large: [27, 0, 2, 3]
+      cliffs_sand_cave_small: [18, 0, 1, 2]
+      cliffs_sand_cave_large: [20, 0, 2, 3]
   cave_wall:
     position: [10, 28]
     size: [1, 1]
@@ -495,36 +575,36 @@ groups:
       ext2_outer_edge_s: [1, 4]
       ext2_outer_edge_se: [2, 4]
   cave_top:
-    position: [10, 28]
+    position: [8, 28]
     size: [1, 1]
     prefix: cave_top_
     areas:
-      outer_edge_nw: [0, 0]
-      outer_edge_n: [1, 0]
-      outer_edge_ne: [2, 0]
-      outer_edge_w: [0, 1]
-      base: [1, 1]
-      outer_edge_e: [2, 1]
-      outer_edge_sw: [0, 2]
-      outer_edge_s: [1, 2]
-      outer_edge_se: [2, 2]
+      outer_edge_nw: [2, 0]
+      outer_edge_n: [3, 0]
+      outer_edge_ne: [4, 0]
+      outer_edge_w: [2, 1]
+      base: [3, 1]
+      outer_edge_e: [4, 1]
+      outer_edge_sw: [2, 2]
+      outer_edge_s: [3, 2]
+      outer_edge_se: [4, 2]
       
-      inner_edge_nw: [3, 0]
-      inner_edge_ne: [4, 0]
-      inner_edge_sw: [3, 1]
-      inner_edge_se: [4, 1]
+      inner_edge_nw: [0, 2]
+      inner_edge_ne: [1, 2]
+      inner_edge_sw: [0, 3]
+      inner_edge_se: [1, 3]
       
-      tunnel_nw: [6, 5]
-      tunnel_n: [7, 5]
-      tunnel_ne: [8, 5]
-      tunnel_w: [6, 6]
-      tunnel_c: [7, 6]
-      tunnel_e: [8, 6]
-      tunnel_sw: [6, 7]
-      tunnel_s: [7, 7]
-      tunnel_se: [8, 7]
+      tunnel_nw: [8, 5]
+      tunnel_n: [9, 5]
+      tunnel_ne: [10, 5]
+      tunnel_w: [8, 6]
+      tunnel_c: [9, 6]
+      tunnel_e: [10, 6]
+      tunnel_sw: [8, 7]
+      tunnel_s: [9, 7]
+      tunnel_se: [10, 7]
   cave_decorations:
-    position: [17, 28]
+    position: [38, 28]
     size: [1, 1]
     areas:
       mine_beam_nw: [0, 0]
@@ -553,12 +633,13 @@ groups:
       cave_entrance_large_c: [2, 5, 1, 3]
       cave_entrance_large_e: [3, 5, 1, 3]
  
-      door_header_metal: [3, 2, 1, 1]
-      door_header_wood: [5, 2, 1, 1]
-      door_frame_metal_e: [3, 3, 1, 2]
-      door_frame_metal_w: [4, 3, 1, 2]
-      door_frame_wood_e: [5, 3, 1, 2]
-      door_frame_wood_w: [6, 3, 1, 2]
+      door_header_metal: [4, 5, 1, 1]
+      door_frame_metal_e: [4, 6, 1, 2]
+      door_frame_metal_w: [5, 6, 1, 2]
+      
+      door_header_wood: [9, 5, 1, 1]
+      door_frame_wood_e: [9, 6, 1, 2]
+      door_frame_wood_w: [10, 6, 1, 2]
       
       cliff_aerial_pass: [20, 6, 1, 5]
       cliff_grass_aerial_pass: [21, 6, 1, 5]
@@ -835,6 +916,23 @@ groups:
       rocks03: [4, 1]
       rocks04: [6, 1]
       rocks05: [8, 1]
+  rocks:
+    position: [38, 26]
+    size: [1, 1]
+    areas:
+      rocks_sm01: [0, 0]
+      rocks_sm02: [1, 0]
+      rocks_sm03: [2, 0]
+      rocks_sm04: [0, 1]
+      rocks_sm05: [1, 1]
+      rocks_sm06: [2, 1]
+  rocks_big:
+    position: [42, 24]
+    size: [2, 2]
+    areas:
+      rocks_lg01: [0, 0]
+      rocks_lg02: [0, 2]
+      rocks_lg03: [0, 4]
   castle01:
     position: [54, 8]
     areas:
@@ -1038,3 +1136,116 @@ groups:
       stairs_up_bot: [0, 2, 3, 1]
       stairs_down_top: [3, 0, 3, 1]
       stairs_down_bot: [3, 1, 3, 2]
+  dunes:
+    position: [32, 29]
+    areas:
+      dune_med01: [0, 0, 3, 3]
+      dune_med02: [3, 0, 3, 3]
+      dune_large01: [0, 3, 3, 4]
+      dune_small01: [3, 3, 2, 2]
+      dune_small02: [3, 5, 2, 2]
+      dune_tiny01: [5, 3, 1, 1]
+  cacti_large:
+    position: [32, 36]
+    areas:
+      cacti_large01_top: [7, 0, 2, 3]
+      cacti_large01_bot: [7, 3, 2, 1]
+      cacti_large02_top: [9, 0, 2, 3]
+      cacti_large02_bot: [9, 3, 2, 1]
+  cacti_small:
+    position: [32, 36]
+    size: [1, 1]
+    areas:
+      cacti_med01_top: [0, 0]
+      cacti_med02_top: [1, 0]
+      cacti_med03_top: [2, 0]
+      cacti_med04_top: [3, 0]
+      cacti_med05_top: [4, 0]
+      cacti_med06_top: [5, 0]
+    
+      cacti_med01_bot: [0, 1]
+      cacti_med02_bot: [1, 1]
+      cacti_med03_bot: [2, 1]
+      cacti_med04_bot: [3, 1]
+      cacti_med05_bot: [4, 1]
+      cacti_med06_bot: [5, 1]
+    
+      cacti_small01: [6, 0]
+      cacti_small02: [6, 1]
+      cacti_small03: [0, 2]
+      cacti_small04: [0, 3]
+      cacti_small05: [1, 2]
+      cacti_small06: [1, 3]
+      cacti_small07: [2, 2]
+      cacti_small08: [2, 3]
+      cacti_small09: [3, 2]
+      cacti_small10: [3, 3]
+      cacti_small11: [4, 2]
+      cacti_small12: [4, 3]
+      cacti_small13: [5, 2]
+      cacti_small14: [5, 3]
+      cacti_small15: [6, 2]
+  adobe:
+    position: [32, 40]
+    prefix: adobe_
+    areas:
+      wall_beam_single_w: [9, 0, 1, 1]
+      wall_beam_double_w: [9, 1, 1, 1]
+      wall_beam_single_e: [10, 0, 1, 1]
+      wall_beam_double_e: [10, 1, 1, 1]
+      wall_beam_s: [11, 0, 1, 1]
+      
+      stairs_w: [9, 2, 1, 1]
+      stairs_e: [10, 2, 1, 1]
+      stairs_single: [9, 3, 1, 1]
+      stairs_c: [10, 3, 1, 1]
+      
+      door_shade: [12, 0, 1, 1]
+      window_shade_top_w: [11, 1, 1, 1]
+      window_shade_mid_w: [11, 2, 1, 1]
+      window_shade_bot_w: [11, 3, 1, 1]
+      window_shade_top_e: [12, 1, 1, 1]
+      window_shade_mid_e: [12, 2, 1, 1]
+      window_shade_bot_e: [12, 3, 1, 1]
+      
+      window_1_open: [13, 0, 1, 1]
+      window_2_open: [13, 1, 1, 1]
+      window_1_closed: [14, 0, 1, 1]
+      window_2_closed: [14, 1, 1, 1]
+      
+      bench_h: [13, 2, 1, 2]
+      bench_w: [14, 2, 2, 1]
+      bench_c: [13, 4, 1, 1]
+      bench_c2: [13, 5, 1, 1]
+      bench_w2: [14, 3, 2, 1]
+      chimney: [14, 4, 1, 2]
+      
+      stack_top: [9, 4, 4, 1]
+      stack_bot: [9, 5, 4, 2]
+      
+      crack01: [0, 7, 1, 1]
+      crack02: [1, 7, 1, 1]
+      crack03: [2, 7, 1, 1]
+      crack04: [3, 7, 1, 1]
+      crack05: [4, 7, 1, 1]
+      crack06: [0, 8, 1, 1]
+      crack07: [1, 8, 1, 1]
+      crack08: [2, 8, 1, 1]
+      crack09: [3, 8, 1, 1]
+      
+      trellis01_top: [0, 9, 3, 4]
+      trellis_bot: [0, 13, 3, 1]
+      trellis02_top: [3, 9, 3, 5]
+      trellis03_top: [6, 9, 3, 4]
+      trellis03_bot: [6, 13, 3, 1]
+
+      arch_brick: [10, 9, 3, 3]
+      arch: [13, 9, 3, 3]
+
+      post_w_top: [13, 6, 1, 2]
+      post_e_top: [14, 6, 1, 2]
+      post_c_top: [15, 6, 1, 2]
+      post_w_bot: [13, 8, 1, 1]
+      post_e_bot: [14, 8, 1, 1]
+      post_c_bot: [15, 8, 1, 1]
+      post_gap: [15, 4, 1, 2]

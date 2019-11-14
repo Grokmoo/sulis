@@ -33,11 +33,13 @@ world_map:
       position: [2, 1]
       icon: desert_town01
       initially_enabled: false
+      linked_area: oasis
+      linked_area_pos: [66, 4]
     desert:
       name: "Desert"
       position: [1, 3]
       icon: flat01
-      initially_enabled: true
+      initially_enabled: false
     last_edge:
       name: "Last Edge"
       position: [17, 11]

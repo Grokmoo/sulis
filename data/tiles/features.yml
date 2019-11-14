@@ -1,35 +1,22 @@
 id: features
 features:
-  tree_med:
-    entries:
-      - tiles:
-          tree_med_02: [[0, 0]]
-        weight: 1
-      - tiles:
-          tree_med_03: [[0, 0]]
-        weight: 1
-      - tiles:
-          tree_med_04: [[0, 0]]
-        weight: 1
-    size: [14, 14]
   boxes:
     entries:
       - tiles:
           props/boxes01: [[0, 0]]
-        weight: 1
       - tiles:
           props/boxes02: [[0, 0]]
-        weight: 1
       - tiles:
           props/boxes03: [[0, 0]]
-        weight: 1
       - tiles:
           props/boxes04: [[0, 0]]
-        weight: 1
       - tiles:
           props/boxes05: [[0, 0]]
-        weight: 1
-    size: [2, 2]
+      - tiles:
+          boxes06: [[0, 0]]
+      - tiles:
+          boxes07: [[0, 0]]
+    size: [3, 2]
   mushrooms:
     entries:
       - tiles:
@@ -521,3 +508,496 @@ features:
     size:
       width: 6
       height: 10
+  well01:
+    entries:
+      - tiles:
+          well01_top: [[0, 0]]
+          well01_bot: [[0, 3]]
+    size:
+      width: 5
+      height: 6
+  well02:
+    entries:
+      - tiles:
+          well02_top: [[0, 0]]
+          well02_bot: [[0, 3]]
+    size:
+      width: 5
+      height: 6
+  tent:
+    entries:
+      - tiles:
+          tent_top: [[0, 0]]
+          tent_bot: [[0, 4]]
+    size:
+      width: 8
+      height: 10
+  veggie_bin:
+    entries:
+      - tiles:
+          tileset/veg01_bin: [[0, 0]]
+      - tiles:
+          tileset/veg02_bin: [[0, 0]]
+      - tiles:
+          tileset/veg03_bin: [[0, 0]]
+      - tiles:
+          tileset/veg04_bin: [[0, 0]]
+      - tiles:
+          tileset/veg05_bin: [[0, 0]]
+      - tiles:
+          tileset/veg06_bin: [[0, 0]]
+      - tiles:
+          tileset/bin01: [[0, 0]]
+    size:
+      width: 2
+      height: 4
+  plants_small:
+    entries:
+      - tiles:
+          tileset/plant01: [[0, 0]]
+      - tiles:
+          tileset/plant02: [[0, 0]]
+      - tiles:
+          tileset/plant03: [[0, 0]]
+      - tiles:
+          tileset/plant04: [[0, 0]]
+      - tiles:
+          tileset/plant05: [[0, 0]]
+      - tiles:
+          tileset/plant06: [[0, 0]]
+      - tiles:
+          tileset/plant07: [[0, 0]]
+      - tiles:
+          tileset/plant08: [[0, 0]]
+      - tiles:
+          tileset/plant09: [[0, 0]]
+      - tiles:
+          tileset/plant10: [[0, 0]]
+      - tiles:
+          tileset/plant11: [[0, 0]]
+      - tiles:
+          tileset/plant12: [[0, 0]]
+      - tiles:
+          tileset/plant13: [[0, 0]]
+      - tiles:
+          tileset/plant14: [[0, 0]]
+      - tiles:
+          tileset/plant15: [[0, 0]]
+      - tiles:
+          tileset/plant16: [[0, 0]]
+      - tiles:
+          tileset/plant17: [[0, 0]]
+      - tiles:
+          tileset/plant18: [[0, 0]]
+      - tiles:
+          tileset/plant19: [[0, 0]]
+      - tiles:
+          tileset/plant20: [[0, 0]]
+    size:
+      width: 2
+      height: 2
+  bazaar_w:
+    entries:
+      - tiles:
+          bazaar01_top: [[0, 0]]
+          bazaar01_bot: [[0, 2]]
+    size:
+      width: 4
+      height: 6
+  bazaar_e:
+    entries:
+      - tiles:
+          bazaar02_top: [[0, 0]]
+          bazaar02_bot: [[0, 2]]
+    size:
+      width: 4
+      height: 6
+  bazaar_n:
+    entries:
+      - tiles:
+          bazaar03_top: [[0, 0]]
+          bazaar03_bot: [[0, 2]]
+    size:
+      width: 4
+      height: 4
+  food:
+    entries:
+      - tiles:
+          tileset/flour_sack: [[0, 0]]
+      - tiles:
+          tileset/meat01: [[0, 0]]
+      - tiles:
+          tileset/meat02: [[0, 0]]
+      - tiles:
+          tileset/fish01: [[0, 0]]
+      - tiles:
+          tileset/fish02: [[0, 0]]
+      - tiles:
+          tileset/fish03: [[0, 0]]
+      - tiles:
+          tileset/veg01: [[0, 0]]
+      - tiles:
+          tileset/veg02: [[0, 0]]
+      - tiles:
+          tileset/veg03: [[0, 0]]
+      - tiles:
+          tileset/veg04: [[0, 0]]
+      - tiles:
+          tileset/veg05: [[0, 0]]
+      - tiles:
+          tileset/veg06: [[0, 0]]
+    size:
+      width: 2
+      height: 2
+  supplies:
+    entries:
+      - tiles:
+          tileset/flour_sack_2by2: [[0, 0]]
+      - tiles:
+          props/barrel: [[0, 0]]
+      - tiles:
+          props/hay01: [[0, 0]]
+      - tiles:
+          props/hay02: [[0, 0]]
+      - tiles:
+          props/barrels: [[0, 0]]
+      - tiles:
+          coins_small: [[0, 0]]
+      - tiles:
+          coins_medium: [[0, 0]]
+      - tiles:
+          coins_large: [[0, 0]]
+      - tiles:
+          props/vase: [[0, 0]]
+      - tiles:
+          tileset/wood_pile: [[0, 0]]
+      - tiles:
+          tileset/wood_pile_2by2: [[0, 0]]
+
+      - tiles:
+          tileset/veg_sack01: [[0, 0]]
+      - tiles:
+          tileset/veg_sack02: [[0, 0]]
+      - tiles:
+          tileset/veg_sack01_2by2: [[0, 0]]
+      - tiles:
+          tileset/veg_sack02_2by2: [[0, 0]]
+    size:
+      width: 4
+      height: 4
+  flower_box:
+    entries:
+      - tiles:
+          flower_box01: [[0, 0]]
+      - tiles:
+          flower_box02: [[0, 0]]
+      - tiles:
+          flower_box03: [[0, 0]]
+    size:
+      width: 2
+      height: 2
+  shelf_items:
+    entries:
+      - tiles:
+          tileset/plate01: [[0, 0]]
+      - tiles:
+          tileset/plate02: [[0, 0]]
+      - tiles:
+          tileset/plate03: [[0, 0]]
+      - tiles:
+          tileset/plate04: [[0, 0]]
+      - tiles:
+          tileset/plate05: [[0, 0]]
+      - tiles:
+          tileset/plate06: [[0, 0]]
+      - tiles:
+          tileset/plate07: [[0, 0]]
+      - tiles:
+          tileset/plate08: [[0, 0]]
+      - tiles:
+          tileset/wine_bottle01: [[0, 0]]
+      - tiles:
+          tileset/wine_bottle02: [[0, 0]]
+      - tiles:
+          tileset/lantern_off: [[0, 0]]
+      - tiles:
+          tileset/papers: [[0, 0]]
+      - tiles:
+          tileset/papers02: [[0, 0]]
+      - tiles:
+          tileset/book01: [[0, 0]]
+      - tiles:
+          tileset/book02: [[0, 0]]
+      - tiles:
+          tileset/bottles01: [[0, 0]]
+      - tiles:
+          tileset/bottles01: [[0, 0]]
+      - tiles:
+          tileset/bottles01: [[0, 0]]
+    size:
+      width: 2
+      height: 2
+  adobe_crack:
+    entries:
+      - tiles:
+          tileset/adobe_crack01: [[0, 0]]
+      - tiles:
+          tileset/adobe_crack02: [[0, 0]]
+      - tiles:
+          tileset/adobe_crack03: [[0, 0]]
+      - tiles:
+          tileset/adobe_crack04: [[0, 0]]
+      - tiles:
+          tileset/adobe_crack05: [[0, 0]]
+      - tiles:
+          tileset/adobe_crack06: [[0, 0]]
+      - tiles:
+          tileset/adobe_crack07: [[0, 0]]
+      - tiles:
+          tileset/adobe_crack08: [[0, 0]]
+      - tiles:
+          tileset/adobe_crack09: [[0, 0]]
+    size:
+      width: 2
+      height: 2
+  bridge_water_w:
+    entries:
+      - tiles:
+          tileset/bridge_top_w1: [[0, 0], [0, 6]]
+          tileset/bridge_top_w2: [[2, 0], [2, 6]]
+          tileset/bridge_top_mid: [[4, 0], [6, 0], [8, 0], [4, 6], [6, 6], [8, 6]]
+          tileset/bridge_mid: [[0, 8]]
+          tileset/bridge_bot_water: [[0, 10]]
+          tileset/bridge_column_mid: [[8, 8]]
+          tileset/bridge_column_mid_water: [[8, 10]]
+    size:
+      width: 10
+      height: 12
+  bridge_water_c:
+    entries:
+      - tiles:
+          tileset/bridge_top_mid: [[0, 0], [2, 0], [4, 0], [6, 0], [8, 0], [0, 6], [2, 6], [4, 6], [6, 6], [8, 6]]
+          tileset/bridge_mid: [[0, 8]]
+          tileset/bridge_bot_water: [[0, 10]]
+          tileset/bridge_column_mid: [[8, 8]]
+          tileset/bridge_column_mid_water: [[8, 10]]
+    size:
+      width: 10
+      height: 12
+  bridge_water_e:
+    entries:
+      - tiles:
+          tileset/bridge_top_e1: [[4, 0], [4, 6]]
+          tileset/bridge_top_e2: [[6, 0], [6, 6]]
+          tileset/bridge_top_mid: [[0, 0], [2, 0], [0, 6], [2, 6]]
+          tileset/bridge_mid: [[0, 8]]
+          tileset/bridge_bot_water: [[0, 10]]
+    size:
+      width: 8
+      height: 12
+  bridge_w:
+    entries:
+      - tiles:
+          tileset/bridge_top_w1: [[0, 0], [0, 6]]
+          tileset/bridge_top_w2: [[2, 0], [2, 6]]
+          tileset/bridge_top_mid: [[4, 0], [6, 0], [8, 0], [4, 6], [6, 6], [8, 6]]
+          tileset/bridge_mid: [[0, 8]]
+          tileset/bridge_bot: [[0, 10]]
+          tileset/bridge_column_mid: [[8, 8], [8, 10]]
+    size:
+      width: 10
+      height: 12
+  bridge_c:
+    entries:
+      - tiles:
+          tileset/bridge_top_mid: [[0, 0], [2, 0], [4, 0], [6, 0], [8, 0], [0, 6], [2, 6], [4, 6], [6, 6], [8, 6]]
+          tileset/bridge_mid: [[0, 8]]
+          tileset/bridge_bot: [[0, 10]]
+          tileset/bridge_column_mid: [[8, 8], [8, 10]]
+    size:
+      width: 10
+      height: 12
+  bridge_e:
+    entries:
+      - tiles:
+          tileset/bridge_top_e1: [[4, 0], [4, 6]]
+          tileset/bridge_top_e2: [[6, 0], [6, 6]]
+          tileset/bridge_top_mid: [[0, 0], [2, 0], [0, 6], [2, 6]]
+          tileset/bridge_mid: [[0, 8]]
+          tileset/bridge_bot: [[0, 10]]
+    size:
+      width: 8
+      height: 12
+  furniture_shelf_tall:
+    entries:
+      - tiles:
+          tileset/cabinet01: [[0, 0]]
+      - tiles:
+          tileset/cabinet02: [[0, 0]]
+      - tiles:
+          tileset/cabinet03: [[0, 0]]
+      - tiles:
+          tileset/cabinet04: [[0, 0]]
+      - tiles:
+          tileset/cabinet05: [[0, 0]]
+      - tiles:
+          tileset/cabinet06: [[0, 0]]
+      - tiles:
+          tileset/cabinet07: [[0, 0]]
+      - tiles:
+          tileset/cabinet08: [[0, 0]]
+      - tiles:
+          tileset/cabinet09: [[0, 0]]
+    size:
+      width: 2
+      height: 6
+  furniture_cabinet_wide:
+    entries:
+      - tiles:
+          tileset/cabinet_wide01: [[0, 0]]
+      - tiles:
+          tileset/cabinet_wide02: [[0, 0]]
+      - tiles:
+          tileset/cabinet_wide03: [[0, 0]]
+      - tiles:
+          tileset/cabinet_wide04: [[0, 0]]
+    size:
+      width: 4
+      height: 4
+  furniture_cabinet_deep:
+    entries:
+      - tiles:
+          tileset/cabinet_med01: [[0, 0]]
+      - tiles:
+          tileset/cabinet_med02: [[0, 0]]
+      - tiles:
+          tileset/cabinet_med03: [[0, 0]]
+      - tiles:
+          tileset/cabinet_med04: [[0, 0]]
+    size:
+      width: 2
+      height: 4
+  furniture_small:
+    entries:
+      - tiles:
+          tileset/cabinet_small_01: [[0, 2]]
+      - tiles:
+          tileset/cabinet_small_02: [[0, 2]]
+    size:
+      width: 2
+      height: 2
+  furniture_small_shelf:
+    entries:
+      - tiles:
+          tileset/cabinet_top_01: [[0, 0]]
+          tileset/cabinet_bot_01: [[0, 2]]
+      - tiles:
+          tileset/cabinet_top_02: [[0, 0]]
+          tileset/cabinet_bot_01: [[0, 2]]
+      - tiles:
+          tileset/cabinet_top_03: [[0, 0]]
+          tileset/cabinet_bot_01: [[0, 2]]
+      - tiles:
+          tileset/cabinet_top_04: [[0, 0]]
+          tileset/cabinet_bot_01: [[0, 2]]
+      - tiles:
+          tileset/cabinet_top_01: [[0, 0]]
+          tileset/cabinet_bot_02: [[0, 2]]
+      - tiles:
+          tileset/cabinet_top_02: [[0, 0]]
+          tileset/cabinet_bot_02: [[0, 2]]
+      - tiles:
+          tileset/cabinet_top_03: [[0, 0]]
+          tileset/cabinet_bot_02: [[0, 2]]
+      - tiles:
+          tileset/cabinet_top_04: [[0, 0]]
+          tileset/cabinet_bot_02: [[0, 2]]
+      - tiles:
+          tileset/cabinet_top_01: [[0, 0]]
+          tileset/cabinet_bot_03: [[0, 2]]
+      - tiles:
+          tileset/cabinet_top_02: [[0, 0]]
+          tileset/cabinet_bot_03: [[0, 2]]
+      - tiles:
+          tileset/cabinet_top_03: [[0, 0]]
+          tileset/cabinet_bot_03: [[0, 2]]
+      - tiles:
+          tileset/cabinet_top_04: [[0, 0]]
+          tileset/cabinet_bot_03: [[0, 2]]
+    size:
+      width: 2
+      height: 4
+  tree_small:
+    entries:
+      - tiles:
+          tree_small_02: [[0, 0]]
+      - tiles:
+          tree_small_03: [[0, 0]]
+      - tiles:
+          tree_small_04: [[0, 0]]
+      - tiles:
+          tree_small_05: [[0, 0]]
+      - tiles:
+          tree_small_06: [[0, 0]]
+      - tiles:
+          tree_small_07: [[0, 0]]
+      - tiles:
+          tree_small_01: [[0, 0]]
+    size:
+      width: 4
+      height: 6
+  tree_med:
+    entries:
+      - tiles:
+          tree_med_02: [[0, 0]]
+          tree_big_01_bot: [[4, 10]]
+      - tiles:
+          tree_med_03: [[0, 0]]
+          tree_big_01_bot: [[4, 10]]
+      - tiles:
+          tree_med_04: [[0, 0]]
+          tree_big_01_bot: [[4, 10]]
+      - tiles:
+          tree_med_05: [[1, 2]]
+          tree_med_05_bot: [[3, 10]]
+      - tiles:
+          tree_med_06: [[2, 3]]
+          tree_med_06_bot: [[4, 9]]
+      - tiles:
+          tree_med_07: [[0, 1]]
+          tree_big_01_bot: [[4, 9]]
+      - tiles:
+          tree_med_08: [[3, 1]]
+          tree_med_08_bot: [[3, 9]]
+      - tiles:
+          tree_med_09: [[0, 1]]
+          tree_big_01_bot: [[3, 9]]
+      - tiles:
+          tree_med_01: [[3, 3]]
+          tree_med_01_bot: [[5, 9]]
+    size: [14, 14]
+  tree_large:
+    entries:
+      - tiles:
+          tree_big_01: [[0, 0]]
+          tree_big_01_bot: [[8, 16]]
+    size:
+      width: 24
+      height: 20
+  sand_dunes:
+    entries:
+      - tiles:
+          dune_med01: [[0, 0]]
+      - tiles:
+          dune_med02: [[0, 0]]
+      - tiles:
+          dune_small01: [[1, 1]]
+      - tiles:
+          dune_small02: [[1, 1]]
+      - tiles:
+          dune_tiny01: [[2, 2]]
+      - tiles:
+          dune_large01: [[0, 0]]
+    size:
+      width: 3
+      height: 3

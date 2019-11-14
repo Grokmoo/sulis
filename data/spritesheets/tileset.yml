@@ -691,6 +691,11 @@ groups:
       tree_med_09: [11, 13, 7, 6]
         
       tree_big_01: [18, 7, 12, 10]
+      tree_big_01_bot: [27, 5, 3, 2]
+      tree_med_05_bot: [21, 6, 3, 1]
+      tree_med_06_bot: [24, 6, 2, 1]
+      tree_med_01_bot: [14, 11, 2, 2]
+      tree_med_08_bot: [16, 11, 2, 2]
   misc_props:
     position: [6, 36]
     areas:

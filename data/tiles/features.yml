@@ -974,7 +974,7 @@ features:
           tree_big_01_bot: [[3, 9]]
       - tiles:
           tree_med_01: [[3, 3]]
-          tree_med_01_bot: [[5, 9]]
+          tree_med_01_bot: [[5, 7]]
     size: [14, 14]
   tree_large:
     entries:

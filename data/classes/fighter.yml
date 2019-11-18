@@ -35,6 +35,12 @@ starting_abilities:
   - weapon_mace
   - weapon_simple
 upgrades:
+  1:
+    ability_choices: [ ]
+    group_uses_per_encounter:
+      - [ Fighter, 1 ]
+      - [ Modes, ~ ]
+      - [ Special, ~ ]
   2:
     ability_choices: [ fighter ]
     group_uses_per_encounter:

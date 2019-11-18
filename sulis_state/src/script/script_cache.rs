@@ -59,6 +59,63 @@ pub fn set_report_enabled(enabled: bool) {
     REPORTING.with(|r| r.set(enabled));
 }
 
+fn parse_traceback_line_num(traceback: &str) -> Option<i32> {
+    // find first line with a line number, this should be the right
+    // place on the call stack
+
+    for line in traceback.lines() {
+        let num_str = match line.split(':').skip(1).next() {
+            None => continue,
+            Some(num_str) => num_str,
+        };
+
+        match num_str.parse() {
+            Err(_) => continue,
+            Ok(num) => return Some(num),
+        };
+    }
+
+    None
+}
+
+fn print_nearby_lines(state: &ScriptState, traceback: &str) -> (String, i32) {
+    let mut out = String::new();
+
+    let num = match parse_traceback_line_num(traceback) {
+        None => {
+            out.push_str("No traceback available.\n");
+            return (out, 0);
+        },
+        Some(num) => num,
+    };
+
+    let script = match get_script_from_id(&state.id) {
+        Err(_) => {
+            out.push_str(&format!("Unable to find script: {} for traceback.\n", state.id));
+            return (out, 0);
+        },
+        Ok(script) => script,
+    };
+
+    let start_num = std::cmp::max(0, num - 5) as usize;
+    let lines = script.lines().skip(start_num);
+
+    let mut i = 0;
+    for line in lines {
+        if i >= 9 { break; }
+
+        if i == 4 {
+            out.push_str(&format!("{:4}", start_num + i + 1));
+        } else {
+            out.push_str("    ");
+        }
+        out.push_str(&format!(" | {}\n", line));
+        i += 1;
+    }
+
+    (out, num)
+}
+
 pub fn exec_func<Args, Ret>(id: &str, func: &str, args: Args) -> Result<Ret>
 where
     Args: for<'a> ToLuaMulti<'a>,
@@ -81,7 +138,17 @@ where
 
     let reporting = REPORTING.with(|r| r.get());
 
-    state.exec_func(func, args, reporting)
+    use rlua::Error::*;
+    match state.exec_func(func, args, reporting) {
+        Ok(ret) => Ok(ret),
+        Err(CallbackError { traceback, cause }) => {
+            let (output, line_num) = print_nearby_lines(&state, &traceback);
+            warn!("Script Error:\n{}\n{}.lua:{} Called '{}'\n{}",
+                cause, state.id, line_num, func, output);
+            Err(CallbackError { traceback, cause })
+        },
+        Err(e) => Err(e),
+    }
 }
 
 pub fn ai_script(parent: &Rc<RefCell<EntityState>>, func: &str) -> Result<ai::State> {

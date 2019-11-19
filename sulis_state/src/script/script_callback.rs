@@ -23,8 +23,8 @@ use std::result;
 use rlua::{UserData, UserDataMethods};
 
 use crate::script::{
-    script_entity, ScriptActiveSurface, ScriptAppliedEffect, ScriptEntity,
-    ScriptEntitySet, ScriptItemKind, ScriptMenuSelection,
+    script_entity, ScriptActiveSurface, ScriptAppliedEffect, ScriptEntity, ScriptEntitySet,
+    ScriptItemKind, ScriptMenuSelection,
 };
 use crate::{EntityState, GameState, Script};
 use sulis_core::util::invalid_data_error;
@@ -53,11 +53,7 @@ impl TriggeredCallback {
     }
 
     pub fn with_target(cb: Rc<CallbackData>, func: FuncKind, target: usize) -> TriggeredCallback {
-        TriggeredCallback {
-            cb,
-            target,
-            func,
-        }
+        TriggeredCallback { cb, target, func }
     }
 }
 
@@ -74,23 +70,19 @@ pub fn fire_cbs(cbs: Vec<TriggeredCallback>) {
             FuncKind::OnMoved => cb.on_moved(),
             FuncKind::OnRoundElapsed => cb.on_round_elapsed(),
             FuncKind::OnSurfaceRoundElapsed => cb.on_surface_round_elapsed(),
-            FuncKind::OnActivated => {
-                match &cb.kind {
-                    Kind::Ability(id) => {
-                        let ability = Module::ability(id).unwrap();
-                        Script::ability_on_activate(cb.parent, &ability);
-                    },
-                    _ => warn!("OnActivated called with invalid callback kind."),
+            FuncKind::OnActivated => match &cb.kind {
+                Kind::Ability(id) => {
+                    let ability = Module::ability(id).unwrap();
+                    Script::ability_on_activate(cb.parent, &ability);
                 }
+                _ => warn!("OnActivated called with invalid callback kind."),
             },
-            FuncKind::OnDeactivated => {
-                match &cb.kind {
-                    Kind::Ability(id) => {
-                        let ability = Module::ability(id).unwrap();
-                        Script::ability_on_deactivate(cb.parent, &ability);
-                    },
-                    _ => warn!("OnDeactivated called with invalid callback kind."),
+            FuncKind::OnDeactivated => match &cb.kind {
+                Kind::Ability(id) => {
+                    let ability = Module::ability(id).unwrap();
+                    Script::ability_on_deactivate(cb.parent, &ability);
                 }
+                _ => warn!("OnDeactivated called with invalid callback kind."),
             },
             _ => {
                 warn!("Surface callback of kind {:?} is not being called.", func);
@@ -719,21 +711,24 @@ impl UserData for CallbackData {
             Ok(())
         });
 
-        methods.add_method_mut("add_affected_points", |_, cb, points: Vec<HashMap<String, i32>>| {
-            if let Kind::Script(_) = cb.kind {
-                warn!("Setting targets on global generated callback will have no effect");
-            }
-
-            cb.create_targets_if_missing();
-            if let Some(ref mut cb_targets) = cb.targets {
-                for p in points {
-                    let (x, y) = script_entity::unwrap_point(p)?;
-                    cb_targets.affected_points.push((x, y));
+        methods.add_method_mut(
+            "add_affected_points",
+            |_, cb, points: Vec<HashMap<String, i32>>| {
+                if let Kind::Script(_) = cb.kind {
+                    warn!("Setting targets on global generated callback will have no effect");
                 }
-            }
 
-            Ok(())
-        });
+                cb.create_targets_if_missing();
+                if let Some(ref mut cb_targets) = cb.targets {
+                    for p in points {
+                        let (x, y) = script_entity::unwrap_point(p)?;
+                        cb_targets.affected_points.push((x, y));
+                    }
+                }
+
+                Ok(())
+            },
+        );
 
         methods.add_method_mut("set_on_effect_applied_fn", |_, cb, func: String| {
             cb.add_func(FuncKind::OnEffectApplied, func);

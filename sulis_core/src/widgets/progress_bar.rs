@@ -19,7 +19,7 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 use crate::image::Image;
-use crate::io::{DrawList, GraphicsRenderer, event::ClickKind};
+use crate::io::{event::ClickKind, DrawList, GraphicsRenderer};
 use crate::resource::ResourceSet;
 use crate::ui::{theme, LineRenderer, Widget, WidgetKind};
 use crate::util::Point;

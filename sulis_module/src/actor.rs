@@ -58,20 +58,28 @@ impl Faction {
             Faction::Hostile => "Hostile",
             Faction::Neutral => "Neutral",
             Faction::Friendly => "Friendly",
-        }.to_owned()
+        }
+        .to_owned()
     }
 
     pub fn is_hostile(&self, other: &Faction) -> bool {
-        if self == &Faction::Neutral { return false; }
-        if other == &Faction::Neutral { return false; }
+        if self == &Faction::Neutral {
+            return false;
+        }
+        if other == &Faction::Neutral {
+            return false;
+        }
 
         self != other
     }
 
-
     pub fn is_friendly(&self, other: &Faction) -> bool {
-        if self == &Faction::Neutral { return false; }
-        if other == &Faction::Neutral { return false; }
+        if self == &Faction::Neutral {
+            return false;
+        }
+        if other == &Faction::Neutral {
+            return false;
+        }
 
         self == other
     }

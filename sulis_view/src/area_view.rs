@@ -38,7 +38,7 @@ use sulis_module::{
 use sulis_state::{area_feedback_text, area_state::PCVisRedraw, RangeIndicatorImageSet};
 use sulis_state::{AreaDrawable, AreaState, EntityState, EntityTextureCache, GameState};
 
-use crate::{action_kind, window_fade, WindowFade, AreaOverlayHandler};
+use crate::{action_kind, window_fade, AreaOverlayHandler, WindowFade};
 
 const NAME: &'static str = "area";
 
@@ -750,9 +750,10 @@ impl WidgetKind for AreaView {
             renderer.draw(draw_list);
         }
 
-        if let Some(mut draw_list) = self.overlay_handler
-            .get_path_draw_list(self.scroll.x(), self.scroll.y(), millis) {
-
+        if let Some(mut draw_list) =
+            self.overlay_handler
+                .get_path_draw_list(self.scroll.x(), self.scroll.y(), millis)
+        {
             draw_list.set_scale(scale_x, scale_y);
             renderer.draw(draw_list);
         }
@@ -784,7 +785,9 @@ impl WidgetKind for AreaView {
             }
 
             let scroll = (self.scroll.x(), self.scroll.y());
-            let party = self.overlay_handler.select_party_in_box(widget, self.scale, scroll);
+            let party = self
+                .overlay_handler
+                .select_party_in_box(widget, self.scale, scroll);
             for entity in party.iter() {
                 self.draw_selection(&entity, renderer, scale_x, scale_y, widget, millis);
             }
@@ -859,8 +862,8 @@ impl WidgetKind for AreaView {
 
         let offset = (p.x as f32 - self.scroll.x(), p.y as f32 - self.scroll.y());
         let scale = (scale_x, scale_y);
-        self.overlay_handler.draw_top(renderer, &self.feedback_text_params,
-            offset, scale, millis);
+        self.overlay_handler
+            .draw_top(renderer, &self.feedback_text_params, offset, scale, millis);
 
         for feedback_text in state.feedback_text_iter() {
             feedback_text.draw(
@@ -898,8 +901,9 @@ impl WidgetKind for AreaView {
         } else {
             let scroll = (self.scroll.x(), self.scroll.y());
             let fire_action = match kind {
-                ClickKind::Left =>
-                    self.overlay_handler.handle_left_click(widget, self.scale, scroll),
+                ClickKind::Left => self
+                    .overlay_handler
+                    .handle_left_click(widget, self.scale, scroll),
                 _ => false,
             };
 

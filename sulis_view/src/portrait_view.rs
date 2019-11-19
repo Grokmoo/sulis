@@ -71,7 +71,7 @@ impl WidgetKind for PortraitView {
                 let widget = Widget::empty("class_stat_bar");
                 widget.borrow_mut().state.set_visible(false);
                 widget
-            },
+            }
             Some(ref stat) => {
                 let cur = entity.actor.current_class_stat(&stat.id);
                 let max = entity.actor.stats.class_stat_max(&stat.id);

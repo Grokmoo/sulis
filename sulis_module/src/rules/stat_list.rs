@@ -138,7 +138,10 @@ impl StatList {
     }
 
     pub fn class_stat_max(&self, stat: &str) -> ExtInt {
-        self.class_stats.get(stat).copied().unwrap_or(ExtInt::Int(0))
+        self.class_stats
+            .get(stat)
+            .copied()
+            .unwrap_or(ExtInt::Int(0))
     }
 
     pub fn uses_per_day_iter(&self) -> impl Iterator<Item = (&String, &ExtInt)> {

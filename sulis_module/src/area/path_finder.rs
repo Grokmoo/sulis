@@ -14,8 +14,8 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::collections::{BinaryHeap};
 use std::cmp::Ordering;
+use std::collections::BinaryHeap;
 use std::time;
 use std::{f32, ptr};
 
@@ -33,10 +33,7 @@ struct OpenEntry {
 
 impl OpenEntry {
     pub fn new(index: i32, f_score: i32) -> OpenEntry {
-        OpenEntry {
-            index,
-            f_score,
-        }
+        OpenEntry { index, f_score }
     }
 }
 
@@ -169,7 +166,8 @@ impl PathFinder {
         self.f_score[start as usize] = self.dist_squared(start);
         // info!("F and G score init: {}", util::format_elapsed_secs(f_g_init_time.elapsed()));
 
-        self.open.push(OpenEntry::new(start, self.f_score[start as usize]));
+        self.open
+            .push(OpenEntry::new(start, self.f_score[start as usize]));
         self.open_set.insert(start);
 
         // info!("Spent {} secs in path find init", util::format_elapsed_secs(start_time.elapsed()));
@@ -236,7 +234,11 @@ impl PathFinder {
             iterations += 1;
         }
 
-        debug!("No path found with {} iterations and {} in open set", iterations, self.open.len());
+        debug!(
+            "No path found with {} iterations and {} in open set",
+            iterations,
+            self.open.len()
+        );
         None
     }
 
@@ -310,7 +312,9 @@ impl PathFinder {
 
     #[inline]
     fn push_to_open_set(&mut self, index: i32, f_score: i32) {
-        if self.open_set.contains(&index) { return; }
+        if self.open_set.contains(&index) {
+            return;
+        }
 
         self.open_set.insert(index);
         self.open.push(OpenEntry::new(index, f_score));

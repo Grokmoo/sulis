@@ -368,7 +368,9 @@ pub fn create_effects_pane(pc: &mut ActorState) -> Rc<RefCell<Widget>> {
     let mut mgr = mgr.borrow_mut();
     for index in pc.effects_iter() {
         let effect = mgr.effect_mut(*index);
-        if !effect.ui_visible { continue; }
+        if !effect.ui_visible {
+            continue;
+        }
         let widget = Widget::with_theme(TextArea::empty(), "effect");
 
         add_effect_text_args(effect, &mut widget.borrow_mut().state);

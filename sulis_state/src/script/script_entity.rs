@@ -793,7 +793,9 @@ impl UserData for ScriptEntity {
             let mut result = Vec::new();
             for effect_index in indices {
                 let effect = mgr.effect(effect_index);
-                if effect.tag != tag { continue; }
+                if effect.tag != tag {
+                    continue;
+                }
                 let sae = ScriptAppliedEffect::new(effect, effect_index);
                 result.push(sae);
             }
@@ -1255,27 +1257,37 @@ impl UserData for ScriptEntity {
             Ok(())
         });
 
-        methods.add_method("add_class_stat", |_, entity, (stat, amount): (String, f32)| {
-            let amount = amount as u32;
-            let parent = entity.try_unwrap()?;
-            parent.borrow_mut().actor.add_class_stat(&stat, amount);
-            let area_state = GameState::area_state();
-            let mut text = area_state.borrow_mut().create_feedback_text(&parent.borrow());
-            text.add_entry(format!("{}", amount), ColorKind::Heal);
-            area_state.borrow_mut().add_feedback_text(text);
-            Ok(())
-        });
+        methods.add_method(
+            "add_class_stat",
+            |_, entity, (stat, amount): (String, f32)| {
+                let amount = amount as u32;
+                let parent = entity.try_unwrap()?;
+                parent.borrow_mut().actor.add_class_stat(&stat, amount);
+                let area_state = GameState::area_state();
+                let mut text = area_state
+                    .borrow_mut()
+                    .create_feedback_text(&parent.borrow());
+                text.add_entry(format!("{}", amount), ColorKind::Heal);
+                area_state.borrow_mut().add_feedback_text(text);
+                Ok(())
+            },
+        );
 
-        methods.add_method("remove_class_stat", |_, entity, (stat, amount): (String, f32)| {
-            let amount = amount as u32;
-            let parent = entity.try_unwrap()?;
-            parent.borrow_mut().actor.remove_class_stat(&stat, amount);
-            let area_state = GameState::area_state();
-            let mut text = area_state.borrow_mut().create_feedback_text(&parent.borrow());
-            text.add_entry(format!("{}", amount), ColorKind::Hit);
-            area_state.borrow_mut().add_feedback_text(text);
-            Ok(())
-        });
+        methods.add_method(
+            "remove_class_stat",
+            |_, entity, (stat, amount): (String, f32)| {
+                let amount = amount as u32;
+                let parent = entity.try_unwrap()?;
+                parent.borrow_mut().actor.remove_class_stat(&stat, amount);
+                let area_state = GameState::area_state();
+                let mut text = area_state
+                    .borrow_mut()
+                    .create_feedback_text(&parent.borrow());
+                text.add_entry(format!("{}", amount), ColorKind::Hit);
+                area_state.borrow_mut().add_feedback_text(text);
+                Ok(())
+            },
+        );
 
         methods.add_method("get_overflow_ap", |_, entity, ()| {
             let entity = entity.try_unwrap()?;
@@ -1363,7 +1375,9 @@ impl UserData for ScriptEntity {
 
             let mut table = Vec::new();
             for (_, state) in &actor.ability_states {
-                if state.group != group { continue; }
+                if state.group != group {
+                    continue;
+                }
                 table.push(ScriptAbility::from(&state.ability));
             }
 

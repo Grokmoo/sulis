@@ -274,8 +274,11 @@ impl BuilderSet for CharacterCreator {
             Ok(filename) => filename,
         };
 
-        if builder.race.is_none() || builder.class.is_none() ||
-            builder.attributes.is_none() || builder.kit.is_none() {
+        if builder.race.is_none()
+            || builder.class.is_none()
+            || builder.attributes.is_none()
+            || builder.kit.is_none()
+        {
             warn!("Unable to save character with undefined stats");
             return;
         }

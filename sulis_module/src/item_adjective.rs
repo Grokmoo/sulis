@@ -46,7 +46,7 @@ pub struct ItemAdjective {
 
     pub attack_bonuses: AttackBonuses,
 
-    pub prereqs: Option<PrereqList>
+    pub prereqs: Option<PrereqList>,
 }
 
 impl ItemAdjective {
@@ -101,7 +101,7 @@ pub struct ItemAdjectiveBuilder {
     #[serde(default)]
     pub attack_bonuses: AttackBonuses,
 
-    pub prereqs: Option<PrereqListBuilder>
+    pub prereqs: Option<PrereqListBuilder>,
 }
 
 impl PartialEq for ItemAdjective {

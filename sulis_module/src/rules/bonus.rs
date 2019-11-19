@@ -226,11 +226,17 @@ fn apply_modifiers(bonus: &mut Bonus, neg: f32, pos: f32) {
         Damage(damage) => Damage(damage.mult_f32(pos)),
         ClassStat { ref id, amount } => {
             if amount > 0 {
-                ClassStat { id: id.clone(), amount: (amount as f32 * pos).round() as i32 }
+                ClassStat {
+                    id: id.clone(),
+                    amount: (amount as f32 * pos).round() as i32,
+                }
             } else {
-                ClassStat { id: id.clone(), amount: (amount as f32 * neg).round() as i32 }
+                ClassStat {
+                    id: id.clone(),
+                    amount: (amount as f32 * neg).round() as i32,
+                }
             }
-        },
+        }
         ArmorKind { kind, amount } => {
             if amount > 0 {
                 ArmorKind {
@@ -491,11 +497,20 @@ pub fn merge_if_dup(first: &Bonus, sec: &Bonus) -> Option<Bonus> {
             }
         }
         ClassStat { ref id, amount } => {
-            if let ClassStat { id: ref other_id, amount: amt } = sec.kind {
-                if id != other_id { return None; }
+            if let ClassStat {
+                id: ref other_id,
+                amount: amt,
+            } = sec.kind
+            {
+                if id != other_id {
+                    return None;
+                }
                 let id = id.clone();
                 let amount = amount + amt;
-                return Some(Bonus { when, kind: ClassStat { id, amount } });
+                return Some(Bonus {
+                    when,
+                    kind: ClassStat { id, amount },
+                });
             }
         }
         // all of these statements could be easily merged into one macro,

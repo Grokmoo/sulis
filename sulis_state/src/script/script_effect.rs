@@ -28,8 +28,9 @@ use sulis_module::{
 
 use crate::script::{
     script_color_animation, script_image_layer_animation, script_particle_generator,
-    script_scale_animation, CallbackData, Result, ScriptAbility, ScriptCallback, ScriptEntity,
-    ScriptColorAnimation, ScriptImageLayerAnimation, ScriptParticleGenerator, ScriptScaleAnimation,
+    script_scale_animation, CallbackData, Result, ScriptAbility, ScriptCallback,
+    ScriptColorAnimation, ScriptEntity, ScriptImageLayerAnimation, ScriptParticleGenerator,
+    ScriptScaleAnimation,
 };
 use crate::{effect, Effect, GameState};
 
@@ -226,7 +227,7 @@ impl UserData for ScriptAppliedEffect {
                     return Err(rlua::Error::FromLuaConversionError {
                         from: "ScriptAppliedEffect",
                         to: "Surface",
-                        message: Some("Called surface_points on invalid effect.".to_string())
+                        message: Some("Called surface_points on invalid effect.".to_string()),
                     });
                 }
                 Some(effect) => effect,
@@ -237,18 +238,22 @@ impl UserData for ScriptAppliedEffect {
                     return Err(rlua::Error::FromLuaConversionError {
                         from: "ScriptAppliedEffect",
                         to: "Surface",
-                        message: Some("Called surface_points on non-surface effect.".to_string())
+                        message: Some("Called surface_points on non-surface effect.".to_string()),
                     });
-                },
+                }
                 Some(effect) => effect,
             };
 
-            let table: Vec<HashMap<&str, i32>> = surface.points.iter().map(|p| {
-                let mut map = HashMap::new();
-                map.insert("x", p.x);
-                map.insert("y", p.y);
-                map
-            }).collect();
+            let table: Vec<HashMap<&str, i32>> = surface
+                .points
+                .iter()
+                .map(|p| {
+                    let mut map = HashMap::new();
+                    map.insert("x", p.x);
+                    map.insert("y", p.y);
+                    map
+                })
+                .collect();
             Ok(table)
         });
 
@@ -412,8 +417,7 @@ pub struct ScriptEffect {
 }
 
 impl ScriptEffect {
-    pub fn new_surface(points: Vec<(i32, i32)>, name: &str,
-        duration: ExtInt) -> ScriptEffect {
+    pub fn new_surface(points: Vec<(i32, i32)>, name: &str, duration: ExtInt) -> ScriptEffect {
         ScriptEffect {
             kind: Kind::Surface {
                 points,
@@ -476,7 +480,7 @@ impl UserData for ScriptEffect {
             match effect.kind {
                 Kind::Entity(_) => {
                     warn!("Attempted to set is_aura on non-surface effect.");
-                },
+                }
                 Kind::Surface { ref mut aura, .. } => {
                     let index = aura_parent.try_unwrap_index()?;
                     *aura = Some(index);

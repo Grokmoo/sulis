@@ -269,10 +269,11 @@ impl GameState {
         Ok(())
     }
 
-    pub fn init(pc_actor: Rc<Actor>,
+    pub fn init(
+        pc_actor: Rc<Actor>,
         party_actors: Vec<Rc<Actor>>,
-        flags: HashMap<String, String>) -> Result<(), Error> {
-
+        flags: HashMap<String, String>,
+    ) -> Result<(), Error> {
         ANIMATIONS.with(|anims| anims.borrow_mut().clear());
         CLEAR_ANIMS.with(|c| c.set(false));
         MODAL_LOCKED.with(|c| c.set(false));
@@ -315,10 +316,11 @@ impl GameState {
         Ok(())
     }
 
-    fn new(pc: Rc<Actor>,
+    fn new(
+        pc: Rc<Actor>,
         party_actors: Vec<Rc<Actor>>,
-        flags: HashMap<String, String>) -> Result<GameState, Error> {
-
+        flags: HashMap<String, String>,
+    ) -> Result<GameState, Error> {
         let party_coins = pc.inventory.pc_starting_coins();
         let mut party_stash = ItemList::new();
         for (qty, item) in pc.inventory.pc_starting_item_iter() {
@@ -366,21 +368,27 @@ impl GameState {
 
         for member in party_actors {
             let mut member_location = location.clone();
-            GameState::find_transition_location(&mut member_location, &member.race.size,
-                &area_state.borrow());
+            GameState::find_transition_location(
+                &mut member_location,
+                &member.race.size,
+                &area_state.borrow(),
+            );
 
-            let index = match area_state.borrow_mut().add_actor(member, member_location,
-                None, true, None) {
-                Err(_) => {
-                    error!("Unable to find start location for party member");
-                    return invalid_data_error("Unable to find start locations.");
-                }, Ok(index) => index,
-            };
+            let index =
+                match area_state
+                    .borrow_mut()
+                    .add_actor(member, member_location, None, true, None)
+                {
+                    Err(_) => {
+                        error!("Unable to find start location for party member");
+                        return invalid_data_error("Unable to find start locations.");
+                    }
+                    Ok(index) => index,
+                };
             let member = mgr.borrow_mut().entity(index);
             member.borrow_mut().actor.init_turn();
             party.push(member);
         }
-
 
         for (flag, value) in &flags {
             pc_state.borrow_mut().set_custom_flag(flag, value);
@@ -968,8 +976,11 @@ impl GameState {
                 &entity.borrow().size,
                 &area_state.borrow(),
             );
-            info!("Transitioning {} to {},{}", entity.borrow().actor.actor.name,
-                cur_location.x, cur_location.y
+            info!(
+                "Transitioning {} to {},{}",
+                entity.borrow().actor.actor.name,
+                cur_location.x,
+                cur_location.y
             );
             let index = entity.borrow().index();
 

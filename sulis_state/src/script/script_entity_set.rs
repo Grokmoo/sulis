@@ -23,8 +23,8 @@ use rlua::{self, Context, UserData, UserDataMethods};
 
 use crate::script::{Result, ScriptActiveSurface, ScriptEntity};
 use crate::{EntityState, GameState};
-use sulis_module::Faction;
 use sulis_core::util::{gen_rand, invalid_data_error};
+use sulis_module::Faction;
 
 /// Represents a set of ScriptEntities, which can be created from a variety of
 /// sources.  This is passed to many script functions as a `targets` variable.
@@ -324,8 +324,12 @@ impl UserData for ScriptEntitySet {
         methods.add_method("visible", |lua, set, ()| {
             visible_within(lua, set, std::f32::MAX)
         });
-        methods.add_method("hostile_to", |lua, set, faction| hostile_to(lua, set, faction));
-        methods.add_method("friendly_to", |lua, set, faction| friendly_to(lua, set, faction));
+        methods.add_method("hostile_to", |lua, set, faction| {
+            hostile_to(lua, set, faction)
+        });
+        methods.add_method("friendly_to", |lua, set, faction| {
+            friendly_to(lua, set, faction)
+        });
         methods.add_method("hostile", |lua, set, ()| is_hostile(lua, set));
         methods.add_method("friendly", |lua, set, ()| is_friendly(lua, set));
         methods.add_method("reachable", &reachable);
@@ -385,9 +389,10 @@ fn hostile_to(_lua: Context, set: &ScriptEntitySet, faction: String) -> Result<S
             return Err(rlua::Error::FromLuaConversionError {
                 from: "String",
                 to: "Faction",
-                message: Some("Invalid faction ID".to_string())
+                message: Some("Invalid faction ID".to_string()),
             });
-        }, Some(faction) => faction,
+        }
+        Some(faction) => faction,
     };
     filter_entities(set, (), &|_, entity, _| {
         faction.is_hostile(&entity.borrow().actor.faction())
@@ -401,9 +406,10 @@ fn friendly_to(_lua: Context, set: &ScriptEntitySet, faction: String) -> Result<
             return Err(rlua::Error::FromLuaConversionError {
                 from: "String",
                 to: "Faction",
-                message: Some("Invalid faction ID".to_string())
+                message: Some("Invalid faction ID".to_string()),
             });
-        }, Some(faction) => faction,
+        }
+        Some(faction) => faction,
     };
 
     filter_entities(set, (), &|_, entity, _| {

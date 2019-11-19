@@ -52,8 +52,9 @@ pub use self::script_ability::{ScriptAbility, ScriptAbilitySet};
 pub mod script_cache;
 
 pub mod script_callback;
-pub use self::script_callback::{CallbackData, FuncKind, ScriptCallback,
-    ScriptHitKind, TriggeredCallback};
+pub use self::script_callback::{
+    CallbackData, FuncKind, ScriptCallback, ScriptHitKind, TriggeredCallback,
+};
 
 mod script_effect;
 pub use self::script_effect::{

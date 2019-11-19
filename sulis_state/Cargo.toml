@@ -10,6 +10,6 @@ sulis_module = { path = "../sulis_module" }
 
 log = "0.4"
 chrono = "0.4"
-rlua = "0.16"
+rlua = "0.17"
 serde = "1.0"
 serde_derive = "1.0"

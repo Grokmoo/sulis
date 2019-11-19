@@ -85,15 +85,18 @@ fn print_nearby_lines(state: &ScriptState, traceback: &str) -> (String, i32) {
         None => {
             out.push_str("No traceback available.\n");
             return (out, 0);
-        },
+        }
         Some(num) => num,
     };
 
     let script = match get_script_from_id(&state.id) {
         Err(_) => {
-            out.push_str(&format!("Unable to find script: {} for traceback.\n", state.id));
+            out.push_str(&format!(
+                "Unable to find script: {} for traceback.\n",
+                state.id
+            ));
             return (out, 0);
-        },
+        }
         Ok(script) => script,
     };
 
@@ -102,7 +105,9 @@ fn print_nearby_lines(state: &ScriptState, traceback: &str) -> (String, i32) {
 
     let mut i = 0;
     for line in lines {
-        if i >= 9 { break; }
+        if i >= 9 {
+            break;
+        }
 
         if i == 4 {
             out.push_str(&format!("{:4}", start_num + i + 1));
@@ -143,10 +148,12 @@ where
         Ok(ret) => Ok(ret),
         Err(CallbackError { traceback, cause }) => {
             let (output, line_num) = print_nearby_lines(&state, &traceback);
-            warn!("Script Error:\n{}\n{}.lua:{} Called '{}'\n{}",
-                cause, state.id, line_num, func, output);
+            warn!(
+                "Script Error:\n{}\n{}.lua:{} Called '{}'\n{}",
+                cause, state.id, line_num, func, output
+            );
             Err(CallbackError { traceback, cause })
-        },
+        }
         Err(e) => Err(e),
     }
 }
@@ -235,7 +242,9 @@ pub fn ability_on_deactivate(parent: usize, ability: &Rc<Ability>) -> Result<()>
     match script_parent.borrow().actor.ability_states.get(&ability.id) {
         None => return Ok(()),
         Some(state) => {
-            if !state.is_active_mode() { return Ok(()); }
+            if !state.is_active_mode() {
+                return Ok(());
+            }
         }
     }
 

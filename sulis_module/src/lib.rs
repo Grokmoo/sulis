@@ -108,7 +108,6 @@ pub use self::rules::{
     QuickSlot, Resistance, Rules, Slot, StatList, Time, WeaponKind, WeaponStyle, ROUND_TIME_MILLIS,
 };
 
-use std::time;
 use std::cell::RefCell;
 use std::collections::HashMap;
 use std::ffi::OsStr;
@@ -117,6 +116,7 @@ use std::fs;
 use std::io::Error;
 use std::path::PathBuf;
 use std::rc::Rc;
+use std::time;
 
 use sulis_core::config::{self, Config};
 use sulis_core::resource::*;
@@ -449,8 +449,12 @@ impl Module {
             module.root_dir = Some(dirs[1].to_string());
 
             for (id, builder) in builder_set.item_adjectives {
-                insert_if_ok("item_adjective", id,
-                    ItemAdjective::new(builder), &mut module.item_adjectives);
+                insert_if_ok(
+                    "item_adjective",
+                    id,
+                    ItemAdjective::new(builder),
+                    &mut module.item_adjectives,
+                );
             }
 
             for (id, quest) in builder_set.quests {
@@ -936,7 +940,7 @@ fn expand_include_directives(scripts: &mut HashMap<String, String>) {
                 None => {
                     error!("Invalid --INCLUDE directive, no script specified.");
                     return;
-                },
+                }
                 Some(id) => id,
             };
             expansion.end_index = expansion.start_index + include_len + id.len();
@@ -945,22 +949,28 @@ fn expand_include_directives(scripts: &mut HashMap<String, String>) {
 
         // start from the last and work forward, expanding each entry
         for exp in expansions.into_iter().rev() {
-            debug!("Found script expansion in {}: '{}' at {} to {}", id, exp.script_id,
-                exp.start_index, exp.end_index);
+            debug!(
+                "Found script expansion in {}: '{}' at {} to {}",
+                id, exp.script_id, exp.start_index, exp.end_index
+            );
 
             let src = match scripts_src.get(&exp.script_id) {
                 None => {
-                    error!("Invalid --INCLUDE direction, script '{}' does not exist",
-                        exp.script_id);
+                    error!(
+                        "Invalid --INCLUDE direction, script '{}' does not exist",
+                        exp.script_id
+                    );
                     return;
-                },
+                }
                 Some(src) => src,
             };
 
             script.replace_range(exp.start_index..exp.end_index, src);
-
         }
     }
 
-    info!("Expanded scripts in {}", util::format_elapsed_secs(start_time.elapsed()));
+    info!(
+        "Expanded scripts in {}",
+        util::format_elapsed_secs(start_time.elapsed())
+    );
 }

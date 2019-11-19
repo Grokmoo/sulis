@@ -149,7 +149,7 @@ impl Item {
             value,
             weight: item.weight,
             usable: item.usable.clone(),
-            prereqs: prereqs,
+            prereqs,
             original_id: item.original_id.clone(),
             original_value: item.original_value,
             original_equippable: item.original_equippable.clone(),
@@ -219,8 +219,12 @@ impl Item {
             adjectives.push(adjective);
         }
 
-        let (equippable, value, prereqs) =
-            apply_adjectives(&prereqs, &builder.equippable, builder.value as i32, &adjectives);
+        let (equippable, value, prereqs) = apply_adjectives(
+            &prereqs,
+            &builder.equippable,
+            builder.value as i32,
+            &adjectives,
+        );
 
         Ok(Item {
             id: builder.id.clone(),

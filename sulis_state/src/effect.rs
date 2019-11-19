@@ -21,7 +21,7 @@ use std::rc::Rc;
 
 use crate::script::{script_callback::FuncKind, CallbackData};
 use crate::{save_state::EffectSaveState, ChangeListenerList, EntityState};
-use sulis_core::util::{ExtInt, Point, invalid_data_error};
+use sulis_core::util::{invalid_data_error, ExtInt, Point};
 use sulis_module::{BonusList, ROUND_TIME_MILLIS};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -80,16 +80,17 @@ impl Effect {
             callbacks.push(Rc::new(cb));
         }
 
-
         let mut surface = data.surface;
         if let Some(ref mut surface) = surface {
             if let Some(aura) = surface.aura.take() {
                 match entities.get(&aura) {
                     None => {
-                        return invalid_data_error(
-                            &format!("Invalid aura parent {} for effect", aura)
-                        );
-                    }, Some(ref entity) => {
+                        return invalid_data_error(&format!(
+                            "Invalid aura parent {} for effect",
+                            aura
+                        ));
+                    }
+                    Some(ref entity) => {
                         surface.aura = Some(entity.borrow().index());
                     }
                 }
@@ -104,7 +105,7 @@ impl Effect {
             total_duration: data.total_duration,
             bonuses: data.bonuses,
             deactivate_with_ability: data.deactivate_with_ability,
-            surface: surface,
+            surface,
             entity: data.entity,
             icon: data.icon,
 

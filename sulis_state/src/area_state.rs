@@ -1089,7 +1089,9 @@ impl AreaState {
     pub(crate) fn entities_with_points(&self, points: &[Point]) -> Vec<usize> {
         let mut result = HashSet::new();
         for p in points {
-            if !self.area.area.coords_valid(p.x, p.y) { continue; }
+            if !self.area.area.coords_valid(p.x, p.y) {
+                continue;
+            }
             for entity in self.entity_grid[(p.x + p.y * self.area.width) as usize].iter() {
                 result.insert(*entity);
             }
@@ -1104,7 +1106,9 @@ impl AreaState {
 
         let mut entities = HashSet::new();
         for p in points {
-            if !self.area.area.coords_valid(p.x, p.y) { continue; }
+            if !self.area.area.coords_valid(p.x, p.y) {
+                continue;
+            }
             self.surface_grid[(p.x + p.y * self.area.width) as usize].retain(|i| *i != index);
             for entity in self.entity_grid[(p.x + p.y * self.area.width) as usize].iter() {
                 entities.insert(*entity);
@@ -1122,7 +1126,9 @@ impl AreaState {
 
         let mut entities = HashSet::new();
         for p in points {
-            if !self.area.area.coords_valid(p.x, p.y) { continue; }
+            if !self.area.area.coords_valid(p.x, p.y) {
+                continue;
+            }
 
             self.surface_grid[(p.x + p.y * self.area.width) as usize].push(index);
 

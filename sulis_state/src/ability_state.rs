@@ -17,9 +17,9 @@
 use std::rc::Rc;
 use std::u32;
 
+use crate::{ChangeListenerList, GameState};
 use sulis_core::util::ExtInt;
 use sulis_module::{ability::Duration, Ability, Module, ROUND_TIME_MILLIS};
-use crate::{GameState, ChangeListenerList};
 
 pub struct AbilityState {
     pub ability: Rc<Ability>,
@@ -36,8 +36,10 @@ impl AbilityState {
         let (group, combat_only, mode) = match ability.active {
             None => panic!(),
             Some(ref active) => {
-                let mode = active.requires_active_mode.as_ref().
-                    map_or(None, |id| Module::ability(&id));
+                let mode = active
+                    .requires_active_mode
+                    .as_ref()
+                    .map_or(None, |id| Module::ability(&id));
                 if mode.is_none() && active.requires_active_mode.is_some() {
                     warn!("Invalid requires_active_mode for {}", ability.id);
                 }
@@ -73,10 +75,14 @@ impl AbilityState {
 
     pub fn is_available(&self, current_modes: &[&str]) -> bool {
         if let Some(required_mode) = self.requires_active_mode.as_ref() {
-            if !current_modes.contains(&&required_mode.id[..]) { return false; }
+            if !current_modes.contains(&&required_mode.id[..]) {
+                return false;
+            }
         }
 
-        if self.combat_only && !GameState::is_combat_active() { return false; }
+        if self.combat_only && !GameState::is_combat_active() {
+            return false;
+        }
         self.remaining_duration.is_zero()
     }
 

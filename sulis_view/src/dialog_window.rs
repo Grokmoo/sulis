@@ -23,13 +23,11 @@ use sulis_core::ui::{theme, Widget, WidgetKind};
 use sulis_core::widgets::TextArea;
 use sulis_module::{conversation::Response, Conversation, OnTrigger};
 use sulis_state::{
-    area_feedback_text::ColorKind,
-    script::{entity_with_id},
-    ChangeListener, EntityState, GameState,
+    area_feedback_text::ColorKind, script::entity_with_id, ChangeListener, EntityState, GameState,
 };
 
+use crate::trigger_activator::{activate, is_match, scroll_view};
 use crate::{AreaView, RootView};
-use crate::trigger_activator::{is_match, activate, scroll_view};
 
 pub const NAME: &str = "dialog_window";
 
@@ -174,7 +172,8 @@ impl ResponseButton {
             None => {
                 warn!("Attempted to switch to invalid speaker '{}'", speaker);
                 return;
-            }, Some(speaker) => speaker,
+            }
+            Some(speaker) => speaker,
         };
 
         let (x, y) = {
@@ -183,7 +182,8 @@ impl ResponseButton {
         };
         let cb = OnTrigger::ScrollView(x, y);
         GameState::add_ui_callback(vec![cb], &self.pc, &speaker);
-        area.borrow_mut().set_active_entity(Some(Rc::clone(&speaker)));
+        area.borrow_mut()
+            .set_active_entity(Some(Rc::clone(&speaker)));
     }
 }
 
@@ -292,4 +292,3 @@ pub fn is_viewable(
 ) -> bool {
     is_match(&response.to_view, pc, target)
 }
-

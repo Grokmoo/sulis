@@ -27,11 +27,11 @@ use crate::{
 use sulis_core::image::{Image, LayeredImage};
 use sulis_core::io::GraphicsRenderer;
 use sulis_core::util::{invalid_data_error, ExtInt};
+use sulis_module::{Ability, Actor, ActorBuilder, Faction, ImageLayer, Module};
 use sulis_module::{
     AccuracyKind, Attack, AttackKind, BonusList, DamageKind, HitFlags, HitKind, ItemKind,
     QuickSlot, Slot, StatList, WeaponStyle,
 };
-use sulis_module::{Ability, Actor, ActorBuilder, Faction, ImageLayer, Module};
 
 pub struct ActorState {
     pub actor: Rc<Actor>,
@@ -281,7 +281,11 @@ impl ActorState {
     }
 
     pub fn current_class_stat(&self, id: &str) -> ExtInt {
-        *self.p_stats.current_class_stats.get(id).unwrap_or(&ExtInt::Int(0))
+        *self
+            .p_stats
+            .current_class_stats
+            .get(id)
+            .unwrap_or(&ExtInt::Int(0))
     }
 
     pub fn current_uses_per_day(&self, ability_group: &str) -> ExtInt {
@@ -1027,7 +1031,6 @@ impl ActorState {
         self.listeners.notify(&self);
     }
 
-
     pub(crate) fn remove_class_stat(&mut self, stat: &str, amount: u32) {
         self.p_stats.remove_class_stat(stat, amount);
         self.listeners.notify(&self);
@@ -1079,7 +1082,9 @@ impl ActorState {
 
     pub fn init_turn(&mut self) {
         debug!(
-            "Init turn for '{}' with overflow ap of {}", self.actor.name, self.overflow_ap()
+            "Init turn for '{}' with overflow ap of {}",
+            self.actor.name,
+            self.overflow_ap()
         );
         self.p_stats.init_turn(&self.stats);
 

@@ -170,7 +170,6 @@ impl Class {
         }
     }
 
-
     pub fn stats_max(&self, level: u32) -> HashMap<String, ExtInt> {
         match self.upgrades.get(&level) {
             None => HashMap::new(),

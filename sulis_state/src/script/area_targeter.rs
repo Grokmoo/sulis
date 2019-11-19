@@ -25,8 +25,10 @@ use sulis_core::util::Point;
 use sulis_module::{Ability, Module, ObjectSize};
 
 use crate::script::{targeter, ScriptItemKind, TargeterData};
-use crate::{AreaState, EntityState, GameState, RangeIndicator, Script,
-    TurnManager, area_feedback_text::Params};
+use crate::{
+    area_feedback_text::Params, AreaState, EntityState, GameState, RangeIndicator, Script,
+    TurnManager,
+};
 
 #[derive(Clone)]
 pub enum Shape {
@@ -990,7 +992,9 @@ impl AreaTargeter {
         millis: u32,
         params: &Params,
     ) {
-        if !self.parent.borrow().is_party_member() { return; }
+        if !self.parent.borrow().is_party_member() {
+            return;
+        }
 
         let mut draw_list = DrawList::empty_sprite();
 
@@ -1031,17 +1035,30 @@ impl AreaTargeter {
         match &self.script_source {
             ScriptSource::Ability(ability) => {
                 if let Some(active) = &ability.active {
-                    self.draw_ap_usage(renderer, params, (scale_x, scale_y),
-                        (x_offset, y_offset), active.ap as i32);
+                    self.draw_ap_usage(
+                        renderer,
+                        params,
+                        (scale_x, scale_y),
+                        (x_offset, y_offset),
+                        active.ap as i32,
+                    );
                 }
-            },
+            }
             _ => (),
         }
     }
 
-    fn draw_ap_usage(&self, renderer: &mut dyn GraphicsRenderer, params: &Params,
-        scale: (f32, f32), offset: (f32, f32), ap: i32) {
-        if !GameState::is_combat_active() { return; }
+    fn draw_ap_usage(
+        &self,
+        renderer: &mut dyn GraphicsRenderer,
+        params: &Params,
+        scale: (f32, f32),
+        offset: (f32, f32),
+        ap: i32,
+    ) {
+        if !GameState::is_combat_active() {
+            return;
+        }
 
         let parent = &self.parent.borrow();
         let ap = parent.actor.ap() as i32 - ap;
@@ -1052,12 +1069,16 @@ impl AreaTargeter {
                 None => return,
                 Some(target) => {
                     let target = &target.borrow();
-                    (target.location.x as f32,
-                     target.location.y as f32 + target.size.height as f32)
+                    (
+                        target.location.x as f32,
+                        target.location.y as f32 + target.size.height as f32,
+                    )
                 }
             }
         } else {
-            if !self.free_select_valid { return; }
+            if !self.free_select_valid {
+                return;
+            }
             (self.cursor_pos.x as f32, self.cursor_pos.y as f32 + 1.0)
         };
 

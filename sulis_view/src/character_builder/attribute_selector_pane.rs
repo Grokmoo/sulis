@@ -24,9 +24,9 @@ use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_core::widgets::{Button, Label, Spinner, TextArea};
 use sulis_module::{Ability, Attribute, AttributeList, BonusKind, Class, Module, Race};
 
+use crate::abilities_bar::add_hover_text_args;
 use crate::character_builder::BuilderPane;
 use crate::CharacterBuilder;
-use crate::abilities_bar::add_hover_text_args;
 
 pub const NAME: &str = "attribute_selector_pane";
 
@@ -199,11 +199,12 @@ impl WidgetKind for AttributeSelectorPane {
 
         let starting_abilities = Widget::empty("starting_abilities");
         for ability in &selected_kit.starting_abilities {
-            let button = Widget::with_defaults(
-                AbilityButton::new(Rc::clone(ability), Rc::clone(class))
-            );
+            let button =
+                Widget::with_defaults(AbilityButton::new(Rc::clone(ability), Rc::clone(class)));
             let icon = Widget::with_theme(Label::empty(), "icon");
-            icon.borrow_mut().state.add_text_arg("icon", &ability.icon.id());
+            icon.borrow_mut()
+                .state
+                .add_text_arg("icon", &ability.icon.id());
             Widget::add_child_to(&button, icon);
             Widget::add_child_to(&starting_abilities, button);
         }
@@ -288,13 +289,9 @@ struct AbilityButton {
 
 impl AbilityButton {
     fn new(ability: Rc<Ability>, class: Rc<Class>) -> Rc<RefCell<AbilityButton>> {
-        Rc::new(RefCell::new(AbilityButton {
-            ability,
-            class,
-        }))
+        Rc::new(RefCell::new(AbilityButton { ability, class }))
     }
 }
-
 
 impl WidgetKind for AbilityButton {
     widget_kind!("ability_button");
@@ -303,8 +300,12 @@ impl WidgetKind for AbilityButton {
         let hover = Widget::with_theme(TextArea::empty(), "kit_selector_ability_hover");
         add_hover_text_args(&mut hover.borrow_mut().state, &self.ability, &self.class);
 
-        Widget::set_mouse_over_widget(&widget, hover, widget.borrow().state.inner_right(),
-            widget.borrow().state.inner_top());
+        Widget::set_mouse_over_widget(
+            &widget,
+            hover,
+            widget.borrow().state.inner_right(),
+            widget.borrow().state.inner_top(),
+        );
 
         true
     }

@@ -25,10 +25,9 @@ use sulis_core::ui::{animation_state, Callback, Widget, WidgetKind, WidgetState}
 use sulis_core::util::{ExtInt, Size};
 use sulis_core::widgets::{Button, Label, TextArea};
 use sulis_module::{
-    Class,
     ability::{AbilityGroup, Duration},
     actor::OwnedAbility,
-    Ability, Module,
+    Ability, Class, Module,
 };
 use sulis_state::{ChangeListener, EntityState, GameState, Script};
 
@@ -530,7 +529,9 @@ pub fn add_hover_text_args(state: &mut WidgetState, ability: &Ability, class: &C
 
         if let Some(class_stats) = active.class_stats.get(&class.id) {
             for stat in &class.stats {
-                if !stat.display { continue; }
+                if !stat.display {
+                    continue;
+                }
                 if let Some(amount) = class_stats.get(&stat.id) {
                     state.add_text_arg("class_stat_name", &stat.name);
                     state.add_text_arg("class_stat_amount", &amount.to_string());
@@ -539,9 +540,7 @@ pub fn add_hover_text_args(state: &mut WidgetState, ability: &Ability, class: &C
         }
 
         match active.duration {
-            Duration::Rounds(rounds) => {
-                state.add_text_arg("duration", &rounds.to_string())
-            }
+            Duration::Rounds(rounds) => state.add_text_arg("duration", &rounds.to_string()),
             Duration::Mode => state.add_text_arg("mode", "true"),
             Duration::Instant => state.add_text_arg("instant", "true"),
             Duration::Permanent => state.add_text_arg("permanent", "true"),

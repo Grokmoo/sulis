@@ -119,7 +119,9 @@ impl Formation {
                     x,
                     y,
                     dist,
-                ).is_none() {
+                )
+                .is_none()
+                {
                     continue;
                 }
 

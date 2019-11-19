@@ -788,11 +788,7 @@ fn add_bonus(
     use sulis_module::BonusKind::*;
     match &bonus.kind {
         Attribute { attribute, amount } => add(state, &attribute.short_name(), amount),
-        ActionPoints(amount) => add(
-            state,
-            "bonus_ap",
-            Module::rules().format_ap(*amount),
-        ),
+        ActionPoints(amount) => add(state, "bonus_ap", Module::rules().format_ap(*amount)),
         Armor(amount) => armor.add_base(*amount),
         ArmorKind { kind, amount } => armor.add_kind(*kind, *amount),
         Resistance { kind, amount } => add(
@@ -934,7 +930,7 @@ pub fn add_prereq_text_args(prereqs: &PrereqList, state: &mut WidgetState) {
         match Module::race(race_id) {
             None => {
                 warn!("Invalid race '{}' in prereq list", race_id);
-            },
+            }
             Some(race) => {
                 state.add_text_arg("prereq_race", &race.name);
             }

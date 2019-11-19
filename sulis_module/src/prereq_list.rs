@@ -14,7 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::collections::{HashSet, HashMap};
+use std::collections::{HashMap, HashSet};
 use std::io::Error;
 use std::rc::Rc;
 
@@ -33,7 +33,7 @@ pub struct PrereqList {
     pub levels: Vec<(String, u32)>,
 
     pub total_level: Option<u32>,
-    pub race: Option<String>,   // we can't store the actual ability or race because they
+    pub race: Option<String>, // we can't store the actual ability or race because they
     pub abilities: Vec<String>, // might not be read in yet
 }
 
@@ -42,12 +42,10 @@ impl PrereqList {
     pub fn merge_optional(a: &Option<PrereqList>, b: &Option<PrereqList>) -> Option<PrereqList> {
         match a {
             None => b.clone(),
-            Some(a) => {
-                match b {
-                    None => Some(a.clone()),
-                    Some(b) => Some(PrereqList::merge(a, b)),
-                }
-            }
+            Some(a) => match b {
+                None => Some(a.clone()),
+                Some(b) => Some(PrereqList::merge(a, b)),
+            },
         }
     }
 
@@ -58,10 +56,12 @@ impl PrereqList {
     /// different race prereqs.
     pub fn merge(a: &PrereqList, b: &PrereqList) -> PrereqList {
         // take the max of all individual attr requirements
-        let mut attributes: HashMap<_, _> =
-            a.attributes.as_ref().map_or(HashMap::new(), |attrs| {
-                attrs.iter().map(|(attr, amount)| (*attr, *amount)).collect()
-            });
+        let mut attributes: HashMap<_, _> = a.attributes.as_ref().map_or(HashMap::new(), |attrs| {
+            attrs
+                .iter()
+                .map(|(attr, amount)| (*attr, *amount))
+                .collect()
+        });
 
         for (attr, amount) in b.attributes.as_ref().unwrap_or(&Vec::new()) {
             let cur = attributes.get(attr).unwrap_or(&0);
@@ -70,8 +70,11 @@ impl PrereqList {
         }
 
         // take the max of all individual level requirements
-        let mut levels: HashMap<_, _> =
-            a.levels.iter().map(|(id, level)| (id.to_string(), *level)).collect();
+        let mut levels: HashMap<_, _> = a
+            .levels
+            .iter()
+            .map(|(id, level)| (id.to_string(), *level))
+            .collect();
         for (id, level) in b.levels.iter() {
             let cur = *levels.get(id).unwrap_or(&0);
             let level = std::cmp::max(cur, *level);
@@ -91,8 +94,10 @@ impl PrereqList {
             Some(race) => {
                 if let Some(race_b) = &b.race {
                     if race != race_b {
-                        warn!("Merging prereqs with incompatible race requirements: {} and {}",
-                            race, race_b);
+                        warn!(
+                            "Merging prereqs with incompatible race requirements: {} and {}",
+                            race, race_b
+                        );
                     }
                 }
                 Some(race.to_string())

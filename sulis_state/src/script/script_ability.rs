@@ -333,9 +333,7 @@ impl ScriptAbility {
 
 impl UserData for ScriptAbility {
     fn add_methods<'lua, M: UserDataMethods<'lua, Self>>(methods: &mut M) {
-        methods.add_method("id", |_, ability, ()| {
-            Ok(ability.id.to_string())
-        });
+        methods.add_method("id", |_, ability, ()| Ok(ability.id.to_string()));
 
         methods.add_method("is_active_mode", |_, ability, target: ScriptEntity| {
             ability.error_if_not_active()?;
@@ -348,20 +346,23 @@ impl UserData for ScriptAbility {
         });
         methods.add_method("activate", &activate);
         methods.add_method("deactivate", &deactivate);
-        methods.add_method("cooldown", |_, ability, (target, rounds): (ScriptEntity, u32)| {
-            ability.error_if_not_active()?;
-            let target = target.try_unwrap()?;
-            let mut target = target.borrow_mut();
-            match target.actor.ability_state(&ability.id) {
-                None => {
-                    warn!("Target does not own specified ability");
-                },
-                Some(ref mut ability_state) => {
-                    ability_state.set_cooldown_rounds(rounds);
+        methods.add_method(
+            "cooldown",
+            |_, ability, (target, rounds): (ScriptEntity, u32)| {
+                ability.error_if_not_active()?;
+                let target = target.try_unwrap()?;
+                let mut target = target.borrow_mut();
+                match target.actor.ability_state(&ability.id) {
+                    None => {
+                        warn!("Target does not own specified ability");
+                    }
+                    Some(ref mut ability_state) => {
+                        ability_state.set_cooldown_rounds(rounds);
+                    }
                 }
-            }
-            Ok(())
-        });
+                Ok(())
+            },
+        );
         methods.add_method("name", |_, ability, ()| Ok(ability.name.to_string()));
         methods.add_method("duration", |_, ability, ()| Ok(ability.duration));
 
@@ -387,7 +388,10 @@ impl UserData for ScriptAbility {
 fn deactivate(_lua: Context, ability: &ScriptAbility, target: ScriptEntity) -> Result<()> {
     ability.error_if_not_active()?;
     let target = target.try_unwrap()?;
-    target.borrow_mut().actor.deactivate_ability_state(&ability.id);
+    target
+        .borrow_mut()
+        .actor
+        .deactivate_ability_state(&ability.id);
     Ok(())
 }
 
@@ -405,7 +409,10 @@ fn activate(
         let bonus = entity.borrow().actor.stats.bonus_ability_action_point_cost;
         let ap = cmp::max(0, ability.ap as i32 - bonus);
         entity.borrow_mut().actor.remove_ap(ap as u32);
-        entity.borrow_mut().actor.remove_class_stats(&ability.to_ability());
+        entity
+            .borrow_mut()
+            .actor
+            .remove_class_stats(&ability.to_ability());
     }
 
     let area = GameState::area_state();

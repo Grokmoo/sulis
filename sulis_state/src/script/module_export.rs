@@ -18,9 +18,9 @@ use std::collections::HashMap;
 
 use rlua::{self, Context, UserData, UserDataMethods};
 
-use sulis_module::{on_trigger, OnTrigger};
-use crate::GameState;
 use crate::script::ScriptEntity;
+use crate::GameState;
+use sulis_module::{on_trigger, OnTrigger};
 
 /// A data structure representing all data that will be
 /// transfered from this module to the specified subsequent module.
@@ -72,11 +72,14 @@ impl UserData for ModuleExport {
             Ok(())
         });
 
-        methods.add_method_mut("set_flag", |_, export, (flag, value): (String, Option<String>)| {
-            let val = value.unwrap_or("true".to_string());
-            export.custom_flags.insert(flag, val);
-            Ok(())
-        });
+        methods.add_method_mut(
+            "set_flag",
+            |_, export, (flag, value): (String, Option<String>)| {
+                let val = value.unwrap_or("true".to_string());
+                export.custom_flags.insert(flag, val);
+                Ok(())
+            },
+        );
 
         methods.add_method_mut("add_to_party", |_, export, entity: ScriptEntity| {
             export.party.push(entity);

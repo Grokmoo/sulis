@@ -211,27 +211,31 @@ impl PartialOrd for ExtInt {
 
 impl ExtInt {
     pub fn max(a: ExtInt, b: ExtInt) -> ExtInt {
-        if a > b { a } else { b }
+        if a > b {
+            a
+        } else {
+            b
+        }
     }
 
     pub fn min(a: ExtInt, b: ExtInt) -> ExtInt {
-        if a > b { b } else { a }
+        if a > b {
+            b
+        } else {
+            a
+        }
     }
 
     pub fn divide(&self, other: &ExtInt) -> f32 {
         match self {
-            ExtInt::Int(amount) => {
-                match other {
-                    ExtInt::Int(other_amount) => *amount as f32 / *other_amount as f32,
-                    ExtInt::Infinity => 0.0,
-                }
+            ExtInt::Int(amount) => match other {
+                ExtInt::Int(other_amount) => *amount as f32 / *other_amount as f32,
+                ExtInt::Infinity => 0.0,
             },
-            ExtInt::Infinity => {
-                match other {
-                    ExtInt::Int(_) => 0.0,
-                    ExtInt::Infinity => 1.0,
-                }
-            }
+            ExtInt::Infinity => match other {
+                ExtInt::Int(_) => 0.0,
+                ExtInt::Infinity => 1.0,
+            },
         }
     }
 

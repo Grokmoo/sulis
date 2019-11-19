@@ -84,15 +84,24 @@ impl PStats {
             Some(active) => active,
         };
 
-        let stats = match active.class_stats.get(&self.base_class.as_ref().unwrap().id) {
+        let stats = match active
+            .class_stats
+            .get(&self.base_class.as_ref().unwrap().id)
+        {
             None => return,
             Some(stats) => stats,
         };
         for (stat, amount) in stats {
-            if *amount == 0 { continue; }
+            if *amount == 0 {
+                continue;
+            }
 
-            let cur = *self.current_class_stats.get(stat).unwrap_or(&ExtInt::Int(0));
-            self.current_class_stats.insert(stat.to_string(), cur - *amount);
+            let cur = *self
+                .current_class_stats
+                .get(stat)
+                .unwrap_or(&ExtInt::Int(0));
+            self.current_class_stats
+                .insert(stat.to_string(), cur - *amount);
         }
     }
 
@@ -102,18 +111,25 @@ impl PStats {
             Some(active) => active,
         };
 
-        let stats = match active.class_stats.get(&self.base_class.as_ref().unwrap().id) {
+        let stats = match active
+            .class_stats
+            .get(&self.base_class.as_ref().unwrap().id)
+        {
             None => return true,
             Some(stats) => stats,
         };
         for (stat, amount) in stats {
-            if *amount == 0 { continue; }
+            if *amount == 0 {
+                continue;
+            }
             let cur = match self.current_class_stats.get(stat) {
                 None => return false,
                 Some(cur) => cur,
             };
 
-            if cur.less_than(*amount) { return false; }
+            if cur.less_than(*amount) {
+                return false;
+            }
         }
 
         true
@@ -215,7 +231,9 @@ impl PStats {
         let amount = match self.current_class_stats.get(stat) {
             None => ExtInt::Int(amount),
             Some(cur) => {
-                if cur.is_infinite() { return; }
+                if cur.is_infinite() {
+                    return;
+                }
                 *cur + amount
             }
         };
@@ -224,8 +242,12 @@ impl PStats {
     }
 
     pub fn remove_class_stat(&mut self, stat: &str, amount: u32) {
-        let cur = *self.current_class_stats.get(stat).unwrap_or(&ExtInt::Int(0));
-        self.current_class_stats.insert(stat.to_string(), cur - amount);
+        let cur = *self
+            .current_class_stats
+            .get(stat)
+            .unwrap_or(&ExtInt::Int(0));
+        self.current_class_stats
+            .insert(stat.to_string(), cur - amount);
     }
 
     pub fn add_hp(&mut self, hp: u32, max: i32) {
@@ -258,10 +280,13 @@ impl PStats {
 
         let base_class = self.base_class.as_ref().unwrap();
         for class_stat in base_class.stats.iter() {
-            if !class_stat.reset_per_day { continue; }
+            if !class_stat.reset_per_day {
+                continue;
+            }
 
             let amount = stats.class_stat_max(&class_stat.id);
-            self.current_class_stats.insert(class_stat.id.to_string(), amount);
+            self.current_class_stats
+                .insert(class_stat.id.to_string(), amount);
         }
 
         self.end_encounter(stats);
@@ -277,10 +302,13 @@ impl PStats {
 
         let base_class = self.base_class.as_ref().unwrap();
         for class_stat in base_class.stats.iter() {
-            if !class_stat.reset_per_encounter { continue; }
+            if !class_stat.reset_per_encounter {
+                continue;
+            }
 
             let amount = stats.class_stat_max(&class_stat.id);
-            self.current_class_stats.insert(class_stat.id.to_string(), amount);
+            self.current_class_stats
+                .insert(class_stat.id.to_string(), amount);
         }
 
         self.init_turn(stats);

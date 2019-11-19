@@ -95,7 +95,9 @@ pub fn add_ability_text_args(state: &mut WidgetState, ability: &Rc<Ability>) {
         for (class_id, stats) in &active.class_stats {
             let class = Module::class(class_id).unwrap();
             for stat in &class.stats {
-                if !stat.display { continue; }
+                if !stat.display {
+                    continue;
+                }
                 if let Some(amount) = stats.get(&stat.id) {
                     state.add_text_arg("class_stat_name", &stat.name);
                     state.add_text_arg("class_stat_amount", &amount.to_string());

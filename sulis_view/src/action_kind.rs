@@ -14,8 +14,8 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::cmp;
 use std::cell::RefCell;
+use std::cmp;
 use std::rc::Rc;
 
 use crate::RootView;
@@ -99,8 +99,10 @@ pub struct ActionHoverInfo {
 }
 
 impl ActionHoverInfo {
-    fn append(base: Option<ActionHoverInfo>,
-        append: Option<ActionHoverInfo>) -> Option<ActionHoverInfo> {
+    fn append(
+        base: Option<ActionHoverInfo>,
+        append: Option<ActionHoverInfo>,
+    ) -> Option<ActionHoverInfo> {
         match base {
             None => append,
             Some(mut base) => {
@@ -129,8 +131,12 @@ impl ActionHoverInfo {
         })
     }
 
-    fn with_ap(entity: &EntityState, point: Point, total_ap: i32,
-        ap: i32) -> Option<ActionHoverInfo> {
+    fn with_ap(
+        entity: &EntityState,
+        point: Point,
+        total_ap: i32,
+        ap: i32,
+    ) -> Option<ActionHoverInfo> {
         Some(ActionHoverInfo {
             size: Rc::clone(&entity.size),
             x: point.x,
@@ -141,9 +147,12 @@ impl ActionHoverInfo {
         })
     }
 
-    fn with_path(entity: &EntityState, point: Point,
-        path: &[(f32, f32)], ap: i32) -> Option<ActionHoverInfo> {
-
+    fn with_path(
+        entity: &EntityState,
+        point: Point,
+        path: &[(f32, f32)],
+        ap: i32,
+    ) -> Option<ActionHoverInfo> {
         let size = Rc::clone(&entity.size);
         Some(ActionHoverInfo {
             size,
@@ -167,7 +176,9 @@ pub trait ActionKind {
     fn fire_action(&mut self, widget: &Rc<RefCell<Widget>>) -> bool;
 
     /// Returns the amount of AP that this action will cost the parent to perform
-    fn ap(&self) -> i32 { 0 }
+    fn ap(&self) -> i32 {
+        0
+    }
 }
 
 struct SelectAction {
@@ -542,10 +553,14 @@ impl AttackAction {
             Some(pc) => Rc::clone(pc),
         };
 
-        let ap ={
+        let ap = {
             let pc = pc.borrow();
-            if !pc.actor.has_ap_to_attack() { return None; }
-            if pc.actor.stats.attack_disabled { return None; }
+            if !pc.actor.has_ap_to_attack() {
+                return None;
+            }
+            if pc.actor.stats.attack_disabled {
+                return None;
+            }
             pc.actor.stats.attack_cost
         };
 
@@ -595,7 +610,9 @@ impl ActionKind for AttackAction {
         false
     }
 
-    fn ap(&self) -> i32 { self.ap }
+    fn ap(&self) -> i32 {
+        self.ap
+    }
 }
 
 struct ActionCallback {
@@ -674,8 +691,9 @@ impl ActionKind for MoveThenAction {
     fn get_hover_info(&self) -> Option<ActionHoverInfo> {
         match self.cb_action {
             None => None,
-            Some(ref action) =>
+            Some(ref action) => {
                 ActionHoverInfo::append(action.get_hover_info(), self.move_action.get_hover_info())
+            }
         }
     }
 
@@ -715,7 +733,6 @@ impl MoveAction {
             Some(pc) => Rc::clone(pc),
         };
 
-
         let dist = match dist {
             None => MOVE_TO_THRESHOLD,
             Some(dist) => dist,
@@ -731,27 +748,37 @@ impl MoveAction {
 
         let selected = GameState::selected();
 
-        let path = match GameState::can_move_towards_point(&selected[0],
-            entities_to_ignore(), x, y, dist) {
-            None => return None,
-            Some(path) => path,
-        };
+        let path =
+            match GameState::can_move_towards_point(&selected[0], entities_to_ignore(), x, y, dist)
+            {
+                None => return None,
+                Some(path) => path,
+            };
 
         let (ap, path) = if path.len() > 0 {
             let pc = pc.borrow();
             let cost_per_move = pc.actor.get_move_ap_cost(1) as i32;
 
-            let total_ap =
-                if !GameState::is_combat_active() { std::i32::MAX } else { pc.actor.ap() as i32 };
+            let total_ap = if !GameState::is_combat_active() {
+                std::i32::MAX
+            } else {
+                pc.actor.ap() as i32
+            };
             let moves = cmp::min(path.len() as i32 - 1, total_ap / cost_per_move);
             let ap = moves * cost_per_move;
 
             (
                 ap,
-                path.iter().skip(1).take(moves as usize).map(|p| {
-                    (p.x as f32 + (pc.size.width as f32 - 1.0) / 2.0,
-                     p.y as f32 + (pc.size.height as f32 - 1.0) / 2.0)
-                }).collect()
+                path.iter()
+                    .skip(1)
+                    .take(moves as usize)
+                    .map(|p| {
+                        (
+                            p.x as f32 + (pc.size.width as f32 - 1.0) / 2.0,
+                            p.y as f32 + (pc.size.height as f32 - 1.0) / 2.0,
+                        )
+                    })
+                    .collect(),
             )
         } else {
             (0, Vec::new())
@@ -816,12 +843,16 @@ impl ActionKind for MoveAction {
 
     fn get_hover_info(&self) -> Option<ActionHoverInfo> {
         let entity = &self.selected[0].borrow();
-        let p = Point::new(self.x as i32 - entity.size.width / 2,
-            self.y as i32 - entity.size.height / 2);
+        let p = Point::new(
+            self.x as i32 - entity.size.width / 2,
+            self.y as i32 - entity.size.height / 2,
+        );
         ActionHoverInfo::with_path(entity, p, &self.path, self.ap)
     }
 
-    fn ap(&self) -> i32 { self.ap }
+    fn ap(&self) -> i32 {
+        self.ap
+    }
 }
 
 struct InvalidAction {}

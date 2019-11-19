@@ -254,14 +254,15 @@ impl TurnManager {
     }
 
     #[must_use]
-    pub fn drain_triggered_cbs(&mut self) ->
-        Vec<TriggeredCallback> {
+    pub fn drain_triggered_cbs(&mut self) -> Vec<TriggeredCallback> {
         let mut result = Vec::new();
         for index in self.surfaces.iter() {
             let effect = self.effects[*index].as_mut().unwrap();
             for (cb, entity_index) in effect.update_on_moved_in_surface() {
                 result.push(TriggeredCallback::with_target(
-                        cb, FuncKind::OnMovedInSurface, entity_index,
+                    cb,
+                    FuncKind::OnMovedInSurface,
+                    entity_index,
                 ));
             }
         }
@@ -317,7 +318,10 @@ impl TurnManager {
         for index in 0..self.effects.len() {
             let (is_removal, effect_cbs) = self.update_effect(index, elapsed_millis);
             for cb in effect_cbs {
-                cbs.push(TriggeredCallback::new(Rc::clone(&cb), FuncKind::OnRoundElapsed));
+                cbs.push(TriggeredCallback::new(
+                    Rc::clone(&cb),
+                    FuncKind::OnRoundElapsed,
+                ));
                 cbs.push(TriggeredCallback::new(cb, FuncKind::OnSurfaceRoundElapsed));
             }
             if is_removal {
@@ -683,8 +687,12 @@ impl TurnManager {
 
             // end any combat-only modes
             for (id, state) in &entity.actor.ability_states {
-                if !state.combat_only { continue; }
-                if !state.is_active_mode() { continue; }
+                if !state.combat_only {
+                    continue;
+                }
+                if !state.is_active_mode() {
+                    continue;
+                }
 
                 let mut cb = CallbackData::new_ability(entity.index(), id);
                 cb.add_func(FuncKind::OnDeactivated, "on_deactivate".to_string());
@@ -783,8 +791,11 @@ impl TurnManager {
         surface.increment_squares_moved(entity_index);
 
         for cb in surface.callbacks.iter() {
-            let cb = TriggeredCallback::with_target(Rc::clone(&cb), FuncKind::OnEnteredSurface,
-                entity_index);
+            let cb = TriggeredCallback::with_target(
+                Rc::clone(&cb),
+                FuncKind::OnEnteredSurface,
+                entity_index,
+            );
             self.triggered_cbs_next_update.push(cb);
         }
     }
@@ -803,8 +814,11 @@ impl TurnManager {
         entity.borrow_mut().actor.remove_effect(surface_index);
 
         for cb in surface.callbacks.iter() {
-            let cb = TriggeredCallback::with_target(Rc::clone(&cb), FuncKind::OnExitedSurface,
-                entity_index);
+            let cb = TriggeredCallback::with_target(
+                Rc::clone(&cb),
+                FuncKind::OnExitedSurface,
+                entity_index,
+            );
             self.triggered_cbs_next_update.push(cb);
         }
     }

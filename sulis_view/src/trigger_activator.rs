@@ -19,7 +19,7 @@ use std::rc::Rc;
 
 use sulis_core::ui::{Callback, Widget};
 use sulis_module::{
-    on_trigger::{self, Kind, QuestStateData, ModuleLoadData},
+    on_trigger::{self, Kind, ModuleLoadData, QuestStateData},
     Actor, MerchantData, Module, OnTrigger,
 };
 use sulis_state::{
@@ -29,7 +29,7 @@ use sulis_state::{
 };
 
 use crate::{
-    dialog_window, ap_bar, character_window, window_fade, ConfirmationWindow, CutsceneWindow,
+    ap_bar, character_window, dialog_window, window_fade, ConfirmationWindow, CutsceneWindow,
     GameOverWindow, LoadingScreen, RootView, ScriptMenu, UIBlocker, WindowFade,
 };
 
@@ -336,8 +336,7 @@ fn load_module(widget: &Rc<RefCell<Widget>>, module_data: &ModuleLoadData) {
     let (root, view) = Widget::parent_mut::<RootView>(widget);
 
     let pc = GameState::player();
-    let inventory = character_window::get_inventory(&pc.borrow().actor,
-        module_data.include_stash);
+    let inventory = character_window::get_inventory(&pc.borrow().actor, module_data.include_stash);
     let actor = Actor::from(
         &pc.borrow().actor.actor,
         None,
@@ -355,10 +354,14 @@ fn load_module(widget: &Rc<RefCell<Widget>>, module_data: &ModuleLoadData) {
             Some(entity) => entity,
         };
         let inv = character_window::get_inventory(&entity.borrow().actor, false);
-        let actor = Rc::new(
-            Actor::from(&entity.borrow().actor.actor, None, entity.borrow().actor.xp(),
-                Vec::new(), Vec::new(), inv)
-            );
+        let actor = Rc::new(Actor::from(
+            &entity.borrow().actor.actor,
+            None,
+            entity.borrow().actor.xp(),
+            Vec::new(),
+            Vec::new(),
+            inv,
+        ));
         party_actors.push(actor);
     }
 
@@ -382,7 +385,10 @@ fn load_module(widget: &Rc<RefCell<Widget>>, module_data: &ModuleLoadData) {
         return;
     }
 
-    warn!("Unable to load module '{}' as it was not found.", module_data.module);
+    warn!(
+        "Unable to load module '{}' as it was not found.",
+        module_data.module
+    );
 }
 
 fn fade_out_in(widget: &Rc<RefCell<Widget>>) {

@@ -14,16 +14,16 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::rc::Rc;
 use std::cell::RefCell;
+use std::rc::Rc;
 
-use sulis_core::ui::{Cursor, LineRenderer, Widget, animation_state, Theme};
-use sulis_core::io::{GraphicsRenderer, DrawList};
-use sulis_core::image::Image;
-use sulis_core::resource::{ResourceSet, Sprite};
-use sulis_module::Module;
-use sulis_state::{AreaState, EntityState, GameState, area_feedback_text::Params};
 use crate::{action_kind, AreaMouseover};
+use sulis_core::image::Image;
+use sulis_core::io::{DrawList, GraphicsRenderer};
+use sulis_core::resource::{ResourceSet, Sprite};
+use sulis_core::ui::{animation_state, Cursor, LineRenderer, Theme, Widget};
+use sulis_module::Module;
+use sulis_state::{area_feedback_text::Params, AreaState, EntityState, GameState};
 
 pub struct HoverSprite {
     pub sprite: Rc<Sprite>,
@@ -91,8 +91,12 @@ impl AreaOverlayHandler {
         None
     }
 
-    pub fn select_party_in_box(&self, widget: &Widget,
-        scale: (f32, f32), scroll: (f32, f32)) -> Vec<Rc<RefCell<EntityState>>> {
+    pub fn select_party_in_box(
+        &self,
+        widget: &Widget,
+        scale: (f32, f32),
+        scroll: (f32, f32),
+    ) -> Vec<Rc<RefCell<EntityState>>> {
         let mut party = Vec::new();
 
         let (x, y, x_end, y_end) = match self.get_selection_box_coords() {
@@ -208,8 +212,12 @@ impl AreaOverlayHandler {
         }
     }
 
-    pub fn update_cursor_and_hover(&mut self, widget: &Rc<RefCell<Widget>>,
-        area_x: f32, area_y: f32) {
+    pub fn update_cursor_and_hover(
+        &mut self,
+        widget: &Rc<RefCell<Widget>>,
+        area_x: f32,
+        area_y: f32,
+    ) {
         let area_state = GameState::area_state();
 
         self.hover_sprite = None;
@@ -288,7 +296,6 @@ impl AreaOverlayHandler {
             self.selection_box_image = ResourceSet::image(image_id);
         }
 
-
         if let Some(ref image_id) = theme.custom.get("path_point_image") {
             self.path_point_image = ResourceSet::image(image_id);
         }
@@ -302,25 +309,39 @@ impl AreaOverlayHandler {
         self.hover_sprite.as_ref()
     }
 
-    pub fn get_path_draw_list(&self, x_offset: f32, y_offset: f32,
-        millis: u32) -> Option<DrawList> {
-
-        if !GameState::is_combat_active() { return None; }
+    pub fn get_path_draw_list(
+        &self,
+        x_offset: f32,
+        y_offset: f32,
+        millis: u32,
+    ) -> Option<DrawList> {
+        if !GameState::is_combat_active() {
+            return None;
+        }
 
         let image = match self.path_point_image {
             None => return None,
             Some(ref image) => image,
         };
 
-        if self.path.is_empty() { return None; }
+        if self.path.is_empty() {
+            return None;
+        }
 
         let mut draw_list = DrawList::empty_sprite();
 
         for p in &self.path[0..self.path.len() - 1] {
             let x = p.0 - x_offset;
             let y = p.1 - y_offset;
-            image.append_to_draw_list(&mut draw_list, &animation_state::NORMAL,
-                x, y, 1.0, 1.0, millis);
+            image.append_to_draw_list(
+                &mut draw_list,
+                &animation_state::NORMAL,
+                x,
+                y,
+                1.0,
+                1.0,
+                millis,
+            );
         }
 
         match self.path_point_end_image {
@@ -329,16 +350,29 @@ impl AreaOverlayHandler {
                 let last = self.path.last().unwrap();
                 let x = last.0 - x_offset;
                 let y = last.1 - y_offset;
-                image.append_to_draw_list(&mut draw_list, &animation_state::NORMAL,
-                    x, y, 1.0, 1.0, millis);
+                image.append_to_draw_list(
+                    &mut draw_list,
+                    &animation_state::NORMAL,
+                    x,
+                    y,
+                    1.0,
+                    1.0,
+                    millis,
+                );
             }
         }
 
         Some(draw_list)
     }
 
-    pub fn draw_top(&self, renderer: &mut dyn GraphicsRenderer, params: &Params,
-        offset: (f32, f32), scale: (f32, f32), millis: u32) {
+    pub fn draw_top(
+        &self,
+        renderer: &mut dyn GraphicsRenderer,
+        params: &Params,
+        offset: (f32, f32),
+        scale: (f32, f32),
+        millis: u32,
+    ) {
         if let Some(ref image) = self.selection_box_image {
             if let Some((x, y, x_end, y_end)) = self.get_selection_box_coords() {
                 let w = x_end - x;
@@ -362,14 +396,18 @@ impl AreaOverlayHandler {
             }
         }
 
-        if !GameState::is_combat_active() { return; }
+        if !GameState::is_combat_active() {
+            return;
+        }
         if let Some(ap) = self.path_ap {
             let font_rend = LineRenderer::new(&params.font);
             let text = Module::rules().format_ap(ap);
             let (x, y) = match &self.hover_sprite {
                 None => (0.0, 0.0),
-                Some(hover) => (hover.x as f32 + offset.0,
-                    hover.y as f32 + hover.h as f32 + offset.1),
+                Some(hover) => (
+                    hover.x as f32 + offset.0,
+                    hover.y as f32 + hover.h as f32 + offset.1,
+                ),
             };
 
             let (mut draw_list, _) = font_rend.get_draw_list(&text, x, y, params.ap_scale);
@@ -388,8 +426,12 @@ impl AreaOverlayHandler {
         }
     }
 
-    pub fn handle_left_click(&mut self, widget: &Rc<RefCell<Widget>>,
-        scale: (f32, f32), scroll: (f32, f32)) -> bool {
+    pub fn handle_left_click(
+        &mut self,
+        widget: &Rc<RefCell<Widget>>,
+        scale: (f32, f32),
+        scroll: (f32, f32),
+    ) -> bool {
         let mut fire_action = false;
         if let Some((x, y, x_end, y_end)) = self.get_selection_box_coords() {
             let w = x_end - x;
@@ -397,9 +439,11 @@ impl AreaOverlayHandler {
             if w < 1.0 && h < 1.0 {
                 fire_action = true;
             } else {
-                GameState::select_party_members(
-                    self.select_party_in_box(&widget.borrow(), scale, scroll),
-                );
+                GameState::select_party_members(self.select_party_in_box(
+                    &widget.borrow(),
+                    scale,
+                    scroll,
+                ));
             }
             self.selection_box_start = None;
         } else {

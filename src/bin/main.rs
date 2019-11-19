@@ -98,10 +98,12 @@ fn main_menu(io: &mut Box<dyn IO>) -> NextGameStep {
     }
 }
 
-fn new_campaign(io: &mut Box<dyn IO>,
+fn new_campaign(
+    io: &mut Box<dyn IO>,
     pc_actor: Rc<Actor>,
     party_actors: Vec<Rc<Actor>>,
-    flags: HashMap<String, String>) -> NextGameStep {
+    flags: HashMap<String, String>,
+) -> NextGameStep {
     info!("Initializing game state.");
     if let Err(e) = GameState::init(pc_actor, party_actors, flags) {
         error!("{}", e);
@@ -146,8 +148,7 @@ fn main() {
         use sulis_state::NextGameStep::*;
         next_step = match next_step {
             Exit => break,
-            NewCampaign { pc_actor } =>
-                new_campaign(&mut io, pc_actor, Vec::new(), HashMap::new()),
+            NewCampaign { pc_actor } => new_campaign(&mut io, pc_actor, Vec::new(), HashMap::new()),
             LoadCampaign { save_state } => load_campaign(&mut io, save_state),
             MainMenu => main_menu(&mut io),
             MainMenuReloadResources => {

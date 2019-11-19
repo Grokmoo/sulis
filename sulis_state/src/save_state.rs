@@ -191,11 +191,13 @@ pub struct EffectSaveState {
     #[serde(default)]
     pub(crate) icon: Option<effect::Icon>,
 
-    #[serde(default="default_true")]
+    #[serde(default = "default_true")]
     pub(crate) ui_visible: bool,
 }
 
-fn default_true() -> bool { true }
+fn default_true() -> bool {
+    true
+}
 
 impl EffectSaveState {
     pub fn new(effect: &Effect, index: usize) -> EffectSaveState {

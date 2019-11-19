@@ -39,10 +39,13 @@ pub fn check_end_turn(widget: &Rc<RefCell<Widget>>) {
             Some(entity) => entity,
         };
         let entity = entity.borrow();
-        if !entity.is_party_member() { return; }
+        if !entity.is_party_member() {
+            return;
+        }
 
-        if !entity.actor.started_turn_with_no_ap_for_actions() &&
-            !entity.actor.has_ap_for_any_action() {
+        if !entity.actor.started_turn_with_no_ap_for_actions()
+            && !entity.actor.has_ap_for_any_action()
+        {
             end_turn = true;
             info!("{} has no AP left.  Ending turn.", entity.actor.actor.name);
         }

@@ -17,7 +17,7 @@
 use std::ops::Index;
 use std::slice::Iter;
 
-use crate::ItemState;
+use sulis_module::ItemState;
 
 #[derive(Clone, Debug)]
 pub struct ItemList {

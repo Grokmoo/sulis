@@ -51,16 +51,20 @@ pub struct Usable {
     pub use_in_slot: bool,
 }
 
+#[derive(Debug, Clone)]
+struct Variant {
+    image: HashMap<ImageLayer, Rc<dyn Image>>,
+    alternate_image: HashMap<ImageLayer, Rc<dyn Image>>,
+    icon: Rc<dyn Image>,
+}
+
 #[derive(Debug)]
 pub struct Item {
     pub id: String,
     pub name: String,
     pub kind: ItemKind,
-    pub icon: Rc<dyn Image>,
     pub equippable: Option<Equippable>,
     pub prereqs: Option<PrereqList>,
-    image: Option<HashMap<ImageLayer, Rc<dyn Image>>>,
-    alternate_image: Option<HashMap<ImageLayer, Rc<dyn Image>>>,
     pub value: i32,
     pub weight: i32,
     pub usable: Option<Usable>,
@@ -77,30 +81,32 @@ pub struct Item {
     // adjectives that were not in the item builder but were created
     // dynamically
     pub added_adjectives: Vec<Rc<ItemAdjective>>,
+
+    icon: Rc<dyn Image>,
+    image: HashMap<ImageLayer, Rc<dyn Image>>,
+    alternate_image: HashMap<ImageLayer, Rc<dyn Image>>,
+    variants: Vec<Variant>,
 }
 
 fn build_hash_map(
     id: &str,
-    input: Option<HashMap<ImageLayer, String>>,
-) -> Result<Option<HashMap<ImageLayer, Rc<dyn Image>>>, Error> {
-    match input {
-        Some(input_images) => {
-            let mut output = HashMap::new();
-            for (layer, image_str) in input_images {
-                let image = match ResourceSet::image(&image_str) {
-                    None => {
-                        warn!("No image found for image '{}'", image_str);
-                        return unable_to_create_error("item", id);
-                    }
-                    Some(image) => image,
-                };
+    input: HashMap<ImageLayer, String>,
+) -> Result<HashMap<ImageLayer, Rc<dyn Image>>, Error> {
+    let mut output = HashMap::new();
+    for (layer, image_id) in input {
+        let image = read_image(&image_id, id)?;
+        output.insert(layer, image);
+    }
 
-                output.insert(layer, image);
-            }
+    Ok(output)
+}
 
-            Ok(Some(output))
-        }
-        None => Ok(None),
+fn read_image(image_id: &str, id: &str) -> Result<Rc<dyn Image>, Error> {
+    match ResourceSet::image(image_id) {
+        None => {
+            warn!("No image found for image '{}'", image_id);
+            unable_to_create_error("item", id)
+        }, Some(image) => Ok(image),
     }
 }
 
@@ -155,18 +161,11 @@ impl Item {
             original_equippable: item.original_equippable.clone(),
             builder_adjectives: item.builder_adjectives.clone(),
             added_adjectives,
+            variants: item.variants.clone(),
         }
     }
 
     pub fn new(builder: ItemBuilder, module: &Module) -> Result<Item, Error> {
-        let icon = match ResourceSet::image(&builder.icon) {
-            None => {
-                warn!("No image found for icon '{}'", builder.icon);
-                return unable_to_create_error("item", &builder.id);
-            }
-            Some(icon) => icon,
-        };
-
         if let &Some(ref equippable) = &builder.equippable {
             if let Some(ref attack) = equippable.attack {
                 if attack.damage.kind.is_none() {
@@ -175,9 +174,6 @@ impl Item {
                 }
             }
         }
-
-        let images = build_hash_map(&builder.id, builder.image)?;
-        let alt_images = build_hash_map(&builder.id, builder.alternate_image)?;
 
         let usable = match builder.usable {
             None => None,
@@ -219,6 +215,18 @@ impl Item {
             adjectives.push(adjective);
         }
 
+        let icon = read_image(&builder.icon, &builder.id)?;
+        let images = build_hash_map(&builder.id, builder.image)?;
+        let alt_images = build_hash_map(&builder.id, builder.alternate_image)?;
+
+        let mut variants = Vec::new();
+        for variant in builder.variants {
+            let icon = read_image(&variant.icon, &builder.id)?;
+            let image = build_hash_map(&builder.id, variant.image)?;
+            let alternate_image = build_hash_map(&builder.id, variant.alternate_image)?;
+            variants.push(Variant { icon, image, alternate_image });
+        }
+
         let (equippable, value, prereqs) = apply_adjectives(
             &prereqs,
             &builder.equippable,
@@ -243,7 +251,12 @@ impl Item {
             original_equippable: builder.equippable,
             builder_adjectives: adjectives,
             added_adjectives: Vec::new(),
+            variants,
         })
+    }
+
+    pub fn num_variants(&self) -> usize {
+        self.variants.len()
     }
 
     pub fn adjective_icons(&self) -> Vec<String> {
@@ -261,17 +274,24 @@ impl Item {
         }
     }
 
-    pub fn alt_image_iter(&self) -> Option<Iter<ImageLayer, Rc<dyn Image>>> {
-        match self.alternate_image {
-            None => None,
-            Some(ref image) => Some(image.iter()),
+    pub fn icon(&self, variant: Option<usize>) -> Rc<dyn Image> {
+        Rc::clone(match variant {
+            None => &self.icon,
+            Some(idx) => &self.variants[idx].icon,
+        })
+    }
+
+    pub fn alt_image_iter(&self, variant: Option<usize>) -> Iter<ImageLayer, Rc<dyn Image>> {
+        match variant {
+            None => self.alternate_image.iter(),
+            Some(idx) => self.variants[idx].alternate_image.iter()
         }
     }
 
-    pub fn image_iter(&self) -> Option<Iter<ImageLayer, Rc<dyn Image>>> {
-        match self.image {
-            None => None,
-            Some(ref image) => Some(image.iter()),
+    pub fn image_iter(&self, variant: Option<usize>) -> Iter<ImageLayer, Rc<dyn Image>> {
+        match variant {
+            None => self.image.iter(),
+            Some(idx) => self.variants[idx].image.iter()
         }
     }
 
@@ -378,20 +398,41 @@ fn bool_true() -> bool {
 
 #[derive(Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
+struct VariantBuilder {
+    #[serde(default)]
+    image: HashMap<ImageLayer, String>,
+
+    #[serde(default)]
+    alternate_image: HashMap<ImageLayer, String>,
+
+    #[serde(default)]
+    icon: String,
+}
+
+#[derive(Deserialize, Debug)]
+#[serde(deny_unknown_fields)]
 pub struct ItemBuilder {
     pub id: String,
     pub name: String,
     kind: Option<ItemKind>,
     pub icon: String,
     pub equippable: Option<Equippable>,
-    pub image: Option<HashMap<ImageLayer, String>>,
-    pub alternate_image: Option<HashMap<ImageLayer, String>>,
+
+    #[serde(default)]
+    pub image: HashMap<ImageLayer, String>,
+
+    #[serde(default)]
+    pub alternate_image: HashMap<ImageLayer, String>,
+
     prereqs: Option<PrereqListBuilder>,
     value: u32,
     weight: u32,
     usable: Option<UsableBuilder>,
     #[serde(default)]
     adjectives: Vec<String>,
+
+    #[serde(default)]
+    variants: Vec<VariantBuilder>,
 }
 
 pub fn format_item_value(value: i32) -> String {

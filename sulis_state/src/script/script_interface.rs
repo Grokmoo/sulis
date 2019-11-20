@@ -21,10 +21,10 @@ use std::rc::Rc;
 use rlua::{self, UserData, UserDataMethods};
 
 use crate::script::*;
-use crate::{animation::Anim, AreaState, EntityState, GameState, ItemState, Location};
+use crate::{animation::Anim, AreaState, EntityState, GameState, Location};
 use sulis_core::config::Config;
 use sulis_module::on_trigger::{self, QuestEntryState};
-use sulis_module::{Faction, Module, OnTrigger, Time};
+use sulis_module::{Faction, Module, OnTrigger, Time, ItemState};
 
 /// The ScriptInterface, accessible in all Lua scripts as the global `game`.
 /// The following methods are available on this object (documentation WIP):
@@ -892,7 +892,7 @@ impl UserData for ScriptInterface {
                 }),
                 Some(item) => item,
             };
-            let item_state = ItemState::new(item);
+            let item_state = ItemState::new(item, None);
             let index = stash.borrow().items().find_index(&item_state);
             Ok(ScriptStashItem { index })
         });
@@ -921,7 +921,7 @@ impl UserData for ScriptInterface {
                 Some(item) => item,
             };
 
-            let item_state = ItemState::new(item);
+            let item_state = ItemState::new(item, None);
             let index = stash.borrow_mut().add_item(1, item_state);
             Ok(ScriptStashItem { index })
         });

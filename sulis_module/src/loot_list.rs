@@ -16,11 +16,10 @@
 
 use std::collections::HashMap;
 use std::io::Error;
-use std::rc::Rc;
 
 use sulis_core::util::{gen_rand, unable_to_create_error};
 
-use crate::{Item, Module};
+use crate::{ItemState, Module};
 
 const MAX_DEPTH: u32 = 10;
 
@@ -35,6 +34,9 @@ struct Entry {
 
     adjective2_total_weight: u32,
     adjective2: Vec<(String, u32)>,
+
+    variant_total_weight: u32,
+    variant: Vec<(usize, u32)>,
 }
 
 #[derive(Debug)]
@@ -103,9 +105,11 @@ impl LootList {
         id: String,
         entry_in: EntryBuilder,
     ) -> Result<Entry, Error> {
-        if entry_in.adjective1.len() != 0 || entry_in.adjective2.len() != 0 {
+        if entry_in.adjective1.len() != 0 ||
+            entry_in.adjective2.len() != 0 ||
+            entry_in.variant.len() != 0 {
             warn!(
-                "Item adjectives may not be specified in loot list sub_list entries: '{}'",
+                "Item adjective and variant may not be specified in loot sub_list entries: '{}'",
                 id
             );
             return unable_to_create_error("loot_list", &builder_id);
@@ -124,6 +128,8 @@ impl LootList {
             adjective1_total_weight: 0,
             adjective2: Vec::new(),
             adjective2_total_weight: 0,
+            variant: Vec::new(),
+            variant_total_weight: 0,
         })
     }
 
@@ -171,6 +177,23 @@ impl LootList {
             adjective2.push((id, weight));
         }
 
+        let mut variant = Vec::new();
+        let mut variant_total_weight = 0;
+        for (id, weight) in entry_in.variant {
+            variant_total_weight += weight;
+            if id == "none" {
+                continue;
+            }
+            let value = match id.parse() {
+                Ok(val) => val,
+                Err(_) => {
+                    warn!("Variant IDs must be parsable integers: '{}'", id);
+                    return unable_to_create_error("loot_list", &builder_id);
+                }
+            };
+            variant.push((value, weight));
+        }
+
         Ok(Entry {
             id,
             weight: entry_in.weight,
@@ -179,10 +202,12 @@ impl LootList {
             adjective1_total_weight,
             adjective2,
             adjective2_total_weight,
+            variant,
+            variant_total_weight,
         })
     }
 
-    pub fn generate_with_chance(&self, chance: u32) -> Vec<(u32, Rc<Item>)> {
+    pub fn generate_with_chance(&self, chance: u32) -> Vec<(u32, ItemState)> {
         let roll = gen_rand(1, 101);
         if chance >= roll {
             self.generate_internal(0)
@@ -191,11 +216,11 @@ impl LootList {
         }
     }
 
-    pub fn generate(&self) -> Vec<(u32, Rc<Item>)> {
+    pub fn generate(&self) -> Vec<(u32, ItemState)> {
         self.generate_internal(0)
     }
 
-    fn generate_internal(&self, depth: u32) -> Vec<(u32, Rc<Item>)> {
+    fn generate_internal(&self, depth: u32) -> Vec<(u32, ItemState)> {
         if depth >= MAX_DEPTH {
             warn!(
                 "Exceeded maximum sub list depth of {}.  \
@@ -236,7 +261,8 @@ impl LootList {
                     }
                     Some(item) => item,
                 };
-                items.push((quantity, item));
+                let variant = self.gen_variant(entry);
+                items.push((quantity, ItemState::new(item, variant)));
             }
         }
 
@@ -303,7 +329,22 @@ impl LootList {
         result
     }
 
-    fn gen_item(&self) -> Option<(u32, Rc<Item>)> {
+    fn gen_variant(&self, entry: &Entry) -> Option<usize> {
+        if entry.variant_total_weight > 0 {
+            let roll = gen_rand(0, entry.variant_total_weight);
+            let mut cur_weight = 0;
+            for (id, weight) in entry.variant.iter() {
+                cur_weight += weight;
+                if roll < cur_weight {
+                    return Some(*id);
+                }
+            }
+        }
+
+        None
+    }
+
+    fn gen_item(&self) -> Option<(u32, ItemState)> {
         let roll = gen_rand(0, self.total_entries_weight);
 
         let mut cur_weight = 0;
@@ -327,7 +368,8 @@ impl LootList {
                     }
                     Some(item) => item,
                 };
-                return Some((quantity, item));
+                let variant = self.gen_variant(entry);
+                return Some((quantity, ItemState::new(item, variant)));
             }
         }
 
@@ -362,6 +404,9 @@ struct EntryBuilder {
     adjective1: HashMap<String, u32>,
     #[serde(default)]
     adjective2: HashMap<String, u32>,
+
+    #[serde(default)]
+    variant: HashMap<String, u32>,
 }
 
 #[derive(Deserialize, Debug)]

@@ -22,11 +22,11 @@ use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::ui::{animation_state, AnimationState, Color};
 use sulis_core::util::invalid_data_error;
 use sulis_module::area::PropData;
-use sulis_module::{prop, Item, LootList, Module, ObjectSizeIterator, Prop};
+use sulis_module::{prop, LootList, Module, ObjectSizeIterator, Prop, ItemState};
 
 use crate::entity_state::AreaDrawable;
 use crate::save_state::PropInteractiveSaveState;
-use crate::{ChangeListenerList, EntityTextureCache, ItemList, ItemState, Location};
+use crate::{ChangeListenerList, EntityTextureCache, ItemList, Location};
 
 #[derive(Debug)]
 pub enum Interactive {
@@ -68,6 +68,7 @@ impl PropState {
         for item_save in prop_data.items.iter() {
             let quantity = item_save.quantity;
             let item = &item_save.item;
+            let variant = item.variant;
             let item = match Module::create_get_item(&item.id, &item.adjectives) {
                 None => {
                     warn!(
@@ -78,7 +79,7 @@ impl PropState {
                 }
                 Some(item) => item,
             };
-            items.add_quantity(quantity, ItemState::new(item));
+            items.add_quantity(quantity, ItemState::new(item, variant));
         }
 
         let mut anim_state = AnimationState::default();
@@ -150,6 +151,7 @@ impl PropState {
                 let mut item_list = ItemList::new();
                 for item_save_state in items {
                     let item = &item_save_state.item;
+                    let variant = item.variant;
                     let item = match Module::create_get_item(&item.id, &item.adjectives) {
                         None => invalid_data_error(&format!(
                             "No item with ID '{}'",
@@ -158,7 +160,7 @@ impl PropState {
                         Some(item) => Ok(item),
                     }?;
 
-                    item_list.add_quantity(item_save_state.quantity, ItemState::new(item));
+                    item_list.add_quantity(item_save_state.quantity, ItemState::new(item, variant));
                 }
 
                 let loot = match loot_to_generate {
@@ -293,8 +295,7 @@ impl PropState {
                 info!("Generating loot for prop from '{}'", loot.id);
                 let generated_items = loot.generate();
                 for (qty, item) in generated_items {
-                    let item_state = ItemState::new(item);
-                    items.add_quantity(qty, item_state);
+                    items.add_quantity(qty, item);
                 }
             }
             Interactive::Door { ref mut open } => {
@@ -317,12 +318,11 @@ impl PropState {
         self.listeners.notify(&self);
     }
 
-    pub fn add_items(&mut self, items_to_add: Vec<(u32, Rc<Item>)>) {
+    pub fn add_items(&mut self, items_to_add: Vec<(u32, ItemState)>) {
         match self.interactive {
             Interactive::Container { ref mut items, .. } => {
                 for (qty, item) in items_to_add {
-                    let item_state = ItemState::new(item);
-                    items.add_quantity(qty, item_state);
+                    items.add_quantity(qty, item);
                 }
             }
             _ => warn!(

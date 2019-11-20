@@ -7,7 +7,7 @@ function on_area_load(parent)
 end
 
 MIN_COINS = 50000
-MIN_XP = 5000
+MIN_XP = 5700
 
 function add_min_xp_coins()
   local player = game:player()

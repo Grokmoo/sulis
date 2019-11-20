@@ -20,17 +20,17 @@ use std::collections::HashMap;
 use std::io::Error;
 use std::rc::Rc;
 
-use crate::save_state::ActorSaveState;
-use crate::{
-    AbilityState, ChangeListenerList, Effect, EntityState, GameState, Inventory, ItemState, PStats,
-};
 use sulis_core::image::{Image, LayeredImage};
 use sulis_core::io::GraphicsRenderer;
 use sulis_core::util::{invalid_data_error, ExtInt};
 use sulis_module::{Ability, Actor, ActorBuilder, Faction, ImageLayer, Module};
 use sulis_module::{
     AccuracyKind, Attack, AttackKind, BonusList, DamageKind, HitFlags, HitKind, ItemKind,
-    QuickSlot, Slot, StatList, WeaponStyle,
+    QuickSlot, Slot, StatList, WeaponStyle, ItemState
+};
+use crate::save_state::ActorSaveState;
+use crate::{
+    AbilityState, ChangeListenerList, Effect, EntityState, GameState, Inventory, PStats,
 };
 
 pub struct ActorState {
@@ -160,7 +160,6 @@ impl ActorState {
         actor_state.compute_stats();
 
         for (slot, item) in actor.inventory.equipped_iter() {
-            let item = ItemState::new(item);
             if !actor_state.can_equip(&item) {
                 warn!(
                     "Unable to equip item '{}' for actor '{}'",
@@ -173,7 +172,6 @@ impl ActorState {
         }
 
         for (slot, item) in actor.inventory.quick_iter() {
-            let item = ItemState::new(item);
             if !actor_state.inventory.can_set_quick(&item, slot, &actor) {
                 warn!(
                     "Unable to set quick item '{}' for actor '{}'",

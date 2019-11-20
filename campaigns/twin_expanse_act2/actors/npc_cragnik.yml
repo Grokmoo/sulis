@@ -51,7 +51,7 @@ inventory:
       adjectives: []
 levels:
   rogue: 8
-xp: 5000
+xp: 5700
 abilities:
   - armor_light
   - weapon_crossbow

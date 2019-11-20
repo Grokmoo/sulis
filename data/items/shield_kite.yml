@@ -18,3 +18,8 @@ image:
     creatures/shield_kite
 weight: 300
 value: 80
+variants:
+  - image:
+      HeldOff:
+        creatures/shield_kite02
+    icon: inventory/shield_kite03

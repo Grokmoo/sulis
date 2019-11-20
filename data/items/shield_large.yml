@@ -22,3 +22,8 @@ image:
     creatures/shield_large
 weight: 600
 value: 100
+variants:
+  - image:
+      HeldOff:
+        creatures/shield_large02
+    icon: inventory/shield_large02

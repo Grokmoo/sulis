@@ -18,3 +18,8 @@ image:
     creatures/shield_heater
 weight: 250
 value: 70
+variants:
+  - image:
+      HeldOff:
+        creatures/shield_heater02
+    icon: inventory/shield_heater02

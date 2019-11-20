@@ -234,6 +234,9 @@ weighted_entries:
       resistance_crushing1: 2
       resistance_piercing1: 2
       resistance_slashing1: 2
+    variant:
+      none: 1
+      "0": 1
   shield_heater:
     weight: 5
     adjective1:
@@ -248,6 +251,9 @@ weighted_entries:
       resistance_crushing1: 2
       resistance_piercing1: 2
       resistance_slashing1: 2
+    variant:
+      none: 1
+      "0": 1
   shield_kite:
     weight: 5
     adjective1:
@@ -262,6 +268,9 @@ weighted_entries:
       resistance_crushing1: 2
       resistance_piercing1: 2
       resistance_slashing1: 2
+    variant:
+      none: 1
+      "0": 1
   shield_large:
     weight: 3
     adjective1:
@@ -276,3 +285,6 @@ weighted_entries:
       resistance_crushing1: 2
       resistance_piercing1: 2
       resistance_slashing1: 2
+    variant:
+      none: 1
+      "0": 1

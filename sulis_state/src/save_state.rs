@@ -319,7 +319,7 @@ impl PropSaveState {
 
                 let items = items
                     .iter()
-                    .map(|(qty, ref it)| ItemListEntrySaveState::new(*qty, &it.item))
+                    .map(|(qty, ref it)| ItemListEntrySaveState::new(*qty, &it))
                     .collect();
 
                 Container {
@@ -396,7 +396,7 @@ impl MerchantSaveState {
         let items = merchant
             .items()
             .iter()
-            .map(|(q, ref it)| ItemListEntrySaveState::new(*q, &it.item))
+            .map(|(q, ref it)| ItemListEntrySaveState::new(*q, &it))
             .collect();
 
         MerchantSaveState {
@@ -546,7 +546,7 @@ impl ActorSaveState {
         let mut equipped = Vec::new();
         for slot in Slot::iter() {
             if let Some(item) = actor_state.inventory().equipped(*slot) {
-                equipped.push(Some(ItemSaveState::new(&item.item)));
+                equipped.push(Some(ItemSaveState::new(&item)));
             } else {
                 equipped.push(None);
             }
@@ -555,7 +555,7 @@ impl ActorSaveState {
         let mut quick = Vec::new();
         for quick_slot in QuickSlot::iter() {
             if let Some(item) = actor_state.inventory().quick(*quick_slot) {
-                quick.push(Some(ItemSaveState::new(&item.item)));
+                quick.push(Some(ItemSaveState::new(&item)));
             } else {
                 quick.push(None);
             }

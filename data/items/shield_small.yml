@@ -18,3 +18,8 @@ image:
     creatures/shield_small
 weight: 200
 value: 50
+variants:
+  - image:
+      HeldOff:
+        creatures/shield_small02
+    icon: inventory/shield_small03

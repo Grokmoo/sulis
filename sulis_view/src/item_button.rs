@@ -27,11 +27,11 @@ use sulis_module::bonus::{AttackBuilder, AttackKindBuilder, Contingent};
 use sulis_module::{
     ability,
     item::{format_item_value, format_item_weight},
-    Item, Module, PrereqList,
+    Module, PrereqList,
 };
-use sulis_module::{Armor, Bonus, BonusList, DamageKind, QuickSlot, Slot};
+use sulis_module::{Armor, Bonus, BonusList, DamageKind, QuickSlot, Slot, ItemState};
 use sulis_state::script::ScriptItemKind;
-use sulis_state::{inventory::has_proficiency, EntityState, GameState, ItemState, Script};
+use sulis_state::{inventory::has_proficiency, EntityState, GameState, Script};
 
 enum Kind {
     Prop {
@@ -74,13 +74,13 @@ pub struct ItemButton {
 const ITEM_BUTTON_NAME: &str = "item_button";
 
 impl ItemButton {
-    pub fn inventory(item: &Rc<Item>, quantity: u32, item_index: usize) -> Rc<RefCell<ItemButton>> {
+    pub fn inventory(item: &ItemState, quantity: u32, item_index: usize) -> Rc<RefCell<ItemButton>> {
         ItemButton::new(item, quantity, Kind::Inventory { item_index })
     }
 
     pub fn equipped(
         player: &Rc<RefCell<EntityState>>,
-        item: &Rc<Item>,
+        item: &ItemState,
         slot: Slot,
     ) -> Rc<RefCell<ItemButton>> {
         let player = Rc::clone(player);
@@ -90,7 +90,7 @@ impl ItemButton {
     pub fn quick(
         player: &Rc<RefCell<EntityState>>,
         quantity: u32,
-        item: &Rc<Item>,
+        item: &ItemState,
         quick: QuickSlot,
     ) -> Rc<RefCell<ItemButton>> {
         let player = Rc::clone(player);
@@ -98,7 +98,7 @@ impl ItemButton {
     }
 
     pub fn prop(
-        item: &Rc<Item>,
+        item: &ItemState,
         quantity: u32,
         item_index: usize,
         prop_index: usize,
@@ -114,7 +114,7 @@ impl ItemButton {
     }
 
     pub fn merchant(
-        item: &Rc<Item>,
+        item: &ItemState,
         quantity: u32,
         item_index: usize,
         merchant_id: &str,
@@ -129,9 +129,9 @@ impl ItemButton {
         )
     }
 
-    fn new(item: &Rc<Item>, quantity: u32, kind: Kind) -> Rc<RefCell<ItemButton>> {
-        let icon = item.icon.id();
-        let adjective_icons = item.adjective_icons();
+    fn new(item: &ItemState, quantity: u32, kind: Kind) -> Rc<RefCell<ItemButton>> {
+        let icon = item.icon().id();
+        let adjective_icons = item.item.adjective_icons();
 
         Rc::new(RefCell::new(ItemButton {
             icon,

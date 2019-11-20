@@ -21,8 +21,8 @@ use std::rc::Rc;
 use rlua::{self, Context, UserData, UserDataMethods};
 
 use crate::script::*;
-use crate::{area_feedback_text::ColorKind, EntityState, GameState, ItemState};
-use sulis_module::{ability, Item, Module};
+use crate::{area_feedback_text::ColorKind, EntityState, GameState};
+use sulis_module::{ability, Item, Module, ItemState};
 
 /// A kind of Item, represented by its owner (Stash, QuickSlot, or a generic
 /// item with a specified ID)
@@ -50,7 +50,7 @@ impl ScriptItemKind {
             },
             ScriptItemKind::WithID(id) => match Module::item(id) {
                 None => None,
-                Some(item) => Some(ItemState::new(item)),
+                Some(item) => Some(ItemState::new(item, None)),
             },
         }
     }
@@ -71,7 +71,7 @@ impl ScriptItemKind {
             },
             ScriptItemKind::WithID(id) => match Module::item(id) {
                 None => unreachable!(),
-                Some(item) => ItemState::new(item),
+                Some(item) => ItemState::new(item, None),
             },
         }
     }

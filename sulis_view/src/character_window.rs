@@ -192,7 +192,7 @@ pub fn get_inventory(pc: &ActorState, include_stash: bool) -> InventoryBuilder {
             .borrow()
             .items()
             .iter()
-            .map(|(qty, item)| ItemListEntrySaveState::new(*qty, &item.item))
+            .map(|(qty, item)| ItemListEntrySaveState::new(*qty, &item))
             .collect()
     } else {
         Vec::new()
@@ -201,13 +201,13 @@ pub fn get_inventory(pc: &ActorState, include_stash: bool) -> InventoryBuilder {
     let equipped = Slot::iter()
         .map(|slot| (*slot, pc.inventory().equipped(*slot)))
         .filter(|(_, item)| item.is_some())
-        .map(|(slot, item)| (slot, ItemSaveState::new(&item.unwrap().item)))
+        .map(|(slot, item)| (slot, ItemSaveState::new(&item.unwrap())))
         .collect();
 
     let quick = QuickSlot::iter()
         .map(|slot| (*slot, pc.inventory().quick(*slot)))
         .filter(|(_, item)| item.is_some())
-        .map(|(slot, item)| (slot, ItemSaveState::new(&item.unwrap().item)))
+        .map(|(slot, item)| (slot, ItemSaveState::new(&item.unwrap())))
         .collect();
 
     InventoryBuilder::new(equipped, quick, coins, items)

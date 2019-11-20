@@ -20,12 +20,12 @@ use std::rc::Rc;
 use sulis_core::ui::{Callback, Widget};
 use sulis_module::{
     on_trigger::{self, Kind, ModuleLoadData, QuestStateData},
-    Actor, MerchantData, Module, OnTrigger,
+    Actor, MerchantData, Module, OnTrigger, ItemState
 };
 use sulis_state::{
     area_feedback_text::ColorKind,
     script::{entity_with_id, CallbackData, FuncKind, ScriptEntity},
-    EntityState, GameState, ItemState, NextGameStep, Script,
+    EntityState, GameState, NextGameStep, Script,
 };
 
 use crate::{

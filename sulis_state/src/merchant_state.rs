@@ -18,9 +18,9 @@ use std::io::Error;
 use std::rc::Rc;
 
 use sulis_core::util::invalid_data_error;
-use sulis_module::{LootList, Module, Time};
+use sulis_module::{LootList, Module, Time, ItemState};
 
-use crate::{save_state::MerchantSaveState, ChangeListenerList, GameState, ItemList, ItemState};
+use crate::{save_state::MerchantSaveState, ChangeListenerList, GameState, ItemList};
 
 pub struct MerchantState {
     pub id: String,
@@ -39,12 +39,13 @@ impl MerchantState {
         let mut items = ItemList::new();
         for item_save in save.items {
             let item = item_save.item;
+            let variant = item.variant;
             let item = match Module::create_get_item(&item.id, &item.adjectives) {
                 None => invalid_data_error(&format!("No item with ID '{}'", item.id)),
                 Some(item) => Ok(item),
             }?;
 
-            items.add_quantity(item_save.quantity, ItemState::new(item));
+            items.add_quantity(item_save.quantity, ItemState::new(item, variant));
         }
 
         Ok(MerchantState {
@@ -73,8 +74,7 @@ impl MerchantState {
         let mut items = ItemList::new();
 
         for (qty, item) in loot_list.generate() {
-            let item_state = ItemState::new(item);
-            items.add_quantity(qty, item_state);
+            items.add_quantity(qty, item);
         }
 
         MerchantState {
@@ -125,7 +125,7 @@ impl MerchantState {
 
         self.items.clear();
         for (qty, item) in loot_list.generate() {
-            self.items.add_quantity(qty, ItemState::new(item));
+            self.items.add_quantity(qty, item);
         }
     }
 

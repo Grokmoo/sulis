@@ -235,3 +235,7 @@ groups:
       
       chest01: [8, 8]
       bag01: [9, 8]
+      shield_small03: [10, 8]
+      shield_large02: [11, 8]
+      shield_kite03: [12, 8]
+      shield_heater02: [13, 8]

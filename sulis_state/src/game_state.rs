@@ -26,14 +26,14 @@ use sulis_core::util::{self, invalid_data_error, ExtInt, Point};
 use sulis_module::on_trigger::QuestEntryState;
 use sulis_module::{
     area::{PathFinder, ToKind, Trigger, TriggerKind},
-    Actor, Module, ObjectSize, OnTrigger, Time, MOVE_TO_THRESHOLD,
+    Actor, Module, ObjectSize, OnTrigger, Time, MOVE_TO_THRESHOLD, ItemState
 };
 
 use crate::animation::{self, particle_generator::Param, Anim, AnimSaveState, AnimState};
 use crate::script::{script_cache, script_callback, Script, ScriptCallback, ScriptEntity};
 use crate::{
     path_finder::find_path, AreaState, ChangeListener, ChangeListenerList, Effect, EntityState,
-    Formation, ItemList, ItemState, Location, PartyStash, QuestStateSet, SaveState, TurnManager,
+    Formation, ItemList, Location, PartyStash, QuestStateSet, SaveState, TurnManager,
     UICallback, WorldMapState, AI,
 };
 
@@ -228,7 +228,9 @@ impl GameState {
                     Some(item) => Ok(item),
                 }?;
 
-                stash.add_quantity(item_save.quantity, ItemState::new(item));
+                let item = ItemState::new(item, item_save.item.variant);
+
+                stash.add_quantity(item_save.quantity, item);
             }
 
             let quests = QuestStateSet::load(save_state.quests);
@@ -324,8 +326,7 @@ impl GameState {
         let party_coins = pc.inventory.pc_starting_coins();
         let mut party_stash = ItemList::new();
         for (qty, item) in pc.inventory.pc_starting_item_iter() {
-            let item_state = ItemState::new(item);
-            party_stash.add_quantity(qty, item_state);
+            party_stash.add_quantity(qty, item);
         }
 
         let campaign = Module::campaign();

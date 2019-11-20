@@ -113,7 +113,7 @@ fn create_button(
         Some(item_state) => {
             let quantity = 1 + stash.borrow().items().get_quantity(&item_state);
             let kind = ScriptItemKind::Quick(slot);
-            let button = ItemButton::quick(entity, quantity, &item_state.item, slot);
+            let button = ItemButton::quick(entity, quantity, &item_state, slot);
             button
                 .borrow_mut()
                 .add_action("Use", use_item_cb(entity, kind), true);

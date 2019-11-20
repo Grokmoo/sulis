@@ -26,7 +26,7 @@ use sulis_core::ui::{Callback, Color, Widget, WidgetKind};
 use sulis_core::util::Point;
 use sulis_core::widgets::{Button, InputField, Label, ScrollPane};
 use sulis_module::actor::Sex;
-use sulis_module::{ImageLayer, ImageLayerSet, Item, Race, Slot};
+use sulis_module::{ImageLayer, ImageLayerSet, ItemState, Race, Slot};
 
 use crate::character_builder::{BuilderPane, ColorButton};
 use crate::CharacterBuilder;
@@ -37,7 +37,7 @@ pub struct CosmeticSelectorPane {
     preview: Rc<RefCell<Widget>>,
 
     race: Option<Rc<Race>>,
-    items: Vec<(Slot, Rc<Item>)>,
+    items: Vec<(Slot, ItemState)>,
     sex: Sex,
     name: String,
     hair_index: Option<usize>,
@@ -90,7 +90,7 @@ impl CosmeticSelectorPane {
                 continue;
             }
 
-            let iter = match &item.equippable {
+            let iter = match &item.item.equippable {
                 Some(equip) => {
                     if equip.slot == *slot {
                         item.image_iter()
@@ -103,11 +103,9 @@ impl CosmeticSelectorPane {
                 None => unreachable!(),
             };
 
-            if let Some(iter) = iter {
-                iter.for_each(|(layer, image)| {
-                    insert.insert(*layer, Rc::clone(image));
-                });
-            }
+            iter.for_each(|(layer, image)| {
+                insert.insert(*layer, Rc::clone(image));
+            });
         }
 
         let images_list =

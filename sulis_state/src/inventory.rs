@@ -19,12 +19,11 @@ use std::io::Error;
 use std::rc::Rc;
 use std::slice::Iter;
 
-use crate::ItemState;
 use sulis_core::image::Image;
 use sulis_core::util::invalid_data_error;
 use sulis_module::{
     bonus::AttackKindBuilder, Actor, ImageLayer, ItemKind, ItemSaveState, Module, QuickSlot, Slot,
-    StatList, WeaponStyle,
+    StatList, WeaponStyle, ItemState
 };
 
 #[derive(Clone)]
@@ -57,9 +56,10 @@ impl Inventory {
                 Some(item) => item,
             };
 
+            let variant = item.variant;
             let item_state = match Module::create_get_item(&item.id, &item.adjectives) {
                 None => invalid_data_error(&format!("No item with ID '{}'", item.id)),
-                Some(item) => Ok(ItemState::new(item)),
+                Some(item) => Ok(ItemState::new(item, variant)),
             }?;
 
             {
@@ -99,9 +99,10 @@ impl Inventory {
                 Some(item) => item,
             };
 
+            let variant = item.variant;
             let item_state = match Module::create_get_item(&item.id, &item.adjectives) {
                 None => invalid_data_error(&format!("No item with ID '{}'", item.id)),
-                Some(item) => Ok(ItemState::new(item)),
+                Some(item) => Ok(ItemState::new(item, variant)),
             }?;
 
             self.quick.insert(quick_slot, item_state);
@@ -421,16 +422,10 @@ impl Inventory {
 
             let iter = if equippable.slot == *slot {
                 // the item is in it's primary slot
-                match item_state.item.image_iter() {
-                    None => continue,
-                    Some(iter) => iter,
-                }
+                item_state.image_iter()
             } else {
                 // the item must be in it's secondary slot
-                match item_state.item.alt_image_iter() {
-                    None => continue,
-                    Some(iter) => iter,
-                }
+                item_state.alt_image_iter()
             };
 
             for (layer, ref image) in iter {

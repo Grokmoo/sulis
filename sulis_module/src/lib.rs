@@ -78,6 +78,9 @@ pub use self::item::Equippable;
 pub use self::item::Item;
 pub use self::item::Usable;
 
+pub mod item_state;
+pub use self::item_state::ItemState;
+
 pub mod item_adjective;
 pub use self::item_adjective::{ItemAdjective, ItemAdjectiveBuilder};
 

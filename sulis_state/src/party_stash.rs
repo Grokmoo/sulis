@@ -14,8 +14,8 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use crate::{ChangeListenerList, GameState, ItemList, ItemState};
-use sulis_module::{ItemListEntrySaveState, Module};
+use crate::{ChangeListenerList, GameState, ItemList};
+use sulis_module::{ItemListEntrySaveState, Module, ItemState};
 
 pub struct PartyStash {
     items: ItemList,
@@ -36,7 +36,7 @@ impl PartyStash {
     pub(crate) fn save(&self) -> Vec<ItemListEntrySaveState> {
         self.items
             .iter()
-            .map(|(q, ref i)| ItemListEntrySaveState::new(*q, &i.item))
+            .map(|(q, ref i)| ItemListEntrySaveState::new(*q, &i))
             .collect()
     }
 

@@ -229,8 +229,8 @@ groups:
       crossbow: [48, 15]
       shortbow: [51, 15]
       longbow: [54, 15]
-      shield_heater: [57, 15]
-      shield_large: [60, 15]
+      shield_small: [57, 15]
+      shield_small02: [60, 15]
       
       dagger_off: [0, 18]
       shortsword_off: [3, 18]
@@ -250,8 +250,9 @@ groups:
       quarterstaff_off: [45, 18]
       projectile_bow: [48, 18]
       projectile_crossbow: [51, 18]
-      shield_small: [54, 18]
-      shield_kite: [57, 18]
+      shield_heater: [54, 18]
+      shield_heater02: [57, 18]
+      shield_kite: [60, 18]
       
       torso_robe: [0, 21]
       torso_robe_dwarf: [3, 21]
@@ -274,6 +275,9 @@ groups:
       pc_dead_small: [45, 21]
       pc_dead_large: [48, 21]
       wings_of_xel: [51, 21]
+      shield_kite02: [54, 21]
+      shield_large: [57, 21]
+      shield_large02: [60, 21]
       
       helm_plate02: [30, 24]
       helm_plate03: [33, 24]
@@ -348,6 +352,10 @@ groups:
       dwarf06: [18, 3]
       dwarf07: [21, 3]
       human31: [0, 6]
+      human32: [3, 6]
+      human33: [6, 6]
+      human34: [9, 6]
+      human35: [12, 6]
       
   dragons:
     position: [0, 52]

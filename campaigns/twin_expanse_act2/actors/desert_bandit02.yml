@@ -1,6 +1,6 @@
 ---
-id: desert_bandit01
-name: Bandit Warrior
+id: desert_bandit02
+name: Bandit Defender
 race: human_simple
 sex: Male
 attributes:
@@ -13,29 +13,29 @@ attributes:
 conversation: ~
 faction: Hostile
 images:
-  Background: creatures/human30
+  Background: creatures/human31
   Shadow: empty
   Foreground: empty
-hue: 0.5
+hue: 0.7
 inventory:
   equipped:
     Torso:
       id: torso_mail
       adjectives: [ fine ]
     HeldMain:
-      id: longsword
+      id: battleaxe
       adjectives: [ fine ]
     HeldOff:
-      id: shortsword
+      id: shield_kite
       adjectives: [ fine ]
     Legs:
-      id: legs_leather
+      id: legs_mail
       adjectives: [ fine ]
     Feet:
-      id: boots_leather
+      id: boots_mail
       adjectives: [ fine ]
     Hands:
-      id: gloves_leather
+      id: gloves_mail
       adjectives: [ fine ]
   quick: {}
 levels:
@@ -51,7 +51,8 @@ abilities:
   - weapon_spear
   - weapon_mace
   - weapon_simple
-  - powerful_blows
-  - stunning_blow
-  - charge_attack
+  - defensive_fighting
+  - shield_slam
+  - helping_hand
+  - inspire
 ai: ai_basic

@@ -1,0 +1,20 @@
+id: desert_scorpion_med
+ai: ai_basic
+name: Scorpion
+faction: Hostile
+images: {}
+race: scorpion_medium
+attributes:
+  str: 10
+  dex: 10
+  end: 10
+  per: 10
+  int: 10
+  wis: 10
+levels:
+  fighter: 6
+reward:
+  xp: 40
+  loot: level1_misc
+  loot_chance: 35
+abilities: []

@@ -1,0 +1,28 @@
+---
+id: lvl10_herbalist
+name: Herbalist
+race: human
+sex: Male
+attributes:
+  str: 10
+  dex: 10
+  end: 10
+  per: 10
+  int: 10
+  wis: 10
+conversation: lvl10_herbalist
+faction: Neutral
+images:
+  Foreground: empty
+  Shadow: empty
+  Background: creatures/human22
+hue: 0.9000000953674316
+inventory:
+  equipped: {}
+  quick: {}
+  pc_starting_coins: 0
+  pc_starting_items: []
+levels:
+  fighter: 1
+abilities: []
+ai: ~

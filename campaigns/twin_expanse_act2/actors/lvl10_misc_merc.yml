@@ -1,0 +1,28 @@
+---
+id: lvl10_misc_merc
+name: Merchant
+race: human
+sex: Male
+attributes:
+  str: 10
+  dex: 10
+  end: 10
+  per: 10
+  int: 10
+  wis: 10
+conversation: lvl10_misc_merc
+faction: Neutral
+images:
+  Background: creatures/human12
+  Foreground: empty
+  Shadow: empty
+hue: 0.8999999761581421
+inventory:
+  equipped: {}
+  quick: {}
+  pc_starting_coins: 0
+  pc_starting_items: []
+levels:
+  fighter: 1
+abilities: []
+ai: ~

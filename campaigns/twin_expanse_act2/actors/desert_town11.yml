@@ -1,0 +1,28 @@
+---
+id: desert_town11
+name: Townsperson
+race: human
+sex: Male
+attributes:
+  str: 10
+  dex: 10
+  end: 10
+  per: 10
+  int: 10
+  wis: 10
+conversation: ~
+faction: Neutral
+images:
+  Shadow: empty
+  Background: creatures/human40
+  Foreground: empty
+hue: 1.4901161193847657e-8
+inventory:
+  equipped: {}
+  quick: {}
+  pc_starting_coins: 0
+  pc_starting_items: []
+levels:
+  fighter: 1
+abilities: []
+ai: ~

@@ -1,0 +1,18 @@
+id: lvl10_misc_merc
+initial_nodes:
+  - id: start01
+nodes:
+  start01:
+    text: |
+      [c=6868FF|#target_name#] - I sell a fine assortment of goods from all corners.  What would you like?
+    responses:
+      - text: "Yes, I'll have a look."
+        on_select:
+          - show_merchant:
+              id: lvl10_misc_merc
+              loot_list: level10_misc_merchant
+              buy_frac: 1.0
+              sell_frac: 0.25
+              refresh_time:
+                hour: 24
+      - text: "Nothing for now."

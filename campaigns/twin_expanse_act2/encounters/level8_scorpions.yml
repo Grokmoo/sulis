@@ -1,0 +1,9 @@
+id: level8_scorpions
+auto_spawn: true
+min_gen_actors: 5
+max_gen_actors: 6
+entries:
+  - id: desert_scorpion_large
+    weight: 1
+  - id: desert_scorpion_med
+    weight: 4

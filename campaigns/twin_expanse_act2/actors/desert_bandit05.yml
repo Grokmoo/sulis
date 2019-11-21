@@ -1,32 +1,32 @@
 ---
-id: desert_bandit01
-name: Bandit Warrior
-race: human_simple
+id: desert_bandit05
+name: Bandit Warlock
+race: human
 sex: Male
 attributes:
-  str: 16
+  str: 10
   dex: 13
-  end: 16
-  per: 10
-  int: 10
-  wis: 10
+  end: 12
+  per: 16
+  int: 12
+  wis: 12
 conversation: ~
 faction: Hostile
 images:
-  Background: creatures/human30
+  Background: creatures/human32
   Shadow: empty
   Foreground: empty
-hue: 0.5
+hue: 0.7
 inventory:
   equipped:
     Torso:
-      id: torso_mail
+      id: torso_leather
       adjectives: [ fine ]
     HeldMain:
-      id: longsword
+      id: shortspear
       adjectives: [ fine ]
     HeldOff:
-      id: shortsword
+      id: shield_small
       adjectives: [ fine ]
     Legs:
       id: legs_leather
@@ -39,19 +39,17 @@ inventory:
       adjectives: [ fine ]
   quick: {}
 levels:
-  fighter: 8
+  warlock: 8
 abilities:
   - armor_light
-  - armor_medium
   - weapon_axe
   - weapon_crossbow
   - weapon_bow
-  - weapon_small_sword
-  - weapon_large_sword
   - weapon_spear
   - weapon_mace
   - weapon_simple
-  - powerful_blows
-  - stunning_blow
-  - charge_attack
+  - secret_strike
+  - vampiric_touch
+  - assay
+  - hex
 ai: ai_basic

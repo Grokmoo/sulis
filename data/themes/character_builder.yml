@@ -72,6 +72,9 @@ themes:
         children:
           title:
             text: "Confirm your choices"
+          help_label:
+            text: ""
+            background: empty
           details:
             from: text_area
             background: bg_base

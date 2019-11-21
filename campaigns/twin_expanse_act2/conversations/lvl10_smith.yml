@@ -1,0 +1,18 @@
+id: lvl10_smith
+initial_nodes:
+  - id: start01
+nodes:
+  start01:
+    text: |
+      [c=6868FF|#target_name#] - Fine weapons and armor, sold here!
+    responses:
+      - text: "Lets see what you have."
+        on_select:
+          - show_merchant:
+              id: lvl10_smith
+              loot_list: level10_smith
+              buy_frac: 1.0
+              sell_frac: 0.25
+              refresh_time:
+                hour: 24
+      - text: "Not right now."

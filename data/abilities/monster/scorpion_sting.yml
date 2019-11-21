@@ -1,0 +1,19 @@
+id: scorpion_sting
+name: "Sting"
+icon: empty
+description: |
+  Make a standard attack against a single target.  On a hit, poisons the target, dealing Raw damage over time.
+active:
+  script: "scorpion_sting"
+  group: "Special"
+  ap: 2000
+  duration:
+    Rounds: 2
+  cooldown: 4
+  ai:
+    priority: 30
+    kind: Damage
+    group: Single
+    range: Reach
+  short_description: |
+    Deal raw damage over time to a target

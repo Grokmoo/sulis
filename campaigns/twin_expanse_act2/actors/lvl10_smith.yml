@@ -1,0 +1,28 @@
+---
+id: lvl10_smith
+name: Smith
+race: human
+sex: Male
+attributes:
+  str: 10
+  dex: 10
+  end: 10
+  per: 10
+  int: 10
+  wis: 10
+conversation: lvl10_smith
+faction: Neutral
+images:
+  Shadow: empty
+  Background: creatures/human33
+  Foreground: empty
+hue: 0.6999999284744263
+inventory:
+  equipped: {}
+  quick: {}
+  pc_starting_coins: 0
+  pc_starting_items: []
+levels:
+  fighter: 1
+abilities: []
+ai: ~

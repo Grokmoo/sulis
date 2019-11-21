@@ -1,0 +1,18 @@
+id: lvl10_herbalist
+initial_nodes:
+  - id: start01
+nodes:
+  start01:
+    text: |
+      [c=6868FF|#target_name#] - I have a variety of herbs and remedies, if you are interested.
+    responses:
+      - text: "Yes, show me."
+        on_select:
+          - show_merchant:
+              id: lvl10_herbalist
+              loot_list: level10_herbalist
+              buy_frac: 1.0
+              sell_frac: 0.25
+              refresh_time:
+                hour: 24
+      - text: "Nothing for now."

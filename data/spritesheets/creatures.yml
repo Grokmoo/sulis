@@ -356,6 +356,11 @@ groups:
       human33: [6, 6]
       human34: [9, 6]
       human35: [12, 6]
+      human36: [0, 9]
+      human37: [3, 9]
+      human38: [6, 9]
+      human39: [9, 9]
+      human40: [12, 9]
       
   dragons:
     position: [0, 52]

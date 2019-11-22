@@ -311,6 +311,7 @@ impl PStats {
                 .insert(class_stat.id.to_string(), amount);
         }
 
+        self.overflow_ap = 0;
         self.init_turn(stats);
     }
 

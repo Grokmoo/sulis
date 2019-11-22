@@ -1,0 +1,9 @@
+id: flag_top
+name: Flag
+icon: inventory/misc_crate
+image: flag_top
+size: 2by2
+visible: true
+interactive:
+  Not
+aerial: true

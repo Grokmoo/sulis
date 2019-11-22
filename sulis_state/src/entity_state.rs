@@ -662,6 +662,8 @@ pub trait AreaDrawable {
     );
 
     fn location(&self) -> &Location;
+
+    fn aerial(&self) -> bool;
 }
 
 impl AreaDrawable for EntityState {
@@ -729,4 +731,6 @@ impl AreaDrawable for EntityState {
     fn location(&self) -> &Location {
         &self.location
     }
+
+    fn aerial(&self) -> bool { false }
 }

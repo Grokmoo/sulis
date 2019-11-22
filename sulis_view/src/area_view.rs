@@ -381,7 +381,13 @@ impl AreaView {
             to_draw.push(entity);
         }
 
-        to_draw.sort_by_key(|k| k.location());
+        to_draw.sort_by(|a, b| {
+            if a.aerial() && ! b.aerial() { std::cmp::Ordering::Greater }
+            else if !a.aerial() && b.aerial() { std::cmp::Ordering::Less }
+            else {
+                a.location().cmp(b.location())
+            }
+        });
 
         for drawable in to_draw {
             let (x, y) = widget.state.inner_position().as_tuple();

@@ -1001,3 +1001,81 @@ features:
     size:
       width: 3
       height: 3
+  booth_nw:
+    entries:
+      - tiles:
+          booth_top_nw: [[0, 0]]
+          booth_bot_sw: [[0, 4]]
+    size:
+      width: 2
+      height: 8
+  booth_w:
+    entries:
+      - tiles:
+          booth_top_w: [[0, 0]]
+          booth_bot_w: [[0, 4]]
+    size:
+      width: 2
+      height: 8
+  booth_c:
+    entries:
+      - tiles:
+          booth_top_c: [[0, 0]]
+          booth_bot_c: [[0, 4]]
+    size:
+      width: 2
+      height: 8
+  booth_e:
+    entries:
+      - tiles:
+          booth_top_e: [[0, 0]]
+          booth_bot_e: [[0, 4]]
+    size:
+      width: 2
+      height: 8
+  booth_ne:
+    entries:
+      - tiles:
+          booth_top_ne: [[0, 0]]
+          booth_bot_se: [[0, 4]]
+    size:
+      width: 2
+      height: 8
+  tower_round1:
+    entries:
+      - tiles:
+          tower_round_top1: [[0, 0]]
+          tower_round_bot: [[0, 8]]
+    size:
+      width: 6
+      height: 16
+  tower_round2:
+    entries:
+      - tiles:
+          tower_round_top2: [[0, 0]]
+          tower_round_bot: [[0, 10]]
+    size:
+      width: 6
+      height: 18
+  stairs_straight_down:
+    entries:
+      - tiles:
+          stairs_straight_down: [[0, 0]]
+    size:
+      width: 4
+      height: 4
+  stairs_straight_up:
+    entries:
+      - tiles:
+          stairs_straight_up: [[0, 0]]
+    size:
+      width: 4
+      height: 6
+  shack:
+    entries:
+      - tiles:
+          shack_top: [[0, 0]]
+          shack_bot: [[0, 2]]
+    size:
+      width: 10
+      height: 10

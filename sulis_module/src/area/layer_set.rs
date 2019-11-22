@@ -29,7 +29,7 @@ pub struct LayerSet {
     pub layers: Vec<Layer>,
     pub entity_layer_index: usize,
     elevation: Vec<u8>,
-    passable: Vec<bool>,
+    pub passable: Vec<bool>,
     visible: Vec<bool>,
 }
 

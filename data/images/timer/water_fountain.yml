@@ -1,0 +1,6 @@
+id: water_fountain
+frame_time_millis: 150
+frames:
+  - "tileset/water_fountain_01"
+  - "tileset/water_fountain_02"
+  - "tileset/water_fountain_03"

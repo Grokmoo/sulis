@@ -50,6 +50,7 @@ pub struct Prop {
     pub impass: Vec<Point>,
     pub invis: Vec<Point>,
     pub interactive: Interactive,
+    pub aerial: bool,
     pub status_text: Option<String>,
 }
 
@@ -157,6 +158,7 @@ impl Prop {
             impass,
             invis,
             interactive,
+            aerial: builder.aerial,
             status_text: builder.status_text,
         })
     }
@@ -204,6 +206,8 @@ pub struct PropBuilder {
     pub impass: Option<Vec<Vec<usize>>>,
     pub invis: Option<Vec<Vec<usize>>>,
     pub visible: Option<bool>,
+    #[serde(default)]
+    pub aerial: bool,
     pub interactive: InteractiveBuilder,
     pub status_text: Option<String>,
 }

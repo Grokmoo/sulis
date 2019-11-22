@@ -1,0 +1,8 @@
+id: water_anim1
+name: water_anim1
+icon: inventory/misc_crate
+image: water_anim1
+size: 2by2
+visible: true
+interactive:
+  Not

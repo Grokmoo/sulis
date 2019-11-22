@@ -427,4 +427,8 @@ impl AreaDrawable for PropState {
     fn location(&self) -> &Location {
         &self.location
     }
+
+    fn aerial(&self) -> bool {
+        self.prop.aerial
+    }
 }

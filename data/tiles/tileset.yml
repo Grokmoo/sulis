@@ -642,7 +642,7 @@ uniform_sets:
       adobe_door_shade, adobe_window_shade_top_w, adobe_window_shade_mid_w, adobe_window_shade_bot_w,
       adobe_window_shade_top_e, adobe_window_shade_mid_e, adobe_window_shade_bot_e,
       adobe_wall_beam_single_w, adobe_wall_beam_double_w, adobe_wall_beam_single_e,
-      adobe_wall_beam_double_e,  adobe_wall_beam_s
+      adobe_wall_beam_double_e,  adobe_wall_beam_s, flag_pole_ext
     ]
   object_1by2_bin:
     layer: object
@@ -651,7 +651,8 @@ uniform_sets:
     impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
     invis: []
     tiles: [
-      veg01_bin, veg02_bin, veg03_bin, veg04_bin, veg05_bin, veg06_bin, bin01
+      veg01_bin, veg02_bin, veg03_bin, veg04_bin, veg05_bin, veg06_bin, bin01,
+      crate_small, barrel,
     ]
   object_2by1_impass:
     layer: object
@@ -2407,3 +2408,121 @@ tiles:
     layer: terrain_border
     size: [2, 2]
     sprite: tileset/roof_adobe_base
+  booth_top_nw:
+    layer: aerial
+    size: [2, 6]
+    impass: [[0, 2], [0, 3]]
+    sprite: tileset/booth_top_nw
+  booth_top_w:
+    layer: aerial
+    size: [2, 6]
+    impass: [[0, 3]]
+    sprite: tileset/booth_top_w
+  booth_top_c:
+    layer: aerial
+    size: [2, 6]
+    impass: []
+    sprite: tileset/booth_top_c
+  booth_top_e:
+    layer: aerial
+    size: [2, 6]
+    impass: [[1, 3]]
+    sprite: tileset/booth_top_e
+  booth_top_ne:
+    layer: aerial
+    size: [2, 6]
+    impass: [[1, 2], [1, 3]]
+    sprite: tileset/booth_top_ne
+  booth_bot_sw:
+    layer: object
+    size: [2, 4]
+    impass: [[0, 0], [0, 1], [1, 1]]
+    sprite: tileset/booth_bot_sw
+  booth_bot_w:
+    layer: object
+    size: [2, 4]
+    impass: [[0, 1], [1, 1]]
+    sprite: tileset/booth_bot_w
+  booth_bot_c:
+    layer: object
+    size: [2, 4]
+    impass: [[0, 1], [1, 1]]
+    sprite: tileset/booth_bot_c
+  booth_bot_e:
+    layer: object
+    size: [2, 4]
+    impass: [[0, 1], [1, 1]]
+    sprite: tileset/booth_bot_e
+  booth_bot_se:
+    layer: object
+    size: [2, 4]
+    impass: [[1, 0], [0, 1], [1, 1]]
+    sprite: tileset/booth_bot_se
+  tileset/crate_big:
+    layer: object
+    size: [4, 4]
+    pass: []
+    sprite: tileset/crate_big
+  tileset/crate_stacked:
+    layer: object
+    size: [2, 6]
+    pass: [[0, 4], [1, 4], [0, 5], [1, 5]]
+    sprite: tileset/crate_stacked
+  tower_round_top1:
+    layer: aerial
+    size: [6, 8]
+    impass: []
+    sprite: tileset/tower_round_top1
+  tower_round_top2:
+    layer: aerial
+    size: [6, 10]
+    impass: []
+    sprite: tileset/tower_round_top2
+  tower_round_bot:
+    layer: walls
+    size: [6, 8]
+    pass: [
+      [0, 4], [0, 5], [0, 6], [0, 7],
+      [1, 5], [1, 6], [1, 7],
+      [2, 5], [2, 6], [2, 7],
+      [3, 5], [3, 6], [3, 7],
+      [4, 5], [4, 6], [4, 7],
+      [5, 4], [5, 5], [5, 6], [5, 7]
+    ]
+    invis: [
+      [0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0],
+      [0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1]
+    ]
+    sprite: tileset/tower_round_bot
+  stairs_straight_down:
+    layer: object
+    size: [4, 4]
+    sprite: tileset/stairs_straight_down
+    pass: [[0, 0], [1, 0], [2, 0], [3, 0], [3, 1], [3, 2], [3, 3]]
+  stairs_straight_up:
+    layer: object
+    size: [4, 6]
+    sprite: tileset/stairs_straight_up
+    pass: [[3, 0], [3, 1], [3, 2], [3, 3], [3, 4], [3, 5], [0, 5], [1, 5], [2, 5]]
+  shack_top:
+    layer: aerial
+    size: [10, 4]
+    sprite: tileset/shack_top
+  shack_bot:
+    layer: walls
+    size: [10, 8]
+    sprite: tileset/shack_bot
+    pass: [
+      [0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0], [8, 0], [9, 0],
+      [0, 7], [1, 7], [2, 7], [3, 7], [4, 7], [5, 7], [6, 7], [7, 7], [8, 7], [9, 7],
+      [9, 1], [9, 2], [9, 3], [9, 4], [9, 5], [9, 6]
+    ]
+    invis: [
+      [1, 1], [1, 2], [2, 1], [2, 2], [3, 1], [3, 2], [4, 1], [4, 2], [5, 1], [5, 2],
+      [6, 1], [6, 2], [7, 1], [7, 2], [0, 2], [8, 2]
+    ]
+  flag_pole_bot:
+    layer: object
+    size: [2, 2]
+    sprite: tileset/flag_pole_bot
+    impass: [[0, 0]]

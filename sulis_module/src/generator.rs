@@ -50,7 +50,8 @@ use std::collections::HashMap;
 use std::io::{Error, ErrorKind};
 use std::rc::Rc;
 
-use crate::area::{EncounterDataBuilder, Layer, LocationChecker, PathFinderGrid, PropDataBuilder};
+use crate::area::{EncounterDataBuilder, Layer, LocationChecker,
+    PathFinderGrid, PropDataBuilder};
 use crate::{ObjectSize, WallKind};
 use sulis_core::util::{Point, ReproducibleRandom};
 
@@ -64,7 +65,37 @@ impl LayerListLocationChecker {
         layers: &[Layer],
         size: Rc<ObjectSize>,
     ) -> LayerListLocationChecker {
-        let grid = PathFinderGrid::new(size, width, height, layers);
+
+        // set up passability matrix based on the layers
+        let mut pass = vec![false; (width * height) as usize];
+        for y in 0..height {
+            for x in 0..width {
+                pass[(x + y * width) as usize] = layers.iter().all(|l| l.is_passable(x, y));
+            }
+        }
+
+        for ref layer in layers.iter() {
+            for &(point, ref tile) in layer.impass_override_tiles.iter() {
+                let start_x = point.x;
+                let start_y = point.y;
+                let end_x = start_x + tile.width;
+                let end_y = start_y + tile.height;
+
+                for y in start_y..end_y {
+                    for x in start_x..end_x {
+                        pass[(x + y * width) as usize] = true;
+                    }
+                }
+
+                for p in tile.impass.iter() {
+                    let x = p.x + start_x;
+                    let y = p.y + start_y;
+                    pass[(x + y * width) as usize] = false;
+                }
+            }
+        }
+
+        let grid = PathFinderGrid::new(size, width, height, &pass);
         LayerListLocationChecker { grid }
     }
 }

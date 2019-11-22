@@ -106,7 +106,7 @@ impl GeneratedArea {
                 Rc::clone(&size),
                 layer_set.width,
                 layer_set.height,
-                &layer_set.layers,
+                &layer_set.passable,
             );
             path_grids.insert(size.id.to_string(), path_grid);
         }

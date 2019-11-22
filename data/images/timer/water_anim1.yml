@@ -1,0 +1,11 @@
+id: water_anim1
+frame_time_millis: 150
+frames:
+  - "tileset/water_anim1_01"
+  - "tileset/water_anim1_02"
+  - "tileset/water_anim1_03"
+  - "tileset/water_anim1_04"
+  - "tileset/water_anim1_05"
+  - "tileset/water_anim1_06"
+  - "tileset/water_anim1_07"
+  - "tileset/water_anim1_08"

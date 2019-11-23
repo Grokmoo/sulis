@@ -1,0 +1,9 @@
+id: candle02
+name: Candle
+icon: inventory/misc_crate
+image: candle02
+size: 1by2
+visible: true
+interactive:
+  Not
+impass: [[0, 1]]

@@ -1079,3 +1079,68 @@ features:
     size:
       width: 10
       height: 10
+  grave_small:
+    entries:
+      - tiles:
+          tileset/grave_small01: [[0, 0]]
+      - tiles:
+          tileset/grave_small02: [[0, 0]]
+      - tiles:
+          tileset/grave_small03: [[0, 0]]
+    size:
+      width: 2
+      height: 2
+  grave_tall:
+    entries:
+      - tiles:
+          tileset/grave_tall_top: [[0, 0]]
+          tileset/grave_tall_bot: [[0, 2]]
+    size:
+      width: 2
+      height: 4
+  grave_med:
+    entries:
+      - tiles:
+          grave_med_top: [[0, 0]]
+          grave_med_bot: [[0, 2]]
+    size:
+      width: 4
+      height: 4
+  grave_large:
+    entries:
+      - tiles:
+          grave_large_top: [[0, 0]]
+          grave_large_bot: [[0, 2]]
+    size:
+      width: 4
+      height: 6
+  grave_huge:
+    entries:
+      - tiles:
+          grave_huge_top: [[0, 0]]
+          grave_huge_bot: [[0, 2]]
+    size:
+      width: 6
+      height: 6
+  pillar_small:
+    entries:
+      - tiles:
+          tileset/pillar_small_top01: [[0, 0]]
+          pillar_small_bot: [[0, 2]]
+      - tiles:
+          tileset/pillar_small_top02: [[0, 0]]
+          pillar_small_bot: [[0, 2]]
+      - tiles:
+          tileset/pillar_small_top03: [[0, 0]]
+          pillar_small_bot: [[0, 2]]
+    size:
+      width: 2
+      height: 4
+  pillar_large:
+    entries:
+      - tiles:
+          pillar_large_top: [[0, 0]]
+          pillar_large_bot: [[0, 4]]
+    size:
+      width: 4
+      height: 8

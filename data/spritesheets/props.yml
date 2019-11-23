@@ -148,3 +148,73 @@ groups:
       lantern0: [0, 0]
       lantern1: [1, 0]
       lantern2: [2, 0]
+  water_anim1:
+    size: [2, 2]
+    position: [47, 0]
+    areas:
+      water_anim1_01: [ 0, 0]
+      water_anim1_02: [ 2, 0]
+      water_anim1_03: [ 4, 0]
+      water_anim1_04: [ 6, 0]
+      water_anim1_05: [ 8, 0]
+      water_anim1_06: [10, 0]
+      water_anim1_07: [12, 0]
+      water_anim1_08: [14, 0]
+  water_anim2:
+    size: [2, 2]
+    position: [47, 2]
+    areas:
+      water_anim2_01: [ 0, 0]
+      water_anim2_02: [ 2, 0]
+      water_anim2_03: [ 4, 0]
+      water_anim2_04: [ 6, 0]
+      water_anim2_05: [ 8, 0]
+      water_anim2_06: [10, 0]
+  water_anim3:
+    size: [4, 4]
+    position: [47, 4]
+    areas:
+      water_anim3_01: [0, 0]
+      water_anim3_02: [4, 0]
+      water_anim3_03: [8, 0]
+      water_anim3_04: [0, 4]
+      water_anim3_05: [4, 4]
+      water_anim3_06: [8, 4]
+  flag_top:
+    size: [2, 2]
+    position: [47, 12]
+    areas:
+      flag_top_01: [ 0, 0]
+      flag_top_02: [ 2, 0]
+      flag_top_03: [ 4, 0]
+      flag_top_04: [ 6, 0]
+      flag_top_05: [ 8, 0]
+  water_fountain:
+    size: [6, 6]
+    position: [46, 15]
+    areas:
+      water_fountain_01: [ 0, 0]
+      water_fountain_02: [ 6, 0]
+      water_fountain_03: [12, 0]
+  dark:
+    position: [19, 2]
+    areas:
+      candelabra01: [0, 0, 2, 4]
+      candelabra02: [2, 0, 2, 4]
+      candle01: [4, 0, 1, 2]
+      candle02: [4, 2, 1, 2]
+  torch_and_candles:
+    position: [36, 21]
+    areas:
+      candle02-01: [0, 0, 1, 2]
+      candle02-02: [2, 0, 1, 2]
+      candle02-03: [4, 0, 1, 2]
+      wall_candles01: [6, 0, 2, 2]
+      wall_candles02: [8, 0, 2, 2]
+      wall_candles03: [10, 0, 2, 2]
+      torch_off: [0, 2, 2, 2]
+      torch01: [2, 2, 2, 2]
+      torch02: [4, 2, 2, 2]
+      torch03: [6, 2, 2, 2]
+      torch04: [8, 2, 2, 2]
+     

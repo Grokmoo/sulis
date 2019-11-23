@@ -1,9 +1,9 @@
 id: water_anim2
 frame_time_millis: 150
 frames:
-  - "tileset/water_anim2_01"
-  - "tileset/water_anim2_02"
-  - "tileset/water_anim2_03"
-  - "tileset/water_anim2_04"
-  - "tileset/water_anim2_05"
-  - "tileset/water_anim2_06"
+  - "props/water_anim2_01"
+  - "props/water_anim2_02"
+  - "props/water_anim2_03"
+  - "props/water_anim2_04"
+  - "props/water_anim2_05"
+  - "props/water_anim2_06"

@@ -1,0 +1,7 @@
+id: torch
+frame_time_millis: 150
+frames:
+  - "props/torch01"
+  - "props/torch02"
+  - "props/torch03"
+  - "props/torch04"

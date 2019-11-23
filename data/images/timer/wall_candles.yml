@@ -1,0 +1,6 @@
+id: wall_candles
+frame_time_millis: 150
+frames:
+  - "props/wall_candles01"
+  - "props/wall_candles02"
+  - "props/wall_candles03"

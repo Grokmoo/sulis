@@ -1,8 +1,8 @@
 id: flag_top
 frame_time_millis: 150
 frames:
-  - "tileset/flag_top_01"
-  - "tileset/flag_top_02"
-  - "tileset/flag_top_03"
-  - "tileset/flag_top_04"
-  - "tileset/flag_top_05"
+  - "props/flag_top_01"
+  - "props/flag_top_02"
+  - "props/flag_top_03"
+  - "props/flag_top_04"
+  - "props/flag_top_05"

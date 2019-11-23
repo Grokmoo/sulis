@@ -132,6 +132,11 @@ impl Spritesheet {
                 }
             };
 
+            let multiplier = match group.grid_multiplier {
+                None => multiplier,
+                Some(mult) => mult as i32,
+            };
+
             let base_size = match template {
                 None => group.size,
                 Some(ref template) => template.size,
@@ -267,4 +272,5 @@ struct SpritesheetGroup {
     pub areas: HashMap<String, Vec<i32>>,
     pub from_template: Option<String>,
     pub simple_image_gen_scale: Option<u32>,
+    pub grid_multiplier: Option<u32>,
 }

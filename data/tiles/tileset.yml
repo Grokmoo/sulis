@@ -642,7 +642,8 @@ uniform_sets:
       adobe_door_shade, adobe_window_shade_top_w, adobe_window_shade_mid_w, adobe_window_shade_bot_w,
       adobe_window_shade_top_e, adobe_window_shade_mid_e, adobe_window_shade_bot_e,
       adobe_wall_beam_single_w, adobe_wall_beam_double_w, adobe_wall_beam_single_e,
-      adobe_wall_beam_double_e,  adobe_wall_beam_s, flag_pole_ext
+      adobe_wall_beam_double_e,  adobe_wall_beam_s, flag_pole_ext, grave_tall_top,
+      pillar_small_top01, pillar_small_top02, pillar_small_top03
     ]
   object_1by2_bin:
     layer: object
@@ -690,14 +691,23 @@ uniform_sets:
     tiles: [
       rock_big, campfire_with_pot, stump,
       wood_pile, anvil01, flour_sack, anvil02, veg_sack01, veg_sack02,
-      fence_e, fence_e_w, fence_w, fence_n, fence_n_s, fence_s, fence_e_s, fence_e_w_s, fence_w_s, fence_e_n_s,
-      fence_e_w_n_s, fence_w_n_s, fence_e_n, fence_e_w_n, fence_w_n, fence_gate_w, fence_gate_c, fence_gate_e,
+      fence_n, fence_n_s, fence_s, fence_e_s, fence_e_w_s, fence_w_s, fence_e_n_s, fence_e_w_n_s, fence_w_n_s, 
       bridge_top_w1, bridge_top_w2, bridge_top_mid, bridge_top_e1, bridge_top_e2,
       box_grey_large,  box_grey_small, box_gold_large, box_gold_small, box_red_large, box_red_small, barrel_water,
       cacti_small01, cacti_small02, cacti_small03, cacti_small04, cacti_small05, cacti_small06, cacti_small07,
       cacti_small08, cacti_small09, cacti_small10, cacti_small11, cacti_small12, cacti_small13, cacti_small14,
       cacti_small15, cacti_med01_bot, cacti_med02_bot, cacti_med03_bot, cacti_med04_bot, cacti_med05_bot,
       cacti_med06_bot, adobe_bench_c2, adobe_bench_c
+    ]
+  object_top_impass:
+    layer: object
+    size: [2, 2]
+    sprite_prefix: "tileset/"
+    impass: [[0, 0], [1, 0]]
+    invis: []
+    tiles: [
+      fence_e, fence_e_w, fence_w, fence_e_n, fence_e_w_n, fence_w_n, fence_gate_w, fence_gate_c, fence_gate_e,
+      grave_small01, grave_small02, grave_small03, grave_tall_bot
     ]
   object_center_impass:
     layer: object
@@ -729,6 +739,16 @@ uniform_sets:
     tiles: [
       bridge_mid, bridge_bot, bridge_bot_water
     ]
+  decoration_tiny:
+    layer: decoration
+    size: [1, 1]
+    sprite_prefix: "tileset/"
+    impass: []
+    invis: []
+    tiles: [
+      dark_bag, dark_coins, dark_mug_full, dark_mug_empty, dark_mug_tipped, dark_blood01, dark_blood02,
+      dark_gem01, dark_gem02, dark_gem03, dark_chain_hook
+    ]
   decoration:
     layer: decoration
     size: [2, 2]
@@ -745,6 +765,8 @@ uniform_sets:
       sign_weapon, sign_bag, sign_helm, sign_bottle, sign_mug, sign_inn, sign_medal, sign_tools, sign_blank,
       adobe_crack01, adobe_crack02, adobe_crack03, adobe_crack04, adobe_crack05, adobe_crack06, 
       adobe_crack07, adobe_crack08, adobe_crack09,
+      dark_goblet01, dark_book01, dark_book02, dark_shield01, dark_shield02, dark_shield03, dark_shield04,
+      tool01, tool02, tool03, tool04, tool05, tool06, tool07
     ]
   decoration2by1:
     layer: decoration
@@ -763,7 +785,8 @@ uniform_sets:
     impass: []
     invis: []
     tiles: [
-      banner_shield_grey, banner_red, banner_blue
+      banner_shield_grey, banner_red, banner_blue,
+      tool_tall01, tool_tall02, tool_tall03, tool_tall04, tool_tall05, tool_tall06
     ]
   decoration1by3:
     layer: decoration
@@ -2526,3 +2549,62 @@ tiles:
     size: [2, 2]
     sprite: tileset/flag_pole_bot
     impass: [[0, 0]]
+  tileset/dark_chain01:
+    layer: decoration
+    size: [1, 2]
+    sprite: tileset/dark_chain01
+  tileset/dark_chain02:
+    layer: decoration
+    size: [1, 2]
+    sprite: tileset/dark_chain02
+  tileset/dark_hanging_cage:
+    layer: decoration
+    size: [2, 5]
+    sprite: tileset/dark_hanging_cage
+    impass: [[0, 4], [1, 4], [0, 3], [1, 3]]
+  torch_off:
+    layer: prop
+    size: [2, 2]
+    sprite: props/torch_off
+  grave_med_top:
+    layer: aerial
+    size: [4, 2]
+    sprite: tileset/grave_med_top
+  grave_med_bot:
+    layer: object
+    size: [4, 2]
+    sprite: tileset/grave_med_bot
+    impass: [[0, 0], [1, 0], [2, 0], [3, 0]]
+  grave_large_top:
+    layer: aerial
+    size: [4, 2]
+    sprite: tileset/grave_large_top
+  grave_large_bot:
+    layer: object
+    size: [4, 4]
+    sprite: tileset/grave_large_bot
+    pass: [[0, 3], [1, 3], [2, 3], [3, 3]]
+  grave_huge_top:
+    layer: aerial
+    size: [6, 2]
+    sprite: tileset/grave_huge_top
+  grave_huge_bot:
+    layer: object
+    size: [6, 4]
+    sprite: tileset/grave_huge_bot
+    pass: [[0, 3], [1, 3], [2, 3], [3, 3], [4, 3], [5, 3]]
+  pillar_small_bot:
+    layer: object
+    size: [2, 2]
+    sprite: tileset/pillar_small_bot
+    impass: [[0, 0], [1, 0]]
+  pillar_large_top:
+    layer: aerial
+    size: [4, 6]
+    sprite: tileset/pillar_large_top
+    invis: [[1, 4], [2, 4], [1, 5], [2, 5]]
+  pillar_large_bot:
+    layer: object
+    size: [4, 4]
+    sprite: tileset/pillar_large_bot
+    impass: [[1, 1], [2, 1], [1, 2], [2, 2]]

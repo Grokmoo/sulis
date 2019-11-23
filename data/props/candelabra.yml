@@ -1,0 +1,9 @@
+id: candelabra
+name: Candelabra
+icon: inventory/misc_crate
+image: candelabra
+size: 2by4
+visible: true
+interactive:
+  Not
+impass: [[0, 2], [1, 2], [0, 3], [1, 3]]

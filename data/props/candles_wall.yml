@@ -1,0 +1,8 @@
+id: candles_wall
+name: Candles
+icon: inventory/misc_crate
+image: wall_candles
+size: 2by2
+visible: true
+interactive:
+  Not

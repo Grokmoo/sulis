@@ -1,0 +1,8 @@
+id: torch
+name: Torch
+icon: inventory/misc_crate
+image: torch
+size: 2by2
+visible: true
+interactive:
+  Not

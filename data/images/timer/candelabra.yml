@@ -1,0 +1,5 @@
+id: candelabra
+frame_time_millis: 150
+frames:
+  - "props/candelabra01"
+  - "props/candelabra02"

@@ -1,0 +1,6 @@
+id: candle02
+frame_time_millis: 150
+frames:
+  - "props/candle02-01"
+  - "props/candle02-02"
+  - "props/candle02-03"

@@ -613,7 +613,7 @@ impl AreaState {
         true
     }
 
-    pub fn is_passable_size(&self, size: &Rc<ObjectSize>, x: i32, y: i32) -> bool {
+    pub fn is_passable_size(&self, size: &ObjectSize, x: i32, y: i32) -> bool {
         if !self.is_terrain_passable(&size.id, x, y) {
             return false;
         }

@@ -25,6 +25,13 @@ use sulis_core::util::{self, Point};
 
 const MAX_ITERATIONS: i32 = 2_000;
 
+#[derive(Debug, Clone, Copy)]
+pub struct Destination {
+    pub x: f32,
+    pub y: f32,
+    pub dist: f32,
+}
+
 #[derive(Eq)]
 struct OpenEntry {
     f_score: i32,
@@ -116,14 +123,12 @@ impl PathFinder {
         checker: &T,
         start_x: i32,
         start_y: i32,
-        dest_x: f32,
-        dest_y: f32,
-        dest_dist: f32,
+        dest: Destination,
     ) -> Option<Vec<Point>> {
-        if dest_x < 0.0 || dest_y < 0.0 {
+        if dest.x < 0.0 || dest.y < 0.0 {
             return None;
         }
-        if dest_x >= self.width as f32 || dest_y >= self.height as f32 {
+        if dest.x >= self.width as f32 || dest.y >= self.height as f32 {
             return None;
         }
 
@@ -131,16 +136,16 @@ impl PathFinder {
             "Finding path from {},{} to within {} of {},{}",
             start_x,
             start_y,
-            dest_dist,
-            dest_x,
-            dest_y
+            dest.dist,
+            dest.x,
+            dest.y
         );
 
         // let start_time = time::Instant::now();
-        let goal = checker.goal(dest_x, dest_y);
+        let goal = checker.goal(dest.x, dest.y);
         self.goal_x = goal.0;
         self.goal_y = goal.1;
-        let dest_dist_squared = (dest_dist * dest_dist) as i32;
+        let dest_dist_squared = (dest.dist * dest.dist) as i32;
         let start = start_x + start_y * self.width;
 
         // the set of discovered nodes that are not evaluated yet

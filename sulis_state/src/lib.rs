@@ -104,6 +104,8 @@ pub use self::save_state::SaveState;
 pub mod script;
 pub use self::script::{Script, ScriptCallback, ScriptState};
 
+mod transition_handler;
+
 mod turn_manager;
 pub(crate) use self::turn_manager::TurnManager;
 

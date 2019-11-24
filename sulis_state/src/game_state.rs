@@ -18,23 +18,22 @@ use std::cell::{Cell, RefCell};
 use std::collections::HashMap;
 use std::io::{Error, ErrorKind};
 use std::rc::Rc;
-use std::time;
 
 use sulis_core::config::Config;
 use sulis_core::io::GraphicsRenderer;
-use sulis_core::util::{self, invalid_data_error, ExtInt, Point};
+use sulis_core::util::{invalid_data_error, ExtInt, Point};
 use sulis_module::on_trigger::QuestEntryState;
 use sulis_module::{
-    area::{PathFinder, ToKind, Trigger, TriggerKind},
-    Actor, Module, ObjectSize, OnTrigger, Time, MOVE_TO_THRESHOLD, ItemState
+    area::{Destination, PathFinder, Trigger, TriggerKind},
+    Actor, Module, OnTrigger, Time, MOVE_TO_THRESHOLD, ItemState
 };
 
-use crate::animation::{self, particle_generator::Param, Anim, AnimSaveState, AnimState};
+use crate::animation::{particle_generator::Param, Anim, AnimSaveState, AnimState};
 use crate::script::{script_cache, script_callback, Script, ScriptCallback, ScriptEntity};
 use crate::{
-    path_finder::find_path, AreaState, ChangeListener, ChangeListenerList, Effect, EntityState,
+    path_finder, AreaState, ChangeListener, ChangeListenerList, Effect, EntityState,
     Formation, ItemList, Location, PartyStash, QuestStateSet, SaveState, TurnManager,
-    UICallback, WorldMapState, AI,
+    UICallback, WorldMapState, AI, transition_handler,
 };
 
 thread_local! {
@@ -369,7 +368,7 @@ impl GameState {
 
         for member in party_actors {
             let mut member_location = location.clone();
-            GameState::find_transition_location(
+            transition_handler::find_transition_location(
                 &mut member_location,
                 &member.race.size,
                 &area_state.borrow(),
@@ -803,22 +802,11 @@ impl GameState {
         })
     }
 
-    fn find_link(state: &AreaState, from: &str) -> Option<Point> {
-        for transition in state.area.transitions.iter() {
-            match transition.to {
-                ToKind::Area { ref id, .. } | ToKind::FindLink { ref id, .. } => {
-                    if id == from {
-                        return Some(transition.from);
-                    }
-                }
-                _ => (),
-            }
-        }
-
-        None
+    pub fn transition_to(area_id: Option<&str>, p: Option<Point>, offset: Point, time: Time) {
+        transition_handler::transition_to(area_id, p, offset, time);
     }
 
-    fn preload_area(area_id: &str) -> Result<(), Error> {
+    pub(crate) fn preload_area(area_id: &str) -> Result<(), Error> {
         if let Some(_) = GameState::get_area_state(area_id) {
             return Ok(());
         }
@@ -834,251 +822,19 @@ impl GameState {
         Ok(())
     }
 
-    pub fn transition_to(
-        area_id: Option<&str>,
-        p: Option<Point>,
-        offset: Point,
-        travel_time: Time,
-    ) {
-        info!("Area transition to {:?} at {:?}", area_id, p);
+    pub(crate) fn set_current_area(area: &Rc<RefCell<AreaState>>) {
+        STATE.with(|state| {
+            let mut state = state.borrow_mut();
+            let state = state.as_mut().unwrap();
 
-        // perform area preload if area is not already loaded
-        if let Some(id) = area_id {
-            if let Err(e) = GameState::preload_area(id) {
-                error!("Error loading {} for transition", id);
-                error!("{}", e);
-                return;
-            }
-        }
+            if Rc::ptr_eq(&state.area_state, area) { return; }
 
-        let (area, location) = match area_id {
-            None => {
-                // intra-area transition
-                if let None = p {
-                    error!("No point specified for intra area transition");
-                    return;
-                }
-
-                (GameState::area_state(), p.unwrap())
-            }
-            Some(id) => {
-                // transition to another area
-                let state = GameState::get_area_state(id).unwrap();
-
-                if Rc::ptr_eq(&state, &GameState::area_state()) {
-                    error!(
-                        "Area transition to already loaded area, but not intra area: {}",
-                        state.borrow().area.area.id
-                    );
-                    return;
-                }
-
-                // use location if specified, otherwise find appropriate link
-                let location = match p {
-                    Some(p) => p,
-                    None => {
-                        let old = GameState::area_state();
-                        let old = old.borrow();
-                        match GameState::find_link(&state.borrow(), &old.area.area.id) {
-                            None => {
-                                error!("Error finding linked coordinates for transition {}", id);
-                                return;
-                            }
-                            Some(loc) => loc,
-                        }
-                    }
-                };
-                (state, location)
-            }
-        };
-
-        if !GameState::check_location(&location, &area) {
-            error!(
-                "Invalid transition location to {:?} in {}",
-                location,
-                area.borrow().area.area.id
-            );
-            return;
-        }
-
-        // now set the new area as the current area if it is not already
-        if !Rc::ptr_eq(&GameState::area_state(), &area) {
-            STATE.with(|state| {
-                let mut state = state.borrow_mut();
-                let state = state.as_mut().unwrap();
-                let width = area.borrow().area.area.width;
-                let height = area.borrow().area.area.height;
-                let path_finder = PathFinder::new(width, height);
-                state.path_finder = path_finder;
-                state.area_state = area;
-            });
-        }
-
-        let (x, y) = (location.x + offset.x, location.y + offset.y);
-
-        // clean up animations and surfaces
-        GameState::set_clear_anims();
-
-        let mgr = GameState::turn_manager();
-        let party = GameState::party();
-        for entity in &party {
-            let area = {
-                let area_id = &entity.borrow().location.area_id;
-                GameState::get_area_state(area_id).unwrap()
-            };
-
-            let surfaces = area.borrow_mut().remove_entity(&entity, &mgr.borrow());
-            let entity_index = entity.borrow().index();
-            for surface in surfaces {
-                mgr.borrow_mut().remove_from_surface(entity_index, surface);
-            }
-        }
-
-        let area_state = GameState::area_state();
-
-        // remove party auras from old area
-        {
-            let mut mgr = mgr.borrow_mut();
-            for entity in &party {
-                let area = {
-                    let id = &entity.borrow().location.area_id;
-                    GameState::get_area_state(id).unwrap()
-                };
-                let mut area = area.borrow_mut();
-
-                let entity_index = entity.borrow().index();
-                let aura_indices = mgr.auras_for(entity_index);
-                for aura_index in aura_indices {
-                    let aura = mgr.effect_mut(aura_index);
-                    let surface = match aura.surface {
-                        None => continue,
-                        Some(ref mut surface) => surface,
-                    };
-
-                    let to_remove = area.remove_surface(aura_index, &surface.points);
-                    for entity in to_remove {
-                        mgr.remove_from_surface(entity, aura_index);
-                    }
-                }
-            }
-        }
-
-        let pc = GameState::player();
-        let mgr = GameState::turn_manager();
-        mgr.borrow_mut().add_time(travel_time);
-
-        // find transition locations for all party members
-        let base_location = Location::new(x, y, &area_state.borrow().area.area);
-        for entity in &party {
-            entity.borrow_mut().clear_pc_vis();
-            let mut cur_location = base_location.clone();
-            GameState::find_transition_location(
-                &mut cur_location,
-                &entity.borrow().size,
-                &area_state.borrow(),
-            );
-            info!(
-                "Transitioning {} to {},{}",
-                entity.borrow().actor.actor.name,
-                cur_location.x,
-                cur_location.y
-            );
-            let index = entity.borrow().index();
-
-            // move this entity's auras to the new area
-            {
-                let mut area = area_state.borrow_mut();
-                let mgr = GameState::turn_manager();
-                let mut mgr = mgr.borrow_mut();
-
-                let dx = entity.borrow().location.x - cur_location.x;
-                let dy = entity.borrow().location.y - cur_location.y;
-
-                let aura_indices = mgr.auras_for(index);
-                for aura_index in aura_indices {
-                    let aura = mgr.effect_mut(aura_index);
-                    let surface = match aura.surface {
-                        None => continue,
-                        Some(ref mut surface) => surface,
-                    };
-                    surface.area_id = area.area.area.id.to_string();
-                    for ref mut p in surface.points.iter_mut() {
-                        p.x -= dx;
-                        p.y -= dy;
-                    }
-
-                    let to_add = area.add_surface(aura_index, &surface.points);
-                    for entity in to_add {
-                        mgr.add_to_surface(entity, aura_index);
-                    }
-                }
-            }
-
-            match area_state
-                .borrow_mut()
-                .transition_entity_to(&entity, index, cur_location)
-            {
-                Ok(_) => (),
-                Err(e) => {
-                    warn!("Unable to add party member");
-                    warn!("{}", e);
-                }
-            }
-        }
-
-        area_state
-            .borrow_mut()
-            .push_scroll_to_callback(Rc::clone(&pc));
-
-        let mut area_state = area_state.borrow_mut();
-        area_state.update_view_visibility();
-        if !area_state.on_load_fired {
-            area_state.on_load_fired = true;
-            GameState::add_ui_callbacks_of_kind(
-                &area_state.area.area.triggers,
-                TriggerKind::OnAreaLoad,
-                &pc,
-                &pc,
-            );
-        }
-    }
-
-    fn find_transition_location(
-        location: &mut Location,
-        size: &Rc<ObjectSize>,
-        area_state: &AreaState,
-    ) {
-        let (base_x, base_y) = (location.x, location.y);
-        let mut search_size = 0;
-        while search_size < 10 {
-            // TODO this does a lot of unneccesary checking
-            for y in -search_size..search_size + 1 {
-                for x in -search_size..search_size + 1 {
-                    if area_state.is_passable_size(size, base_x + x, base_y + y) {
-                        location.x = base_x + x;
-                        location.y = base_y + y;
-                        return;
-                    }
-                }
-            }
-
-            search_size += 1;
-        }
-
-        warn!("Unable to find transition locations for all party members");
-    }
-
-    fn check_location(p: &Point, area_state: &Rc<RefCell<AreaState>>) -> bool {
-        let location = Location::from_point(p, &area_state.borrow().area.area);
-        if !location.coords_valid(location.x, location.y) {
-            error!(
-                "Location coordinates {},{} are not valid for area {}",
-                location.x, location.y, location.area_id
-            );
-            return false;
-        }
-
-        true
+            let width = area.borrow().area.area.width;
+            let height = area.borrow().area.area.height;
+            let path_finder = PathFinder::new(width, height);
+            state.path_finder = path_finder;
+            state.area_state = Rc::clone(area);
+        });
     }
 
     fn setup_area_state(area_id: &str) -> Result<Rc<RefCell<AreaState>>, Error> {
@@ -1393,52 +1149,21 @@ impl GameState {
         dist: f32,
         cb: Option<Box<dyn ScriptCallback>>,
     ) -> bool {
-        if entity.borrow().actor.stats.move_disabled {
-            return false;
-        }
-
-        // if entity cannot move even 1 square
-        if entity.borrow().actor.ap() < entity.borrow().actor.get_move_ap_cost(1) {
-            return false;
-        }
+        let dest = Destination { x, y, dist };
 
         let anim = STATE.with(|s| {
             let mut state = s.borrow_mut();
             let state = state.as_mut().unwrap();
-            debug!(
-                "Moving '{}' to {},{}",
-                entity.borrow().actor.actor.name,
-                x,
-                y
-            );
 
-            let start_time = time::Instant::now();
-            let path = {
-                let area_state = state.area_state.borrow();
-                match find_path(
-                    &mut state.path_finder,
-                    &area_state,
-                    &entity.borrow(),
-                    entities_to_ignore,
-                    x,
-                    y,
-                    dist,
-                ) {
-                    None => return None,
-                    Some(path) => path,
-                }
-            };
-            debug!(
-                "Path finding complete in {} secs",
-                util::format_elapsed_secs(start_time.elapsed())
-            );
-
-            let mut anim =
-                animation::move_animation::new(entity, path, Config::animation_base_time_millis());
-            if let Some(cb) = cb {
-                anim.add_completion_callback(cb);
-            }
-            Some(anim)
+            let area = state.area_state.borrow();
+            path_finder::move_towards_point(
+                &mut state.path_finder,
+                &area,
+                entity,
+                entities_to_ignore,
+                dest,
+                cb
+            )
         });
 
         match anim {
@@ -1458,36 +1183,21 @@ impl GameState {
         y: f32,
         dist: f32,
     ) -> Option<Vec<Point>> {
-        if entity.borrow().actor.stats.move_disabled {
-            return None;
-        }
 
-        // if entity cannot move even 1 square
-        if entity.borrow().actor.ap() < entity.borrow().actor.get_move_ap_cost(1) {
-            return None;
-        }
-
+        let dest = Destination { x, y, dist };
         STATE.with(|s| {
+
             let mut state = s.borrow_mut();
             let state = state.as_mut().unwrap();
-            let area_state = state.area_state.borrow();
 
-            let start_time = time::Instant::now();
-            let val = find_path(
+            let area = state.area_state.borrow();
+            path_finder::can_move_towards_point(
                 &mut state.path_finder,
-                &area_state,
-                &entity.borrow(),
+                &area,
+                entity,
                 entities_to_ignore,
-                x,
-                y,
-                dist,
-            );
-            trace!(
-                "Path finding complete in {} secs",
-                util::format_elapsed_secs(start_time.elapsed())
-            );
-
-            val
+                dest
+            )
         })
     }
 

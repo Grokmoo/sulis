@@ -26,7 +26,7 @@ use crate::generator::{
 };
 use crate::MOVE_TO_THRESHOLD;
 use crate::{
-    area::{GeneratorParams, Layer, LocationChecker, PathFinder, Tile, TransitionBuilder},
+    area::{Destination, GeneratorParams, Layer, LocationChecker, PathFinder, Tile, TransitionBuilder},
     Module, ObjectSize,
 };
 use sulis_core::util::{Point, ReproducibleRandom};
@@ -225,14 +225,13 @@ impl AreaGenerator {
             let (end_x, end_y) = (open[i + 1].x, open[i + 1].y);
             let (end_x, end_y) = (end_x as f32, end_y as f32);
 
+            let dest = Destination { x: end_x, y: end_y, dist: MOVE_TO_THRESHOLD };
             if path_finder
                 .find(
                     &location_checker,
                     start_x,
                     start_y,
-                    end_x,
-                    end_y,
-                    MOVE_TO_THRESHOLD,
+                    dest
                 )
                 .is_none()
             {

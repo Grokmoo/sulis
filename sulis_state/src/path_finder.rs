@@ -15,10 +15,12 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::f32;
+use std::rc::Rc;
+use std::cell::RefCell;
 
-use crate::{AreaState, EntityState};
-use sulis_core::util::Point;
-use sulis_module::area::{LocationChecker, PathFinder, PathFinderGrid};
+use sulis_core::{config::Config, util::{self, Point}};
+use sulis_module::{area::{Destination, LocationChecker, PathFinder, PathFinderGrid}};
+use crate::{animation, animation::Anim, AreaState, EntityState, script::ScriptCallback};
 
 pub struct StateLocationChecker<'a, 'b> {
     width: i32,
@@ -83,23 +85,60 @@ impl<'a, 'b> LocationChecker for StateLocationChecker<'a, 'b> {
     }
 }
 
-pub fn find_path(
+pub fn move_towards_point(
+    finder: &mut PathFinder,
+    area: &AreaState,
+    entity: &Rc<RefCell<EntityState>>,
+    entities_to_ignore: Vec<usize>,
+    dest: Destination,
+    cb: Option<Box<dyn ScriptCallback>>
+) -> Option<Anim> {
+
+    let path = match find_path(finder, area, entity, entities_to_ignore, dest) {
+        None => return None,
+        Some(path) => path,
+    };
+
+    let mut anim = animation::move_animation::new(entity, path, Config::animation_base_time_millis());
+    if let Some(cb) = cb {
+        anim.add_completion_callback(cb);
+    }
+
+    Some(anim)
+}
+
+pub fn can_move_towards_point(
+    finder: &mut PathFinder,
+    area: &AreaState,
+    entity: &Rc<RefCell<EntityState>>,
+    entities_to_ignore: Vec<usize>,
+    dest: Destination,
+) -> Option<Vec<Point>> {
+    find_path(finder, area, entity, entities_to_ignore, dest)
+}
+
+fn find_path(
     path_finder: &mut PathFinder,
     area_state: &AreaState,
-    entity: &EntityState,
+    entity: &Rc<RefCell<EntityState>>,
     entities_to_ignore: Vec<usize>,
-    dest_x: f32,
-    dest_y: f32,
-    dest_dist: f32,
+    dest: Destination,
 ) -> Option<Vec<Point>> {
+    let entity = &entity.borrow();
     let checker = StateLocationChecker::new(area_state, entity, entities_to_ignore);
 
-    path_finder.find(
-        &checker,
-        entity.location.x,
-        entity.location.y,
-        dest_x,
-        dest_y,
-        dest_dist,
-    )
+    debug!("Attempting move '{}' to {:?}", entity.actor.actor.name, dest);
+
+    if entity.actor.stats.move_disabled || entity.actor.ap() < entity.actor.get_move_ap_cost(1) {
+        return None;
+    }
+
+    trace!("  Entity is able to move");
+
+    let start_time = std::time::Instant::now();
+
+    let path = path_finder.find(&checker, entity.location.x, entity.location.y, dest);
+
+    debug!("Pathing complete in {} secs", util::format_elapsed_secs(start_time.elapsed()));
+    path
 }

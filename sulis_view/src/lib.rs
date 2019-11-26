@@ -43,6 +43,8 @@ pub use self::area_view::AreaView;
 mod basic_mouseover;
 pub use self::basic_mouseover::BasicMouseover;
 
+mod bonus_text_arg_handler;
+
 pub mod character_builder;
 pub use self::character_builder::CharacterBuilder;
 
@@ -81,6 +83,8 @@ pub use self::item_action_menu::ItemActionMenu;
 
 mod item_button;
 pub use self::item_button::ItemButton;
+
+mod item_callback_handler;
 
 mod item_list_pane;
 pub use self::item_list_pane::ItemListPane;

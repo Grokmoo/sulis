@@ -159,8 +159,8 @@ impl Class {
         None
     }
 
-    pub fn starting_abilities(&self) -> Vec<Rc<Ability>> {
-        self.starting_abilities.clone()
+    pub fn starting_abilities(&self) -> impl Iterator<Item=&Rc<Ability>> {
+        self.starting_abilities.iter()
     }
 
     pub fn ability_choices(&self, level: u32) -> Vec<Rc<AbilityList>> {

@@ -19,10 +19,11 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 use sulis_core::ui::{Callback, Widget, WidgetKind};
-use sulis_core::widgets::{Button, Label};
+use sulis_core::widgets::{Button, Label, TextArea};
 use sulis_module::{Class, Module};
 
-use crate::character_builder::BuilderPane;
+use crate::bonus_text_arg_handler::add_bonus_text_args;
+use crate::character_builder::{attribute_selector_pane::AbilityButton, BuilderPane};
 use crate::{CharacterBuilder, ClassPane};
 
 pub const NAME: &str = "class_selector_pane";
@@ -129,10 +130,28 @@ impl WidgetKind for ClassSelectorPane {
             Some(ref class) => class,
         };
 
+        let selected = Widget::empty("selected");
+
         let class_pane = ClassPane::empty();
         class_pane.borrow_mut().set_class(Rc::clone(class));
-        let class_pane_widget = Widget::with_defaults(class_pane);
+        Widget::add_child_to(&selected, Widget::with_defaults(class_pane));
 
-        vec![title, class_pane_widget, classes_pane]
+        let bonuses = Widget::with_theme(TextArea::empty(), "bonuses");
+        add_bonus_text_args(&class.bonuses_per_level, &mut bonuses.borrow_mut().state);
+        Widget::add_child_to(&selected, bonuses);
+
+        let starting_abilities = Widget::empty("starting_abilities");
+        for ability in class.starting_abilities() {
+            let button =
+                Widget::with_defaults(AbilityButton::new(Rc::clone(ability), Rc::clone(class)));
+            let icon = Widget::with_theme(Label::empty(), "icon");
+            icon.borrow_mut().state.add_text_arg("icon", &ability.icon.id());
+            Widget::add_child_to(&button, icon);
+            Widget::add_child_to(&starting_abilities, button);
+        }
+
+        Widget::add_child_to(&selected, starting_abilities);
+
+        vec![title, classes_pane, selected]
     }
 }

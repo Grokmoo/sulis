@@ -22,7 +22,7 @@ use sulis_core::ui::{Widget, WidgetKind, WidgetState};
 use sulis_core::widgets::TextArea;
 use sulis_module::{ability, Ability, Module};
 
-use crate::item_button::{add_bonus_text_args, add_prereq_text_args};
+use crate::bonus_text_arg_handler::{add_bonus_text_args, add_prereq_text_args};
 
 pub const NAME: &str = "ability_pane";
 

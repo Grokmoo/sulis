@@ -22,7 +22,7 @@ use sulis_core::ui::{Widget, WidgetKind};
 use sulis_core::widgets::TextArea;
 use sulis_module::Race;
 
-use crate::item_button::{add_attack_text_args, add_bonus_text_args};
+use crate::bonus_text_arg_handler::{add_attack_text_args, add_bonus_text_args};
 
 pub const NAME: &str = "race_pane";
 

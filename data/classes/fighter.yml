@@ -5,10 +5,10 @@ description: |
   
   On the battlefield, they can both protect more fragile comrades as well as leap into the fray themselves.
   
-  Fighters have proficiency in light and medium armor, and all weapons.
+  Melee-focused fighters will rely heavily on their [c=f00|Strength], while ranged-focused fighters will make more use of [c=f00|Dexterity].
 bonuses_per_level:
   - kind:
-      hit_points: 10
+      hit_points: 8
   - kind:
       melee_accuracy: 4
   - kind:
@@ -26,14 +26,15 @@ bonuses_per_level:
 starting_abilities:
   - armor_light
   - armor_medium
-  - weapon_axe
-  - weapon_crossbow
-  - weapon_bow
-  - weapon_small_sword
-  - weapon_large_sword
+  - weapon_simple
   - weapon_spear
   - weapon_mace
-  - weapon_simple
+  - weapon_axe
+  - weapon_small_sword
+  - weapon_large_sword
+  - weapon_bow
+  - weapon_crossbow
+
 upgrades:
   1:
     ability_choices: [ ]

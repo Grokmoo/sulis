@@ -5,7 +5,7 @@ description: |
   
   Their spell casting is only limited by their own internal pool of power which improves as they gain experience.  They can cast any spell at will as long as they have the available Power.
   
-  Warlocks have proficiency with light armor and most weapons.
+  A warlock's spell casting is influenced by their [c=f00|Intellect].
 stats:
   - id: Power
     name: Power
@@ -35,12 +35,12 @@ bonuses_per_level:
       caster_level: 1
 starting_abilities:
   - armor_light
-  - weapon_axe
-  - weapon_crossbow
-  - weapon_bow
+  - weapon_simple
   - weapon_spear
   - weapon_mace
-  - weapon_simple
+  - weapon_axe
+  - weapon_bow
+  - weapon_crossbow
 upgrades:
   1:
     ability_choices: []

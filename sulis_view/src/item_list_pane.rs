@@ -23,7 +23,7 @@ use sulis_core::widgets::{Button, ScrollPane};
 use sulis_module::{Item, Module, ItemState};
 use sulis_state::{script::ScriptItemKind, EntityState, GameState};
 
-use crate::{item_button::*, ItemButton};
+use crate::{item_callback_handler::*, ItemButton};
 
 pub const NAME: &str = "item_list_pane";
 

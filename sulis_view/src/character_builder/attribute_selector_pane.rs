@@ -282,13 +282,13 @@ impl WidgetKind for AttributeSelectorPane {
     }
 }
 
-struct AbilityButton {
+pub struct AbilityButton {
     class: Rc<Class>,
     ability: Rc<Ability>,
 }
 
 impl AbilityButton {
-    fn new(ability: Rc<Ability>, class: Rc<Class>) -> Rc<RefCell<AbilityButton>> {
+    pub fn new(ability: Rc<Ability>, class: Rc<Class>) -> Rc<RefCell<AbilityButton>> {
         Rc::new(RefCell::new(AbilityButton { ability, class }))
     }
 }

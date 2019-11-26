@@ -34,7 +34,7 @@ use sulis_module::{
 use sulis_state::{ActorState, ChangeListener, Effect, EntityState, GameState};
 
 use crate::ability_pane::add_ability_text_args;
-use crate::item_button::add_bonus_text_args;
+use crate::bonus_text_arg_handler::add_bonus_text_args;
 use crate::CharacterBuilder;
 
 pub const NAME: &str = "character_window";

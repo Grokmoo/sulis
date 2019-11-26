@@ -5,7 +5,7 @@ description: |
   
   They are less limited than Mages in when they can cast their spells, but do not have the same wide range of effects.
   
-  Druids have proficiency in light and medium armor and most weapons.
+  Druids use their [c=f00|Wisdom] for spell casting.
 bonuses_per_level:
   - kind:
       hit_points: 5
@@ -31,10 +31,10 @@ starting_abilities:
   - armor_light
   - armor_medium
   - weapon_simple
-  - weapon_axe
-  - weapon_bow
   - weapon_spear
+  - weapon_axe
   - weapon_small_sword
+  - weapon_bow
 upgrades:
   1:
     ability_choices: [ ]
@@ -188,8 +188,8 @@ kits:
       [s=7|Starting Equipment]
       
       Sickle
-      Staff
       Small Shield
+      Staff
       Partial Leather Armor
       150 Coins
   - name: Summoner
@@ -202,14 +202,14 @@ kits:
       wis: 16
     starting_inventory:
       equipped:
-        HeldMain: { id: druid_staff }
+        HeldMain: { id: shortbow }
         Feet: { id: boots_leather }
         Torso: { id: torso_leather }
         Legs: { id: legs_pants }
       quick:
         Usable1: { id: potion_healing }
         Usable2: { id: potion_mind }
-        AltHeldMain: { id: shortbow }
+        AltHeldMain: { id: druid_staff }
       pc_starting_coins: 300
     starting_abilities:
       - summon_animal
@@ -218,6 +218,7 @@ kits:
       
       [s=7|Starting Equipment]
       
+      Shortbow
       Staff
       Partial Leather Armor
       300 Coins

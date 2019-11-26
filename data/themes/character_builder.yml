@@ -233,14 +233,6 @@ themes:
             custom:
               tooltip: |
                 Your primary profession and role, your class is the single largest determiner of what type of character you will be.
-          class_pane:
-            from: game.class_pane
-            background: bg_base
-            border: [1, 1, 1, 1]
-            relative:
-              width: Max
-            size: [0, 100]
-            position: [0, 25]
           classes_pane:
             border: [1, 1, 1, 1]
             size: [0, 12]
@@ -257,6 +249,77 @@ themes:
                   scale: 7.0
                 text: "#name#"
                 size: [30, 10]
+          selected:
+            relative:
+              width: Max
+            size: [0, 100]
+            position: [0, 25]
+            children:
+              class_pane:
+                from: game.class_pane
+                background: bg_base
+                border: [1, 1, 1, 1]
+                relative:
+                  width: Max
+                size: [0, 50]
+              starting_abilities_box:
+                kind: Container
+                relative:
+                  width: Max
+                size: [-65, 31]
+                position: [0, 55]
+                background: bg_base
+                border: [2, 2, 2, 2]
+                children:
+                  starting_abilities_title:
+                    from: label
+                    kind: Label
+                    relative:
+                      width: Max
+                    size: [0, 5]
+                    text: Starting Proficiencies
+                    text_params:
+                      scale: 7
+                      horizontal_alignment: Left
+                  starting_abilities:
+                    relative:
+                      width: Max
+                    layout: Grid
+                    layout_spacing: { top: 0, bottom: 0, left: 0, right: 2 }
+                    size: [0, 25]
+                    position: [0, 5]
+                    children:
+                      ability_button:
+                        from: button
+                        background: background_inner
+                        foreground: ability_overlay
+                        size: [12, 12]
+                        children:
+                          icon:
+                            foreground: "#icon#"
+                            relative:
+                              width: Max
+                              height: Max
+              bonuses:
+                from: text_area
+                background: bg_base
+                border: [2, 2, 2, 2]
+                size: [60, 52]
+                relative:
+                  x: Max
+                position: [0, 55]
+                text: |
+                  [s=7|Bonuses per Level]
+                  [s=4|]
+                  [?hit_points|[s=6.0|Hit Points: [r=40|+#hit_points#]]
+                  ][?melee_accuracy|[s=6.0|Melee Accuracy: [r=40|+#melee_accuracy#]]
+                  ][?ranged_accuracy|[s=6.0|Ranged Accuracy: [r=40|+#ranged_accuracy#]]
+                  [?defense|[s=6.0|Defense: [r=40|+#defense#]]
+                  ][?fortitude|[s=6.0|Fortitude: [r=40|+#fortitude#]]
+                  ][?reflex|[s=6.0|Reflex: [r=40|+#reflex#]]
+                  ][?will|[s=6.0|Will: [r=40|+#will#]]
+                  ][?caster_level|Caster level: [r=40|+#caster_level#]]
+                  [?spell_accuracy|[s=6.0|Spell Accuracy: [r=40|+#spell_accuracy#]]]
       attribute_selector_pane:
         from: builder_pane
         children:
@@ -384,7 +447,7 @@ themes:
             position: [-40, 25]
             text: "Strength"
             custom:
-              tooltip: "Affects your damage output and accuracy in close quarters combat."
+              tooltip: "Affects your damage output and accuracy in close quarters combat.  Important for many Fighter abilities."
           str_spinner:
             from: spinner
             position: [-20, 25]
@@ -401,7 +464,7 @@ themes:
             position: [-40, 40]
             text: "Dexterity"
             custom:
-              tooltip: "Affects your ranged accuracy, overall defenses, and reflexes."
+              tooltip: "Affects your ranged attack, defense, and reflexes.  Important for most Rogue abilities."
           dex_spinner:
             from: spinner
             position: [-20, 40]
@@ -435,7 +498,7 @@ themes:
             position: [-40, 70]
             text: "Perception"
             custom:
-              tooltip: "Affects melee and ranged accuracy stats and the order you go in combat."
+              tooltip: "Affects your accuracy and the order you go in combat.  Important for all Bard abilities."
           per_spinner:
             from: spinner
             position: [-20, 70]
@@ -452,7 +515,7 @@ themes:
             position: [-40, 85]
             text: "Intelligence"
             custom:
-              tooltip: "Affects spell accuracy and power of spells and many special abilities."
+              tooltip: "Affects spell accuracy.  Important for all Mage and Warlock abilities."
           int_spinner:
             from: spinner
             position: [-20, 85]
@@ -469,7 +532,7 @@ themes:
             position: [-40, 100]
             text: "Wisdom"
             custom:
-              tooltip: "Affects spell accuracy and your ability to resist many magical effects."
+              tooltip: "Affects spell accuracy and your Will.  Important for all Druid abilities."
           wis_spinner:
             from: spinner
             position: [-20, 100]

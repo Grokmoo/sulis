@@ -1285,25 +1285,6 @@ themes:
               height: Max
             text: |
               #description#
-              [s=9|]
-              [y=50;s=7|Bonuses per Level]
-              [?str|Strength: [r=40|+#str#]
-              ][?dex|Dexterity: [r=40|+#dex#]
-              ][?end|Endurance: [r=40|+#end#]
-              ][?per|Perception: [r=40|+#per#]
-              ][?int|Intelligence: [r=40|+#int#]
-              ][?wis|Wisdom: [r=40|+#wis#]
-              ][?caster_level|Caster level: [r=40|+#caster_level#]]
-              [?bonus_ap|AP: [r=40|+#bonus_ap#]
-              ][?hit_points|[s=6.0|Hit Points: [r=40|+#hit_points#]]
-              ][?melee_accuracy|[s=6.0|Melee Accuracy: [r=40|+#melee_accuracy#]]
-              ][?ranged_accuracy|[s=6.0|Ranged Accuracy: [r=40|+#ranged_accuracy#]]
-              ][?spell_accuracy|[s=6.0|Spell Accuracy: [r=40|+#spell_accuracy#]]]
-              [?defense|[s=6.0|Defense: [r=40|+#defense#]]
-              ][?fortitude|[s=6.0|Fortitude: [r=40|+#fortitude#]]
-              ][?reflex|[s=6.0|Reflex: [r=40|+#reflex#]]
-              ][?will|[s=6.0|Will: [r=40|+#will#]]
-              ]
       script_game_over_window:
         background: bg_base
         border: [3, 3, 3, 3]

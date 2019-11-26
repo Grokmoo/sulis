@@ -5,7 +5,7 @@ description: |
   
   While reciting a basic song can be done at any time, Bards rely on a limited pool of inspiration in order to come up with new and exciting variations, maximizing their songs' overall effectiveness.
   
-  Bards have proficiency in light armor and most weapons.
+  Bards rely on their [c=f00|Perception] for their songs and supporting abilities.
 stats:
   - id: Inspiration
     name: Inspiration
@@ -14,7 +14,7 @@ stats:
     reset_per_day: false
 bonuses_per_level:
   - kind:
-      hit_points: 4
+      hit_points: 5
   - kind:
       melee_accuracy: 3
   - kind:
@@ -35,12 +35,12 @@ bonuses_per_level:
       caster_level: 1
 starting_abilities:
   - armor_light
-  - weapon_axe
-  - weapon_crossbow
-  - weapon_bow
+  - weapon_simple
   - weapon_spear
   - weapon_mace
-  - weapon_simple
+  - weapon_axe
+  - weapon_bow
+  - weapon_crossbow
 upgrades:
   1:
     ability_choices: []

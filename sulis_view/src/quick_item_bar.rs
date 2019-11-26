@@ -19,7 +19,7 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 use crate::{
-    item_button::{clear_quickslot_cb, use_item_cb},
+    item_callback_handler::{clear_quickslot_cb, use_item_cb},
     ItemButton,
 };
 use sulis_core::ui::{animation_state, Callback, Widget, WidgetKind};

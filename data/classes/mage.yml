@@ -5,7 +5,7 @@ description: |
   
   However, the most powerful spells a mage knows can only be cast a limited number of times per day, necessitating a measured use of available spell power.
   
-  Mages start with proficiency in only simple weapons, and no armor.
+  A mage's spell casting is influenced by their [c=f00|Intellect].
 bonuses_per_level:
   - kind:
       hit_points: 4

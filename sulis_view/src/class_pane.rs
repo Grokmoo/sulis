@@ -22,8 +22,6 @@ use sulis_core::ui::{Widget, WidgetKind};
 use sulis_core::widgets::TextArea;
 use sulis_module::Class;
 
-use crate::item_button::add_bonus_text_args;
-
 pub const NAME: &str = "class_pane";
 
 pub struct ClassPane {
@@ -70,8 +68,6 @@ impl WidgetKind for ClassPane {
             let state = &mut details.borrow_mut().state;
             state.add_text_arg("name", &class.name);
             state.add_text_arg("description", &class.description);
-
-            add_bonus_text_args(&class.bonuses_per_level, state);
         }
         vec![details]
     }

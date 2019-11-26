@@ -5,10 +5,10 @@ description: |
   
   Rogues function best in concert with another warrior to distract opponents.  They have many abilities geared at debilitating or doing massive damage to tough individual opponents.
   
-  Rogues have profiency with light armor and piercing weapons.
+  Rogues rely heavily on their [c=f00|Dexterity] in combat.
 bonuses_per_level:
   - kind:
-      hit_points: 7
+      hit_points: 6
   - kind:
       melee_accuracy: 3
   - kind:
@@ -25,10 +25,10 @@ bonuses_per_level:
       initiative: 1
 starting_abilities:
   - armor_light
-  - weapon_crossbow
-  - weapon_bow
-  - weapon_small_sword
   - weapon_simple
+  - weapon_small_sword
+  - weapon_bow
+  - weapon_crossbow
 upgrades:
   1:
     ability_choices: []

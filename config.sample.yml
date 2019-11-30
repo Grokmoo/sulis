@@ -52,7 +52,7 @@ resources:
 
 input:
     # whether moving the mouse to the screen edge will scroll the view
-    edge_scrolling: false
+    edge_scrolling: true
 
     # scrolling rate for all scrolling methods
     scroll_speed: 1.5
@@ -133,4 +133,13 @@ editor:
       - gui/elev_high
       - gui/elev_higher
       - gui/elev_highest
+
+# Debugging / Cheat options
+debug:
+    # when set to false, random encounters will not spawn on map load.  some pre-scripted
+    # encounters will still spawn
+    encounter_spawning: true
+
+    # when set to false, the player will be able to see the entire area at all times.
+    limit_line_of_sight: true
 ...

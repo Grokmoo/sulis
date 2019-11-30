@@ -28,7 +28,7 @@ use crate::save_state::EntitySaveState;
 use crate::script::{self, CallbackData, ScriptEntitySet};
 use crate::{
     ActorState, AreaState, ChangeListenerList, EntityTextureCache, EntityTextureSlot, GameState,
-    Location, PropState, ScriptCallback, TurnManager,
+    Location, PropState, ScriptCallback, TurnManager, entity_attack_handler::weapon_attack
 };
 use sulis_core::io::GraphicsRenderer;
 use sulis_core::ui::{color, Color};
@@ -371,16 +371,16 @@ impl EntityState {
         }
     }
 
-    pub fn is_hostile(&self, other: &Rc<RefCell<EntityState>>) -> bool {
+    pub fn is_hostile(&self, other: &EntityState) -> bool {
         let self_faction = self.actor.faction();
-        let other_faction = other.borrow().actor.faction();
+        let other_faction = other.actor.faction();
 
         self_faction.is_hostile(&other_faction)
     }
 
-    pub fn is_friendly(&self, other: &Rc<RefCell<EntityState>>) -> bool {
+    pub fn is_friendly(&self, other: &EntityState) -> bool {
         let self_faction = self.actor.faction();
-        let other_faction = other.borrow().actor.faction();
+        let other_faction = other.actor.faction();
 
         self_faction.is_friendly(&other_faction)
     }
@@ -401,7 +401,7 @@ impl EntityState {
 
     /// Returns true if this entity can reach the specified target with its
     /// current weapon, without moving, false otherwise
-    pub fn can_reach(&self, target: &Rc<RefCell<EntityState>>) -> bool {
+    pub fn can_reach(&self, target: &EntityState) -> bool {
         let dist = self.dist_to_entity(target);
         let area = GameState::area_state();
         let vis_dist = area.borrow().area.area.vis_dist as f32;
@@ -415,7 +415,7 @@ impl EntityState {
 
     /// Returns true if this entity can attack the specified target with its
     /// current weapon, without moving
-    pub fn can_attack(&self, target: &Rc<RefCell<EntityState>>, area_state: &AreaState) -> bool {
+    pub fn can_attack(&self, target: &EntityState, area_state: &AreaState) -> bool {
         if self.actor.stats.attack_disabled {
             return false;
         }
@@ -426,7 +426,7 @@ impl EntityState {
             return false;
         }
 
-        area_state.has_visibility(&self, &target.borrow())
+        area_state.has_visibility(&self, &target)
     }
 
     pub fn attack(
@@ -443,7 +443,7 @@ impl EntityState {
                 target,
                 time * 5,
                 cbs,
-                Box::new(|a, d| ActorState::weapon_attack(&a, &d)),
+                Box::new(|a, d| weapon_attack(&a, &d)),
             );
             GameState::add_animation(anim);
         } else if entity.borrow().actor.stats.attack_is_ranged() {
@@ -551,15 +551,15 @@ impl EntityState {
         }
     }
 
-    pub fn dist_to_entity(&self, other: &Rc<RefCell<EntityState>>) -> f32 {
-        let value = self.dist(other.borrow().location.to_point(), &other.borrow().size);
+    pub fn dist_to_entity(&self, other: &EntityState) -> f32 {
+        let value = self.dist(other.location.to_point(), &other.size);
 
         trace!(
             "Computed distance from '{}' at {:?} to '{}' at {:?} = {}",
             self.actor.actor.name,
             self.location,
-            other.borrow().actor.actor.name,
-            other.borrow().location,
+            other.actor.actor.name,
+            other.location,
             value
         );
 

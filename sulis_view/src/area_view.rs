@@ -871,7 +871,7 @@ impl WidgetKind for AreaView {
         self.overlay_handler
             .draw_top(renderer, &self.feedback_text_params, offset, scale, millis);
 
-        for feedback_text in state.feedback_text_iter() {
+        for feedback_text in state.feedback_text_iter_mut() {
             feedback_text.draw(
                 renderer,
                 &self.feedback_text_params,

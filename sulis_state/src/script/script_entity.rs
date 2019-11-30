@@ -22,8 +22,8 @@ use std::{self, f32, u32};
 
 use rlua::{self, Context, UserData, UserDataMethods};
 
-use crate::{ai, animation, script::*};
-use crate::{area_feedback_text::ColorKind, ActorState, EntityState, GameState, Location};
+use crate::{AreaFeedbackText, ai, animation, script::*, entity_attack_handler};
+use crate::{area_feedback_text::ColorKind, EntityState, GameState, Location};
 use sulis_core::config::Config;
 use sulis_core::resource::ResourceSet;
 use sulis_core::util::ExtInt;
@@ -621,14 +621,14 @@ impl UserData for ScriptEntity {
         methods.add_method("is_hostile", |_, entity, other: ScriptEntity| {
             let entity = entity.try_unwrap()?;
             let other = other.try_unwrap()?;
-            let result = entity.borrow().is_hostile(&other);
+            let result = entity.borrow().is_hostile(&other.borrow());
             Ok(result)
         });
 
         methods.add_method("is_friendly", |_, entity, other: ScriptEntity| {
             let entity = entity.try_unwrap()?;
             let other = other.try_unwrap()?;
-            let result = entity.borrow().is_friendly(&other);
+            let result = entity.borrow().is_friendly(&other.borrow());
             Ok(result)
         });
 
@@ -1011,7 +1011,7 @@ impl UserData for ScriptEntity {
         methods.add_method("can_reach", |_, entity, target: ScriptEntity| {
             let parent = entity.try_unwrap()?;
             let target = target.try_unwrap()?;
-            let result = parent.borrow().can_reach(&target);
+            let result = parent.borrow().can_reach(&target.borrow());
             Ok(result)
         });
 
@@ -1071,7 +1071,7 @@ impl UserData for ScriptEntity {
             let target = target.try_unwrap()?;
             let parent = entity.try_unwrap()?;
             let area_state = GameState::area_state();
-            let result = ActorState::weapon_attack(&parent, &target);
+            let result = entity_attack_handler::weapon_attack(&parent, &target);
 
             let mut total_hit_kind = HitKind::Miss;
             let mut total_damage = Vec::new();
@@ -1084,9 +1084,14 @@ impl UserData for ScriptEntity {
 
                 total_damage.append(&mut damage.clone());
 
-                area_state
-                    .borrow_mut()
-                    .add_damage_feedback_text(&target, hit_kind, hit_flags, damage);
+                let feedback = AreaFeedbackText::with_damage(
+                    &target.borrow(),
+                    &area_state.borrow(),
+                    hit_kind,
+                    hit_flags,
+                    &damage
+                );
+                area_state.borrow_mut().add_feedback_text(feedback);
             }
 
             let hit_kind = ScriptHitKind::new(total_hit_kind, total_damage);
@@ -1133,7 +1138,7 @@ impl UserData for ScriptEntity {
                 let mut attack = Attack::special(&parent.borrow().actor.stats,
                     min_damage, max_damage, ap, damage_kind, attack_kind.clone());
 
-                vec![ActorState::attack(att, def, &mut attack)]
+                vec![entity_attack_handler::attack(att, def, &mut attack)]
             }));
 
             GameState::add_animation(anim);
@@ -1176,15 +1181,18 @@ impl UserData for ScriptEntity {
                 );
 
                 let (hit_kind, hit_flags, damage) =
-                    ActorState::attack(&parent, &target, &mut attack);
+                    entity_attack_handler::attack(&parent, &target, &mut attack);
 
                 let area_state = GameState::area_state();
-                area_state.borrow_mut().add_damage_feedback_text(
-                    &target,
+
+                let feedback = AreaFeedbackText::with_damage(
+                    &target.borrow(),
+                    &area_state.borrow(),
                     hit_kind,
                     hit_flags,
-                    damage.clone(),
+                    &damage
                 );
+                area_state.borrow_mut().add_feedback_text(feedback);
                 let hit_kind = ScriptHitKind::new(hit_kind, damage);
                 Ok(hit_kind)
             },
@@ -1233,12 +1241,15 @@ impl UserData for ScriptEntity {
                 }
 
                 let area_state = GameState::area_state();
-                area_state.borrow_mut().add_damage_feedback_text(
-                    &parent,
+
+                let feedback = AreaFeedbackText::with_damage(
+                    &parent.borrow(),
+                    &area_state.borrow(),
                     HitKind::Auto,
                     HitFlags::default(),
-                    damage,
+                    &damage
                 );
+                area_state.borrow_mut().add_feedback_text(feedback);
                 Ok(())
             },
         );
@@ -1248,11 +1259,10 @@ impl UserData for ScriptEntity {
             let parent = entity.try_unwrap()?;
             parent.borrow_mut().actor.add_hp(amount);
             let area_state = GameState::area_state();
-            let mut text = area_state
-                .borrow_mut()
-                .create_feedback_text(&parent.borrow());
-            text.add_entry(format!("{}", amount), ColorKind::Heal);
-            area_state.borrow_mut().add_feedback_text(text);
+
+            let mut feedback = AreaFeedbackText::with_target(&parent.borrow(), &area_state.borrow());
+            feedback.add_entry(format!("{}", amount), ColorKind::Heal);
+            area_state.borrow_mut().add_feedback_text(feedback);
 
             Ok(())
         });
@@ -1263,12 +1273,11 @@ impl UserData for ScriptEntity {
                 let amount = amount as u32;
                 let parent = entity.try_unwrap()?;
                 parent.borrow_mut().actor.add_class_stat(&stat, amount);
-                let area_state = GameState::area_state();
-                let mut text = area_state
-                    .borrow_mut()
-                    .create_feedback_text(&parent.borrow());
-                text.add_entry(format!("{}", amount), ColorKind::Heal);
-                area_state.borrow_mut().add_feedback_text(text);
+                let area = GameState::area_state();
+
+                let mut feedback = AreaFeedbackText::with_target(&parent.borrow(), &area.borrow());
+                feedback.add_entry(format!("{}", amount), ColorKind::Heal);
+                area.borrow_mut().add_feedback_text(feedback);
                 Ok(())
             },
         );
@@ -1279,12 +1288,11 @@ impl UserData for ScriptEntity {
                 let amount = amount as u32;
                 let parent = entity.try_unwrap()?;
                 parent.borrow_mut().actor.remove_class_stat(&stat, amount);
-                let area_state = GameState::area_state();
-                let mut text = area_state
-                    .borrow_mut()
-                    .create_feedback_text(&parent.borrow());
-                text.add_entry(format!("{}", amount), ColorKind::Hit);
-                area_state.borrow_mut().add_feedback_text(text);
+                let area= GameState::area_state();
+
+                let mut feedback = AreaFeedbackText::with_target(&parent.borrow(), &area.borrow());
+                feedback.add_entry(format!("{}", amount), ColorKind::Hit);
+                area.borrow_mut().add_feedback_text(feedback);
                 Ok(())
             },
         );
@@ -1513,6 +1521,7 @@ impl UserData for ScriptEntity {
             let entity = entity.try_unwrap()?;
             let target = target.try_unwrap()?;
             let entity = entity.borrow();
+            let target = target.borrow();
             Ok(entity.dist_to_entity(&target))
         });
 
@@ -1678,11 +1687,11 @@ fn targets(_lua: Context, parent: &ScriptEntity, _args: ()) -> Result<ScriptEnti
     let mgr = GameState::turn_manager();
     let mut indices = Vec::new();
     for entity in mgr.borrow().entity_iter() {
-        if parent.borrow().is_hostile(&entity) && entity.borrow().actor.stats.hidden {
+        let entity = entity.borrow();
+        if parent.borrow().is_hostile(&entity) && entity.actor.stats.hidden {
             continue;
         }
 
-        let entity = entity.borrow();
         if entity.actor.is_dead() {
             continue;
         }

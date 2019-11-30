@@ -344,7 +344,7 @@ fn without_self(_lua: Context, set: &ScriptEntitySet, _: ()) -> Result<ScriptEnt
 
 fn visible_within(_lua: Context, set: &ScriptEntitySet, dist: f32) -> Result<ScriptEntitySet> {
     filter_entities(set, dist, &|parent, entity, dist| {
-        if parent.borrow().dist_to_entity(entity) > dist {
+        if parent.borrow().dist_to_entity(&entity.borrow()) > dist {
             return false;
         }
 
@@ -358,7 +358,7 @@ fn attackable(_lua: Context, set: &ScriptEntitySet, _args: ()) -> Result<ScriptE
     filter_entities(set, (), &|parent, entity, _| {
         let area_state = GameState::area_state();
         let area_state = area_state.borrow();
-        parent.borrow().can_attack(entity, &area_state)
+        parent.borrow().can_attack(&entity.borrow(), &area_state)
     })
 }
 
@@ -372,13 +372,13 @@ fn threatening(_lua: Context, set: &ScriptEntitySet, _args: ()) -> Result<Script
             return false;
         }
 
-        entity.can_reach(parent)
+        entity.can_reach(&parent.borrow())
     })
 }
 
 fn reachable(_lua: Context, set: &ScriptEntitySet, _args: ()) -> Result<ScriptEntitySet> {
     filter_entities(set, (), &|parent, entity, _| {
-        parent.borrow().can_reach(entity)
+        parent.borrow().can_reach(&entity.borrow())
     })
 }
 
@@ -419,13 +419,13 @@ fn friendly_to(_lua: Context, set: &ScriptEntitySet, faction: String) -> Result<
 
 fn is_hostile(_lua: Context, set: &ScriptEntitySet) -> Result<ScriptEntitySet> {
     filter_entities(set, (), &|parent, entity, _| {
-        parent.borrow().is_hostile(entity)
+        parent.borrow().is_hostile(&entity.borrow())
     })
 }
 
 fn is_friendly(_lua: Context, set: &ScriptEntitySet) -> Result<ScriptEntitySet> {
     filter_entities(set, (), &|parent, entity, _| {
-        !parent.borrow().is_hostile(entity)
+        !parent.borrow().is_hostile(&entity.borrow())
     })
 }
 

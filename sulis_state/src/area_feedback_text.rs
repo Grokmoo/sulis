@@ -23,7 +23,9 @@ use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::resource::{Font, ResourceSet};
 use sulis_core::ui::{animation_state, Color, LineRenderer};
 use sulis_core::util::{self, Point};
-use sulis_module::DamageKind;
+use sulis_module::{HitKind, HitFlags, DamageKind};
+
+use crate::{AreaState, EntityState};
 
 pub struct Params {
     pub font: Rc<Font>,
@@ -111,6 +113,74 @@ pub struct AreaFeedbackText {
 }
 
 impl AreaFeedbackText {
+    pub fn with_damage(
+        target: &EntityState,
+        area: &AreaState,
+        hit_kind: HitKind,
+        hit_flags: HitFlags,
+        damage: &[(DamageKind, u32)]
+    ) -> AreaFeedbackText {
+        let mut text = AreaFeedbackText::with_target(target, area);
+
+        if hit_flags.sneak_attack {
+            text.add_icon_entry(IconKind::Backstab, ColorKind::Info);
+        } else if hit_flags.flanking {
+            text.add_icon_entry(IconKind::Flanking, ColorKind::Info);
+        }
+
+        if hit_flags.concealment {
+            text.add_icon_entry(IconKind::Concealment, ColorKind::Info);
+        }
+
+        let mut first = true;
+        for (kind, amount) in damage {
+            if !first {
+                text.add_entry(" + ".to_string(), ColorKind::Info);
+            }
+
+            let color = ColorKind::Damage { kind: *kind };
+            text.add_entry(format!("{}", amount), color);
+
+            first = false;
+        }
+
+        match hit_kind {
+            HitKind::Graze => text.add_icon_entry(IconKind::Graze, ColorKind::Info),
+            HitKind::Hit => text.add_icon_entry(IconKind::Hit, ColorKind::Info),
+            HitKind::Crit => text.add_icon_entry(IconKind::Crit, ColorKind::Info),
+            HitKind::Miss => text.add_entry("Miss".to_string(), ColorKind::Miss),
+            HitKind::Auto => (),
+        }
+
+        text
+    }
+
+    pub fn with_target(target: &EntityState, area: &AreaState) -> AreaFeedbackText {
+        let move_rate = 3.0;
+        let mut area_pos = target.location.to_point();
+        loop {
+            let mut valid = true;
+
+            let pos_y = area_pos.y as f32;
+            for text in area.feedback_text_iter() {
+                let text_pos_y = text.area_pos().y as f32 - text.cur_hover_y();
+                if (pos_y - text_pos_y).abs() < 0.7 {
+                    area_pos.y -= 1;
+                    valid = false;
+                    break;
+                }
+            }
+
+            if valid || area_pos.y == 0 { break; }
+        }
+
+        let width = target.size.width as f32;
+        let pos_x = area_pos.x as f32 + width / 2.0;
+        let pos_y = area_pos.y as f32 - 1.5;
+
+        AreaFeedbackText::new(area_pos, pos_x, pos_y, move_rate)
+    }
+
     pub fn new(area_pos: Point, pos_x: f32, pos_y: f32, move_rate: f32) -> AreaFeedbackText {
         AreaFeedbackText {
             area_pos,

@@ -17,7 +17,7 @@
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use crate::{animation::Anim, EntityState, GameState};
+use crate::{AreaFeedbackText, animation::Anim, EntityState, GameState};
 use crate::{script::ScriptEntitySet, ScriptCallback};
 use sulis_module::{DamageKind, HitFlags, HitKind};
 
@@ -58,12 +58,14 @@ pub(in crate::animation) fn update(
         let result = (model.attack_func)(attacker, &model.defender);
         for entry in result {
             let (hit_kind, hit_flags, damage) = entry;
-            area_state.borrow_mut().add_damage_feedback_text(
-                &model.defender,
+            let feedback = AreaFeedbackText::with_damage(
+                &model.defender.borrow(),
+                &area_state.borrow(),
                 hit_kind,
                 hit_flags,
-                damage.clone(),
+                &damage
             );
+            area_state.borrow_mut().add_feedback_text(feedback);
 
             for cb in model.callbacks.iter() {
                 cb.after_attack(&cb_def_targets, hit_kind, damage.clone());

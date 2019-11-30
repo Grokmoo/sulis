@@ -525,7 +525,7 @@ impl TurnManager {
             if entity.actor.is_dead() {
                 continue;
             }
-            if !entity.is_hostile(mover) {
+            if !entity.is_hostile(&mover.borrow()) {
                 continue;
             }
             if !entity.location.is_in(&area_state) {
@@ -597,7 +597,7 @@ impl TurnManager {
                 let front = self.order.pop_front().unwrap();
                 self.order.push_back(front);
             }
-            area_state.bump_party_overlap(self);
+            crate::party_bump_handler::bump_party_overlap(area_state, self);
             self.init_turn_for_current_entity(area_state);
         }
 

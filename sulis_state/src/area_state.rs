@@ -14,7 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::cell::{Ref, RefCell};
+use std::cell::{RefCell};
 use std::collections::HashSet;
 use std::io::Error;
 use std::ptr;
@@ -28,7 +28,7 @@ use sulis_core::config::Config;
 use sulis_core::util::{self, gen_rand, invalid_data_error, Point, Size};
 use sulis_module::area::{PropData, Transition, TriggerKind};
 use sulis_module::{
-    prop, Actor, Area, DamageKind, HitFlags, HitKind, LootList, Module, ObjectSize, Prop, Time,
+    prop, Actor, Area, LootList, Module, ObjectSize, Prop, Time,
 };
 
 pub struct TriggerState {
@@ -42,8 +42,6 @@ pub enum PCVisRedraw {
     Partial { delta_x: i32, delta_y: i32 },
     Not,
 }
-
-impl PCVisRedraw {}
 
 pub struct AreaState {
     pub area: GeneratedArea,
@@ -624,8 +622,8 @@ impl AreaState {
 
     pub fn is_passable(
         &self,
-        requester: &Ref<EntityState>,
-        entities_to_ignore: &Vec<usize>,
+        requester: &EntityState,
+        entities_to_ignore: &[usize],
         new_x: i32,
         new_y: i32,
     ) -> bool {
@@ -953,7 +951,7 @@ impl AreaState {
         grid_index.is_empty()
     }
 
-    fn point_entities_passable(&self, entities_to_ignore: &Vec<usize>, x: i32, y: i32) -> bool {
+    fn point_entities_passable(&self, entities_to_ignore: &[usize], x: i32, y: i32) -> bool {
         if !self.area.area.coords_valid(x, y) {
             return false;
         }
@@ -1182,7 +1180,7 @@ impl AreaState {
 
             let entity = mgr.entity(index);
 
-            if !mover.is_hostile(&entity) {
+            if !mover.is_hostile(&entity.borrow()) {
                 continue;
             }
 
@@ -1284,7 +1282,7 @@ impl AreaState {
         true
     }
 
-    fn update_entity_position(
+    pub(crate) fn update_entity_position(
         &mut self,
         entity: &Rc<RefCell<EntityState>>,
         old_x: i32,
@@ -1443,89 +1441,6 @@ impl AreaState {
         }
     }
 
-    pub fn bump_party_overlap(&mut self, mgr: &mut TurnManager) {
-        debug!("Combat initiated.  Checking for party overlap");
-        let party = GameState::party();
-        if party.len() < 2 {
-            return;
-        }
-
-        let mut bb = Vec::new();
-        for member in party.iter() {
-            let member = member.borrow();
-            let x = member.location.x;
-            let y = member.location.y;
-            let w = member.size.width;
-            let h = member.size.height;
-            bb.push((x, y, w, h));
-        }
-
-        let mut to_bump = HashSet::new();
-        for i in 0..(bb.len() - 1) {
-            for j in (i + 1)..(bb.len()) {
-                // if one box is on left side of the other
-                if bb[i].0 >= bb[j].0 + bb[j].2 || bb[j].0 >= bb[i].0 + bb[i].2 {
-                    continue;
-                }
-
-                // if one box in above the other
-                if bb[i].1 >= bb[j].1 + bb[j].3 || bb[j].1 >= bb[i].1 + bb[i].3 {
-                    continue;
-                }
-
-                trace!("Found party overlap between {} and {}", i, j);
-                to_bump.insert(i);
-            }
-        }
-
-        for index in to_bump {
-            let member = &party[index];
-
-            let (old_x, old_y) = (member.borrow().location.x, member.borrow().location.y);
-            let (x, y) = match self.find_bump_position(member, old_x, old_y) {
-                None => {
-                    warn!(
-                        "Unable to bump '{}' to avoid party overlap",
-                        member.borrow().actor.actor.name
-                    );
-                    continue;
-                }
-                Some((x, y)) => (x, y),
-            };
-
-            info!(
-                "Bumping '{}' from {},{} to {},{}",
-                member.borrow().actor.actor.name,
-                old_x,
-                old_y,
-                x,
-                y
-            );
-            member.borrow_mut().location.move_to(x, y);
-            self.update_entity_position(member, old_x, old_y, mgr);
-            // TODO add subpos animation so move is smooth
-        }
-    }
-
-    fn find_bump_position(
-        &self,
-        entity: &Rc<RefCell<EntityState>>,
-        cur_x: i32,
-        cur_y: i32,
-    ) -> Option<(i32, i32)> {
-        let to_ignore = vec![entity.borrow().index()];
-        for radius in 1..=3 {
-            for y in -radius..=radius {
-                for x in -radius..=radius {
-                    if self.point_entities_passable(&to_ignore, cur_x + x, cur_y + y) {
-                        return Some((cur_x + x, cur_y + y));
-                    }
-                }
-            }
-        }
-        None
-    }
-
     #[must_use]
     pub fn remove_entity(
         &mut self,
@@ -1563,84 +1478,6 @@ impl AreaState {
         self.props.len() - 1
     }
 
-    pub fn add_damage_feedback_text(
-        &mut self,
-        target: &Rc<RefCell<EntityState>>,
-        hit_kind: HitKind,
-        hit_flags: HitFlags,
-        damage: Vec<(DamageKind, u32)>,
-    ) {
-        use area_feedback_text::{ColorKind, IconKind};
-        let mut text = self.create_feedback_text(&target.borrow());
-
-        let mut output = String::new();
-        if hit_flags.sneak_attack {
-            text.add_icon_entry(IconKind::Backstab, ColorKind::Info);
-        } else if hit_flags.flanking {
-            text.add_icon_entry(IconKind::Flanking, ColorKind::Info);
-        }
-
-        if hit_flags.concealment {
-            text.add_icon_entry(IconKind::Concealment, ColorKind::Info);
-        }
-
-        let mut first = true;
-        for (kind, amount) in damage {
-            if !first {
-                text.add_entry(" + ".to_string(), ColorKind::Info);
-            }
-
-            let color = ColorKind::Damage { kind };
-            output.push_str(&format!("{}", amount));
-
-            text.add_entry(output.clone(), color);
-
-            output.clear();
-            first = false;
-        }
-
-        match hit_kind {
-            HitKind::Graze => text.add_icon_entry(IconKind::Graze, ColorKind::Info),
-            HitKind::Hit => text.add_icon_entry(IconKind::Hit, ColorKind::Info),
-            HitKind::Crit => text.add_icon_entry(IconKind::Crit, ColorKind::Info),
-            HitKind::Miss => text.add_entry("Miss".to_string(), ColorKind::Miss),
-            HitKind::Auto => (),
-        }
-
-        self.add_feedback_text(text);
-    }
-
-    pub fn create_feedback_text(&self, target: &EntityState) -> AreaFeedbackText {
-        let move_rate = 3.0;
-
-        let mut area_pos = target.location.to_point();
-        loop {
-            let mut area_pos_valid = true;
-
-            let area_pos_y = area_pos.y as f32;
-            for text in self.feedback_text.iter() {
-                let text_pos_y = text.area_pos().y as f32 - text.cur_hover_y();
-                if (area_pos_y - text_pos_y).abs() < 0.7 {
-                    area_pos.y -= 1;
-                    area_pos_valid = false;
-                    break;
-                }
-            }
-
-            if area_pos_valid {
-                break;
-            }
-            if area_pos.y == 0 {
-                break;
-            }
-        }
-        let width = target.size.width as f32;
-        let pos_x = area_pos.x as f32 + width / 2.0;
-        let pos_y = area_pos.y as f32 - 1.5;
-
-        AreaFeedbackText::new(area_pos, pos_x, pos_y, move_rate)
-    }
-
     pub fn add_feedback_text(&mut self, text: AreaFeedbackText) {
         if text.is_empty() {
             return;
@@ -1649,7 +1486,11 @@ impl AreaState {
         self.feedback_text.push(text);
     }
 
-    pub fn feedback_text_iter(&mut self) -> impl Iterator<Item = &mut AreaFeedbackText> {
+    pub fn feedback_text_iter(&self) -> impl Iterator<Item=&AreaFeedbackText> {
+        self.feedback_text.iter()
+    }
+
+    pub fn feedback_text_iter_mut(&mut self) -> impl Iterator<Item = &mut AreaFeedbackText> {
         self.feedback_text.iter_mut()
     }
 

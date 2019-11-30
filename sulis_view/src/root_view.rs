@@ -23,6 +23,7 @@ use sulis_core::util;
 use sulis_core::widgets::{Button, ConfirmationWindow, Label};
 use sulis_module::{area::OnRest, Module};
 use sulis_state::{
+    AreaFeedbackText,
     area_feedback_text::ColorKind, save_file::create_save, script::script_callback,
     script::ScriptEntity, ChangeListener, EntityState, GameState, NextGameStep, Script,
 };
@@ -427,11 +428,12 @@ impl WidgetKind for RootView {
                     let target = GameState::player();
                     match area.on_rest {
                         OnRest::Disabled { ref message } => {
-                            let mut text = area_state
-                                .borrow_mut()
-                                .create_feedback_text(&target.borrow());
-                            text.add_entry(message.to_string(), ColorKind::Info);
-                            area_state.borrow_mut().add_feedback_text(text);
+                            let mut feedback = AreaFeedbackText::with_target(
+                                &target.borrow(),
+                                &area_state.borrow()
+                            );
+                            feedback.add_entry(message.to_string(), ColorKind::Info);
+                            area_state.borrow_mut().add_feedback_text(feedback);
                         }
                         OnRest::FireScript { ref id, ref func } => {
                             Script::trigger(id, func, ScriptEntity::from(&target));

@@ -23,7 +23,7 @@ use sulis_module::{
     Actor, MerchantData, Module, OnTrigger, ItemState
 };
 use sulis_state::{
-    area_feedback_text::ColorKind,
+    AreaFeedbackText, area_feedback_text::ColorKind,
     script::{entity_with_id, CallbackData, FuncKind, ScriptEntity},
     EntityState, GameState, NextGameStep, Script,
 };
@@ -230,11 +230,11 @@ pub fn activate(
             ShowMerchant(ref merch) => show_merchant(widget, merch),
             StartConversation(ref convo) => start_convo(widget, convo, pc, target),
             SayLine(ref line) => {
-                let area_state = GameState::area_state();
-                let mut area = area_state.borrow_mut();
-                let mut text = area.create_feedback_text(&target.borrow());
-                text.add_entry(line.to_string(), ColorKind::Info);
-                area.add_feedback_text(text);
+                let area = GameState::area_state();
+
+                let mut feedback = AreaFeedbackText::with_target(&target.borrow(), &area.borrow());
+                feedback.add_entry(line.to_string(), ColorKind::Info);
+                area.borrow_mut().add_feedback_text(feedback);
             }
             ShowCutscene(ref cutscene) => show_cutscene(widget, cutscene),
             FireScript(ref script) => fire_script(&script.id, &script.func, pc, target),

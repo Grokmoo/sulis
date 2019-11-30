@@ -15,7 +15,6 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::cell::RefCell;
-use std::cmp;
 use std::collections::HashMap;
 use std::io::Error;
 use std::rc::Rc;
@@ -24,10 +23,7 @@ use sulis_core::image::{Image, LayeredImage};
 use sulis_core::io::GraphicsRenderer;
 use sulis_core::util::{invalid_data_error, ExtInt};
 use sulis_module::{Ability, Actor, ActorBuilder, Faction, ImageLayer, Module};
-use sulis_module::{
-    AccuracyKind, Attack, AttackKind, BonusList, DamageKind, HitFlags, HitKind, ItemKind,
-    QuickSlot, Slot, StatList, WeaponStyle, ItemState
-};
+use sulis_module::{BonusList, ItemKind, QuickSlot, Slot, StatList, ItemState};
 use crate::save_state::ActorSaveState;
 use crate::{
     AbilityState, ChangeListenerList, Effect, EntityState, GameState, Inventory, PStats,
@@ -550,7 +546,7 @@ impl ActorState {
         dist < self.stats.attack_distance()
     }
 
-    pub(crate) fn can_weapon_attack(&self, _target: &Rc<RefCell<EntityState>>, dist: f32) -> bool {
+    pub(crate) fn can_weapon_attack(&self, _target: &EntityState, dist: f32) -> bool {
         trace!(
             "Checking can attack for '{}'.  Distance to target is {} with attack dist of {}",
             self.actor.name,
@@ -571,254 +567,6 @@ impl ActorState {
 
     pub fn has_ap_for_any_action(&self) -> bool {
         self.ap() >= self.get_move_ap_cost(1) || self.has_ap_to_attack()
-    }
-
-    fn is_sneak_attack(
-        parent: &Rc<RefCell<EntityState>>,
-        target: &Rc<RefCell<EntityState>>,
-    ) -> bool {
-        parent.borrow().actor.stats.hidden && !target.borrow().actor.stats.sneak_attack_immunity
-    }
-
-    fn is_flanking(parent: &Rc<RefCell<EntityState>>, target: &Rc<RefCell<EntityState>>) -> bool {
-        if target.borrow().actor.stats.flanked_immunity {
-            return false;
-        }
-
-        let mgr = GameState::turn_manager();
-        let area = GameState::get_area_state(&parent.borrow().location.area_id).unwrap();
-        let area = area.borrow();
-        for entity_index in area.entity_iter() {
-            let entity = mgr.borrow().entity(*entity_index);
-
-            if Rc::ptr_eq(&entity, parent) {
-                continue;
-            }
-            if Rc::ptr_eq(&entity, target) {
-                continue;
-            }
-
-            let entity = entity.borrow();
-
-            if !entity.is_hostile(&target) {
-                continue;
-            }
-
-            if entity.actor.stats.attack_disabled {
-                continue;
-            }
-
-            match entity.actor.inventory.weapon_style() {
-                WeaponStyle::Ranged => continue,
-                WeaponStyle::TwoHanded
-                | WeaponStyle::Single
-                | WeaponStyle::Shielded
-                | WeaponStyle::DualWielding => (),
-            }
-
-            if !entity.can_reach(&target) {
-                continue;
-            }
-
-            let p_target = (
-                target.borrow().center_x_f32(),
-                target.borrow().center_y_f32(),
-            );
-            let p_parent = (
-                parent.borrow().center_x_f32(),
-                parent.borrow().center_y_f32(),
-            );
-            let p_other = (entity.center_x_f32(), entity.center_y_f32());
-
-            let p1 = (p_target.0 - p_parent.0, p_target.1 - p_parent.1);
-            let p2 = (p_target.0 - p_other.0, p_target.1 - p_other.1);
-
-            let mut cos_angle = (p1.0 * p2.0 + p1.1 * p2.1) / (p1.0.hypot(p1.1) * p2.0.hypot(p2.1));
-            if cos_angle > 1.0 {
-                cos_angle = 1.0;
-            }
-            if cos_angle < -1.0 {
-                cos_angle = -1.0;
-            }
-
-            let angle = cos_angle.acos().to_degrees();
-
-            debug!(
-                "Got angle {} between {} and {} attacking {}",
-                angle,
-                parent.borrow().actor.actor.name,
-                entity.actor.actor.name,
-                target.borrow().actor.actor.name
-            );
-
-            if angle > parent.borrow().actor.stats.flanking_angle as f32 {
-                return true;
-            }
-        }
-
-        false
-    }
-
-    pub fn weapon_attack(
-        parent: &Rc<RefCell<EntityState>>,
-        target: &Rc<RefCell<EntityState>>,
-    ) -> Vec<(HitKind, HitFlags, Vec<(DamageKind, u32)>)> {
-        if target.borrow_mut().actor.hp() <= 0 {
-            return vec![(HitKind::Miss, HitFlags::default(), Vec::new())];
-        }
-
-        info!(
-            "'{}' attacks '{}'",
-            parent.borrow().actor.actor.name,
-            target.borrow().actor.actor.name
-        );
-
-        let attacks = parent.borrow().actor.stats.attacks.clone();
-
-        let is_flanking = ActorState::is_flanking(parent, target);
-        let is_sneak_attack = ActorState::is_sneak_attack(parent, target);
-
-        let mut result = Vec::new();
-        for attack in attacks {
-            let mut attack = if is_flanking {
-                Attack::from(&attack, &parent.borrow().actor.stats.flanking_bonuses)
-            } else {
-                attack
-            };
-
-            let (hit_kind, hit_flags, damage) = ActorState::attack_internal(
-                parent,
-                target,
-                &mut attack,
-                is_flanking,
-                is_sneak_attack,
-            );
-            result.push((hit_kind, hit_flags, damage));
-        }
-
-        ActorState::check_death(parent, target);
-        result
-    }
-
-    pub fn attack(
-        parent: &Rc<RefCell<EntityState>>,
-        target: &Rc<RefCell<EntityState>>,
-        attack: &mut Attack,
-    ) -> (HitKind, HitFlags, Vec<(DamageKind, u32)>) {
-        if target.borrow_mut().actor.hp() <= 0 {
-            return (HitKind::Miss, HitFlags::default(), Vec::new());
-        }
-
-        info!(
-            "'{}' attacks '{}'",
-            parent.borrow().actor.actor.name,
-            target.borrow().actor.actor.name
-        );
-
-        let is_flanking = ActorState::is_flanking(parent, target);
-        let is_sneak_attack = ActorState::is_sneak_attack(parent, target);
-
-        let (hit_kind, hit_flags, damage) =
-            ActorState::attack_internal(parent, target, attack, is_flanking, is_sneak_attack);
-
-        ActorState::check_death(parent, target);
-
-        (hit_kind, hit_flags, damage)
-    }
-
-    fn attack_internal(
-        parent: &Rc<RefCell<EntityState>>,
-        target: &Rc<RefCell<EntityState>>,
-        attack: &mut Attack,
-        flanking: bool,
-        sneak_attack: bool,
-    ) -> (HitKind, HitFlags, Vec<(DamageKind, u32)>) {
-        let rules = Module::rules();
-
-        let concealment = cmp::max(
-            0,
-            target.borrow().actor.stats.concealment
-                - parent.borrow().actor.stats.concealment_ignore,
-        );
-
-        if !rules.concealment_roll(concealment) {
-            debug!("Concealment miss");
-            return (
-                HitKind::Miss,
-                HitFlags {
-                    concealment: true,
-                    ..Default::default()
-                },
-                Vec::new(),
-            );
-        }
-
-        let (accuracy_kind, defense) = {
-            let target_stats = &target.borrow().actor.stats;
-            match attack.kind {
-                AttackKind::Fortitude { accuracy } => (accuracy, target_stats.fortitude),
-                AttackKind::Reflex { accuracy } => (accuracy, target_stats.reflex),
-                AttackKind::Will { accuracy } => (accuracy, target_stats.will),
-                AttackKind::Melee { .. } => (AccuracyKind::Melee, target_stats.defense),
-                AttackKind::Ranged { .. } => (AccuracyKind::Ranged, target_stats.defense),
-                AttackKind::Dummy => {
-                    return (HitKind::Hit, HitFlags::default(), Vec::new());
-                }
-            }
-        };
-        let crit_immunity = target.borrow().actor.stats.crit_immunity;
-
-        if flanking {
-            attack.bonuses.melee_accuracy += rules.flanking_accuracy_bonus;
-            attack.bonuses.ranged_accuracy += rules.flanking_accuracy_bonus;
-            attack.bonuses.spell_accuracy += rules.flanking_accuracy_bonus;
-        } else if sneak_attack {
-            attack.bonuses.melee_accuracy += rules.hidden_accuracy_bonus;
-            attack.bonuses.ranged_accuracy += rules.hidden_accuracy_bonus;
-            attack.bonuses.spell_accuracy += rules.hidden_accuracy_bonus;
-        }
-
-        let hit_flags = HitFlags {
-            flanking,
-            sneak_attack,
-            concealment: false,
-        };
-
-        let (hit_kind, damage_multiplier) = {
-            let parent_stats = &parent.borrow().actor.stats;
-            let hit_kind =
-                parent_stats.attack_roll(accuracy_kind, crit_immunity, defense, &attack.bonuses);
-            let damage_multiplier = match hit_kind {
-                HitKind::Miss => {
-                    debug!("Miss");
-                    return (HitKind::Miss, hit_flags, Vec::new());
-                }
-                HitKind::Graze => parent_stats.graze_multiplier + attack.bonuses.graze_multiplier,
-                HitKind::Hit => parent_stats.hit_multiplier + attack.bonuses.hit_multiplier,
-                HitKind::Crit => parent_stats.crit_multiplier + attack.bonuses.crit_multiplier,
-                HitKind::Auto => panic!(),
-            };
-            (hit_kind, damage_multiplier)
-        };
-
-        let damage = {
-            let target = &target.borrow().actor.stats;
-            let damage = &attack.damage;
-            rules.roll_damage(damage, &target.armor, &target.resistance, damage_multiplier)
-        };
-
-        debug!("{:?}. {:?} damage", hit_kind, damage);
-
-        if !damage.is_empty() {
-            let mut total = 0;
-            for (_kind, amount) in damage.iter() {
-                total += amount;
-            }
-
-            EntityState::remove_hp(target, parent, hit_kind, damage.clone());
-        }
-
-        return (hit_kind, hit_flags, damage);
     }
 
     /// Sets the specified item as the item at the quick slot.  Returns the

@@ -23,6 +23,7 @@ use sulis_core::ui::{theme, Widget, WidgetKind};
 use sulis_core::widgets::TextArea;
 use sulis_module::{conversation::Response, Conversation, OnTrigger};
 use sulis_state::{
+    AreaFeedbackText,
     area_feedback_text::ColorKind, script::entity_with_id, ChangeListener, EntityState, GameState,
 };
 
@@ -105,11 +106,10 @@ impl WidgetKind for DialogWindow {
         if responses.is_empty() {
             widget.borrow_mut().mark_for_removal();
 
-            let area_state = GameState::area_state();
-            let mut area = area_state.borrow_mut();
-            let mut text = area.create_feedback_text(&self.entity.borrow());
-            text.add_entry(cur_text, ColorKind::Info);
-            area.add_feedback_text(text);
+            let area = GameState::area_state();
+            let mut feedback = AreaFeedbackText::with_target(&self.entity.borrow(), &area.borrow());
+            feedback.add_entry(cur_text, ColorKind::Info);
+            area.borrow_mut().add_feedback_text(feedback);
             return Vec::new();
         }
 
@@ -244,11 +244,11 @@ pub fn show_convo(
 ) {
     let initial_node = get_initial_node(&convo, &pc, &target);
     if convo.responses(&initial_node).is_empty() {
-        let area_state = GameState::area_state();
-        let mut area = area_state.borrow_mut();
-        let mut text = area.create_feedback_text(&target.borrow());
-        text.add_entry(convo.text(&initial_node).to_string(), ColorKind::Info);
-        area.add_feedback_text(text);
+        let area = GameState::area_state();
+
+        let mut feedback = AreaFeedbackText::with_target(&target.borrow(), &area.borrow());
+        feedback.add_entry(convo.text(&initial_node).to_string(), ColorKind::Info);
+        area.borrow_mut().add_feedback_text(feedback);
     } else {
         let window = Widget::with_defaults(DialogWindow::new(&pc, &target, convo));
         window.borrow_mut().state.set_modal(true);

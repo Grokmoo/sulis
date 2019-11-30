@@ -31,7 +31,7 @@ pub use self::actor_state::ActorState;
 pub mod animation;
 
 pub mod area_feedback_text;
-use self::area_feedback_text::AreaFeedbackText;
+pub use self::area_feedback_text::AreaFeedbackText;
 
 pub mod area_state;
 pub use self::area_state::AreaState;
@@ -42,6 +42,8 @@ pub use self::change_listener::ChangeListenerList;
 
 mod effect;
 pub use self::effect::Effect;
+
+mod entity_attack_handler;
 
 mod entity_state;
 pub use self::entity_state::AreaDrawable;
@@ -77,6 +79,8 @@ mod merchant_state;
 pub use self::merchant_state::MerchantState;
 
 mod path_finder;
+
+mod party_bump_handler;
 
 mod party_stash;
 pub use self::party_stash::PartyStash;

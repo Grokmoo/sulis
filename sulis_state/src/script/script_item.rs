@@ -21,7 +21,7 @@ use std::rc::Rc;
 use rlua::{self, Context, UserData, UserDataMethods};
 
 use crate::script::*;
-use crate::{area_feedback_text::ColorKind, EntityState, GameState};
+use crate::{AreaFeedbackText, area_feedback_text::ColorKind, EntityState, GameState};
 use sulis_module::{ability, Item, Module, ItemState};
 
 /// A kind of Item, represented by its owner (Stash, QuickSlot, or a generic
@@ -195,9 +195,9 @@ fn activate_item(_lua: Context, script_item: &ScriptItem, target: ScriptEntity) 
     let area = GameState::area_state();
     let name = item.name.to_string();
 
-    let mut text = area.borrow_mut().create_feedback_text(&target.borrow());
-    text.add_entry(name, ColorKind::Info);
-    area.borrow_mut().add_feedback_text(text);
+    let mut feedback = AreaFeedbackText::with_target(&target.borrow(), &area.borrow());
+    feedback.add_entry(name, ColorKind::Info);
+    area.borrow_mut().add_feedback_text(feedback);
 
     match item.usable {
         None => unreachable!(),

@@ -257,7 +257,7 @@ impl DialogAction {
             Some(pc) => Rc::clone(pc),
         };
 
-        let dist = pc.borrow().dist_to_entity(&target);
+        let dist = pc.borrow().dist_to_entity(&target.borrow());
         if dist <= max_dist {
             Some(Box::new(DialogAction { target, pc }))
         } else {
@@ -564,7 +564,7 @@ impl AttackAction {
             pc.actor.stats.attack_cost
         };
 
-        if pc.borrow().can_attack(&target, &area_state) {
+        if pc.borrow().can_attack(&target.borrow(), &area_state) {
             Some(Box::new(AttackAction { pc, target, ap }))
         } else {
             let cb_action = Box::new(AttackAction {
@@ -601,7 +601,7 @@ impl ActionKind for AttackAction {
         if !self
             .pc
             .borrow()
-            .can_attack(&self.target, &area_state.borrow())
+            .can_attack(&self.target.borrow(), &area_state.borrow())
         {
             return false;
         }
@@ -739,7 +739,7 @@ impl MoveAction {
         };
 
         if let Some(target) = get_attack_target(&area_state, x as i32, y as i32) {
-            if pc.borrow().can_attack(&target, &area_state) {
+            if pc.borrow().can_attack(&target.borrow(), &area_state) {
                 // if we can already reach the target with our weapon, don't
                 // move further towards them
                 return None;

@@ -103,3 +103,13 @@ pub enum Key {
     Key8,
     Key9,
 }
+
+impl Key {
+    pub fn short_name(self) -> String {
+        let long_name = format!("{:?}", self);
+
+        let short_name = long_name[3..].to_string();
+
+        short_name
+    }
+}

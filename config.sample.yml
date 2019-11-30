@@ -65,6 +65,7 @@ input:
         KeyF: ToggleFormation
         KeyM: ToggleMap
         KeyJ: ToggleJournal
+        KeyR: Rest
         KeySpace: EndTurn
         KeyDown: ScrollDown
         KeyUp: ScrollUp

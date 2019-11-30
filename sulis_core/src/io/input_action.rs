@@ -32,6 +32,7 @@ pub enum InputAction {
     ToggleFormation,
     ShowMenu,
     EndTurn,
+    Rest,
     ScrollUp,
     ScrollDown,
     ScrollLeft,
@@ -47,6 +48,15 @@ pub enum InputAction {
     MouseScroll(i32),
     CharReceived(char),
     RawKey(Key),
+}
+
+impl std::cmp::Eq for InputAction {}
+
+impl std::hash::Hash for InputAction {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        std::mem::discriminant(self).hash(state);
+        // we don't care if different data leads to the same hash
+    }
 }
 
 impl InputAction {

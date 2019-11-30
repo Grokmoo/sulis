@@ -131,7 +131,8 @@ themes:
             position: [0, 2]
             size: [10, 10]
             custom:
-              tooltip: "Select All Party Members"
+              tooltip: |
+                \[[c=f0f|#keybinding#]\] - Select all party members
           formations_button:
             from: button
             foreground: formations
@@ -139,7 +140,8 @@ themes:
             position: [0, 13]
             size: [10, 10]
             custom:
-              tooltip: "Set party formation"
+              tooltip: |
+                \[[c=f0f|#keybinding#]\] - Set party formation
           rest_button:
             from: button
             foreground: rest
@@ -147,7 +149,8 @@ themes:
             position: [0, 24]
             size: [10, 10]
             custom:
-              tooltip: "Rest"
+              tooltip: |
+                \[[c=f0f|#keybinding#]\] - Rest
           portrait_pane:
             size: [120, 0]
             position: [11, 0]
@@ -387,7 +390,8 @@ themes:
               end_turn_button:
                 from: button
                 custom:
-                  tooltip: "End Turn"
+                  tooltip: |
+                    \[[c=f0f|#keybinding#]\] - End Turn
                 background: background
                 size: [22, 22]
                 position: [0, -4]
@@ -398,31 +402,36 @@ themes:
               map_button:
                 from: game.bottom_pane.window_button
                 custom:
-                  tooltip: "Map"
+                  tooltip: |
+                    \[[c=f0f|#keybinding#]\] - Map
                 position: [-24, -4]
                 foreground: map_icon
               journal_button:
                 from: game.bottom_pane.window_button
                 custom:
-                  tooltip: "Journal"
+                  tooltip: |
+                    \[[c=f0f|#keybinding#]\] - Journal
                 position: [-24, -16]
                 foreground: log_icon
               character_button:
                 from: game.bottom_pane.window_button
                 custom:
-                  tooltip: "Character Sheet"
+                  tooltip: |
+                    \[[c=f0f|#keybinding#]\] - Character Sheet
                 position: [-24, -28]
                 foreground: char_icon
               inventory_button:
                 from: game.bottom_pane.window_button
                 custom:
-                  tooltip: "Inventory"
+                  tooltip: |
+                    \[[c=f0f|#keybinding#]\] - Inventory
                 position: [-12, -28]
                 foreground: inv_icon
               menu_button:
                 from: game.bottom_pane.window_button
                 custom:
-                  tooltip: "Menu"
+                  tooltip: |
+                    \[[c=f0f|#keybinding#]\] - Menu
                 position: [0, -28]
                 foreground: menu_icon
           time:

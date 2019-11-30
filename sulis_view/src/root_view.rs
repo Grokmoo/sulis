@@ -15,9 +15,10 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::{any::Any, cell::RefCell, rc::Rc, time::Instant};
+use std::collections::HashMap;
 
 use sulis_core::config::Config;
-use sulis_core::io::{InputAction};
+use sulis_core::io::{InputAction, keyboard_event::Key};
 use sulis_core::ui::{Callback, Cursor, Widget, WidgetKind};
 use sulis_core::util;
 use sulis_core::widgets::{Button, ConfirmationWindow, Label};
@@ -278,6 +279,26 @@ impl RootView {
         }
     }
 
+    pub fn rest(&self) {
+        let area_state = GameState::area_state();
+        let area = Rc::clone(&area_state.borrow().area.area);
+
+        let target = GameState::player();
+        match area.on_rest {
+            OnRest::Disabled { ref message } => {
+                let mut feedback = AreaFeedbackText::with_target(
+                    &target.borrow(),
+                    &area_state.borrow()
+                );
+                feedback.add_entry(message.to_string(), ColorKind::Info);
+                area_state.borrow_mut().add_feedback_text(feedback);
+            }
+            OnRest::FireScript { ref id, ref func } => {
+                Script::trigger(id, func, ScriptEntity::from(&target));
+            }
+        }
+    }
+
     pub fn save(&mut self) {
         if GameState::is_combat_active() {
             self.add_status_text("Cannot save during combat.");
@@ -376,6 +397,7 @@ impl WidgetKind for RootView {
             ToggleJournal => self.toggle_quest_window(widget),
             ToggleFormation => self.toggle_formation_window(widget),
             EndTurn => self.end_turn(),
+            Rest => self.rest(),
             Exit => self.show_exit(widget),
             SelectAll => GameState::select_party_members(GameState::party()),
             QuickSave => self.save(),
@@ -392,6 +414,9 @@ impl WidgetKind for RootView {
     fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         info!("Adding to root widget.");
 
+        let keys = Config::get_keybindings();
+        use InputAction::*;
+
         self.console_widget.borrow_mut().state.set_visible(false);
 
         self.area_view = AreaView::new();
@@ -401,60 +426,38 @@ impl WidgetKind for RootView {
         {
             let portrait_pane = Widget::with_defaults(PortraitPane::new());
 
-            let formations = Widget::with_theme(Button::empty(), "formations_button");
-            formations
-                .borrow_mut()
-                .state
-                .add_callback(Callback::new(Rc::new(|widget, _| {
+            let formations = create_button(
+                &keys, ToggleFormation, "formations_button", Rc::new(|widget, _| {
                     let (root, view) = Widget::parent_mut::<RootView>(widget);
                     view.toggle_formation_window(&root);
-                })));
+                })
+            );
 
-            let select_all = Widget::with_theme(Button::empty(), "select_all_button");
-            select_all
-                .borrow_mut()
-                .state
-                .add_callback(Callback::new(Rc::new(|_, _| {
+            let select_all = create_button(
+                &keys, SelectAll, "select_all_button", Rc::new(|_, _| {
                     GameState::select_party_members(GameState::party());
-                })));
-
-            let rest = Widget::with_theme(Button::empty(), "rest_button");
-            rest.borrow_mut()
-                .state
-                .add_callback(Callback::new(Rc::new(|_, _| {
-                    let area_state = GameState::area_state();
-                    let area = Rc::clone(&area_state.borrow().area.area);
-
-                    let target = GameState::player();
-                    match area.on_rest {
-                        OnRest::Disabled { ref message } => {
-                            let mut feedback = AreaFeedbackText::with_target(
-                                &target.borrow(),
-                                &area_state.borrow()
-                            );
-                            feedback.add_entry(message.to_string(), ColorKind::Info);
-                            area_state.borrow_mut().add_feedback_text(feedback);
-                        }
-                        OnRest::FireScript { ref id, ref func } => {
-                            Script::trigger(id, func, ScriptEntity::from(&target));
-                        }
-                    }
-                })));
+                })
+            );
+            let rest = create_button(
+                &keys, Rest, "rest_button", Rc::new(|widget, _| {
+                    let (_, view) = Widget::parent_mut::<RootView>(widget);
+                    view.rest();
+                })
+            );
 
             let navi_pane = Widget::empty("navi_pane");
 
-            let end_turn_button = Widget::with_theme(Button::empty(), "end_turn_button");
-            end_turn_button
-                .borrow_mut()
-                .state
-                .add_callback(Callback::new(Rc::new(|widget, _| {
+            let end_turn_button = create_button(
+                &keys, EndTurn, "end_turn_button", Rc::new(|widget, _| {
                     let (_, view) = Widget::parent_mut::<RootView>(widget);
                     view.end_turn();
-                })));
+                })
+            );
             end_turn_button
                 .borrow_mut()
                 .state
                 .set_enabled(GameState::is_pc_current());
+
 
             let end_turn_button_ref = Rc::clone(&end_turn_button);
             let mgr = GameState::turn_manager();
@@ -469,50 +472,40 @@ impl WidgetKind for RootView {
                 }),
             ));
 
-            let inv_button = Widget::with_theme(Button::empty(), "inventory_button");
-            inv_button
-                .borrow_mut()
-                .state
-                .add_callback(Callback::new(Rc::new(|widget, _| {
+            let inv_button = create_button(
+                &keys, ToggleInventory, "inventory_button", Rc::new(|widget, _| {
                     let (root, view) = Widget::parent_mut::<RootView>(widget);
                     view.toggle_inventory_window(&root);
-                })));
+                })
+            );
 
-            let cha_button = Widget::with_theme(Button::empty(), "character_button");
-            cha_button
-                .borrow_mut()
-                .state
-                .add_callback(Callback::new(Rc::new(|widget, _| {
+            let cha_button = create_button(
+                &keys, ToggleCharacter, "character_button", Rc::new(|widget, _| {
                     let (root, view) = Widget::parent_mut::<RootView>(widget);
                     view.toggle_character_window(&root);
-                })));
+                })
+            );
 
-            let map_button = Widget::with_theme(Button::empty(), "map_button");
-            map_button
-                .borrow_mut()
-                .state
-                .add_callback(Callback::new(Rc::new(|widget, _| {
+            let map_button = create_button(
+                &keys, ToggleMap, "map_button", Rc::new(|widget, _| {
                     let (root, view) = Widget::parent_mut::<RootView>(widget);
                     view.toggle_map_window(&root);
-                })));
+                })
+            );
 
-            let log_button = Widget::with_theme(Button::empty(), "journal_button");
-            log_button
-                .borrow_mut()
-                .state
-                .add_callback(Callback::new(Rc::new(|widget, _| {
+            let log_button = create_button(
+                &keys, ToggleJournal, "journal_button", Rc::new(|widget, _| {
                     let (root, view) = Widget::parent_mut::<RootView>(widget);
                     view.toggle_quest_window(&root);
-                })));
+                })
+            );
 
-            let men_button = Widget::with_theme(Button::empty(), "menu_button");
-            men_button
-                .borrow_mut()
-                .state
-                .add_callback(Callback::new(Rc::new(|widget, _| {
+            let men_button = create_button(
+                &keys, ShowMenu, "menu_button", Rc::new(|widget, _| {
                     let (root, view) = Widget::parent_mut::<RootView>(widget);
                     view.show_menu(&root);
-                })));
+                })
+            );
 
             Widget::add_children_to(
                 &navi_pane,
@@ -620,6 +613,25 @@ impl WidgetKind for RootView {
             Rc::clone(&self.console_widget),
         ]
     }
+}
+
+fn create_button(
+    keybindings: &HashMap<InputAction, Key>,
+    action: InputAction,
+    id: &str,
+    cb: Rc<dyn Fn(&Rc<RefCell<Widget>>, &mut dyn WidgetKind)>
+) -> Rc<RefCell<Widget>> {
+
+    let button = Widget::with_theme(Button::empty(), id);
+    {
+        let mut button = button.borrow_mut();
+        button.state.add_callback(Callback::new(cb));
+        if let Some(key) = keybindings.get(&action) {
+            button.state.add_text_arg("keybinding", &key.short_name())
+        }
+    }
+
+    button
 }
 
 fn is_defeated(party: &[Rc<RefCell<EntityState>>]) -> bool {

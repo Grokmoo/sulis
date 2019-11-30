@@ -137,6 +137,10 @@ impl Config {
         CONFIG.with(|c| c.borrow().resources.clone())
     }
 
+    pub fn get_keybindings() -> HashMap<InputAction, Key> {
+        CONFIG.with(|c| c.borrow().input.keybindings.iter().map(|(k, v)| (*v, *k)).collect())
+    }
+
     pub fn get_input_action(k: KeyboardEvent) -> Option<InputAction> {
         debug!("Got keyboard input '{:?}'", k);
         CONFIG.with(|c| match c.borrow().input.keybindings.get(&k.key) {

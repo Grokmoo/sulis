@@ -62,7 +62,7 @@ pub enum Kind {
     RawKey(Key),
 }
 
-#[derive(Deserialize, Serialize, Copy, Clone, Debug, PartialEq, PartialOrd)]
+#[derive(Eq, Hash, Deserialize, Serialize, Copy, Clone, Debug, PartialEq, PartialOrd)]
 #[serde(deny_unknown_fields)]
 pub enum ClickKind {
     Left,

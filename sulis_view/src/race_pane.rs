@@ -71,6 +71,7 @@ impl WidgetKind for RacePane {
             state.add_text_arg("name", &race.name);
             state.add_text_arg("description", &race.description);
 
+            state.add_text_arg("movement_rate", &format!("{:.2}", race.movement_rate));
             add_bonus_text_args(&race.base_stats, state);
             add_attack_text_args(&race.base_attack, state);
         }

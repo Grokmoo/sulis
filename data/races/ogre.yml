@@ -9,13 +9,6 @@ base_stats:
   - kind: { attribute: { attribute: Endurance, amount: 3 } }
   - kind: { attribute: { attribute: Intellect, amount: -3 } }
   - kind: { hit_points: 40 }
-  - kind: { melee_accuracy: 30 }
-  - kind: { ranged_accuracy: 30 }
-  - kind: { spell_accuracy: 20 }
-  - kind: { defense: 30 }
-  - kind: { fortitude: 30 }
-  - kind: { reflex: 30 }
-  - kind: { will: 30 }
   - kind: { reach: 1.0 }
 base_attack:
   damage:

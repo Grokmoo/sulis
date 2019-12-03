@@ -3,7 +3,7 @@ name: Human
 description: |
   Tough and adaptable, Humans are the most populous race in the known world.  In the thousand years since the Sundering, Humans have spread and colonized vast stretches of all over Eao.  While often looked down upon by the older races, they have proven themselves time and again fiercesome and intelligent warriors, conquerors, and diplomats.
   
-  Human adventurers of all classes can be found frequently throughout the Twin Expanse and beyond.
+  Human adventurers of [c=f00|all classes] can be found frequently throughout the Twin Expanse and beyond.
 size: 2by2
 movement_rate: 1.0
 pc_death_prop: pc_dead_med
@@ -12,13 +12,6 @@ base_stats:
   - kind: { attribute: { attribute: Endurance, amount: 1 } }
   - kind: { attribute: { attribute: Perception, amount: -1 } }
   - kind: { hit_points: 40 }
-  - kind: { melee_accuracy: 30 }
-  - kind: { ranged_accuracy: 30 }
-  - kind: { spell_accuracy: 30 }
-  - kind: { defense: 30 }
-  - kind: { fortitude: 30 }
-  - kind: { reflex: 30 }
-  - kind: { will: 30 }
   - kind: { reach: 0.25 }
 base_attack:
   damage:

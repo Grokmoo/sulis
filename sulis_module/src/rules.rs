@@ -59,6 +59,8 @@ use sulis_core::util::{gen_rand, invalid_data_error};
 #[serde(deny_unknown_fields)]
 pub struct Rules {
     pub id: String,
+    pub base_accuracy: u32,
+    pub base_defense: u32,
     pub base_ap: u32,
     pub max_overflow_ap: i32,
     pub min_overflow_ap: i32,

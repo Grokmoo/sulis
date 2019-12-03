@@ -450,7 +450,10 @@ impl StatList {
 
         self.attack_range = attack_range.unwrap_or(0.0);
 
+        let base_accuracy = rules.base_accuracy as i32;
+        let base_defense = rules.base_defense as i32;
         let base_attr = rules.base_attribute;
+
         use crate::rules::Attribute::*;
         let attrs = &self.attributes;
         let str_bonus = attrs.bonus(Strength, base_attr);
@@ -460,13 +463,13 @@ impl StatList {
         let int_bonus = attrs.bonus(Intellect, base_attr);
         let wis_bonus = attrs.bonus(Wisdom, base_attr);
         self.initiative += dex_bonus / 2 + per_bonus / 2;
-        self.melee_accuracy += per_bonus + str_bonus * 2;
-        self.ranged_accuracy += per_bonus + dex_bonus * 2;
-        self.spell_accuracy += wis_bonus + int_bonus * 2;
-        self.defense += dex_bonus * 2;
-        self.fortitude += end_bonus * 2;
-        self.reflex += dex_bonus * 2;
-        self.will += wis_bonus * 2;
+        self.melee_accuracy += base_accuracy + per_bonus + str_bonus * 2;
+        self.ranged_accuracy += base_accuracy + per_bonus + dex_bonus * 2;
+        self.spell_accuracy += base_accuracy + wis_bonus + int_bonus * 2;
+        self.defense += base_defense + dex_bonus * 2;
+        self.fortitude += base_defense + end_bonus * 2;
+        self.reflex += base_defense + dex_bonus * 2;
+        self.will += base_defense + wis_bonus * 2;
         self.max_hp += (actor.total_level as i32 * end_bonus) / 3;
 
         let damage_stat_bonus = if is_melee { str_bonus } else { dex_bonus } as f32;

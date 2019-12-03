@@ -3,7 +3,7 @@ name: Elf
 description: |
   Boasting the oldest civilization in the known world (at least according to them), the Elves had empires that stretched across the known world and beyond at their peak.  While those days are long gone, Elvish people are still fairly common in most areas of the world, including the Twin Expanse.  Elves are known for being frail but remarkably quick and perceptive.
   
-  Elves are naturally talented at archery, music, and magic - and are usually quite attuned to nature.  This makes them suitable for most any role, except perhaps that of a frontline Fighter.
+  Elves are naturally talented at archery, music, and magic - and are usually quite attuned to nature.  This makes them suitable for most any role, but especially [c=f00|Mages], [c=f00|Druids] and [c=f00|Bards].
 size: 2by2
 movement_rate: 1.1
 pc_death_prop: pc_dead_med
@@ -13,13 +13,6 @@ base_stats:
   - kind: { attribute: { attribute: Endurance, amount: -2 } }
   - kind: { attribute: { attribute: Perception, amount: 2 } }
   - kind: { hit_points: 35 }
-  - kind: { melee_accuracy: 30 }
-  - kind: { ranged_accuracy: 30 }
-  - kind: { spell_accuracy: 35 }
-  - kind: { defense: 30 }
-  - kind: { fortitude: 30 }
-  - kind: { reflex: 30 }
-  - kind: { will: 35 }
   - kind: { reach: 0.25 }
 base_attack:
   damage:

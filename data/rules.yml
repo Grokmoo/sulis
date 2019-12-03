@@ -1,5 +1,7 @@
 ---
 id: rules
+base_accuracy: 30
+base_defense: 30
 display_ap: 1000
 base_ap: 4000
 max_ap: 8000

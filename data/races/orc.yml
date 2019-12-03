@@ -10,13 +10,6 @@ base_stats:
   - kind: { attribute: { attribute: Perception, amount: -1 } }
   - kind: { attribute: { attribute: Intellect, amount: -4 } }
   - kind: { hit_points: 40 }
-  - kind: { melee_accuracy: 30 }
-  - kind: { ranged_accuracy: 25 }
-  - kind: { spell_accuracy: 30 }
-  - kind: { defense: 30 }
-  - kind: { fortitude: 30 }
-  - kind: { reflex: 25 }
-  - kind: { will: 30 }
   - kind: { reach: 0.5 }
 base_attack:
   damage:

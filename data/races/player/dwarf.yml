@@ -3,7 +3,7 @@ name: Dwarf
 description: |
   Short of stature but tougher and stronger than one would expect for their size, Dwarves are a formidable people.  They are however a bit slower on their feet than other races.  Most dwarves spend their entire lives never leaving their mountain kingdoms, but some few do venture to other lands.  Famously stubborn and rigid, they are nonetheless adaptable enought to thrive as traders, warriors or craftsmen.
   
-  Dwarves have a long and proud tradition of Fighters, especially defensive fighters.  They also have a well known Bardic tradition.  Magic is frowned upon in Dwarven society, but they are capable of being effective magic users if they so choose.
+  Dwarves have a long and proud tradition of [c=f00|Fighters], especially defensive fighters.  They also have many well known [c=f00|Bards].  Magic is frowned upon in Dwarven society, but they are capable of being effective magic users if they so choose.
 size: 2by2
 movement_rate: 0.85
 pc_death_prop: pc_dead_small
@@ -12,13 +12,6 @@ base_stats:
   - kind: { attribute: { attribute: Endurance, amount: 3 } }
   - kind: { attribute: { attribute: Wisdom, amount: -1 } }
   - kind: { hit_points: 40 }
-  - kind: { melee_accuracy: 30 }
-  - kind: { ranged_accuracy: 30 }
-  - kind: { spell_accuracy: 25 }
-  - kind: { defense: 30 }
-  - kind: { fortitude: 30 }
-  - kind: { reflex: 30 }
-  - kind: { will: 40 }
   - kind: { reach: 0.25 }
 base_attack:
   damage:

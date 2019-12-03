@@ -3,7 +3,7 @@ name: Dracon
 description: |
   An ancient race of lizard or Dragon like creatures, Dracon are strong, tough, and have good natural defenses thanks to their armor-like scales.  They are resistant to Fire but vulnerable to Cold, which can slow them down greatly.  All Dracon have individually unique head shapes and horns, prohibiting them from equipping helmets or other headgear.
   
-  Dracons can deal incredible damage as Fighters, but also make strong magic users.  They are generally poorly suited to being Rogues.
+  Dracons can deal incredible damage as [c=f00|Fighters], but also make strong magic users.  They are generally poorly suited to being [c=f00|Rogues].
 size: 2by2
 movement_rate: 0.9
 pc_death_prop: pc_dead_large
@@ -14,13 +14,6 @@ base_stats:
   - kind: { attribute: { attribute: Dexterity, amount: -3 } }
   - kind: { attribute: { attribute: Perception, amount: -1 } }
   - kind: { hit_points: 40 }
-  - kind: { melee_accuracy: 30 }
-  - kind: { ranged_accuracy: 25 }
-  - kind: { spell_accuracy: 30 }
-  - kind: { defense: 35 }
-  - kind: { fortitude: 30 }
-  - kind: { reflex: 25 }
-  - kind: { will: 30 }
   - kind: { reach: 0.5 }
   - kind: { armor: 2 }
   - kind: { resistance: { kind: "Fire", amount: 25 } }

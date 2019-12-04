@@ -77,20 +77,54 @@ themes:
             background: empty
           details:
             from: text_area
-            background: bg_base
             border: [2, 2, 2, 2]
-            size: [0, 100]
+            background: bg_base
+            size: [-40, 10]
+            position: [0, 15]
+            relative:
+              x: Center
+              width: Max
+            text: |
+              [s=8|#class# Level #level#]
+          abilities_container:
+            kind: Container
+            background: bg_base
             relative:
               width: Max
-            position: [0, 15]
-            text: |
-              [s=7|Class: #class#]
-              [s=6|]
-              [?ability_name_0|Ability: #ability_name_0#]
-              [?ability_name_1|Ability: #ability_name_1#]
-              [?ability_name_2|Ability: #ability_name_2#]
-              [?ability_name_3|Ability: #ability_name_3#]
-              [?ability_name_4|Ability: #ability_name_4#]
+              x: Center
+            size: [-40, 50]
+            position: [0, 30]
+            border: [2, 2, 2, 2]
+            children:
+              abilities_title:
+                from: label
+                kind: Label
+                relative:
+                  width: Max
+                size: [0, 5]
+                text: Selected Abilities
+                text_params:
+                  scale: 7
+                  horizontal_alignment: Left
+              abilities:
+                relative:
+                  width: Max
+                layout: BoxHorizontal
+                layout_spacing: { top: 0, bottom: 0, left: 0, right: 2 }
+                size: [0, 12]
+                position: [0, 5]
+                children:
+                  ability_button:
+                    from: button
+                    background: background_inner
+                    foreground: ability_overlay
+                    size: [12, 12]
+                    children:
+                      icon:
+                        foreground: "#icon#"
+                        relative:
+                          width: Max
+                          height: Max
       race_selector_pane:
         from: builder_pane
         children:
@@ -313,9 +347,9 @@ themes:
                       ][?ability_uses_2_id|[c=f0f|#ability_uses_2_id#][r=30|#ability_uses_2_per_enc#][r=60|#ability_uses_2_per_day#]
                       ][?ability_uses_3_id|[c=f0f|#ability_uses_3_id#][r=30|#ability_uses_3_per_enc#][r=60|#ability_uses_3_per_day#]
                       ]][?stat_0_id|
-                      [?stat_0_id|[c=f0f|#stat_0_id#][r=20|#stat_0_total#][r=30|(+#stat_0_gain#)]
-                      ][?stat_1_id|[c=f0f|#stat_1_id#][r=20|#stat_1_total#][r=30|(+#stat_1_gain#)]
-                      ][?stat_2_id|[c=f0f|#stat_2_id#][r=20|#stat_2_total#][r=30|(+#stat_2_gain#)]
+                      [?stat_0_id|[c=f0f|#stat_0_id#][r=30|#stat_0_total#][r=40|(+#stat_0_gain#)]
+                      ][?stat_1_id|[c=f0f|#stat_1_id#][r=30|#stat_1_total#][r=40|(+#stat_1_gain#)]
+                      ][?stat_2_id|[c=f0f|#stat_2_id#][r=30|#stat_2_total#][r=40|(+#stat_2_gain#)]
                       ]][?choice_0_name|
                       New Ability Choices
                       [?choice_0_name|[c=f0f|#choice_0_name#]

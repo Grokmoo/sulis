@@ -22,7 +22,7 @@ use sulis_core::ui::{Widget, WidgetKind};
 use sulis_core::widgets::{Label, TextArea};
 use sulis_module::{Ability, Class};
 
-use crate::character_builder::BuilderPane;
+use crate::character_builder::{attribute_selector_pane::AbilityButton, BuilderPane};
 use crate::CharacterBuilder;
 
 pub const NAME: &str = "level_up_finish_pane";
@@ -30,13 +30,15 @@ pub const NAME: &str = "level_up_finish_pane";
 pub struct LevelUpFinishPane {
     class: Option<Rc<Class>>,
     abilities: Vec<Rc<Ability>>,
+    level: u32,
 }
 
 impl LevelUpFinishPane {
-    pub fn new() -> Rc<RefCell<LevelUpFinishPane>> {
+    pub fn new(level: u32) -> Rc<RefCell<LevelUpFinishPane>> {
         Rc::new(RefCell::new(LevelUpFinishPane {
             class: None,
             abilities: Vec::new(),
+            level,
         }))
     }
 }
@@ -82,19 +84,33 @@ impl WidgetKind for LevelUpFinishPane {
     fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let title = Widget::with_theme(Label::empty(), "title");
 
+        let class = match &self.class {
+            Some(class) => class,
+            None => return Vec::new(),
+        };
+
         let details = Widget::with_theme(TextArea::empty(), "details");
 
         {
             let state = &mut details.borrow_mut().state;
-            if let Some(ref class) = self.class {
-                state.add_text_arg("class", &class.name);
-            }
-
-            for (index, ability) in self.abilities.iter().enumerate() {
-                state.add_text_arg(&format!("ability_name_{}", index), &ability.name);
-            }
+            state.add_text_arg("class", &class.name);
+            state.add_text_arg("level", &format!("{}", self.level));
         }
 
-        vec![title, details]
+        let abilities = Widget::empty("abilities");
+        for ability in &self.abilities {
+            let class = Rc::clone(class);
+            let ability = Rc::clone(ability);
+
+            let icon = Widget::with_theme(Label::empty(), "icon");
+            icon.borrow_mut().state.add_text_arg("icon", &ability.icon.id());
+
+            let button = Widget::with_defaults(AbilityButton::new(ability, class));
+
+            Widget::add_child_to(&button, icon);
+            Widget::add_child_to(&abilities, button);
+        }
+
+        vec![title, details, abilities]
     }
 }

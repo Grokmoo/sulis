@@ -43,7 +43,7 @@ impl BuilderSet for LevelUpBuilder {
             (vec![base_class.id.to_string()], levels)
         };
         let class_selector_pane = ClassSelectorPane::new(choices, false, level);
-        let level_up_finish_pane = LevelUpFinishPane::new();
+        let level_up_finish_pane = LevelUpFinishPane::new(level);
         let class_sel_widget = Widget::with_defaults(class_selector_pane.clone());
         let level_up_finish_widget = Widget::with_defaults(level_up_finish_pane.clone());
 

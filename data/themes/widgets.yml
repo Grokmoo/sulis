@@ -131,7 +131,15 @@ themes:
     text: |
       [s=6.0|#name#]   [!activate_ap;c=0ff|Passive][?activate_ap;s=5.0;c=f00|AP: #activate_ap#][?class_stat_name|[s=5.0;c=f0f|   #class_stat_name#: #class_stat_amount#]][?activate_ap|
       [s=5;c=f00|[?duration|Duration: #duration# Rounds][?mode|Mode][?instant|Duration: Instantaneous][?permanent|Permanent]]    [?cooldown;s=5;c=f00|Cooldown: #cooldown# Rounds]]
-      [s=5.0|#description#]
+      [s=5.0|#description#][?upgrade1|[s=3|
+      
+      ][s=6|Level 2]
+      [s=5|#upgrade1#]
+      ][?upgrade2|[s=6|Level 3]
+      [s=5|#upgrade2#]
+      ][?upgrade3|[s=6|Level 4]
+      [s=5|#upgrade3#]
+      ]
   ability_hover:
     from: text_area
     border: { top: 1, bottom: 1, left: 2, right: 2 }

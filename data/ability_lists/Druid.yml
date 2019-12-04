@@ -1,4 +1,5 @@
 id: druid
+name: Druid
 abilities:
   - id: enlarge
     position: [2.0, 7]

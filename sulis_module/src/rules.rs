@@ -123,7 +123,7 @@ impl Rules {
 
     pub fn format_ap(&self, ap: i32) -> String {
         let amount = (ap as f32 * 10.0 / self.display_ap as f32).floor();
-        format!("{:.1} AP", amount / 10.0)
+        format!("{:.1}", amount / 10.0)
     }
 
     pub fn canonicalize_time(&self, time: &mut Time) {

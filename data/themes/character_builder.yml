@@ -102,7 +102,6 @@ themes:
                 Each race has unique strengths and weaknesses, making them more or less suited for any given class - but any combination is possible.
           race_pane:
             from: game.race_pane
-            background: bg_base
             border: [1, 1, 1, 1]
             relative:
               width: Max
@@ -266,14 +265,13 @@ themes:
                 kind: Container
                 relative:
                   width: Max
-                size: [-65, 31]
+                size: [-65, 52]
                 position: [0, 55]
                 background: bg_base
                 border: [2, 2, 2, 2]
                 children:
                   starting_abilities_title:
                     from: label
-                    kind: Label
                     relative:
                       width: Max
                     size: [0, 5]
@@ -300,6 +298,31 @@ themes:
                             relative:
                               width: Max
                               height: Max
+                  upgrades:
+                    from: text_area
+                    relative:
+                      width: Max
+                      height: Max
+                    position: [0, 0]
+                    text: |
+                      [s=7|Upgrades at Level #level#]
+                      [?ability_uses_0_id|
+                      Ability Uses[x=25|Per Encounter][x=55|Per Day]
+                      [?ability_uses_0_id|[c=f0f|#ability_uses_0_id#][r=30|#ability_uses_0_per_enc#][r=60|#ability_uses_0_per_day#]
+                      ][?ability_uses_1_id|[c=f0f|#ability_uses_1_id#][r=30|#ability_uses_1_per_enc#][r=60|#ability_uses_1_per_day#]
+                      ][?ability_uses_2_id|[c=f0f|#ability_uses_2_id#][r=30|#ability_uses_2_per_enc#][r=60|#ability_uses_2_per_day#]
+                      ][?ability_uses_3_id|[c=f0f|#ability_uses_3_id#][r=30|#ability_uses_3_per_enc#][r=60|#ability_uses_3_per_day#]
+                      ]][?stat_0_id|
+                      [?stat_0_id|[c=f0f|#stat_0_id#][r=20|#stat_0_total#][r=30|(+#stat_0_gain#)]
+                      ][?stat_1_id|[c=f0f|#stat_1_id#][r=20|#stat_1_total#][r=30|(+#stat_1_gain#)]
+                      ][?stat_2_id|[c=f0f|#stat_2_id#][r=20|#stat_2_total#][r=30|(+#stat_2_gain#)]
+                      ]][?choice_0_name|
+                      New Ability Choices
+                      [?choice_0_name|[c=f0f|#choice_0_name#]
+                      ][?choice_1_name|[c=f0f|#choice_1_name#]
+                      ][?choice_2_name|[c=f0f|#choice_2_name#]
+                      ][?choice_3_name|[c=f0f|#choice_3_name#]
+                      ]]
               bonuses:
                 from: text_area
                 background: bg_base

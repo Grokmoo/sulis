@@ -70,11 +70,23 @@ impl WidgetKind for RacePane {
             let state = &mut details.borrow_mut().state;
             state.add_text_arg("name", &race.name);
             state.add_text_arg("description", &race.description);
+        }
 
+        let stats = Widget::with_theme(TextArea::empty(), "stats");
+        {
+            let state = &mut stats.borrow_mut().state;
+            state.add_text_arg("name", &race.name);
             state.add_text_arg("movement_rate", &format!("{:.2}", race.movement_rate));
             add_bonus_text_args(&race.base_stats, state);
             add_attack_text_args(&race.base_attack, state);
+
+            let mut i = 0;
+            for slot in &race.disabled_slots {
+                state.add_text_arg(&format!("disabled_slot_{}", i), &format!("{:?}", slot));
+                i += 1;
+            }
         }
-        vec![details]
+
+        vec![details, stats]
     }
 }

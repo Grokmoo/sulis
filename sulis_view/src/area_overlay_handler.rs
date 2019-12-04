@@ -401,7 +401,7 @@ impl AreaOverlayHandler {
         }
         if let Some(ap) = self.path_ap {
             let font_rend = LineRenderer::new(&params.font);
-            let text = Module::rules().format_ap(ap);
+            let text = format!("{} AP", Module::rules().format_ap(ap));
             let (x, y) = match &self.hover_sprite {
                 None => (0.0, 0.0),
                 Some(hover) => (

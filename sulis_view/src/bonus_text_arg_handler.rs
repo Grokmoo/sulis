@@ -20,6 +20,14 @@ use sulis_core::ui::{WidgetState};
 use sulis_module::{Armor, Bonus, BonusList, DamageKind, Module, PrereqList};
 use sulis_module::bonus::{AttackKindBuilder, AttackBuilder, Contingent};
 
+pub fn format_bonus_or_penalty(amount: i32) -> String {
+    if amount >= 0 {
+        format!("+{}", amount)
+    } else {
+        format!("{}", amount)
+    }
+}
+
 pub fn add_attack_text_args(attack: &AttackBuilder, widget_state: &mut WidgetState) {
     widget_state.add_text_arg("min_damage", &attack.damage.min.to_string());
     widget_state.add_text_arg("max_damage", &attack.damage.max.to_string());
@@ -119,7 +127,7 @@ fn add_bonus(
     use sulis_module::BonusKind::*;
     match &bonus.kind {
         Attribute { attribute, amount } => add(state, &attribute.short_name(), amount),
-        ActionPoints(amount) => add(state, "bonus_ap", Module::rules().format_ap(*amount)),
+        ActionPoints(amount) => add(state, "action_points", Module::rules().format_ap(*amount)),
         Armor(amount) => armor.add_base(*amount),
         ArmorKind { kind, amount } => armor.add_kind(*kind, *amount),
         Resistance { kind, amount } => add(

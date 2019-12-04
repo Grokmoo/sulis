@@ -1,4 +1,5 @@
 id: warlock
+name: Warlock
 abilities:
   - id: vampiric_touch
     position: [3, 0]

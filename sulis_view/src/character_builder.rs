@@ -229,7 +229,7 @@ impl BuilderSet for CharacterCreator {
         let class_choices = Module::rules().selectable_classes.clone();
 
         let race_selector_pane = RaceSelectorPane::new();
-        let class_selector_pane = ClassSelectorPane::new(class_choices, true);
+        let class_selector_pane = ClassSelectorPane::new(class_choices, true, 1);
         let attribute_selector_pane = AttributeSelectorPane::new();
         let backstory_selector_pane = BackstorySelectorPane::new();
         let cosmetic_selector_pane = CosmeticSelectorPane::new();

@@ -12,6 +12,7 @@ base_stats:
   - kind: { attribute: { attribute: Dexterity, amount: 4 } }
   - kind: { attribute: { attribute: Endurance, amount: -1 } }
   - kind: { attribute: { attribute: Wisdom, amount: -1 } }
+  - kind: { action_points: 100 }
   - kind: { hit_points: 35 }
   - kind: { reach: 0.25 }
 base_attack:

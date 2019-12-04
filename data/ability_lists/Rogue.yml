@@ -1,4 +1,5 @@
 id: rogue
+name: Rogue
 abilities:
   - id: hide
     position: [0, 0.5]

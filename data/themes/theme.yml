@@ -1209,35 +1209,51 @@ themes:
             position: [-4, 10]
       race_pane:
         size: [40, 40]
-        background: bg_base
         border: [1, 1, 1, 1]
         children:
           details:
             from: text_area
+            background: bg_base
             border: [2, 2, 2, 2]
             relative:
               width: Max
-              height: Max
+            size: [0, 45]
             text: |
               #description#
-              [s=9|]
-              [y=45;s=7|Stats]
+          stats:
+            from: text_area
+            border: [2, 2, 2, 2]
+            background: bg_base
+            relative:
+              width: Max
+              height: Max
+            position: [0, 50]
+            size: [0, -50]
+            text: |
+              [s=7|Stats]
               [?hit_points|[s=6.0|Hit Points [r=40|#hit_points#]]
-              ][?armor|[s=6.0|Armor [r=40|#armor#]]
-              ][?resistance_acid|[s=6.0|Acid Resistance [r=40|#resistance_acid#%]]
-              ][?resistance_cold|[s=6.0|Cold Resistance [r=40|#resistance_cold#%]]
-              ][?resistance_fire|[s=6.0|Fire Resistance [r=40|#resistance_fire#%]]
-              ][?resistance_shock|[s=6.0|Shock Resistance [r=40|#resistance_shock#%]]
-              ]
-              [?movement_rate|[s=6.0|Movement Rate [r=40|#movement_rate#]]
+              ][?movement_rate|[s=6.0|Movement Rate [r=40|#movement_rate#]]
               ][?bonus_reach|[s=6.0|Reach [r=40|#bonus_reach#]]
-              [y=45|][x=60;s=7|Attribute Bonuses]
+              [y=0;x=60;s=7|Attributes]
               [x=60;?str|Strength [r=92|#str#]
               ][x=60;?dex|Dexterity [r=92|#dex#]
               ][x=60;?end|Endurance [r=92|#end#]
               ][x=60;?per|Perception [r=92|#per#]
               ][x=60;?int|Intelligence [r=92|#int#]
               ][x=60;?wis|Wisdom: [r=92|#wis#]
+              ]
+              [y=0;x=120;s=7|Bonuses & Penalties]
+              [x=120;?disabled_slot_0|[s=6.0|Cannot equip to [r=160|#disabled_slot_0#]]
+              ][x=120;?disabled_slot_1|[s=6.0|Cannot equip to [r=160|#disabled_slot_1#]]
+              ][x=120;?disabled_slot_2|[s=6.0|Cannot equip to [r=160|#disabled_slot_2#]]
+              ][x=120;?armor|[s=6.0|Armor [r=160|#armor#]]
+              ][x=120;?resistance_acid|[s=6.0|Acid Resistance [r=160|#resistance_acid#%]]
+              ][x=120;?resistance_cold|[s=6.0|Cold Resistance [r=160|#resistance_cold#%]]
+              ][x=120;?resistance_fire|[s=6.0|Fire Resistance [r=160|#resistance_fire#%]]
+              ][x=120;?resistance_shock|[s=6.0|Shock Resistance [r=160|#resistance_shock#%]]
+              ][x=120;?initiative|[s=6.0|Initiative [r=160|#initiative#]]
+              ][x=120;?caster_level|[s=6.0|Caster Level [r=160|#caster_level#]]
+              ][x=120;?action_points|[s=6.0|Action Points [r=160|#action_points#]]
               ]
       ability_pane:
         size: [40, 40]
@@ -1509,7 +1525,7 @@ themes:
           ][?int|Intelligence: #int#
           ][?wis|Wisdom: #wis#
           ][?caster_level|Caster level: #caster_level#
-          ][?bonus_ap|#bonus_ap#
+          ][?action_points|Action Points: #action_points#
           ][?min_damage|Damage: #min_damage# to #max_damage# [c=ff0|#damage_kind#]
           ][?armor_penetration|Armor Penetration: #armor_penetration#
           ][?attack_min_bonus_damage|Damage: #attack_min_bonus_damage# to #attack_max_bonus_damage# [?attack_bonus_damage_kind;c=ff0|#attack_bonus_damage_kind#]

@@ -31,6 +31,7 @@ pub struct Entry {
 #[derive(Debug)]
 pub struct AbilityList {
     pub id: String,
+    pub name: String,
     entries: Vec<Entry>,
 }
 
@@ -54,6 +55,7 @@ impl AbilityList {
 
         Ok(AbilityList {
             id: builder.id,
+            name: builder.name,
             entries,
         })
     }
@@ -74,5 +76,6 @@ pub struct EntryBuilder {
 #[serde(deny_unknown_fields)]
 pub struct AbilityListBuilder {
     pub id: String,
+    pub name: String,
     abilities: Vec<EntryBuilder>,
 }

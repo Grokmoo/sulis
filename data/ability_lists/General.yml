@@ -1,4 +1,5 @@
 id: general
+name: General
 abilities:
   - id: armor_light
     position: [0, 0]

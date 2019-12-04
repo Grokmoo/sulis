@@ -1,4 +1,5 @@
 id: fighter
+name: Fighter
 abilities:
   - id: defensive_fighting
     position: [0, 0.0]

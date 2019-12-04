@@ -12,6 +12,7 @@ base_stats:
   - kind: { attribute: { attribute: Dexterity, amount: 1 } }
   - kind: { attribute: { attribute: Endurance, amount: -2 } }
   - kind: { attribute: { attribute: Perception, amount: 2 } }
+  - kind: { caster_level: 1 }
   - kind: { hit_points: 35 }
   - kind: { reach: 0.25 }
 base_attack:

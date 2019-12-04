@@ -17,7 +17,7 @@ base_stats:
   - kind: { reach: 0.5 }
   - kind: { armor: 2 }
   - kind: { resistance: { kind: "Fire", amount: 25 } }
-  - kind: { resistance: { kind: "Cold", amount: -25 } }
+  - kind: { resistance: { kind: "Cold", amount: -35 } }
 base_attack:
   damage:
     min: 8

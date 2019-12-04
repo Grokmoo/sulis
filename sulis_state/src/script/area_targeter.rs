@@ -1083,7 +1083,7 @@ impl AreaTargeter {
         };
 
         let font_rend = LineRenderer::new(&params.font);
-        let text = Module::rules().format_ap(ap);
+        let text = format!("{} AP", Module::rules().format_ap(ap));
         let x = x - offset.0;
         let y = y - offset.1;
         let (mut draw_list, _) = font_rend.get_draw_list(&text, x, y, params.ap_scale);

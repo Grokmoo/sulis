@@ -1,4 +1,5 @@
 id: mage
+name: Mage
 abilities:
   - id: minor_heal
     position: [6, 5]

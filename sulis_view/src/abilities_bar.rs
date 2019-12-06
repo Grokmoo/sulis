@@ -244,6 +244,7 @@ struct GroupPane {
     abilities: Vec<OwnedAbility>,
     group: String,
     description: Rc<RefCell<Widget>>,
+    skip_first_position: bool,
     vertical_count: u32,
     min_horizontal_count: u32,
     grid_width: u32,
@@ -277,6 +278,7 @@ impl GroupPane {
             grid_width: 1,
             grid_border: 1,
             vertical_count: 1,
+            skip_first_position: true,
             min_horizontal_count: 1,
             collapse_enabled,
         }))
@@ -284,24 +286,19 @@ impl GroupPane {
 
     fn set_layout_size(&mut self, widget: &mut Widget) {
         let theme = &widget.theme;
-        if let Some(ref count) = theme.custom.get("vertical_count") {
-            self.vertical_count = count.parse::<u32>().unwrap_or(1);
-        }
 
-        if let Some(ref width) = theme.custom.get("grid_width") {
-            self.grid_width = width.parse::<u32>().unwrap_or(1);
-        }
-
-        if let Some(ref count) = theme.custom.get("min_horizontal_count") {
-            self.min_horizontal_count = count.parse::<u32>().unwrap_or(1);
-        }
-
-        if let Some(ref width) = theme.custom.get("grid_border") {
-            self.grid_border = width.parse::<u32>().unwrap_or(1);
-        }
+        self.vertical_count = theme.get_custom_or_default("vertical_count", 1);
+        self.grid_width = theme.get_custom_or_default("grid_width", 1);
+        self.min_horizontal_count = theme.get_custom_or_default("min_horizontal_count", 1);
+        self.grid_border = theme.get_custom_or_default("grid_border", 1);
+        self.skip_first_position = theme.get_custom_or_default("skip_first_position", false);
 
         let height = widget.state.height();
-        let cols = (self.abilities.len() as f32 / self.vertical_count as f32).ceil() as u32;
+
+        let mut items_count = self.abilities.len();
+        if self.skip_first_position { items_count += 1; }
+
+        let cols = (items_count as f32 / self.vertical_count as f32).ceil() as u32;
         let cols = cmp::max(cols, self.min_horizontal_count) as i32;
         let width = cols * self.grid_width as i32 + self.grid_border as i32;
         widget.state.set_size(Size::new(width, height));
@@ -392,6 +389,12 @@ impl WidgetKind for GroupPane {
             .add_text_arg("group", &self.group);
 
         let abilities_pane = Widget::empty("abilities_pane");
+
+        if self.skip_first_position {
+            let skip = Widget::empty("skip_button");
+            Widget::add_child_to(&abilities_pane, skip);
+        }
+
         for ability in self.abilities.iter() {
             let ability = &ability.ability;
 
@@ -416,7 +419,7 @@ impl WidgetKind for GroupPane {
                 parent.borrow_mut().invalidate_children();
             })));
 
-        vec![self.description.clone(), change_size, abilities_pane]
+        vec![self.description.clone(), abilities_pane, change_size]
     }
 }
 

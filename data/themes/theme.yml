@@ -202,7 +202,7 @@ themes:
                       width: Max
                       height: Max
                     size: [-7, -12]
-                    layout: Grid
+                    layout: GridRows
                     layout_spacing: { top: 0, bottom: 1, left: 0, right: 1 }
                     children:
                       icon:
@@ -225,13 +225,13 @@ themes:
             relative:
               height: Max
             position: [132, 0]
-            size: [28, 0]
+            size: [24, 0]
             background: bg_base
             border: [1, 1, 1, 1]
             children:
               title:
                 from: label
-                text: "Usable Items"
+                text: "Items"
                 position: [0, 1]
                 size: [0, 8]
                 relative:
@@ -243,7 +243,7 @@ themes:
               swap_weapons:
                 from: button
                 foreground: swap_weapons
-                size: [7, 7]
+                size: [10, 10]
                 position: [0, 0]
                 relative:
                   x: Max
@@ -251,30 +251,34 @@ themes:
                   tooltip: "Swap Weapon Set"
               usable1:
                 from: item_button
+                size: [10, 10]
                 background: quick_item_button
                 foreground: ability_button_fg
-                position: [0, 9]
+                position: [0, 12]
               usable2:
                 from: item_button
+                size: [10, 10]
                 background: quick_item_button
                 foreground: ability_button_fg
-                position: [14, 9]
+                position: [12, 12]
               usable3:
                 from: item_button
+                size: [10, 10]
                 background: quick_item_button
                 foreground: ability_button_fg
-                position: [0, 23]
+                position: [0, 24]
               usable4:
                 from: item_button
+                size: [10, 10]
                 background: quick_item_button
                 foreground: ability_button_fg
-                position: [14, 23]
+                position: [12, 24]
           abilities_bar:
             relative:
               width: Max
               height: Max
-            position: [161, 0]
-            size: [-199, 0]
+            position: [157, 0]
+            size: [-191, 0]
             layout: BoxHorizontal
             layout_spacing: { top: 0, bottom: 0, left: 0, right: 1 }
             children:
@@ -320,17 +324,16 @@ themes:
                   width: Custom
                 border: { top: 1, bottom: 1, left: 1, right: 0 }
                 custom:
-                  vertical_count: "2"
+                  vertical_count: "3"
                   grid_width: "13"
                   grid_border: "2"
                   min_horizontal_count: "1"
+                  skip_first_position: "true"
                 children:
                   change_size:
                     from: button
                     background: background_transparent_no_disabled
-                    size: [1, 5]
-                    relative:
-                      width: Max
+                    size: [15, 5]
                     position: [-1, -1]
                     custom:
                       tooltip: "Collapse"
@@ -347,16 +350,17 @@ themes:
                     relative:
                       width: Max
                       height: Max
-                      y: Max
-                    size: [0, -10]
-                    layout: Grid
-                    layout_spacing: { top: 0, bottom: 0, left: 0, right: 0 }
+                    size: [0, 0]
+                    layout: GridColumns
+                    layout_spacing: { top: 0, bottom: 1, left: 1, right: 1 }
                     children:
+                      skip_button:
+                        size: [11, 11]
                       ability_button:
                         from: button
                         background: ability_button
                         foreground: ability_button_fg
-                        size: [13, 13]
+                        size: [11, 11]
                         children:
                           duration_label:
                             from: label
@@ -385,7 +389,7 @@ themes:
             relative:
               x: Max
               height: Max
-            size: [38, 0]
+            size: [32, 0]
             children:
               end_turn_button:
                 from: button
@@ -393,8 +397,8 @@ themes:
                   tooltip: |
                     \[[c=f0f|#keybinding#]\] - End Turn
                 background: background
-                size: [22, 22]
-                position: [0, -4]
+                size: [21, 21]
+                position: [0, -6]
                 relative:
                   x: Max
                   y: Max
@@ -404,28 +408,28 @@ themes:
                 custom:
                   tooltip: |
                     \[[c=f0f|#keybinding#]\] - Map
-                position: [-24, -4]
+                position: [-22, -6]
                 foreground: map_icon
               journal_button:
                 from: game.bottom_pane.window_button
                 custom:
                   tooltip: |
                     \[[c=f0f|#keybinding#]\] - Journal
-                position: [-24, -16]
+                position: [-22, -17]
                 foreground: log_icon
               character_button:
                 from: game.bottom_pane.window_button
                 custom:
                   tooltip: |
                     \[[c=f0f|#keybinding#]\] - Character Sheet
-                position: [-24, -28]
+                position: [-22, -28]
                 foreground: char_icon
               inventory_button:
                 from: game.bottom_pane.window_button
                 custom:
                   tooltip: |
                     \[[c=f0f|#keybinding#]\] - Inventory
-                position: [-12, -28]
+                position: [-11, -28]
                 foreground: inv_icon
               menu_button:
                 from: game.bottom_pane.window_button
@@ -439,7 +443,7 @@ themes:
             text: "#hour#, Day #day#"
             text_params:
               horizontal_alignment: Right
-            size: [40, 4]
+            size: [40, 5]
             relative:
               x: Max
               y: Max
@@ -666,7 +670,7 @@ themes:
                   scroll_delta: "13"
               content:
                 size: [-7, 0]
-                layout: Grid
+                layout: GridRows
                 layout_spacing: [0, 1, 0, 1]
                 relative:
                   width: Max
@@ -1077,7 +1081,7 @@ themes:
                       scroll_delta: "15"
                   content:
                     size: [-7, 0]
-                    layout: Grid
+                    layout: GridRows
                     layout_spacing: { bottom: 2, right: 2 }
                     relative:
                       width: Max
@@ -1097,7 +1101,7 @@ themes:
               height: Max
             size: [0, -6]
             position: [0, 7]
-            layout: Grid
+            layout: GridRows
             layout_spacing: { top: 0, bottom: 1, left: 1, right: 0 }
             children:
               scrollbar:
@@ -1106,7 +1110,7 @@ themes:
                   scroll_delta: "10"
               content:
                 size: [-7, 0]
-                layout: Grid
+                layout: GridRows
                 layout_spacing: { top: 0, bottom: 1, left: 0, right: 1 }
                 relative:
                   width: Max

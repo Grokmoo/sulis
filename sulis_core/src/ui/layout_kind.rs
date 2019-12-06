@@ -26,7 +26,8 @@ pub enum LayoutKind {
     Normal,
     BoxVertical,
     BoxHorizontal,
-    Grid,
+    GridRows,
+    GridColumns,
 }
 
 impl Default for LayoutKind {
@@ -43,7 +44,37 @@ impl LayoutKind {
             Normal => LayoutKind::layout_normal(widget, theme),
             BoxVertical => LayoutKind::layout_box_vertical(widget, theme),
             BoxHorizontal => LayoutKind::layout_box_horizontal(widget, theme),
-            Grid => LayoutKind::layout_grid(widget, theme),
+            GridRows => LayoutKind::layout_grid(widget, theme),
+            GridColumns => LayoutKind::layout_grid_column(widget, theme),
+        }
+    }
+
+    fn layout_grid_column(widget: &Widget, theme: Rc<Theme>) {
+        let mut current_x = widget.state.inner_left();
+        let mut current_y = widget.state.inner_top();
+
+        let mut max_width = 0;
+        current_x += theme.layout_spacing.left;
+
+        for child in widget.children.iter() {
+            current_y += theme.layout_spacing.top;
+
+            let width =
+                LayoutKind::width_recursive(&child.borrow_mut(), widget.state.inner_width());
+            let height =
+                LayoutKind::height_recursive(&child.borrow_mut(), widget.state.inner_height());
+            max_width = cmp::max(max_width, width);
+            child.borrow_mut().state.set_size(Size::new(width, height));
+
+            if current_y + height + theme.layout_spacing.bottom > widget.state.inner_bottom() + 1 {
+                current_y = widget.state.inner_top() + theme.layout_spacing.top;
+                current_x += max_width;
+                current_x += theme.layout_spacing.left + theme.layout_spacing.right;
+                max_width = 0;
+            }
+
+            child.borrow_mut().state.set_position(current_x, current_y);
+            current_y += height + theme.layout_spacing.bottom;
         }
     }
 

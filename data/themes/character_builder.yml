@@ -316,7 +316,7 @@ themes:
                   starting_abilities:
                     relative:
                       width: Max
-                    layout: Grid
+                    layout: GridRows
                     layout_spacing: { top: 0, bottom: 0, left: 0, right: 2 }
                     size: [0, 25]
                     position: [0, 5]
@@ -700,7 +700,7 @@ themes:
           skin_color_panel:
             position: [33, 45]
             size: [60, 14]
-            layout: Grid
+            layout: GridRows
             layout_spacing: { top: 0, bottom: 1, left: 0, right: 1 }
             children:
               color_button:
@@ -745,7 +745,7 @@ themes:
           hair_color_panel:
             position: [33, 68]
             size: [70, 14]
-            layout: Grid
+            layout: GridRows
             layout_spacing: { top: 0, bottom: 1, left: 0, right: 1 }
             children:
               color_button:
@@ -762,7 +762,7 @@ themes:
           color_panel:
             position: [33, 87]
             size: [70, 14]
-            layout: Grid
+            layout: GridRows
             layout_spacing: { top: 0, bottom: 1, left: 0, right: 1 }
             children:
               color_button:
@@ -802,7 +802,7 @@ themes:
         relative:
           width: Max
           height: Max
-        layout: Grid
+        layout: GridRows
         layout_spacing: { top: 0, bottom: 1, left: 0, right: 1 }
         children:
           portrait_button:

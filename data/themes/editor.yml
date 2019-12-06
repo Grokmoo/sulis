@@ -131,7 +131,7 @@ themes:
               width: Max
             position: [0, 44]
             size: [-20, 20]
-            layout: Grid
+            layout: GridRows
             layout_spacing: [0, 0, 0, 0]
             children:
               ext_button:
@@ -153,7 +153,7 @@ themes:
                 relative:
                   width: Max
                   height: Max
-                layout: Grid
+                layout: GridRows
                 layout_spacing: [0, 0, 0, 0]
                 children:
                   wall_button:
@@ -192,7 +192,7 @@ themes:
                 relative:
                   width: Max
                   height: Max
-                layout: Grid
+                layout: GridRows
                 layout_spacing: [0, 0, 0, 0]
                 children:
                   terrain_button:
@@ -232,7 +232,7 @@ themes:
           x: Max
           height: Max
         position: [0, 4]
-        layout: Grid
+        layout: GridRows
         layout_spacing: [0, 1, 0, 1]
         children:
           features:
@@ -248,7 +248,7 @@ themes:
                 relative:
                   width: Max
                   height: Max
-                layout: Grid
+                layout: GridRows
                 layout_spacing: [0, 0, 0, 0]
                 children:
                   feature_button:
@@ -263,7 +263,7 @@ themes:
           x: Max
           height: Max
         position: [0, 4]
-        layout: Grid
+        layout: GridRows
         layout_spacing: [0, 1, 0, 1]
         children:
           actors:
@@ -279,7 +279,7 @@ themes:
                 relative:
                   width: Max
                   height: Max
-                layout: Grid
+                layout: GridRows
                 layout_spacing: [0, 0, 0, 0]
                 children:
                   actor_button:
@@ -294,7 +294,7 @@ themes:
           x: Max
           height: Max
         position: [0, 4]
-        layout: Grid
+        layout: GridRows
         layout_spacing: [0, 1, 0, 1]
         children:
           props:
@@ -310,7 +310,7 @@ themes:
                 relative:
                   width: Max
                   height: Max
-                layout: Grid
+                layout: GridRows
                 layout_spacing: [0, 0, 0, 0]
                 children:
                   prop_button:
@@ -370,7 +370,7 @@ themes:
                 relative:
                   width: Max
                   height: Max
-                layout: Grid
+                layout: GridRows
                 layout_spacing: [0, 0, 0, 0]
                 children:
                   encounter_button:
@@ -411,7 +411,7 @@ themes:
                 relative:
                   width: Max
                   height: Max
-                layout: Grid
+                layout: GridRows
                 layout_spacing: [0, 0, 0, 0]
                 children:
                   tile_button:
@@ -530,7 +530,7 @@ themes:
           levels_pane:
             position: [85, 20]
             size: [60, 30]
-            layout: Grid
+            layout: GridRows
             layout_spacing: { bottom: 1, right: 1 }
             children:
               class_widget:

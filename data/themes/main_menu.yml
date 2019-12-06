@@ -246,7 +246,7 @@ themes:
               width: Max
               height: Max
             size: [-7, 0]
-            layout: Grid
+            layout: GridRows
             layout_spacing: { top: 0, bottom: 1, right: 1, left: 0 }
             children:
               character_button:
@@ -704,7 +704,7 @@ themes:
                 relative:
                   width: Max
                   height: Max
-                layout: Grid
+                layout: GridRows
                 layout_spacing: { right: 1, bottom: 1 }
                 children:
                   key_button:

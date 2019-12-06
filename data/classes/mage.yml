@@ -189,7 +189,7 @@ upgrades:
       - [ "3rd Circle", 2 ]
       - [ "4th Circle", 3 ]
   16:
-    ability_choices: [ mage, general ]
+    ability_choices: [ mage ]
     group_uses_per_encounter:
       - [ "Cantrips", 4 ]
       - [ "1st Circle", 2 ]
@@ -203,7 +203,7 @@ upgrades:
       - [ "3rd Circle", 2 ]
       - [ "4th Circle", 2 ]
   17:
-    ability_choices: [ mage, general ]
+    ability_choices: [ mage ]
     group_uses_per_encounter:
       - [ "Cantrips", 4 ]
       - [ "1st Circle", 2 ]
@@ -231,7 +231,7 @@ upgrades:
       - [ "3rd Circle", 2 ]
       - [ "4th Circle", 2 ]
   19:
-    ability_choices: [ mage, general ]
+    ability_choices: [ mage ]
     group_uses_per_encounter:
       - [ "Cantrips", 4 ]
       - [ "1st Circle", 2 ]

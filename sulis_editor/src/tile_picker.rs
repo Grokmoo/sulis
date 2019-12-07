@@ -21,7 +21,7 @@ use std::rc::Rc;
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::ui::{Callback, Color, Widget, WidgetKind};
 use sulis_core::util::Point;
-use sulis_core::widgets::{Button, ScrollPane};
+use sulis_core::widgets::{Button, ScrollPane, ScrollDirection};
 use sulis_module::area::Tile;
 use sulis_module::Module;
 
@@ -190,7 +190,7 @@ impl WidgetKind for TilePicker {
             Some(ref layer) => layer,
         };
 
-        let scrollpane = ScrollPane::new();
+        let scrollpane = ScrollPane::new(ScrollDirection::Vertical);
         for tile in all_tiles {
             if &tile.layer != cur_layer {
                 continue;

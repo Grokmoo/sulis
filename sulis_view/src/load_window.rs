@@ -19,7 +19,8 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 use sulis_core::ui::{Callback, Widget, WidgetKind};
-use sulis_core::widgets::{Button, ConfirmationWindow, Label, ScrollPane, TextArea};
+use sulis_core::widgets::{Button, ConfirmationWindow, Label,
+    ScrollPane, ScrollDirection, TextArea};
 use sulis_state::save_file::{delete_save, get_available_save_files, load_state};
 use sulis_state::{NextGameStep, SaveFileMetaData, SaveState};
 
@@ -175,7 +176,7 @@ impl WidgetKind for LoadWindow {
                 parent.borrow_mut().mark_for_removal();
             })));
 
-        let scrollpane = ScrollPane::new();
+        let scrollpane = ScrollPane::new(ScrollDirection::Vertical);
         let entries = Widget::with_theme(scrollpane.clone(), "entries");
 
         for (index, ref meta) in self.entries.iter().enumerate() {

@@ -23,7 +23,7 @@ use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::resource::{ResourceSet, Sprite};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_core::util::Point;
-use sulis_core::widgets::{Button, Label, ScrollPane, Spinner};
+use sulis_core::widgets::{Button, Label, ScrollPane, ScrollDirection, Spinner};
 use sulis_module::{Encounter, Module};
 
 use crate::{AreaModel, EditorMode};
@@ -164,7 +164,7 @@ impl WidgetKind for EncounterPicker {
 
         let size_label = Widget::with_theme(Label::empty(), "size_label");
 
-        let scrollpane = ScrollPane::new();
+        let scrollpane = ScrollPane::new(ScrollDirection::Vertical);
         {
             let mut all_encounters = Module::all_encounters();
             all_encounters.sort_by(|a, b| a.id.cmp(&b.id));

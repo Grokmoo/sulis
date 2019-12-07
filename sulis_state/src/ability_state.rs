@@ -29,6 +29,7 @@ pub struct AbilityState {
     pub requires_active_mode: Option<Rc<Ability>>,
     cur_duration: u32,
     pub listeners: ChangeListenerList<AbilityState>,
+    pub newly_added_ability: bool,
 }
 
 impl AbilityState {
@@ -55,6 +56,7 @@ impl AbilityState {
             cur_duration: 0,
             requires_active_mode: mode,
             listeners: ChangeListenerList::default(),
+            newly_added_ability: false,
         }
     }
 

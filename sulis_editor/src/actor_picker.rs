@@ -21,7 +21,7 @@ use std::rc::Rc;
 use sulis_core::io::GraphicsRenderer;
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_core::util::Point;
-use sulis_core::widgets::{Button, ScrollPane};
+use sulis_core::widgets::{Button, ScrollPane, ScrollDirection};
 use sulis_module::{Actor, Module};
 
 use crate::{AreaModel, EditorMode};
@@ -146,7 +146,7 @@ impl WidgetKind for ActorPicker {
         let mut all_actors = Module::all_actors();
         all_actors.sort_by(|a, b| a.id.cmp(&b.id));
 
-        let scrollpane = ScrollPane::new();
+        let scrollpane = ScrollPane::new(ScrollDirection::Vertical);
         for actor in all_actors {
             let button = Widget::with_theme(Button::empty(), "actor_button");
             button.borrow_mut().state.add_text_arg("name", &actor.id);

@@ -19,7 +19,8 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 use sulis_core::ui::*;
-use sulis_core::widgets::{Button, ConfirmationWindow, Label, ScrollPane, TextArea};
+use sulis_core::widgets::{Button, ConfirmationWindow, Label,
+    ScrollPane, ScrollDirection, TextArea};
 use sulis_module::{Actor, Module};
 use sulis_state::{ActorState, NextGameStep};
 
@@ -140,7 +141,7 @@ impl WidgetKind for CharacterSelector {
         };
 
         let mut must_create_character = true;
-        let scrollpane = ScrollPane::new();
+        let scrollpane = ScrollPane::new(ScrollDirection::Vertical);
         let scroll_widget = Widget::with_theme(scrollpane.clone(), "characters_pane");
         {
             let characters = Module::get_available_characters();

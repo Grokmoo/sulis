@@ -23,7 +23,7 @@ use std::rc::Rc;
 use sulis_core::io::event;
 use sulis_core::ui::{animation_state, Callback, Widget, WidgetKind, WidgetState};
 use sulis_core::util::{ExtInt, Size};
-use sulis_core::widgets::{Button, Label, TextArea};
+use sulis_core::widgets::{Button, Label, TextArea, ScrollPane, ScrollDirection};
 use sulis_module::{
     ability::{AbilityGroup, Duration},
     actor::OwnedAbility,
@@ -119,6 +119,8 @@ impl WidgetKind for AbilitiesBar {
             }
         }
 
+        let scrollpane = ScrollPane::new(ScrollDirection::Horizontal);
+
         let collapse_enabled = (collapsed_groups.len() as u32) < self.max_collapsed;
         if collapsed_groups.len() > 0 {
             let all_collapsed = Widget::empty("collapsed_panes");
@@ -129,7 +131,7 @@ impl WidgetKind for AbilitiesBar {
                 self.collapsed_panes.push(Rc::clone(&widget));
                 Widget::add_child_to(&all_collapsed, widget);
             }
-            children.push(all_collapsed);
+            scrollpane.borrow().add_to_content(all_collapsed);
         }
 
         for group in groups {
@@ -141,9 +143,11 @@ impl WidgetKind for AbilitiesBar {
 
             let group_widget = Widget::with_defaults(group_pane);
             self.group_panes.push(Rc::clone(&group_widget));
-            children.push(group_widget);
+
+            scrollpane.borrow().add_to_content(group_widget);
         }
 
+        children.push(Widget::with_theme(scrollpane, "groups_pane"));
         children
     }
 }
@@ -234,6 +238,9 @@ impl WidgetKind for CollapsedGroupPane {
 
                 let (parent, _) = Widget::parent::<AbilitiesBar>(widget);
                 parent.borrow_mut().invalidate_children();
+
+                let root = Widget::get_root(widget);
+                Widget::remove_mouse_over(&root);
             })));
 
         vec![self.description.clone(), change_size]
@@ -417,6 +424,9 @@ impl WidgetKind for GroupPane {
 
                 let (parent, _) = Widget::parent::<AbilitiesBar>(widget);
                 parent.borrow_mut().invalidate_children();
+
+                let root = Widget::get_root(widget);
+                Widget::remove_mouse_over(&root);
             })));
 
         vec![self.description.clone(), abilities_pane, change_size]
@@ -426,13 +436,21 @@ impl WidgetKind for GroupPane {
 struct AbilityButton {
     entity: Rc<RefCell<EntityState>>,
     ability: Rc<Ability>,
+    newly_added: bool,
 }
 
 impl AbilityButton {
     fn new(ability: &Rc<Ability>, entity: &Rc<RefCell<EntityState>>) -> Rc<RefCell<AbilityButton>> {
+        let mut newly_added = false;
+        if let Some(state) = entity.borrow_mut().actor.ability_state(&ability.id) {
+            newly_added = state.newly_added_ability;
+            state.newly_added_ability = false;
+        }
+
         Rc::new(RefCell::new(AbilityButton {
             ability: Rc::clone(ability),
             entity: Rc::clone(entity),
+            newly_added,
         }))
     }
 }
@@ -461,6 +479,12 @@ impl WidgetKind for AbilityButton {
             .actor
             .ability_state(&self.ability.id)
         {
+            if self.newly_added {
+                widget.state.animation_state.add(animation_state::Kind::Custom2);
+            } else {
+                widget.state.animation_state.remove(animation_state::Kind::Custom2);
+            }
+
             widget.children[1].borrow_mut().state.clear_text_args();
             let child = &mut widget.children[1].borrow_mut().state;
             match state.remaining_duration_rounds() {
@@ -490,6 +514,10 @@ impl WidgetKind for AbilityButton {
         let hover = Widget::with_theme(TextArea::empty(), "ability_hover");
         let class = self.entity.borrow_mut().actor.actor.base_class();
         add_hover_text_args(&mut hover.borrow_mut().state, &self.ability, &class);
+
+        if self.newly_added {
+            hover.borrow_mut().state.add_text_arg("newly_added", "true");
+        }
 
         Widget::set_mouse_over_widget(
             &widget,

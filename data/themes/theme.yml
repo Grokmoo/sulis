@@ -225,7 +225,7 @@ themes:
             relative:
               height: Max
             position: [132, 0]
-            size: [24, 0]
+            size: [23, -5]
             background: bg_base
             border: [1, 1, 1, 1]
             children:
@@ -243,7 +243,7 @@ themes:
               swap_weapons:
                 from: button
                 foreground: swap_weapons
-                size: [10, 10]
+                size: [8, 8]
                 position: [0, 0]
                 relative:
                   x: Max
@@ -254,129 +254,144 @@ themes:
                 size: [10, 10]
                 background: quick_item_button
                 foreground: ability_button_fg
-                position: [0, 12]
+                position: [0, 10]
               usable2:
                 from: item_button
                 size: [10, 10]
                 background: quick_item_button
                 foreground: ability_button_fg
-                position: [12, 12]
+                position: [11, 10]
               usable3:
                 from: item_button
                 size: [10, 10]
                 background: quick_item_button
                 foreground: ability_button_fg
-                position: [0, 24]
+                position: [0, 21]
               usable4:
                 from: item_button
                 size: [10, 10]
                 background: quick_item_button
                 foreground: ability_button_fg
-                position: [12, 24]
+                position: [11, 21]
           abilities_bar:
             relative:
               width: Max
               height: Max
-            position: [157, 0]
-            size: [-191, 0]
-            layout: BoxHorizontal
-            layout_spacing: { top: 0, bottom: 0, left: 0, right: 1 }
+            position: [156, 0]
+            size: [-189, 0]
             children:
-              collapsed_panes:
-                size: [15, 0]
+              groups_pane:
                 relative:
                   height: Max
-                layout: BoxVertical
-                layout_spacing: { bottom: 1 }
-                custom:
-                  max_collapsed: "3"
+                  width: Max
                 children:
-                  collapsed_group_pane:
-                    background: bg_base
-                    size: [0, 12]
-                    relative:
-                      width: Max
-                    border: { top: 1, bottom: 1, left: 1, right: 0 }
-                    children:
-                      change_size:
-                        from: button
-                        background: background_transparent
-                        size: [1, 5]
-                        relative:
-                          width: Max
-                        position: [-1, -1]
-                        custom:
-                          tooltip: "Expand"
-                      description:
-                        from: text_area
-                        relative:
-                          width: Max
-                        size: [0, 10]
-                        text: |
-                          [y=-1.5;s=5.0;c=f00|#group#]
-                          [y=3.0|][?total_uses_per_encounter;s=5.0|#current_uses_per_encounter#/#total_uses_per_encounter# Enc][!total_uses_per_encounter;!total_uses_per_day;s=5.0|Unlimited]
-                          [y=6.0|][?total_uses_per_day;s=5.0|#current_uses_per_day#/#total_uses_per_day# Day]
-              group_pane:
-                background: bg_base
-                size: [0, 0]
-                relative:
-                  height: Max
-                  width: Custom
-                border: { top: 1, bottom: 1, left: 1, right: 0 }
-                custom:
-                  vertical_count: "3"
-                  grid_width: "13"
-                  grid_border: "2"
-                  min_horizontal_count: "1"
-                  skip_first_position: "true"
-                children:
-                  change_size:
-                    from: button
-                    background: background_transparent_no_disabled
-                    size: [15, 5]
-                    position: [-1, -1]
+                  scrollbar:
+                    from: horizontal_scrollbar
                     custom:
-                      tooltip: "Collapse"
-                  description:
-                    from: text_area
-                    relative:
-                      width: Max
-                    size: [0, 10]
-                    text: |
-                      [y=-1.5;s=5.0;c=f00|#group#]
-                      [y=3.0|][?total_uses_per_encounter;s=5.0|#current_uses_per_encounter#/#total_uses_per_encounter# Enc][!total_uses_per_encounter;!total_uses_per_day;s=5.0|Unlimited]
-                      [y=6.0|][?total_uses_per_day;s=5.0|#current_uses_per_day#/#total_uses_per_day# Day]
-                  abilities_pane:
+                      scroll_delta: "10"
+                  content:
                     relative:
                       width: Max
                       height: Max
-                    size: [0, 0]
-                    layout: GridColumns
-                    layout_spacing: { top: 0, bottom: 1, left: 1, right: 1 }
+                    size: [0, -5]
+                    layout: BoxHorizontal
+                    layout_spacing: { top: 0, bottom: 0, left: 0, right: 1 }
                     children:
-                      skip_button:
-                        size: [11, 11]
-                      ability_button:
-                        from: button
-                        background: ability_button
-                        foreground: ability_button_fg
-                        size: [11, 11]
+                      collapsed_panes:
+                        size: [15, 0]
+                        relative:
+                          height: Max
+                        layout: BoxVertical
+                        layout_spacing: { bottom: 1 }
+                        custom:
+                          max_collapsed: "3"
                         children:
-                          duration_label:
-                            from: label
-                            text: "#duration#"
-                            text_params:
-                              horizontal_alignment: Right
-                              vertical_alignment: Top
-                              color: f00
+                          collapsed_group_pane:
+                            background: bg_base
+                            size: [0, 12]
+                            relative:
+                              width: Max
+                            border: { top: 1, bottom: 1, left: 1, right: 0 }
+                            children:
+                              change_size:
+                                from: button
+                                background: background_transparent
+                                size: [1, 5]
+                                relative:
+                                  width: Max
+                                position: [-1, -1]
+                                custom:
+                                  tooltip: "Expand"
+                              description:
+                                from: text_area
+                                relative:
+                                  width: Max
+                                size: [0, 10]
+                                text: |
+                                  [y=-1.5;s=5.0;c=f00|#group#]
+                                  [y=3.0|][?total_uses_per_encounter;s=5.0|#current_uses_per_encounter#/#total_uses_per_encounter# Enc][!total_uses_per_encounter;!total_uses_per_day;s=5.0|Unlimited]
+                                  [y=6.0|][?total_uses_per_day;s=5.0|#current_uses_per_day#/#total_uses_per_day# Day]
+                      group_pane:
+                        background: bg_base
+                        size: [0, 0]
+                        relative:
+                          height: Max
+                          width: Custom
+                        border: { top: 0, bottom: 1, left: 1, right: 0 }
+                        custom:
+                          vertical_count: "3"
+                          grid_width: "13"
+                          grid_border: "2"
+                          min_horizontal_count: "1"
+                          skip_first_position: "true"
+                        children:
+                          change_size:
+                            from: button
+                            background: background_transparent_no_disabled
+                            size: [15, 5]
+                            position: [-1, 0]
+                            custom:
+                              tooltip: "Collapse"
+                          description:
+                            from: text_area
+                            relative:
+                              width: Max
+                            size: [0, 10]
+                            text: |
+                              [y=-0.5;s=5.0;c=f00|#group#]
+                              [y=4.0|][?total_uses_per_encounter;s=5.0|#current_uses_per_encounter#/#total_uses_per_encounter# Enc][!total_uses_per_encounter;!total_uses_per_day;s=5.0|Unlimited]
+                              [y=7.0|][?total_uses_per_day;s=5.0|#current_uses_per_day#/#total_uses_per_day# Day]
+                          abilities_pane:
                             relative:
                               width: Max
                               height: Max
-                          icon:
-                            foreground: "#icon#"
-                            relative:
-                              width: Max
-                              height: Max
+                            size: [0, 0]
+                            layout: GridColumns
+                            layout_spacing: { top: 0, bottom: 0, left: 1, right: 1 }
+                            children:
+                              skip_button:
+                                size: [11, 11]
+                              ability_button:
+                                from: button
+                                background: ability_button
+                                foreground: ability_button_fg
+                                size: [11, 11]
+                                children:
+                                  duration_label:
+                                    from: label
+                                    text: "#duration#"
+                                    text_params:
+                                      horizontal_alignment: Right
+                                      vertical_alignment: Top
+                                      color: f00
+                                    relative:
+                                      width: Max
+                                      height: Max
+                                  icon:
+                                    foreground: "#icon#"
+                                    relative:
+                                      width: Max
+                                      height: Max
           window_button:
             from: button
             background: background
@@ -389,7 +404,7 @@ themes:
             relative:
               x: Max
               height: Max
-            size: [32, 0]
+            size: [33, 0]
             children:
               end_turn_button:
                 from: button

@@ -26,7 +26,7 @@ use sulis_core::config;
 use sulis_core::resource::write_to_file;
 use sulis_core::ui::{Callback, Widget, WidgetKind, WidgetState};
 use sulis_core::util::ExtInt;
-use sulis_core::widgets::{Button, ScrollPane, TextArea};
+use sulis_core::widgets::{Button, ScrollPane, ScrollDirection, TextArea};
 use sulis_module::{
     ActorBuilder, Attribute, DamageKind, InventoryBuilder, ItemListEntrySaveState, ItemSaveState,
     Module, QuickSlot, Slot,
@@ -316,12 +316,12 @@ pub fn create_abilities_pane(pc: &ActorState, show_passive: bool) -> Rc<RefCell<
         })));
     Widget::add_child_to(&abilities, passive);
 
-    let details_scroll = ScrollPane::new();
+    let details_scroll = ScrollPane::new(ScrollDirection::Vertical);
     let details_widget = Widget::with_theme(details_scroll.clone(), "details_pane");
     let details = Widget::with_theme(TextArea::empty(), "details");
     details_scroll.borrow().add_to_content(Rc::clone(&details));
 
-    let scrollpane = ScrollPane::new();
+    let scrollpane = ScrollPane::new(ScrollDirection::Vertical);
     let list = Widget::with_theme(scrollpane.clone(), "list");
     for ability in pc.actor.abilities.iter() {
         if !show_passive && ability.ability.active.is_none() {
@@ -361,7 +361,7 @@ pub fn create_abilities_pane(pc: &ActorState, show_passive: bool) -> Rc<RefCell<
 }
 
 pub fn create_effects_pane(pc: &mut ActorState) -> Rc<RefCell<Widget>> {
-    let scrollpane = ScrollPane::new();
+    let scrollpane = ScrollPane::new(ScrollDirection::Vertical);
     let effects = Widget::with_theme(scrollpane.clone(), "effects");
 
     let mgr = GameState::turn_manager();

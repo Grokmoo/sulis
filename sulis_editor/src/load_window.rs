@@ -23,7 +23,7 @@ use std::rc::Rc;
 
 use sulis_core::config::Config;
 use sulis_core::ui::{Callback, Widget, WidgetKind};
-use sulis_core::widgets::{list_box, Button, ListBox, ScrollPane};
+use sulis_core::widgets::{list_box, Button, ListBox, ScrollPane, ScrollDirection};
 
 use crate::AreaEditor;
 
@@ -92,7 +92,7 @@ impl WidgetKind for LoadWindow {
             let entry = list_box::Entry::new(area, Some(cb.clone()));
             entries.push(entry);
         }
-        let scrollpane = ScrollPane::new();
+        let scrollpane = ScrollPane::new(ScrollDirection::Vertical);
         let areas_list = Widget::with_theme(ListBox::new(entries), "listbox");
 
         let area_editor_ref = Rc::clone(&self.area_editor);

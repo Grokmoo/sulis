@@ -19,7 +19,7 @@ use std::cell::{Cell, RefCell};
 use std::rc::Rc;
 
 use sulis_core::ui::{Callback, Widget, WidgetKind};
-use sulis_core::widgets::{Button, ScrollPane};
+use sulis_core::widgets::{Button, ScrollPane, ScrollDirection};
 use sulis_module::{Item, Module, ItemState};
 use sulis_state::{script::ScriptItemKind, EntityState, GameState};
 
@@ -119,7 +119,7 @@ impl ItemListPane {
             Some(ref merchant) => merchant,
         };
 
-        let scrollpane = ScrollPane::new();
+        let scrollpane = ScrollPane::new(ScrollDirection::Vertical);
         let list_content = Widget::with_theme(scrollpane.clone(), "items_list");
         for (index, &(qty, ref item)) in merchant.items().iter().enumerate() {
             if !self.cur_filter.get().is_allowed(&item.item) {
@@ -146,7 +146,7 @@ impl ItemListPane {
         let area_state = area_state.borrow();
         let prop = area_state.get_prop(prop_index);
 
-        let scrollpane = ScrollPane::new();
+        let scrollpane = ScrollPane::new(ScrollDirection::Vertical);
         let list_content = Widget::with_theme(scrollpane.clone(), "items_list");
         match prop.items() {
             None => (),
@@ -179,7 +179,7 @@ impl ItemListPane {
 
         let ref actor = self.entity.borrow().actor;
 
-        let scrollpane = ScrollPane::new();
+        let scrollpane = ScrollPane::new(ScrollDirection::Vertical);
         let list_content = Widget::with_theme(scrollpane.clone(), "items_list");
 
         let stash = GameState::party_stash();

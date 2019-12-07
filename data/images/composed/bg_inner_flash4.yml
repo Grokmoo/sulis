@@ -1,0 +1,7 @@
+id: bg_inner_flash4
+generate_sub_images:
+  size: [1, 1]
+  spritesheet: "gui"
+grid: [ "bg_top_left_flash4",    "bg_top_middle_flash4",    "bg_top_right_flash4",
+        "bg_middle_left_flash4", "bg_middle_flash4",        "bg_middle_right_flash4",
+        "bg_bottom_left_flash4", "bg_bottom_middle_flash4", "bg_bottom_right_flash4" ]

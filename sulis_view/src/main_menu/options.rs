@@ -23,7 +23,7 @@ use sulis_core::config::DisplayMode;
 use sulis_core::config::{self, Config};
 use sulis_core::io::{event::ClickKind, keyboard_event::Key, DisplayConfiguration, InputAction};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
-use sulis_core::widgets::{Button, Label, ScrollPane};
+use sulis_core::widgets::{Button, Label, ScrollPane, ScrollDirection};
 
 use crate::main_menu::MainMenu;
 
@@ -198,7 +198,7 @@ impl Options {
 
         let resolution_title = Widget::with_theme(Label::empty(), "resolution_title");
 
-        let scrollpane = ScrollPane::new();
+        let scrollpane = ScrollPane::new(ScrollDirection::Vertical);
         let resolution_pane = Widget::with_theme(scrollpane.clone(), "resolution_pane");
         let mut resolution_found = false;
         for (w, h) in self.display_confs[self.cur_display_conf].resolutions.iter() {
@@ -420,7 +420,7 @@ impl Options {
 
         let keybindings_title = Widget::with_theme(Label::empty(), "keybindings_title");
 
-        let scrollpane = ScrollPane::new();
+        let scrollpane = ScrollPane::new(ScrollDirection::Vertical);
         let keybindings_pane = Widget::with_theme(scrollpane.clone(), "keybindings_pane");
         for (key, action) in self.cur_keybindings.iter() {
             let key_button = Widget::with_theme(Button::empty(), "key_button");

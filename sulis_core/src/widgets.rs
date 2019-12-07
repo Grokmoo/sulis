@@ -42,7 +42,7 @@ pub mod progress_bar;
 pub use self::progress_bar::ProgressBar;
 
 pub mod scrollpane;
-pub use self::scrollpane::ScrollPane;
+pub use self::scrollpane::{ScrollDirection, ScrollPane};
 
 pub mod spinner;
 pub use self::spinner::Spinner;

@@ -491,8 +491,9 @@ impl ActorState {
                 continue;
             }
 
-            self.ability_states
-                .insert(ability.id.to_string(), AbilityState::new(ability));
+            let mut ability_state = AbilityState::new(ability);
+            ability_state.newly_added_ability = true;
+            self.ability_states.insert(ability.id.to_string(), ability_state);
         }
 
         let mut to_remove = Vec::new();

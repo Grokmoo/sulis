@@ -21,7 +21,7 @@ use std::rc::Rc;
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::ui::{animation_state, Callback, Color, Widget, WidgetKind};
 use sulis_core::util::Point;
-use sulis_core::widgets::{Button, ScrollPane};
+use sulis_core::widgets::{Button, ScrollPane, ScrollDirection};
 use sulis_module::{Module, Prop};
 
 use crate::{AreaModel, EditorMode};
@@ -139,7 +139,7 @@ impl WidgetKind for PropPicker {
         let mut all_props = Module::all_props();
         all_props.sort_by(|a, b| a.id.cmp(&b.id));
 
-        let scrollpane = ScrollPane::new();
+        let scrollpane = ScrollPane::new(ScrollDirection::Vertical);
         for prop in all_props {
             let button = Widget::with_theme(Button::empty(), "prop_button");
             button.borrow_mut().state.add_text_arg("name", &prop.id);

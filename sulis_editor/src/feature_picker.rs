@@ -21,7 +21,7 @@ use std::rc::Rc;
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_core::util::Point;
-use sulis_core::widgets::{Button, ScrollPane};
+use sulis_core::widgets::{Button, ScrollPane, ScrollDirection};
 use sulis_module::{area::tile::Feature, Module};
 
 use crate::{AreaModel, EditorMode};
@@ -147,7 +147,7 @@ impl WidgetKind for FeaturePicker {
         let mut all_features = Module::all_features();
         all_features.sort_by(|a, b| a.id.cmp(&b.id));
 
-        let scrollpane = ScrollPane::new();
+        let scrollpane = ScrollPane::new(ScrollDirection::Vertical);
         for feature in all_features {
             let button = Widget::with_theme(Button::empty(), "feature_button");
             button.borrow_mut().state.add_text_arg("name", &feature.id);

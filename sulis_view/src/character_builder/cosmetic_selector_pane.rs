@@ -24,7 +24,7 @@ use sulis_core::io::GraphicsRenderer;
 use sulis_core::resource::ResourceSet;
 use sulis_core::ui::{Callback, Color, Widget, WidgetKind};
 use sulis_core::util::Point;
-use sulis_core::widgets::{Button, InputField, Label, ScrollPane};
+use sulis_core::widgets::{Button, InputField, Label, ScrollPane, ScrollDirection};
 use sulis_module::actor::Sex;
 use sulis_module::{ImageLayer, ImageLayerSet, ItemState, Race, Slot};
 
@@ -497,7 +497,7 @@ impl WidgetKind for CosmeticSelectorPane {
             .add_callback(Callback::new(Rc::new(move |widget, _| {
                 let (parent, _) = Widget::parent::<CosmeticSelectorPane>(widget);
 
-                let scrollpane = ScrollPane::new();
+                let scrollpane = ScrollPane::new(ScrollDirection::Vertical);
                 let pop_up = Widget::with_theme(scrollpane.clone(), "portrait_selector");
                 pop_up.borrow_mut().state.set_modal(true);
                 pop_up.borrow_mut().state.modal_remove_on_click_outside = true;

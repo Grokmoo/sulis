@@ -8,3 +8,5 @@ states:
     custom1: bg_inner_disabled
     custom1 + hover: bg_inner_disabled
     custom1 + pressed + hover: bg_inner_disabled
+    custom2: bg_inner_flash
+    custom2 + custom1: bg_inner_flash

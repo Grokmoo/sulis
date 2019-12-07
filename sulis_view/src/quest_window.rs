@@ -19,7 +19,7 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 use sulis_core::ui::{Callback, Widget, WidgetKind};
-use sulis_core::widgets::{Button, Label, ScrollPane, TextArea};
+use sulis_core::widgets::{Button, Label, ScrollPane, ScrollDirection, TextArea};
 use sulis_module::{on_trigger::QuestEntryState, Module, Quest};
 use sulis_state::{ChangeListener, GameState};
 
@@ -82,7 +82,7 @@ impl WidgetKind for QuestWindow {
 
         let show_completed_label = Widget::with_theme(Label::empty(), "show_completed_label");
 
-        let quest_list_pane = ScrollPane::new();
+        let quest_list_pane = ScrollPane::new(ScrollDirection::Vertical);
         let quest_list_widget = Widget::with_theme(quest_list_pane.clone(), "quest_list");
 
         let mut all_quests = Module::all_quests();
@@ -138,7 +138,7 @@ impl WidgetKind for QuestWindow {
             quest_list_pane.borrow().add_to_content(button);
         }
 
-        let quest_entries_pane = ScrollPane::new();
+        let quest_entries_pane = ScrollPane::new(ScrollDirection::Vertical);
         let quest_entries_widget = Widget::with_theme(quest_entries_pane.clone(), "quest_entries");
 
         if let Some(ref quest) = self.active_quest {

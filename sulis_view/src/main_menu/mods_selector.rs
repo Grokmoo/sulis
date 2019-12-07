@@ -21,7 +21,7 @@ use std::rc::Rc;
 
 use sulis_core::ui::*;
 use sulis_core::util::ActiveResources;
-use sulis_core::widgets::{Button, Label, ScrollPane, TextArea};
+use sulis_core::widgets::{Button, Label, ScrollPane, ScrollDirection, TextArea};
 use sulis_module::ModificationInfo;
 use sulis_state::NextGameStep;
 
@@ -70,10 +70,10 @@ impl WidgetKind for ModsSelector {
         let available_title = Widget::with_theme(Label::empty(), "available_title");
         let active_title = Widget::with_theme(Label::empty(), "active_title");
 
-        let available_pane = ScrollPane::new();
+        let available_pane = ScrollPane::new(ScrollDirection::Vertical);
         let available = Widget::with_theme(available_pane.clone(), "available");
 
-        let active_pane = ScrollPane::new();
+        let active_pane = ScrollPane::new(ScrollDirection::Vertical);
         let active = Widget::with_theme(active_pane.clone(), "active");
 
         self.available_mods

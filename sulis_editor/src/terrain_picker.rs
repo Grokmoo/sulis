@@ -23,7 +23,7 @@ use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::resource::{ResourceSet, Sprite};
 use sulis_core::ui::{Callback, Color, Widget, WidgetKind};
 use sulis_core::util::Point;
-use sulis_core::widgets::{Button, Label, ScrollPane, Spinner};
+use sulis_core::widgets::{Button, Label, ScrollPane, ScrollDirection, Spinner};
 use sulis_module::{area::tile::TerrainRules, area::MAX_AREA_SIZE, Module};
 
 use crate::{AreaModel, EditorMode};
@@ -230,7 +230,7 @@ impl WidgetKind for TerrainPicker {
 
         let brush_size_label = Widget::with_theme(Label::empty(), "brush_size_label");
 
-        let scrollpane = ScrollPane::new();
+        let scrollpane = ScrollPane::new(ScrollDirection::Vertical);
         for (i, terrain_kind) in Module::terrain_kinds().into_iter().enumerate() {
             let base_tile_id = format!(
                 "{}{}{}",

@@ -28,6 +28,7 @@ pub struct TimerImage {
     id: String,
     frames: Vec<Rc<dyn Image>>,
     frame_time_millis: u32,
+    total_frame_time: u32,
     size: Size,
 }
 
@@ -66,17 +67,18 @@ impl TimerImage {
             frames.push(Rc::clone(&image));
         }
 
+        let total_frame_time = builder.frame_time_millis * frames.len() as u32;
         Ok(Rc::new(TimerImage {
             frames,
             size: size.unwrap(),
             frame_time_millis: builder.frame_time_millis,
+            total_frame_time,
             id: builder.id,
         }))
     }
 
     fn get_cur_frame(&self, millis: u32) -> &Rc<dyn Image> {
-        let total_frame_time = self.frame_time_millis * self.frames.len() as u32;
-        let offset = millis % total_frame_time;
+        let offset = millis % self.total_frame_time;
         let index = (offset / self.frame_time_millis) as usize;
 
         &self.frames[index]

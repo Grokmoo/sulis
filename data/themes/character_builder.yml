@@ -170,7 +170,7 @@ themes:
             position: [150, 2]
             custom:
               tooltip: |
-                Selecting new abilities is the primary way you customize and grow your character.
+                Selecting new abilities is the primary way you customize and grow your character.  New abilities are automatically added to your quickbar.
           ability_pane:
             from: game.ability_pane
             position: [140, 10]

@@ -313,6 +313,7 @@ impl PStats {
 
         self.overflow_ap = 0;
         self.init_turn(stats);
+        self.ap = Module::rules().base_ap;
     }
 
     /// Called each time the entity begins a new turn

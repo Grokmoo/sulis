@@ -82,7 +82,7 @@ impl Conversation {
             for response in node.responses.iter() {
                 if let Some(ref to) = response.to {
                     if !builder.nodes.contains_key(to) {
-                        warn!("Invalid to for node response.  Must be a node ID");
+                        warn!("Invalid to '{}' for node response.  Must be a node ID", to);
                         return unable_to_create_error("conversation", &builder.id);
                     }
                 }

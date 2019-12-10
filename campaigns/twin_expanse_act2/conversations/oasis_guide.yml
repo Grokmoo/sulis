@@ -1,0 +1,116 @@
+id: oasis_guide
+initial_nodes:
+  - id: main
+    to_view:
+      - target_flag: already_talked
+  - id: start01
+nodes:
+  start01:
+    text: |
+      [c=6868FF|#target_name#] - [c=888|A dark grizzled man addresses you.  He seems to have been expecting you.]
+      
+      Boss told me to help you get your bearings and then send you on - so that's what I'll do.
+      
+      This here is Oasis.  Only town of any size in the whole of the Sciedan.  You are maybe four or five hundred miles Northwest of where you were in the 'Spance.
+    on_view:
+      - target_flag: already_talked
+    responses:
+      - text: "[c=888|Continue]"
+        to: start02
+  start02:
+    text: |
+      [c=6868FF|#target_name#] - The town is a prison of sorts, for our honorable leader.  No walls, but the sand works just as well.
+      
+      You work with us, and your stay here will be much more ... pleasant.
+    responses:
+      - text: "[c=888|Continue]"
+        to: start03
+  start03:
+    text: |
+      [c=6868FF|#target_name#] - After we're done here, you are to go talk to the boss.  Big house, north end of the square.  You can't miss it.
+    responses:
+      - text: "[c=888|Continue]"
+        to: main
+  main:
+    text: |
+      [c=6868FF|#target_name#] - So, your questions?
+    responses:
+      - text: "Who are you?"
+        to: "ask_who"
+      - text: "How do you know all this about me?"
+        to: "ask_about_me"
+      - text: "Who is this boss of yours?  Berkeley?"
+        to: "ask_boss"
+      - text: "Tell me more about this place."
+        to: "ask_place"
+      - text: "I need to get back to Rose Lake!"
+        to: "ask_rose_lake"
+      - text: "That's all for now.  Farewell."
+  ask_who:
+    text: |
+      [c=6868FF|#target_name#] - [c=888|He seems slightly surprised by the question.]
+
+      I'm just one of the hired hands around here.  Boss trusts me with jobs that require a bit more finesse than just bashin' heads.
+    responses:
+      - text: "Help me get back to Rose Lake."
+        to: ask_help
+      - text: "Back to my other questions."
+        to: main
+  ask_help:
+    text: |
+      [c=6868FF|#target_name#] - [c=888|He laughs.]  And why would I do that?
+    responses:
+      - text: "Because if you don't, I'll bash your skull in."
+        to: ask_help_threaten
+      - text: "Because I can pay you."
+        to: ask_help_pay
+      - text: "Because it is the right thing to do."
+        to: ask_help_moral
+      - text: "Nevermind.  I had another question."
+        to: main
+  ask_help_threaten:
+    text: |
+      [c=6868FF|#target_name#] - You could try.  And might be, you would.  But, that wouldn't help you get out of here or back to Rose Lake.
+    responses:
+      - text: "[c=888|Continue]"
+        to: main
+  ask_help_pay:
+    text: |
+      [c=6868FF|#target_name#] - Yeah, I bet you carry a tidy sum.  And what would I do with that money?  I'm stuck here, same as you.
+    responses:
+      - text: "[c=888|Continue]"
+        to: main
+  ask_help_moral:
+    text: |
+      [c=6868FF|#target_name#] - I've lived long enough to know that the right thing ain't always the practical or smart thing.  I like to do the smart thing.
+    responses:
+      - text: "[c=888|Continue]"
+        to: main
+  ask_about_me:
+    text: |
+      [c=6868FF|#target_name#] - Well, the boss told me.  How does he know - well, I guess you'd better ask him yerself.
+    responses:
+      - text: "[c=888|Continue]"
+        to: main
+  ask_boss:
+    text: |
+      [c=6868FF|#target_name#] - Could be his name, maybe?  Not too many folks use proper names around here.  We just call him boss.
+    responses:
+      - text: "[c=888|Continue]"
+        to: main
+  ask_place:
+    text: |
+      [c=6868FF|#target_name#] - This used to be a right proper town, or so I'm told.  But, times in the desert are tough and the town got smaller.
+      
+      Leader came through here a few years back and took over.  Uses it as a prison now.
+    responses:
+      - text: "[c=888|Continue]"
+        to: main
+  ask_rose_lake:
+    text: |
+      [c=6868FF|#target_name#] - Yeah, its a nice spot.  Nicer than here, anyway.  But, boss says you stay.  You want to leave, you gotta ask him.
+      
+      But don't get your hopes up.
+    responses:
+      - text: "[c=888|Continue]"
+        to: main

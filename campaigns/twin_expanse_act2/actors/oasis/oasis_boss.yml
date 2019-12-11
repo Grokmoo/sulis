@@ -1,0 +1,68 @@
+---
+id: oasis_boss
+name: Boss
+race: dracon
+sex: Male
+portrait: portraits/dracon07
+attributes:
+  str: 18
+  dex: 14
+  end: 16
+  per: 12
+  int: 10
+  wis: 10
+conversation: oasis_boss
+faction: Neutral
+images:
+  Hair: creatures/dracon_horn02
+hue: 0.0
+hair_color:
+  r: 0.545098066329956
+  g: 0.3529411852359772
+  b: 0.16862745583057404
+  a: 1.0
+skin_color:
+  r: 0.3803921639919281
+  g: 0.3803921639919281
+  b: 0.32549020648002627
+  a: 1.0
+inventory:
+  equipped:
+    Legs:
+      id: legs_plate
+    HeldMain:
+      id: battleaxe
+      adjectives: [ exceptional ]
+    HeldOff:
+      id: shield_kite
+      adjectives: [ exceptional ]
+    Feet:
+      id: boots_plate
+      adjectives: []
+    Torso:
+      id: torso_plate
+      adjectives: []
+  quick:
+    Usable1:
+      id: potion_healing
+      adjectives: []
+      variant: ~
+levels:
+  fighter: 15
+abilities:
+  - armor_light
+  - armor_medium
+  - armor_heavy
+  - weapon_simple
+  - weapon_spear
+  - weapon_mace
+  - weapon_axe
+  - weapon_small_sword
+  - weapon_large_sword
+  - weapon_bow
+  - weapon_crossbow
+  - stunning_blow
+  - whirlwind_attack
+  - blitz
+  - mark_target
+ai: ai_basic

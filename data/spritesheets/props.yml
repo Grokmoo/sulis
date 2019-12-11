@@ -124,7 +124,7 @@ groups:
       door_single_02_wall_open: [20, 27]
       door_single_03_wall_open: [24, 27]
       door_single_04_wall_open: [28, 27]
-      door_single_05_wall_open: [30, 27]
+      door_single_05_wall_open: [32, 27]
   campfire:
     size: [2, 4]
     areas:

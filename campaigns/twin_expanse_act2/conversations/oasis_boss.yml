@@ -1,0 +1,71 @@
+id: oasis_boss
+initial_nodes:
+  - id: main
+    to_view:
+      - target_flag: already_talked
+  - id: start01
+nodes:
+  start01:
+    text: |
+      [c=6868FF|#target_name#] - [c=888|Before you stands a very large and heavily armored Dracon man.  He has a certain regal bearing to him.]
+      
+      Ah, you've arrived.  I'm sure my man has filled you in on your current situation, so we can skip that part.
+      
+      I am in charge of this town.  People call me boss.
+    on_view:
+      - target_flag: already_talked
+    responses:
+      - text: "[c=888|Continue]"
+        to: start02
+  start02:
+    text: |
+      [c=6868FF|#target_name#] - Our leader has given me the small task of maintaining order here, and that is what I intend to do.  As long as you do not interfere with that goal, we will not have a problem.
+    responses:
+      - text: "[c=888|Continue]"
+        to: start03
+  start03:
+    text: |
+      [c=6868FF|#target_name#] - I've also been informed you have skills which will prove useful to us.  I expect we'll be making use of them.  In due time.
+      
+      For now, you are free to move about Oasis.  You'll find escape to be quite impossible, so don't bother.
+    responses:
+      - text: "[c=888|Continue]"
+        to: main
+  main:
+    text: |
+      [c=6868FF|#target_name#] - You have questions?
+    responses:
+      - text: |
+          "Our leader?"  You mean, Berkeley?
+        to: ask_leader
+      - text: "People just call you Boss?  What is your real name?"
+        to: ask_boss
+      - text: "I do not take orders from villians like you!"
+        to: ask_refuse
+      - text: "I will be happy to work with you.  The whole situation in Rose Lake was just a big misunderstanding."
+        to: ask_accept
+      - text: "Nothing for now."
+  ask_leader:
+    text: |
+      [c=6868FF|#target_name#] - Yes, I believe that is what he calls himself.
+    responses:
+      - text: "[c=888|Continue]"
+        to: main
+  ask_boss:
+    text: |
+      [c=6868FF|#target_name#] - You will find most people around here are not too keen on names.  Regardless, it simply doesn't matter.  Boss will do.
+    responses:
+      - text: "[c=888|Continue]"
+        to: main
+  ask_refuse:
+    text: |
+      [c=6868FF|#target_name#] - I think you will eventually find we are quite persuasive.  You can have your little rebellion.  For now.
+    responses:
+      - text: "[c=888|Continue]"
+        to: main
+  ask_accept:
+    text: |
+      [c=6868FF|#target_name#] - I know little of what has transpired in Rose Lake.  We will see where your motives lie soon enough.
+    responses:
+      - text: "[c=888|Continue]"
+        to: main

@@ -1,0 +1,45 @@
+---
+id: oasis_bandit04
+name: Bandit Mage
+race: human
+sex: Male
+attributes:
+  str: 10
+  dex: 10
+  end: 10
+  per: 10
+  int: 10
+  wis: 10
+conversation: ~
+faction: Neutral
+images:
+  Background: creatures/human34
+  Foreground: empty
+  Shadow: empty
+hue: 0.8
+inventory:
+  equipped:
+    Torso:
+      id: torso_robe
+      adjectives: [ fine ]
+    HeldMain:
+      id: crossbow
+      adjectives: [ fine ]
+    Legs:
+      id: legs_pants
+      adjectives: [ fine ]
+    Feet:
+      id: boots_leather
+      adjectives: [ fine ]
+  quick: {}
+levels:
+  mage: 10
+abilities:
+  - weapon_simple
+  - weapon_crossbow
+  - shock
+  - fire_shield
+  - fireball
+  - slow
+  - heal
+ai: ai_basic

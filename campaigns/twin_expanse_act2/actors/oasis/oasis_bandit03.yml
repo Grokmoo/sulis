@@ -1,0 +1,59 @@
+---
+id: oasis_bandit03
+name: Bandit Rogue
+race: human
+sex: Male
+attributes:
+  str: 12
+  dex: 16
+  end: 14
+  per: 13
+  int: 10
+  wis: 10
+conversation: ~
+faction: Neutral
+images:
+  Shadow: empty
+  Background: creatures/human35
+  Foreground: empty
+hue: 1.0
+inventory:
+  equipped:
+    Torso:
+      id: torso_leather
+      adjectives: [ fine ]
+    HeldMain:
+      id: shortsword
+      adjectives: [ fine, acid5 ]
+    HeldOff:
+      id: dagger
+      adjectives: [ fine ]
+    Legs:
+      id: legs_leather
+      adjectives: [ fine ]
+    Feet:
+      id: boots_leather
+      adjectives: [ fine ]
+    Hands:
+      id: gloves_leather
+      adjectives: [ fine ]
+  quick: {}
+  pc_starting_coins: 0
+  pc_starting_items: []
+levels:
+  rogue: 10
+abilities:
+  - armor_light
+  - weapon_crossbow
+  - weapon_bow
+  - weapon_small_sword
+  - weapon_simple
+  - backstab
+  - speedy
+  - backflip
+  - shadow_step
+  - attacker
+  - flanker
+  - weapon_small_sword
+  - rupture
+ai: ai_basic

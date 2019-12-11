@@ -1,0 +1,58 @@
+---
+id: oasis_bandit02
+name: Bandit Defender
+race: human_simple
+sex: Male
+attributes:
+  str: 16
+  dex: 13
+  end: 16
+  per: 10
+  int: 10
+  wis: 10
+conversation: ~
+faction: Neutral
+images:
+  Background: creatures/human31
+  Shadow: empty
+  Foreground: empty
+hue: 0.7
+inventory:
+  equipped:
+    Torso:
+      id: torso_mail
+      adjectives: [ fine ]
+    HeldMain:
+      id: battleaxe
+      adjectives: [ fine ]
+    HeldOff:
+      id: shield_kite
+      adjectives: [ fine ]
+    Legs:
+      id: legs_mail
+      adjectives: [ fine ]
+    Feet:
+      id: boots_mail
+      adjectives: [ fine ]
+    Hands:
+      id: gloves_mail
+      adjectives: [ fine ]
+  quick: {}
+levels:
+  fighter: 10
+abilities:
+  - armor_light
+  - armor_medium
+  - weapon_axe
+  - weapon_crossbow
+  - weapon_bow
+  - weapon_small_sword
+  - weapon_large_sword
+  - weapon_spear
+  - weapon_mace
+  - weapon_simple
+  - defensive_fighting
+  - shield_slam
+  - helping_hand
+  - inspire
+ai: ai_basic

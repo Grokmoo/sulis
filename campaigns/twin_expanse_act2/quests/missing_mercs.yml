@@ -1,0 +1,12 @@
+id: missing_mercs
+name: "Missing Mercs"
+entries:
+  start:
+    description: |
+      A dwarf mercenary commander at the North end of Oasis has asked me to find some of his men.  He suspects they are off drinking in their usual spot, a canyon to the East of town.
+  found:
+    description: |
+      I found the drunk mercenaries and prodded them back to Oasis.
+  complete:
+    description: |
+      I spoke to the mercenary commander and the mercs found their way back home.

@@ -1,0 +1,42 @@
+---
+id: oasis_merc03
+name: "Merc"
+race: human_simple
+sex: Male
+attributes:
+  str: 10
+  dex: 10
+  end: 10
+  per: 10
+  int: 10
+  wis: 10
+conversation: ~
+faction: Neutral
+images:
+  Foreground: empty
+  Shadow: empty
+  Background: creatures/human21
+hue: 0.9
+inventory:
+  equipped:
+    Feet: { id: boots_mail }
+    Torso: { id: torso_mail }
+    Legs: { id: legs_mail }
+    HeldMain: { id: warhammer }
+    HeldOff: { id: shield_kite }
+  quick: {}
+levels:
+  fighter: 8
+abilities:
+  - armor_light
+  - armor_medium
+  - armor_heavy
+  - weapon_axe
+  - weapon_crossbow
+  - weapon_bow
+  - weapon_small_sword
+  - weapon_large_sword
+  - weapon_spear
+  - weapon_mace
+  - weapon_simple
+ai: ~

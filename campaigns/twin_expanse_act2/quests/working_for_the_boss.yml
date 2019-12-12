@@ -1,0 +1,9 @@
+id: working_for_the_boss
+name: "Working for the Boss"
+entries:
+  start:
+    description: |
+      The leader of the thugs in control of Oasis has given me a task to complete.  I am to travel Southwest of town and eliminate an infestation of drakes that have been harrassing the town.
+  drakes_cleared:
+    description: |
+      I have eradicated the drakes queen, which should drastically lower their activities for many years at least.  I should report back to the Boss in Oasis.

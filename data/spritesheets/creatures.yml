@@ -46,6 +46,7 @@ groups:
       ogre03: [12, 42]
       ogre04: [16, 42]
       ogre05: [20, 42]
+      elemental_sand: [24, 42]
       
       demon01: [0, 46]
       demon02: [4, 46]

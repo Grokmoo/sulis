@@ -1,0 +1,12 @@
+id: attacked_in_the_dark
+name: "Attacked in the Dark"
+entries:
+  start:
+    description: |
+      The herbalist in Oasis was out in a canyon to the East of town when he was attacked by some sort of creature.  He has asked me to go and retrieve his things from the cart.  He doesn't know what it was exactly that attacked him.
+  found:
+    description: |
+      I located the supplies and was attacked by a large sand monster.
+  returned:
+    description: |
+      I returned the supplies to the merchant and received a reward.

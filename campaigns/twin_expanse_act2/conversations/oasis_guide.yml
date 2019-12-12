@@ -28,6 +28,11 @@ nodes:
   start03:
     text: |
       [c=6868FF|#target_name#] - After we're done here, you are to go talk to the boss.  Big house, north end of the square.  You can't miss it.
+    on_view:
+      - quest_state:
+          quest: the_aegis
+          entry: oasis
+          state: Visible
     responses:
       - text: "[c=888|Continue]"
         to: main

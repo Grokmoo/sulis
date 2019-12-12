@@ -1,0 +1,9 @@
+id: level10_fire_drake_boss
+auto_spawn: true
+min_gen_actors: 4
+max_gen_actors: 4
+entries:
+  - id: fire_drake
+    weight: 1
+  - id: fire_drake_queen
+    always: true

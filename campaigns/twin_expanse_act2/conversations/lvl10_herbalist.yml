@@ -5,6 +5,8 @@ nodes:
   start01:
     text: |
       [c=6868FF|#target_name#] - I have a variety of herbs and remedies, if you are interested.
+      
+      Also let me know if you are interested in any odd jobs.
     responses:
       - text: "Yes, show me."
         on_select:
@@ -15,4 +17,43 @@ nodes:
               sell_frac: 0.25
               refresh_time:
                 hour: 24
+      - text: "I found your supplies."
+        to_view:
+          - party_item: merchant_supplies
+        to: finish_job01
+      - text: "About that job?"
+        to_view:
+          - not_target_flag: supplies_found
+        to: ask_job01
       - text: "Nothing for now."
+  ask_job01:
+    text: |
+      [c=6868FF|#target_name#] -  You are interested?  I need someone to travel to a canyon, just East of here.  Near the entrance, you'll find a broken cart with some of my things inside.  Grab them, and return them to me.
+    responses:
+      - text: "Why can't you do this yourself?"
+        to: ask_job02
+  ask_job02:
+    text: |
+      [c=6868FF|#target_name#] - Well the cart was broken when I was attacked.  Whatever attacked me may still be there.  Its nothing someone like you can't handle, I'm sure!
+    responses:
+      - text: "And what attacked you?"
+        to: ask_job03
+  ask_job03:
+    text: |
+      [c=6868FF|#target_name#] - I'm really not sure.  It was very dark, and it came out of the sand quite suddenly.  I didn't really have time to get a good look.
+    on_view:
+      - fire_script:
+          id: oasis
+          func: herbalist_quest_start
+    responses:
+      - text: "I'll think about it.  Farewell."
+  finish_job01:
+    text: |
+      [c=6868FF|#target_name#] -  Fantastic news, thank you!  And I have something special for you, for services rendered.
+    on_view:
+      - fire_script:
+          id: oasis
+          func: herbalist_quest_end
+    responses:
+      - text: "Farewell."
+    

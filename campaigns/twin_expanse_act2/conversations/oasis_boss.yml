@@ -25,9 +25,11 @@ nodes:
         to: start03
   start03:
     text: |
-      [c=6868FF|#target_name#] - I've also been informed you have skills which will prove useful to us.  I expect we'll be making use of them.  In due time.
+      [c=6868FF|#target_name#] - I've also been informed you have skills which will prove useful to us.  I expect we'll be making use of them soon.
       
       For now, you are free to move about Oasis.  You'll find escape to be quite impossible, so don't bother.
+      
+      When you are ready for your assignment, come see me.
     responses:
       - text: "[c=888|Continue]"
         to: main
@@ -42,8 +44,8 @@ nodes:
         to: ask_boss
       - text: "I do not take orders from villians like you!"
         to: ask_refuse
-      - text: "I will be happy to work with you.  The whole situation in Rose Lake was just a big misunderstanding."
-        to: ask_accept
+      - text: "What is my assignment?"
+        to: ask_accept_a1
       - text: "Nothing for now."
   ask_leader:
     text: |
@@ -63,9 +65,25 @@ nodes:
     responses:
       - text: "[c=888|Continue]"
         to: main
-  ask_accept:
+  ask_accept_a1:
     text: |
-      [c=6868FF|#target_name#] - I know little of what has transpired in Rose Lake.  We will see where your motives lie soon enough.
+      [c=6868FF|#target_name#] - It is simple enough.  There is a large colony of drakes to the southeast of town.  The drakes have been getting larger and more dangerous, attacking my men and being a general nuisance.
+    responses:
+      - text: "[c=888|Continue]"
+        to: ask_accept_a2
+  ask_accept_a2:
+    text: |
+      [c=6868FF|#target_name#] - I'm marking the location on your map.  Travel there and kill the brood mother, and as many of the drakes as you can.
+    responses:
+      - text: "[c=888|Continue]"
+        to: ask_accept_a3
+  ask_accept_a3:
+    text: |
+      [c=6868FF|#target_name#] - Once you are done, report back.  And I will see about giving you a more significant task.
+    on_view:
+      - fire_script:
+          id: oasis
+          func: working_for_the_boss_a
     responses:
       - text: "[c=888|Continue]"
         to: main

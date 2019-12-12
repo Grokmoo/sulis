@@ -1,0 +1,34 @@
+id: fire_drake_queen
+name: Fire Drake Queen
+description: "Monster"
+size: 6by5
+movement_rate: 1.5
+base_stats:
+  - kind: { attribute: { attribute: Strength, amount: 10 } }
+  - kind: { attribute: { attribute: Dexterity, amount: -2 } }
+  - kind: { attribute: { attribute: Endurance, amount: 10 } }
+  - kind: { attribute: { attribute: Intellect, amount: -4 } }
+  - kind: { reach: 1.5 }
+  - kind: { armor: 20 }
+  - kind: { resistance: { kind: "Fire", amount: 50 } }
+  - kind: { resistance: { kind: "Cold", amount: -25 } }
+base_attack:
+  damage:
+    min: 25
+    max: 35
+    kind: Piercing
+  kind: #Melee
+    reach: 2.0
+  bonuses: {}
+default_images:
+  Male:
+    Background: creatures/dragon_large01
+  Female:
+    Background: creatures/dragon_large01
+ticker_offset: [0.0, 0.0]
+image_layer_offset_scale: 16
+image_layer_offsets:
+  Shadow: [-32, -19]
+  Background: [-32, -19]
+image_layer_postfix: {}
+

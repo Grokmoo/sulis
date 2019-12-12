@@ -1,0 +1,57 @@
+id: oasis_merc_lead
+initial_nodes:
+  - id: complete
+    to_view:
+      - player_flag: mercs_found
+  - id: main
+    to_view:
+      - target_flag: already_talked
+  - id: start01
+nodes:
+  start01:
+    text: |
+      [c=6868FF|#target_name#] - [c=888|A rather annoyed looking Dwarf addresses you.]
+      
+      You are the new one around town, right?  I've got a job for you, if you are interested.
+    on_view:
+      - target_flag: already_talked
+    responses:
+      - text: "[c=888|Continue]"
+        to: start02
+  start02:
+    text: |
+      [c=6868FF|#target_name#] - A bunch of my men went AWOL again.  I need you to go get them.  I'd go myself, but I can't really leave Oasis unattended at the moment.
+    responses:
+      - text: "[c=888|Continue]"
+        to: start03
+  start03:
+    text: |
+      [c=6868FF|#target_name#] - I'd bet good money they are off drinking in their usual spot, a canyon east of town.  Go there and make sure the lot of them come back.
+    on_view:
+      - fire_script:
+          id: oasis
+          func: missing_mercs_start
+    responses:
+      - text: "[c=888|Continue]"
+        to: main
+  main:
+    text: |
+      [c=6868FF|#target_name#] - Questions?
+    responses:
+      - text: "What did you want me to do again?"
+        to_view:
+          - not_target_flag: quest_complete
+        to: start02
+      - text: "Nothing, farewell."
+  complete:
+    text: |
+      [c=6868FF|#target_name#] - Thank you for your help.  My men have made it back home.  Now I just need to make them sober up...
+      
+      Here is a small token of our appreciation.
+    on_view:
+      - fire_script:
+          id: oasis
+          func: missing_mercs_complete
+    responses:
+      - text: "Thanks.  Farewell."
+      

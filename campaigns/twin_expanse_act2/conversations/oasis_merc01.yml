@@ -1,0 +1,80 @@
+id: oasis_merc01
+initial_nodes:
+  - id: main
+    to_view:
+      - target_flag: already_talked
+  - id: start01
+nodes:
+  start01:
+    text: |
+      [c=6868FF|#target_name#] - [c=888|A very drunk man takes note of you.]
+      
+      That's funny, I don't remember inviting anybody.  Do you guys remember?
+    on_view:
+      - target_flag: already_talked
+    responses:
+      - text: "[c=888|Continue]"
+        to: start02
+  start02:
+    text: |
+      [c=68FF68|Merc]
+      
+      I don't remember.
+    switch_speaker: oasis_merc02
+    responses:
+      - text: "[c=888|Continue]"
+        to: start03
+  start03:
+    text: |
+      [c=68FF68|Merc]
+      
+      Ummmmmmmm...
+    switch_speaker: oasis_merc03
+    responses:
+      - text: "[c=888|Continue]"
+        to: start04
+  start04:
+    text: |
+      [c=6868FF|#target_name#] - [c=888|The merc looks confused for a moment.]
+      
+      Uh... what were you saying?
+    switch_speaker: oasis_merc01
+    responses:
+      - text: "[c=888|Continue]"
+        to: start05
+  start05:
+    text: |
+      [c=6868FF|#target_name#] - [c=888|He mumbles something incomprehensible.]
+    responses:
+      - text: "I just spoke to your commander.  He needs you back in Oasis now."
+        to: start06
+  start06:
+    text: |
+      [c=6868FF|#target_name#] - [c=888|He seems to gain a bit of lucidity.]
+      
+      The commander?  But we were just taking a break.
+    responses:
+      - text: "No more breaks.  You need to go.  Now."
+        to: start07
+  start07:
+    text: |
+      [c=6868FF|#target_name#] - Oh man, we are gonna get it.
+      
+      C'mon boys, time to go!
+    responses:
+      - text: "[c=888|Continue]"
+        to: start08
+  start08:
+    text: |
+      [c=888|The men gather themselves up quite quickly, for a bunch of drunks.  Then, they march off.]
+    responses:
+      - text: "[c=888|Leave]"
+        on_select:
+          - fire_script:
+              id: oasis
+              func: mercs_found
+  main:
+    text: |
+      [c=6868FF|#target_name#] - We're going, we're going!
+    responses:
+      - text: "Farewell."

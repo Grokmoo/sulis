@@ -1,6 +1,6 @@
 ---
 id: desert_start_canyon
-name: Desert Canyon
+name: Canyon
 width: 71
 height: 128
 visibility_tile: gui/area_invis

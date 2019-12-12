@@ -1,0 +1,5 @@
+id: merchant_supplies
+name: Merchant Supplies
+icon: inventory/chest01
+weight: 20
+value: 0

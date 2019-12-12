@@ -1686,6 +1686,27 @@ tiles:
     size: [4, 6]
     sprite: tileset/cliffs_grass_cave_large
     pass: [[0, 4], [1, 4], [2, 4], [3, 4], [0, 5], [1, 5], [2, 5], [3, 5]]
+  cliff_sand_entrance_small:
+    layer: object
+    size: [2, 4]
+    sprite: tileset/cliffs_sand_cave_small
+    pass: [[0, 2], [1, 2], [0, 3], [1, 3]]
+  cliff_sand_entrance_large:
+    layer: object
+    size: [4, 6]
+    sprite: tileset/cliffs_sand_cave_large
+    pass: [[0, 4], [1, 4], [2, 4], [3, 4], [0, 5], [1, 5], [2, 5], [3, 5]]
+  cliffs_sand_tunnel_top:
+    layer: aerial
+    size: [4, 8]
+    sprite: tileset/cliffs_sand_tunnel_top
+    impass: [[0, 1], [0, 2], [0, 3], [0, 4], [0, 5], [0, 6],
+             [3, 1], [3, 2], [3, 3], [3, 4], [3, 5], [3, 6]]
+  cliffs_sand_tunnel_bot:
+    layer: walls
+    size: [4, 4]
+    sprite: tileset/cliffs_sand_tunnel_bot
+    impass: [[0, 1], [3, 1]]
   cave_entrance_small:
     layer: object
     size: [2, 4]

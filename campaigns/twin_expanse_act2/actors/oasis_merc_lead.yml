@@ -1,0 +1,28 @@
+---
+id: oasis_merc_lead
+name: Merc Leader
+race: dwarf
+sex: Male
+attributes:
+  str: 10
+  dex: 10
+  end: 10
+  per: 10
+  int: 10
+  wis: 10
+conversation: oasis_merc_lead
+faction: Neutral
+images:
+  Background: creatures/dwarf02
+  Foreground: empty
+  Shadow: empty
+hue: 0.6000000238418579
+inventory:
+  equipped: {}
+  quick: {}
+  pc_starting_coins: 0
+  pc_starting_items: []
+levels:
+  fighter: 1
+abilities: []
+ai: ~

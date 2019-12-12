@@ -1144,3 +1144,11 @@ features:
     size:
       width: 4
       height: 8
+  cliffs_sand_tunnel:
+    entries:
+      - tiles:
+          cliffs_sand_tunnel_top: [[0, 0]]
+          cliffs_sand_tunnel_bot: [[0, 6]]
+    size:
+      width: 4
+      height: 10

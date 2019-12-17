@@ -69,3 +69,5 @@ abilities:
     position: [4, 8.9]
   - id: spell_sequencer
     position: [3, 8.45]
+  - id: earthquake
+    position: [5, 10]

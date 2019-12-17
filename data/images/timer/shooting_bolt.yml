@@ -1,0 +1,11 @@
+id: shooting_bolt
+frame_time_millis: 80
+frames:
+  - particles/bolt01
+  - particles/bolt02
+  - particles/bolt03
+  - particles/bolt04
+  - particles/bolt05
+  - particles/bolt06
+  - particles/bolt07
+  - particles/bolt08

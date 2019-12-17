@@ -203,6 +203,7 @@ groups:
       wings_of_xel: [8, 13]
       winged_leap: [9, 13]
       the_shield_of_rinly: [10, 13]
+      earthquake: [11, 13]
       
       deadly_caster: [0, 14]
       ice_master: [1, 14]

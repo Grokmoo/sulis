@@ -403,3 +403,15 @@ groups:
       spell_shock06: [320, 0]
       spell_shock07: [384, 0]
       spell_shock08: [448, 0]
+  bolt:
+    position: [576, 672]
+    size: [256, 32]
+    areas:
+      bolt01: [0, 0]
+      bolt02: [0, 32]
+      bolt03: [0, 64]
+      bolt04: [0, 96]
+      bolt05: [0, 128]
+      bolt06: [0, 160]
+      bolt07: [0, 192]
+      bolt08: [0, 224]

@@ -1,0 +1,22 @@
+id: earthquake
+name: "Earthquake"
+icon: abilities/earthquake
+description: |
+  A large area of nearby ground erupts in massive siesmic activity.  All targets must in the area must make a Reflex check to avoid being stunned and taking heavy crushing damage.
+active:
+  script: "earthquake"
+  group: "4th Circle"
+  ap: 3000
+  duration:
+    Instant
+  cooldown: 5
+  combat_only: true
+  ai:
+    priority: 10
+    kind: Debuff
+    group: Single
+    range: Short
+  short_description: |
+    Stun and deal heavy damage to targets in a large area.
+prereqs:
+  total_level: 13

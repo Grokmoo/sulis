@@ -28,6 +28,7 @@ use crate::image::animated_image::AnimatedImageBuilder;
 use crate::image::composed_image::ComposedImageBuilder;
 use crate::image::simple_image::SimpleImageBuilder;
 use crate::image::timer_image::TimerImageBuilder;
+use crate::image::window_image::WindowImageBuilder;
 use crate::resource::font::FontBuilder;
 use crate::resource::spritesheet::SpritesheetBuilder;
 use crate::resource::*;
@@ -39,6 +40,7 @@ pub struct ResourceBuilderSet {
     pub simple_builders: HashMap<String, SimpleImageBuilder>,
     pub composed_builders: HashMap<String, ComposedImageBuilder>,
     pub timer_builders: HashMap<String, TimerImageBuilder>,
+    pub window_builders: HashMap<String, WindowImageBuilder>,
     pub animated_builders: HashMap<String, AnimatedImageBuilder>,
     pub spritesheet_builders: HashMap<String, SpritesheetBuilder>,
     pub font_builders: HashMap<String, FontBuilder>,
@@ -68,6 +70,7 @@ impl ResourceBuilderSet {
             simple_builders: read_builders(resources, SimpleImage)?,
             composed_builders: read_builders(resources, ComposedImage)?,
             timer_builders: read_builders(resources, TimerImage)?,
+            window_builders: read_builders(resources, WindowImage)?,
             animated_builders: read_builders(resources, AnimatedImage)?,
             spritesheet_builders: read_builders_insert_dirs(resources, Spritesheet)?,
         })

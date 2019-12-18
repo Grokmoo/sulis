@@ -32,13 +32,22 @@ function on_target_select(parent, ability, targets)
   cb:set_on_anim_complete_fn("attack_targets")
   anim:set_completion_callback(cb)
   anim:activate()
+  
+  ability:activate(parent)
 end
 
 function create_random_anim(parent, ability, targets)
+  local ids = { "01", "02", "03" }
+  local id = ids[math.random(#ids)]
+  local id = "01"
+
   local position = targets:selected_point()
 
-  local anim = parent:create_anim("shooting_bolt", 0.64)
-  anim:set_position(anim:param(position.x - radius - 1.0), anim:param(position.y - 1.0))
+  local anim = parent:create_anim("shooting_bolt" .. id, 0.7)
+  anim:set_position(
+    anim:param(position.x - radius - 1.0 + (math.random() - 0.5) * 4.0),
+    anim:param(position.y - 1.0 + (math.random() - 0.5) * 4.0)
+  )
   anim:set_particle_size_dist(anim:fixed_dist(20.0), anim:fixed_dist(2.5))
   anim:set_rotation(anim:param(math.random() * 2.0 * math.pi))
   anim:set_color(anim:param(0.53), anim:param(0.46), anim:param(0.40))

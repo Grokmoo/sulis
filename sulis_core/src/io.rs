@@ -110,6 +110,7 @@ pub enum DrawListKind {
 pub struct DrawList {
     pub quads: Vec<Vertex>,
     pub texture: String,
+    pub centroid: Option<[f32; 2]>,
     pub texture_mag_filter: TextureMagFilter,
     pub texture_min_filter: TextureMinFilter,
     pub kind: DrawListKind,
@@ -129,6 +130,7 @@ impl Default for DrawList {
             texture_mag_filter: TextureMagFilter::Linear,
             texture_min_filter: TextureMinFilter::Linear,
             kind: DrawListKind::Sprite,
+            centroid: None,
             color_filter: [1.0, 1.0, 1.0, 1.0],
             color_sec: [0.0, 0.0, 0.0, 0.0],
             scale: [1.0, 1.0],
@@ -188,6 +190,8 @@ impl DrawList {
         let y_min = y_max - h;
         let tc = tex_coords;
 
+        let centroid = Some([(x_min + x_max) / 2.0, (y_min + y_max) / 2.0]);
+
         let quads = vec![
             Vertex {
                 position: [x_min, y_max],
@@ -218,6 +222,7 @@ impl DrawList {
         DrawList {
             texture: id.to_string(),
             quads,
+            centroid,
             ..Default::default()
         }
     }
@@ -273,6 +278,11 @@ impl DrawList {
         if self.texture.is_empty() {
             self.texture = other.texture.to_string();
         }
+        if let None = self.centroid {
+            if let Some(centroid) = other.centroid {
+                self.centroid = Some(centroid);
+            }
+        }
     }
 
     /// rotates the vertices in this drawlist by the given angle,
@@ -284,15 +294,24 @@ impl DrawList {
         let sin = angle.sin();
         let cos = angle.cos();
 
-        let mut avg_x = 0.0;
-        let mut avg_y = 0.0;
-        for ref vertex in self.quads.iter() {
-            avg_x += vertex.position[0];
-            avg_y += vertex.position[1];
-        }
+        let (avg_x, avg_y) = match self.centroid {
+            None => {
+                let mut avg_x = 0.0;
+                let mut avg_y = 0.0;
 
-        avg_x /= self.quads.len() as f32;
-        avg_y /= self.quads.len() as f32;
+                for ref vertex in self.quads.iter() {
+                    avg_x += vertex.position[0];
+                    avg_y += vertex.position[1];
+                }
+
+                avg_x /= self.quads.len() as f32;
+                avg_y /= self.quads.len() as f32;
+                (avg_x, avg_y)
+            },
+            Some(centroid) => {
+                (centroid[0], centroid[1])
+            }
+        };
 
         for ref mut vertex in self.quads.iter_mut() {
             let x = vertex.position[0] - avg_x;

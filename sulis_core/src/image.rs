@@ -29,6 +29,9 @@ pub use self::simple_image::SimpleImage;
 pub mod timer_image;
 pub use self::timer_image::TimerImage;
 
+pub mod window_image;
+pub use self::window_image::WindowImage;
+
 use std::fmt::Debug;
 
 use crate::io::{DrawList, GraphicsRenderer};

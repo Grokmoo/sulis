@@ -40,6 +40,7 @@ pub enum YamlResourceKind {
     ComposedImage,
     SimpleImage,
     TimerImage,
+    WindowImage,
     Spritesheet,
 
     Ability,
@@ -88,6 +89,7 @@ impl YamlResourceKind {
             "images/composed" | "images\\composed" => ComposedImage,
             "images/simple" | "images\\simple" => SimpleImage,
             "images/timer" | "images\\timer" => TimerImage,
+            "images/window" | "images\\window" => WindowImage,
             "spritesheets" => Spritesheet,
 
             "abilities" => Ability,

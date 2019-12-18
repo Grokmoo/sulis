@@ -52,6 +52,10 @@ function ai_action(parent)
     end
 
     local target = find_target(parent, hostiles)
+	if target == nil then
+	  return parent:state_end()
+	end
+	
 	local result = check_move_for_attack(parent, target)
 	if result.attack then
 		parent:anim_weapon_attack(target, nil, true)

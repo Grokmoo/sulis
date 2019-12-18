@@ -1,0 +1,11 @@
+id: terror
+frame_time_millis: 100
+frames:
+  - particles/terror01
+  - particles/terror02
+  - particles/terror03
+  - particles/terror04
+  - particles/terror05
+  - particles/terror04
+  - particles/terror03
+  - particles/terror02

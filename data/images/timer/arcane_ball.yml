@@ -1,0 +1,11 @@
+id: arcane_ball
+frame_time_millis: 125
+frames:
+  - particles/arcane_ball01
+  - particles/arcane_ball02
+  - particles/arcane_ball03
+  - particles/arcane_ball04
+  - particles/arcane_ball05
+  - particles/arcane_ball06
+  - particles/arcane_ball07
+  - particles/arcane_ball08

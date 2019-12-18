@@ -76,16 +76,11 @@ function check_terrify(parent, ability)
       effect:add_attack_disabled()
       effect:add_num_bonus("will", -20)
       
-      local anim = target:create_color_anim()
-      anim:set_color(anim:param(0.8),
-                     anim:param(0.1),
-                     anim:param(0.1),
-                     anim:param(1.0))
-      anim:set_color_sec(anim:param(0.3),
-                         anim:param(0.0),
-                         anim:param(0.0),
-                         anim:param(0.0))
-      effect:add_color_anim(anim)
+      local gen = target:create_anim("terror")
+      gen:set_moves_with_parent()
+      gen:set_position(gen:param(-0.75), gen:param(-3.0))
+      gen:set_particle_size_dist(gen:fixed_dist(1.5), gen:fixed_dist(1.5))
+      effect:add_anim(gen)
       effect:apply()
 	  end
   end

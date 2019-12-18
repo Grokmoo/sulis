@@ -1,0 +1,10 @@
+id: note_electric
+frame_time_millis: 100
+frames:
+  - particles/note_electric01
+  - particles/note_electric02
+  - particles/note_electric03
+  - particles/note_electric04
+  - particles/note_electric05
+  - particles/note_electric06
+  - particles/note_electric07

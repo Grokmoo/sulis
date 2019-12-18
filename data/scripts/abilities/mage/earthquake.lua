@@ -44,6 +44,7 @@ function create_random_anim(parent, ability, targets)
   local position = targets:selected_point()
 
   local anim = parent:create_anim("shooting_bolt" .. id, 0.7)
+  anim:set_draw_below_entities()
   anim:set_position(
     anim:param(position.x - radius - 1.0 + (math.random() - 0.5) * 4.0),
     anim:param(position.y - 1.0 + (math.random() - 0.5) * 4.0)

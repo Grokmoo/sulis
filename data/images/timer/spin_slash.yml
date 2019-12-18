@@ -1,0 +1,9 @@
+id: spin_slash
+frame_time_millis: 100
+frames:
+  - particles/spin_slash01
+  - particles/spin_slash02
+  - particles/spin_slash03
+  - particles/spin_slash04
+  - particles/spin_slash05
+  - particles/spin_slash06

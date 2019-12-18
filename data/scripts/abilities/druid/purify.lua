@@ -30,4 +30,10 @@ function on_target_select(parent, ability, targets)
   anim:set_color(anim:param(1.0), anim:param(1.0), anim:param(1.0), anim:param(0.0, 0.5, -0.5))
   anim:set_particle_duration_dist(anim:fixed_dist(2.0))
   anim:activate()
+  
+  local anim = target:create_anim("spinning_flash", 0.6)
+  anim:set_moves_with_parent()
+  anim:set_position(anim:param(-2.0), anim:param(-2.75))
+  anim:set_particle_size_dist(anim:fixed_dist(4.0), anim:fixed_dist(4.0))
+  anim:activate()
 end

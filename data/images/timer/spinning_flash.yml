@@ -1,0 +1,9 @@
+id: spinning_flash
+frame_time_millis: 100
+frames:
+  - particles/spinning_flash01
+  - particles/spinning_flash02
+  - particles/spinning_flash03
+  - particles/spinning_flash04
+  - particles/spinning_flash05
+  - particles/spinning_flash06

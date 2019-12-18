@@ -1,6 +1,6 @@
 id: particles
 src: "particles.png"
-size: [ 1024, 1024 ]
+size: [ 2048, 2048 ]
 simple_image_gen_scale: 4
 groups:
   hail:
@@ -410,3 +410,55 @@ groups:
       shooting_bolt01: [0, 0]
       shooting_bolt02: [0, 32]
       shooting_bolt03: [0, 64]
+  arcane_ball:
+    position: [0, 872]
+    size: [110, 75]
+    areas:
+      arcane_ball01: [0, 0]
+      arcane_ball02: [110, 0]
+      arcane_ball03: [220, 0]
+      arcane_ball04: [330, 0]
+      arcane_ball05: [440, 0]
+      arcane_ball06: [550, 0]
+      arcane_ball07: [660, 0]
+      arcane_ball08: [770, 0]
+  spinning_flash:
+    position: [0, 947]
+    size: [100, 100]
+    areas:
+      spinning_flash01: [0, 0]
+      spinning_flash02: [100, 0]
+      spinning_flash03: [200, 0]
+      spinning_flash04: [300, 0]
+      spinning_flash05: [400, 0]
+      spinning_flash06: [500, 0]
+  note_electric:
+    position: [0, 1047]
+    size: [100, 100]
+    areas:
+      note_electric01: [0, 0]
+      note_electric02: [100, 0]
+      note_electric03: [200, 0]
+      note_electric04: [300, 0]
+      note_electric05: [400, 0]
+      note_electric06: [500, 0]
+      note_electric07: [600, 0]
+  spin_slash:
+    position: [0, 1147]
+    size: [100, 100]
+    areas:
+      spin_slash01: [0, 0]
+      spin_slash02: [100, 0]
+      spin_slash03: [200, 0]
+      spin_slash04: [300, 0]
+      spin_slash05: [400, 0]
+      spin_slash06: [500, 0]
+  terror:
+    position: [0, 1247]
+    size: [100, 100]
+    areas:
+      terror01: [0, 0]
+      terror02: [100, 0]
+      terror03: [200, 0]
+      terror04: [300, 0]
+      terror05: [400, 0]

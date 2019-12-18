@@ -1,5 +1,5 @@
 function on_activate(parent, ability)
-  local targets = parent:targets():hostile():reachable()
+  local targets = parent:targets():hostile():visible_within(4.0)
   
   local targeter = parent:create_targeter(ability)
   targeter:set_selection_reachable()

@@ -20,6 +20,7 @@ use std::cell::{Cell, RefCell};
 use std::rc::Rc;
 
 use crate::{animation::Anim, EntityState};
+use sulis_core::config::Config;
 use sulis_core::image::Image;
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::ui::{animation_state, Color};
@@ -343,6 +344,11 @@ pub(in crate::animation) fn update(
         rotation.update(v_term, a_term, j_term);
     }
 
+    if let Some(ref mut centroid) = model.centroid {
+        centroid.0.update(v_term, a_term, j_term);
+        centroid.1.update(v_term, a_term, j_term);
+    }
+
     let mut i = state.particles.len();
     loop {
         if i == 0 {
@@ -408,6 +414,13 @@ pub(in crate::animation) fn draw(
             model.alpha.value,
         ));
         if let Some(ref rotation) = model.rotation {
+            if let Some(ref centroid) = model.centroid {
+                let x = centroid.0.value + offset_x;
+                let y = centroid.1.value + offset_y;
+                let y = Config::ui_height() as f32 - y;
+                draw_list.centroid = Some([x, y]);
+            }
+
             draw_list.rotate(rotation.value);
         }
         renderer.draw(draw_list);
@@ -438,6 +451,9 @@ pub struct GeneratorModel {
 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub rotation: Option<Param>,
+
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub centroid: Option<(Param, Param)>,
 
     pub red: Param,
     pub green: Param,
@@ -475,6 +491,7 @@ impl GeneratorModel {
             duration_millis,
             position: (Param::fixed(x), Param::fixed(y)),
             rotation: None,
+            centroid: None,
             red: Param::fixed(1.0),
             green: Param::fixed(1.0),
             blue: Param::fixed(1.0),

@@ -1,0 +1,22 @@
+id: vacuum
+name: "Vacuum"
+icon: abilities/vacuum
+description: |
+  You instantaneously remove all air from an area, creating a massive pressure wave that sucks in all nearby targets and does major crushing damage.
+active:
+  script: "vacuum"
+  group: "4th Circle"
+  ap: 3000
+  duration:
+    Instant
+  cooldown: 6
+  combat_only: true
+  ai:
+    priority: 10
+    kind: Damage
+    group: Multiple
+    range: Visible
+  short_description: |
+    Suck targets in towards a point and deal damage.
+prereqs:
+  total_level: 13

@@ -1,0 +1,22 @@
+id: lightning_leap
+name: "Lightning Leap"
+icon: abilities/lightning_leap
+description: |
+  While Become Lightning is active, you can instantly move to a new location, dealing shock damage to all targets in a line.
+active:
+  script: "lightning_leap"
+  group: "Special"
+  ap: 0
+  duration:
+    Instant
+  cooldown: 1
+  combat_only: true
+  ai:
+    priority: 10
+    kind: Damage
+    group: Multiple
+    range: Visible
+  short_description: |
+    Move to a new location, dealing shock damage to targets in a line.
+prereqs:
+  total_level: 13

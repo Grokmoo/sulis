@@ -1,0 +1,24 @@
+id: lightning_form
+name: "Lightning Form"
+icon: abilities/lightning_form
+description: |
+  Your body becomes one with lightning, and you gain access to the Lightning Leap ability.
+  
+  Once per round while the spell is active, you can choose to instantly transmit yourself to a new location, doing major Shock damage to all targets in your path.  This action does not cost any AP.  You also gain 100% immunity to shock damage.
+active:
+  script: "lightning_form"
+  group: "4th Circle"
+  ap: 2000
+  duration:
+    Rounds: 3
+  cooldown: 6
+  combat_only: true
+  ai:
+    priority: 10
+    kind: Special
+    group: Single
+    range: Personal
+  short_description: |
+    Lightning leap once per round to attack enemies.
+prereqs:
+  total_level: 13

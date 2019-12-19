@@ -55,6 +55,8 @@ groups:
       minor_heal: [7, 3]
       restoration: [8, 3]
       draining_field: [9, 3]
+      lightning_form: [10, 3]
+      aegis_of_flame: [11, 3]
       
       expediate: [0, 4]
       beast_shape: [1, 4]
@@ -204,6 +206,9 @@ groups:
       winged_leap: [9, 13]
       the_shield_of_rinly: [10, 13]
       earthquake: [11, 13]
+      lightning_leap: [12, 13]
+      flaming_bolt: [13, 13]
+      vacuum: [14, 13]
       
       deadly_caster: [0, 14]
       ice_master: [1, 14]

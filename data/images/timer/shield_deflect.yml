@@ -1,0 +1,11 @@
+id: shield_deflect
+frame_time_millis: 200
+frames:
+  - particles/shield_deflect01
+  - particles/shield_deflect02
+  - particles/shield_deflect03
+  - particles/shield_deflect04
+  - particles/shield_deflect05
+  - particles/shield_deflect04
+  - particles/shield_deflect03
+  - particles/shield_deflect02

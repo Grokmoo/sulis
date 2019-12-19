@@ -17,7 +17,7 @@ active:
     group: Single
     range: Personal
   short_description: |
-    Grant attribute bonuses to all nearby allies.
+    Protect yourself against flanking, crits, and concealment.
 prereqs:
   abilities: [ inspire ]
   total_level: 9

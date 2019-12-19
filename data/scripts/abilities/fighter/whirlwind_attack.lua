@@ -16,14 +16,14 @@ function on_activate(parent, ability)
 end
 
 function on_target_select(parent, ability, targets)
-  local duration = 1.0
+  local duration = 1.8
   local gen = parent:create_anim("whirlwind", duration)
-  gen:set_position(gen:param(parent:center_x() - 1.5), gen:param(parent:center_y() - 2.0))
-  gen:set_particle_size_dist(gen:fixed_dist(4.0), gen:fixed_dist(4.0))
+  gen:set_position(gen:param(parent:center_x() - 2.5), gen:param(parent:center_y() - 3.0))
+  gen:set_particle_size_dist(gen:fixed_dist(6.0), gen:fixed_dist(6.0))
   gen:set_alpha(gen:param(1.0, 0.0, 0.0, -6.0))
 
   local targets = targets:to_table()
-  local duration_per_target = duration / (#targets + 1)
+  local duration_per_target = 0.5 * duration / (#targets + 1)
   for i = 1, #targets do
     local cb = ability:create_callback(parent)
 	cb:add_target(targets[i])

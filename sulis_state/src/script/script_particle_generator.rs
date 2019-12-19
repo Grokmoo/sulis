@@ -90,6 +90,10 @@ use crate::GameState;
 /// is currently being done in software for convenience, so this is not suitable for
 /// animations with many particles.
 ///
+/// # `set_rotation_centroid(x: Param, y: Param)`
+/// Sets the point that the rotation, if any, is done about.  By default, this is the
+/// center point of the particle image.
+///
 /// # `set_color(r: Param, g: Param, b: Param, a: Param (Optional))`
 /// Sets the color which all particles in this animation are drawn using.  The `a` alpha
 /// component is optional and defaults to a fixed value of 1.0.  Each component Param
@@ -212,6 +216,10 @@ impl UserData for ScriptParticleGenerator {
         });
         methods.add_method_mut("set_position", |_, gen, (x, y): (Param, Param)| {
             gen.model.position = (x, y);
+            Ok(())
+        });
+        methods.add_method_mut("set_rotation_centroid", |_, gen, (x, y): (Param, Param)| {
+            gen.model.centroid = Some((x, y));
             Ok(())
         });
         methods.add_method_mut("set_rotation", |_, gen, rotation: Param| {

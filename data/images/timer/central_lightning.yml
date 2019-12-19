@@ -1,0 +1,7 @@
+id: central_lightning
+frame_time_millis: 100
+frames:
+  - particles/central_lightning01
+  - particles/central_lightning02
+  - particles/central_lightning03
+  - particles/central_lightning04

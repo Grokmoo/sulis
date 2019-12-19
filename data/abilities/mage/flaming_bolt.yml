@@ -1,0 +1,20 @@
+id: flaming_bolt
+name: "Flaming Bolt"
+icon: abilities/flaming_bolt
+description: |
+  You launch a bolt of fire at an opponent, doing significant fire damage.
+active:
+  script: "flaming_bolt"
+  group: "Special"
+  ap: 1000
+  duration:
+    Instant
+  cooldown: 4
+  combat_only: false
+  ai:
+    priority: 10
+    kind: Damage
+    group: Single
+    range: Visible
+  short_description: |
+    Launch a bolt of fire at an opponent.

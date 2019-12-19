@@ -1,0 +1,18 @@
+id: wind_collapse
+frame_time_millis: 50
+frames:
+  - particles/wind_collapse01
+  - particles/wind_collapse02
+  - particles/wind_collapse03
+  - particles/wind_collapse04
+  - particles/wind_collapse05
+  - particles/wind_collapse06
+  - particles/wind_collapse07
+  - particles/wind_collapse08
+  - particles/wind_collapse09
+  - particles/wind_collapse10
+  - particles/wind_collapse11
+  - particles/wind_collapse12
+  - particles/wind_collapse13
+  - particles/wind_collapse14
+  - particles/wind_collapse15

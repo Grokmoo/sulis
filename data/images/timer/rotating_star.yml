@@ -1,0 +1,15 @@
+id: rotating_star
+frame_time_millis: 80
+frames:
+  - particles/rotating_star01
+  - particles/rotating_star02
+  - particles/rotating_star03
+  - particles/rotating_star04
+  - particles/rotating_star05
+  - particles/rotating_star06
+  - particles/rotating_star07
+  - particles/rotating_star08
+  - particles/rotating_star09
+  - particles/rotating_star10
+  - particles/rotating_star11
+  - particles/rotating_star12

@@ -1,8 +1,9 @@
 id: whirlwind
-frame_time_millis: 40
+frame_time_millis: 50
 frames:
-  - particles/whirlwind1
-  - particles/whirlwind2
-  - particles/whirlwind3
-  - particles/whirlwind4
-  - particles/whirlwind5
+  - particles/whirl01
+  - particles/whirl02
+  - particles/whirl03
+  - particles/whirl04
+  - particles/whirl05
+  - particles/whirl06

@@ -1,0 +1,15 @@
+id: time_spin
+frame_time_millis: 150
+frames:
+  - particles/time_spin01
+  - particles/time_spin02
+  - particles/time_spin03
+  - particles/time_spin04
+  - particles/time_spin05
+  - particles/time_spin06
+  - particles/time_spin07
+  - particles/time_spin08
+  - particles/time_spin09
+  - particles/time_spin10
+  - particles/time_spin11
+  - particles/time_spin12

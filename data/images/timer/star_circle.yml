@@ -1,0 +1,10 @@
+id: star_circle
+frame_time_millis: 100
+frames:
+  - particles/star_circle01
+  - particles/star_circle02
+  - particles/star_circle03
+  - particles/star_circle04
+  - particles/star_circle05
+  - particles/star_circle06
+  - particles/star_circle07

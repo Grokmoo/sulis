@@ -42,15 +42,15 @@ function create_feint_effect(parent, ability, targets, hit)
     effect:add_num_bonus("defense", -30 - stats.level * 2)
   end
 
-  local anim = target:create_particle_generator("arrow_down")
+  local anim = target:create_particle_generator("rotating_star")
   anim:set_moves_with_parent()
-  anim:set_position(anim:param(0.0), anim:param(-1.5))
-  anim:set_particle_size_dist(anim:fixed_dist(0.5), anim:fixed_dist(0.5))
+  anim:set_position(anim:param(-0.5), anim:param(-1.5))
+  anim:set_particle_size_dist(anim:fixed_dist(1.0), anim:fixed_dist(1.0))
   anim:set_gen_rate(anim:param(6.0))
   anim:set_initial_gen(2.0)
   anim:set_particle_position_dist(anim:dist_param(anim:uniform_dist(-0.7, 0.7), anim:uniform_dist(-0.1, 0.1)),
-                                  anim:dist_param(anim:fixed_dist(0.0), anim:uniform_dist(1.0, 1.5)))
-  anim:set_particle_duration_dist(anim:fixed_dist(0.75))
+                                  anim:dist_param(anim:fixed_dist(0.0), anim:uniform_dist(0.2, 1.5)))
+  anim:set_particle_duration_dist(anim:fixed_dist(1.0))
   anim:set_color(anim:param(1.0), anim:param(0.0), anim:param(0.0))
   effect:add_anim(anim)
   

@@ -45,4 +45,9 @@ function apply_effect(parent, ability, targets)
   target:remove_effects_with_tag("blind")
   target:remove_effects_with_tag("disease")
   target:remove_effects_with_tag("rupture")
+  
+  local anim = parent:create_anim("water_spin", 0.75)
+  anim:set_position(anim:param(target:center_x() - 1.5), anim:param(target:center_y() - 2.0))
+  anim:set_particle_size_dist(anim:fixed_dist(4.0), anim:fixed_dist(4.0))
+  anim:activate()
 end

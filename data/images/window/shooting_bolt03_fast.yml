@@ -1,0 +1,13 @@
+id: shooting_bolt03_fast
+image: particles/shooting_bolt03
+size: [8, 1]
+initial:
+  x: 0.0
+  y: 0.0
+  w: 0.0
+  h: 1.0
+delta:
+  x: 0.0
+  y: 0.0
+  w: 2.0
+  h: 0.0

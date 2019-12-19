@@ -1,0 +1,9 @@
+id: water_spin
+frame_time_millis: 125
+frames:
+  - particles/water_spin01
+  - particles/water_spin02
+  - particles/water_spin03
+  - particles/water_spin04
+  - particles/water_spin05
+  - particles/water_spin06

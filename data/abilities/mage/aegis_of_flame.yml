@@ -1,0 +1,23 @@
+id: aegis_of_flame
+name: "Aegis of Flame"
+icon: abilities/aegis_of_flame
+description: |
+  You and nearby allies erupt into flame.  You gain 100% immunity to fire damage, and attacks deal additional fire damage.  In addition, each affected target gains access to a special flaming bolt ability which they can use once to inflict fire damage on
+  an enemy at range.
+active:
+  script: "aegis_of_flame"
+  group: "4th Circle"
+  ap: 3000
+  duration:
+    Rounds: 4
+  cooldown: 6
+  combat_only: true
+  ai:
+    priority: 10
+    kind: Buff
+    group: Multiple
+    range: Short
+  short_description: |
+    Deal large fire damage to a group of opponents.
+prereqs:
+  total_level: 13

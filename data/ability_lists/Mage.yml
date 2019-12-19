@@ -24,6 +24,8 @@ abilities:
     position: [2.9, 3.1]
   - id: breach
     position: [1.5, 6.75]
+  - id: aegis_of_flame
+    position: [0.0, 5]
     
   - id: wind_gust
     position: [5, 3]
@@ -35,6 +37,10 @@ abilities:
     position: [5, 2]
   - id: chameleon
     position: [5.5, 1.1]
+  - id: lightning_form
+    position: [1.5, 1.5]
+  - id: vacuum
+    position: [5, 0]
 
   - id: slow
     position: [7, 5]

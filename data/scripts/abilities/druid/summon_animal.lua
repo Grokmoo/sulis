@@ -85,9 +85,9 @@ function on_removed(parent, ability)
 
   local anim = parent:create_color_anim(1.0)
   anim:set_color(anim:param(1.0), anim:param(1.0), anim:param(1.0), anim:param(1.0, -1.0))
-  anim:set_color_sec(anim:param(1.0, -1,0),
-                     anim:param(1.0, -1,0),
-                     anim:param(1.0, -1,0),
+  anim:set_color_sec(anim:param(1.0, -1.0),
+                     anim:param(1.0, -1.0),
+                     anim:param(1.0, -1.0),
                      anim:param(0.0))
   anim:set_completion_callback(cb)
   anim:activate()

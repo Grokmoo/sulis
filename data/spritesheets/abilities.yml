@@ -19,6 +19,7 @@ groups:
       spell_sequencer: [9, 0]
       activate_spell_sequencer: [10, 0]
       disease: [11, 0]
+      greater_contingency: [12, 0]
       
       lightning_reflexes: [0, 1]
       stunning_blow: [1, 1]
@@ -57,6 +58,7 @@ groups:
       draining_field: [9, 3]
       lightning_form: [10, 3]
       aegis_of_flame: [11, 3]
+      cryofreeze: [12, 3]
       
       expediate: [0, 4]
       beast_shape: [1, 4]

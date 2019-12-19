@@ -58,6 +58,10 @@ abilities:
     position: [6.8, 5.95]
   - id: contingency
     position: [8.4, 3]
+  - id: cryofreeze
+    position: [10, 5]
+  - id: greater_contingency
+    position: [9.55, 3]
   
   - id: crush
     position: [5, 7]

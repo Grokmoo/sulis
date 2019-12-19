@@ -1,0 +1,21 @@
+id: greater_contingency
+name: "Greater Contingency"
+icon: abilities/greater_contingency
+description: |
+  You select a trigger condition such as being hit, badly damaged, or attacked in melee.  Then, you select a spell of 3rd Circle or an area of effect spell of 3rd Circle or lower.  The next time the trigger condition is met, this spell will automatically be cast on yourself without using any AP, even if it is not currently your turn.
+active:
+  script: "greater_contingency"
+  group: "4th Circle"
+  ap: 4000
+  duration:
+    Mode
+  cooldown: 4
+  ai:
+    priority: 10
+    kind: Special
+    group: Single
+    range: Personal
+  short_description: |
+    Cause a powerful spell to automatically trigger when a condition is met.
+prereqs:
+  total_level: 13

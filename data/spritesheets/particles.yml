@@ -561,3 +561,14 @@ groups:
       wind_collapse13:  [384, 128]
       wind_collapse14:  [512, 128]
       wind_collapse15:  [640, 128]
+  ice_explode:
+    position: [0, 1937]
+    size: [100, 100]
+    areas:
+      ice_explode01: [  0, 0]
+      ice_explode02: [100, 0]
+      ice_explode03: [200, 0]
+      ice_explode04: [300, 0]
+      ice_explode05: [400, 0]
+      ice_explode06: [500, 0]
+      ice_explode07: [600, 0]

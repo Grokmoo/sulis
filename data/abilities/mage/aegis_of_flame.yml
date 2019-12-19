@@ -18,6 +18,6 @@ active:
     group: Multiple
     range: Short
   short_description: |
-    Deal large fire damage to a group of opponents.
+    Your party gains fire damage and flaming bolt attacks.
 prereqs:
   total_level: 13

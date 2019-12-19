@@ -1,0 +1,10 @@
+id: ice_explode
+frame_time_millis: 100
+frames:
+  - particles/ice_explode01
+  - particles/ice_explode02
+  - particles/ice_explode03
+  - particles/ice_explode04
+  - particles/ice_explode05
+  - particles/ice_explode06
+  - particles/ice_explode07

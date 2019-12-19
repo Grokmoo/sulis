@@ -1,0 +1,22 @@
+id: cryofreeze
+name: "Cryofreeze"
+icon: abilities/cryofreeze
+description: |
+  All hostiles in the targeted area suffer massive piercing and cold damage as water and water vapor around them instantly turns into razor sharp icicles.  This spell does not effect friendly targets.
+active:
+  script: "cryofreeze"
+  group: "4th Circle"
+  ap: 3000
+  duration:
+    Rounds: 4
+  cooldown: 6
+  combat_only: true
+  ai:
+    priority: 10
+    kind: Damage
+    group: Multiple
+    range: Visible
+  short_description: |
+    Deal massive cold and piercing damage to a group of hostiles.
+prereqs:
+  total_level: 13

@@ -19,5 +19,5 @@ active:
   short_description: |
     Gain bonus action points.
 prereqs:
-  total_level: 7
+  total_level: 9
   abilities: [ become_wind, hide ]

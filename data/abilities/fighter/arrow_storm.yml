@@ -20,4 +20,4 @@ active:
     Attack all opponents in an arc.
 prereqs:
   abilities: [ called_shot ]
-  total_level: 9
+  total_level: 11

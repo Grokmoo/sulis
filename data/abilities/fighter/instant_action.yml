@@ -20,4 +20,4 @@ active:
     Gain instant bonus action points at the cost of them next turn.
 prereqs:
   abilities: [ sixth_sense, charge_attack ]
-  total_level: 12
+  total_level: 11

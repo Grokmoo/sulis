@@ -62,16 +62,22 @@ end
 -- this function is used by external scripts that deactivate the hidden state
 function deactivate(parent, ability)
   if not ability:is_active_mode(parent) then return end
+  if parent:has_effect_with_tag("unspottable") then return end
+  
   game:say_line("Spotted!", parent)
   ability:deactivate(parent)
 end
 
 function after_attack(parent, ability)
+  if parent:has_effect_with_tag("unspottable") then return end
+
   deactivate(parent, ability)
   game:run_script_delayed("hide", "check_ai_activation", 0.1)
 end
 
 function check_spotted(parent, ability)
+  if parent:has_effect_with_tag("unspottable") then return end
+
   local stats = parent:stats()
   local parent_concealment = stats.concealment
   local parent_hide_level = 15 + parent:ability_level(ability) * 20 + stats.level * 2

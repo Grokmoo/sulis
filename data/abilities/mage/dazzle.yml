@@ -18,5 +18,3 @@ active:
     range: Short
   short_description: |
     A single opponent suffers an accuracy penalty.
-prereqs:
-  total_level: 2

@@ -22,7 +22,7 @@ bonuses:
       WeaponStyle: Shielded
 prereqs:
   abilities: [ deflection, shield_throw ]
-  total_level: 12
+  total_level: 13
 upgrades:
   - description: |
       You gain bonus armor when fighting in a shielded style.

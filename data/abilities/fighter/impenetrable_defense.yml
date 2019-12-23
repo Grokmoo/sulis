@@ -21,4 +21,4 @@ active:
     Gain bonuses to all defenses.
 prereqs:
   abilities: [ deflection ]
-  total_level: 9
+  total_level: 11

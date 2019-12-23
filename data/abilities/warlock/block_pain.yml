@@ -21,8 +21,6 @@ active:
     range: Short
   short_description: |
     Grant armor and healing to a nearby ally.
-prereqs:
-  total_level: 2
 upgrades:
   - description: |
       The targeted ally now also heals over time while the effect is active.

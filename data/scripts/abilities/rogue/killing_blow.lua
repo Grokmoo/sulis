@@ -47,7 +47,9 @@ function do_attack(parent, ability, targets)
   local cur_hp = target_stats.current_hp
   local max_hp = target_stats.max_hp
   
-  if cur_hp / max_hp < 0.3 then
+  local threshold = 0.15 + 0.10 * parent:ability_level(ability)
+  
+  if cur_hp / max_hp < threshold then
     target:take_damage(parent, cur_hp, cur_hp, "Raw")
   else
     target:take_damage(parent, min_dmg, max_dmg, "Raw")

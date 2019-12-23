@@ -6,4 +6,4 @@ description: |
 bonuses: []
 prereqs:
   abilities: [ shrapnel_grenade, sundering_trap ]
-  total_level: 12
+  total_level: 13

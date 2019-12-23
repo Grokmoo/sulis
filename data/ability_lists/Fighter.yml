@@ -10,11 +10,11 @@ abilities:
   - id: shield_throw
     position: [3, 1]
   - id: impenetrable_defense
-    position: [4, 0]
+    position: [5, 0]
   - id: guardian
     position: [1.25, 0.4]
   - id: shielded_mastery
-    position: [5, 0.5]
+    position: [6, 0.5]
 
   - id: leap
     position: [0, 2]
@@ -46,9 +46,9 @@ abilities:
   - id: overpower
     position: [4, 4]
   - id: melee_mastery
-    position: [5, 4.05]
+    position: [6, 4.05]
   - id: dual_wielding_mastery
-    position: [5, 5]
+    position: [6, 5]
     
   - id: precise_shot
     position: [0, 6]
@@ -63,6 +63,6 @@ abilities:
   - id: called_shot
     position: [3, 7]
   - id: arrow_storm
-    position: [4, 7]
+    position: [5, 7]
   - id: ranged_mastery
-    position: [5, 6.5]
+    position: [6, 6.5]

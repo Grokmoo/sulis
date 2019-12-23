@@ -2,10 +2,8 @@ id: backstab_mastery
 name: "Backstab Mastery"
 icon: abilities/backstab_mastery
 description: |
-  You are a master at striking at weakness when least expected.  All of your attacks gain additional armor penetration, and your backstabs gain improved critial chance and damage.
+  You are a master at striking at weakness when least expected.  Your backstabs gain improved critical chance and damage.
 bonuses:
-  - kind:
-      damage: { min: 0, max: 0, ap: 5 }
   - kind:
       crit_multiplier: 0.5
     when: AttackWhenFlanking
@@ -20,4 +18,10 @@ bonuses:
     when:  AttackWhenHidden
 prereqs:
   abilities: [ feint, pierce ]
-  total_level: 12
+  total_level: 13
+upgrades:
+  - description: |
+      All of your attacks gain additional armor penetration.
+    bonuses:
+      - kind:
+          damage: { min: 0, max: 0, ap: 5 }

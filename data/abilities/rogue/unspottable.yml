@@ -1,0 +1,25 @@
+id: unspottable
+name: "Unspottable"
+icon: abilities/unspottable
+description: |
+  You enter hidden mode if you are not already hidden, and become completely undetectable to all but the most powerful magical means for the duration.
+active:
+  script: "unspottable"
+  group: Modes
+  ap: 2000
+  duration:
+    Rounds: 2
+  cooldown: 8
+  ai:
+    priority: 10
+    kind: Special
+    group: Single
+    range: Personal
+  short_description: |
+    Hide and become completely unspottable for a short time.
+prereqs:
+  total_level: 11
+  abilities: [ shadow_step ]
+upgrades:
+  - description: |
+      Your undetectable status lasts for one additional round.

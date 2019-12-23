@@ -6,11 +6,13 @@ abilities:
   - id: become_wind
     position: [1, 0]
   - id: hide_in_plain_sight
-    position: [5, 0.5]
+    position: [6, 0.5]
   - id: shadow_step
     position: [2, 1.0]
   - id: speed_of_thought
-    position: [3, 0.5]
+    position: [4, 0.5]
+  - id: unspottable
+    position: [5, 1.0]
     
   - id: backflip
     position: [0, 2]
@@ -31,7 +33,7 @@ abilities:
   - id: rupture
     position: [2, 4.5]
   - id: backstab_mastery
-    position: [5, 3.0]
+    position: [6, 3.0]
 
   - id: spike_trap
     position: [0, 6]
@@ -48,4 +50,4 @@ abilities:
   - id: sundering_trap
     position: [3, 5.5]
   - id: mechanical_mastery
-    position: [5, 6]
+    position: [6, 6]

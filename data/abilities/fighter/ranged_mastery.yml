@@ -14,7 +14,7 @@ bonuses:
       WeaponStyle: Ranged
 prereqs:
   abilities: [ called_shot, point_blank_shot ]
-  total_level: 12
+  total_level: 13
 upgrades:
   - description: |
       Your ranged attacks are nearly impossible to resist.  You gain armor penetration and ignore a large amount of concealment on all ranged attacks.

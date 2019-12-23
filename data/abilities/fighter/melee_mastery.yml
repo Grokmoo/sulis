@@ -14,7 +14,7 @@ bonuses:
       WeaponStyle: TwoHanded
 prereqs:
   abilities: [ overpower ]
-  total_level: 12
+  total_level: 13
 upgrades:
   - description: |
       Your melee attacks are nearly always hit for major damage.  Grazes do significantly more damage.

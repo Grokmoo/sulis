@@ -2,7 +2,7 @@ id: spirit_defense
 name: "Spirit Defense"
 icon: abilities/spirit_defense
 description: |
-  Friendly spirits surround you and your nearby allies, provides limited precognition against all threats, improving defenses and saves.
+  Friendly spirits surround you and your nearby allies, provides limited precognition against all threats. All affected gain improved defenses and saves.
 active:
   script: "spirit_defense"
   group: "Druid"

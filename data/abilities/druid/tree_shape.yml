@@ -4,7 +4,7 @@ icon: abilities/tree_shape
 description: |
   You transform into a tree like shape, gaining tremendous strength and endurance and a powerful melee attack, but becoming rooted in one spot.  Most equipment is temporarily absorbed into the form, with the exception of items in the hands which are temporarily unequipped.  Most bonuses from equipment are retained.
   
-  You cannot use abilities while shapeshifted.  You will not be able to change your equipped items while shapeshifted.
+  You cannot use your other abilities or change equipment while shapeshifted.
 active:
   script: "tree_shape"
   group: "Druid"

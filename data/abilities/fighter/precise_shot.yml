@@ -2,7 +2,7 @@ id: precise_shot
 name: "Precise Shot"
 icon: abilities/precise_shot
 description: |
-  Each ranged attack you make has greatly improved accuracy, armor penetration, and critical damage, at the cost of attack speed.  You may only have one combat mode active at a time.
+  Each ranged attack you make has greatly improved accuracy, armor penetration, and critical damage, at the cost of attack speed.  This ability is a combat mode which will last until deactivated.  You may only have one combat mode active at a time.
 active:
   script: "precise_shot"
   group: Modes

@@ -2,7 +2,7 @@ id: penetrating_shot
 name: "Penetrating Shot"
 icon: abilities/penetrating_shot
 description: |
-  You fire a single shot, traveling in a straight line up to your maximum range.  A reflex attack is made against each target in line.  Damage from this attack ignores armor.
+  You fire a single shot, traveling in a straight line up to your maximum range.  A reflex attack is made against each target in line.  This attack does Raw damage which ignores armor.
 active:
   script: "penetrating_shot"
   group: Fighter

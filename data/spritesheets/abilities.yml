@@ -59,6 +59,7 @@ groups:
       lightning_form: [10, 3]
       aegis_of_flame: [11, 3]
       cryofreeze: [12, 3]
+      cyclone: [13, 3]
       
       expediate: [0, 4]
       beast_shape: [1, 4]

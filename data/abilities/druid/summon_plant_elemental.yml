@@ -21,3 +21,6 @@ active:
 prereqs:
   abilities: [ tree_shape ]
   total_level: 12
+upgrades:
+  - description: |
+      Your plant elemental can now use the Grapple and Overpower Fighter abilities in combat.

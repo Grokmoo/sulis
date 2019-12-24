@@ -1,0 +1,7 @@
+id: cyclone
+frame_time_millis: 125
+frames:
+  - particles/cyclone01
+  - particles/cyclone02
+  - particles/cyclone03
+  - particles/cyclone04

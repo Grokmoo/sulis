@@ -22,6 +22,12 @@ function on_target_select(parent, ability, targets)
     summon:add_levels("fighter", levels - 3)
   end
   
+  if parent:ability_level(ability) > 1 then
+    summon:add_ability("grapple")
+	summon:add_ability("grapple")
+	summon:add_ability("overpower")
+  end
+  
   local effect = summon:create_effect(ability:name(), ability:duration())
   local cb = ability:create_callback(summon)
   cb:set_on_removed_fn("on_removed")

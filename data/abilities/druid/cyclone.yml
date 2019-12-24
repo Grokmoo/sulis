@@ -1,0 +1,26 @@
+id: cyclone
+name: "Cyclone"
+icon: abilities/cyclone
+description: |
+  A powerful cyclone is created above you and surges forward in the direction of your choice.  The cyclone picks up and throws creatures in its path randomly, doing large crushing damage.
+active:
+  script: "cyclone"
+  group: "Druid"
+  ap: 3000
+  duration:
+    Instant
+  cooldown: 4
+  combat_only: true
+  ai:
+    priority: 20
+    kind: Damage
+    group: Multiple
+    range: Visible
+  short_description: |
+    Blind and deal minor damage in a large area.
+prereqs:
+  abilities: [ hail_storm ]
+  total_level: 11
+upgrades:
+  - description: |
+      The created cyclone is larger and throws creatures farther.

@@ -17,7 +17,7 @@ prereqs:
   total_level: 13
 upgrades:
   - description: |
-      Your melee attacks are nearly always hit for major damage.  Grazes do significantly more damage.
+      Your melee attacks nearly always hit for major damage.  Grazes do significantly more damage.
     bonuses:
       - kind:
           graze_multiplier: 0.25

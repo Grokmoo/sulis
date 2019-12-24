@@ -20,7 +20,7 @@ active:
     Summon a powerful air spirit to fight for you.
 prereqs:
   abilities: [ spirit_eye ]
-  total_level: 12
+  total_level: 11
 upgrades:
   - description: |
-      Your wind elemental can now cast the wind gust and shock spells in combat.
+      Your wind elemental can now cast the Wind Gust and Shock spells in combat.

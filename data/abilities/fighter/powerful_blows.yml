@@ -2,7 +2,7 @@ id: powerful_blows
 name: "Powerful Blows"
 icon: abilities/powerful_blows
 description: |
-  You move into an offensive stance.  Your attacks become more powerful, but your defenses are lessened.  You may only have one combat mode active at a time.
+  You move into an offensive stance.  Your attacks become more powerful, but your defenses are lessened.  This ability is a combat mode which will last until deactivated.  You may only have one combat mode active at a time.
 active:
   script: "powerful_blows"
   group: Modes

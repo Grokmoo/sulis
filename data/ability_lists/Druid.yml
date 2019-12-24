@@ -12,7 +12,7 @@ abilities:
   - id: tree_shape
     position: [5.0, 2.5]
   - id: polymorph
-    position: [3.5, 1]
+    position: [3.5, 0]
         
   - id: lightning_bolt
     position: [2.75, 5]
@@ -20,6 +20,8 @@ abilities:
     position: [2.5, 3.5]
   - id: hail_storm
     position: [3, 2.5]
+  - id: cyclone
+    position: [2.0, 1.5]
 
   - id: spirit_defense
     position: [3, 7]
@@ -45,4 +47,4 @@ abilities:
   - id: summon_plant_elemental
     position: [6.0, 1]
   - id: summon_wind_elemental
-    position: [7.0, 1]
+    position: [7.0, 1.5]

@@ -572,3 +572,11 @@ groups:
       ice_explode05: [400, 0]
       ice_explode06: [500, 0]
       ice_explode07: [600, 0]
+  cyclone:
+    position: [896, 256]
+    size: [192, 192]
+    areas:
+      cyclone01: [0, 0]
+      cyclone02: [192, 0]
+      cyclone03: [384, 0]
+      cyclone04: [576, 0]

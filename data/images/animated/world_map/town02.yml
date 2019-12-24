@@ -1,4 +1,4 @@
 id: town02
 states:
-    normal: town02_normal
-    disabled: town02_disabled
+    normal: gui/town02
+    disabled: gui/town02_disabled

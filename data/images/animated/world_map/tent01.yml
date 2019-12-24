@@ -1,0 +1,4 @@
+id: tent01
+states:
+    normal: gui/tent01
+    disabled: gui/tent01_disabled

@@ -534,9 +534,23 @@ groups:
       mouse_search: [0, 256]
       mouse_unlock: [128, 256]
       mouse_interact: [256, 256]
+  world_map128:
+    size: [128, 92]
+    position: [1022, 0]
+    simple_image_gen_scale: 128
+    areas:
+      tent01: [0, 0]
+      tent02: [128, 0]
+      tent03: [256, 0]
+      tent04: [384, 0]
+      tent01_disabled: [512, 0]
+      tent02_disabled: [640, 0]
+      tent03_disabled: [768, 0]
+      tent04_disabled: [896, 0]
   world_map:
     size: [100, 72]
     position: [1022, 513]
+    simple_image_gen_scale: 4
     areas:
       camp01: [0, 0]
       town01: [100, 0]
@@ -659,7 +673,6 @@ groups:
       area_unexplored: [57, 512, 16, 16]
       editor_encounter: [187, 513, 14, 14]
       
-      world_map: [1025, 0, 896, 512]
       inventory_paper_doll: [ 512, 0, 512, 512]
       icon_up: [0, 153, 15, 15]
       icon_down: [0, 170, 15, 15]

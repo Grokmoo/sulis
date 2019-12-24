@@ -1,4 +1,4 @@
 id: swamp01
 states:
-    normal: swamp01_normal
-    disabled: swamp01_disabled
+    normal: gui/swamp01
+    disabled: gui/swamp01_disabled

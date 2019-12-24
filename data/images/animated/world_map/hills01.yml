@@ -1,4 +1,4 @@
 id: hills01
 states:
-    normal: hills01_normal
-    disabled: hills01_disabled
+    normal: gui/hills01
+    disabled: gui/hills01_disabled

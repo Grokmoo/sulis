@@ -1,4 +1,4 @@
 id: flat04
 states:
-    normal: flat04_normal
-    disabled: flat04_disabled
+    normal: gui/flat04
+    disabled: gui/flat04_disabled

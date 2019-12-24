@@ -1,4 +1,4 @@
 id: camp01
 states:
-    normal: camp01_normal
-    disabled: camp01_disabled
+    normal: gui/camp01
+    disabled: gui/camp01_disabled

@@ -1,4 +1,4 @@
 id: bridge01
 states:
-    normal: bridge01_normal
-    disabled: bridge01_disabled
+    normal: gui/bridge01
+    disabled: gui/bridge01_disabled

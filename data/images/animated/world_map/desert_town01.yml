@@ -1,4 +1,4 @@
 id: desert_town01
 states:
-    normal: desert_town01_normal
-    disabled: desert_town01_disabled
+    normal: gui/desert_town01
+    disabled: gui/desert_town01_disabled

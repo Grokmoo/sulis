@@ -37,6 +37,15 @@ nodes:
     text: |
       [c=6868FF|#target_name#] - You have questions?
     responses:
+      - text: "I have cleared out the drake nest, as you asked."
+        to_view:
+          - player_flag: drakes_cleared
+          - not_player_flag: dracon_assigned
+        to: drakes_cleared01
+      - text: "About the Dracon camp..."
+        to_view:
+          - player_flag: dracon_assigned
+        to: drakes_questions
       - text: |
           "Our leader?"  You mean, Berkeley?
         to: ask_leader
@@ -46,6 +55,8 @@ nodes:
         to: ask_refuse
       - text: "What is my assignment?"
         to: ask_accept_a1
+        to_view:
+          - not_player_flag: drakes_cleared
       - text: "Nothing for now."
   ask_leader:
     text: |
@@ -87,3 +98,62 @@ nodes:
     responses:
       - text: "[c=888|Continue]"
         to: main
+  drakes_cleared01:
+    text: |
+      [c=6868FF|#target_name#] - Yes, my scouts report the same.
+      
+      It seems you are quite capable.
+    responses:
+      - text: "[c=888|Continue]"
+        to: drakes_cleared02
+  drakes_cleared02:
+    text: |
+      [c=6868FF|#target_name#] - Now, for a more ... delicate matter.
+      
+      The local Dracon have never fully accepted the Leader's rule - and I have heard rumors that there is talk of open rebellion.
+    responses:
+      - text: "[c=888|Continue]"
+        to: drakes_cleared03
+  drakes_cleared03:
+    text: |
+      [c=6868FF|#target_name#] - Travel to their encampment outside the city.  Make an example of any rebels, and ensure they will pay their required tribute.
+      
+      My men will see to the rest.
+    on_view:
+      - fire_script:
+          id: oasis
+          func: working_for_the_boss_b
+    responses:
+      - text: "[c=888|Continue]"
+        to: drakes_questions
+  drakes_questions:
+    text: |
+      [c=6868FF|#target_name#] - Questions?
+    responses:
+      - text: "Clearing out monsters is one thing, but this is quite another.  I won't do it."
+        to: drakes_questions_refuse
+      - text: "You want me to kill your own kind?"
+        to: drakes_questions_dracon
+      - text: "Very well, I will do it."
+        to: drakes_questions_accept
+      - text: "Nothing for now."
+  drakes_questions_refuse:
+    text: |
+      [c=6868FF|#target_name#] - As I said before.  We can be persuasive, if we desire.  For now, I'll give you some time to reconsider.
+    responses:
+      - text: "[c=888|Continue]"
+        to: drakes_questions
+  drakes_questions_accept:
+    text: |
+      [c=6868FF|#target_name#] - Good.  I expect it done soon.
+    responses:
+      - text: "[c=888|Continue]"
+        to: drakes_questions
+  drakes_questions_dracon:
+    text: |
+      [c=6868FF|#target_name#] - [c=888|His reaction is more muted than you might expect.]
+      
+      I care little for such things.  Just see it done.
+    responses:
+      - text: "[c=888|Continue]"
+        to: drakes_questions

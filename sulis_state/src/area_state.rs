@@ -449,6 +449,13 @@ impl AreaState {
         let player = GameState::player();
         for trigger_index in self.area.encounters[index].triggers.iter() {
             let trigger = &self.area.area.triggers[*trigger_index];
+
+            if *trigger_index >= self.triggers.len() {
+                // this can happen when loading from a save and
+                // the area data has since been updated
+                continue;
+            }
+
             if self.triggers[*trigger_index].fired {
                 continue;
             }

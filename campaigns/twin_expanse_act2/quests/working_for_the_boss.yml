@@ -6,4 +6,7 @@ entries:
       The leader of the thugs in control of Oasis has given me a task to complete.  I am to travel Southwest of town and eliminate an infestation of drakes that have been harrassing the town.
   drakes_cleared:
     description: |
-      I have eradicated the drakes queen, which should drastically lower their activities for many years at least.  I should report back to the Boss in Oasis.
+      I have eradicated the drake's queen, which should drastically lower their activities for many years at least.  I should report back to the Boss in Oasis.
+  dracon_camp:
+    description: |
+      I have been tasked with traveling to a Dracon encampment just outside Oasis and putting down any signs of rebellion there.  Then, I am to ensure they produce the expected tribute for Berkeley, the Leader.

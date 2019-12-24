@@ -1,4 +1,4 @@
 id: forest01
 states:
-    normal: forest01_normal
-    disabled: forest01_disabled
+    normal: gui/forest01
+    disabled: gui/forest01_disabled

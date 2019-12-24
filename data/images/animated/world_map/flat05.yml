@@ -1,4 +1,4 @@
 id: flat05
 states:
-    normal: flat05_normal
-    disabled: flat05_disabled
+    normal: gui/flat05
+    disabled: gui/flat05_disabled

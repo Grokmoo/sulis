@@ -20,6 +20,12 @@ function fire_drakes_cleared(parent)
   game:player():set_flag("drakes_cleared", "true")
 end
 
+function working_for_the_boss_b(parent)
+  game:set_world_map_location_visible("dracon_camp", true)
+  game:set_quest_entry_state("working_for_the_boss", "dracon_camp", "Visible")
+  game:player():set_flag("dracon_assigned", "true")
+end
+
 function herbalist_quest_start(parent)
   game:set_quest_entry_state("attacked_in_the_dark", "start", "Visible")
   game:set_world_map_location_visible("desert_canyon", true)

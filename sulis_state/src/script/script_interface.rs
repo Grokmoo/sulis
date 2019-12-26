@@ -698,7 +698,7 @@ impl UserData for ScriptInterface {
             |_, _, (x, y, id): (i32, i32, Option<String>)| {
                 let area_state = get_area(id)?;
                 let mut area_state = area_state.borrow_mut();
-                if !area_state.set_prop_enabled_at(x, y, true) {
+                if !area_state.props_mut().set_enabled_at(x, y, true) {
                     warn!("Unable to find prop at {},{}", x, y);
                 }
                 Ok(())
@@ -710,7 +710,7 @@ impl UserData for ScriptInterface {
             |_, _, (x, y, id): (i32, i32, Option<String>)| {
                 let area_state = get_area(id)?;
                 let mut area_state = area_state.borrow_mut();
-                if !area_state.set_prop_enabled_at(x, y, false) {
+                if !area_state.props_mut().set_enabled_at(x, y, false) {
                     warn!("Unable to find prop at {},{}", x, y);
                 }
                 Ok(())
@@ -722,7 +722,7 @@ impl UserData for ScriptInterface {
             |_, _, (x, y, id): (i32, i32, Option<String>)| {
                 let area_state = get_area(id)?;
                 let mut area_state = area_state.borrow_mut();
-                let index = match area_state.prop_index_at(x, y) {
+                let index = match area_state.props().index_at(x, y) {
                     None => {
                         warn!("Unable to find prop at {},{}", x, y);
                         return Ok(());

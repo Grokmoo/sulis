@@ -144,7 +144,7 @@ impl ItemListPane {
 
         let area_state = GameState::area_state();
         let area_state = area_state.borrow();
-        let prop = area_state.get_prop(prop_index);
+        let prop = area_state.props().get(prop_index);
 
         let scrollpane = ScrollPane::new(ScrollDirection::Vertical);
         let list_content = Widget::with_theme(scrollpane.clone(), "items_list");

@@ -89,12 +89,12 @@ impl AreaMouseover {
             Kind::Prop(index) => {
                 let area_state = GameState::area_state();
                 let area_state = area_state.borrow();
-                if !area_state.prop_index_valid(index) {
+                if !area_state.props().index_valid(index) {
                     state.set_visible(false);
                     return false;
                 }
 
-                let prop = area_state.get_prop(index);
+                let prop = area_state.props().get(index);
 
                 if !prop.is_hover() && !prop.might_contain_items() {
                     state.add_text_arg("empty", "true");

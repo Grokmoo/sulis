@@ -629,7 +629,7 @@ impl GameState {
             let area_state = GameState::get_area_state(&location.area_id).unwrap();
             let index = member.borrow().index();
             let mut area_state = area_state.borrow_mut();
-            area_state.remove_matching_prop(
+            area_state.props_mut().remove_matching(
                 location.x,
                 location.y,
                 &member.borrow().actor.actor.name,
@@ -679,7 +679,8 @@ impl GameState {
                 let enabled = member.actor.is_disabled();
                 area_state
                     .borrow_mut()
-                    .add_prop_at(&prop, x, y, enabled, Some(name));
+                    .props_mut()
+                    .add_at(&prop, x, y, enabled, Some(name));
             }
             notify = true;
         }

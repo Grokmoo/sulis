@@ -265,7 +265,7 @@ impl AreaSaveState {
         let on_load_fired = area_state.on_load_fired;
 
         let mut props = Vec::new();
-        for prop_state in area_state.prop_iter() {
+        for prop_state in area_state.props().iter() {
             props.push(PropSaveState::new(prop_state));
         }
 

@@ -148,9 +148,9 @@ impl AreaOverlayHandler {
             None
         } else if let Some(transition) = area_state.get_transition_at(x, y) {
             Some(AreaMouseover::new_transition(&transition.hover_text))
-        } else if let Some(index) = area_state.prop_index_at(x, y) {
+        } else if let Some(index) = area_state.props().index_at(x, y) {
             let interactive = {
-                let prop = area_state.get_prop(index);
+                let prop = area_state.props().get(index);
                 (prop.is_container() || prop.is_hover()) && prop.is_enabled()
             };
 
@@ -170,9 +170,9 @@ impl AreaOverlayHandler {
         y: i32,
         area_state: &AreaState,
     ) -> Option<Rc<RefCell<AreaMouseover>>> {
-        if let Some(index) = area_state.prop_index_at(x, y) {
+        if let Some(index) = area_state.props().index_at(x, y) {
             {
-                let prop = area_state.get_prop(index);
+                let prop = area_state.props().get(index);
                 if !prop.is_door() || prop.is_active() {
                     return None;
                 }

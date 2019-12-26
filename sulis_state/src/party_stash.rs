@@ -89,7 +89,7 @@ impl PartyStash {
     pub fn take_all(&mut self, prop_index: usize) {
         let area_state = GameState::area_state();
         let mut area_state = area_state.borrow_mut();
-        let prop_state = area_state.get_prop_mut(prop_index);
+        let prop_state = area_state.props_mut().get_mut(prop_index);
 
         let num_items = match prop_state.items() {
             None => return,
@@ -117,7 +117,7 @@ impl PartyStash {
     pub fn take(&mut self, prop_index: usize, item_index: usize) {
         let area_state = GameState::area_state();
         let mut area_state = area_state.borrow_mut();
-        let prop_state = area_state.get_prop_mut(prop_index);
+        let prop_state = area_state.props_mut().get_mut(prop_index);
 
         if let Some((qty, item_state)) = prop_state.remove_all_at(item_index) {
             self.add_item(qty, item_state);

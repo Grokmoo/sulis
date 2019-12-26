@@ -194,11 +194,11 @@ fn drop_item(widget: &Rc<RefCell<Widget>>, entity: &Rc<RefCell<EntityState>>, it
 fn drop_to_prop(item: ItemState, prop_index: usize) {
     let area_state = GameState::area_state();
     let mut area_state = area_state.borrow_mut();
-    if !area_state.prop_index_valid(prop_index) {
+    if !area_state.props().index_valid(prop_index) {
         return;
     }
 
-    let prop_state = area_state.get_prop_mut(prop_index);
+    let prop_state = area_state.props_mut().get_mut(prop_index);
 
     prop_state.add_item(item);
 }
@@ -208,8 +208,8 @@ fn drop_to_ground(entity: &Rc<RefCell<EntityState>>, item: ItemState) {
     let area_state = GameState::area_state();
     let mut area_state = area_state.borrow_mut();
 
-    area_state.check_create_prop_container_at(p.x, p.y);
-    if let Some(ref mut prop) = area_state.prop_mut_at(p.x, p.y) {
+    area_state.props_mut().check_or_create_container(p.x, p.y);
+    if let Some(ref mut prop) = area_state.props_mut().get_mut_at(p.x, p.y) {
         prop.add_item(item);
     }
 }

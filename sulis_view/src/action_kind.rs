@@ -59,11 +59,11 @@ fn get_prop_or_transition_action(x: i32, y: i32) -> Option<Box<dyn ActionKind>> 
     let area_state = GameState::area_state();
     let area_state = area_state.borrow();
 
-    let index = match area_state.prop_index_at(x, y) {
+    let index = match area_state.props().index_at(x, y) {
         None => return TransitionAction::create_if_valid(x, y, &area_state),
         Some(index) => index,
     };
-    let prop = area_state.get_prop(index);
+    let prop = area_state.props().get(index);
 
     // an enabled container or a closed door (regardless of enabled) blocks a transition.
     // an open door (regardless of enabled) does not block a transition
@@ -344,7 +344,7 @@ impl ActionKind for DoorPropAction {
     fn get_hover_info(&self) -> Option<ActionHoverInfo> {
         let area_state = GameState::area_state();
         let area_state = area_state.borrow();
-        let prop = area_state.get_prop(self.index);
+        let prop = area_state.props().get(self.index);
         let point = prop.location.to_point();
         ActionHoverInfo::new(&prop.prop.size, point)
     }
@@ -400,7 +400,7 @@ impl ActionKind for LootPropAction {
     fn get_hover_info(&self) -> Option<ActionHoverInfo> {
         let area_state = GameState::area_state();
         let area_state = area_state.borrow();
-        let prop = area_state.get_prop(self.index);
+        let prop = area_state.props().get(self.index);
         let point = prop.location.to_point();
         ActionHoverInfo::new(&prop.prop.size, point)
     }
@@ -409,7 +409,7 @@ impl ActionKind for LootPropAction {
         let is_active = {
             let area_state = GameState::area_state();
             let mut area_state = area_state.borrow_mut();
-            let state = area_state.get_prop_mut(self.index);
+            let state = area_state.props_mut().get_mut(self.index);
             state.toggle_active();
             state.is_active()
         };

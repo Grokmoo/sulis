@@ -14,6 +14,9 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+mod prop_handler;
+use prop_handler::PropHandler;
+
 use std::cell::{RefCell};
 use std::collections::HashSet;
 use std::io::Error;
@@ -26,10 +29,8 @@ use crate::script::AreaTargeter;
 use crate::*;
 use sulis_core::config::Config;
 use sulis_core::util::{self, gen_rand, invalid_data_error, Point, Size};
-use sulis_module::area::{PropData, Transition, TriggerKind};
-use sulis_module::{
-    prop, Actor, Area, LootList, Module, ObjectSize, Prop, Time,
-};
+use sulis_module::area::{Transition, TriggerKind};
+use sulis_module::{Actor, Area, LootList, Module, ObjectSize, Time};
 
 pub struct TriggerState {
     pub(crate) fired: bool,
@@ -50,20 +51,17 @@ pub struct AreaState {
     // Members that need to be saved
     pub(crate) pc_explored: Vec<bool>,
     pub on_load_fired: bool,
-    props: Vec<Option<PropState>>,
     entities: Vec<usize>,
     surfaces: Vec<usize>,
     pub(crate) triggers: Vec<TriggerState>,
     pub(crate) merchants: Vec<MerchantState>,
 
-    prop_grid: Vec<Option<usize>>,
     pub(crate) entity_grid: Vec<Vec<usize>>,
     surface_grid: Vec<Vec<usize>>,
     transition_grid: Vec<Option<usize>>,
     trigger_grid: Vec<Option<usize>>,
 
-    pub(crate) prop_vis_grid: Vec<bool>,
-    pub(crate) prop_pass_grid: Vec<bool>,
+    props: PropHandler,
 
     pc_vis_redraw: PCVisRedraw,
     pc_vis: Vec<bool>,
@@ -100,26 +98,24 @@ impl AreaState {
         let entity_grid = vec![Vec::new(); dim];
         let surface_grid = vec![Vec::new(); dim];
         let transition_grid = vec![None; dim];
-        let prop_grid = vec![None; dim];
         let trigger_grid = vec![None; dim];
         let pc_vis = vec![false; dim];
         let pc_explored = vec![false; dim];
+
+        let props = PropHandler::new(dim, &area);
 
         info!("Initializing area state for '{}'", gened.area.name);
         Ok(AreaState {
             area: gened,
             area_gen_seed,
-            props: Vec::new(),
+            props: props,
             entities: Vec::new(),
             surfaces: Vec::new(),
             triggers: Vec::new(),
             transition_grid,
             entity_grid,
             surface_grid,
-            prop_grid,
             trigger_grid,
-            prop_vis_grid: vec![true; dim],
-            prop_pass_grid: vec![true; dim],
             pc_vis,
             pc_explored,
             pc_vis_redraw: PCVisRedraw::Not,
@@ -155,30 +151,7 @@ impl AreaState {
             }
         }
 
-        for prop_save_state in save.props {
-            let prop = match Module::prop(&prop_save_state.id) {
-                None => invalid_data_error(&format!("No prop with ID '{}'", prop_save_state.id)),
-                Some(prop) => Ok(prop),
-            }?;
-
-            let location = Location::from_point(&prop_save_state.location, &area_state.area.area);
-
-            let prop_data = PropData {
-                prop,
-                location: prop_save_state.location,
-                items: Vec::new(),
-                enabled: prop_save_state.enabled,
-                hover_text: None,
-            };
-
-            let index = area_state.add_prop(&prop_data, location, false)?;
-            area_state.props[index]
-                .as_mut()
-                .unwrap()
-                .load_interactive(prop_save_state.interactive)?;
-
-            area_state.update_prop_vis_pass_grid(index);
-        }
+        area_state.props.load(save.props)?;
 
         for (index, trigger_save) in save.triggers.into_iter().enumerate() {
             if index >= area_state.area.area.triggers.len() {
@@ -201,6 +174,14 @@ impl AreaState {
         }
 
         Ok(area_state)
+    }
+
+    pub fn props(&self) -> &PropHandler {
+        &self.props
+    }
+
+    pub fn props_mut(&mut self) -> &mut PropHandler {
+        &mut self.props
     }
 
     fn pc_vis_partial_redraw(&mut self, x: i32, y: i32) {
@@ -285,19 +266,7 @@ impl AreaState {
             }
         }
 
-        // regrettably need to clone for ownership here, even though add_prop
-        // does not borrow self.area and so it would be fine without
-        for prop_data in self.area.props.clone() {
-            let location = Location::from_point(&prop_data.location, &area);
-            debug!("Adding prop '{}' at '{:?}'", prop_data.prop.id, location);
-            match self.add_prop(&prop_data, location, false) {
-                Err(e) => {
-                    warn!("Unable to add prop at {:?}", &prop_data.location);
-                    warn!("{}", e);
-                }
-                Ok(_) => (),
-            }
-        }
+        self.props.populate(&self.area.props);
 
         for (index, trigger) in area.triggers.iter().enumerate() {
             let trigger_state = TriggerState {
@@ -643,174 +612,6 @@ impl AreaState {
             .all(|p| self.point_entities_passable(entities_to_ignore, p.x, p.y))
     }
 
-    pub fn prop_index_valid(&self, index: usize) -> bool {
-        if index >= self.props.len() {
-            return false;
-        }
-
-        self.props[index].is_some()
-    }
-
-    pub fn prop_index_at(&self, x: i32, y: i32) -> Option<usize> {
-        if !self.area.area.coords_valid(x, y) {
-            return None;
-        }
-
-        let x = x as usize;
-        let y = y as usize;
-        self.prop_grid[x + y * self.area.width as usize]
-    }
-
-    pub fn add_prop_at(
-        &mut self,
-        prop: &Rc<Prop>,
-        x: i32,
-        y: i32,
-        enabled: bool,
-        hover_text: Option<String>,
-    ) {
-        let location = Location::new(x, y, &self.area.area);
-        let prop_data = PropData {
-            prop: Rc::clone(prop),
-            enabled,
-            location: Point::new(x, y),
-            items: Vec::new(),
-            hover_text,
-        };
-
-        match self.add_prop(&prop_data, location, true) {
-            Err(e) => {
-                warn!("Unable to add prop at {},{}", x, y);
-                warn!("{}", e);
-            }
-            Ok(_) => (),
-        }
-    }
-
-    pub fn check_create_prop_container_at(&mut self, x: i32, y: i32) {
-        match self.prop_index_at(x, y) {
-            Some(_) => return,
-            None => (),
-        };
-
-        let prop = match Module::prop(&Module::rules().loot_drop_prop) {
-            None => {
-                warn!(
-                    "Unable to generate prop for item drop as the loot_drop_prop does not exist."
-                );
-                return;
-            }
-            Some(prop) => prop,
-        };
-
-        let location = Location::new(x, y, &self.area.area);
-        let prop_data = PropData {
-            prop,
-            enabled: true,
-            location: location.to_point(),
-            items: Vec::new(),
-            hover_text: None,
-        };
-
-        match self.add_prop(&prop_data, location, true) {
-            Err(e) => {
-                warn!("Unable to add temp container at {},{}", x, y);
-                warn!("{}", e);
-            }
-            Ok(_) => (),
-        }
-    }
-
-    pub fn set_prop_enabled_at(&mut self, x: i32, y: i32, enabled: bool) -> bool {
-        match self.prop_mut_at(x, y) {
-            None => false,
-            Some(ref mut prop) => {
-                prop.set_enabled(enabled);
-                true
-            }
-        }
-    }
-
-    pub fn prop_mut_at(&mut self, x: i32, y: i32) -> Option<&mut PropState> {
-        let index = match self.prop_index_at(x, y) {
-            None => return None,
-            Some(index) => index,
-        };
-
-        Some(self.get_prop_mut(index))
-    }
-
-    pub fn prop_at(&self, x: i32, y: i32) -> Option<&PropState> {
-        let index = match self.prop_index_at(x, y) {
-            None => return None,
-            Some(index) => index,
-        };
-
-        Some(self.get_prop(index))
-    }
-
-    pub fn toggle_prop_active(&mut self, index: usize) {
-        {
-            let state = self.get_prop_mut(index);
-            state.toggle_active();
-            if !state.is_door() {
-                return;
-            }
-        }
-
-        self.update_prop_vis_pass_grid(index);
-
-        self.pc_vis_partial_redraw(0, 0);
-        for member in GameState::party().iter() {
-            self.compute_pc_visibility(member, 0, 0);
-        }
-        self.update_view_visibility();
-    }
-
-    fn update_prop_vis_pass_grid(&mut self, index: usize) {
-        // borrow checker isn't smart enough to let us use get_prop_mut here
-        let prop_ref = self.props[index].as_mut();
-        let state = prop_ref.unwrap();
-
-        if !state.is_door() {
-            return;
-        }
-
-        let width = self.area.width;
-        let start_x = state.location.x;
-        let start_y = state.location.y;
-        let end_x = start_x + state.prop.size.width;
-        let end_y = start_y + state.prop.size.height;
-
-        if state.is_active() {
-            for y in start_y..end_y {
-                for x in start_x..end_x {
-                    self.prop_vis_grid[(x + y * width) as usize] = true;
-                    self.prop_pass_grid[(x + y * width) as usize] = true;
-                }
-            }
-        } else {
-            match state.prop.interactive {
-                prop::Interactive::Door {
-                    ref closed_invis,
-                    ref closed_impass,
-                    ..
-                } => {
-                    for p in closed_invis.iter() {
-                        self.prop_vis_grid[(p.x + start_x + (p.y + start_y) * width) as usize] =
-                            false;
-                    }
-
-                    for p in closed_impass.iter() {
-                        self.prop_pass_grid[(p.x + start_x + (p.y + start_y) * width) as usize] =
-                            false;
-                    }
-                }
-                _ => (),
-            }
-        }
-    }
-
     pub fn get_entity_at(&self, x: i32, y: i32) -> Option<Rc<RefCell<EntityState>>> {
         if !self.area.area.coords_valid(x, y) {
             return None;
@@ -842,8 +643,19 @@ impl AreaState {
         self.area.transitions.get(index)
     }
 
+    pub fn toggle_prop_active(&mut self, index: usize) {
+        if !self.props.toggle_active(index) { return; }
+
+        self.pc_vis_partial_redraw(0, 0);
+        for member in GameState::party().iter() {
+            self.compute_pc_visibility(member, 0, 0);
+        }
+        self.update_view_visibility();
+    }
+
+
     pub fn has_visibility(&self, parent: &EntityState, target: &EntityState) -> bool {
-        has_visibility(&self.area, &self.prop_vis_grid, parent, target)
+        has_visibility(&self.area, &self.props.entire_vis_grid(), parent, target)
     }
 
     pub fn compute_pc_visibility(
@@ -857,8 +669,8 @@ impl AreaState {
         let props_vis = calculate_los(
             &mut self.pc_explored,
             &self.area,
-            &self.prop_vis_grid,
-            &self.prop_grid,
+            self.props.entire_vis_grid(),
+            self.props.grid(),
             &mut entity.borrow_mut(),
             delta_x,
             delta_y,
@@ -866,7 +678,7 @@ impl AreaState {
 
         // set explored to true for any partially visible props
         for prop_index in props_vis {
-            let prop = self.props[prop_index].as_ref().unwrap();
+            let prop = self.props.get(prop_index);
             for point in prop.location_points() {
                 let index = (point.x + point.y * self.area.width) as usize;
                 self.pc_explored[index] = true;
@@ -949,9 +761,7 @@ impl AreaState {
         }
 
         let index = (x + y * self.area.width) as usize;
-        if !self.prop_pass_grid[index] {
-            return false;
-        }
+        if !self.props.pass_grid(index) { return false; }
 
         let grid_index = &self.entity_grid[index];
 
@@ -964,9 +774,7 @@ impl AreaState {
         }
 
         let index = (x + y * self.area.width) as usize;
-        if !self.prop_pass_grid[index] {
-            return false;
-        }
+        if !self.props.pass_grid(index) { return false; }
 
         let grid = &self.entity_grid[index];
 
@@ -976,94 +784,6 @@ impl AreaState {
             }
         }
         true
-    }
-
-    pub(crate) fn add_prop(
-        &mut self,
-        prop_data: &PropData,
-        location: Location,
-        temporary: bool,
-    ) -> Result<usize, Error> {
-        let prop = &prop_data.prop;
-
-        if !self.area.area.coords_valid(location.x, location.y) {
-            return invalid_data_error(&format!("Prop location outside area bounds"));
-        }
-        if !self
-            .area
-            .area
-            .coords_valid(location.x + prop.size.width, location.y + prop.size.height)
-        {
-            return invalid_data_error(&format!("Prop location outside area bounds"));
-        }
-
-        let prop_state = PropState::new(prop_data, location, temporary);
-
-        let start_x = prop_state.location.x as usize;
-        let start_y = prop_state.location.y as usize;
-        let end_x = start_x + prop_state.prop.size.width as usize;
-        let end_y = start_y + prop_state.prop.size.height as usize;
-
-        let index = self.find_prop_index_to_add();
-        for y in start_y..end_y {
-            for x in start_x..end_x {
-                self.prop_grid[x + y * self.area.width as usize] = Some(index);
-            }
-        }
-
-        self.props[index] = Some(prop_state);
-        self.update_prop_vis_pass_grid(index);
-
-        Ok(index)
-    }
-
-    pub(crate) fn remove_matching_prop(&mut self, x: i32, y: i32, name: &str) {
-        let mut matching_index = None;
-        for (index, prop) in self.props.iter().enumerate() {
-            let prop = match prop {
-                None => continue,
-                Some(ref prop) => prop,
-            };
-
-            match prop.interactive {
-                prop_state::Interactive::Hover { ref text } => {
-                    if text == name {
-                        if prop.location.x == x && prop.location.y == y {
-                            matching_index = Some(index);
-                            break;
-                        }
-                    }
-                }
-                _ => (),
-            }
-        }
-
-        if let Some(index) = matching_index {
-            self.remove_prop(index);
-        }
-    }
-
-    pub(crate) fn remove_prop(&mut self, index: usize) {
-        {
-            let prop = match self.props[index] {
-                None => return,
-                Some(ref prop) => prop,
-            };
-            trace!("Removing prop '{}'", prop.prop.id);
-
-            let start_x = prop.location.x as usize;
-            let start_y = prop.location.y as usize;
-            let end_x = start_x + prop.prop.size.width as usize;
-            let end_y = start_y + prop.prop.size.height as usize;
-
-            for y in start_y..end_y {
-                for x in start_x..end_x {
-                    self.prop_grid[x + y * self.area.width as usize] = None;
-                }
-            }
-        }
-
-        self.props[index] = None;
     }
 
     pub(crate) fn add_actor(
@@ -1394,42 +1114,8 @@ impl AreaState {
         self.entity_grid[(x + y * self.area.width) as usize].retain(|e| *e != index);
     }
 
-    pub fn prop_iter<'a>(&'a self) -> PropIterator {
-        PropIterator {
-            area_state: &self,
-            index: 0,
-        }
-    }
-
-    pub fn get_prop<'a>(&'a self, index: usize) -> &'a PropState {
-        &self.props[index].as_ref().unwrap()
-    }
-
-    pub fn get_prop_mut<'a>(&'a mut self, index: usize) -> &'a mut PropState {
-        let prop_ref = self.props[index].as_mut();
-        prop_ref.unwrap()
-    }
-
-    pub fn props_len(&self) -> usize {
-        self.props.len()
-    }
-
     pub(crate) fn update(&mut self) {
-        let len = self.props.len();
-        for index in 0..len {
-            {
-                let prop = match self.props[index] {
-                    None => continue,
-                    Some(ref prop) => prop,
-                };
-
-                if !prop.is_marked_for_removal() {
-                    continue;
-                }
-            }
-
-            self.remove_prop(index);
-        }
+        self.props.update();
 
         self.feedback_text.iter_mut().for_each(|f| f.update());
         self.feedback_text.retain(|f| f.retain());
@@ -1474,17 +1160,6 @@ impl AreaState {
         surfaces
     }
 
-    fn find_prop_index_to_add(&mut self) -> usize {
-        for (index, item) in self.props.iter().enumerate() {
-            if item.is_none() {
-                return index;
-            }
-        }
-
-        self.props.push(None);
-        self.props.len() - 1
-    }
-
     pub fn add_feedback_text(&mut self, text: AreaFeedbackText) {
         if text.is_empty() {
             return;
@@ -1506,25 +1181,3 @@ impl AreaState {
     }
 }
 
-pub struct PropIterator<'a> {
-    area_state: &'a AreaState,
-    index: usize,
-}
-
-impl<'a> Iterator for PropIterator<'a> {
-    type Item = &'a PropState;
-    fn next(&mut self) -> Option<&'a PropState> {
-        loop {
-            let next = self.area_state.props.get(self.index);
-            self.index += 1;
-
-            match next {
-                None => return None,
-                Some(prop) => match prop {
-                    &None => continue,
-                    &Some(ref prop) => return Some(prop),
-                },
-            }
-        }
-    }
-}

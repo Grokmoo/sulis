@@ -60,11 +60,11 @@ impl WidgetKind for PropWindow {
         let area_state = GameState::area_state();
         let mut area_state = area_state.borrow_mut();
 
-        if !area_state.prop_index_valid(self.prop_index) {
+        if !area_state.props().index_valid(self.prop_index) {
             return;
         }
 
-        let prop = area_state.get_prop_mut(self.prop_index);
+        let prop = area_state.props_mut().get_mut(self.prop_index);
 
         prop.listeners.remove(NAME);
         if prop.is_active() {
@@ -81,13 +81,13 @@ impl WidgetKind for PropWindow {
             let area_state = GameState::area_state();
             let mut area_state = area_state.borrow_mut();
 
-            if !area_state.prop_index_valid(self.prop_index) {
+            if !area_state.props().index_valid(self.prop_index) {
                 // prop is invalid or has been removed.  close the window
                 widget.borrow_mut().mark_for_removal();
                 return Vec::new();
             }
 
-            let prop = area_state.get_prop_mut(self.prop_index);
+            let prop = area_state.props_mut().get_mut(self.prop_index);
 
             prop.listeners.add(ChangeListener::invalidate(NAME, widget));
 

@@ -39,7 +39,7 @@ impl<'a, 'b> StateLocationChecker<'a, 'b> {
     ) -> StateLocationChecker<'a, 'b> {
         let width = area_state.area.width;
         let grid = &area_state.area.path_grid(&requester.size());
-        let prop_grid = &area_state.prop_pass_grid;
+        let prop_grid = area_state.props().entire_pass_grid();
         let entity_grid = &area_state.entity_grid;
         entities_to_ignore.push(requester.index());
 

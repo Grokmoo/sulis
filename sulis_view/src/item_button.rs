@@ -188,11 +188,11 @@ impl ItemButton {
                 prop_index,
                 item_index,
             } => {
-                if !area_state.prop_index_valid(prop_index) {
+                if !area_state.props().index_valid(prop_index) {
                     return None;
                 }
 
-                match area_state.get_prop(prop_index).items() {
+                match area_state.props().get(prop_index).items() {
                     None => None,
                     Some(ref items) => match items.get(item_index) {
                         None => None,

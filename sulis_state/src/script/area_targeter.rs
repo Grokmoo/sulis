@@ -242,7 +242,7 @@ impl Shape {
                 }
 
                 let index = (p.x + p.y * area_state.area.width) as usize;
-                if !area_state.prop_pass_grid[index] {
+                if !area_state.props().pass_grid(index) {
                     return false;
                 }
 
@@ -257,7 +257,7 @@ impl Shape {
                 }
 
                 let index = (p.x + p.y * area_state.area.width) as usize;
-                if !area_state.prop_vis_grid[index] {
+                if !area_state.props().vis_grid(index) {
                     return false;
                 }
 
@@ -533,13 +533,13 @@ impl Shape {
                 return true;
             }
 
-            if !area.prop_pass_grid[p_index] {
+            if !area.props().pass_grid(p_index) {
                 return true;
             }
         }
 
         if invis_blocks {
-            if !area.prop_vis_grid[p_index] {
+            if !area.props().vis_grid(p_index) {
                 return true;
             }
 

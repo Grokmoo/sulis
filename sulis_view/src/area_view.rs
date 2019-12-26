@@ -358,7 +358,7 @@ impl AreaView {
         // let start_time = time::Instant::now();
         let mut to_draw: Vec<&dyn AreaDrawable> = Vec::new();
 
-        for prop_state in state.prop_iter() {
+        for prop_state in state.props().iter() {
             to_draw.push(&*prop_state);
         }
 

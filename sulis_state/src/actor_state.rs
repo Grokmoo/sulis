@@ -697,8 +697,8 @@ impl ActorState {
         let p = target.borrow().location.to_point();
         let mut area_state = area_state.borrow_mut();
 
-        area_state.check_create_prop_container_at(p.x, p.y);
-        match area_state.prop_mut_at(p.x, p.y) {
+        area_state.props_mut().check_or_create_container(p.x, p.y);
+        match area_state.props_mut().get_mut_at(p.x, p.y) {
             None => (),
             Some(ref mut prop) => {
                 prop.add_items(items);

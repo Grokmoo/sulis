@@ -22,7 +22,7 @@ use std::rc::Rc;
 use rlua::{self, Context, UserData, UserDataMethods};
 
 use crate::script::{Result, ScriptActiveSurface, ScriptEntity};
-use crate::{EntityState, GameState};
+use crate::{EntityState, GameState, is_within, is_within_attack_dist, is_within_touch_dist, is_threat};
 use sulis_core::util::{gen_rand, invalid_data_error};
 use sulis_module::Faction;
 
@@ -344,41 +344,41 @@ fn without_self(_lua: Context, set: &ScriptEntitySet, _: ()) -> Result<ScriptEnt
 
 fn visible_within(_lua: Context, set: &ScriptEntitySet, dist: f32) -> Result<ScriptEntitySet> {
     filter_entities(set, dist, &|parent, entity, dist| {
-        if parent.borrow().dist_to_entity(&entity.borrow()) > dist {
+        let parent = &*parent.borrow();
+        let entity = &*entity.borrow();
+        if !is_within(parent, entity, dist) {
             return false;
         }
 
         let area_state = GameState::area_state();
         let area_state = area_state.borrow();
-        area_state.has_visibility(&parent.borrow(), &entity.borrow())
+        area_state.has_visibility(parent, entity)
     })
 }
 
 fn attackable(_lua: Context, set: &ScriptEntitySet, _args: ()) -> Result<ScriptEntitySet> {
     filter_entities(set, (), &|parent, entity, _| {
-        let area_state = GameState::area_state();
-        let area_state = area_state.borrow();
-        parent.borrow().can_attack(&entity.borrow(), &area_state)
+        let parent = &*parent.borrow();
+        let entity = &*entity.borrow();
+
+        is_within_attack_dist(parent, entity)
     })
 }
 
 fn threatening(_lua: Context, set: &ScriptEntitySet, _args: ()) -> Result<ScriptEntitySet> {
     filter_entities(set, (), &|parent, entity, _| {
-        let entity = entity.borrow();
-        if !entity.actor.stats.attack_is_melee() {
-            return false;
-        }
-        if entity.actor.stats.attack_disabled {
-            return false;
-        }
+        let entity = &*entity.borrow();
+        let parent = &*parent.borrow();
 
-        entity.can_reach(&parent.borrow())
+        is_threat(entity, parent)
     })
 }
 
 fn touchable(_lua: Context, set: &ScriptEntitySet, _args: ()) -> Result<ScriptEntitySet> {
     filter_entities(set, (), &|parent, entity, _| {
-        parent.borrow().can_touch(&entity.borrow())
+        let entity = &*entity.borrow();
+        let parent = &*parent.borrow();
+        is_within_touch_dist(parent, entity)
     })
 }
 

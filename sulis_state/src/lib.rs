@@ -40,6 +40,10 @@ mod change_listener;
 pub use self::change_listener::ChangeListener;
 pub use self::change_listener::ChangeListenerList;
 
+mod distance_finder;
+pub use self::distance_finder::{Locatable, center, center_i32, dist, is_within,
+    is_within_attack_dist, is_within_touch_dist, is_threat, can_attack};
+
 mod effect;
 pub use self::effect::Effect;
 

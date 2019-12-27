@@ -23,6 +23,7 @@ use sulis_core::ui::{animation_state, Widget};
 use sulis_core::util::Point;
 use sulis_module::{area::ToKind, Faction, Module, ObjectSize, OnTrigger, Time, MOVE_TO_THRESHOLD};
 use sulis_state::{AreaState, EntityState, GameState, PropState, ScriptCallback};
+use sulis_state::{is_within, can_attack};
 
 pub fn get_action(x_f32: f32, y_f32: f32) -> Box<dyn ActionKind> {
     let (x, y) = (x_f32 as i32, y_f32 as i32);
@@ -257,8 +258,7 @@ impl DialogAction {
             Some(pc) => Rc::clone(pc),
         };
 
-        let dist = pc.borrow().dist_to_entity(&target.borrow());
-        if dist <= max_dist {
+        if is_within(&*pc.borrow(), &*target.borrow(), max_dist) {
             Some(Box::new(DialogAction { target, pc }))
         } else {
             let cb_action = Box::new(DialogAction {
@@ -320,7 +320,7 @@ impl DoorPropAction {
             None => return None,
             Some(pc) => Rc::clone(pc),
         };
-        if pc.borrow().dist_to_prop(prop_state) > max_dist {
+        if !is_within(&*pc.borrow(), prop_state, max_dist) {
             let cb_action = Box::new(DoorPropAction { index });
             return MoveThenAction::create_if_valid(
                 &pc,
@@ -376,7 +376,7 @@ impl LootPropAction {
             None => return None,
             Some(pc) => Rc::clone(pc),
         };
-        if pc.borrow().dist_to_prop(prop_state) > max_dist {
+        if !is_within(&*pc.borrow(), prop_state, max_dist) {
             let cb_action = Box::new(LootPropAction { index });
             return MoveThenAction::create_if_valid(
                 &pc,
@@ -435,7 +435,7 @@ impl TransitionAction {
         let transition = area_state.get_transition_at(x, y);
         let transition = match transition {
             None => return None,
-            Some(ref transition) => transition,
+            Some(transition) => transition,
         };
 
         let cb_action = Box::new(TransitionAction {
@@ -449,7 +449,7 @@ impl TransitionAction {
             None => return None,
             Some(pc) => Rc::clone(pc),
         };
-        if pc.borrow().dist_to_transition(transition) > max_dist {
+        if !is_within(&*pc.borrow(), transition, max_dist) {
             return MoveThenAction::create_if_valid(
                 &pc,
                 transition.from,
@@ -564,7 +564,7 @@ impl AttackAction {
             pc.actor.stats.attack_cost
         };
 
-        if pc.borrow().can_attack(&target.borrow(), &area_state) {
+        if can_attack(&*pc.borrow(), &*target.borrow()) {
             Some(Box::new(AttackAction { pc, target, ap }))
         } else {
             let cb_action = Box::new(AttackAction {
@@ -597,12 +597,7 @@ impl ActionKind for AttackAction {
 
     fn fire_action(&mut self, _widget: &Rc<RefCell<Widget>>) -> bool {
         trace!("Firing attack action.");
-        let area_state = GameState::area_state();
-        if !self
-            .pc
-            .borrow()
-            .can_attack(&self.target.borrow(), &area_state.borrow())
-        {
+        if !can_attack(&*self.pc.borrow(), &*self.target.borrow()) {
             return false;
         }
 
@@ -739,7 +734,7 @@ impl MoveAction {
         };
 
         if let Some(target) = get_attack_target(&area_state, x as i32, y as i32) {
-            if pc.borrow().can_attack(&target.borrow(), &area_state) {
+            if can_attack(&*pc.borrow(), &*target.borrow()) {
                 // if we can already reach the target with our weapon, don't
                 // move further towards them
                 return None;

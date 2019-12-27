@@ -28,12 +28,12 @@ use crate::save_state::EntitySaveState;
 use crate::script::{self, CallbackData, ScriptEntitySet};
 use crate::{
     ActorState, AreaState, ChangeListenerList, EntityTextureCache, EntityTextureSlot, GameState,
-    Location, PropState, ScriptCallback, TurnManager, entity_attack_handler::weapon_attack
+    Location, ScriptCallback, TurnManager, entity_attack_handler::weapon_attack, is_within_attack_dist,
 };
 use sulis_core::io::GraphicsRenderer;
 use sulis_core::ui::{color, Color};
-use sulis_core::util::{invalid_data_error, Point};
-use sulis_module::area::{Transition, MAX_AREA_SIZE};
+use sulis_core::util::{invalid_data_error};
+use sulis_module::area::{MAX_AREA_SIZE};
 use sulis_module::{
     actor::Faction, ai, Actor, DamageKind, HitKind, Module, ObjectSize, ObjectSizeIterator,
 };
@@ -399,41 +399,19 @@ impl EntityState {
         self.actor.ap() >= self.actor.get_move_ap_cost(1)
     }
 
-    /// Returns true if this entity can touch the specified target
-    /// without moving, false otherwise
-    pub fn can_touch(&self, target: &EntityState) -> bool {
-        let dist = self.dist_to_entity(target);
-        self.actor.can_touch(dist)
-    }
-
-    /// Returns true if this entity can reach the specified target with its
-    /// current weapon, without moving, false otherwise
-    pub fn can_reach(&self, target: &EntityState) -> bool {
-        let dist = self.dist_to_entity(target);
-        let area = GameState::area_state();
-        let vis_dist = area.borrow().area.area.vis_dist as f32;
-
-        if dist > vis_dist {
-            false
-        } else {
-            self.actor.can_reach(self.dist_to_entity(target))
-        }
-    }
-
     /// Returns true if this entity can attack the specified target with its
     /// current weapon, without moving
-    pub fn can_attack(&self, target: &EntityState, area_state: &AreaState) -> bool {
+    pub fn can_attack(&self, target: &EntityState) -> bool {
         if self.actor.stats.attack_disabled {
             return false;
         }
 
-        let dist = self.dist_to_entity(target);
-
-        if !self.actor.can_weapon_attack(target, dist) {
+        if !self.actor.has_ap_to_attack() {
             return false;
         }
 
-        area_state.has_visibility(&self, &target)
+
+        is_within_attack_dist(self, target)
     }
 
     pub fn attack(
@@ -526,85 +504,6 @@ impl EntityState {
         self.location.move_to(x, y);
         self.listeners.notify(&self);
         true
-    }
-
-    pub fn dist_to(&self, x: f32, y: f32) -> f32 {
-        self.dist_internal(x, y, 0.0)
-    }
-
-    pub fn dist_to_point(&self, pos: Point) -> f32 {
-        self.dist_internal(pos.x as f32, pos.y as f32, (2.0 as f32).sqrt() / 2.0)
-    }
-
-    pub fn dist(&self, pos: Point, size: &Rc<ObjectSize>) -> f32 {
-        self.dist_internal(
-            pos.x as f32 + size.width as f32 / 2.0,
-            pos.y as f32 + size.height as f32 / 2.0,
-            size.diagonal / 2.0,
-        )
-    }
-
-    fn dist_internal(&self, x2: f32, y2: f32, offset: f32) -> f32 {
-        let x1 = self.location.x as f32 + (self.size.width / 2) as f32;
-        let y1 = self.location.y as f32 + (self.size.height / 2) as f32;
-
-        let mut dist = ((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2)).sqrt();
-        dist -= self.size.diagonal / 2.0 + offset;
-
-        if dist > 0.0 {
-            dist
-        } else {
-            0.0
-        }
-    }
-
-    pub fn dist_to_entity(&self, other: &EntityState) -> f32 {
-        let value = self.dist(other.location.to_point(), &other.size);
-
-        trace!(
-            "Computed distance from '{}' at {:?} to '{}' at {:?} = {}",
-            self.actor.actor.name,
-            self.location,
-            other.actor.actor.name,
-            other.location,
-            value
-        );
-
-        value
-    }
-
-    pub fn dist_to_transition(&self, other: &Transition) -> f32 {
-        let value = self.dist(other.from, &other.size);
-
-        trace!(
-            "Computed distance from '{}' at {:?} to transition at {:?} = {}",
-            self.actor.actor.name,
-            self.location,
-            other.from,
-            value
-        );
-
-        value
-    }
-
-    pub fn dist_to_prop(&self, other: &PropState) -> f32 {
-        self.dist(other.location.to_point(), &other.prop.size)
-    }
-
-    pub fn center_x_f32(&self) -> f32 {
-        self.location.x as f32 + self.size.width as f32 / 2.0
-    }
-
-    pub fn center_y_f32(&self) -> f32 {
-        self.location.y as f32 + self.size.height as f32 / 2.0
-    }
-
-    pub fn center_x(&self) -> i32 {
-        self.location.x + self.size.width / 2
-    }
-
-    pub fn center_y(&self) -> i32 {
-        self.location.y + self.size.height / 2
     }
 
     pub fn size(&self) -> &str {

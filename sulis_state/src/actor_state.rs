@@ -543,29 +543,6 @@ impl ActorState {
             .draw_to_texture(renderer, texture_id, scale_x, scale_y, x, y);
     }
 
-    pub fn can_touch(&self, dist: f32) -> bool {
-        dist < self.stats.touch_distance()
-    }
-
-    pub fn can_reach(&self, dist: f32) -> bool {
-        dist < self.stats.attack_distance()
-    }
-
-    pub(crate) fn can_weapon_attack(&self, _target: &EntityState, dist: f32) -> bool {
-        trace!(
-            "Checking can attack for '{}'.  Distance to target is {} with attack dist of {}",
-            self.actor.name,
-            dist,
-            self.stats.attack_distance()
-        );
-
-        if !self.has_ap_to_attack() {
-            return false;
-        }
-
-        self.can_reach(dist)
-    }
-
     pub fn has_ap_to_attack(&self) -> bool {
         self.p_stats.ap() >= self.stats.attack_cost as u32
     }

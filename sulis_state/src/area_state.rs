@@ -20,7 +20,6 @@ use prop_handler::PropHandler;
 use std::cell::{RefCell};
 use std::collections::HashSet;
 use std::io::Error;
-use std::ptr;
 use std::rc::Rc;
 use std::time;
 
@@ -692,7 +691,7 @@ impl AreaState {
     }
 
     pub fn update_view_visibility(&mut self) {
-        unsafe { ptr::write_bytes(self.pc_vis.as_mut_ptr(), 0, self.pc_vis.len()) }
+        unsafe { std::ptr::write_bytes(self.pc_vis.as_mut_ptr(), 0, self.pc_vis.len()) }
 
         for entity in GameState::party().iter() {
             let entity = entity.borrow();

@@ -4,7 +4,7 @@ function on_activate(parent, ability)
     return
   end
 
-  local targets = parent:targets():friendly():reachable():without_self()
+  local targets = parent:targets():friendly():touchable():without_self()
  
   if parent:ability_level(ability) > 1 then
     local targeter = parent:create_targeter(ability)
@@ -15,7 +15,7 @@ function on_activate(parent, ability)
     targeter:activate()
   else
     local targeter = parent:create_targeter(ability)
-	targeter:set_selection_reachable()
+	targeter:set_selection_touchable()
     targeter:add_all_selectable(targets)
     targeter:add_all_effectable(targets)
     targeter:activate()

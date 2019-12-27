@@ -399,6 +399,13 @@ impl EntityState {
         self.actor.ap() >= self.actor.get_move_ap_cost(1)
     }
 
+    /// Returns true if this entity can touch the specified target
+    /// without moving, false otherwise
+    pub fn can_touch(&self, target: &EntityState) -> bool {
+        let dist = self.dist_to_entity(target);
+        self.actor.can_touch(dist)
+    }
+
     /// Returns true if this entity can reach the specified target with its
     /// current weapon, without moving, false otherwise
     pub fn can_reach(&self, target: &EntityState) -> bool {

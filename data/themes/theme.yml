@@ -1202,7 +1202,7 @@ themes:
                    [x=0|Intellect][r=30|#int#]
                    [x=0|Wisdom][r=30|#wis#]]
               
-              [y=70;x=60;s=5|Range[x=90|#reach#]]
+              [y=70;x=60;s=5|Range[x=90|#range#]]
               [x=60;s=5|Caster level[x=90|#caster_level#]]
               [x=60;s=5|Initiative[x=90|#initiative#]]
               [x=60;s=5|Movement Rate[x=90|#movement_rate#]]

@@ -32,7 +32,8 @@ pub enum Kind {
 pub enum SelectionArea {
     Radius(f32),
     Visible,
-    Reachable,
+    Touchable,
+    Attackable,
     None,
 }
 
@@ -134,8 +135,11 @@ pub enum SelectionArea {
 /// # `set_selection_visible()`
 /// Sets the selection area to visible targets.  See `set_selection_radius`.
 ///
-/// # `set_selection_reachable()`
-/// Sets the selection area to reachable targets.  See `set_selection_radius`.
+/// # `set_selection_touchable()`
+/// Sets the selection area to touch-reachable targets (without a weapon).  See `set_selection_radius`.
+///
+/// # `set_selection_attackable()`
+/// Sets the selection area to attackable targets.  See `set_selection_radius`.
 ///
 #[derive(Clone)]
 pub struct TargeterData {
@@ -372,8 +376,13 @@ impl UserData for TargeterData {
             Ok(())
         });
 
-        methods.add_method_mut("set_selection_reachable", |_, targeter, ()| {
-            targeter.selection_area = SelectionArea::Reachable;
+        methods.add_method_mut("set_selection_touchable", |_, targeter, ()| {
+            targeter.selection_area = SelectionArea::Touchable;
+            Ok(())
+        });
+
+        methods.add_method_mut("set_selection_attackable", |_, targeter, ()| {
+            targeter.selection_area = SelectionArea::Attackable;
             Ok(())
         });
     }

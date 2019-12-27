@@ -818,9 +818,13 @@ impl AreaTargeter {
                 let area = GameState::area_state();
                 let r = area.borrow().area.area.vis_dist;
                 Some(RangeIndicator::new(r as f32 - 1.0, &parent))
-            }
-            targeter::SelectionArea::Reachable => {
-                let r = parent.borrow().actor.stats.attack_distance() + 1.4;
+            },
+            targeter::SelectionArea::Attackable => {
+              let r = parent.borrow().actor.stats.attack_distance() + 1.4;
+              Some(RangeIndicator::new(r, &parent))
+            },
+            targeter::SelectionArea::Touchable => {
+                let r = parent.borrow().actor.stats.touch_distance();
                 Some(RangeIndicator::new(r, &parent))
             }
         };

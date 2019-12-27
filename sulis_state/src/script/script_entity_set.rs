@@ -109,9 +109,9 @@ use sulis_module::Faction;
 /// Creates a new ScriptEntitySet filtered to only those targets that are friendly to
 /// the specified Faction
 ///
-/// # `reachable() -> ScriptEntitySet`
+/// # `touchable() -> ScriptEntitySet`
 /// Creates a new ScriptEntitySet with all the data from this set, except only targets
-/// which the parent can reach with a melee weapon are present.
+/// which the parent can touch (without any weapon) are parents.
 ///
 /// # `attackable() -> ScriptEntitySet`
 /// Creates a new ScriptEntitySet with all the data from this set, except only targets
@@ -332,7 +332,7 @@ impl UserData for ScriptEntitySet {
         });
         methods.add_method("hostile", |lua, set, ()| is_hostile(lua, set));
         methods.add_method("friendly", |lua, set, ()| is_friendly(lua, set));
-        methods.add_method("reachable", &reachable);
+        methods.add_method("touchable", &touchable);
         methods.add_method("attackable", &attackable);
         methods.add_method("threatening", &threatening);
     }
@@ -376,9 +376,9 @@ fn threatening(_lua: Context, set: &ScriptEntitySet, _args: ()) -> Result<Script
     })
 }
 
-fn reachable(_lua: Context, set: &ScriptEntitySet, _args: ()) -> Result<ScriptEntitySet> {
+fn touchable(_lua: Context, set: &ScriptEntitySet, _args: ()) -> Result<ScriptEntitySet> {
     filter_entities(set, (), &|parent, entity, _| {
-        parent.borrow().can_reach(&entity.borrow())
+        parent.borrow().can_touch(&entity.borrow())
     })
 }
 

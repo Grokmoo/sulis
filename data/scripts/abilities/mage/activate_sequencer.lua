@@ -1,16 +1,18 @@
 function on_activate(parent, ability)
   local target_type = parent:get_flag("__sequencer_type")
-  
+  local targeter = parent:create_targeter(ability)
+
   if target_type == "self" then
     fire_sequencer(parent, ability, parent)
 	return
   elseif target_type == "friendly" then
-    targets = parent:targets():friendly():reachable()
+    targets = parent:targets():friendly():touchable()
+    targeter:set_selection_touchable()
   elseif target_type == "hostile" then
     targets = parent:targets():hostile():visible_within(8)
+    targeter:set_selection_radius(8)
   end
   
-  local targeter = parent:create_targeter(ability)
   targeter:add_all_selectable(targets)
   targeter:add_all_effectable(targets)
   targeter:activate()

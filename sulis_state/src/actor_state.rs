@@ -543,6 +543,10 @@ impl ActorState {
             .draw_to_texture(renderer, texture_id, scale_x, scale_y, x, y);
     }
 
+    pub fn can_touch(&self, dist: f32) -> bool {
+        dist < self.stats.touch_distance()
+    }
+
     pub fn can_reach(&self, dist: f32) -> bool {
         dist < self.stats.attack_distance()
     }

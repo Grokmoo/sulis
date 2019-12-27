@@ -5,11 +5,12 @@ function on_activate(parent, ability)
     return
   end
 
-  local targets = parent:targets():hostile():visible()
+  local targets = parent:targets():hostile():attackable()
 
   local targeter = parent:create_targeter(ability)
   targeter:set_show_mouseover(false)
-  targeter:set_shape_circle(stats.attack_distance)
+  targeter:set_selection_attackable()
+  targeter:set_shape_circle(stats.attack_distance + 0.7)
   targeter:add_selectable(parent)
   targeter:add_all_effectable(targets)
   targeter:activate()

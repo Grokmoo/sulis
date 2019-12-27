@@ -29,6 +29,7 @@ use sulis_core::util::{gen_rand, ExtInt};
 #[derive(Clone)]
 pub struct StatList {
     attack_range: f32,
+    touch_range: f32,
 
     pub attributes: AttributeList,
     armor_proficiencies: Vec<ArmorKind>,
@@ -99,6 +100,7 @@ impl StatList {
             bonus_reach: 0.0,
             bonus_range: 0.0,
             attack_range: 0.0,
+            touch_range: 0.0,
             attacks: Vec::new(),
             armor: Armor::default(),
             resistance: Resistance::default(),
@@ -237,6 +239,11 @@ impl StatList {
         }
 
         self.attacks[0].get_ranged_projectile()
+    }
+
+    /// Returns the max distance that this StatList can touch / reach
+    pub fn touch_distance(&self) -> f32 {
+        self.touch_range
     }
 
     /// Returns the maximum distance that this StatList's
@@ -503,5 +510,7 @@ impl StatList {
         self.crit_multiplier += rules.crit_damage_multiplier;
         self.movement_rate += actor.race.movement_rate;
         self.attack_cost += rules.attack_ap as i32;
+
+        self.touch_range = self.bonus_reach;
     }
 }

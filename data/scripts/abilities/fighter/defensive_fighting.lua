@@ -46,7 +46,7 @@ function after_defense(parent, ability, targets, hit)
   
   local target = targets:first()
 
-  if not target:can_reach(parent) then return end
+  if not target:stats().attack_is_melee then return end
 
   local max_damage = math.floor(hit:total_damage() * 0.3)
   

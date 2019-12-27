@@ -905,11 +905,6 @@ impl AreaState {
             }
 
             let entity = mgr.entity(index);
-
-            if !mover.is_hostile(&entity.borrow()) {
-                continue;
-            }
-
             let mut entity = entity.borrow_mut();
 
             self.check_threatened(&mut mover, &mut entity, removal);
@@ -918,28 +913,13 @@ impl AreaState {
     }
 
     fn check_threatened(&self, att: &mut EntityState, def: &mut EntityState, removal: bool) {
-        if removal || !self.is_threat(att, def) {
+        if removal || !is_threat(att, def) {
             att.actor.remove_threatening(def.index());
             def.actor.remove_threatener(att.index());
         } else {
             att.actor.add_threatening(def.index());
             def.actor.add_threatener(att.index());
         }
-    }
-
-    fn is_threat(&self, att: &mut EntityState, def: &mut EntityState) -> bool {
-        if !att.actor.stats.attack_is_melee() {
-            return false;
-        }
-        if att.actor.stats.attack_disabled {
-            return false;
-        }
-        if att.actor.is_dead() {
-            return false;
-        }
-
-        let dist = att.dist(def.location.to_point(), &def.size);
-        att.actor.can_reach(dist)
     }
 
     pub(crate) fn transition_entity_to(

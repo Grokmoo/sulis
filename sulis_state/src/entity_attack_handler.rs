@@ -17,8 +17,8 @@
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use sulis_module::{AccuracyKind, Attack, AttackKind, DamageKind, HitFlags, HitKind, Module, WeaponStyle};
-use crate::{ActorState, GameState, EntityState};
+use sulis_module::{AccuracyKind, Attack, AttackKind, DamageKind, HitFlags, HitKind, Module};
+use crate::{ActorState, GameState, EntityState, is_threat, center};
 
 fn is_sneak_attack(parent: &EntityState, target: &EntityState) -> bool {
     parent.actor.stats.hidden && !target.actor.stats.sneak_attack_immunity
@@ -40,35 +40,13 @@ fn is_flanking(parent: &EntityState, target: &EntityState) -> bool {
         let entity = mgr.borrow().entity(*entity_index);
         let entity = entity.borrow();
 
-        if !entity.is_hostile(&target) {
+        if !is_threat(&entity, target) {
             continue;
         }
 
-        if entity.actor.stats.attack_disabled {
-            continue;
-        }
-
-        match entity.actor.inventory().weapon_style() {
-            WeaponStyle::Ranged => continue,
-            WeaponStyle::TwoHanded
-                | WeaponStyle::Single
-                | WeaponStyle::Shielded
-                | WeaponStyle::DualWielding => (),
-        }
-
-        if !entity.can_reach(&target) {
-            continue;
-        }
-
-        let p_target = (
-            target.center_x_f32(),
-            target.center_y_f32(),
-        );
-        let p_parent = (
-            parent.center_x_f32(),
-            parent.center_y_f32(),
-        );
-        let p_other = (entity.center_x_f32(), entity.center_y_f32());
+        let p_target = center(target);
+        let p_parent = center(parent);
+        let p_other = center(&*entity);
 
         let p1 = (p_target.0 - p_parent.0, p_target.1 - p_parent.1);
         let p2 = (p_target.0 - p_other.0, p_target.1 - p_other.1);

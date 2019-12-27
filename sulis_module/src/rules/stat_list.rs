@@ -511,6 +511,8 @@ impl StatList {
         self.movement_rate += actor.race.movement_rate;
         self.attack_cost += rules.attack_ap as i32;
 
-        self.touch_range = self.bonus_reach;
+        let size_bonus = actor.race.size.diagonal / 2.0;
+        self.touch_range = self.bonus_reach + size_bonus;
+        self.attack_range += size_bonus;
     }
 }

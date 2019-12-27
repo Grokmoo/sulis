@@ -105,7 +105,7 @@ end
 
 function check_move_for_attack(parent, target)
     if not parent:stats().attack_is_ranged then
-	    if parent:can_reach(target) then
+	    if parent:is_within_attack_dist(target) then
 		    return { attack=true }
 		end
 		
@@ -227,7 +227,7 @@ function check_action(parent, ai_data, hostiles, friendlies, failed_use_count)
     if ai_data.range == "Personal" then
         return { done=false, target=parent }
     elseif ai_data.range == "Reach" then
-        if parent:can_reach(target) then
+        if parent:is_within_touch_dist(target) then
             return { done=false, target=target }
         end
 

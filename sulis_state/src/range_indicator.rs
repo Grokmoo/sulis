@@ -22,7 +22,7 @@ use sulis_core::io::DrawList;
 use sulis_core::resource::ResourceSet;
 use sulis_core::ui::animation_state;
 
-use crate::EntityState;
+use crate::{EntityState, dist};
 
 const NW: u8 = 1;
 const N: u8 = 2;
@@ -59,7 +59,7 @@ impl RangeIndicator {
                     let (x1, y1) = (x1 as f32 + 0.5, y1 as f32 + 0.5);
 
                     let idx = x + y * width;
-                    points[idx] = parent.dist_to(x1, y1) > radius;
+                    points[idx] = dist(&*parent, x1, y1) > radius;
                 }
             }
         }

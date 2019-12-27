@@ -24,6 +24,7 @@ use rlua::{self, Context, UserData, UserDataMethods};
 
 use crate::{AreaFeedbackText, ai, animation, script::*, entity_attack_handler};
 use crate::{area_feedback_text::ColorKind, EntityState, GameState, Location};
+use crate::{is_within_attack_dist, is_within_touch_dist, center, dist};
 use sulis_core::config::Config;
 use sulis_core::resource::ResourceSet;
 use sulis_core::util::ExtInt;
@@ -254,6 +255,8 @@ use sulis_module::{
 ///
 /// # `dist_to_entity(target: ScriptEntity) -> Float`
 /// Computes the current euclidean distance to the specified `target`, in tiles.
+/// This should not be used for targeting purposes.  Use the ScriptEntitySet's
+/// filtering methods instead.
 ///
 /// # `dist_to_point(point: Table) -> Float`
 /// Computes the euclidean distance to the specified `point`, in tiles.  Point is
@@ -262,9 +265,12 @@ use sulis_module::{
 /// # `has_ap_to_attack() -> Bool`
 /// Returns true if this entity has enough AP to issue a single attack, false otherwise.
 ///
-/// # `can_reach(target: ScriptEntity) -> Bool`
-/// Returns true if this entity can reach the `target` with a melee attack, false
-/// otherwise.
+/// # `is_within_touch_dist(target: ScriptEntity) -> Bool`
+/// Returns whether this entity is close enough to touch the specified target.
+///
+/// # `is_within_attack_dist(target: ScriptEntity) -> Bool`
+/// Returns whether this entity is close enough to attack the target with
+/// its current weapon.
 ///
 /// # `has_visibility(target: ScriptEntity) -> Bool`
 /// Returns true if this entity can see the `target`, false otherwise.
@@ -1008,10 +1014,17 @@ impl UserData for ScriptEntity {
             Ok(result)
         });
 
-        methods.add_method("can_reach", |_, entity, target: ScriptEntity| {
+        methods.add_method("is_within_attack_dist", |_, entity, target: ScriptEntity| {
             let parent = entity.try_unwrap()?;
             let target = target.try_unwrap()?;
-            let result = parent.borrow().can_reach(&target.borrow());
+            let result = is_within_attack_dist(&*parent.borrow(), &*target.borrow());
+            Ok(result)
+        });
+
+        methods.add_method("is_within_touch_dist", |_, entity, target: ScriptEntity| {
+            let parent = entity.try_unwrap()?;
+            let target = target.try_unwrap()?;
+            let result = is_within_touch_dist(&*parent.borrow(), &*target.borrow());
             Ok(result)
         });
 
@@ -1520,16 +1533,19 @@ impl UserData for ScriptEntity {
         methods.add_method("dist_to_entity", |_, entity, target: ScriptEntity| {
             let entity = entity.try_unwrap()?;
             let target = target.try_unwrap()?;
-            let entity = entity.borrow();
-            let target = target.borrow();
-            Ok(entity.dist_to_entity(&target))
+            let entity = &*entity.borrow();
+            let target = &*target.borrow();
+
+            let (x, y) = center(target);
+            Ok(dist(entity, x, y))
         });
 
         methods.add_method("dist_to_point", |_, entity, point: HashMap<String, i32>| {
             let (x, y) = unwrap_point(point)?;
             let entity = entity.try_unwrap()?;
-            let entity = entity.borrow();
-            Ok(entity.dist_to_point(Point::new(x, y)))
+            let entity = &*entity.borrow();
+
+            Ok(dist(entity, x as f32, y as f32))
         });
 
         methods.add_method("is_threatened", |_, entity, ()| {

@@ -27,7 +27,7 @@ use sulis_module::{Ability, Module, ObjectSize};
 use crate::script::{targeter, ScriptItemKind, TargeterData};
 use crate::{
     area_feedback_text::Params, AreaState, EntityState, GameState, RangeIndicator, Script,
-    TurnManager,
+    TurnManager, center_i32, dist,
 };
 
 #[derive(Clone)]
@@ -889,8 +889,9 @@ impl AreaTargeter {
                 Some(ref target) => target,
             };
 
-            let center_x = target.borrow().center_x() - self.cursor_offset.x;
-            let center_y = target.borrow().center_y() - self.cursor_offset.y;
+            let (mut center_x, mut center_y) = center_i32(&*target.borrow());
+            center_x -= self.cursor_offset.x;
+            center_y -= self.cursor_offset.y;
             let shift = if target.borrow().size.width % 2 == 0 {
                 0.5
             } else {
@@ -937,14 +938,15 @@ impl AreaTargeter {
     }
 
     fn compute_free_select_valid(&mut self) -> bool {
-        let dist = match self.free_select {
+        let max_dist = match self.free_select {
             None => {
                 return false;
             }
             Some(dist) => dist,
         };
 
-        if self.parent.borrow().dist_to_point(self.cursor_pos) > dist {
+        let parent = &*self.parent.borrow();
+        if dist(parent, self.cursor_pos.x as f32, self.cursor_pos.y as f32) > max_dist {
             return false;
         }
 

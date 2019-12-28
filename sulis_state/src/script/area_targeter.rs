@@ -27,7 +27,7 @@ use sulis_module::{Ability, Module, ObjectSize};
 use crate::script::{targeter, ScriptItemKind, TargeterData};
 use crate::{
     area_feedback_text::Params, AreaState, EntityState, GameState, RangeIndicator, Script,
-    TurnManager, center_i32, dist,
+    TurnManager, center_i32, is_within,
 };
 
 #[derive(Clone)]
@@ -817,10 +817,10 @@ impl AreaTargeter {
             targeter::SelectionArea::Visible => {
                 let area = GameState::area_state();
                 let r = area.borrow().area.area.vis_dist;
-                Some(RangeIndicator::new(r as f32 - 1.0, &parent))
+                Some(RangeIndicator::new(r as f32, &parent))
             },
             targeter::SelectionArea::Attackable => {
-              let r = parent.borrow().actor.stats.attack_distance() + 1.4;
+              let r = parent.borrow().actor.stats.attack_distance();
               Some(RangeIndicator::new(r, &parent))
             },
             targeter::SelectionArea::Touchable => {
@@ -945,8 +945,7 @@ impl AreaTargeter {
             Some(dist) => dist,
         };
 
-        let parent = &*self.parent.borrow();
-        if dist(parent, self.cursor_pos.x as f32, self.cursor_pos.y as f32) > max_dist {
+        if !is_within(&*self.parent.borrow(), &self.cursor_pos, max_dist) {
             return false;
         }
 

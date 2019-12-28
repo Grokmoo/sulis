@@ -24,7 +24,7 @@ use rlua::{self, Context, UserData, UserDataMethods};
 
 use crate::{AreaFeedbackText, ai, animation, script::*, entity_attack_handler};
 use crate::{area_feedback_text::ColorKind, EntityState, GameState, Location};
-use crate::{is_within_attack_dist, is_within_touch_dist, center, dist};
+use crate::{is_within_attack_dist, is_within_touch_dist, dist};
 use sulis_core::config::Config;
 use sulis_core::resource::ResourceSet;
 use sulis_core::util::ExtInt;
@@ -1536,8 +1536,8 @@ impl UserData for ScriptEntity {
             let entity = &*entity.borrow();
             let target = &*target.borrow();
 
-            let (x, y) = center(target);
-            Ok(dist(entity, x, y))
+            let result = dist(entity, target);
+            Ok(result)
         });
 
         methods.add_method("dist_to_point", |_, entity, point: HashMap<String, i32>| {
@@ -1545,7 +1545,8 @@ impl UserData for ScriptEntity {
             let entity = entity.try_unwrap()?;
             let entity = &*entity.borrow();
 
-            Ok(dist(entity, x as f32, y as f32))
+            let result = dist(entity, &Point::new(x, y));
+            Ok(result)
         });
 
         methods.add_method("is_threatened", |_, entity, ()| {

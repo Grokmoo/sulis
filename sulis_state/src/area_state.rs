@@ -340,7 +340,7 @@ impl AreaState {
         }
 
         if is_combat_active {
-            let radius = entity.borrow().actor.stats.attack_distance() + 0.5;
+            let radius = entity.borrow().actor.stats.attack_distance();
             let indicator = RangeIndicator::new(radius, entity);
             self.set_range_indicator(Some(indicator));
         } else {

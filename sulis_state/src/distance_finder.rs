@@ -14,6 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use sulis_core::util::Point;
 use sulis_module::area::Transition;
 use crate::{EntityState, PropState};
 
@@ -52,6 +53,16 @@ impl Locatable for Transition {
     }
 }
 
+impl Locatable for Point {
+    fn size(&self) -> (f32, f32) {
+        (1.0, 1.0)
+    }
+
+    fn pos(&self) -> (f32, f32) {
+        (self.x as f32, self.y as f32)
+    }
+}
+
 pub fn center_i32<T: Locatable>(target: &T) -> (i32, i32) {
     let (x, y) = center(target);
     (x as i32, y as i32)
@@ -63,35 +74,26 @@ pub fn center<T: Locatable>(target: &T) -> (f32, f32) {
     (x + w / 2.0, y + h / 2.0)
 }
 
-pub fn dist<T: Locatable>(parent: &T, x: f32, y: f32) -> f32 {
-    let (tx, ty) = center(parent);
-    dist_from_center(tx, ty, x, y)
-}
-
-fn dist_from_center(cx: f32, cy: f32, x: f32, y: f32) -> f32 {
-    (cx - x).hypot(cy - y)
-}
-
-pub fn is_within<T: Locatable, U: Locatable>(parent: &T, target: &U, max_dist: f32) -> bool {
+pub fn dist(parent: &impl Locatable, target: &impl Locatable) -> f32 {
     let (cx, cy) = center(parent);
 
-    let (x, y) = target.pos();
+    let (tx, ty) = center(target);
     let (w, h) = target.size();
 
-    // check all four corners of the target
-    let to_check = [
-        (x, y),
-        (x + w, y),
-        (x + w, y + h),
-        (x, y + h),
-    ];
+    // closest distance from cx, cy to axis aligned rect centered
+    // on tx, ty
 
-    for (x, y) in &to_check {
-      let dist = dist_from_center(cx, cy, *x, *y);
-      if dist <= max_dist { return true; }
-    }
+    let mut dx = (cx - tx).abs() - w / 2.0;
+    let mut dy = (cy - ty).abs() - h / 2.0;
 
-    false
+    if dx < 0.0 { dx = 0.0; }
+    if dy < 0.0 { dy = 0.0; }
+
+    dx.hypot(dy)
+}
+
+pub fn is_within(parent: &impl Locatable, target: &impl Locatable, max_dist: f32) -> bool {
+    dist(parent, target) <= max_dist
 }
 
 pub fn is_within_attack_dist<T: Locatable>(parent: &EntityState, target: &T) -> bool {

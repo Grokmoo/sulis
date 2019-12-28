@@ -1081,77 +1081,48 @@ impl GameState {
         false
     }
 
-    fn get_target(
-        entity: &Rc<RefCell<EntityState>>,
-        target: &Rc<RefCell<EntityState>>,
-    ) -> (f32, f32, f32) {
-        let (target_x, target_y) = {
-            let target = target.borrow();
-            (
-                target.location.x as f32 + (target.size.width / 2) as f32,
-                target.location.y as f32 + (target.size.height / 2) as f32,
-            )
-        };
+    pub fn get_target_dest(entity: &EntityState, target: &EntityState) -> Destination {
+        let dist = entity.actor.stats.attack_distance();
+        let x = target.location.x as f32;
+        let y = target.location.y as f32;
+        let w = target.size.width as f32;
+        let h = target.size.height as f32;
+        let parent_w = entity.size.width as f32;
+        let parent_h = entity.size.height as f32;
+        Destination { x, y, w, h, parent_w, parent_h, dist }
+    }
 
-        let sizes = (entity.borrow().size.diagonal + target.borrow().size.diagonal) / 2.0;
-        let mut range = sizes + entity.borrow().actor.stats.attack_distance();
-
-        let area = GameState::area_state();
-        let vis_dist = area.borrow().area.area.vis_dist as f32;
-        if range > vis_dist {
-            range = vis_dist;
-        }
-
-        trace!(
-            "Getting move target at {}, {} within {}",
-            target_x,
-            target_y,
-            range
-        );
-        (target_x, target_y, range)
+    pub fn get_point_dest(entity: &EntityState, x: f32, y: f32) -> Destination {
+        let dist = MOVE_TO_THRESHOLD;
+        let w = 0.0;
+        let h = 0.0;
+        let parent_w = entity.size.width as f32;
+        let parent_h = entity.size.height as f32;
+        Destination { x, y, w, h, parent_w, parent_h, dist }
     }
 
     pub fn can_move_towards(
         entity: &Rc<RefCell<EntityState>>,
         target: &Rc<RefCell<EntityState>>,
     ) -> Option<Vec<Point>> {
-        let (x, y, dist) = GameState::get_target(entity, target);
-        GameState::can_move_towards_point(entity, Vec::new(), x, y, dist)
+        let dest = GameState::get_target_dest(&entity.borrow(), &target.borrow());
+        GameState::can_move_towards_dest(entity, Vec::new(), dest)
     }
 
     pub fn move_towards(
         entity: &Rc<RefCell<EntityState>>,
         target: &Rc<RefCell<EntityState>>,
     ) -> bool {
-        let (x, y, dist) = GameState::get_target(entity, target);
-        GameState::move_towards_point(entity, Vec::new(), x, y, dist, None)
+        let dest = GameState::get_target_dest(&entity.borrow(), &target.borrow());
+        GameState::move_towards_dest(entity, Vec::new(), dest, None)
     }
 
-    pub fn can_move_to(entity: &Rc<RefCell<EntityState>>, x: i32, y: i32) -> Option<Vec<Point>> {
-        GameState::can_move_towards_point(entity, Vec::new(), x as f32, y as f32, MOVE_TO_THRESHOLD)
-    }
-
-    pub fn move_to(entity: &Rc<RefCell<EntityState>>, x: i32, y: i32) -> bool {
-        GameState::move_towards_point(
-            entity,
-            Vec::new(),
-            x as f32,
-            y as f32,
-            MOVE_TO_THRESHOLD,
-            None,
-        )
-    }
-
-    pub fn move_towards_point(
+    pub fn move_towards_dest(
         entity: &Rc<RefCell<EntityState>>,
         entities_to_ignore: Vec<usize>,
-        x: f32,
-        y: f32,
-        dist: f32,
+        dest: Destination,
         cb: Option<Box<dyn ScriptCallback>>,
     ) -> bool {
-        let dest = Destination { x, y, dist };
-
         let anim = STATE.with(|s| {
             let mut state = s.borrow_mut();
             let state = state.as_mut().unwrap();
@@ -1177,15 +1148,11 @@ impl GameState {
         }
     }
 
-    pub fn can_move_towards_point(
+    pub fn can_move_towards_dest(
         entity: &Rc<RefCell<EntityState>>,
         entities_to_ignore: Vec<usize>,
-        x: f32,
-        y: f32,
-        dist: f32,
+        dest: Destination,
     ) -> Option<Vec<Point>> {
-
-        let dest = Destination { x, y, dist };
         STATE.with(|s| {
 
             let mut state = s.borrow_mut();

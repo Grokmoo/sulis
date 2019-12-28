@@ -18,8 +18,9 @@ use std::cell::RefCell;
 use std::f32;
 use std::rc::Rc;
 
-use crate::{EntityState, GameState};
 use sulis_core::util;
+use sulis_module::{area::Destination};
+use crate::{EntityState, GameState};
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 #[serde(deny_unknown_fields)]
@@ -75,23 +76,20 @@ impl Formation {
         &self,
         entities_to_move: &Vec<Rc<RefCell<EntityState>>>,
         entities_to_ignore: Vec<usize>,
-        x_base: f32,
-        y_base: f32,
+        dest: Destination,
     ) {
         if entities_to_move.len() == 1 {
-            GameState::move_towards_point(
+            GameState::move_towards_dest(
                 &entities_to_move[0],
                 entities_to_ignore,
-                x_base,
-                y_base,
-                0.6,
+                dest,
                 None,
             );
             return;
         }
 
         let (cur_x, cur_y) = center_of_group(entities_to_move);
-        let (dir_x, dir_y) = (x_base - cur_x, y_base - cur_y);
+        let (dir_x, dir_y) = (dest.x - cur_x, dest.y - cur_y);
 
         let angle = dir_y.atan2(dir_x);
         let (sin, cos) = angle.sin_cos();
@@ -108,29 +106,30 @@ impl Formation {
             let xi = -self.positions[index].1;
             let yi = self.positions[index].0;
 
-            let x = (xi * cos - yi * sin).round() + x_base;
-            let y = (xi * sin + yi * cos).round() + y_base;
+            let x = (xi * cos - yi * sin).round() + dest.x;
+            let y = (xi * sin + yi * cos).round() + dest.y;
+
+            let parent = &to_move[index];
+            let parent_w = parent.borrow().size.width as f32;
+            let parent_h = parent.borrow().size.height as f32;
 
             for dist_increase in 0..3 {
-                let dist = 0.6 + dist_increase as f32 * 1.0;
-                if GameState::can_move_towards_point(
+                let dist = dest.dist + dist_increase as f32 * 1.0;
+                let dest = Destination { x, y, w: dest.w, h: dest.h, parent_w, parent_h, dist };
+                if GameState::can_move_towards_dest(
                     &to_move[index],
                     entities_to_ignore.clone(),
-                    x,
-                    y,
-                    dist,
+                    dest
                 )
                 .is_none()
                 {
                     continue;
                 }
 
-                GameState::move_towards_point(
-                    &to_move[index],
+                GameState::move_towards_dest(
+                    parent,
                     entities_to_ignore.clone(),
-                    x,
-                    y,
-                    dist,
+                    dest,
                     None,
                 );
                 break;

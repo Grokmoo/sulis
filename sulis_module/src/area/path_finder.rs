@@ -22,14 +22,33 @@ use std::{f32, ptr};
 use hashbrown::{HashMap, HashSet};
 
 use sulis_core::util::{self, Point};
+use crate::MOVE_TO_THRESHOLD;
 
 const MAX_ITERATIONS: i32 = 2_000;
 
 #[derive(Debug, Clone, Copy)]
 pub struct Destination {
+    pub parent_w: f32,
+    pub parent_h: f32,
     pub x: f32,
     pub y: f32,
+    pub w: f32,
+    pub h: f32,
     pub dist: f32,
+}
+
+impl Destination {
+    pub fn with_defaults(x: f32, y: f32) -> Destination {
+        Destination {
+            x,
+            y,
+            w: 0.0,
+            h: 0.0,
+            parent_w: 0.0,
+            parent_h: 0.0,
+            dist: MOVE_TO_THRESHOLD
+        }
+    }
 }
 
 #[derive(Eq)]
@@ -64,8 +83,6 @@ impl PartialEq for OpenEntry {
 }
 
 pub trait LocationChecker {
-    fn goal(&self, x: f32, y: f32) -> (f32, f32);
-
     fn passable(&self, x: i32, y: i32) -> bool;
 }
 
@@ -80,8 +97,12 @@ pub struct PathFinder {
     closed: HashSet<i32>,
     came_from: HashMap<i32, i32>,
 
-    goal_x: f32,
-    goal_y: f32,
+    dest_x: f32,
+    dest_y: f32,
+    dest_w_over2: f32,
+    dest_h_over2: f32,
+    parent_w_over2: f32,
+    parent_h_over2: f32,
 
     max_iterations: i32,
 }
@@ -97,8 +118,12 @@ impl PathFinder {
             open_set: HashSet::default(),
             closed: HashSet::default(),
             came_from: HashMap::default(),
-            goal_x: 0.0,
-            goal_y: 0.0,
+            dest_x: 0.0,
+            dest_y: 0.0,
+            dest_w_over2: 0.0,
+            dest_h_over2: 0.0,
+            parent_w_over2: 0.0,
+            parent_h_over2: 0.0,
             max_iterations: MAX_ITERATIONS,
         }
     }
@@ -128,23 +153,28 @@ impl PathFinder {
         if dest.x < 0.0 || dest.y < 0.0 {
             return None;
         }
-        if dest.x >= self.width as f32 || dest.y >= self.height as f32 {
+        if dest.x + dest.w >= self.width as f32 || dest.y + dest.h >= self.height as f32 {
             return None;
         }
 
         trace!(
-            "Finding path from {},{} to within {} of {},{}",
+            "Finding path from {},{} to within {} of {},{},{},{}",
             start_x,
             start_y,
             dest.dist,
             dest.x,
-            dest.y
+            dest.y,
+            dest.w,
+            dest.h
         );
 
         // let start_time = time::Instant::now();
-        let goal = checker.goal(dest.x, dest.y);
-        self.goal_x = goal.0;
-        self.goal_y = goal.1;
+        self.dest_x = dest.x + dest.w / 2.0;
+        self.dest_y = dest.y + dest.h / 2.0;
+        self.dest_w_over2 = dest.w / 2.0;
+        self.dest_h_over2 = dest.h / 2.0;
+        self.parent_w_over2 = dest.parent_w / 2.0;
+        self.parent_h_over2 = dest.parent_h / 2.0;
         let dest_dist_squared = (dest.dist * dest.dist) as i32;
         let start = start_x + start_y * self.width;
 
@@ -334,12 +364,17 @@ impl PathFinder {
 
     #[inline]
     fn dist_squared(&self, start: i32) -> i32 {
-        let s_x = start % self.width;
-        let s_y = start / self.width;
+        let s_x = (start % self.width) as f32 + self.parent_w_over2;
+        let s_y = (start / self.width) as f32 + self.parent_h_over2;
 
-        let x_part = s_x as f32 - self.goal_x;
-        let y_part = s_y as f32 - self.goal_y;
+        // closest distance from s_x, s_y to axis aligned dest
+        // rect
 
-        (x_part * x_part + y_part * y_part) as i32
+        let mut dx = (s_x - self.dest_x).abs() - self.dest_w_over2;
+        let mut dy = (s_y - self.dest_y).abs() - self.dest_h_over2;
+        if dx < 0.0 { dx = 0.0; }
+        if dy < 0.0 { dy = 0.0; }
+
+        (dx * dx + dy * dy) as i32
     }
 }

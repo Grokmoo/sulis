@@ -19,7 +19,7 @@ equippable:
       ap: 3
       kind: Slashing
     kind: # Melee
-      reach: 2.0
+      reach: 1.5
     bonuses: {}
 image:
   HeldMain:

@@ -19,7 +19,7 @@ base_attack:
     max: 20
     kind: Fire
   kind: #Melee
-    reach: 2.0
+    reach: 1.0
   bonuses: {}
 default_images:
   Male:

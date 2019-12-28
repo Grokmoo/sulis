@@ -16,7 +16,7 @@ equippable:
       max: 17
       kind: Slashing
     kind: # Melee
-      reach: 1.5
+      reach: 1.0
     bonuses:
       melee_accuracy: 5
 image:

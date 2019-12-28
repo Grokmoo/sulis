@@ -18,7 +18,7 @@ base_attack:
     max: 30
     kind: Piercing
   kind: #Melee
-    reach: 2.0
+    reach: 1.0
   bonuses: {}
 default_images:
   Male:

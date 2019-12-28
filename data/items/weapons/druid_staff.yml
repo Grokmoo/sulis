@@ -16,7 +16,7 @@ equippable:
       max: 18
       kind: Crushing
     kind: # Melee
-      reach: 2.0
+      reach: 1.5
     bonuses:
       crit_multiplier: -0.5
 image:

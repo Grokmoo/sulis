@@ -16,7 +16,7 @@ equippable:
       ap: 5
       kind: Crushing
     kind: # Melee
-      reach: 1.0
+      reach: 0.75
     bonuses:
       crit_multiplier: -0.5
 image:

@@ -17,7 +17,7 @@ equippable:
       ap: 5
       kind: Slashing
     kind: # Melee
-      reach: 1.5
+      reach: 1.25
     bonuses:
       crit_multiplier: 1.0
 image:

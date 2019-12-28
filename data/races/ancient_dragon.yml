@@ -9,7 +9,7 @@ base_stats:
   - kind: { attribute: { attribute: Endurance, amount: 10 } }
   - kind: { attribute: { attribute: Intellect, amount: 4 } }
   - kind: { hit_points: 100 }
-  - kind: { reach: 1.5 }
+  - kind: { reach: 2.0 }
 base_attack:
   damage:
     min: 25

@@ -8,7 +8,7 @@ base_stats:
   - kind: { attribute: { attribute: Dexterity, amount: -2 } }
   - kind: { attribute: { attribute: Endurance, amount: 10 } }
   - kind: { attribute: { attribute: Intellect, amount: -4 } }
-  - kind: { reach: 1.5 }
+  - kind: { reach: 2.0 }
   - kind: { armor: 20 }
   - kind: { resistance: { kind: "Fire", amount: 50 } }
   - kind: { resistance: { kind: "Cold", amount: -25 } }

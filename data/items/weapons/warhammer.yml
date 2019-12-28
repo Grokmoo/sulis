@@ -16,7 +16,7 @@ equippable:
       ap: 3
       kind: Crushing
     kind: # Melee
-      reach: 1.0
+      reach: 0.75
     bonuses: {}
 image:
   HeldMain:

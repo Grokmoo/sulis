@@ -22,7 +22,7 @@ equippable:
       max: 18
       kind: Piercing
     kind: # Ranged
-      range: 30.0
+      range: 20.0
       projectile: creatures/projectile_bow
     bonuses:
       crit_multiplier: 1.0

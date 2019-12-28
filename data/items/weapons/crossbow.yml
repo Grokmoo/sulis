@@ -23,7 +23,7 @@ equippable:
       ap: 10
       kind: Piercing
     kind: # Ranged
-      range: 30.0
+      range: 20.0
       projectile: creatures/projectile_crossbow
     bonuses: {}
 image:

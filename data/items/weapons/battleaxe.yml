@@ -15,7 +15,7 @@ equippable:
       max: 22
       kind: Slashing
     kind: # Melee
-      reach: 1.0
+      reach: 0.75
     bonuses:
       crit_multiplier: 1.0
 image:

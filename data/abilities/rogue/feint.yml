@@ -15,7 +15,7 @@ active:
     priority: 30
     kind: Debuff
     group: Single
-    range: Reach
+    range: Melee
   short_description: |
     Lower the defenses of a single target.
 prereqs:

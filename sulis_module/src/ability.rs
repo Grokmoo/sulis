@@ -303,7 +303,8 @@ impl AIGroup {
 #[serde(deny_unknown_fields)]
 pub enum AIRange {
     Personal,
-    Reach,
+    Touch,
+    Melee,
     Short,
     Visible,
 }
@@ -312,7 +313,8 @@ impl AIRange {
     pub fn from_str(s: &str) -> AIRange {
         match s {
             "Personal" => AIRange::Personal,
-            "Reach" => AIRange::Reach,
+            "Touch" => AIRange::Touch,
+            "Melee" => AIRange::Melee,
             "Short" => AIRange::Short,
             "Visible" => AIRange::Visible,
             _ => {

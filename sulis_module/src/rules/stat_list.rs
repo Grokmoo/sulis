@@ -513,6 +513,9 @@ impl StatList {
 
         let size_bonus = actor.race.size.diagonal / 2.0;
         self.touch_range = self.bonus_reach + size_bonus;
-        self.attack_range += size_bonus;
+
+        if is_melee {
+            self.attack_range += size_bonus;
+        }
     }
 }

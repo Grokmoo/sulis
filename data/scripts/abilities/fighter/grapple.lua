@@ -5,7 +5,7 @@ function on_activate(parent, ability)
     return
   end
 
-  local targets = parent:targets():hostile():attackable()
+  local targets = parent:targets():hostile():touchable()
   
   local targeter = parent:create_targeter(ability)
   targeter:set_selection_attackable()

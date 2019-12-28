@@ -18,7 +18,7 @@ active:
     priority: 10
     kind: Debuff
     group: Single
-    range: Reach
+    range: Touch
   short_description: |
     Terrify a single target.
 prereqs:

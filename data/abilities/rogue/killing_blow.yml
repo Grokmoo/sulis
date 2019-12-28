@@ -15,7 +15,7 @@ active:
     priority: 30
     kind: Damage
     group: Single
-    range: Reach
+    range: Melee
   short_description: |
     Instantly kill heavily damaged targets.
 prereqs:

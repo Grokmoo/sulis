@@ -78,7 +78,7 @@ type Result<T> = std::result::Result<T, rlua::Error>;
 ///
 /// # `only_range(range: String) -> ScriptAbilitySet`
 /// Creates a new ScriptAbilitySet from this one, but only including abilities
-/// with the specified AI range `range`.  Valid range types are `Personal`, `Reach`,
+/// with the specified AI range `range`.  Valid range types are `Personal`, `Touch`, `Melee`,
 /// `Short`, `Visible`
 ///
 /// # `sort_by_priority()`
@@ -86,7 +86,7 @@ type Result<T> = std::result::Result<T, rlua::Error>;
 /// set.  Lower priorities are sorted first.
 /// ## Examples
 /// ```lua
-///   abilities = parent:abilities():only_range("Reach"):only_kind("Attack")
+///   abilities = parent:abilities():only_range("Melee"):only_kind("Attack")
 ///   if abilities:is_empty() return end
 ///   abilities:sort_by_priority()
 ///   -- do something with the first ability

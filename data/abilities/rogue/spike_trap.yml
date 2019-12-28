@@ -14,7 +14,7 @@ active:
     priority: 10
     kind: Special
     group: Single
-    range: Reach
+    range: Touch
   short_description: |
     Set a damaging trap for enemies
 upgrades:

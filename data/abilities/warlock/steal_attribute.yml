@@ -18,7 +18,7 @@ active:
     priority: 10
     kind: Damage
     group: Single
-    range: Reach
+    range: Touch
   short_description: |
     Reduce one attribute of a target while raising your own.
 prereqs:

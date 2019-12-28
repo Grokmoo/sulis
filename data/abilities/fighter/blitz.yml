@@ -15,7 +15,7 @@ active:
     priority: 10
     kind: Damage
     group: Single
-    range: Reach
+    range: Melee
   short_description: |
     Rapidly attack a single opponent many times.
 prereqs:

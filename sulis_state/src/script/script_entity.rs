@@ -1653,6 +1653,7 @@ fn create_stats_table<'a>(
     stats.set("reflex", src.reflex)?;
     stats.set("will", src.will)?;
 
+    stats.set("touch_distance", src.touch_distance())?;
     stats.set("attack_distance",src.attack_distance())?;
     stats.set("attack_is_melee", src.attack_is_melee())?;
     stats.set("attack_is_ranged", src.attack_is_ranged())?;

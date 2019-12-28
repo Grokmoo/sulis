@@ -13,5 +13,5 @@ usable:
     priority: 10
     kind: Heal
     group: Single
-    range: Reach
+    range: Touch
   short_description: "Heals damage on an ally slowly over time."

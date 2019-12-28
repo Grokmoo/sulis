@@ -15,6 +15,6 @@ active:
     priority: 100
     kind: Special
     group: Single
-    range: Reach
+    range: Short
   short_description: |
     Move behind an enemy and make an attack.

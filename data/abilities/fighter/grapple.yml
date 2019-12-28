@@ -15,7 +15,7 @@ active:
     priority: 10
     kind: Debuff
     group: Single
-    range: Reach
+    range: Touch
   short_description: |
     Hold an opponent, preventing them from moving or attacking.
 prereqs:

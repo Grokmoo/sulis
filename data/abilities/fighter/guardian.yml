@@ -15,7 +15,7 @@ active:
     priority: 20
     kind: Buff
     group: Single
-    range: Reach
+    range: Touch
   short_description: |
     Protect a nearby ally or allies.
 prereqs:

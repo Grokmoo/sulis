@@ -15,7 +15,7 @@ active:
     priority: 10
     kind: Damage
     group: Multiple
-    range: Reach
+    range: Melee
   short_description: |
     Attacks all enemies in an arc.
 prereqs:

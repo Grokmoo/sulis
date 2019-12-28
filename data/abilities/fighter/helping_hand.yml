@@ -14,6 +14,6 @@ active:
     priority: 20
     kind: Buff
     group: Single
-    range: Reach
+    range: Touch
   short_description: |
     Clear minor status effects on an ally.

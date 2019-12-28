@@ -15,7 +15,7 @@ active:
     priority: 20
     kind: Damage
     group: Single
-    range: Reach
+    range: Short
   short_description: |
     Throw your shield like a boomerang at an opponent.
 prereqs:

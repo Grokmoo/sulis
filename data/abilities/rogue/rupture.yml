@@ -15,7 +15,7 @@ active:
     priority: 10
     kind: Damage
     group: Single
-    range: Reach
+    range: Melee
   short_description: |
     Make an attack that causes the enemy to suffer damage when they move.
 prereqs:

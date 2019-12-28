@@ -14,6 +14,6 @@ active:
     priority: 30
     kind: Heal
     group: Single
-    range: Reach
+    range: Touch
   short_description: |
     Heal one ally a small amount.

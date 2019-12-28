@@ -101,10 +101,6 @@ impl LayerListLocationChecker {
 }
 
 impl LocationChecker for LayerListLocationChecker {
-    fn goal(&self, x: f32, y: f32) -> (f32, f32) {
-        (x, y)
-    }
-
     fn passable(&self, x: i32, y: i32) -> bool {
         self.grid.is_passable(x, y)
     }

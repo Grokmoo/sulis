@@ -21,7 +21,8 @@ use std::rc::Rc;
 use crate::RootView;
 use sulis_core::ui::{animation_state, Widget};
 use sulis_core::util::Point;
-use sulis_module::{area::ToKind, Faction, Module, ObjectSize, OnTrigger, Time, MOVE_TO_THRESHOLD};
+use sulis_module::{area::{Destination, ToKind}, Faction, Module, ObjectSize,
+    OnTrigger, Time, MOVE_TO_THRESHOLD};
 use sulis_state::{AreaState, EntityState, GameState, PropState, ScriptCallback};
 use sulis_state::{is_within, can_attack};
 
@@ -49,7 +50,7 @@ pub fn get_action(x_f32: f32, y_f32: f32) -> Box<dyn ActionKind> {
         return action;
     }
 
-    if let Some(action) = MoveAction::create_if_valid(x as f32, y as f32, None) {
+    if let Some(action) = MoveAction::create_if_valid(x as f32, y as f32, 0.0, 0.0, None) {
         return action;
     }
 
@@ -636,13 +637,12 @@ impl MoveThenAction {
         cb_action: Box<dyn ActionKind>,
         mut cursor_state: animation_state::Kind,
     ) -> Option<Box<dyn ActionKind>> {
-        let (px, py) = (pos.x as f32, pos.y as f32);
+        let x = pos.x as f32;
+        let y = pos.y as f32;
+        let w = size.width as f32;
+        let h = size.height as f32;
 
-        let x = px + (size.width / 2) as f32;
-        let y = py + (size.height / 2) as f32;
-
-        let dist = dist + pc.borrow().size.diagonal;
-        let move_action = match MoveAction::new_if_valid(x, y, Some(dist)) {
+        let move_action = match MoveAction::new_if_valid(x, y, w, h, Some(dist)) {
             None => return None,
             Some(move_action) => move_action,
         };
@@ -698,9 +698,7 @@ impl ActionKind for MoveThenAction {
 }
 struct MoveAction {
     selected: Vec<Rc<RefCell<EntityState>>>,
-    x: f32,
-    y: f32,
-    dist: f32,
+    dest: Destination,
     cb: Option<Box<dyn ScriptCallback>>,
 
     ap: i32,
@@ -719,7 +717,7 @@ fn entities_to_ignore() -> Vec<usize> {
 }
 
 impl MoveAction {
-    fn new_if_valid(x: f32, y: f32, dist: Option<f32>) -> Option<MoveAction> {
+    fn new_if_valid(x: f32, y: f32, w: f32, h: f32, dist: Option<f32>) -> Option<MoveAction> {
         let area_state = GameState::area_state();
         let area_state = area_state.borrow();
 
@@ -728,10 +726,7 @@ impl MoveAction {
             Some(pc) => Rc::clone(pc),
         };
 
-        let dist = match dist {
-            None => MOVE_TO_THRESHOLD,
-            Some(dist) => dist,
-        };
+        let dist = dist.unwrap_or(MOVE_TO_THRESHOLD);
 
         if let Some(target) = get_attack_target(&area_state, x as i32, y as i32) {
             if can_attack(&*pc.borrow(), &*target.borrow()) {
@@ -742,9 +737,12 @@ impl MoveAction {
         }
 
         let selected = GameState::selected();
+        let parent_w = selected[0].borrow().size.width as f32;
+        let parent_h = selected[0].borrow().size.height as f32;
+        let dest = Destination { x, y, w, h, parent_w, parent_h, dist };
 
         let path =
-            match GameState::can_move_towards_point(&selected[0], entities_to_ignore(), x, y, dist)
+            match GameState::can_move_towards_dest(&selected[0], entities_to_ignore(), dest)
             {
                 None => return None,
                 Some(path) => path,
@@ -781,17 +779,17 @@ impl MoveAction {
 
         Some(MoveAction {
             selected,
-            x,
-            y,
-            dist,
+            dest,
             cb: None,
             path,
             ap,
         })
     }
 
-    fn create_if_valid(x: f32, y: f32, dist: Option<f32>) -> Option<Box<dyn ActionKind>> {
-        match MoveAction::new_if_valid(x, y, dist) {
+    fn create_if_valid(x: f32, y: f32, w: f32, h: f32,
+        dist: Option<f32>) -> Option<Box<dyn ActionKind>> {
+
+        match MoveAction::new_if_valid(x, y, w, h, dist) {
             None => None,
             Some(action) => Some(Box::new(action)),
         }
@@ -799,12 +797,10 @@ impl MoveAction {
 
     fn move_one(&mut self) {
         let cb = self.cb.take();
-        GameState::move_towards_point(
+        GameState::move_towards_dest(
             &self.selected[0],
             entities_to_ignore(),
-            self.x,
-            self.y,
-            self.dist,
+            self.dest,
             cb,
         );
     }
@@ -813,7 +809,7 @@ impl MoveAction {
         let formation = GameState::party_formation();
         formation
             .borrow()
-            .move_group(&self.selected, entities_to_ignore(), self.x, self.y);
+            .move_group(&self.selected, entities_to_ignore(), self.dest);
     }
 }
 
@@ -839,8 +835,8 @@ impl ActionKind for MoveAction {
     fn get_hover_info(&self) -> Option<ActionHoverInfo> {
         let entity = &self.selected[0].borrow();
         let p = Point::new(
-            self.x as i32 - entity.size.width / 2,
-            self.y as i32 - entity.size.height / 2,
+            self.dest.x as i32 - entity.size.width / 2,
+            self.dest.y as i32 - entity.size.height / 2,
         );
         ActionHoverInfo::with_path(entity, p, &self.path, self.ap)
     }

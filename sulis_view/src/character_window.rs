@@ -540,7 +540,7 @@ pub fn create_details_text_box(pc: &ActorState, is_pc: bool) -> Rc<RefCell<Widge
             );
         }
 
-        state.add_text_arg("range", &stats.attack_distance().to_string());
+        state.add_text_arg("range", &format!("{:.2}", stats.attack_distance()));
         state.add_text_arg("cur_hp", &pc.hp().to_string());
         state.add_text_arg("max_hp", &stats.max_hp.to_string());
         state.add_text_arg("cur_ap", &pc.ap().to_string());

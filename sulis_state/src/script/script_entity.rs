@@ -967,19 +967,12 @@ impl UserData for ScriptEntity {
                 let target = dest.try_unwrap()?;
 
                 if let Some(dist) = dist {
-                    let (x, y) = {
-                        let target = target.borrow();
-                        (
-                            target.location.x as f32 + (target.size.width / 2) as f32,
-                            target.location.y as f32 + (target.size.height / 2) as f32,
-                        )
-                    };
-                    Ok(GameState::move_towards_point(
+                    let mut dest = GameState::get_target_dest(&*parent.borrow(), &*target.borrow());
+                    dest.dist = dist;
+                    Ok(GameState::move_towards_dest(
                         &parent,
                         Vec::new(),
-                        x,
-                        y,
-                        dist,
+                        dest,
                         None,
                     ))
                 } else {
@@ -993,13 +986,12 @@ impl UserData for ScriptEntity {
             |_, entity, (x, y, dist): (f32, f32, Option<f32>)| {
                 let parent = entity.try_unwrap()?;
 
-                let dist = dist.unwrap_or(MOVE_TO_THRESHOLD);
-                Ok(GameState::move_towards_point(
+                let mut dest = GameState::get_point_dest(&*parent.borrow(), x, y);
+                dest.dist = dist.unwrap_or(MOVE_TO_THRESHOLD);
+                Ok(GameState::move_towards_dest(
                     &parent,
                     Vec::new(),
-                    x,
-                    y,
-                    dist,
+                    dest,
                     None,
                 ))
             },
@@ -1661,10 +1653,7 @@ fn create_stats_table<'a>(
     stats.set("reflex", src.reflex)?;
     stats.set("will", src.will)?;
 
-    stats.set(
-        "attack_distance",
-        src.attack_distance() + parent.size.diagonal / 2.0,
-    )?;
+    stats.set("attack_distance",src.attack_distance())?;
     stats.set("attack_is_melee", src.attack_is_melee())?;
     stats.set("attack_is_ranged", src.attack_is_ranged())?;
 

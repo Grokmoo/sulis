@@ -14,7 +14,6 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::f32;
 use std::rc::Rc;
 use std::cell::RefCell;
 
@@ -55,13 +54,6 @@ impl<'a, 'b> StateLocationChecker<'a, 'b> {
 }
 
 impl<'a, 'b> LocationChecker for StateLocationChecker<'a, 'b> {
-    fn goal(&self, x: f32, y: f32) -> (f32, f32) {
-        (
-            x - (self.requester.size.width / 2) as f32,
-            y - (self.requester.size.height / 2) as f32,
-        )
-    }
-
     fn passable(&self, x: i32, y: i32) -> bool {
         if !self.grid.is_passable(x, y) {
             return false;

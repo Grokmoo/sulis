@@ -24,7 +24,6 @@ use crate::generator::{
     TerrainParams, TileIter, TileKind, TilesModel, TransitionGen, TransitionOutput,
     TransitionParams, WallKinds, WeightedList,
 };
-use crate::MOVE_TO_THRESHOLD;
 use crate::{
     area::{Destination, GeneratorParams, Layer, LocationChecker, PathFinder, Tile, TransitionBuilder},
     Module, ObjectSize,
@@ -225,7 +224,7 @@ impl AreaGenerator {
             let (end_x, end_y) = (open[i + 1].x, open[i + 1].y);
             let (end_x, end_y) = (end_x as f32, end_y as f32);
 
-            let dest = Destination { x: end_x, y: end_y, dist: MOVE_TO_THRESHOLD };
+            let dest = Destination::with_defaults(end_x, end_y);
             if path_finder
                 .find(
                     &location_checker,

@@ -17,12 +17,13 @@
 use std::cell::RefCell;
 use std::rc::Rc;
 
+use sulis_core::util::Point;
 use sulis_core::image::Image;
 use sulis_core::io::DrawList;
 use sulis_core::resource::ResourceSet;
 use sulis_core::ui::animation_state;
 
-use crate::{EntityState, dist};
+use crate::{EntityState, is_within};
 
 const NW: u8 = 1;
 const N: u8 = 2;
@@ -50,16 +51,17 @@ impl RangeIndicator {
 
         {
             let parent = parent.borrow();
+
             for y in 0..width {
                 for x in 0..width {
                     let (x1, y1) = (
                         x as i32 + parent.location.x - half_width,
                         y as i32 + parent.location.y - half_width,
                     );
-                    let (x1, y1) = (x1 as f32 + 0.5, y1 as f32 + 0.5);
+                    let p = Point::new(x1, y1);
 
                     let idx = x + y * width;
-                    points[idx] = dist(&*parent, x1, y1) > radius;
+                    points[idx] = !is_within(&*parent, &p, radius);
                 }
             }
         }

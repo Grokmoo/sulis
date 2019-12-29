@@ -17,7 +17,7 @@ equippable:
       ap: 3
       kind: Piercing
     kind: # Melee
-      reach: 0.25
+      reach: 0.5
     bonuses: {}
 image:
   HeldMain:

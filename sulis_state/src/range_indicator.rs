@@ -24,8 +24,8 @@ use sulis_core::io::DrawList;
 use sulis_core::resource::ResourceSet;
 use sulis_core::ui::animation_state;
 
-use sulis_module::Ability;
-use crate::{EntityState, is_within};
+use sulis_module::{ability::Range, Ability};
+use crate::{GameState, EntityState, is_within};
 
 const NW: u8 = 1;
 const N: u8 = 2;
@@ -145,11 +145,23 @@ pub struct RangeIndicator {
 }
 
 impl RangeIndicator {
-    pub fn ability(
-        radius: f32,
-        parent: &Rc<RefCell<EntityState>>,
-        ability: &Rc<Ability>
-    ) -> RangeIndicator {
+    /// Creates an ability range indicator.  will panic if ability is not active.
+    pub fn ability(parent: &Rc<RefCell<EntityState>>, ability: &Rc<Ability>) -> RangeIndicator {
+        let active = ability.active.as_ref().unwrap();
+
+        let radius = match active.range {
+            Range::None => 0.0,
+            Range::Personal => 0.0,
+            Range::Radius(r) => r,
+            Range::Touch => parent.borrow().actor.stats.touch_distance(),
+            Range::Attack => parent.borrow().actor.stats.attack_distance(),
+            Range::Visible => {
+                let area = GameState::area_state();
+                let area = &area.borrow().area.area;
+                area.vis_dist as f32
+            }
+        };
+
         let ability = Rc::clone(ability);
         RangeIndicator::new(Kind::Ability(ability), radius, parent)
     }
@@ -169,24 +181,11 @@ impl RangeIndicator {
         let half_width = radius.ceil() as i32 + 5;
         let width = (half_width * 2) as usize;
 
-        let mut points = vec![true; width * width];
-
-        {
-            let parent = parent.borrow();
-
-            for y in 0..width {
-                for x in 0..width {
-                    let (x1, y1) = (
-                        x as i32 + parent.location.x - half_width,
-                        y as i32 + parent.location.y - half_width,
-                    );
-                    let p = Point::new(x1, y1);
-
-                    let idx = x + y * width;
-                    points[idx] = !is_within(&*parent, &p, radius);
-                }
-            }
-        }
+        let points = if radius == 0.0 {
+            personal_points(&parent.borrow(), half_width, width)
+        } else {
+            compute_points(&parent.borrow(), radius, half_width, width)
+        };
 
         let mut neighbors = vec![0; width * width];
         for y in 0..width {
@@ -236,6 +235,39 @@ impl RangeIndicator {
 
         draw_list
     }
+}
+
+fn personal_points(parent: &EntityState, half_width: i32, width: usize) -> Vec<bool> {
+    let mut points = vec![false; width * width];
+
+    for p in parent.location_points() {
+        let x = (p.x - parent.location.x + half_width) as usize;
+        let y = (p.y - parent.location.y + half_width) as usize;
+
+        let idx = x + y * width;
+        points[idx] = true;
+    }
+
+    points
+}
+
+fn compute_points(parent: &EntityState, radius: f32, half_width: i32, width: usize) -> Vec<bool> {
+    let mut points = vec![true; width * width];
+
+    for y in 0..width {
+        for x in 0..width {
+            let (x1, y1) = (
+                x as i32 + parent.location.x - half_width,
+                y as i32 + parent.location.y - half_width,
+            );
+            let p = Point::new(x1, y1);
+
+            let idx = x + y * width;
+            points[idx] = !is_within(parent, &p, radius);
+        }
+    }
+
+    points
 }
 
 fn find_neighbors(width: usize, points: &[bool], x: usize, y: usize) -> u8 {

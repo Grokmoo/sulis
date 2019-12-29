@@ -442,15 +442,12 @@ fn create_range_indicator(
         Some(active) => active,
     };
 
-    use ability::Range;
-    let radius = match active.range {
-        Range::None => return None,
-        Range::Radius(r) => r,
-        Range::Touch => entity.borrow().actor.stats.touch_distance(),
-        Range::Attack => entity.borrow().actor.stats.attack_distance(),
+    match active.range {
+        ability::Range::None => return None,
+        _ => (),
     };
 
-    Some(RangeIndicator::ability(radius, entity, ability))
+    Some(RangeIndicator::ability(entity, ability))
 }
 
 struct AbilityButton {

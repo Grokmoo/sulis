@@ -263,8 +263,8 @@ impl UserData for ScriptAbilitySet {
 /// # `range() -> Float`
 /// Returns the range of this ability as defined in its resource file.  Note that this
 /// is not the AI helper range, but the range used for drawing the range indicator preview.
-/// Valid ranges are None, Touch, Attack, and Radius(float).
-/// Returns 0.0 for values of Touch, and Attack, as those depend on parent stats.
+/// Valid ranges are None, Personal, Touch, Attack, Radius(float), and Visible
+/// Returns 0.0 for values of Personal, Touch, and Attack, as those depend on parent stats.
 /// Returns 0.0 for a Range of None.
 ///
 /// # `ai_data() -> Table`
@@ -384,8 +384,13 @@ impl UserData for ScriptAbility {
 
         methods.add_method("range", |_, ability, ()| {
             Ok(match ability.range {
-                Range::None | Range::Touch | Range::Attack => 0.0,
+                Range::None | Range::Touch | Range::Attack | Range::Personal => 0.0,
                 Range::Radius(val) => val,
+                Range::Visible => {
+                    let area = GameState::area_state();
+                    let area = area.borrow();
+                    area.area.area.vis_dist as f32
+                }
             })
         });
 

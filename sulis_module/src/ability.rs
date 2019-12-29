@@ -358,9 +358,11 @@ pub struct AbilityBuilder {
 #[serde(deny_unknown_fields)]
 pub enum Range {
     None,
+    Personal,
     Touch,
     Attack,
     Radius(f32),
+    Visible,
 }
 
 fn range_none() -> Range { Range::None }

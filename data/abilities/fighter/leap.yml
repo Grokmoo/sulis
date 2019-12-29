@@ -11,6 +11,8 @@ active:
     Instant
   cooldown: 2
   combat_only: false
+  range:
+    Radius: 10
   ai:
     priority: 100
     kind: Special

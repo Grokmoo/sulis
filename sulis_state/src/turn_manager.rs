@@ -408,10 +408,14 @@ impl TurnManager {
 
         if current.borrow().is_party_member() {
             GameState::set_selected_party_member(Rc::clone(current));
-            area_state.set_default_range_indicator(Some(current), self.is_combat_active());
+
+            area_state.range_indicators().remove_attack();
+            if self.is_combat_active() {
+                area_state.range_indicators().add_attack(current);
+            }
         } else {
             GameState::clear_selected_party_member();
-            area_state.set_range_indicator(None);
+            area_state.range_indicators().remove_attack();
         }
 
         let mut current = current.borrow_mut();
@@ -708,7 +712,7 @@ impl TurnManager {
         }
 
         let area = GameState::area_state();
-        area.borrow_mut().set_range_indicator(None);
+        area.borrow_mut().range_indicators().clear();
     }
 
     fn initiate_combat(&mut self) {

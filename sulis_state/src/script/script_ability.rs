@@ -24,7 +24,7 @@ use rlua::{self, Context, UserData, UserDataMethods};
 use crate::script::{CallbackData, ScriptEntity};
 use crate::{AreaFeedbackText, area_feedback_text::ColorKind, EntityState, GameState};
 use sulis_module::{
-    ability::{self, AIData},
+    ability::{self, AIData, Range},
     Ability, Module,
 };
 
@@ -78,7 +78,7 @@ type Result<T> = std::result::Result<T, rlua::Error>;
 ///
 /// # `only_range(range: String) -> ScriptAbilitySet`
 /// Creates a new ScriptAbilitySet from this one, but only including abilities
-/// with the specified AI range `range`.  Valid range types are `Personal`, `Touch`, `Melee`,
+/// with the specified AI range `range`.  Valid range types are `Personal`, `Touch`, `Attack`,
 /// `Short`, `Visible`
 ///
 /// # `sort_by_priority()`
@@ -86,7 +86,7 @@ type Result<T> = std::result::Result<T, rlua::Error>;
 /// set.  Lower priorities are sorted first.
 /// ## Examples
 /// ```lua
-///   abilities = parent:abilities():only_range("Melee"):only_kind("Attack")
+///   abilities = parent:abilities():only_range("Touch"):only_kind("Attack")
 ///   if abilities:is_empty() return end
 ///   abilities:sort_by_priority()
 ///   -- do something with the first ability
@@ -260,6 +260,13 @@ impl UserData for ScriptAbilitySet {
 /// are met.  These methods will be called from this ability's script, as defined in
 /// its resource file.
 ///
+/// # `range() -> Float`
+/// Returns the range of this ability as defined in its resource file.  Note that this
+/// is not the AI helper range, but the range used for drawing the range indicator preview.
+/// Valid ranges are None, Touch, Attack, and Radius(float).
+/// Returns 0.0 for values of Touch, and Attack, as those depend on parent stats.
+/// Returns 0.0 for a Range of None.
+///
 /// # `ai_data() -> Table`
 /// Creates a Lua table including the AI data of this ability.  This includes
 /// the `priority`, an integer, the `kind`, `group, and `range`, all Strings.  See
@@ -271,6 +278,7 @@ pub struct ScriptAbility {
     name: String,
     duration: u32,
     ap: u32,
+    range: Range,
     ai_data: AIData,
 }
 
@@ -296,9 +304,9 @@ impl ScriptAbility {
             }
         };
 
-        let ap = match ability.active {
-            None => 0,
-            Some(ref active) => active.ap,
+        let (range, ap) = match ability.active {
+            None => (Range::None, 0),
+            Some(ref active) => (active.range, active.ap),
         };
 
         ScriptAbility {
@@ -307,6 +315,7 @@ impl ScriptAbility {
             duration,
             ap,
             ai_data,
+            range,
         }
     }
 
@@ -371,6 +380,13 @@ impl UserData for ScriptAbility {
             let index = parent.try_unwrap_index()?;
             let cb_data = CallbackData::new_ability(index, &ability.id);
             Ok(cb_data)
+        });
+
+        methods.add_method("range", |_, ability, ()| {
+            Ok(match ability.range {
+                Range::None | Range::Touch | Range::Attack => 0.0,
+                Range::Radius(val) => val,
+            })
         });
 
         methods.add_method("ai_data", |lua, ability, ()| {

@@ -10,6 +10,7 @@ active:
   duration:
     Mode
   cooldown: 1
+  combat_only: false
   ai:
     priority: 5
     kind: Buff

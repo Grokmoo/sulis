@@ -100,7 +100,7 @@ pub use self::quest_state::QuestState;
 pub use self::quest_state::QuestStateSet;
 
 mod range_indicator;
-pub use self::range_indicator::{RangeIndicator, RangeIndicatorImageSet};
+pub use self::range_indicator::{RangeIndicatorHandler, RangeIndicator, RangeIndicatorImageSet};
 
 pub mod save_file;
 pub use self::save_file::SaveFile;

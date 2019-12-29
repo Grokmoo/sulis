@@ -234,7 +234,7 @@ function check_action(parent, ai_data, hostiles, friendlies, failed_use_count)
         local stats = parent:stats()
         parent:move_towards_entity(target, stats.touch_distance)
         return { done=true }
-    elseif ai_data.range == "Melee" then
+    elseif ai_data.range == "Attack" then
         if parent:is_within_attack_dist(target) then
             return { done=false, target=target }
         end

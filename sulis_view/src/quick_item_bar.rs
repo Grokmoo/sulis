@@ -81,7 +81,7 @@ impl WidgetKind for QuickItemBar {
             .state
             .add_callback(Callback::new(Rc::new(|widget, _| {
                 let (_, bar) = Widget::parent_mut::<QuickItemBar>(widget);
-                bar.entity.borrow_mut().actor.swap_weapon_set();
+                EntityState::swap_weapon_set(&bar.entity);
             })));
         swap_weapons
             .borrow_mut()

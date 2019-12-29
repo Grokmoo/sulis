@@ -389,6 +389,17 @@ impl EntityState {
         self.marked_for_removal
     }
 
+    pub fn swap_weapon_set(entity: &Rc<RefCell<EntityState>>) {
+        if !entity.borrow_mut().actor.do_swap_weapons() { return; }
+
+        if GameState::is_combat_active() {
+            let area = GameState::area_state();
+            let mut area = area.borrow_mut();
+            area.range_indicators().remove_attack();
+            area.range_indicators().add_attack(entity);
+        }
+    }
+
     /// Returns true if this entity has enough AP to move at least 1 square,
     /// false otherwise
     pub fn can_move(&self) -> bool {

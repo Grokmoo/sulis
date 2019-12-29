@@ -15,7 +15,7 @@ active:
     priority: 20
     kind: Damage
     group: Single
-    range: Melee
+    range: Attack
   short_description: |
     Make an attack that causes permanent disease.
 prereqs:

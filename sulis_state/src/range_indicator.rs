@@ -14,6 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::cmp::Ordering;
 use std::cell::RefCell;
 use std::rc::Rc;
 
@@ -23,6 +24,7 @@ use sulis_core::io::DrawList;
 use sulis_core::resource::ResourceSet;
 use sulis_core::ui::animation_state;
 
+use sulis_module::Ability;
 use crate::{EntityState, is_within};
 
 const NW: u8 = 1;
@@ -34,14 +36,134 @@ const S: u8 = 32;
 const SW: u8 = 64;
 const W: u8 = 128;
 
+pub struct RangeIndicatorHandler {
+    indicators: Vec<RangeIndicator>,
+}
+
+impl RangeIndicatorHandler {
+    pub fn new() -> RangeIndicatorHandler {
+        RangeIndicatorHandler { indicators: Vec::new() }
+    }
+
+    pub fn current(&self) -> Option<&RangeIndicator> {
+        self.indicators.first()
+    }
+
+    pub fn add_attack(&mut self, parent: &Rc<RefCell<EntityState>>) {
+        let indicator = RangeIndicator::attack(parent);
+        self.add(Some(indicator));
+    }
+
+    pub fn add(&mut self, indicator: Option<RangeIndicator>) {
+        let indicator = match indicator {
+            None => return,
+            Some(ind) => ind,
+        };
+
+        self.indicators.push(indicator);
+        self.indicators.sort_by(|a, b| a.kind.cmp(&b.kind));
+    }
+
+    pub fn clear(&mut self) {
+        self.indicators.clear();
+    }
+
+    pub fn remove_ability(&mut self, ability: &Rc<Ability>) {
+        self.indicators.retain(|ind| {
+            match &ind.kind {
+                Kind::Ability(other) => !Rc::ptr_eq(ability, other),
+                _ => true,
+            }
+        });
+    }
+
+    pub fn remove_targeter(&mut self) {
+        self.indicators.retain(|ind| {
+            match &ind.kind {
+                Kind::Targeter => false,
+                _ => true,
+            }
+        });
+    }
+
+    pub fn remove_attack(&mut self) {
+        self.indicators.retain(|ind| {
+            match &ind.kind {
+                Kind::Attack => false,
+                _ => true,
+            }
+        });
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+enum Kind {
+    Ability(Rc<Ability>),
+    Targeter,
+    Attack,
+}
+
+impl PartialOrd for Kind {
+    fn partial_cmp(&self, other: &Kind) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl Ord for Kind {
+    fn cmp(&self, other: &Kind) -> Ordering {
+        use Kind::*;
+        match self {
+            Ability(self_ability) => {
+                match other {
+                    Ability(other_ability) => self_ability.id.cmp(&other_ability.id),
+                    _ => Ordering::Less,
+                }
+            },
+            Targeter => {
+                match other {
+                    Ability(..) => Ordering::Greater,
+                    Targeter => Ordering::Equal,
+                    Attack => Ordering::Less,
+                }
+            },
+            Attack => {
+                match other {
+                    Attack => Ordering::Equal,
+                    _ => Ordering::Greater,
+                }
+            }
+        }
+    }
+}
+
+#[derive(Clone)]
 pub struct RangeIndicator {
+    kind: Kind,
     parent: Rc<RefCell<EntityState>>,
     neighbors: Vec<u8>,
     half_width: i32,
 }
 
 impl RangeIndicator {
-    pub fn new(radius: f32, parent: &Rc<RefCell<EntityState>>) -> RangeIndicator {
+    pub fn ability(
+        radius: f32,
+        parent: &Rc<RefCell<EntityState>>,
+        ability: &Rc<Ability>
+    ) -> RangeIndicator {
+        let ability = Rc::clone(ability);
+        RangeIndicator::new(Kind::Ability(ability), radius, parent)
+    }
+
+    pub fn targeter(radius: f32, parent: &Rc<RefCell<EntityState>>) -> RangeIndicator {
+        RangeIndicator::new(Kind::Targeter, radius, parent)
+    }
+
+    pub fn attack(parent: &Rc<RefCell<EntityState>>) -> RangeIndicator {
+        let radius = parent.borrow().actor.stats.attack_distance();
+        RangeIndicator::new(Kind::Attack, radius, parent)
+    }
+
+    fn new(kind: Kind, radius: f32, parent: &Rc<RefCell<EntityState>>) -> RangeIndicator {
         let parent = Rc::clone(parent);
 
         let half_width = radius.ceil() as i32 + 5;
@@ -77,6 +199,7 @@ impl RangeIndicator {
             neighbors,
             half_width,
             parent,
+            kind,
         }
     }
 

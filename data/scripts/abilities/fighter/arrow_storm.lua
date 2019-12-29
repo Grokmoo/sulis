@@ -1,12 +1,6 @@
 max_dist = 30
 
 function on_activate(parent, ability)
-  local stats = parent:stats()
-  if not stats.attack_is_ranged then
-    game:say_line("You must have a ranged weapon equipped.", parent)
-    return
-  end
-
   local targets = parent:targets():without_self()
   
   local targeter = parent:create_targeter(ability)

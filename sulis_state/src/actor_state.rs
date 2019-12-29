@@ -381,7 +381,7 @@ impl ActorState {
                     return false;
                 }
 
-                state.is_available(&self.current_active_modes())
+                state.is_available(&self.stats, &self.current_active_modes())
             }
         }
     }
@@ -406,7 +406,7 @@ impl ActorState {
                     return false;
                 }
 
-                state.is_available(&self.current_active_modes())
+                state.is_available(&self.stats, &self.current_active_modes())
             }
         }
     }
@@ -569,17 +569,20 @@ impl ActorState {
         item
     }
 
-    pub fn swap_weapon_set(&mut self) {
+    /// Should only be called by swap_weapon_set in EntityState
+    pub(crate) fn do_swap_weapons(&mut self) -> bool {
         let swap_ap = Module::rules().swap_weapons_ap;
         if self.ap() < swap_ap {
-            return;
+            return false;
         }
         self.inventory.swap_weapon_set();
         self.compute_stats();
         self.texture_cache_invalid = true;
+
         if GameState::is_combat_active() {
             self.remove_ap(swap_ap);
         }
+        return true;
     }
 
     /// Attempts to equip the specified item to this actor's inventory.

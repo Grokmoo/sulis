@@ -98,7 +98,7 @@ impl WidgetKind for InventoryWindow {
             .borrow_mut()
             .state
             .add_callback(Callback::new(Rc::new(move |_, _| {
-                entity_ref.borrow_mut().actor.swap_weapon_set();
+                EntityState::swap_weapon_set(&entity_ref);
             })));
         swap_weapons
             .borrow_mut()

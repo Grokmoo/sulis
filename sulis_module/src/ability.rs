@@ -62,8 +62,11 @@ pub struct Active {
     pub cooldown: u32,
     pub short_description: String,
     pub ai: AIData,
+    pub range: Range,
     pub class_stats: HashMap<String, HashMap<String, u32>>,
     pub combat_only: bool,
+    pub requires_melee: bool,
+    pub requires_ranged: bool,
     pub requires_active_mode: Option<String>,
 }
 
@@ -138,8 +141,11 @@ impl Ability {
                     group,
                     short_description: active.short_description,
                     ai: active.ai,
+                    range: active.range,
                     class_stats: active.class_stats,
                     combat_only: active.combat_only,
+                    requires_melee: active.requires_melee,
+                    requires_ranged: active.requires_ranged,
                     requires_active_mode: active.requires_active_mode,
                 })
             }
@@ -214,6 +220,10 @@ pub struct ActiveBuilder {
     group: String,
     cooldown: Option<u32>,
     short_description: String,
+
+    #[serde(default = "range_none")]
+    range: Range,
+
     ai: AIData,
 
     #[serde(default)]
@@ -221,6 +231,12 @@ pub struct ActiveBuilder {
 
     #[serde(default)]
     combat_only: bool,
+
+    #[serde(default)]
+    requires_melee: bool,
+
+    #[serde(default)]
+    requires_ranged: bool,
 
     #[serde(default)]
     requires_active_mode: Option<String>,
@@ -304,7 +320,7 @@ impl AIGroup {
 pub enum AIRange {
     Personal,
     Touch,
-    Melee,
+    Attack,
     Short,
     Visible,
 }
@@ -314,7 +330,7 @@ impl AIRange {
         match s {
             "Personal" => AIRange::Personal,
             "Touch" => AIRange::Touch,
-            "Melee" => AIRange::Melee,
+            "Attack" => AIRange::Attack,
             "Short" => AIRange::Short,
             "Visible" => AIRange::Visible,
             _ => {
@@ -337,3 +353,14 @@ pub struct AbilityBuilder {
     pub prereqs: Option<PrereqListBuilder>,
     pub upgrades: Option<Vec<Upgrade>>,
 }
+
+#[derive(Deserialize, Debug, Clone, Copy, PartialEq)]
+#[serde(deny_unknown_fields)]
+pub enum Range {
+    None,
+    Touch,
+    Attack,
+    Radius(f32),
+}
+
+fn range_none() -> Range { Range::None }

@@ -11,11 +11,12 @@ active:
     Instant
   cooldown: 5
   combat_only: true
+  requires_melee: true
   ai:
     priority: 10
     kind: Damage
     group: Multiple
-    range: Melee
+    range: Attack
   short_description: |
     Attacks all enemies in an arc.
 prereqs:

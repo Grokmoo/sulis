@@ -11,6 +11,7 @@ active:
     Instant
   cooldown: 4
   combat_only: true
+  requires_ranged: true
   ai:
     priority: 10
     kind: Damage

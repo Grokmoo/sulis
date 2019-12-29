@@ -2,7 +2,7 @@ id: backflip
 name: "Backflip"
 icon: abilities/backflip
 description: |
-  Flip over the head of a nearby enemy, performing an attack while doing so.  
+  Flip over the head of a nearby enemy, performing a melee attack while doing so.  
 active:
   script: "backflip"
   group: Rogue
@@ -11,6 +11,7 @@ active:
     Instant
   cooldown: 3
   combat_only: true
+  requires_melee: true
   ai:
     priority: 100
     kind: Special

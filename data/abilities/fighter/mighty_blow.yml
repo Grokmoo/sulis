@@ -12,10 +12,11 @@ active:
     Instant
   cooldown: 3
   combat_only: true
+  requires_melee: true
   ai:
     priority: 20
     kind: Damage
     group: Single
-    range: Melee
+    range: Attack
   short_description: |
     A super powered melee attack against one opponent.

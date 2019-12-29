@@ -758,7 +758,7 @@ impl UserData for ScriptEntity {
                 return Ok(false);
             }
 
-            parent.borrow_mut().actor.swap_weapon_set();
+            EntityState::swap_weapon_set(&parent);
             Ok(true)
         });
 

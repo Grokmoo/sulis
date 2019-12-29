@@ -10,6 +10,7 @@ active:
   duration:
     Mode
   cooldown: 1
+  requires_ranged: true
   ai:
     priority: 10
     kind: Special

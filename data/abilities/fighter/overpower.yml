@@ -11,11 +11,12 @@ active:
     Rounds: 3
   cooldown: 5
   combat_only: true
+  requires_melee: true
   ai:
     priority: 10
     kind: Damage
     group: Single
-    range: Melee
+    range: Attack
   short_description: |
     A massive attack against a single opponent.
 prereqs:

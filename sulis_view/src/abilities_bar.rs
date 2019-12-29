@@ -25,11 +25,11 @@ use sulis_core::ui::{animation_state, Callback, Widget, WidgetKind, WidgetState}
 use sulis_core::util::{ExtInt, Size};
 use sulis_core::widgets::{Button, Label, TextArea, ScrollPane, ScrollDirection};
 use sulis_module::{
-    ability::{AbilityGroup, Duration},
+    ability::{self, AbilityGroup, Duration},
     actor::OwnedAbility,
     Ability, Class, Module,
 };
-use sulis_state::{ChangeListener, EntityState, GameState, Script};
+use sulis_state::{ChangeListener, EntityState, GameState, RangeIndicator, Script};
 
 pub const NAME: &str = "abilities_bar";
 
@@ -433,10 +433,31 @@ impl WidgetKind for GroupPane {
     }
 }
 
+fn create_range_indicator(
+    ability: &Rc<Ability>,
+    entity: &Rc<RefCell<EntityState>>
+) -> Option<RangeIndicator> {
+    let active = match &ability.active {
+        None => return None,
+        Some(active) => active,
+    };
+
+    use ability::Range;
+    let radius = match active.range {
+        Range::None => return None,
+        Range::Radius(r) => r,
+        Range::Touch => entity.borrow().actor.stats.touch_distance(),
+        Range::Attack => entity.borrow().actor.stats.attack_distance(),
+    };
+
+    Some(RangeIndicator::ability(radius, entity, ability))
+}
+
 struct AbilityButton {
     entity: Rc<RefCell<EntityState>>,
     ability: Rc<Ability>,
     newly_added: bool,
+    range_indicator: Option<RangeIndicator>,
 }
 
 impl AbilityButton {
@@ -447,10 +468,12 @@ impl AbilityButton {
             state.newly_added_ability = false;
         }
 
+        let range_indicator = create_range_indicator(ability, entity);
         Rc::new(RefCell::new(AbilityButton {
             ability: Rc::clone(ability),
             entity: Rc::clone(entity),
             newly_added,
+            range_indicator,
         }))
     }
 }
@@ -508,6 +531,23 @@ impl WidgetKind for AbilityButton {
         icon.borrow_mut().state.set_enabled(false);
 
         vec![icon, duration_label]
+    }
+
+    fn on_mouse_enter(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
+        let can_activate = self.entity.borrow().actor.can_activate(&self.ability.id);
+        if can_activate {
+            let area = GameState::area_state();
+            area.borrow_mut().range_indicators().add(self.range_indicator.clone());
+        }
+        self.super_on_mouse_enter(widget);
+        true
+    }
+
+    fn on_mouse_exit(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
+        let area = GameState::area_state();
+        area.borrow_mut().range_indicators().remove_ability(&self.ability);
+        self.super_on_mouse_exit(widget);
+        true
     }
 
     fn on_mouse_move(&mut self, widget: &Rc<RefCell<Widget>>, _dx: f32, _dy: f32) -> bool {

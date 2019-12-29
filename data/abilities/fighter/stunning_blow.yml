@@ -13,11 +13,12 @@ active:
     Instant
   cooldown: 3
   combat_only: true
+  requires_melee: true
   ai:
     priority: 30
     kind: Damage
     group: Single
-    range: Melee
+    range: Attack
   short_description: |
     Stun a single opponent for one round.
 prereqs:

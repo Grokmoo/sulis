@@ -11,11 +11,12 @@ active:
     Rounds: 1
   cooldown: 4
   combat_only: true
+  requires_melee: true
   ai:
     priority: 30
     kind: Debuff
     group: Single
-    range: Melee
+    range: Attack
   short_description: |
     Lower the defenses of a single target.
 prereqs:

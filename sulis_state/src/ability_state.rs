@@ -19,13 +19,15 @@ use std::u32;
 
 use crate::{ChangeListenerList, GameState};
 use sulis_core::util::ExtInt;
-use sulis_module::{ability::Duration, Ability, Module, ROUND_TIME_MILLIS};
+use sulis_module::{ability::Duration, Ability, Module, StatList, ROUND_TIME_MILLIS};
 
 pub struct AbilityState {
     pub ability: Rc<Ability>,
     pub group: String,
     pub(crate) remaining_duration: ExtInt,
     pub combat_only: bool,
+    pub requires_melee: bool,
+    pub requires_ranged: bool,
     pub requires_active_mode: Option<Rc<Ability>>,
     cur_duration: u32,
     pub listeners: ChangeListenerList<AbilityState>,
@@ -34,7 +36,7 @@ pub struct AbilityState {
 
 impl AbilityState {
     pub fn new(ability: &Rc<Ability>) -> AbilityState {
-        let (group, combat_only, mode) = match ability.active {
+        let (group, combat_only, mode, melee, ranged) = match ability.active {
             None => panic!(),
             Some(ref active) => {
                 let mode = active
@@ -44,7 +46,8 @@ impl AbilityState {
                 if mode.is_none() && active.requires_active_mode.is_some() {
                     warn!("Invalid requires_active_mode for {}", ability.id);
                 }
-                (active.group.name(), active.combat_only, mode)
+                (active.group.name(), active.combat_only, mode,
+                 active.requires_melee, active.requires_ranged)
             }
         };
 
@@ -55,6 +58,8 @@ impl AbilityState {
             combat_only,
             cur_duration: 0,
             requires_active_mode: mode,
+            requires_melee: melee,
+            requires_ranged: ranged,
             listeners: ChangeListenerList::default(),
             newly_added_ability: false,
         }
@@ -75,7 +80,10 @@ impl AbilityState {
         self.ability.active.as_ref().unwrap().ap
     }
 
-    pub fn is_available(&self, current_modes: &[&str]) -> bool {
+    pub fn is_available(&self, stats: &StatList, current_modes: &[&str]) -> bool {
+        if self.requires_melee && !stats.attack_is_melee() { return false; }
+        if self.requires_ranged && !stats.attack_is_ranged() { return false; }
+
         if let Some(required_mode) = self.requires_active_mode.as_ref() {
             if !current_modes.contains(&&required_mode.id[..]) {
                 return false;

@@ -10,6 +10,7 @@ active:
   duration:
     Mode
   cooldown: 1
+  range: Personal
   ai:
     priority: 10
     kind: Buff

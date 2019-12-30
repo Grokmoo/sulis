@@ -3,18 +3,11 @@ function on_activate(parent, ability)
     game:say_line("You must have a shield equipped.", parent)
     return
   end
-
-  local stats = parent:inventory():equipped_stats("held_off")
-  local dists = {
-    light = 13,
-	medium = 8,
-	heavy = 5
-  }
   
-  local targets = parent:targets():hostile():visible_within(dists[stats.armor_kind])
+  local targets = parent:targets():hostile():visible_within(ability:range())
   
   local targeter = parent:create_targeter(ability)
-  targeter:set_selection_radius(dists[stats.armor_kind])
+  targeter:set_selection_radius(ability:range())
   targeter:add_all_selectable(targets)
   targeter:add_all_effectable(targets)
   targeter:activate()

@@ -63,6 +63,16 @@ impl Locatable for Point {
     }
 }
 
+impl Locatable for (f32, f32) {
+    fn size(&self) -> (f32, f32) {
+        (1.0, 1.0)
+    }
+
+    fn pos(&self) -> (f32, f32) {
+        (self.0, self.1)
+    }
+}
+
 pub fn center_i32<T: Locatable>(target: &T) -> (i32, i32) {
     let (x, y) = center(target);
     (x as i32, y as i32)

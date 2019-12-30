@@ -12,6 +12,8 @@ active:
   cooldown: 3
   combat_only: true
   requires_melee: true
+  range:
+    Radius: 12.0
   ai:
     priority: 10
     kind: Special

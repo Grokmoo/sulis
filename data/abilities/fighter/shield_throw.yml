@@ -2,7 +2,7 @@ id: shield_throw
 name: "Shield Throw"
 icon: abilities/shield_throw
 description: |
-  You throw your shield at a nearby opponent, dealing significant piercing damage.  The shield returns to your hand like a boomerang.  Smaller shields can be thrown at much more distant targets than larger shields.
+  You throw your shield at a nearby opponent, dealing significant piercing damage.  The shield returns to your hand like a boomerang.
 active:
   script: "shield_throw"
   group: Fighter
@@ -11,6 +11,8 @@ active:
     Instant
   cooldown: 3
   combat_only: true
+  range:
+    Radius: 8.0
   ai:
     priority: 20
     kind: Damage

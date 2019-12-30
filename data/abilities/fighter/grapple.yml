@@ -11,6 +11,7 @@ active:
     Rounds: 1
   cooldown: 3
   combat_only: true
+  range: Touch
   ai:
     priority: 10
     kind: Debuff

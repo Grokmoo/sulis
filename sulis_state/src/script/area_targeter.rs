@@ -27,7 +27,7 @@ use sulis_module::{Ability, Module, ObjectSize};
 use crate::script::{targeter, ScriptItemKind, TargeterData};
 use crate::{
     area_feedback_text::Params, AreaState, EntityState, GameState, RangeIndicator, Script,
-    TurnManager, center_i32, is_within,
+    TurnManager, center_i32, is_within, dist
 };
 
 #[derive(Clone)]
@@ -140,11 +140,14 @@ fn get_cursor_offset_from_size(size: &str) -> Point {
 
 impl Shape {
     pub fn get_cursor_offset(&self) -> Point {
+        use Shape::*;
         match self {
-            &Shape::Single | &Shape::Circle { .. } | &Shape::Cone { .. } => Point::default(),
-            &Shape::LineSegment { ref size, .. } => get_cursor_offset_from_size(size),
-            &Shape::Line { ref size, .. } => get_cursor_offset_from_size(size),
-            &Shape::ObjectSize { ref size } => get_cursor_offset_from_size(size),
+            Single | Circle { .. } | Cone { .. } =>
+                Point::default(),
+            LineSegment { .. } | Line { .. } =>
+                Point::default(),
+            ObjectSize { ref size } =>
+                get_cursor_offset_from_size(size),
         }
     }
 
@@ -642,34 +645,33 @@ impl Shape {
         angular_size: f32,
         _area_state: &AreaState,
     ) -> Vec<Point> {
+        let pos = Point::new(origin_x.trunc() as i32, origin_y.trunc() as i32);
+        let origin = (origin_x, origin_y);
+        let angle = (to.y as f32 - origin_y).atan2(to.x as f32 - origin_x);
+
         let mut points = Vec::new();
 
-        let radius = radius + 1.0;
-        let angle = (to.y as f32 - origin_y).atan2(to.x as f32 - origin_x);
-        let shift_x = origin_x.fract();
-        let shift_y = origin_y.fract();
-        let origin_x = origin_x.trunc() as i32;
-        let origin_y = origin_y.trunc() as i32;
-
         let r = (radius + 2.0).ceil() as i32;
-        for y in -r..r {
-            for x in -r..r {
-                let dist = (x as f32 - shift_x).hypot(y as f32 - shift_y);
-                if dist > radius {
-                    continue;
-                }
-                if dist < min_radius {
+        let width = (r * 2) as usize;
+
+        for y in 0..width {
+            for x in 0..width {
+                let x1 = x as i32 + pos.x - r;
+                let y1 = y as i32 + pos.y - r;
+                let p = Point::new(x1, y1);
+
+                let dist = dist(&origin, &p);
+                if dist > radius || dist < min_radius {
                     continue;
                 }
 
-                let cur_angle = (y as f32).atan2(x as f32);
-
+                let cur_angle = (y as f32 - r as f32).atan2(x as f32 - r as f32);
                 let angle_diff = (angle - cur_angle + 3.0 * PI) % (2.0 * PI) - PI;
                 if angle_diff.abs() > angular_size / 2.0 {
                     continue;
                 }
 
-                points.push(Point::new(x + origin_x, y + origin_y));
+                points.push(p);
             }
         }
 
@@ -684,24 +686,26 @@ impl Shape {
         shift: f32,
         _area_state: &AreaState,
     ) -> Vec<Point> {
+        let origin = (pos.x as f32 - shift, pos.y as f32 - shift);
         let mut points = Vec::new();
 
-        let r = (radius + 1.0).ceil() as i32;
+        let r = (radius + 2.0).ceil() as i32;
+        let width = (r * 2) as usize;
 
-        for y in -r..r {
-            for x in -r..r {
-                let dist = (x as f32 + shift).hypot(y as f32 + shift);
+        for y in 0..width {
+            for x in 0..width {
+                let x1 = x as i32 + pos.x - r;
+                let y1 = y as i32 + pos.y - r;
+                let p = Point::new(x1, y1);
 
-                if dist > radius {
-                    continue;
+                let dist = dist(&origin, &p);
+
+                if dist <= radius && dist >= min_radius {
+                    points.push(p);
                 }
-                if dist < min_radius {
-                    continue;
-                }
-
-                points.push(Point::new(x + pos.x, y + pos.y));
             }
         }
+
         points
     }
 

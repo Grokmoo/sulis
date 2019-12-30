@@ -1,10 +1,9 @@
-line_len = 20.0
-
 function on_activate(parent, ability)
+  local line_len = parent:stats().attack_distance
   local targets = parent:targets():without_self()
   
   local targeter = parent:create_targeter(ability)
-  targeter:set_selection_radius(line_len)
+  targeter:set_selection_attackable()
   targeter:set_free_select(line_len)
   targeter:set_shape_line("1by1", parent:x(), parent:y(), line_len)
   targeter:add_all_effectable(targets)
@@ -13,6 +12,7 @@ function on_activate(parent, ability)
 end
 
 function on_target_select(parent, ability, targets)
+  local line_len = parent:stats().attack_distance
   local pos = targets:selected_point()
   
   local speed = 500 * game:anim_base_time()

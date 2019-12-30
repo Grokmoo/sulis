@@ -11,6 +11,7 @@ active:
     Mode
   cooldown: 1
   requires_ranged: true
+  range: Personal
   ai:
     priority: 10
     kind: Special

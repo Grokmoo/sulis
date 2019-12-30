@@ -8,7 +8,7 @@ function on_activate(parent, ability)
  
   if parent:ability_level(ability) > 1 then
     local targeter = parent:create_targeter(ability)
-	targeter:set_selection_radius(5.0)
+	targeter:set_selection_touchable()
     targeter:add_selectable(parent)
     targeter:set_shape_circle(5.0)
     targeter:add_all_effectable(targets)

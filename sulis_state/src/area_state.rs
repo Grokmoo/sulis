@@ -338,7 +338,9 @@ impl AreaState {
 
     pub(crate) fn set_targeter(&mut self, mut targeter: AreaTargeter) {
         self.range_indicators.remove_targeter();
-        self.range_indicators.add(targeter.take_range_indicator());
+        if targeter.parent().borrow().is_party_member() {
+            self.range_indicators.add(targeter.take_range_indicator());
+        }
         self.targeter = Some(Rc::new(RefCell::new(targeter)));
     }
 

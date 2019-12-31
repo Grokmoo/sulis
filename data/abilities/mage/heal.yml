@@ -15,6 +15,6 @@ active:
     priority: 20
     kind: Heal
     group: Single
-    range: Short
+    range: Touch
   short_description: |
     Heal a significant amount of damage to one ally instantly.

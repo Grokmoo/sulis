@@ -207,6 +207,28 @@ impl RangeIndicator {
             }
         }
 
+        // warn!("RangeIndicator Points:");
+        // for y in 0..width {
+        //     let mut line = String::new();
+        //     for x in 0..width {
+        //         if points[x + y * width] {
+        //             line.push('*');
+        //         } else {
+        //             line.push(' ');
+        //         }
+        //     }
+        //     warn!("  {}", line);
+        // }
+        //
+        // warn!("Neighbors:");
+        // for y in 0..width {
+        //     let mut line = String::new();
+        //     for x in 0..width {
+        //       line.push_str(&format!("{:<3x?}", neighbors[x + y * width]));
+        //     }
+        //     warn!("  {}", line);
+        // }
+
         RangeIndicator {
             neighbors,
             half_width,
@@ -371,6 +393,10 @@ impl RangeIndicatorImageSet {
             ("outer_s", SW + W + NW + N + NE + E + SE),
             ("outer_e", SE + S + SW + W + NW + N + NE),
             ("outer_w", NW + N + NE + E + SE + S + SW),
+            ("outer_nw", NW + N + NE + SW + W),
+            ("outer_ne", NW + N + NE + E + SE),
+            ("outer_sw", NW + SE + S + SW + W),
+            ("outer_se", NE + E + SE + S + SW),
             ("center", 0),
         ];
 

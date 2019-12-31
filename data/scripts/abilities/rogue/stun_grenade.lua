@@ -2,8 +2,8 @@ function on_activate(parent, ability)
   local targets = parent:targets()
   
   local targeter = parent:create_targeter(ability)
-  targeter:set_selection_radius(8.0)
-  targeter:set_free_select(8.0)
+  targeter:set_selection_radius(ability:range())
+  targeter:set_free_select(ability:range())
   -- targeter:set_free_select_must_be_passable("1by1")
   if parent:ability_level(ability) > 1 then
     targeter:set_shape_circle(5.5)

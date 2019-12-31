@@ -144,9 +144,7 @@ impl Shape {
         match self {
             Single | Circle { .. } | Cone { .. } =>
                 Point::default(),
-            LineSegment { .. } | Line { .. } =>
-                Point::default(),
-            ObjectSize { ref size } =>
+            LineSegment { ref size, .. } | Line { ref size, .. } | ObjectSize { ref size } =>
                 get_cursor_offset_from_size(size),
         }
     }

@@ -12,6 +12,7 @@ active:
   cooldown: 4
   combat_only: true
   requires_melee: true
+  range: Attack
   ai:
     priority: 30
     kind: Debuff

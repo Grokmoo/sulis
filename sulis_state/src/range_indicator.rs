@@ -149,7 +149,7 @@ impl RangeIndicator {
     pub fn ability(parent: &Rc<RefCell<EntityState>>, ability: &Rc<Ability>) -> RangeIndicator {
         let active = ability.active.as_ref().unwrap();
 
-        let radius = match active.range {
+        let mut radius = match active.range {
             Range::None => 0.0,
             Range::Personal => 0.0,
             Range::Radius(r) => r,
@@ -161,6 +161,13 @@ impl RangeIndicator {
                 area.vis_dist as f32
             }
         };
+
+        let level = parent.borrow().actor.actor.ability_level(&ability.id).unwrap_or(0);
+        for (index, upgrade) in ability.upgrades.iter().enumerate() {
+            if index as u32 >= level { break; }
+
+            radius += upgrade.range_increase;
+        }
 
         let ability = Rc::clone(ability);
         RangeIndicator::new(Kind::Ability(ability), radius, parent)

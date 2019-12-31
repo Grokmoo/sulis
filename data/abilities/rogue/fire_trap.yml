@@ -10,6 +10,7 @@ active:
   duration:
     Permanent
   cooldown: 5
+  range: Touch
   ai:
     priority: 10
     kind: Special

@@ -209,6 +209,9 @@ pub enum Duration {
 pub struct Upgrade {
     pub description: String,
     pub bonuses: Option<BonusList>,
+
+    #[serde(default)]
+    pub range_increase: f32,
 }
 
 #[derive(Deserialize, Debug)]

@@ -10,6 +10,8 @@ active:
   duration:
     Instant
   cooldown: 3
+  range:
+    Radius: 5.0
   ai:
     priority: 100
     kind: Special
@@ -23,3 +25,4 @@ prereqs:
 upgrades:
   - description: |
       You can now shadow step a larger distance.
+    range_increase: 2.0

@@ -5,10 +5,11 @@ function on_activate(parent, ability)
   end
 
   local targets = parent:targets()
+  local radius = parent:stats().touch_distance
   
   local targeter = parent:create_targeter(ability)
-  targeter:set_selection_radius(1.0)
-  targeter:set_free_select(1.0)
+  targeter:set_selection_radius(radius)
+  targeter:set_free_select(radius)
   targeter:set_free_select_must_be_passable("1by1")
   targeter:set_shape_object_size("1by1")
   targeter:add_all_effectable(targets)

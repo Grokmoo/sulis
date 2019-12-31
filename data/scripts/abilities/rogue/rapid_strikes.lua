@@ -1,12 +1,10 @@
-max_dist = 8
-
 function on_activate(parent, ability)
   local targets = parent:targets():hostile()
   
   local targeter = parent:create_targeter(ability)
-  targeter:set_selection_radius(max_dist)
-  targeter:set_free_select(max_dist * 2)
-  targeter:set_shape_cone(parent:center_x(), parent:center_y(), 1.0, max_dist, math.pi / 3) 
+  targeter:set_selection_radius(ability:range())
+  targeter:set_free_select(ability:range() * 2)
+  targeter:set_shape_cone(parent:center_x(), parent:center_y(), 1.0, ability:range(), math.pi / 3) 
   targeter:add_all_effectable(targets)
   targeter:impass_blocks_affected_points(true)
   targeter:activate()

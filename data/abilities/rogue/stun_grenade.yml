@@ -10,6 +10,8 @@ active:
   duration:
     Instant
   cooldown: 5
+  range:
+    Radius: 8.0
   ai:
     priority: 20
     kind: Debuff

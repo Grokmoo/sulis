@@ -263,6 +263,7 @@ impl UserData for ScriptAbilitySet {
 /// # `range() -> Float`
 /// Returns the range of this ability as defined in its resource file.  Note that this
 /// is not the AI helper range, but the range used for drawing the range indicator preview.
+/// Does not include any range bonuses from upgrade levels.
 /// Valid ranges are None, Personal, Touch, Attack, Radius(float), and Visible
 /// Returns 0.0 for values of Personal, Touch, and Attack, as those depend on parent stats.
 /// Returns 0.0 for a Range of None.

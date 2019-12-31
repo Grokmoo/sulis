@@ -11,6 +11,7 @@ active:
     Permanent
   cooldown: 5
   combat_only: false
+  range: Touch
   ai:
     priority: 10
     kind: Special

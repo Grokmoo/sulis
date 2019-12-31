@@ -1,5 +1,5 @@
 function on_activate(parent, ability)
-  local dist = 4.0 + parent:ability_level(ability) * 2.0
+  local dist = ability:range() + (parent:ability_level(ability) - 1) * 2.0
 
   local targeter = parent:create_targeter(ability)
   targeter:set_selection_radius(dist)

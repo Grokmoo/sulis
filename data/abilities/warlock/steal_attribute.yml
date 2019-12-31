@@ -14,6 +14,7 @@ active:
     Rounds: 4
   cooldown: 5
   combat_only: true
+  range: Touch
   ai:
     priority: 10
     kind: Damage

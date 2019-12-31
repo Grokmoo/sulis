@@ -11,6 +11,8 @@ active:
     Rounds: 4
   cooldown: 8
   combat_only: true
+  range:
+    Radius: 12.0
   ai:
     priority: 30
     kind: Special

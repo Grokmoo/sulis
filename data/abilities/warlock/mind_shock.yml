@@ -14,6 +14,8 @@ active:
     Instant
   cooldown: 5
   combat_only: true
+  range:
+    Radius: 4.0
   ai:
     priority: 10
     kind: Debuff
@@ -27,3 +29,4 @@ prereqs:
 upgrades:
   - description: |
       The mind shock removes more AP and has a larger radius.
+    range_increase: 2.0

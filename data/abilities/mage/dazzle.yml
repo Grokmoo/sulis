@@ -11,6 +11,8 @@ active:
     Rounds: 2
   cooldown: 4
   combat_only: true
+  range:
+    Radius: 10.0
   ai:
     priority: 40
     kind: Debuff

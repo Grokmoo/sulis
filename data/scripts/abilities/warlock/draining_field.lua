@@ -1,12 +1,10 @@
-radius = 8.0
-
 function on_activate(parent, ability)
   local targets = parent:targets()
   
   local targeter = parent:create_targeter(ability)
-  targeter:set_selection_radius(12.0)
-  targeter:set_free_select(12.0)
-  targeter:set_shape_circle(radius)
+  targeter:set_selection_radius(ability:range())
+  targeter:set_free_select(ability:range())
+  targeter:set_shape_circle(8.0)
   targeter:add_all_effectable(targets)
   targeter:allow_affected_points_impass(false)
   targeter:activate()

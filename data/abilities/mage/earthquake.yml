@@ -11,6 +11,8 @@ active:
     Instant
   cooldown: 6
   combat_only: true
+  range:
+    Radius: 15.0
   ai:
     priority: 10
     kind: Debuff

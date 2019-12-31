@@ -11,6 +11,7 @@ active:
     Rounds: 3
   cooldown: 5
   combat_only: true
+  range: Personal
   ai:
     priority: 10
     kind: Buff

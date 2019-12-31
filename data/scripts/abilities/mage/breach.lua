@@ -1,8 +1,8 @@
 function on_activate(parent, ability)
-  local targets = parent:targets():hostile():visible_within(7)
+  local targets = parent:targets():hostile():visible_within(ability:range())
   
   local targeter = parent:create_targeter(ability)
-  targeter:set_selection_radius(7.0)
+  targeter:set_selection_radius(ability:range())
   targeter:add_all_selectable(targets)
   targeter:add_all_effectable(targets)
   targeter:activate()

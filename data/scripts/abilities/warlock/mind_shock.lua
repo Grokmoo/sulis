@@ -3,6 +3,7 @@ function on_activate(parent, ability)
   
   local targeter = parent:create_targeter(ability)
   targeter:add_selectable(parent)
+  targeter:set_selection_radius(radius(parent, ability))
   targeter:set_shape_circle(radius(parent, ability))
   targeter:add_all_effectable(targets)
   targeter:invis_blocks_affected_points(true)
@@ -10,7 +11,7 @@ function on_activate(parent, ability)
 end
 
 function radius(parent, ability)
-  local radius = 5.0
+  local radius = ability:range()
   if parent:ability_level(ability) > 1 then
     radius = radius + 2.0
   end

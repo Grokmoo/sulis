@@ -11,6 +11,11 @@ active:
     Mode
   cooldown: 1
   combat_only: true
+  range:
+    Radius: 8.0
+  range_increases_with:
+    ability: louder_music
+    amount: 2.0
   ai:
     priority: 10
     kind: Debuff

@@ -1,12 +1,10 @@
-max_dist = 14
-
 function on_activate(parent, ability)
   local targets = parent:targets():without_self()
   
   targeter = parent:create_targeter(ability)
-  targeter:set_selection_radius(max_dist)
-  targeter:set_free_select(max_dist * 2)
-  targeter:set_shape_cone(parent:center_x(), parent:center_y(), 1.0, max_dist, math.pi / 4) 
+  targeter:set_selection_radius(ability:range())
+  targeter:set_free_select(ability:range() * 2)
+  targeter:set_shape_cone(parent:center_x(), parent:center_y(), 1.0, ability:range(), math.pi / 4) 
   targeter:add_all_effectable(targets)
   targeter:invis_blocks_affected_points(true)
   targeter:activate()
@@ -35,7 +33,7 @@ function on_target_select(parent, ability, targets)
   local targets = targets:to_table()
   for i = 1, #targets do
     local dist = parent:dist_to_entity(targets[i])
-    local cb_dur = 0.5 * duration * (1 - dist / max_dist)
+    local cb_dur = 0.5 * duration * (1 - dist / ability:range())
     -- fire callback for further targets first, so they move out of the way of the closer targets
     local cb = ability:create_callback(parent)
 	cb:add_target(targets[i])

@@ -1,13 +1,11 @@
-line_len = 16.0
-
 function on_activate(parent, ability)
   local targets = parent:targets():without_self():visible()
   
   local targeter = parent:create_targeter(ability)
-  targeter:set_selection_radius(line_len)
-  targeter:set_free_select(line_len)
+  targeter:set_selection_radius(ability:range())
+  targeter:set_free_select(ability:range())
   targeter:impass_blocks_affected_points(true)
-  targeter:set_shape_line("1by1", parent:x(), parent:y(), line_len)
+  targeter:set_shape_line("1by1", parent:x(), parent:y(), ability:range())
   targeter:add_all_effectable(targets)
   targeter:activate()
 end
@@ -16,7 +14,7 @@ function on_target_select(parent, ability, targets)
   local pos = targets:selected_point()
   
   local speed = 500 * game:anim_base_time()
-  local duration = line_len / speed
+  local duration = ability:range() / speed
   
   local anim = parent:create_particle_generator("fire_particle", duration + 0.2)
 
@@ -26,8 +24,8 @@ function on_target_select(parent, ability, targets)
   
   local norm = math.sqrt((delta_x * delta_x) + (delta_y * delta_y))
   
-  delta_x = delta_x / norm * line_len
-  delta_y = delta_y / norm * line_len
+  delta_x = delta_x / norm * ability:range()
+  delta_y = delta_y / norm * ability:range()
   
   anim:set_position(anim:param(parent:x(), delta_x / duration), anim:param(parent:y(), delta_y / duration))
   anim:set_particle_position_dist(anim:dist_param(anim:uniform_dist(-0.3, 0.3), anim:fixed_dist(-delta_x / duration)),

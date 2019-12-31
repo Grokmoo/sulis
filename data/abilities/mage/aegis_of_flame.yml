@@ -12,6 +12,8 @@ active:
     Rounds: 4
   cooldown: 6
   combat_only: true
+  range:
+    Radius: 9.0
   ai:
     priority: 10
     kind: Buff

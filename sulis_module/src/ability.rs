@@ -63,6 +63,7 @@ pub struct Active {
     pub short_description: String,
     pub ai: AIData,
     pub range: Range,
+    pub range_increases_with: Option<RangeIncreaseWith>,
     pub class_stats: HashMap<String, HashMap<String, u32>>,
     pub combat_only: bool,
     pub requires_melee: bool,
@@ -142,6 +143,7 @@ impl Ability {
                     short_description: active.short_description,
                     ai: active.ai,
                     range: active.range,
+                    range_increases_with: active.range_increases_with,
                     class_stats: active.class_stats,
                     combat_only: active.combat_only,
                     requires_melee: active.requires_melee,
@@ -216,6 +218,13 @@ pub struct Upgrade {
 
 #[derive(Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
+pub struct RangeIncreaseWith {
+    pub ability: String,
+    pub amount: f32,
+}
+
+#[derive(Deserialize, Debug)]
+#[serde(deny_unknown_fields)]
 pub struct ActiveBuilder {
     script: String,
     ap: u32,
@@ -226,6 +235,8 @@ pub struct ActiveBuilder {
 
     #[serde(default = "range_none")]
     range: Range,
+
+    range_increases_with: Option<RangeIncreaseWith>,
 
     ai: AIData,
 

@@ -9,8 +9,8 @@ function on_activate(parent, ability)
     targets = parent:targets():friendly():touchable()
     targeter:set_selection_touchable()
   elseif target_type == "hostile" then
-    targets = parent:targets():hostile():visible_within(8)
-    targeter:set_selection_radius(8)
+    targets = parent:targets():hostile():visible_within(ability:range())
+    targeter:set_selection_radius(ability:range())
   end
   
   targeter:add_all_selectable(targets)

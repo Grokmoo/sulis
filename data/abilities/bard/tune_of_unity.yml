@@ -16,6 +16,11 @@ active:
     Mode
   cooldown: 3
   combat_only: true
+  range:
+    Radius: 8.0
+  range_increases_with:
+    ability: louder_music
+    amount: 2.0
   ai:
     priority: 20
     kind: Special

@@ -1,5 +1,3 @@
-line_len = 18.0
-
 function on_activate(parent, ability)
   local size = "6by6round"
   local offset = 2
@@ -11,10 +9,10 @@ function on_activate(parent, ability)
   local targets = parent:targets():without_self()
   
   local targeter = parent:create_targeter(ability)
-  targeter:set_selection_radius(line_len)
-  targeter:set_free_select(line_len)
+  targeter:set_selection_radius(ability:range())
+  targeter:set_free_select(ability:range())
   targeter:impass_blocks_affected_points(false)
-  targeter:set_shape_line(size, parent:x() - offset, parent:y() - offset, line_len)
+  targeter:set_shape_line(size, parent:x() - offset, parent:y() - offset, ability:range())
   targeter:add_all_effectable(targets)
   targeter:activate()
 end
@@ -23,7 +21,7 @@ function on_target_select(parent, ability, targets)
   local pos = targets:selected_point()
   
   local speed = 250 * game:anim_base_time()
-  local duration = line_len / speed
+  local duration = ability:range() / speed
 
   local delta_x = pos.x - parent:x()
   local delta_y = pos.y - parent:y()
@@ -31,8 +29,8 @@ function on_target_select(parent, ability, targets)
   
   local norm = math.sqrt((delta_x * delta_x) + (delta_y * delta_y))
   
-  delta_x = delta_x / norm * line_len
-  delta_y = delta_y / norm * line_len
+  delta_x = delta_x / norm * ability:range()
+  delta_y = delta_y / norm * ability:range()
   
   
   local size = 8.0

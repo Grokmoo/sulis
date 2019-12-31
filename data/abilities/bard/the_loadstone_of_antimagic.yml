@@ -17,6 +17,11 @@ active:
       Inspiration: 40
   combat_only: true
   requires_active_mode: song_of_curses
+  range:
+    Radius: 8.0
+  range_increases_with:
+    ability: louder_music
+    amount: 2.0
   ai:
     priority: 10
     kind: Buff

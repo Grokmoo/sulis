@@ -11,6 +11,8 @@ active:
     Instant
   cooldown: 4
   combat_only: false
+  range:
+    Radius: 12.0
   ai:
     priority: 20
     kind: Heal

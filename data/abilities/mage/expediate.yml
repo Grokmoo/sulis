@@ -11,6 +11,7 @@ active:
     Rounds: 2
   cooldown: 4
   combat_only: true
+  range: Touch
   ai:
     priority: 40
     kind: Buff

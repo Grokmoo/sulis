@@ -1,11 +1,10 @@
-radius = 5.0
-
 function on_activate(parent, ability)
   local targets = parent:targets():friendly()
   
   local targeter = parent:create_targeter(ability)
+  targeter:set_selection_radius(ability:range())
   targeter:add_selectable(parent)
-  targeter:set_shape_circle(radius)
+  targeter:set_shape_circle(ability:range())
   targeter:add_all_effectable(targets)
   targeter:invis_blocks_affected_points(true)
   targeter:activate()
@@ -20,7 +19,7 @@ function on_target_select(parent, ability, targets)
   gen:set_initial_gen(1000.0)
   gen:set_position(gen:param(position.x), gen:param(position.y))
   gen:set_particle_size_dist(gen:fixed_dist(0.7), gen:fixed_dist(0.7))
-  local speed = radius / 0.5
+  local speed = ability:range() / 0.5
   gen:set_particle_position_dist(gen:dist_param(gen:uniform_dist(-0.1, 0.1),
                                  gen:angular_dist(0.0, 2 * math.pi, 3.0 * speed / 4.0, speed)))
   gen:set_particle_duration_dist(gen:fixed_dist(0.5))

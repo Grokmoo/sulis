@@ -1,11 +1,8 @@
 function on_activate(parent, ability)
-  local stats = parent:stats()
-  local range = 7 + stats.caster_level / 2
-
-  local targets = parent:targets():visible_within(range)
+  local targets = parent:targets():visible_within(ability:range())
   
   local targeter = parent:create_targeter(ability)
-  targeter:set_selection_radius(range)
+  targeter:set_selection_radius(ability:range())
   targeter:add_all_selectable(targets)
   targeter:add_all_effectable(targets)
   targeter:set_callback_fn("on_target")

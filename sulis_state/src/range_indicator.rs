@@ -169,6 +169,12 @@ impl RangeIndicator {
             radius += upgrade.range_increase;
         }
 
+        if let Some(increase) = &active.range_increases_with {
+            if let Some(level) = parent.borrow().actor.actor.ability_level(&increase.ability) {
+                radius += (level + 1) as f32 * increase.amount;
+            }
+        }
+
         let ability = Rc::clone(ability);
         RangeIndicator::new(Kind::Ability(ability), radius, parent)
     }

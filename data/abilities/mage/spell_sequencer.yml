@@ -10,6 +10,7 @@ active:
   duration:
     Mode
   cooldown: 4
+  range: Personal
   ai:
     priority: 10
     kind: Special

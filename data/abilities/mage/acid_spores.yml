@@ -11,6 +11,8 @@ active:
     Instant
   cooldown: 4
   combat_only: true
+  range:
+    Radius: 15.0
   ai:
     priority: 10
     kind: Damage

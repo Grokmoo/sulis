@@ -425,22 +425,22 @@ fn activate(
     ability.error_if_not_active()?;
     let entity = target.try_unwrap()?;
     let take_ap = take_ap.unwrap_or(true);
+    let base_ap = ability.ap as i32;
 
+    let ability = ability.to_ability();
     let mgr = GameState::turn_manager();
     if take_ap && mgr.borrow().is_combat_active() {
         let bonus = entity.borrow().actor.stats.bonus_ability_action_point_cost;
-        let ap = cmp::max(0, ability.ap as i32 - bonus);
+        let ap = cmp::max(0, base_ap - bonus);
         entity.borrow_mut().actor.remove_ap(ap as u32);
-        entity
-            .borrow_mut()
-            .actor
-            .remove_class_stats(&ability.to_ability());
+        entity.borrow_mut().actor.remove_class_stats(&ability);
     }
 
     let area = GameState::area_state();
     let mut text = AreaFeedbackText::with_target(&entity.borrow(), &area.borrow());
     text.add_entry(ability.name.to_string(), ColorKind::Info);
     area.borrow_mut().add_feedback_text(text);
+    area.borrow_mut().range_indicators().remove_ability(&ability);
     entity
         .borrow_mut()
         .actor

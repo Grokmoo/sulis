@@ -101,7 +101,7 @@ props:
     enabled: true
   - id: water_anim1
     location:
-      x: 126
+      x: 125
       y: 10
     enabled: true
   - id: water_anim1

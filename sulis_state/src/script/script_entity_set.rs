@@ -32,6 +32,9 @@ use sulis_module::Faction;
 /// optionally a selected point (for a targeter that has been activated), and
 /// optionally a list of affected points (again for a targeter).
 ///
+/// # `num_targets() -> Int`
+/// Returns the number of targets in this set.
+///
 /// # `to_table() -> Table`
 /// Creates a table of this set.  Iterating over the table will allow you
 /// to access each entity in this set.
@@ -230,6 +233,10 @@ impl ScriptEntitySet {
 
 impl UserData for ScriptEntitySet {
     fn add_methods<'lua, M: UserDataMethods<'lua, Self>>(methods: &mut M) {
+        methods.add_method("num_targets", |_, set, ()| {
+            Ok(set.indices.len())
+        });
+
         methods.add_method("to_table", |_, set, ()| {
             let table: Vec<ScriptEntity> = set
                 .indices

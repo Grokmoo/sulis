@@ -86,6 +86,10 @@ use sulis_module::{
 /// # `remove_from_party()`
 /// Removes this entity from the player's party
 ///
+/// # `get_relationship(other: ScriptEntity) -> Int`
+/// Returns a positive 1 if this entity is friendly or neutral to the specified other
+/// entity, or a negative 1 if it is hostile.
+///
 /// # `is_hostile(other: ScriptEntity) -> Bool`
 /// Returns true if this entity is hostile to the specified entity, false otherwise
 ///
@@ -622,6 +626,19 @@ impl UserData for ScriptEntity {
             let entity = entity.try_unwrap()?;
             GameState::remove_party_member(entity);
             Ok(())
+        });
+
+        methods.add_method("get_relationship", |_, entity, other: ScriptEntity| {
+            let entity = entity.try_unwrap()?;
+            let other = other.try_unwrap()?;
+
+            let result = if entity.borrow().is_hostile(&other.borrow()) {
+              -1
+            } else {
+              1
+            };
+
+            Ok(result)
         });
 
         methods.add_method("is_hostile", |_, entity, other: ScriptEntity| {

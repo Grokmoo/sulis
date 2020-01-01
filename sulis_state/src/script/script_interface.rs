@@ -98,6 +98,16 @@ use sulis_module::{Faction, Module, OnTrigger, Time, ItemState};
 /// should verify a targeter is active with `has_targeter()` before calling
 /// this method.
 ///
+/// # `get_targeter_selectable() -> ScriptEntitySet`
+/// Returns the set of entities that can be selected by the active targeter,
+/// if there is one and it is no free select.  You should verify there is an
+/// active targeter with `has_targeter()` before calling this method.
+///
+/// # `is_targeter_free_select() -> Bool`
+/// Returns true if the active targeter is free select, false otherwise.
+/// You should verify there is an active targeter with `has_targeter()`
+/// before calling this method.
+///
 /// # `has_targeter() -> Bool`
 /// Returns true if a targeter is currently active, false otherwise.
 /// Useful for AI activating of abilities.
@@ -141,6 +151,12 @@ use sulis_module::{Faction, Module, OnTrigger, Time, ItemState};
 /// # `log(message: String)`
 /// Logs the specified string to the game's output at info level.  This is primarily useful
 /// for debugging purposes.
+///
+/// # `debug(message: String)`
+/// Logs the specified string to game output at debug level.
+///
+/// # `trace(message: String)`
+/// Logs the specified string to game output at trace level.
 ///
 /// # `ap_display_factor() -> Int`
 /// Gets the ap display factor, which is the factor that the internal AP representation is
@@ -381,7 +397,7 @@ impl UserData for ScriptInterface {
 
         methods.add_method("get_targeter_affected", |_, _, ()| {
             let targeter = get_targeter()?;
-            let targeter = targeter.borrow_mut();
+            let targeter = targeter.borrow();
             let parent = targeter.parent();
             let affected = targeter
                 .cur_affected()
@@ -389,6 +405,24 @@ impl UserData for ScriptInterface {
                 .map(|e| Some(Rc::clone(e)))
                 .collect();
             Ok(ScriptEntitySet::new(&parent, &affected))
+        });
+
+        methods.add_method("get_targeter_selectable", |_, _, ()| {
+            let targeter = get_targeter()?;
+            let targeter = targeter.borrow();
+            let parent = targeter.parent();
+            let selectable = targeter
+                .selectable()
+                .iter()
+                .map(|e| Some(Rc::clone(e)))
+                .collect();
+            Ok(ScriptEntitySet::new(&parent, &selectable))
+        });
+
+        methods.add_method("is_targeter_free_select", |_, _, ()| {
+            let targeter = get_targeter()?;
+            let targeter = targeter.borrow();
+            Ok(targeter.is_free_select())
         });
 
         methods.add_method("cancel_targeter", |_, _, ()| {
@@ -462,6 +496,16 @@ impl UserData for ScriptInterface {
 
         methods.add_method("log", |_, _, val: String| {
             info!("[LUA]: {}", val);
+            Ok(())
+        });
+
+        methods.add_method("debug", |_, _, val: String| {
+            debug!("[LUA]: {}", val);
+            Ok(())
+        });
+
+        methods.add_method("trace", |_, _, val: String| {
+            debug!("[LUA]: {}", val);
             Ok(())
         });
 

@@ -1153,6 +1153,14 @@ impl AreaTargeter {
         self.cancel = true;
     }
 
+    pub fn is_free_select(&self) -> bool {
+        self.free_select.is_some()
+    }
+
+    pub fn selectable(&self) -> &[Rc<RefCell<EntityState>>] {
+        &self.selectable
+    }
+
     pub fn cur_affected(&self) -> &Vec<Rc<RefCell<EntityState>>> {
         &self.cur_effected
     }

@@ -153,7 +153,7 @@ impl PathFinder {
         if dest.x < 0.0 || dest.y < 0.0 {
             return None;
         }
-        if dest.x + dest.w >= self.width as f32 || dest.y + dest.h >= self.height as f32 {
+        if dest.x + dest.w > self.width as f32 + 0.1|| dest.y + dest.h > self.height as f32 + 0.1 {
             return None;
         }
 

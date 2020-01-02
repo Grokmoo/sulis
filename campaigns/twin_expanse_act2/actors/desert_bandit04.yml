@@ -41,4 +41,5 @@ abilities:
   - fire_shield
   - slow
   - heal
+  - flaming_fingers
 ai: ai_basic

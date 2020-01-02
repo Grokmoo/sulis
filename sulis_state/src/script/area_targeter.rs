@@ -1166,6 +1166,8 @@ impl AreaTargeter {
     }
 
     pub fn is_valid_to_activate(&self) -> bool {
+        if self.cancel() { return false; }
+
         if self.free_select.is_none() {
             match self.cur_target {
                 None => false,
@@ -1177,11 +1179,11 @@ impl AreaTargeter {
     }
 
     pub fn on_activate(&mut self) {
-        self.cancel = true;
-
         if !self.is_valid_to_activate() {
             return;
         }
+
+        self.cancel = true;
 
         let affected = self
             .cur_effected

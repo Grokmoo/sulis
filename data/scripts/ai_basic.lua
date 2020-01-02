@@ -1,3 +1,4 @@
+MIN_MULTIPLE_SCORE=2
 MOVE_THRESHOLD=0.1
 
 function ai_action(parent)
@@ -17,7 +18,7 @@ function ai_action(parent)
     if parent:has_effect_with_tag("fear") then
         game:log("  Running away due to fear")
         attempt_run_away(parent, hostiles:visible():to_table())
-        return parent:state_end()
+        return end_turn(parent)
     end
 
     if check_swap_weapons(parent, hostiles).done then
@@ -65,13 +66,13 @@ function ai_action(parent)
 
     if not parent:has_ap_to_attack() then
         game:log("  No AP remaining.  End")
-        return parent:state_end()
+        return end_turn(parent)
     end
 
     local target = check_for_valid_target(parent, hostiles)
     if target == nil then
         game:log("  No valid attack target.  End")
-        return parent:state_end()
+        return end_turn(parent)
     end
 
     local result = check_move_for_attack(parent, target)
@@ -82,10 +83,14 @@ function ai_action(parent)
 
     if result.done then
         game:log("  Done")
-        return parent:state_end()
+        return end_turn(parent)
     else
         return parent:state_wait(10)
     end
+end
+
+function end_turn(parent)
+    return parent:state_end()
 end
 
 function attempt_run_away(parent, hostiles)
@@ -202,8 +207,13 @@ function find_and_use_item(parent, items, hostiles, friendlies, failed_use_count
         end
 
         if result.target then
+            game:log("      Use item")
             parent:use_item(item)
-            return handle_targeter(parent, result.target, item:ai_data(), hostiles, friendlies)
+            local result = handle_targeter(parent, result.target, item:ai_data(), hostiles, friendlies)
+
+            if result.done then
+                return { done=true }
+            end
         end
     end
 
@@ -224,7 +234,11 @@ function find_and_use_ability(parent, abilities, hostiles, friendlies, failed_us
         if result.target then
             game:log("      Use ability")
             parent:use_ability(ability)
-            return handle_targeter(parent, result.target, ability:ai_data(), hostiles, friendlies)
+            local result = handle_targeter(parent, result.target, ability:ai_data(), hostiles, friendlies)
+
+            if result.done then
+                return { done=true }
+            end
         end
     end
 
@@ -234,7 +248,7 @@ end
 -- find the best target for the given targeter
 function handle_targeter(parent, closest_target, ai_data, hostiles, friendlies)
     if not game:has_targeter() then
-        return { done=false }
+        return { done=false, do_next=true }
     end
 
     game:log("      Attempting to handle targeter")
@@ -263,7 +277,8 @@ function handle_targeter(parent, closest_target, ai_data, hostiles, friendlies)
 
     if to_check == nil then
         game:log("      No available targets")
-        return { done=false }
+        game:cancel_targeter()
+        return { done=false, do_next=true }
     end
 
     game:log("      Got " .. tostring(#to_check) .. " targets ")
@@ -291,6 +306,14 @@ function handle_targeter(parent, closest_target, ai_data, hostiles, friendlies)
 
     game:log("      Best score was " .. tostring(best_score))
 
+    if ai_data.group == "Multiple" then
+        if best_score < MIN_MULTIPLE_SCORE then
+            game:log("      Minimum score for multi-target ability not reached.  cancel.")
+            game:cancel_targeter()
+            return { done=false, do_next=true }
+        end
+    end
+
     -- fire targeter on best scored target.  if none with score greater than 0 was found,
     -- will just return
     return activate_targeter(best_target)
@@ -300,7 +323,7 @@ function activate_targeter(target)
     if target == nil then
         game:log("      No target.")
         game:cancel_targeter()
-        return { done=false }
+        return { done=false, do_next=true }
     end
 
     game:log("      Found best target " .. tostring(target:name()))
@@ -315,7 +338,7 @@ function activate_targeter(target)
     else
         game:log("      Cancel targeter")
         game:cancel_targeter()
-        return { done=false }
+        return { done=false, do_next=true }
     end
 end
 

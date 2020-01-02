@@ -351,5 +351,26 @@ impl UserData for ScriptUsableItem {
 
             Ok(ai_data)
         });
+
+        methods.add_method("name", |_, item, ()| {
+            let parent = item.parent.try_unwrap()?;
+            let slot = item.slot;
+
+            let parent = parent.borrow();
+            let item = parent.actor.inventory().quick(slot);
+
+            let item = match item {
+                None => {
+                    return Err(rlua::Error::FromLuaConversionError {
+                        from: "ScriptUsableItem",
+                        to: "Item",
+                        message: Some(format!("ScriptUsableItem is invalid / does not exist.")),
+                    });
+                }
+                Some(item) => item,
+            };
+
+            Ok(item.item.name.to_string())
+        });
     }
 }

@@ -5,15 +5,22 @@ max_gen_actors: 5
 entries:
   - id: orc_archer
     weight: 1
+    limit: 2
   - id: orc_warrior
     weight: 1
+    limit: 2
   - id: orc_crusher
     weight: 2
+    limit: 2
   - id: orc_protector
     weight: 2
+    limit: 2
   - id: orc_rogue
     weight: 2
+    limit: 2
   - id: goblin_mage_01
     weight: 1
+    limit: 1
   - id: goblin_mage_02
     weight: 1
+    limit: 1

@@ -5,5 +5,7 @@ max_gen_actors: 3
 entries:
   - id: goblin
     weight: 2
+    limit: 2
   - id: goblin_spearman
     weight: 1
+    limit: 2

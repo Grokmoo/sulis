@@ -5,5 +5,6 @@ max_gen_actors: 6
 entries:
   - id: desert_scorpion_large
     weight: 1
+    limit: 2
   - id: desert_scorpion_med
     weight: 4

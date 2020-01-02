@@ -14,6 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::collections::{HashMap, HashSet};
 use std::io::Error;
 use std::rc::Rc;
 
@@ -25,6 +26,7 @@ struct Entry {
     unique_id: Option<String>,
     weight: u32,
     always: bool,
+    limit: Option<u32>,
 }
 
 pub struct Encounter {
@@ -43,9 +45,20 @@ impl Encounter {
             return unable_to_create_error("encounter", &builder.id);
         }
 
+        let mut ids = HashSet::new();
+
         let mut entries = Vec::new();
         let mut total_weight = 0;
         for entry in builder.entries {
+            if !entry.always {
+                if ids.contains(&entry.id) {
+                    warn!("Duplicate entry '{}'", entry.id);
+                    return unable_to_create_error("encounter", &builder.id);
+                }
+
+                ids.insert(entry.id.to_string());
+            }
+
             let actor = match module.actors.get(&entry.id) {
                 None => {
                     warn!("no actor '{}' found", entry.id);
@@ -54,11 +67,22 @@ impl Encounter {
                 Some(actor) => Rc::clone(actor),
             };
 
+            if entry.always && entry.limit.is_some() {
+                warn!("Cannot set a limit on an always generated entry.");
+                return unable_to_create_error("encounter", &builder.id);
+            }
+
+            if entry.always && entry.weight > 0 {
+                warn!("Cannot set a weight on an always generated entry.");
+                return unable_to_create_error("encounter", &builder.id);
+            }
+
             total_weight += entry.weight;
             entries.push(Entry {
                 actor,
                 unique_id: entry.unique_id,
                 weight: entry.weight,
+                limit: entry.limit,
                 always: entry.always,
             });
         }
@@ -73,17 +97,40 @@ impl Encounter {
         })
     }
 
-    fn gen_actor(&self) -> Option<(Rc<Actor>, Option<String>)> {
+    fn gen_actor(&self, count: &mut HashMap<String, u32>) -> Option<(Rc<Actor>, Option<String>)> {
         if self.total_weight == 0 {
             return None;
         }
 
+        // try to gen a maximum of 100 times
+        for _ in 0..100 {
+            let index = match self.gen_roll() {
+                None => continue,
+                Some(index) => index,
+            };
+
+            let entry = &self.entries[index];
+
+            if let Some(limit) = entry.limit {
+                let cur_count = *count.get(&entry.actor.id).unwrap_or(&0);
+                if cur_count >= limit { continue; }
+                count.insert(entry.actor.id.to_string(), cur_count + 1);
+            }
+
+            return Some((Rc::clone(&entry.actor), entry.unique_id.clone()));
+        }
+
+        warn!("Unable to generate a valid actor after max attempts");
+        None
+    }
+
+    fn gen_roll(&self) -> Option<usize> {
         let roll = gen_rand(0, self.total_weight);
         let mut cur_weight = 0;
-        for entry in self.entries.iter() {
+        for (index, entry) in self.entries.iter().enumerate() {
             cur_weight += entry.weight;
             if roll < cur_weight {
-                return Some((Rc::clone(&entry.actor), entry.unique_id.clone()));
+                return Some(index);
             }
         }
 
@@ -93,17 +140,22 @@ impl Encounter {
     pub fn gen_actors(&self) -> Vec<(Rc<Actor>, Option<String>)> {
         let mut actors = Vec::new();
 
-        let num = gen_rand(self.min_gen_actors, self.max_gen_actors + 1);
-        for _ in 0..num {
-            match self.gen_actor() {
+        let total_num = gen_rand(self.min_gen_actors, self.max_gen_actors + 1);
+
+        let mut count = HashMap::new();
+        let mut cur_num = 0;
+
+        while cur_num < total_num {
+            let actor = match self.gen_actor(&mut count) {
                 None => {
                     warn!("Unable to generate actor for encounter '{}'", self.id);
-                    continue;
-                }
-                Some(actor_data) => {
-                    actors.push(actor_data);
-                }
-            }
+                    return actors;
+                }, Some(actor) => actor,
+            };
+
+            actors.push(actor);
+
+            cur_num += 1;
         }
 
         for entry in self.entries.iter() {
@@ -136,6 +188,8 @@ pub struct EntryBuilder {
 
     #[serde(default)]
     always: bool,
+
+    limit: Option<u32>,
 
     #[serde(default)]
     unique_id: Option<String>,

@@ -7,11 +7,16 @@ entries:
     always: true
   - id: slime_blue
     weight: 1
+    limit: 1
   - id: slime_red
     weight: 1
+    limit: 1
   - id: slime_orange
     weight: 1
+    limit: 1
   - id: shroom_med
     weight: 2
+    limit: 2
   - id: shroom_large
     weight: 1
+    limit: 1

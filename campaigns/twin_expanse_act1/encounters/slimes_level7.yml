@@ -5,9 +5,12 @@ max_gen_actors: 4
 entries:
   - id: slime_blue
     weight: 1
+    limit: 1
   - id: slime_red
     weight: 1
+    limit: 1
   - id: slime_orange
     weight: 1
+    limit: 1
   - id: slime
     weight: 4

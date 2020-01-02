@@ -5,11 +5,16 @@ max_gen_actors: 5
 entries:
   - id: desert_bandit01
     weight: 1
+    limit: 2
   - id: desert_bandit02
     weight: 1
+    limit: 2
   - id: desert_bandit03
     weight: 1
+    limit: 2
   - id: desert_bandit04
     weight: 1
+    limit: 1
   - id: desert_bandit05
     weight: 1
+    limit: 1

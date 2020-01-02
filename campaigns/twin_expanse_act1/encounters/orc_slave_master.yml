@@ -8,9 +8,13 @@ entries:
     unique_id: orc_slave_master
   - id: orc_warrior
     weight: 1
+    limit: 1
   - id: orc_crusher
     weight: 1
+    limit: 1
   - id: orc_protector
     weight: 1
+    limit: 1
   - id: orc_rogue
     weight: 1
+    limit: 1

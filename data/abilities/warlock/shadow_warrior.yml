@@ -17,11 +17,11 @@ active:
     Radius: 12.0
   ai:
     priority: 30
-    kind: Special
+    kind: Summon
     group: Multiple
     range: Visible
   short_description: |
-    Summon a powerful nature spirit to fight for you.
+    Illusory shadows distract your opponents.
 prereqs:
   total_level: 7
   abilities: [ illusory_locus ]

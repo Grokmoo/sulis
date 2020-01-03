@@ -44,14 +44,14 @@ use sulis_module::{
 /// ```lua
 ///   function ai_action(parent, state)
 ///     -- tell ai to end turn immediately
-///     _G.state = game:state_end()
+///     return parent:state_end()
 ///   end
 /// ```
 ///
 /// # `state_wait(time: Int) -> AIState`
 /// Returns the AI state telling the caller to wait for the specified
-/// number of milliseconds (`time`), and then call the AI again.
-/// See `state_end`
+/// number of milliseconds (`time`) times the base animation time, and then
+/// call the AI again.  See `state_end`
 ///
 /// # `vis_dist() -> Float`
 /// Returns the currently visibility distance for this entity (how
@@ -80,7 +80,7 @@ use sulis_module::{
 /// Sets this entity to disabled status or not.  Disabled status is only checked when
 /// an entity is dead, so this is only useful from the campaign `on_party_death` script.
 /// Disabled party members will not be removed from the party, and will be set back to 1
-/// hit point when combat ends.  You can use this behavior for custom death behavior in
+/// hit point when combat ends.  You can use this for custom death behavior in
 /// a campaign.
 ///
 /// # `remove_from_party()`
@@ -111,8 +111,8 @@ use sulis_module::{
 /// set a specific value.
 ///
 /// # `add_num_flag(flag: String, value: Float)`
-/// Sets the specified `flag` to a floating point numeric `value`.  This is for
-/// convenience to avoid Lua needing to parse numbers from a string flag.
+/// Adds the specified `value` to the amount stored in the specified `flag`.  If the
+/// flag is not currently present, sets the flag to the specified value.
 ///
 /// # `get_flag(flag: String) -> String`
 /// Returns the value of the specified `flag` on this entity.  Returns the lua
@@ -122,7 +122,7 @@ use sulis_module::{
 /// Returns true if the specified `flag` is set to any value on this entity, false
 /// otherwise
 ///
-/// # `get_num_flag(flag: String) -> Int`
+/// # `get_num_flag(flag: String) -> Float`
 /// Returns the numeric value of this `flag` set on this entity, or 0.0 if it has
 /// not been set.
 ///
@@ -442,6 +442,10 @@ use sulis_module::{
 /// # `is_threatened() -> Bool`
 /// Returns whether or not this entity is currently threatened by a hostile
 /// with a melee weapon
+///
+/// # `is_threatened_by(target: ScriptEntity) -> Bool`
+/// Returns true if this entity is threatened by the speciied target with its
+/// melee weapon, false otherwise
 #[derive(Clone, Debug)]
 pub struct ScriptEntity {
     pub index: Option<usize>,
@@ -1562,6 +1566,14 @@ impl UserData for ScriptEntity {
             let entity = entity.try_unwrap()?;
             let entity = entity.borrow();
             Ok(entity.actor.is_threatened())
+        });
+
+        methods.add_method("is_threatened_by", |_, entity, target: ScriptEntity| {
+            let entity = entity.try_unwrap()?;
+            let entity = entity.borrow();
+
+            let target = target.index.unwrap_or(std::usize::MAX);
+            Ok(entity.actor.p_stats().is_threatened_by(target))
         });
     }
 }

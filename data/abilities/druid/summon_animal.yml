@@ -17,7 +17,7 @@ active:
     priority: 30
     kind: Special
     group: Multiple
-    range: Visible
+    range: Short
   short_description: |
     Summon a loyal animal to fight for you.
 upgrades:

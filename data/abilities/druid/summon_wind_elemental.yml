@@ -15,9 +15,9 @@ active:
     Radius: 12.0
   ai:
     priority: 30
-    kind: Special
+    kind: Summon
     group: Multiple
-    range: Visible
+    range: Short
   short_description: |
     Summon a powerful air spirit to fight for you.
 prereqs:

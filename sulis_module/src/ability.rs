@@ -290,6 +290,7 @@ pub enum AIKind {
     Heal,
     Buff,
     Debuff,
+    Summon,
     Special,
 }
 
@@ -300,6 +301,7 @@ impl AIKind {
             "Heal" => AIKind::Heal,
             "Buff" => AIKind::Buff,
             "Debuff" => AIKind::Debuff,
+            "Summon" => AIKind::Summon,
             "Special" => AIKind::Special,
             _ => {
                 warn!("Invalid AI kind string '{}'", s);

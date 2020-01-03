@@ -1,8 +1,9 @@
 MIN_MULTIPLE_SCORE=2
 MOVE_THRESHOLD=0.1
+HEALING_FRAC = 0.5
 
 function ai_action(parent)
-    game:log("AI turn for " .. parent:name())
+    game:log("AI turn for " .. parent:id())
     game:log("  Current AP " .. tostring(parent:stats().current_ap))
 
     local abilities = parent:abilities():can_activate():remove_kind("Special")
@@ -51,6 +52,11 @@ function ai_action(parent)
             return parent:state_wait(10)
         end
 
+        if result.no_abilities then
+            game:log("  No abilities currently available.")
+            break
+        end
+
         local cur_len = abilities:len()
         abilities = abilities:can_activate()
 
@@ -69,7 +75,7 @@ function ai_action(parent)
         return end_turn(parent)
     end
 
-    local target = check_for_valid_target(parent, hostiles)
+    local target = find_best_attack_target(parent, hostiles)
     if target == nil then
         game:log("  No valid attack target.  End")
         return end_turn(parent)
@@ -77,7 +83,7 @@ function ai_action(parent)
 
     local result = check_move_for_attack(parent, target)
     if result.attack then
-        game:log("  Attack target " .. target:name())
+        game:log("  Attack target " .. target:id())
         parent:anim_weapon_attack(target, nil, true)
     end
 
@@ -242,7 +248,7 @@ function find_and_use_ability(parent, abilities, hostiles, friendlies, failed_us
         end
     end
 
-    return { done=false }
+    return { done=false, no_abilities=true }
 end
 
 -- find the best target for the given targeter
@@ -254,12 +260,15 @@ function handle_targeter(parent, closest_target, ai_data, hostiles, friendlies)
     game:log("      Attempting to handle targeter")
 
     if ai_data.kind == "Heal" then
-        return activate_targeter(closest_target)
+        return activate_targeter({ x=closest_target:x(), y=closest_target:y() })
+    elseif ai_data.kind == "Summon" then
+        game:log("      Attempting to activate summon")
+        return activate_targeter(find_targeter_position_nearby(closest_target))
     end
 
     -- want hostiles and don't want friendlies for damage or debuff, the opposite for others
     local relationship_modifier = 1
-    if ai_data.kind == "Damage" or ai_data.kind == "Debuff" then
+    if ai_data.kind == "Damage" or ai_data.kind == "Debuff" or ai_data.kind == "Summon" then
         relationship_modifier = -1
     end
 
@@ -294,7 +303,8 @@ function handle_targeter(parent, closest_target, ai_data, hostiles, friendlies)
             local potential_targets = game:get_targeter_affected():to_table()
             for j = 1,#potential_targets do
                 local target = potential_targets[j]
-                cur_score = cur_score + parent:get_relationship(target) * relationship_modifier
+                local weight = compute_weight(parent, target)
+                cur_score = cur_score + weight * relationship_modifier
             end
         end
 
@@ -314,9 +324,38 @@ function handle_targeter(parent, closest_target, ai_data, hostiles, friendlies)
         end
     end
 
+    if best_target == nil then
+        game:log("      No target.")
+        game:cancel_targeter()
+        return { done=false, do_next=true }
+    end
+
+    game:log("      Found best target " .. best_target:id())
+
     -- fire targeter on best scored target.  if none with score greater than 0 was found,
     -- will just return
-    return activate_targeter(best_target)
+    return activate_targeter({ x=best_target:x(), y=best_target:y() })
+end
+
+function find_targeter_position_nearby(target)
+    game:log("      Looking for valid target near " .. tostring(target:id()))
+
+    local base_x = target:x() - 5
+    local base_y = target:y() - 5
+
+    for y = 1, 9, 2 do
+        for x = 1, 9, 2 do
+            local pos_x = x + base_x
+            local pos_y = y + base_y
+            if game:check_targeter_position(pos_x, pos_y) then
+                game:log("      Found targeter pos at " .. tostring(pos_x) .. ", " .. tostring(pos_y))
+                return { x=pos_x, y=pos_y }
+            end
+        end
+    end
+
+    game:log("      Unable to locate valid targeter pos")
+    return nil
 end
 
 function activate_targeter(target)
@@ -326,12 +365,7 @@ function activate_targeter(target)
         return { done=false, do_next=true }
     end
 
-    game:log("      Found best target " .. tostring(target:name()))
-
-    local x = target:x()
-    local y = target:y()
-
-    if game:check_targeter_position(x, y) then
+    if game:check_targeter_position(target.x, target.y) then
         game:log("      Activate targeter")
         game:activate_targeter()
         return { done=true }
@@ -343,14 +377,14 @@ function activate_targeter(target)
 end
 
 function check_action(parent, ai_data, hostiles, friendlies, failed_use_count)
-    local target = get_close_target(parent, ai_data, hostiles, friendlies)
+    local target = get_usable_target(parent, ai_data, hostiles, friendlies)
 
     if target == nil then
         game:log("      No valid target")
         return { done=false, target=nil }
     end
 
-    game:log("      Got target " .. target:name())
+    game:log("      Got target " .. target:id())
 
     local target_dist = 0
 
@@ -396,9 +430,7 @@ function check_action(parent, ai_data, hostiles, friendlies, failed_use_count)
     end
 end
 
-HEALING_FRAC = 0.5
-
-function get_close_target(parent, ai_data, hostiles, friendlies)
+function get_usable_target(parent, ai_data, hostiles, friendlies)
     if ai_data.range == "Personal" then
         if ai_data.kind == "Heal" then
             stats = parent:stats()
@@ -410,12 +442,12 @@ function get_close_target(parent, ai_data, hostiles, friendlies)
         else
             return parent
         end
-    elseif ai_data.kind == "Damage" or ai_data.kind == "Debuff" then
-        return check_for_valid_target(parent, hostiles)
+    elseif ai_data.kind == "Damage" or ai_data.kind == "Debuff" or ai_data.kind == "Summon" then
+        return find_closest_target(parent, hostiles)
     elseif ai_data.kind == "Heal" then
         return find_heal_target(parent, friendlies)
     else
-        return check_for_valid_target(parent, friendlies)
+        return find_closest_target(parent, friendlies)
     end
 end
 
@@ -441,7 +473,7 @@ function find_heal_target(parent, targets)
 end
 
 -- Just finds the closest target for now
-function check_for_valid_target(parent, targets)
+function find_closest_target(parent, targets)
     local closest_dist = 1000
     local closest_target = nil
 
@@ -457,9 +489,107 @@ function check_for_valid_target(parent, targets)
     return closest_target
 end
 
+function find_best_attack_target(parent, hostiles)
+    local best = nil
+    local best_score = 0
+
+    game:log("      Finding best attack target for " .. parent:id())
+    for i = 1, #hostiles do
+        local target = hostiles[i]
+        local score = compute_weight(parent, target)
+        game:debug("        Got score of " .. tostring(score) .. " for " .. target:id())
+        if score < best_score then
+            best = target
+            best_score = score
+        end
+    end
+
+    game:log("      Best score was " .. tostring(best_score))
+    return best
+end
+
+function compute_weight(parent, target)
+    local base = parent:get_relationship(target)
+    local target_stats = target:stats()
+
+    local modifiers = 0
+
+    -- threatening hostiles are higher priority
+    if parent:is_threatened_by(target) then
+        modifiers = modifiers + 0.25
+    end
+
+    -- closer targets are higher priority
+    modifiers = modifiers + (20.0 - parent:dist_to_entity(target)) / 80.0
+
+    -- weaker hostiles and stronger friendlies are higher priority
+    if base == 1 then
+        modifiers = modifiers + compute_offensive_strength(target_stats)
+    else
+        modifiers = modifiers - compute_defensive_strength(target_stats)
+    end
+
+    -- hostiles that have hurt us are higher priority
+    modifiers = modifiers + parent:get_num_flag("__damage_taken_from" .. target:id())
+
+    -- hostiles that are difficult to damage with our regular attack are lower priority
+    modifiers = modifiers + parent:get_num_flag("__hard_target_for" .. target:id())
+
+    game:debug("        Computed weight of " .. tostring(modifiers) .. " for " .. target:id())
+
+    return base * (1 + modifiers)
+end
+
+function compute_defensive_strength(stats)
+    local armor = stats.base_armor / 100.0
+    local hp = stats.current_hp / 400
+
+    return armor + hp
+end
+
+function compute_offensive_strength(stats)
+    local result = 0
+    if stats.caster_level > 0 then
+        result = result + stats.spell_accuracy / 100.0
+    else
+        local damage = (stats.damage_min_0 + stats.damage_max_0) / 2.0
+        result = result + damage / 100.0
+
+        if stats.attack_is_melee then
+            result = result + stats.melee_accuracy / 200.0
+        else -- attack is ranged
+            result = result + stats.range_accuracy / 200.0
+        end
+    end
+
+    return result
+end
+
 -- OnDamaged script hook
 function on_damaged(parent, targets, hit)
-    -- local target = targets:first()
-	-- game:log(parent:name() .. " damaged by " .. target:name() .. ": "
-	--     .. hit:kind() .. " for " .. hit:total_damage() .. " damage.")
+    local target = targets:first()
+    local max_hp = parent:stats().max_hp
+    local damage = hit:total_damage()
+    local frac = damage / max_hp
+    parent:add_num_flag("__damage_taken_from_" .. target:id(), frac)
+
+    game:debug("Added damage_taken_from " .. tostring(frac) .. " for " .. target:id() .. " on "
+        .. parent:id())
+
+    -- game:log(parent:name() .. " damaged by " .. target:name() .. ": "
+    --     .. hit:kind() .. " for " .. hit:total_damage() .. " damage.")
+end
+
+-- AfterAttack script hook
+function after_attack(parent, targets, hit)
+    local target = targets:first()
+    local target_max_hp = target:stats().max_hp
+    local damage = hit:total_damage()
+    local frac = damage / target_max_hp
+
+    local hard_target_factor = math.max(0.0, 0.1 - frac)
+    parent:add_num_flag("__hard_target_for_" .. target:id(), hard_target_factor)
+
+    game:debug("Added hard_target " .. tostring(hard_target_factor) .. " for " .. target:id() .. " on "
+        .. parent:id())
 end

@@ -213,6 +213,10 @@ impl ActorState {
         self.compute_stats();
     }
 
+    pub fn p_stats(&self) -> &PStats {
+        &self.p_stats
+    }
+
     pub fn is_inventory_locked(&self) -> bool {
         self.p_stats.is_inventory_locked()
     }

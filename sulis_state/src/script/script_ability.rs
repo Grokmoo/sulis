@@ -59,7 +59,7 @@ type Result<T> = std::result::Result<T, rlua::Error>;
 /// Creates a new ScriptAbilitySet from this one, but with all abilities
 /// with the specified AI Kind `kind` removed.  The kind is specified in the ability
 /// definition.  Does not modify this set. Valid kinds are `Damage`, `Heal`, `Buff`,
-/// `Debuff`, `Special`
+/// `Debuff`, `Summon`, `Special`
 ///
 /// ## Examples
 /// ```lua
@@ -70,7 +70,7 @@ type Result<T> = std::result::Result<T, rlua::Error>;
 /// # `only_kind(kind: String) -> ScriptAbilitySet`
 /// Creates a new ScriptAbilitySet from this one, but only including abilities
 /// with the specified AI Kind `kind`.  Valid kinds are `Damage`, `Heal`, `Buff`,
-/// `Debuff`, `Special`
+/// `Debuff`, `Summon`, `Special`
 ///
 /// # `only_group(group: String) -> ScriptAbilitySet`
 /// Creates a new ScriptAbilitySet from this one, but only including abilities

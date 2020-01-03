@@ -143,6 +143,12 @@ impl PStats {
         self.disabled
     }
 
+    /// Returns true if the parent entity is threatened by the entity
+    /// with the specified index, false otherwise
+    pub fn is_threatened_by(&self, index: usize) -> bool {
+        self.threatened_by.contains(&index)
+    }
+
     pub fn is_threatened(&self) -> bool {
         self.threatened_by.len() > 0
     }

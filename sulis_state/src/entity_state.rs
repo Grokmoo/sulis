@@ -392,7 +392,7 @@ impl EntityState {
     pub fn swap_weapon_set(entity: &Rc<RefCell<EntityState>>) {
         if !entity.borrow_mut().actor.do_swap_weapons() { return; }
 
-        if GameState::is_combat_active() {
+        if entity.borrow().is_party_member() && GameState::is_combat_active() {
             let area = GameState::area_state();
             let mut area = area.borrow_mut();
             area.range_indicators().remove_attack();

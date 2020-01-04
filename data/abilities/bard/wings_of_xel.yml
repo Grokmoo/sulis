@@ -21,7 +21,7 @@ active:
   range_increases_with:
     ability: louder_music
     amount: 2.0
-  requires_active_mode: song_of_heroes
+  requires_active_mode: [ song_of_heroes ]
   ai:
     priority: 10
     kind: Buff

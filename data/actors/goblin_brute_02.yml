@@ -18,6 +18,8 @@ inventory:
     Torso: { id: torso_leather }
   quick:
     Usable1: { id: potion_body }
+    AltHeldMain:
+      id: shortbow
 reward:
   xp: 15
   loot: level1_misc

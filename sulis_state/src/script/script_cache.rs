@@ -178,14 +178,18 @@ where
     exec_func(&script, func, (parent, targets, arg))
 }
 
-pub fn item_on_activate(parent: &Rc<RefCell<EntityState>>, kind: ScriptItemKind) -> Result<()> {
+pub fn item_on_activate(
+    parent: &Rc<RefCell<EntityState>>,
+    func: String,
+    kind: ScriptItemKind
+) -> Result<()> {
     let t: Option<usize> = None;
     item_script(
         parent,
         kind,
         ScriptEntitySet::new(parent, &Vec::new()),
         t,
-        "on_activate",
+        &func,
     )
 }
 
@@ -230,11 +234,17 @@ where
     exec_func(&script, func, (parent, item, targets, arg))
 }
 
-pub fn ability_on_activate(parent: usize, ability: &Rc<Ability>) -> Result<()> {
+pub fn ability_on_activate(
+    parent: usize,
+    func: String,
+    ability: &Rc<Ability>
+) -> Result<()> {
+
     let script = get_ability_script_id(ability)?;
     let parent = ScriptEntity::new(parent);
     let ability = ScriptAbility::from(ability);
-    exec_func(&script, "on_activate", (parent, ability))
+
+    exec_func(&script, &func, (parent, ability))
 }
 
 pub fn ability_on_deactivate(parent: usize, ability: &Rc<Ability>) -> Result<()> {

@@ -19,16 +19,18 @@ function on_target_select(parent, ability, targets)
   local points = targets:affected_points()
   
   for i=1,amount do
-    gen_summon(ability, points)
+    gen_summon(parent, ability, points)
   end
 end
 
-function gen_summon(ability, points)
+function gen_summon(parent, ability, points)
   local summon = try_find_position(points)
   if summon == nil then return end
   
-  summon:add_to_party(false)
-  summon:set_flag("__is_summoned_party_member")
+  if parent:is_party_member() then
+    summon:add_to_party(false)
+    summon:set_flag("__is_summoned_party_member")
+  end
   
   local effect = summon:create_effect(ability:name(), ability:duration())
   effect:add_abilities_disabled()
@@ -51,7 +53,7 @@ function try_find_position(points)
     -- generate random point
 	local pos = points[math.random(#points)]
 	
-	local summon = game:spawn_actor_at("shadow_warrior", pos.x, pos.y, "Friendly")
+	local summon = game:spawn_actor_at("shadow_warrior", pos.x, pos.y, parent:get_faction())
     if summon:is_valid() then return summon end
   end
   

@@ -37,7 +37,10 @@ inventory:
     Hands:
       id: gloves_mail
       adjectives: [ fine ]
-  quick: {}
+  quick:
+    AltHeldMain:
+      id: shortbow
+      adjectives: [ fine ]
 levels:
   fighter: 8
 abilities:

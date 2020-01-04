@@ -15,6 +15,9 @@ levels:
 inventory:
   equipped:
     HeldMain: { id: greataxe }
+  quick:
+    AltHeldMain:
+      id: shortbow
 reward:
   xp: 20
   loot: level1_misc

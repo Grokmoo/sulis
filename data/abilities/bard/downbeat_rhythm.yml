@@ -19,9 +19,10 @@ active:
   range_increases_with:
     ability: louder_music
     amount: 2.0
+  requires_active_mode: [ song_of_curses, song_of_heroes, song_of_survival ]
   ai:
     priority: 20
-    kind: Special
+    kind: Buff
     group: Multiple
     range: Short
   short_description: |

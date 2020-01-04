@@ -16,9 +16,9 @@
 
 use rlua::{UserData, UserDataMethods};
 
-use crate::script::{script_callback::FuncKind, CallbackData};
-use crate::GameState;
 use sulis_module::on_trigger::{self, OnTrigger, ScriptMenuChoice};
+use crate::script::{script_callback::FuncKind, CallbackData, ScriptEntity};
+use crate::GameState;
 
 /// A user interface menu being created by a script.  Normally created
 /// by `game:create_menu()`
@@ -28,7 +28,7 @@ use sulis_module::on_trigger::{self, OnTrigger, ScriptMenuChoice};
 /// displayed.  The selection return is either `value` if specified,
 /// or `text` if not.
 ///
-/// # `show()`
+/// # `show(parent: ScriptEntity)`
 /// Shows this menu, allowing the user to select their choice.
 #[derive(Clone)]
 pub struct ScriptMenu {
@@ -65,7 +65,8 @@ impl UserData for ScriptMenu {
             },
         );
 
-        methods.add_method("show", |_, menu, ()| {
+        methods.add_method("show", |_, menu, parent: ScriptEntity| {
+            let parent = parent.try_unwrap()?;
             let func = match menu.callback.get_func(FuncKind::OnMenuSelect) {
                 None => {
                     return Err(rlua::Error::FromLuaConversionError {
@@ -76,6 +77,13 @@ impl UserData for ScriptMenu {
                 }
                 Some(func) => func,
             };
+
+            if !parent.borrow().is_party_member() {
+                warn!("Attempted to show menu for a non-player");
+                warn!("You may want to specify an AI-specific on_activate \
+                      in the Ability/Item AIData");
+                return Ok(());
+            }
 
             let choices = menu.choices.clone();
 

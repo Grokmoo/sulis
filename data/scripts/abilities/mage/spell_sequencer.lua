@@ -10,7 +10,7 @@ function on_activate(parent, ability)
   menu:add_choice("Self", "self")
   menu:add_choice("Friendly", "friendly")
   menu:add_choice("Hostile", "hostile")
-  menu:show()
+  menu:show(parent)
 end
 
 function on_deactivate(parent, ability)
@@ -61,7 +61,7 @@ function setup_menu(parent, ability, target_type, cb, title)
 	  end
 	end
   end
-  menu:show()
+  menu:show(parent)
 end
 
 function create_sequencer(parent, ability, targets, selection)

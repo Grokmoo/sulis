@@ -17,6 +17,9 @@ inventory:
   equipped:
     HeldMain: { id: battleaxe }
     HeldOff: { id: shield_kite}
+  quick:
+    AltHeldMain:
+      id: shortbow
 reward:
   xp: 25
   loot: level1_misc

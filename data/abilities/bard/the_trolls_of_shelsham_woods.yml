@@ -16,7 +16,7 @@ active:
     bard:
       Inspiration: 20
   combat_only: true
-  requires_active_mode: song_of_survival
+  requires_active_mode: [ song_of_survival ]
   range:
     Radius: 8.0
   range_increases_with:

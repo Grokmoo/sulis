@@ -1,6 +1,7 @@
 MIN_MULTIPLE_SCORE=2
 MOVE_THRESHOLD=0.1
 HEALING_FRAC = 0.5
+WAIT_TIME = 10
 
 function ai_action(parent)
     game:log("AI turn for " .. parent:id())
@@ -22,8 +23,8 @@ function ai_action(parent)
         return end_turn(parent)
     end
 
-    if check_swap_weapons(parent, hostiles).done then
-        return parent:state_wait(10)
+    if check_swap_weapons_to_melee(parent, hostiles).done then
+        return parent:state_wait(WAIT_TIME)
     end
 
     local items = parent:inventory():usable_items()
@@ -39,17 +40,18 @@ function ai_action(parent)
         local result = find_and_use_item(parent, items, hostiles, friendlies, failed_use_count)
         if result.done then
             game:log("  Item used or moved")
-            return parent:state_wait(10)
+            return parent:state_wait(WAIT_TIME)
         end
 
         if abilities:is_empty() then
             break
         end
 
-        local result = find_and_use_ability(parent, abilities, hostiles, friendlies, failed_use_count)
+        local result = find_and_use_ability(parent, abilities, hostiles,
+            friendlies, failed_use_count)
         if result.done then
             game:log("  Ability used or moved")
-            return parent:state_wait(10)
+            return parent:state_wait(WAIT_TIME)
         end
 
         if result.no_abilities then
@@ -75,24 +77,39 @@ function ai_action(parent)
         return end_turn(parent)
     end
 
-    local target = find_best_attack_target(parent, hostiles)
-    if target == nil then
+    local targets = sort_attack_targets(parent, hostiles)
+    if targets == nil then
         game:log("  No valid attack target.  End")
         return end_turn(parent)
     end
 
-    local result = check_move_for_attack(parent, target)
-    if result.attack then
-        game:log("  Attack target " .. target:id())
-        parent:anim_weapon_attack(target, nil, true)
+    for i = 1, #targets do
+        local target = targets[i]
+        game:log("  Checking for attack against " .. target:id())
+
+        local result = check_move_for_attack(parent, target)
+        if result.attack then
+            game:log("  Perform attack")
+            parent:anim_weapon_attack(target, nil, true)
+
+            return parent:state_wait(WAIT_TIME)
+        end
+
+        if result.moved then
+            game:log("  Moved.")
+            return parent:state_wait(WAIT_TIME)
+        end
     end
 
-    if result.done then
-        game:log("  Done")
-        return end_turn(parent)
+    -- if using a melee weapon and unable to attack any targets
+    if check_swap_weapons_to_ranged(parent).swapped then
+        game:log("    Swapping to ranged attack.")
+        return parent:state_wait(WAIT_TIME)
     else
-        return parent:state_wait(10)
+        game:log("    Unable to swap weapons.  Nothing left to try")
     end
+
+    return end_turn(parent)
 end
 
 function end_turn(parent)
@@ -145,8 +162,11 @@ function check_move_for_attack(parent, target)
         game:log("    Attempt move towards target")
         if not parent:move_towards_entity(target) then
             game:log("    Unable to move.")
-            return { attack=false, done=true }
+
+            return { attack=false }
         end
+
+        return { attack=false, moved=true }
     else
         game:log("    Ranged attack")
         local dist = parent:dist_to_entity(target)
@@ -157,10 +177,10 @@ function check_move_for_attack(parent, target)
             game:log("    Attempt move towards target")
             if not parent:move_towards_entity(target, target_dist) then
                 game:log("    Unable to move.")
-                return { attack=false, done=true }
+                return { attack=false }
             end
 
-            return { attack=false, done=false }
+            return { attack=false, moved=true }
         end
 
         if not parent:has_visibility(target) then
@@ -170,16 +190,32 @@ function check_move_for_attack(parent, target)
                 return { attack=false, done=true }
             end
 
-            return { attack=false, done=false }
+            return { attack=false, moved=true }
         end
 
         return { attack=true }
     end
-
-    return { attack=false, done=false }
 end
 
-function check_swap_weapons(parent, hostiles)
+function check_swap_weapons_to_ranged(parent)
+    if parent:stats().attack_is_ranged then
+        return { swapped=false }
+    end
+
+    if not parent:inventory():has_alt_weapons() then
+        return { swapped=false }
+    end
+
+    if parent:inventory():alt_weapon_style() == "Ranged" then
+        if parent:swap_weapons() then
+            return { swapped=true }
+        end
+    end
+
+    return { swapped=false }
+end
+
+function check_swap_weapons_to_melee(parent, hostiles)
     if parent:inventory():weapon_style() ~= "Ranged" then
         return { done=false }
     end
@@ -399,17 +435,16 @@ function check_action(parent, ai_data, hostiles, friendlies, failed_use_count)
 
         local stats = parent:stats()
         game:log("      Moving to within touch range")
-        parent:move_towards_entity(target, stats.touch_distance - MOVE_THRESHOLD)
-        return { done=true }
+        return check_move_towards(parent, target, stats.touch_distance - MOVE_THRESHOLD)
     elseif ai_data.range == "Attack" then
         if parent:is_within_attack_dist(target) then
             game:log("      Attack range ability within range")
             return { done=false, target=target }
         end
 
+        local stats = parent:stats()
         game:log("      Moving to within attack range")
-        parent:move_towards_entity(target)
-        return { done=true }
+        return check_move_towards(parent, target, stats.attack_distance - MOVE_THRESHOLD)
     elseif ai_data.range == "Short" then
         target_dist = 8 - failed_use_count * 2
     elseif ai_data.range == "Visible" then
@@ -425,8 +460,16 @@ function check_action(parent, ai_data, hostiles, friendlies, failed_use_count)
         return { done=false, target=target}
     else
         game:log("      Moving to within range")
-        parent:move_towards_entity(target, target_dist - MOVE_THRESHOLD)
+        return check_move_towards(parent, target, target_dist - MOVE_THRESHOLD)
+    end
+end
+
+function check_move_towards(parent, target, dist)
+    if parent:move_towards_entity(target, dist) then
         return { done=true }
+    else
+        game:log("      Unable to path towards " .. target:id())
+        return { done=false }
     end
 end
 
@@ -489,23 +532,30 @@ function find_closest_target(parent, targets)
     return closest_target
 end
 
-function find_best_attack_target(parent, hostiles)
-    local best = nil
-    local best_score = 0
+function sort_attack_targets(parent, hostiles)
+    if hostiles == nil then return nil end
 
-    game:log("      Finding best attack target for " .. parent:id())
+    local ranked = {}
+    local scores = {}
+
+    game:log("  Sorting " .. tostring(#hostiles) .. " potential attack targets")
     for i = 1, #hostiles do
         local target = hostiles[i]
         local score = compute_weight(parent, target)
         game:debug("        Got score of " .. tostring(score) .. " for " .. target:id())
-        if score < best_score then
-            best = target
-            best_score = score
-        end
+        ranked[score] = target
+        table.insert(scores, score)
     end
 
-    game:log("      Best score was " .. tostring(best_score))
-    return best
+    table.sort(scores)
+
+    local out = {}
+    for i = 1, #scores do
+        local score = scores[i]
+        table.insert(out, ranked[score])
+    end
+
+    return out
 end
 
 function compute_weight(parent, target)

@@ -11,11 +11,13 @@ function on_target_select(parent, ability, targets)
   local pos = targets:selected_point()
   ability:activate(parent)
   
-  local summon = game:spawn_actor_at("plant_elemental", pos.x, pos.y, "Friendly")
+  local summon = game:spawn_actor_at("plant_elemental", pos.x, pos.y, parent:get_faction())
   if not summon:is_valid() then return end
   
-  summon:add_to_party(false)
-  summon:set_flag("__is_summoned_party_member")
+  if parent:is_party_member() then
+    summon:add_to_party(false)
+	summon:set_flag("__is_summoned_party_member")
+  end
   
   local levels = parent:stats().caster_level
   if levels > 3 then

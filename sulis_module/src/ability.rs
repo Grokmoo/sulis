@@ -68,7 +68,7 @@ pub struct Active {
     pub combat_only: bool,
     pub requires_melee: bool,
     pub requires_ranged: bool,
-    pub requires_active_mode: Option<String>,
+    pub requires_active_mode: Vec<String>,
 }
 
 #[derive(Debug)]
@@ -253,16 +253,17 @@ pub struct ActiveBuilder {
     requires_ranged: bool,
 
     #[serde(default)]
-    requires_active_mode: Option<String>,
+    requires_active_mode: Vec<String>,
 }
 
-#[derive(Deserialize, Debug, Clone, Copy)]
+#[derive(Deserialize, Debug, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct AIData {
     pub priority: u32,
     pub kind: AIKind,
     pub group: AIGroup,
     pub range: AIRange,
+    pub on_activate_fn: Option<String>,
 }
 
 impl AIData {

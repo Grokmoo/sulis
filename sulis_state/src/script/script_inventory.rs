@@ -278,7 +278,7 @@ impl UserData for ScriptInventory {
                 items.push(ScriptUsableItem {
                     parent: data.parent.clone(),
                     slot: *slot,
-                    ai: usable.ai,
+                    ai: usable.ai.clone(),
                 });
             }
 
@@ -340,6 +340,12 @@ pub struct ScriptUsableItem {
     ai: AIData,
 }
 
+impl ScriptUsableItem {
+    pub fn ai_data(&self) -> &AIData {
+        &self.ai
+    }
+}
+
 impl UserData for ScriptUsableItem {
     fn add_methods<'lua, M: UserDataMethods<'lua, Self>>(methods: &mut M) {
         methods.add_method("ai_data", |lua, item, ()| {
@@ -348,6 +354,10 @@ impl UserData for ScriptUsableItem {
             ai_data.set("kind", item.ai.kind())?;
             ai_data.set("group", item.ai.group())?;
             ai_data.set("range", item.ai.range())?;
+
+            if let Some(on_activate_fn) = &item.ai.on_activate_fn {
+                ai_data.set("on_activate_fn", on_activate_fn.to_string())?;
+            }
 
             Ok(ai_data)
         });

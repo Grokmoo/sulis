@@ -17,9 +17,10 @@ active:
   range: Touch
   ai:
     priority: 10
-    kind: Damage
+    kind: Debuff
     group: Single
     range: Touch
+    on_activate_fn: ai_on_activate
   short_description: |
     Reduce one attribute of a target while raising your own.
 prereqs:

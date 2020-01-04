@@ -135,6 +135,10 @@ use sulis_module::{Faction, Module, OnTrigger, Time, ItemState};
 /// uses and sets maximum hit points.  This is normally used in a script when the
 /// party rests.
 ///
+/// # `create_menu_selection(value: String)`
+/// Creates a ScriptMenuSelection object with the specified value.  Useful to
+/// manually generate a callback value without the user actually clicking on it
+///
 /// # `create_menu(title: String, callback: CallbackData)`
 /// Creates a new `ScriptMenu` which can then be built up and finally shown with `show()`.
 /// Calls the callback function `on_menu_select` when the user select an option.
@@ -463,6 +467,11 @@ impl UserData for ScriptInterface {
                 member.borrow_mut().actor.init_day();
             }
             Ok(())
+        });
+
+        methods.add_method("create_menu_selection", |_, _, value: String| {
+            let out = ScriptMenuSelection { value };
+            Ok(out)
         });
 
         methods.add_method(

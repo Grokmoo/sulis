@@ -9,7 +9,7 @@ function on_activate(parent, ability)
   menu:add_choice("Hit points below 25%", "hit_points_25")
   menu:add_choice("Attacked", "attacked")
   menu:add_choice("Attacked in Melee", "attacked_melee")
-  menu:show()
+  menu:show(parent)
 end
 
 function on_deactivate(parent, ability)
@@ -32,7 +32,7 @@ function spell_select(parent, ability, targets, selection)
 	  menu:add_choice(ability:name(), ability_id)
 	end
   end
-  menu:show()
+  menu:show(parent)
 end
 
 function create_contingency(parent, ability, targets, selection)

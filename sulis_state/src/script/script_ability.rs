@@ -301,7 +301,7 @@ impl ScriptAbility {
                     ability::Duration::Instant => 0,
                 };
 
-                (duration, active.ai)
+                (duration, active.ai.clone())
             }
         };
 
@@ -318,6 +318,10 @@ impl ScriptAbility {
             ai_data,
             range,
         }
+    }
+
+    pub fn ai_data(&self) -> &AIData {
+        &self.ai_data
     }
 
     pub fn to_ability(&self) -> Rc<Ability> {
@@ -401,6 +405,10 @@ impl UserData for ScriptAbility {
             ai_data.set("kind", ability.ai_data.kind())?;
             ai_data.set("group", ability.ai_data.group())?;
             ai_data.set("range", ability.ai_data.range())?;
+
+            if let Some(on_activate_fn) = &ability.ai_data.on_activate_fn {
+                ai_data.set("on_activate_fn", on_activate_fn.to_string())?;
+            }
 
             Ok(ai_data)
         });

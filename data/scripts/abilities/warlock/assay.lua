@@ -16,7 +16,7 @@ function on_target_select(parent, ability, targets)
   local stats = parent:stats()
   local amount = 10 + stats.caster_level / 2 + stats.intellect_bonus / 4
   
-  local effect = target:create_effect(ability:name(), duration)
+  local effect = target:create_effect(ability:name(), ability:duration())
   effect:set_tag("assay")
   effect:add_num_bonus("defense", -amount)
   effect:add_num_bonus("fortitude", -amount)

@@ -17,6 +17,8 @@ inventory:
     HeldMain: { id: mace }
   quick:
     Usable1: { id: potion_healing }
+    AltHeldMain:
+      id: shortbow
 reward:
   xp: 15
   loot: level1_misc

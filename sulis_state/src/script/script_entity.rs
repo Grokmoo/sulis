@@ -30,7 +30,7 @@ use sulis_core::resource::ResourceSet;
 use sulis_core::util::ExtInt;
 use sulis_module::{
     Actor, Attack, AttackKind, Attribute, DamageKind, Faction, HitFlags, HitKind, ImageLayer,
-    InventoryBuilder, MOVE_TO_THRESHOLD,
+    InventoryBuilder, MOVE_TO_THRESHOLD, ability::AIData,
 };
 
 /// Represents a single entity for Lua scripts.  Also can represent an invalid,
@@ -466,6 +466,15 @@ impl ScriptEntity {
         }
     }
 
+    pub fn is_party_member(&self) -> bool {
+        let entity = match self.try_unwrap() {
+            Ok(entity) => entity,
+            Err(_) => return false,
+        };
+        let entity = entity.borrow();
+        entity.is_party_member()
+    }
+
     pub fn check_not_equal(&self, other: &ScriptEntity) -> Result<()> {
         if self.index == other.index {
             warn!("Parent and target must not refer to the same entity for this method");
@@ -758,7 +767,11 @@ impl UserData for ScriptEntity {
                     }
                 }
                 let index = parent.borrow().index();
-                Script::ability_on_activate(index, &ability.to_ability());
+                let func = get_on_activate_fn(
+                    parent.borrow().is_party_member(),
+                    ability.ai_data()
+                );
+                Script::ability_on_activate(index, func, &ability.to_ability());
                 Ok(true)
             },
         );
@@ -769,7 +782,11 @@ impl UserData for ScriptEntity {
             if !parent.borrow().actor.can_use_quick(slot) {
                 return Ok(false);
             }
-            Script::item_on_activate(&parent, ScriptItemKind::Quick(slot));
+            let func = get_on_activate_fn(
+                parent.borrow().is_party_member(),
+                item.ai_data()
+            );
+            Script::item_on_activate(&parent, func, ScriptItemKind::Quick(slot));
             Ok(true)
         });
 
@@ -1746,4 +1763,16 @@ fn targets(_lua: Context, parent: &ScriptEntity, _args: ()) -> Result<ScriptEnti
         affected_points: Vec::new(),
         surface: None,
     })
+}
+
+fn get_on_activate_fn(is_party_member: bool, ai_data: &AIData) -> String {
+    if is_party_member {
+        "on_activate".to_string()
+    } else {
+        if let Some(func) = &ai_data.on_activate_fn {
+            func.to_string()
+        } else {
+            "on_activate".to_string()
+        }
+    }
 }

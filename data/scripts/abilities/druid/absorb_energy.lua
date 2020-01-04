@@ -1,12 +1,20 @@
+choices = { "Piercing", "Slashing", "Crushing" }
+
 function on_activate(parent, ability)
   local cb = ability:create_callback(parent)
   cb:set_on_menu_select_fn("menu_select")
 
   local menu = game:create_menu("Select type for Absorb Energy", cb)
-  menu:add_choice("Piercing")
-  menu:add_choice("Slashing")
-  menu:add_choice("Crushing")
-  menu:show()
+  for i = 1, #choices do
+    menu:add_choice(choices[i])
+  end
+  menu:show(parent)
+end
+
+function ai_on_activate(parent, ability)
+  local choice = choices[math.random(#choices)]
+  local selection = game:create_menu_selection(choice)
+  menu_select(parent, ability, nil, selection)
 end
 
 function menu_select(parent, ability, targets, selection)

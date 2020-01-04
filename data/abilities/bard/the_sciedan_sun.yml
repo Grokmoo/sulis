@@ -16,7 +16,7 @@ active:
     bard:
       Inspiration: 20
   combat_only: true
-  requires_active_mode: song_of_curses
+  requires_active_mode: [ song_of_curses ]
   range:
     Radius: 8.0
   range_increases_with:
@@ -24,7 +24,7 @@ active:
     amount: 2.0
   ai:
     priority: 10
-    kind: Buff
+    kind: Debuff
     group: Multiple
     range: Short
   short_description: |

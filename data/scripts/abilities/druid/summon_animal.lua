@@ -1,22 +1,37 @@
+function build_choices(parent, ability)
+  local choices = { "Wolf", "Rat", "Scorpion" }
+  
+  local level = parent:ability_level(ability)
+  
+  if level > 1 then
+    table.insert(choices, "Spider")
+  end
+  
+  if level > 2 then
+    table.insert(choices, "Mushroom")
+  end
+  
+  return choices
+end
+
 function on_activate(parent, ability)
   local cb = ability:create_callback(parent)
   cb:set_on_menu_select_fn("menu_select")
 
-  local level = parent:ability_level(ability)
-  
+  local choices = build_choices(parent, ability)
   local menu = game:create_menu("Select an animal to summon", cb)
-  menu:add_choice("Wolf")
-  menu:add_choice("Rat")
-  menu:add_choice("Scorpion")
-  if level > 1 then
-    menu:add_choice("Spider")
+  for i = 1, #choices do
+    menu:add_choice(choices[i])
   end
   
-  if level > 2 then
-    menu:add_choice("Mushroom")
-  end
-  
-  menu:show()
+  menu:show(parent)
+end
+
+function ai_on_activate(parent, ability)
+  local choices = build_choices(parent, ability)
+  local choice = choices[math.random(#choices)]
+  local selection = game:create_menu_selection(choice)
+  menu_select(parent, ability, nil, selection)
 end
 
 function menu_select(parent, ability, targets, selection)
@@ -54,11 +69,13 @@ function on_target_select(parent, ability, targets)
 	Mushroom = "shroom_large_summon"
   }
   
-  local summon = game:spawn_actor_at(summon_ids[summon_type], pos.x, pos.y, "Friendly")
+  local summon = game:spawn_actor_at(summon_ids[summon_type], pos.x, pos.y, parent:get_faction())
   if not summon:is_valid() then return end
   
-  summon:add_to_party(false)
-  summon:set_flag("__is_summoned_party_member")
+  if parent:is_party_member() then
+    summon:add_to_party(false)
+	summon:set_flag("__is_summoned_party_member")
+  end
   
   local levels = parent:stats().caster_level
   if levels > 1 then

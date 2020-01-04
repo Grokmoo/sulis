@@ -77,7 +77,7 @@ pub fn use_item_cb(entity: &Rc<RefCell<EntityState>>, kind: ScriptItemKind) -> C
         }
         let (root, view) = Widget::parent_mut::<RootView>(widget);
         view.set_inventory_window(&root, false);
-        Script::item_on_activate(&entity, kind.clone());
+        Script::item_on_activate(&entity, "on_activate".to_string(), kind.clone());
     }))
 }
 

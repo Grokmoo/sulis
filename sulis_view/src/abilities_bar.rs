@@ -572,7 +572,7 @@ impl WidgetKind for AbilityButton {
         let can_activate = self.entity.borrow().actor.can_activate(&self.ability.id);
         if can_activate {
             let index = self.entity.borrow().index();
-            Script::ability_on_activate(index, &self.ability);
+            Script::ability_on_activate(index, "on_activate".to_string(), &self.ability);
             return true;
         }
 

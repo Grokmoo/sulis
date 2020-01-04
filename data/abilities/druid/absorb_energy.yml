@@ -14,9 +14,10 @@ active:
   range: Personal
   ai:
     priority: 30
-    kind: Special
+    kind: Buff
     group: Single
     range: Personal
+    on_activate_fn: ai_on_activate
   short_description: |
     A single selected damage type heals instead of harms you.
 prereqs:

@@ -17,6 +17,9 @@ inventory:
     HeldMain: { id: shortsword }
     HeldOff: { id: shield_small }
     Torso: { id: torso_mail }
+  quick:
+    AltHeldMain:
+      id: shortbow
 reward:
   xp: 15
   loot: level1_misc

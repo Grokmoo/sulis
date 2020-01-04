@@ -15,9 +15,10 @@ active:
     Radius: 12.0
   ai:
     priority: 30
-    kind: Special
+    kind: Summon
     group: Multiple
     range: Short
+    on_activate_fn: ai_on_activate
   short_description: |
     Summon a loyal animal to fight for you.
 upgrades:

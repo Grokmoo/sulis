@@ -158,8 +158,12 @@ impl Script {
         }
     }
 
-    pub fn item_on_activate(parent: &Rc<RefCell<EntityState>>, kind: ScriptItemKind) {
-        if let Err(e) = script_cache::item_on_activate(parent, kind) {
+    pub fn item_on_activate(
+        parent: &Rc<RefCell<EntityState>>,
+        func: String,
+        kind: ScriptItemKind
+    ) {
+        if let Err(e) = script_cache::item_on_activate(parent, func, kind) {
             warn!("Error in item on_activate script: {}", e);
         }
     }
@@ -232,8 +236,8 @@ impl Script {
         }
     }
 
-    pub fn ability_on_activate(parent: usize, ability: &Rc<Ability>) {
-        if let Err(e) = script_cache::ability_on_activate(parent, ability) {
+    pub fn ability_on_activate(parent: usize, func: String, ability: &Rc<Ability>) {
+        if let Err(e) = script_cache::ability_on_activate(parent, func, ability) {
             warn!("Error in ability on_activate: {}", e);
         }
     }

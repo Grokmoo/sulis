@@ -16,6 +16,9 @@ levels:
 inventory:
   equipped:
     HeldMain: { id: shortsword }
+  quick:
+    AltHeldMain:
+      id: crossbow
 reward:
   xp: 20
   loot: level1_misc

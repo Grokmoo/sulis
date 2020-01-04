@@ -28,7 +28,7 @@ use crate::script::{
 };
 use crate::{EntityState, GameState, Script};
 use sulis_core::util::invalid_data_error;
-use sulis_module::{on_trigger::Kind, DamageKind, HitKind, Module};
+use sulis_module::{on_trigger::Kind, DamageKind, HitKind, Module, Ability};
 
 pub fn fire_round_elapsed(cbs: Vec<Rc<CallbackData>>) {
     for cb in cbs {
@@ -73,7 +73,8 @@ pub fn fire_cbs(cbs: Vec<TriggeredCallback>) {
             FuncKind::OnActivated => match &cb.kind {
                 Kind::Ability(id) => {
                     let ability = Module::ability(id).unwrap();
-                    Script::ability_on_activate(cb.parent, &ability);
+                    let func = get_on_activate_fn(&cb, &ability);
+                    Script::ability_on_activate(cb.parent, func, &ability);
                 }
                 _ => warn!("OnActivated called with invalid callback kind."),
             },
@@ -86,6 +87,35 @@ pub fn fire_cbs(cbs: Vec<TriggeredCallback>) {
             },
             _ => {
                 warn!("Surface callback of kind {:?} is not being called.", func);
+            }
+        }
+    }
+}
+
+const ON_ACTIVATE_DEFAULT: &str = "on_activate";
+
+fn get_on_activate_fn(cb: &CallbackData, ability: &Ability) -> String {
+    let ai_data = match &ability.active {
+        None => return ON_ACTIVATE_DEFAULT.to_string(),
+        Some(active) => &active.ai,
+    };
+
+    let func = match &ai_data.on_activate_fn {
+        None => return ON_ACTIVATE_DEFAULT.to_string(),
+        Some(func) => func.to_string(),
+    };
+
+    let mgr = GameState::turn_manager();
+    let mgr = mgr.borrow();
+    match mgr.entity_checked(cb.parent) {
+        None => {
+            ON_ACTIVATE_DEFAULT.to_string()
+        },
+        Some(entity) => {
+            if entity.borrow().is_party_member() {
+                ON_ACTIVATE_DEFAULT.to_string()
+            } else {
+                func
             }
         }
     }

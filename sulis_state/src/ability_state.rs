@@ -28,25 +28,35 @@ pub struct AbilityState {
     pub combat_only: bool,
     pub requires_melee: bool,
     pub requires_ranged: bool,
-    pub requires_active_mode: Option<Rc<Ability>>,
+    pub requires_active_mode: Vec<Rc<Ability>>,
     cur_duration: u32,
     pub listeners: ChangeListenerList<AbilityState>,
     pub newly_added_ability: bool,
 }
 
+fn get_modes(ability: &Ability, input: &[String]) -> Vec<Rc<Ability>> {
+    let mut out = Vec::new();
+
+    for id in input {
+        match Module::ability(id) {
+            None => {
+                warn!("Invalid requires_active_mode for {}", ability.id);
+            }, Some(ability) => {
+                out.push(ability);
+            }
+        }
+    }
+
+    out
+}
+
 impl AbilityState {
     pub fn new(ability: &Rc<Ability>) -> AbilityState {
-        let (group, combat_only, mode, melee, ranged) = match ability.active {
+        let (group, combat_only, modes, melee, ranged) = match ability.active {
             None => panic!(),
             Some(ref active) => {
-                let mode = active
-                    .requires_active_mode
-                    .as_ref()
-                    .map_or(None, |id| Module::ability(&id));
-                if mode.is_none() && active.requires_active_mode.is_some() {
-                    warn!("Invalid requires_active_mode for {}", ability.id);
-                }
-                (active.group.name(), active.combat_only, mode,
+                let modes = get_modes(ability, &active.requires_active_mode);
+                (active.group.name(), active.combat_only, modes,
                  active.requires_melee, active.requires_ranged)
             }
         };
@@ -57,7 +67,7 @@ impl AbilityState {
             remaining_duration: ExtInt::Int(0),
             combat_only,
             cur_duration: 0,
-            requires_active_mode: mode,
+            requires_active_mode: modes,
             requires_melee: melee,
             requires_ranged: ranged,
             listeners: ChangeListenerList::default(),
@@ -84,10 +94,16 @@ impl AbilityState {
         if self.requires_melee && !stats.attack_is_melee() { return false; }
         if self.requires_ranged && !stats.attack_is_ranged() { return false; }
 
-        if let Some(required_mode) = self.requires_active_mode.as_ref() {
-            if !current_modes.contains(&&required_mode.id[..]) {
-                return false;
+        if !self.requires_active_mode.is_empty() {
+            let mut found = false;
+            for mode in &self.requires_active_mode {
+                if current_modes.contains(&&mode.id[..]) {
+                    found = true;
+                    break;
+                }
             }
+
+            if !found { return false; }
         }
 
         if self.combat_only && !GameState::is_combat_active() {

@@ -37,7 +37,10 @@ inventory:
     Hands:
       id: gloves_leather
       adjectives: [ fine ]
-  quick: {}
+  quick:
+    AltHeldMain:
+      id: crossbow
+      adjectives: [ fine ]
   pc_starting_coins: 0
   pc_starting_items: []
 levels:

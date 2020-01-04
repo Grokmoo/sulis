@@ -1,3 +1,5 @@
+choices = { "Strength", "Dexterity", "Endurance", "Perception", "Intellect", "Wisdom" }
+
 function on_activate(parent, ability)
   local cb = ability:create_callback(parent)
   cb:set_on_menu_select_fn("menu_select")
@@ -5,14 +7,17 @@ function on_activate(parent, ability)
   local level = parent:ability_level(ability)
   
   local menu = game:create_menu("Select an attribute to steal", cb)
-  menu:add_choice("Strength")
-  menu:add_choice("Dexterity")
-  menu:add_choice("Endurance")
-  menu:add_choice("Perception")
-  menu:add_choice("Intellect")
-  menu:add_choice("Wisdom")
+  for i = 1, #choices do
+    menu:add_choice(choices[i])
+  end
   
-  menu:show()
+  menu:show(parent)
+end
+
+function ai_on_activate(parent, ability)
+  local choice = choices[math.random(#choices)]
+  local selection = game:create_menu_selection(choice)
+  menu_select(parent, ability, nil, selection)
 end
 
 function menu_select(parent, ability, targets, selection)

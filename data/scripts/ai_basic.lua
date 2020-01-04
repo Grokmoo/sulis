@@ -35,7 +35,7 @@ function ai_action(parent)
 
     local failed_use_count = 0
 
-    -- only loop at most 10 times
+    -- only check items and abilities at most 10 times
     for i = 1,10 do
         local result = find_and_use_item(parent, items, hostiles, friendlies, failed_use_count)
         if result.done then

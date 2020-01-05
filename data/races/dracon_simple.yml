@@ -1,0 +1,49 @@
+id: dracon_simple
+name: Dracon
+description: "Dracon with limited subicons"
+size: 2by2
+movement_rate: 0.9
+disabled_slots: [ Head ]
+base_stats:
+  - kind: { attribute: { attribute: Dexterity, amount: -2 } }
+  - kind: { attribute: { attribute: Endurance, amount: 3 } }
+  - kind: { attribute: { attribute: Wisdom, amount: -1 } }
+  - kind: { hit_points: 40 }
+  - kind: { reach: 0.25 }
+base_attack:
+  damage:
+    min: 8
+    max: 12
+    kind: Crushing
+  kind: #Melee
+    reach: 0.5
+  bonuses: {}
+default_images:
+  Male:
+    Foreground: creatures/dracon_fg
+    Background: creatures/dracon_bg
+    Shadow: creatures/trollkin_shadow
+  Female:
+    Foreground: creatures/dracon_fg
+    Background: creatures/dracon_bg
+    Shadow: creatures/trollkin_shadow
+ticker_offset: [0.5, 2.5]
+image_layer_offset_scale: 16
+image_layer_offsets:
+  HeldMain: [-26, -24]
+  HeldOff: [9, -23]
+  Ears: [-8,-18]
+  Hair: [-8,-36]
+  Beard: [-7,-29]
+  Head: [-7,-30]
+  Hands: [-8,-18]
+  Foreground: [-8,-18]
+  Torso: [-8,-18]
+  Legs: [-8,-18]
+  Feet: [-8,-18]
+  Background: [-8,-18]
+  Cloak: [-8,-18]
+  Shadow: [-8,-18]
+image_layer_postfix:
+  Female: "_trollkin"
+  Male: "_trollkin"

@@ -10,3 +10,6 @@ entries:
   dracon_camp:
     description: |
       I have been tasked with traveling to a Dracon encampment just outside Oasis and putting down any signs of rebellion there.  Then, I am to ensure they produce the expected tribute for Berkeley, the Leader.
+  dracon_allies:
+    description: |
+      I am now working with the Dracon against Berkeley and his minions.

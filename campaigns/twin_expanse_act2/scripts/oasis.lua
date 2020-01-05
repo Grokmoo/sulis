@@ -81,3 +81,10 @@ function missing_mercs_complete(parent, target)
   game:set_quest_entry_state("missing_mercs", "complete", "Visible")
   game:set_quest_state("missing_mercs", "Complete")
 end
+
+function dracon_imperator_show_library(parent, target)
+  game:set_quest_entry_state("the_aegis", "the_library", "Visible")
+  game:set_quest_entry_state("working_for_the_boss", "dracon_allies", "Visible")
+  
+  game:set_world_map_location_visible("ancient_library", true)
+end

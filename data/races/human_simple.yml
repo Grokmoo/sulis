@@ -7,6 +7,7 @@ base_stats:
   - kind: { attribute: { attribute: Strength, amount: 1 } }
   - kind: { attribute: { attribute: Endurance, amount: 1 } }
   - kind: { attribute: { attribute: Perception, amount: -1 } }
+  - kind: { initiative: 1 }
   - kind: { hit_points: 40 }
   - kind: { reach: 0.25 }
 base_attack:

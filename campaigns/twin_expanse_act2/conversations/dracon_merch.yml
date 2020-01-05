@@ -1,0 +1,29 @@
+id: dracon_merch
+initial_nodes:
+  - id: start01
+nodes:
+  start01:
+    text: |
+      [c=6868FF|#target_name#] - I have a small selection of goods that we trade with outsiders.
+    responses:
+      - text: "Yes, I'll have a look."
+        on_select:
+          - show_merchant:
+              id: dracon_merch
+              loot_list: level10_misc_merchant
+              buy_frac: 1.0
+              sell_frac: 0.25
+              refresh_time:
+                hour: 24
+      - text: "May we rest here?"
+        to: rest
+      - text: "Nothing for now."
+  rest:
+    text: |
+      [c=6868FF|#target_name#] - Very well.  No harm will come to you in our camp.
+    responses:
+      - text: "[c=888|Rest]"
+        on_select:
+          - fire_script:
+              id: oasis
+              func: priest_rest

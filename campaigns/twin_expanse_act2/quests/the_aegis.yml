@@ -9,3 +9,6 @@ entries:
   oasis:
     description: |
       I have discovered that I am a prisoner of sorts in the town of Oasis, located on the other side of the Sciedan Desert.  I must find a way to escape and return to the Twin Expanse.
+  the_library:
+    description: |
+      The leader of a small Dracon group near Oasis has given me the location of an ancient library containing information about the Aegis.  With luck, I will find some clue there on how to defeat Berkeley.

@@ -1,0 +1,125 @@
+id: dracon_imperator
+initial_nodes:
+  - id: main
+    to_view:
+      - target_flag: already_talked
+  - id: start01
+nodes:
+  start01:
+    text: |
+      [c=6868FF|#target_name#] - [c=888|You see a tall but relatively thin Dracon man.  He regards you with piercing eyes.]
+      
+      Ah you've arrived.  I know Berkeley's lackeys sent you.
+    on_view:
+      - target_flag: already_talked
+    responses:
+      - text: "[c=888|Continue]"
+        to: start02
+  start02:
+    text: |
+      [c=6868FF|#target_name#] - But, I also know you have no love for him.  And I know you seek a way to return to Rose Lake.
+    responses:
+      - text: "Then you will help me?"
+        to: start03
+  start03:
+    text: |
+      [c=6868FF|#target_name#] - I will try.  But first, I have heard many rumors of Berkeley, and happenings in Rose Lake.
+      
+      Of what I have heard, it seems you have been at the center of much of it.  So tell me, what truly happened?
+    responses:
+      - text: "How do I know I can trust you?"
+        to: start_trust
+      - text: "I don't think so."
+        to: start_refuse
+      - text: "[c=888|Tell him of Berkeley gaining control of Rose Lake and the Aegis.]"
+        to: start_tell
+  start_trust:
+    text: |
+      [c=6868FF|#target_name#] - Truthfully, you don't.  But if I am to help you, I must know the truth of these matters.
+    responses:
+      - text: |
+          I don't think so.
+        to: start_refuse
+      - text: "[c=888|Tell him of Berkeley gaining control of Rose Lake and the Aegis.]"
+        to: start_tell
+  start_refuse:
+    text: |
+      [c=6868FF|#target_name#] - Unfortunately, that means I cannot help you.  Let me know if you change your mind.
+    responses:
+      - text: "[c=888|Leave]"
+  main:
+    text: |
+      [c=6868FF|#target_name#] - Yes?
+    responses:
+      - text: "[c=888|Tell him of Berkeley gaining control of Rose Lake and the Aegis.]"
+        to_view:
+          - not_target_flag: told_aegis
+        to: start_tell
+      - text: "There is still the matter of Berkeley's men in Oasis."
+        to: ask_oasis
+      - text: "Nothing for now."
+  start_tell:
+    text: |
+      [c=6868FF|#target_name#] - It is as bad as I have feared.  Worse, even.
+        
+      With the completed Aegis, Berkeley has control of a power that has no match in our modern world.
+    on_view:
+      - target_flag: told_aegis
+    responses:
+      - text: "[c=888|Continue]"
+        to: aegis_plan_main
+  aegis_plan_main:
+    text: |
+      [c=6868FF|#target_name#] - [c=888|He pauses in thought for a moment.]
+    responses:
+      - text: "What is the Aegis?"
+        to: ask_aegis
+      - text: "If Berkeley has powerful magic, surely we can find equally powerful magic to fight him?"
+        to: ask_magic
+      - text: "You said you could help me return to Rose Lake."
+        to: ask_rose_lake
+  ask_aegis:
+    text: |
+      [c=6868FF|#target_name#] - The Aegis is a powerful magical artifact, from before the Sundering.  It gives its owner profound power over space and distance.
+    responses:
+      - text: "[c=888|Continue]"
+        to: aegis_plan_main
+  ask_magic:
+    text: |
+      [c=6868FF|#target_name#] - The Aegis is one of a kind, a pre-Sundering artifact.  Magic of that complexity and power is simply not possible at present.
+      
+      Maybe, there is another artifact somewhere out there, which you could use to match it?  More likely, not.
+    responses:
+      - text: "[c=888|Continue]"
+        to: aegis_plan_main
+  ask_rose_lake:
+    text: |
+      [c=6868FF|#target_name#] - Yes, but that was before you confirmed that Berkeley has the completed Aegis in his possession.
+      
+      Rushing back to Rose Lake to fight him will simply result in your immediate death.
+    responses:
+      - text: "[c=888|Continue]"
+        to: ask_rose_lake_2
+  ask_rose_lake_2:
+    text: |
+      [c=6868FF|#target_name#] -  But I can help you, nonetheless.  There is an ancient library of my people, partially buried in the desert not far from here.
+      
+      Berkeley spent some time there in years past.  Perhaps you can discover something there to aide you.
+    responses:
+      - text: "[c=888|Continue]"
+        to: ask_rose_lake_3
+  ask_rose_lake_3:
+    text: |
+      [c=6868FF|#target_name#] -  We can only hope for good fortune in this.  Good luck.
+    on_view:
+      - fire_script:
+          id: oasis
+          func: dracon_imperator_show_library
+    responses:
+      - text: "Farewell."
+  ask_oasis:
+    text: |
+      [c=6868FF|#target_name#] - That is nothing for you to concern yourself with.  We can handle that rabble, if it comes to it.
+    responses:
+      - text: "[c=888|Continue]"
+        to: main

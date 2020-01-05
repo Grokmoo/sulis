@@ -362,7 +362,15 @@ groups:
       human38: [6, 9]
       human39: [9, 9]
       human40: [12, 9]
-      
+  premades_dracon:
+    size: [3, 4]
+    position: [40, 58]
+    areas:
+      dracon01: [0, 0]
+      dracon02: [3, 0]
+      dracon03: [6, 0]
+      dracon04: [9, 0]
+      dracon05: [12, 0]
   dragons:
     position: [0, 52]
     areas:

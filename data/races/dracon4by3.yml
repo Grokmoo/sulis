@@ -1,0 +1,50 @@
+id: dracon4by3
+name: Dracon
+description: |
+  Dracon with 4by3 bg
+size: 2by2
+movement_rate: 0.9
+disabled_slots: [ Head ]
+base_stats:
+  - kind: { attribute: { attribute: Strength, amount: 2 } }
+  - kind: { attribute: { attribute: Endurance, amount: 2 } }
+  - kind: { attribute: { attribute: Dexterity, amount: -3 } }
+  - kind: { attribute: { attribute: Perception, amount: -1 } }
+  - kind: { hit_points: 40 }
+  - kind: { reach: 0.5 }
+  - kind: { armor: 2 }
+  - kind: { resistance: { kind: "Fire", amount: 25 } }
+  - kind: { resistance: { kind: "Cold", amount: -35 } }
+base_attack:
+  damage:
+    min: 8
+    max: 12
+    kind: Crushing
+  kind: #Melee
+    reach: 0.5
+  bonuses: {}
+default_images:
+  Male:
+    Foreground: creatures/dracon_fg
+    Background: creatures/dracon_bg
+    Shadow: creatures/trollkin_shadow
+  Female:
+    Foreground: creatures/dracon_fg
+    Background: creatures/dracon_bg
+    Shadow: creatures/trollkin_shadow
+ticker_offset: [0.5, 2.5]
+image_layer_offset_scale: 16
+image_layer_offsets:
+  HeldMain: [-26, -36]
+  HeldOff: [9, -35]
+  Foreground: [-8,-30]
+  Background: [-8,-30]
+  Cloak: [-8,-30]
+  Shadow: [-8,-30]
+image_layer_postfix:
+  Female: "_trollkin"
+  Male: "_trollkin"
+editor_creator_images:
+  Background: [ creatures/dracon01, creatures/dracon02, creatures/dracon03, creatures/dracon04, creatures/dracon05 ]
+  Foreground: [ empty ]
+  Shadow: [ empty ]

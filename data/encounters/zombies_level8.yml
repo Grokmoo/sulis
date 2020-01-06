@@ -1,0 +1,9 @@
+id: zombies_level8
+auto_spawn: true
+min_gen_actors: 5
+max_gen_actors: 6
+entries:
+  - id: zombie
+    weight: 1
+  - id: zombie02
+    weight: 1

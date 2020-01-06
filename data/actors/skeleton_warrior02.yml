@@ -1,0 +1,39 @@
+id: skeleton_warrior02
+ai: ai_basic
+name: Skeleton Warrior
+faction: Hostile
+images: {}
+race: skeleton
+attributes:
+  str: 10
+  dex: 10
+  end: 10
+  per: 10
+  int: 10
+  wis: 10
+levels:
+  fighter: 9
+inventory:
+  equipped:
+    HeldMain: { id: longsword }
+    HeldOff: { id: shield_small }
+  quick:
+    AltHeldMain:
+      id: shortbow
+reward:
+  xp: 100
+  loot: level1_misc
+  loot_chance: 35
+abilities:
+  - armor_light
+  - armor_medium
+  - armor_heavy
+  - weapon_axe
+  - weapon_crossbow
+  - weapon_bow
+  - weapon_small_sword
+  - weapon_large_sword
+  - weapon_spear
+  - weapon_mace
+  - weapon_simple
+  - whirlwind_attack

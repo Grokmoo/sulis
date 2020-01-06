@@ -307,6 +307,14 @@ groups:
       rodian03: [18, 50]
       rodian04: [21, 50]
       rodian05: [24, 50]
+      
+      undead01: [36, 24]
+      undead02: [39, 24]
+      undead03: [42, 24]
+      undead04: [45, 24]
+      undead05: [48, 24]
+      undead06: [51, 24]
+      undead07: [54, 24]
   premades:
     size: [3, 3]
     position: [0, 39]

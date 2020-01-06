@@ -90,6 +90,8 @@ world_map:
       position: [4.5, 4.5]
       icon: mountain_town01
       initially_visible: false
+      linked_area: ancient_library
+      linked_area_pos: [6, 12]
       travel_times:
         dracon_camp: 24
         drake_nest: 36

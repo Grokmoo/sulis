@@ -16,6 +16,10 @@ images:
   Shadow: empty
   Background: creatures/human35
   Foreground: empty
+reward:
+  xp: 80
+  loot: level1_misc
+  loot_chance: 35
 hue: 1.0
 inventory:
   equipped:

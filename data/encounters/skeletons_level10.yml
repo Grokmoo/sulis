@@ -1,0 +1,36 @@
+id: skeletons_level10
+auto_spawn: true
+min_gen_actors: 4
+max_gen_actors: 4
+entries:
+  - id: zombie
+    always: true
+  - id: zombie02
+    always: true
+  - id: skeleton_warrior01
+    weight: 1
+    limit: 2
+  - id: skeleton_warrior02
+    weight: 1
+    limit: 2
+  - id: skeleton_warrior03
+    weight: 1
+    limit: 2
+  - id: skeleton_rogue01
+    weight: 1
+    limit: 2
+  - id: skeleton_rogue02
+    weight: 1
+    limit: 2
+  - id: skeleton_rogue03
+    weight: 1
+    limit: 1
+  - id: skeleton_mage01
+    weight: 1
+    limit: 1
+  - id: skeleton_mage02
+    weight: 1
+    limit: 1
+  - id: skeleton_mage03
+    weight: 1
+    limit: 1

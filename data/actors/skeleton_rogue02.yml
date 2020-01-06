@@ -1,0 +1,37 @@
+id: skeleton_rogue02
+ai: ai_basic
+name: Skeleton Rogue
+faction: Hostile
+images: {}
+race: skeleton
+attributes:
+  str: 10
+  dex: 10
+  end: 10
+  per: 10
+  int: 10
+  wis: 10
+levels:
+  rogue: 9
+inventory:
+  equipped:
+    HeldMain: { id: dagger }
+    HeldOff: { id: dagger }
+  quick:
+    AltHeldMain:
+      id: shortbow
+images:
+  Background: creatures/undead02
+reward:
+  xp: 100
+  loot: level1_misc
+  loot_chance: 35
+abilities:
+  - armor_light
+  - weapon_crossbow
+  - weapon_bow
+  - weapon_small_sword
+  - weapon_simple
+  - backstab
+  - flanker
+  - rapid_strikes

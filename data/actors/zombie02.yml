@@ -1,0 +1,23 @@
+id: zombie02
+ai: ai_basic
+name: Zombie
+faction: Hostile
+images: {}
+race: zombie
+attributes:
+  str: 10
+  dex: 10
+  end: 10
+  per: 10
+  int: 10
+  wis: 10
+levels:
+  fighter: 8
+images:
+  Background: creatures/undead06
+inventory: {}
+reward:
+  xp: 45
+  loot: level1_misc
+  loot_chance: 35
+abilities: []

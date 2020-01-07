@@ -608,7 +608,7 @@ function compute_offensive_strength(stats)
         if stats.attack_is_melee then
             result = result + stats.melee_accuracy / 200.0
         else -- attack is ranged
-            result = result + stats.range_accuracy / 200.0
+            result = result + stats.ranged_accuracy / 200.0
         end
     end
 

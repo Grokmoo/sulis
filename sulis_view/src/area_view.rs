@@ -296,6 +296,7 @@ impl AreaView {
             // info!("{}|", cur_line);
         }
 
+        if draw_list.is_empty() { return; }
         AreaView::draw_list_to_texture(renderer, draw_list, VISIBILITY_TEX_ID);
     }
 

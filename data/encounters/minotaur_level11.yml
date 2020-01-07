@@ -1,0 +1,11 @@
+id: minotaur_level11
+auto_spawn: true
+min_gen_actors: 4
+max_gen_actors: 4
+entries:
+  - id: minotaur
+    always: true
+  - id: zombie
+    weight: 1
+  - id: zombie02
+    weight: 1

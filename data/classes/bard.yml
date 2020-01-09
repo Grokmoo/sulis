@@ -320,7 +320,7 @@ kits:
       wis: 12
     starting_inventory:
       equipped:
-        HeldMain: { id: handaxe }
+        HeldMain: { id: hatchet }
         HeldOff: { id: shield_small }
         Feet: { id: boots_leather }
         Torso: { id: torso_leather }
@@ -340,7 +340,7 @@ kits:
       
       [s=7|Starting Equipment]
       
-      Handaxe
+      Hatchet
       Small Shield
       Partial Leather Armor
       120 Coins

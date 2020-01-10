@@ -1,0 +1,17 @@
+id: history_of_the_aegis
+initial_nodes:
+  - id: start01
+nodes:
+  start01:
+    text: |
+      [c=888|This is a book written in a language you have never seen before.  Prominently on the cover is a picture of the Aegis.]
+    responses:
+      - text: "[c=888|Flip through the pages for anything of interest.]"
+        to: flip_through
+      - text: "[c=888|Close the journal.]"
+  flip_through:
+    text: |
+      [c=888|Flipping through the pages, you see various diagrams of the Aegis and its components, but cannot make sense of the strange script.]
+    responses:
+      - text: "[c=888|Continue]"
+        to: start01

@@ -1,0 +1,17 @@
+id: history_of_the_aegis
+name: "History of the Aegis"
+icon: inventory/misc_book06
+weight: 100
+value: 10
+usable:
+  consumable: false
+  script: history_of_the_aegis
+  ap: 2000
+  duration: Instant
+  use_in_slot: false
+  ai:
+    priority: 99999
+    kind: Special
+    group: Single
+    range: Personal
+  short_description: "Read this book"

@@ -12,3 +12,6 @@ entries:
   the_library:
     description: |
       The leader of a small Dracon group near Oasis has given me the location of an ancient library containing information about the Aegis.  With luck, I will find some clue there on how to defeat Berkeley.
+  razethar_the_sage:
+    description: |
+      I have found a book that appears to contain a history of the Aegis.  But I cannot read it.  The only one who can is the Sage, Rathezar, who lives alone on top of a lonely mesa.

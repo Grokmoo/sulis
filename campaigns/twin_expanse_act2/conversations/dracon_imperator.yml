@@ -55,6 +55,11 @@ nodes:
         to_view:
           - not_target_flag: told_aegis
         to: start_tell
+      - text: "[c=888|Show him the Aegis Book] I found this book.  But I cannot read it."
+        to_view:
+          - party_item: history_of_the_aegis
+          - not_target_flag: shown_mesa
+        to: history_aegis_01
       - text: "There is still the matter of Berkeley's men in Oasis."
         to: ask_oasis
       - text: "Nothing for now."
@@ -123,3 +128,47 @@ nodes:
     responses:
       - text: "[c=888|Continue]"
         to: main
+  history_aegis_01:
+    text: |
+      [c=6868FF|#target_name#] - [c=888|He perks up, excited.]
+      
+      Oh?  Very interesting.
+    responses:
+      - text: "[c=888|Continue]"
+        to: history_aegis_02
+  history_aegis_02:
+    text: |
+      [c=6868FF|#target_name#] - [c=888|He studies the book intently.]
+    responses:
+      - text: "[c=888|Continue]"
+        to: history_aegis_03
+  history_aegis_03:
+    text: |
+      [c=6868FF|#target_name#] - [c=888|He seems lost in deep thought.]
+    responses:
+      - text: "Well?  What does it say?"
+        to: history_aegis_04
+  history_aegis_04:
+    text: |
+      [c=6868FF|#target_name#] - [c=888|He looks up at you with a start, almost as if he forgot you were there.]
+      
+      Say?  I have no idea.  I cannot read it.  This script is ancient Draconic.  It has neither been spoken or written for thousands of years.
+    responses:
+      - text: "[c=888|Continue]"
+        to: history_aegis_05
+  history_aegis_05:
+    text: |
+      [c=6868FF|#target_name#] - I know of only one who can read it.  An old sage, Razethar.
+    responses:
+      - text: "How do we find him?"
+        to: history_aegis_06
+  history_aegis_06:
+    text: |
+      [c=6868FF|#target_name#] - There is a lonely mesa to the south.  He lives alone at the top.  If he is still alive, that is.
+    on_view:
+      - fire_script:
+          id: oasis
+          func: dracon_imperator_show_mesa
+      - target_flag:  shown_mesa
+    responses:
+      - text: "Thank you.  Farewell."

@@ -88,3 +88,10 @@ function dracon_imperator_show_library(parent, target)
   
   game:set_world_map_location_visible("ancient_library", true)
 end
+
+function dracon_imperator_show_mesa(parent, target)
+  game:set_quest_entry_state("the_aegis", "razethar_the_sage", "Visible")
+  
+  game:set_world_map_location_visible("lonely_mesa", true)
+  game:set_world_map_location_visible("southern_desert", true)
+end

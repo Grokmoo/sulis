@@ -39,6 +39,8 @@ world_map:
         drake_nest: 24
         dracon_camp: 12
         ancient_library: 36
+        southern_desert: 60
+        lonely_mesa: 72
     desert_start:
       name: "Desert"
       position: [1, 3]
@@ -61,6 +63,8 @@ world_map:
         desert_canyon: 18
         dracon_camp: 12
         ancient_library: 36
+        southern_desert: 60
+        lonely_mesa: 72
     desert_canyon:
       name: "Desert Canyon"
       position: [5, 1.5]
@@ -73,6 +77,8 @@ world_map:
         drake_nest: 18
         dracon_camp: 12
         ancient_library: 36
+        southern_desert: 60
+        lonely_mesa: 72
     dracon_camp:
       name: "Dracon Camp"
       position: [3.5, 2.5]
@@ -85,9 +91,11 @@ world_map:
         desert_canyon: 12
         oasis: 12
         ancient_library: 24
+        southern_desert: 48
+        lonely_mesa: 60
     ancient_library:
       name: "Ancient Library"
-      position: [4.5, 4.5]
+      position: [5.5, 4.5]
       icon: mountain_town01
       initially_visible: false
       linked_area: ancient_library
@@ -97,3 +105,30 @@ world_map:
         drake_nest: 36
         desert_canyon: 36
         oasis: 36
+        southern_desert: 24
+        lonely_mesa: 36
+    southern_desert:
+      name: "Southern Desert"
+      position: [3.0, 6.0]
+      icon: flat02
+      initially_visible: false
+      travel_times:
+        ancient_library: 24
+        dracon_camp: 48
+        drake_nest: 60
+        desert_canyon: 60
+        oasis: 60
+        lonely_mesa: 12
+    lonely_mesa:
+      name: "Lonely Mesa"
+      position: [3.0, 7.5]
+      icon: hills02
+      initially_visible: false
+      initially_enabled: false
+      travel_times:
+        ancient_library: 36
+        dracon_camp: 60
+        drake_nest: 72
+        desert_canyon: 72
+        oasis: 72
+        southern_desert: 12

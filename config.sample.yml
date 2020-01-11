@@ -76,6 +76,7 @@ input:
         KeyF5: QuickSave
         KeyGrave: ToggleConsole
         KeyP: SelectAll
+        KeyS: SwapWeapons
 
 logging:
     # Log level may be error, warn, info, debug, or trace

@@ -41,6 +41,7 @@ pub enum InputAction {
     ZoomOut,
     QuickSave,
     SelectAll,
+    SwapWeapons,
     Exit,
     MouseMove(f32, f32),
     MouseDown(ClickKind),

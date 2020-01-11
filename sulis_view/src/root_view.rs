@@ -46,6 +46,9 @@ pub struct RootView {
     area_view_widget: Rc<RefCell<Widget>>,
     console: Rc<RefCell<ConsoleWindow>>,
     console_widget: Rc<RefCell<Widget>>,
+
+    quick_item_bar: Option<Rc<RefCell<Widget>>>,
+    abilities_bar: Option<Rc<RefCell<Widget>>>,
     area: String,
 }
 
@@ -86,6 +89,8 @@ impl RootView {
             area: "".to_string(),
             console,
             console_widget,
+            quick_item_bar: None,
+            abilities_bar: None,
         }))
     }
 
@@ -405,6 +410,12 @@ impl WidgetKind for RootView {
             ScrollDown => self.area_view.borrow_mut().scroll(0.0, -2.0, 33),
             ScrollRight => self.area_view.borrow_mut().scroll(-2.0, 0.0, 33),
             ScrollLeft => self.area_view.borrow_mut().scroll(2.0, 0.0, 33),
+            SwapWeapons => {
+                if let Some(quick_item_bar) = &self.quick_item_bar {
+                    let bar: &QuickItemBar = Widget::kind(&quick_item_bar);
+                    bar.swap();
+                }
+            }
             _ => return false,
         }
 
@@ -526,8 +537,11 @@ impl WidgetKind for RootView {
                 selected.remove(0)
             };
 
-            let quick_items = Widget::with_defaults(QuickItemBar::new(&entity));
+            let quick_items = Widget::with_defaults(QuickItemBar::new(&entity, &keys));
+            self.quick_item_bar = Some(Rc::clone(&quick_items));
+
             let abilities = Widget::with_defaults(AbilitiesBar::new(entity));
+            self.abilities_bar = Some(Rc::clone(&abilities));
 
             let time_label = Widget::with_theme(Label::empty(), "time");
             let mgr = GameState::turn_manager();

@@ -248,7 +248,8 @@ themes:
                 relative:
                   x: Max
                 custom:
-                  tooltip: "Swap Weapon Set"
+                  tooltip: |
+                    \[[c=f0f|#keybinding#]\] - Swap Weapon Set
               usable1:
                 from: item_button
                 size: [10, 10]

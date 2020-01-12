@@ -35,7 +35,7 @@ pub struct QuickItemBar {
     entity: Rc<RefCell<EntityState>>,
     swap_weapons_key: Option<Key>,
     quick_item_keys: [Option<Key>; 4],
-    quick_items: Vec<Rc<RefCell<Widget>>>,
+    quick_items: Vec<Option<Rc<RefCell<Widget>>>>,
 }
 
 impl QuickItemBar {
@@ -75,7 +75,10 @@ impl QuickItemBar {
     fn do_quick_item(&self, index: usize) {
         if self.quick_items.len() <= index { return; }
 
-        let widget = &self.quick_items[index];
+        let widget = match &self.quick_items[index] {
+            None => return,
+            Some(widget) => widget,
+        };
 
         let button: &mut ItemButton = Widget::kind_mut(widget);
         button.fire_left_click_action(widget);
@@ -83,6 +86,23 @@ impl QuickItemBar {
 
     fn swap(&self) {
         EntityState::swap_weapon_set(&self.entity);
+    }
+
+    fn add_button(
+        &mut self,
+        slot: QuickSlot,
+        key_index: usize,
+        theme_id: &str,
+    ) -> Rc<RefCell<Widget>> {
+        let key = self.quick_item_keys[key_index];
+        let (button, add) = create_button(&self.entity, slot, key, theme_id);
+
+        if add {
+            self.quick_items.push(Some(Rc::clone(&button)));
+        } else {
+            self.quick_items.push(None);
+        }
+        button
     }
 }
 
@@ -137,23 +157,12 @@ impl WidgetKind for QuickItemBar {
             }
         }
 
-        let keys = &self.quick_item_keys;
-        let usable1 = create_button(&self.entity, QuickSlot::Usable1, keys[0], "usable1");
-        let usable2 = create_button(&self.entity, QuickSlot::Usable2, keys[1], "usable2");
-        let usable3 = create_button(&self.entity, QuickSlot::Usable3, keys[2], "usable3");
-        let usable4 = create_button(&self.entity, QuickSlot::Usable4, keys[3], "usable4");
-
-        self.quick_items.push(Rc::clone(&usable1));
-        self.quick_items.push(Rc::clone(&usable2));
-        self.quick_items.push(Rc::clone(&usable3));
-        self.quick_items.push(Rc::clone(&usable4));
+        let usable1 = self.add_button(QuickSlot::Usable1, 0, "usable1");
+        let usable2 = self.add_button(QuickSlot::Usable2, 1, "usable2");
+        let usable3 = self.add_button(QuickSlot::Usable3, 2, "usable3");
+        let usable4 = self.add_button(QuickSlot::Usable4, 3, "usable4");
 
         vec![title, swap_weapons, usable1, usable2, usable3, usable4]
-    }
-
-    fn on_key_press(&mut self, _widget: &Rc<RefCell<Widget>>, key: InputAction) -> bool {
-        warn!("Key press {:?} in quick item bar", key);
-        return false;
     }
 }
 
@@ -162,14 +171,14 @@ fn create_button(
     slot: QuickSlot,
     key: Option<Key>,
     theme_id: &str,
-) -> Rc<RefCell<Widget>> {
+) -> (Rc<RefCell<Widget>>, bool) {
     let stash = GameState::party_stash();
     let actor = &entity.borrow().actor;
     match actor.inventory().quick(slot) {
         None => {
             let button = Widget::empty(theme_id);
             button.borrow_mut().state.set_enabled(false);
-            button
+            (button, false)
         }
         Some(item_state) => {
             let quantity = 1 + stash.borrow().items().get_quantity(&item_state);
@@ -196,7 +205,7 @@ fn create_button(
                     .animation_state
                     .add(animation_state::Kind::Custom1);
             }
-            widget
+            (widget, true)
         }
     }
 }

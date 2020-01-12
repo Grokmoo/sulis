@@ -42,6 +42,7 @@ lazy_static! {
 #[derive(Debug, Deserialize, Serialize, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct Config {
+    pub revision: u32,
     pub display: DisplayConfig,
     pub resources: ResourcesConfig,
     pub input: InputConfig,
@@ -317,6 +318,15 @@ pub fn create_dir_and_warn(path: &Path) {
 
 impl Config {
     fn init() -> Config {
+        let revision = match Config::new(Path::new(CONFIG_BASE), 0) {
+            Ok(config) => config.revision,
+            Err(e) => {
+                eprintln!("{}", e);
+                eprintln!("Unable to parse revision from config.sample");
+                std::process::exit(1);
+            }
+        };
+
         let mut config_path = USER_DIR.clone();
         config_path.push(CONFIG_FILENAME);
         let config_path = config_path.as_path();
@@ -325,7 +335,7 @@ impl Config {
             Config::create_config_from_sample(config_path);
         }
 
-        match Config::new(config_path) {
+        match Config::new(config_path, revision) {
             Ok(config) => config,
             Err(e) => {
                 eprintln!("{}", e);
@@ -336,12 +346,12 @@ impl Config {
 
                 Config::create_config_from_sample(config_path);
 
-                match Config::new(config_path) {
+                match Config::new(config_path, revision) {
                     Ok(config) => config,
                     Err(e) => {
                         eprintln!("{}", e);
                         eprintln!("Fatal error in sample config.  Exiting...");
-                        ::std::process::exit(1);
+                        std::process::exit(1);
                     }
                 }
             }
@@ -377,7 +387,7 @@ impl Config {
         }
     }
 
-    pub fn new(filepath: &Path) -> Result<Config, Error> {
+    pub fn new(filepath: &Path, required_revision: u32) -> Result<Config, Error> {
         let mut f = File::open(filepath)?;
         let mut file_data = String::new();
         f.read_to_string(&mut file_data)?;
@@ -389,6 +399,11 @@ impl Config {
                 return Err(Error::new(ErrorKind::InvalidData, format!("{}", e)));
             }
         };
+
+        if config.revision < required_revision {
+            return Err(Error::new(ErrorKind::InvalidData,
+                    format!("Config has old revision: {}", config.revision)));
+        }
 
         match config.logging.log_level.as_ref() {
             "error" | "warn" | "info" | "debug" | "trace" => (),

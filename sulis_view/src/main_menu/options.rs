@@ -84,7 +84,7 @@ impl Options {
 
     fn reset_config(&self) {
         let path = Path::new(config::CONFIG_BASE);
-        let config = match Config::new(&path) {
+        let config = match Config::new(&path, 0) {
             Ok(config) => config,
             Err(e) => {
                 warn!("Unable to get base config file at {}", config::CONFIG_BASE);

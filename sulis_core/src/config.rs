@@ -400,13 +400,6 @@ impl Config {
             }
         };
 
-        if config.display.width < 80 || config.display.height < 24 {
-            return Err(Error::new(
-                ErrorKind::InvalidData,
-                "Minimum terminal display size is 80x24",
-            ));
-        }
-
         Ok(config)
     }
 }

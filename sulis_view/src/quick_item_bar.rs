@@ -34,6 +34,8 @@ pub const NAME: &str = "quick_item_bar";
 pub struct QuickItemBar {
     entity: Rc<RefCell<EntityState>>,
     swap_weapons_key: Option<Key>,
+    quick_item_keys: [Option<Key>; 4],
+    quick_items: Vec<Rc<RefCell<Widget>>>,
 }
 
 impl QuickItemBar {
@@ -41,14 +43,45 @@ impl QuickItemBar {
         keybindings: &HashMap<InputAction, Key>) -> Rc<RefCell<QuickItemBar>> {
 
         let swap_weapons_key = keybindings.get(&InputAction::SwapWeapons).cloned();
+        let quick_item_keys = [
+            keybindings.get(&InputAction::QuickItem1).cloned(),
+            keybindings.get(&InputAction::QuickItem2).cloned(),
+            keybindings.get(&InputAction::QuickItem3).cloned(),
+            keybindings.get(&InputAction::QuickItem4).cloned(),
+        ];
 
         Rc::new(RefCell::new(QuickItemBar {
             entity: Rc::clone(entity),
             swap_weapons_key,
+            quick_item_keys,
+            quick_items: Vec::new(),
         }))
     }
 
-    pub fn swap(&self) {
+    pub fn check_handle_keybinding(&self, key: InputAction) -> bool {
+        use sulis_core::io::InputAction::*;
+        match key {
+            SwapWeapons => self.swap(),
+            QuickItem1 => self.do_quick_item(0),
+            QuickItem2 => self.do_quick_item(1),
+            QuickItem3 => self.do_quick_item(2),
+            QuickItem4 => self.do_quick_item(3),
+            _ => return false,
+        }
+
+        true
+    }
+
+    fn do_quick_item(&self, index: usize) {
+        if self.quick_items.len() <= index { return; }
+
+        let widget = &self.quick_items[index];
+
+        let button: &mut ItemButton = Widget::kind_mut(widget);
+        button.fire_left_click_action(widget);
+    }
+
+    fn swap(&self) {
         EntityState::swap_weapon_set(&self.entity);
     }
 }
@@ -57,6 +90,8 @@ impl WidgetKind for QuickItemBar {
     widget_kind!(NAME);
 
     fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+        self.quick_items.clear();
+
         {
             let mut entity = self.entity.borrow_mut();
             entity
@@ -102,10 +137,16 @@ impl WidgetKind for QuickItemBar {
             }
         }
 
-        let usable1 = create_button(&self.entity, QuickSlot::Usable1, "usable1");
-        let usable2 = create_button(&self.entity, QuickSlot::Usable2, "usable2");
-        let usable3 = create_button(&self.entity, QuickSlot::Usable3, "usable3");
-        let usable4 = create_button(&self.entity, QuickSlot::Usable4, "usable4");
+        let keys = &self.quick_item_keys;
+        let usable1 = create_button(&self.entity, QuickSlot::Usable1, keys[0], "usable1");
+        let usable2 = create_button(&self.entity, QuickSlot::Usable2, keys[1], "usable2");
+        let usable3 = create_button(&self.entity, QuickSlot::Usable3, keys[2], "usable3");
+        let usable4 = create_button(&self.entity, QuickSlot::Usable4, keys[3], "usable4");
+
+        self.quick_items.push(Rc::clone(&usable1));
+        self.quick_items.push(Rc::clone(&usable2));
+        self.quick_items.push(Rc::clone(&usable3));
+        self.quick_items.push(Rc::clone(&usable4));
 
         vec![title, swap_weapons, usable1, usable2, usable3, usable4]
     }
@@ -119,6 +160,7 @@ impl WidgetKind for QuickItemBar {
 fn create_button(
     entity: &Rc<RefCell<EntityState>>,
     slot: QuickSlot,
+    key: Option<Key>,
     theme_id: &str,
 ) -> Rc<RefCell<Widget>> {
     let stash = GameState::party_stash();
@@ -133,6 +175,7 @@ fn create_button(
             let quantity = 1 + stash.borrow().items().get_quantity(&item_state);
             let kind = ScriptItemKind::Quick(slot);
             let button = ItemButton::quick(entity, quantity, &item_state, slot);
+            button.borrow_mut().set_keyboard_shortcut(key);
             button
                 .borrow_mut()
                 .add_action("Use", use_item_cb(entity, kind), true);

@@ -19,7 +19,7 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 use crate::{ItemActionMenu, MerchantWindow, RootView};
-use sulis_core::io::event;
+use sulis_core::io::{keyboard_event::Key, event};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_core::widgets::{Label, TextArea};
 use sulis_module::{ability, item::{format_item_value, format_item_weight}, Module};
@@ -62,6 +62,7 @@ pub struct ItemButton {
     quantity: u32,
     kind: Kind,
     actions: Vec<ButtonAction>,
+    keyboard_shortcut: Option<Key>,
 
     item_window: Option<Rc<RefCell<Widget>>>,
 }
@@ -135,7 +136,29 @@ impl ItemButton {
             kind,
             actions: Vec::new(),
             item_window: None,
+            keyboard_shortcut: None,
         }))
+    }
+
+    pub fn set_keyboard_shortcut(&mut self, key: Option<Key>) {
+        self.keyboard_shortcut = key;
+    }
+
+    pub fn fire_left_click_action(&mut self, widget: &Rc<RefCell<Widget>>) {
+        let sell_action = self.check_sell_action(widget);
+        let cb = sell_action
+            .iter()
+            .chain(self.actions.iter())
+            .find_map(|action| {
+                if action.can_left_click {
+                    Some(action.callback.clone())
+                } else {
+                    None
+                }
+            });
+        if let Some(action) = cb {
+            action.call(widget, self);
+        }
     }
 
     pub fn add_action(&mut self, name: &str, cb: Callback, can_left_click: bool) {
@@ -328,6 +351,10 @@ impl WidgetKind for ItemButton {
                 widget.borrow().state.inner_top(),
             );
 
+            if let Some(key) = self.keyboard_shortcut {
+                item_window.state.add_text_arg("keybinding", &key.short_name());
+            }
+
             match self.kind {
                 Kind::Prop { .. } | Kind::Inventory { .. } | Kind::Merchant { .. } => {
                     let player = GameState::selected();
@@ -427,20 +454,7 @@ impl WidgetKind for ItemButton {
 
         match kind {
             event::ClickKind::Left => {
-                let sell_action = self.check_sell_action(widget);
-                let cb = sell_action
-                    .iter()
-                    .chain(self.actions.iter())
-                    .find_map(|action| {
-                        if action.can_left_click {
-                            Some(action.callback.clone())
-                        } else {
-                            None
-                        }
-                    });
-                if let Some(action) = cb {
-                    action.call(widget, self);
-                }
+                self.fire_left_click_action(widget);
             }
             event::ClickKind::Right => {
                 let menu = ItemActionMenu::new();

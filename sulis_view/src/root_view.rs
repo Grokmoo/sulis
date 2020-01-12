@@ -410,13 +410,12 @@ impl WidgetKind for RootView {
             ScrollDown => self.area_view.borrow_mut().scroll(0.0, -2.0, 33),
             ScrollRight => self.area_view.borrow_mut().scroll(-2.0, 0.0, 33),
             ScrollLeft => self.area_view.borrow_mut().scroll(2.0, 0.0, 33),
-            SwapWeapons => {
+            _ => {
                 if let Some(quick_item_bar) = &self.quick_item_bar {
                     let bar: &QuickItemBar = Widget::kind(&quick_item_bar);
-                    bar.swap();
+                    return bar.check_handle_keybinding(key);
                 }
             }
-            _ => return false,
         }
 
         true

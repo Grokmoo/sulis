@@ -77,6 +77,10 @@ input:
         KeyGrave: ToggleConsole
         KeyP: SelectAll
         KeyS: SwapWeapons
+        Key1: QuickItem1
+        Key2: QuickItem2
+        Key3: QuickItem3
+        Key4: QuickItem4
 
 logging:
     # Log level may be error, warn, info, debug, or trace

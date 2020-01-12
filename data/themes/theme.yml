@@ -1511,7 +1511,7 @@ themes:
       bonus_text:
         from: text_area
         text: |
-          [s=6.0;c=0ff|#name#]
+          [?keybinding|\[[c=f0f|#keybinding#]\] - ][s=6.0;c=0ff|#name#]
           [?usable_description|AP: #usable_ap# [?consumable;c=f00|    Consumable]
           [?usable_duration|Duration: #usable_duration# Rounds][?usable_instant|Duration: Instantaneous]
           [s=4.0|#usable_description#]

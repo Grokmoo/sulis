@@ -318,6 +318,14 @@ impl RootView {
             self.add_status_text("Save Complete.");
         }
     }
+
+    pub fn select_party_member(&self, index: usize) {
+        let party = GameState::party();
+
+        if let Some(member) = party.get(index) {
+            GameState::set_selected_party_member(Rc::clone(member));
+        }
+    }
 }
 
 impl WidgetKind for RootView {
@@ -410,9 +418,18 @@ impl WidgetKind for RootView {
             ScrollDown => self.area_view.borrow_mut().scroll(0.0, -2.0, 33),
             ScrollRight => self.area_view.borrow_mut().scroll(-2.0, 0.0, 33),
             ScrollLeft => self.area_view.borrow_mut().scroll(2.0, 0.0, 33),
+            SelectPartyMember1 => self.select_party_member(0),
+            SelectPartyMember2 => self.select_party_member(1),
+            SelectPartyMember3 => self.select_party_member(2),
+            SelectPartyMember4 => self.select_party_member(3),
             _ => {
                 if let Some(quick_item_bar) = &self.quick_item_bar {
                     let bar: &QuickItemBar = Widget::kind(&quick_item_bar);
+                    if bar.check_handle_keybinding(key) { return true; }
+                }
+
+                if let Some(abilities_bar) = &self.abilities_bar {
+                    let bar: &AbilitiesBar = Widget::kind(abilities_bar);
                     return bar.check_handle_keybinding(key);
                 }
             }
@@ -539,7 +556,7 @@ impl WidgetKind for RootView {
             let quick_items = Widget::with_defaults(QuickItemBar::new(&entity, &keys));
             self.quick_item_bar = Some(Rc::clone(&quick_items));
 
-            let abilities = Widget::with_defaults(AbilitiesBar::new(entity));
+            let abilities = Widget::with_defaults(AbilitiesBar::new(entity, &keys));
             self.abilities_bar = Some(Rc::clone(&abilities));
 
             let time_label = Widget::with_theme(Label::empty(), "time");

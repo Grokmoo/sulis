@@ -14,13 +14,14 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::collections::HashMap;
 use std::any::Any;
 use std::cell::RefCell;
 use std::cmp;
 use std::collections::HashSet;
 use std::rc::Rc;
 
-use sulis_core::io::event;
+use sulis_core::io::{keyboard_event::Key, event, InputAction};
 use sulis_core::ui::{animation_state, Callback, Widget, WidgetKind, WidgetState};
 use sulis_core::util::{ExtInt, Size};
 use sulis_core::widgets::{Button, Label, TextArea, ScrollPane, ScrollDirection};
@@ -38,16 +39,70 @@ pub struct AbilitiesBar {
     group_panes: Vec<Rc<RefCell<Widget>>>,
     collapsed_panes: Vec<Rc<RefCell<Widget>>>,
     max_collapsed: u32,
+    keys: Vec<Option<Key>>,
 }
 
 impl AbilitiesBar {
-    pub fn new(entity: Rc<RefCell<EntityState>>) -> Rc<RefCell<AbilitiesBar>> {
+    pub fn new(
+        entity: Rc<RefCell<EntityState>>,
+        keys: &HashMap<InputAction, Key>
+    ) -> Rc<RefCell<AbilitiesBar>> {
+        use InputAction::*;
+        let keys = vec![
+            keys.get(&ActivateAbility1).cloned(),
+            keys.get(&ActivateAbility2).cloned(),
+            keys.get(&ActivateAbility3).cloned(),
+            keys.get(&ActivateAbility4).cloned(),
+            keys.get(&ActivateAbility5).cloned(),
+            keys.get(&ActivateAbility6).cloned(),
+            keys.get(&ActivateAbility7).cloned(),
+            keys.get(&ActivateAbility8).cloned(),
+            keys.get(&ActivateAbility9).cloned(),
+            keys.get(&ActivateAbility10).cloned(),
+        ];
+
         Rc::new(RefCell::new(AbilitiesBar {
             entity,
             group_panes: Vec::new(),
             collapsed_panes: Vec::new(),
             max_collapsed: 3,
+            keys,
         }))
+    }
+
+    pub fn check_handle_keybinding(&self, key: InputAction) -> bool{
+        use InputAction::*;
+        match key {
+            ActivateAbility1 => self.do_ability(0),
+            ActivateAbility2 => self.do_ability(1),
+            ActivateAbility3 => self.do_ability(2),
+            ActivateAbility4 => self.do_ability(3),
+            ActivateAbility5 => self.do_ability(4),
+            ActivateAbility6 => self.do_ability(5),
+            ActivateAbility7 => self.do_ability(6),
+            ActivateAbility8 => self.do_ability(7),
+            ActivateAbility9 => self.do_ability(8),
+            ActivateAbility10 => self.do_ability(9),
+            _ => return false,
+        }
+
+        true
+    }
+
+    fn do_ability(&self, target_index: usize) {
+        let mut cur_index = 0;
+        for widget in &self.group_panes {
+            let pane: &GroupPane = Widget::kind(widget);
+
+            for (ability, _) in &pane.abilities {
+                if cur_index == target_index {
+                    activate_ability(&self.entity, &ability.ability);
+                    return;
+                }
+
+                cur_index += 1;
+            }
+        }
     }
 }
 
@@ -134,8 +189,13 @@ impl WidgetKind for AbilitiesBar {
             scrollpane.borrow().add_to_content(all_collapsed);
         }
 
+        let mut remaining_keys = self.keys.clone();
+        remaining_keys.reverse();
+
         for group in groups {
-            let group_pane = GroupPane::new(group, &self.entity, &abilities, collapse_enabled);
+            let group_pane = GroupPane::new(
+                group, &self.entity, &abilities, collapse_enabled, &mut remaining_keys
+            );
 
             if group_pane.borrow().abilities.is_empty() {
                 continue;
@@ -248,7 +308,7 @@ impl WidgetKind for CollapsedGroupPane {
 }
 struct GroupPane {
     entity: Rc<RefCell<EntityState>>,
-    abilities: Vec<OwnedAbility>,
+    abilities: Vec<(OwnedAbility, Option<Key>)>,
     group: String,
     description: Rc<RefCell<Widget>>,
     skip_first_position: bool,
@@ -265,6 +325,7 @@ impl GroupPane {
         entity: &Rc<RefCell<EntityState>>,
         abilities: &Vec<OwnedAbility>,
         collapse_enabled: bool,
+        remaining_keys: &mut Vec<Option<Key>>,
     ) -> Rc<RefCell<GroupPane>> {
         let mut abilities_to_add = Vec::new();
         for ability in abilities.iter() {
@@ -274,7 +335,8 @@ impl GroupPane {
             };
 
             if active.group == group {
-                abilities_to_add.push(ability.clone());
+                let key = remaining_keys.pop().flatten();
+                abilities_to_add.push((ability.clone(), key));
             }
         }
         Rc::new(RefCell::new(GroupPane {
@@ -340,7 +402,7 @@ impl WidgetKind for GroupPane {
     }
 
     fn on_remove(&mut self, _widget: &Rc<RefCell<Widget>>) {
-        for ability in self.abilities.iter() {
+        for (ability, _) in self.abilities.iter() {
             if let Some(ref mut state) = self
                 .entity
                 .borrow_mut()
@@ -353,7 +415,7 @@ impl WidgetKind for GroupPane {
     }
 
     fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
-        for ability in self.abilities.iter() {
+        for (ability, _) in self.abilities.iter() {
             if let Some(ref mut state) = self
                 .entity
                 .borrow_mut()
@@ -402,10 +464,10 @@ impl WidgetKind for GroupPane {
             Widget::add_child_to(&abilities_pane, skip);
         }
 
-        for ability in self.abilities.iter() {
+        for (ability, key) in self.abilities.iter() {
             let ability = &ability.ability;
 
-            let button = Widget::with_defaults(AbilityButton::new(ability, &self.entity));
+            let button = Widget::with_defaults(AbilityButton::new(ability, &self.entity, *key));
             Widget::add_child_to(&abilities_pane, button);
         }
 
@@ -455,10 +517,15 @@ struct AbilityButton {
     ability: Rc<Ability>,
     newly_added: bool,
     range_indicator: Option<RangeIndicator>,
+    key: Option<Key>
 }
 
 impl AbilityButton {
-    fn new(ability: &Rc<Ability>, entity: &Rc<RefCell<EntityState>>) -> Rc<RefCell<AbilityButton>> {
+    fn new(
+        ability: &Rc<Ability>,
+        entity: &Rc<RefCell<EntityState>>,
+        key: Option<Key>
+    ) -> Rc<RefCell<AbilityButton>> {
         let mut newly_added = false;
         if let Some(state) = entity.borrow_mut().actor.ability_state(&ability.id) {
             newly_added = state.newly_added_ability;
@@ -471,6 +538,7 @@ impl AbilityButton {
             entity: Rc::clone(entity),
             newly_added,
             range_indicator,
+            key,
         }))
     }
 }
@@ -527,7 +595,12 @@ impl WidgetKind for AbilityButton {
             .add_text_arg("icon", &self.ability.icon.id());
         icon.borrow_mut().state.set_enabled(false);
 
-        vec![icon, duration_label]
+        let key_label = Widget::with_theme(Label::empty(), "key_label");
+        if let Some(key) = self.key {
+            key_label.borrow_mut().state.add_text_arg("keybinding", &key.short_name());
+        }
+
+        vec![icon, duration_label, key_label]
     }
 
     fn on_mouse_enter(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
@@ -550,7 +623,7 @@ impl WidgetKind for AbilityButton {
     fn on_mouse_move(&mut self, widget: &Rc<RefCell<Widget>>, _dx: f32, _dy: f32) -> bool {
         let hover = Widget::with_theme(TextArea::empty(), "ability_hover");
         let class = self.entity.borrow_mut().actor.actor.base_class();
-        add_hover_text_args(&mut hover.borrow_mut().state, &self.ability, &class);
+        add_hover_text_args(&mut hover.borrow_mut().state, &self.ability, &class, self.key);
 
         if self.newly_added {
             hover.borrow_mut().state.add_text_arg("newly_added", "true");
@@ -569,27 +642,40 @@ impl WidgetKind for AbilityButton {
     fn on_mouse_release(&mut self, widget: &Rc<RefCell<Widget>>, kind: event::ClickKind) -> bool {
         self.super_on_mouse_release(widget, kind);
 
-        let can_activate = self.entity.borrow().actor.can_activate(&self.ability.id);
-        if can_activate {
-            let index = self.entity.borrow().index();
-            Script::ability_on_activate(index, "on_activate".to_string(), &self.ability);
-            return true;
-        }
-
-        let can_toggle = self.entity.borrow().actor.can_toggle(&self.ability.id);
-        if can_toggle {
-            let index = self.entity.borrow().index();
-            Script::ability_on_deactivate(index, &self.ability);
-        }
-
-        true
+        return activate_ability(&self.entity, &self.ability);
     }
 }
 
-pub fn add_hover_text_args(state: &mut WidgetState, ability: &Ability, class: &Class) {
+fn activate_ability(entity: &Rc<RefCell<EntityState>>, ability: &Rc<Ability>) -> bool {
+    let can_activate = entity.borrow().actor.can_activate(&ability.id);
+    if can_activate {
+        let index = entity.borrow().index();
+        Script::ability_on_activate(index, "on_activate".to_string(), &ability);
+        return true;
+    }
+
+    let can_toggle = entity.borrow().actor.can_toggle(&ability.id);
+    if can_toggle {
+        let index = entity.borrow().index();
+        Script::ability_on_deactivate(index, &ability);
+    }
+
+    true
+}
+
+pub fn add_hover_text_args(
+    state: &mut WidgetState,
+    ability: &Ability,
+    class: &Class,
+    key: Option<Key>
+) {
     state.disable();
     state.add_text_arg("name", &ability.name);
     state.add_text_arg("description", &ability.description);
+
+    if let Some(key) = key {
+        state.add_text_arg("keybinding", &key.short_name());
+    }
 
     for (index, upgrade) in ability.upgrades.iter().enumerate() {
         state.add_text_arg(&format!("upgrade{}", index + 1), &upgrade.description);

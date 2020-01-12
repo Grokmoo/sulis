@@ -2,7 +2,7 @@
 # The main game configuration file.  User preferences are set here.
 
 # If the user has an old revision, their config is automatically recreated from the sample.
-revision: 2
+revision: 5
 
 display:
     # Display Adapter - Glium is the only choice for now
@@ -80,10 +80,24 @@ input:
         KeyGrave: ToggleConsole
         KeyP: SelectAll
         KeyS: SwapWeapons
-        Key1: QuickItem1
-        Key2: QuickItem2
-        Key3: QuickItem3
-        Key4: QuickItem4
+        KeyF1: SelectPartyMember1
+        KeyF2: SelectPartyMember2
+        KeyF3: SelectPartyMember3
+        KeyF4: SelectPartyMember4
+        KeyZ: QuickItem1
+        KeyX: QuickItem2
+        KeyC: QuickItem3
+        KeyV: QuickItem4
+        Key1: ActivateAbility1
+        Key2: ActivateAbility2
+        Key3: ActivateAbility3
+        Key4: ActivateAbility4
+        Key5: ActivateAbility5
+        Key6: ActivateAbility6
+        Key7: ActivateAbility7
+        Key8: ActivateAbility8
+        Key9: ActivateAbility9
+        Key0: ActivateAbility10
 
 logging:
     # Log level may be error, warn, info, debug, or trace

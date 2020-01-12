@@ -691,7 +691,7 @@ themes:
             background: bg_base
             relative:
               x: Center
-            size: [70, 73]
+            size: [80, 73]
             position: [0, 35]
             children:
               scrollbar:
@@ -721,7 +721,7 @@ themes:
                     text: "#action#"
                     text_params:
                       horizontal_alignment: Left
-                    size: [35, 6]
+                    size: [45, 6]
   mods_selector:
     children:
       title:

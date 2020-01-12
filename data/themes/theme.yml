@@ -388,6 +388,16 @@ themes:
                                     relative:
                                       width: Max
                                       height: Max
+                                  key_label:
+                                    from: label
+                                    text: "#keybinding#"
+                                    text_params:
+                                      color: f0f
+                                      horizontal_alignment: Left
+                                      vertical_alignment: Bottom
+                                    relative:
+                                      width: Max
+                                      height: Max
                                   icon:
                                     foreground: "#icon#"
                                     relative:

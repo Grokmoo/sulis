@@ -325,7 +325,12 @@ impl WidgetKind for ItemButton {
             Widget::add_child_to(&adj, widget);
         }
 
-        vec![icon, adj, qty_label]
+        let key_label = Widget::with_theme(Label::empty(), "key_label");
+        if let Some(key) = self.keyboard_shortcut {
+            key_label.borrow_mut().state.add_text_arg("keybinding", &key.short_name());
+        }
+
+        vec![icon, adj, qty_label, key_label]
     }
 
     fn on_mouse_enter(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {

@@ -388,7 +388,14 @@ impl Config {
     }
 
     pub fn new(filepath: &Path, required_revision: u32) -> Result<Config, Error> {
-        let mut f = File::open(filepath)?;
+        let mut f = match File::open(filepath) {
+            Ok(f) => Ok(f),
+            Err(_) => {
+                let up = Path::new("../").join(filepath);
+                File::open(up.as_path())
+            }
+        }?;
+
         let mut file_data = String::new();
         f.read_to_string(&mut file_data)?;
 

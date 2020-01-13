@@ -67,7 +67,7 @@ impl WidgetKind for DialogWindow {
 
         use sulis_core::io::InputAction::*;
         match key {
-            ShowMenu => view.show_menu(&root),
+            Back => view.show_menu(&root),
             Exit => view.show_exit(&root),
             _ => return false,
         }

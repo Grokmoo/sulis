@@ -119,7 +119,7 @@ impl WidgetKind for MainMenu {
     fn on_key_press(&mut self, widget: &Rc<RefCell<Widget>>, key: InputAction) -> bool {
         use sulis_core::io::InputAction::*;
         match key {
-            Exit | ShowMenu => {
+            Exit | Back => {
                 let exit_window = Widget::with_theme(
                     ConfirmationWindow::new(Callback::new(Rc::new(|widget, _| {
                         let (_, selector) = Widget::parent_mut::<MainMenu>(widget);

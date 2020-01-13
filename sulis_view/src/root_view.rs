@@ -36,6 +36,16 @@ use crate::{
     AbilitiesBar, GameOverWindow, ApBar, InitiativeTicker,
 };
 
+const WINDOW_NAMES: [&str; 7] = [
+    self::formation_window::NAME,
+    self::inventory_window::NAME,
+    self::character_window::NAME,
+    self::quest_window::NAME,
+    self::world_map_window::NAME,
+    self::merchant_window::NAME,
+    self::prop_window::NAME,
+];
+
 const NAME: &'static str = "game";
 
 pub struct RootView {
@@ -217,6 +227,22 @@ impl RootView {
                 }
             }
         }
+    }
+
+    // returns true if there was at least one open window, false otherwise
+    fn close_all_windows(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
+        let mut found = false;
+        for name in &WINDOW_NAMES {
+            match Widget::get_child_with_name(widget, name) {
+                None => continue,
+                Some(ref window) => {
+                    window.borrow_mut().mark_for_removal();
+                    found = true;
+                }
+            }
+        }
+
+        found
     }
 
     pub fn toggle_formation_window(&mut self, widget: &Rc<RefCell<Widget>>) {
@@ -402,7 +428,11 @@ impl WidgetKind for RootView {
         trace!("Key press: {:?} in root view.", key);
         use sulis_core::io::InputAction::*;
         match key {
-            ShowMenu => self.show_menu(widget),
+            Back => {
+                if !self.close_all_windows(widget) {
+                    self.show_menu(widget);
+                }
+            },
             ToggleConsole => self.toggle_console_window(widget),
             ToggleInventory => self.toggle_inventory_window(widget),
             ToggleCharacter => self.toggle_character_window(widget),
@@ -528,7 +558,7 @@ impl WidgetKind for RootView {
             );
 
             let men_button = create_button(
-                &keys, ShowMenu, "menu_button", Rc::new(|widget, _| {
+                &keys, Back, "menu_button", Rc::new(|widget, _| {
                     let (root, view) = Widget::parent_mut::<RootView>(widget);
                     view.show_menu(&root);
                 })

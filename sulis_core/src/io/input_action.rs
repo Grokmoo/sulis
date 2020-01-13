@@ -30,7 +30,7 @@ pub enum InputAction {
     ToggleMap,
     ToggleJournal,
     ToggleFormation,
-    ShowMenu,
+    Back,
     EndTurn,
     Rest,
     ScrollUp,

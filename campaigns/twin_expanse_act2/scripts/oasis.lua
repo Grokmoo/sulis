@@ -95,3 +95,7 @@ function dracon_imperator_show_mesa(parent, target)
   game:set_world_map_location_visible("lonely_mesa", true)
   game:set_world_map_location_visible("southern_desert", true)
 end
+
+function on_exit_lonely_mesa(parent)
+  game:set_world_map_location_enabled("lonely_mesa", true)
+end

@@ -112,6 +112,8 @@ world_map:
       position: [3.0, 6.0]
       icon: flat02
       initially_visible: false
+      linked_area: southern_desert
+      linked_area_pos: [57, 6]
       travel_times:
         ancient_library: 24
         dracon_camp: 48
@@ -125,6 +127,8 @@ world_map:
       icon: hills02
       initially_visible: false
       initially_enabled: false
+      linked_area: lonely_mesa
+      linked_area_pos: [118, 97]
       travel_times:
         ancient_library: 36
         dracon_camp: 60

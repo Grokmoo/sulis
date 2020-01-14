@@ -320,10 +320,15 @@ impl Config {
     fn init() -> Config {
         let revision = match Config::new(Path::new(CONFIG_BASE), 0) {
             Ok(config) => config.revision,
-            Err(e) => {
-                eprintln!("{}", e);
-                eprintln!("Unable to parse revision from config.sample");
-                std::process::exit(1);
+            Err(orig_e) => {
+                match Config::new(&Path::new("../").join(CONFIG_BASE), 0) {
+                    Err(_) => {
+                        eprintln!("{}", orig_e);
+                        eprintln!("Unable to parse revision from config.sample");
+                        std::process::exit(1);
+                    },
+                    Ok(config) => config.revision,
+                }
             }
         };
 
@@ -388,13 +393,7 @@ impl Config {
     }
 
     pub fn new(filepath: &Path, required_revision: u32) -> Result<Config, Error> {
-        let mut f = match File::open(filepath) {
-            Ok(f) => Ok(f),
-            Err(_) => {
-                let up = Path::new("../").join(filepath);
-                File::open(up.as_path())
-            }
-        }?;
+        let mut f = File::open(filepath)?;
 
         let mut file_data = String::new();
         f.read_to_string(&mut file_data)?;

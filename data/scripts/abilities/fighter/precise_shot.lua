@@ -18,6 +18,10 @@ function on_activate(parent, ability)
 	effect:add_num_bonus("crit_multiplier", 0.50)
   end
   
+  local cb = ability:create_callback(parent)
+  cb:set_on_swap_weapons_fn("on_swap_weapons")
+  effect:add_callback(cb)
+  
   local gen = parent:create_anim("precise_arrow")
   gen:set_moves_with_parent()
   gen:set_position(gen:param(-0.5), gen:param(-2.5))
@@ -30,4 +34,11 @@ end
 
 function on_deactivate(parent, ability)
   ability:deactivate(parent)
+end
+
+function on_swap_weapons(parent, ability)
+  if not parent:stats().attack_is_ranged then
+    game:say_line("Precise Shot Deactivated", parent)
+    ability:deactivate(parent)
+  end
 end

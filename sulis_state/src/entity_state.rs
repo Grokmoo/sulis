@@ -398,6 +398,10 @@ impl EntityState {
             area.range_indicators().remove_attack();
             area.range_indicators().add_attack(entity);
         }
+
+        let mgr = GameState::turn_manager();
+        let cbs = entity.borrow().callbacks(&mgr.borrow());
+        cbs.iter().for_each(|cb| cb.on_swap_weapons());
     }
 
     /// Returns true if this entity has enough AP to move at least 1 square,

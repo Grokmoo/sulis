@@ -21,11 +21,14 @@ function on_activate(parent, ability)
   effect:add_num_bonus("crit_multiplier", -0.5)
   effect:add_num_bonus("melee_accuracy", -10)
 
+  local cb = ability:create_callback(parent)
+  cb:set_on_swap_weapons_fn("on_swap_weapons")
+
   if parent:ability_level(ability) > 1 then
-    local cb = ability:create_callback(parent)
     cb:set_after_defense_fn("after_defense")
-    effect:add_callback(cb)
   end
+  
+  effect:add_callback(cb)
 
   local gen = parent:create_anim("shield")
   gen:set_moves_with_parent()
@@ -39,6 +42,13 @@ end
 
 function on_deactivate(parent, ability)
   ability:deactivate(parent)
+end
+
+function on_swap_weapons(parent, ability)
+  if not parent:inventory():has_equipped_shield() then
+    game:say_line("Defensive Fighting Deactivated", parent)
+    ability:deactivate(parent)
+  end
 end
 
 function after_defense(parent, ability, targets, hit)

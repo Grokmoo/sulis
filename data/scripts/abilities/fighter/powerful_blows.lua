@@ -17,6 +17,10 @@ function on_activate(parent, ability)
   else
     effect:add_damage(2, 5 + stats.level / 2, 0)
   end
+  
+  local cb = ability:create_callback(parent)
+  cb:set_on_swap_weapons_fn("on_swap_weapons")
+  effect:add_callback(cb)
 
   local gen = parent:create_anim("crossed_swords")
   gen:set_moves_with_parent()
@@ -30,4 +34,11 @@ end
 
 function on_deactivate(parent, ability)
   ability:deactivate(parent)
+end
+
+function on_swap_weapons(parent, ability)
+  if not parent:stats().attack_is_melee then
+    game:say_line("Powerful Blows Deactivated", parent)
+    ability:deactivate(parent)
+  end
 end

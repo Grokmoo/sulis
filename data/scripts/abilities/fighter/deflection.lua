@@ -15,6 +15,7 @@ function on_activate(parent, ability)
   local effect = parent:create_effect(ability:name())
   effect:deactivate_with(ability)
   local cb = ability:create_callback(parent)
+  cb:set_on_swap_weapons_fn("on_swap_weapons")
   cb:set_after_defense_fn("after_defense")
   effect:add_callback(cb)
 
@@ -30,6 +31,13 @@ end
 
 function on_deactivate(parent, ability)
   ability:deactivate(parent)
+end
+
+function on_swap_weapons(parent, ability)
+  if not parent:inventory():has_equipped_shield() then
+    game:say_line("Deflection Deactivated", parent)
+    ability:deactivate(parent)
+  end
 end
 
 function after_defense(parent, ability, targets, hit)

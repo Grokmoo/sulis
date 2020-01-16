@@ -67,6 +67,7 @@ pub struct Active {
     pub class_stats: HashMap<String, HashMap<String, u32>>,
     pub combat_only: bool,
     pub requires_melee: bool,
+    pub requires_shield: bool,
     pub requires_ranged: bool,
     pub requires_active_mode: Vec<String>,
 }
@@ -147,6 +148,7 @@ impl Ability {
                     class_stats: active.class_stats,
                     combat_only: active.combat_only,
                     requires_melee: active.requires_melee,
+                    requires_shield: active.requires_shield,
                     requires_ranged: active.requires_ranged,
                     requires_active_mode: active.requires_active_mode,
                 })
@@ -251,6 +253,9 @@ pub struct ActiveBuilder {
 
     #[serde(default)]
     requires_ranged: bool,
+
+    #[serde(default)]
+    requires_shield: bool,
 
     #[serde(default)]
     requires_active_mode: Vec<String>,

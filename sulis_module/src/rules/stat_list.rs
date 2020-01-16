@@ -80,6 +80,7 @@ pub struct StatList {
     pub crit_immunity: bool,
     pub free_ability_group_use: bool,
     pub caster_level: i32,
+    has_shield: bool,
     group_uses_per_encounter: HashMap<String, ExtInt>,
     group_uses_per_day: HashMap<String, ExtInt>,
     class_stats: HashMap<String, ExtInt>,
@@ -133,6 +134,7 @@ impl StatList {
             crit_immunity: false,
             free_ability_group_use: false,
             caster_level: 0,
+            has_shield: false,
             group_uses_per_encounter: HashMap::new(),
             group_uses_per_day: HashMap::new(),
             class_stats: HashMap::new(),
@@ -215,6 +217,10 @@ impl StatList {
         } else {
             HitKind::Miss
         }
+    }
+
+    pub fn has_shield(&self) -> bool {
+        self.has_shield
     }
 
     pub fn attack_is_melee(&self) -> bool {
@@ -427,6 +433,11 @@ impl StatList {
                     }
                 }
             }
+        }
+
+        match weapon_style {
+            WeaponStyle::Shielded => self.has_shield = true,
+            _ => (),
         }
 
         let multiplier = if attacks.is_empty() {

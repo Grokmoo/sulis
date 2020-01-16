@@ -28,6 +28,7 @@ pub struct AbilityState {
     pub combat_only: bool,
     pub requires_melee: bool,
     pub requires_ranged: bool,
+    pub requires_shield: bool,
     pub requires_active_mode: Vec<Rc<Ability>>,
     cur_duration: u32,
     pub listeners: ChangeListenerList<AbilityState>,
@@ -52,12 +53,18 @@ fn get_modes(ability: &Ability, input: &[String]) -> Vec<Rc<Ability>> {
 
 impl AbilityState {
     pub fn new(ability: &Rc<Ability>) -> AbilityState {
-        let (group, combat_only, modes, melee, ranged) = match ability.active {
+        let (group, combat_only, modes, melee, ranged, shield) = match ability.active {
             None => panic!(),
             Some(ref active) => {
                 let modes = get_modes(ability, &active.requires_active_mode);
-                (active.group.name(), active.combat_only, modes,
-                 active.requires_melee, active.requires_ranged)
+                (
+                    active.group.name(),
+                    active.combat_only,
+                    modes,
+                    active.requires_melee,
+                    active.requires_ranged,
+                    active.requires_shield
+                )
             }
         };
 
@@ -69,6 +76,7 @@ impl AbilityState {
             cur_duration: 0,
             requires_active_mode: modes,
             requires_melee: melee,
+            requires_shield: shield,
             requires_ranged: ranged,
             listeners: ChangeListenerList::default(),
             newly_added_ability: false,
@@ -91,6 +99,7 @@ impl AbilityState {
     }
 
     pub fn is_available(&self, stats: &StatList, current_modes: &[&str]) -> bool {
+        if self.requires_shield && !stats.has_shield() { return false; }
         if self.requires_melee && !stats.attack_is_melee() { return false; }
         if self.requires_ranged && !stats.attack_is_ranged() { return false; }
 

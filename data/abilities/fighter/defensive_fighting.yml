@@ -12,6 +12,7 @@ active:
   cooldown: 1
   combat_only: false
   range: Personal
+  requires_shield: true
   ai:
     priority: 5
     kind: Buff

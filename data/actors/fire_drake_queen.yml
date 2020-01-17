@@ -30,5 +30,7 @@ abilities:
   - weapon_spear
   - weapon_mace
   - weapon_simple
-  - red_dragon_breath
+  - fire_breath
+  - tail_whip
+  - trample
 ai: ai_basic

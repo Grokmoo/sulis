@@ -1,0 +1,22 @@
+id: tail_whip
+name: "Tail Whip"
+icon: empty
+description: |
+  You slam a target with your tail, doing substantial damage and sending them flying.
+active:
+  script: "tail_whip"
+  group: Special
+  ap: 2000
+  duration:
+    Instant
+  cooldown: 3
+  combat_only: true
+  requires_melee: true
+  range: Attack
+  ai:
+    priority: 20
+    kind: Debuff
+    group: Single
+    range: Attack
+  short_description: |
+    Push back, stun, and damage a single opponent.

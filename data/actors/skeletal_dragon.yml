@@ -1,9 +1,9 @@
-id: forest_troll
+id: skeletal_dragon
 ai: ai_basic
-name: Forest Troll
+name: Skeletal Dragon
 faction: Hostile
 images: {}
-race: forest_troll
+race: skeletal_dragon
 attributes:
   str: 10
   dex: 10
@@ -12,13 +12,13 @@ attributes:
   int: 10
   wis: 10
 levels:
-  fighter: 7
+  fighter: 15
 inventory: {}
 reward:
-  xp: 80
+  xp: 300
   loot: level5_misc
   loot_chance: 100
 abilities:
-  - troll_regeneration
-  - mighty_blow
-  - grab
+  - trample
+  - death_breath
+  - tail_whip

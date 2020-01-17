@@ -30,7 +30,7 @@ use crate::script::{
     script_color_animation, script_image_layer_animation, script_particle_generator,
     script_scale_animation, CallbackData, Result, ScriptAbility, ScriptCallback,
     ScriptColorAnimation, ScriptEntity, ScriptImageLayerAnimation, ScriptParticleGenerator,
-    ScriptScaleAnimation,
+    ScriptScaleAnimation, script_subpos_animation, ScriptSubposAnimation,
 };
 use crate::{effect, Effect, GameState};
 
@@ -323,6 +323,11 @@ impl UserData for ScriptAppliedEffect {
 /// when this effect has `apply()` called.  It will be removed when this effect is
 /// removed.
 ///
+/// # `add_subpos_anim(anim: ScriptSubposAnimation)`
+/// Adds a subpos animation `anim` to this effect.  The anim will have `apply()`
+/// called when this effect has `apply()` called.  It will be removed when this
+/// effect is removed.
+///
 /// # `add_callback(callback: CallbackData)`
 /// Adds the specified `callback` to fire for entity's with this effect.
 ///
@@ -414,6 +419,7 @@ pub struct ScriptEffect {
     image_layer_anims: Vec<ScriptImageLayerAnimation>,
     color_anims: Vec<ScriptColorAnimation>,
     scale_anims: Vec<ScriptScaleAnimation>,
+    subpos_anims: Vec<ScriptSubposAnimation>,
 }
 
 impl ScriptEffect {
@@ -436,6 +442,7 @@ impl ScriptEffect {
             image_layer_anims: Vec::new(),
             color_anims: Vec::new(),
             scale_anims: Vec::new(),
+            subpos_anims: Vec::new(),
         }
     }
 
@@ -454,6 +461,7 @@ impl ScriptEffect {
             image_layer_anims: Vec::new(),
             color_anims: Vec::new(),
             scale_anims: Vec::new(),
+            subpos_anims: Vec::new(),
         }
     }
 }
@@ -501,6 +509,10 @@ impl UserData for ScriptEffect {
         });
         methods.add_method_mut("add_color_anim", |_, effect, anim: ScriptColorAnimation| {
             effect.color_anims.push(anim);
+            Ok(())
+        });
+        methods.add_method_mut("add_subpos_anim", |_, effect, anim: ScriptSubposAnimation| {
+            effect.subpos_anims.push(anim);
             Ok(())
         });
         methods.add_method_mut("add_anim", |_, effect, pgen: ScriptParticleGenerator| {
@@ -837,6 +849,10 @@ fn apply(effect_data: &ScriptEffect) -> Result<()> {
 
     for anim in effect_data.image_layer_anims.iter() {
         anims.push(script_image_layer_animation::create_anim(&anim)?);
+    }
+
+    for anim in effect_data.subpos_anims.iter() {
+        anims.push(script_subpos_animation::create_anim(&anim)?);
     }
 
     for mut anim in anims {

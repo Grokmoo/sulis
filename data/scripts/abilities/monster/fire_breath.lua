@@ -31,7 +31,7 @@ function on_target_select(parent, ability, targets)
   local duration = 1.5
   
   local gen = parent:create_particle_generator("fire_particle", duration)
-  gen:set_position(gen:param(parent:center_x() + 0.5), gen:param(parent:center_y() - 0.5))
+  gen:set_position(gen:param(parent:center_x() + 2.0), gen:param(parent:center_y() - 0.5))
   gen:set_gen_rate(gen:param(500.0, -500))
   gen:set_initial_gen(500.0)
   gen:set_particle_size_dist(gen:fixed_dist(0.7), gen:fixed_dist(0.7))
@@ -63,7 +63,7 @@ function attack_target(parent, ability, targets)
     local stats = parent:stats()
 	local min_dmg = 15 + stats.caster_level / 3 + stats.intellect_bonus / 6
     local max_dmg = 25 + stats.intellect_bonus / 3 + stats.caster_level * 0.667
-    parent:special_attack(target, "Reflex", "Spell", min_dmg, max_dmg, 0, "Fire")
+    parent:special_attack(target, "Reflex", "Ranged", min_dmg, max_dmg, 0, "Fire")
   end
 end
 

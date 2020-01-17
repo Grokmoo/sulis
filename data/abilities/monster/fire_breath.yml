@@ -1,10 +1,10 @@
-id: red_dragon_breath
-name: "Red Dragon Breath"
-icon: abilities/flaming_fingers
+id: fire_breath
+name: "Fire Breath"
+icon: empty
 description: |
   The dragon breaths a cone of fire on its enemies.
 active:
-  script: "red_dragon_breath"
+  script: "fire_breath"
   group: "Special"
   ap: 3000
   duration:

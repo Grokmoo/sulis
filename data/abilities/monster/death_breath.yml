@@ -1,0 +1,19 @@
+id: death_breath
+name: "Death Breath"
+icon: empty
+description: |
+  The undead dragons breath sucks the life out of all it touches.
+active:
+  script: "death_breath"
+  group: "Special"
+  ap: 3000
+  duration:
+    Instant
+  cooldown: 4
+  ai:
+    priority: 10
+    kind: Damage
+    group: Multiple
+    range: Short
+  short_description: |
+    Deal raw damage to all opponents in an arc

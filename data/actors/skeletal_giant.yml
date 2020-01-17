@@ -19,4 +19,5 @@ reward:
   loot: level5_misc
   loot_chance: 100
 abilities:
-  - mighty_blow
+  - trample
+  - grab

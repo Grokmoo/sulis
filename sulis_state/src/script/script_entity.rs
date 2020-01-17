@@ -166,6 +166,10 @@ use sulis_module::{
 /// Creates a ScriptEntitySet consisting of all possible targets for abilities or items used
 /// by this entity.  This includes all known entities in the same area as the parent entity.
 ///
+/// # `targets_from(targets: Table) -> ScriptEntitySet`
+/// Creates a ScriptEntitySet for this parent with the specified array-like table of targets
+/// as the targets.  Allows the script complete control over the set of targets
+///
 /// # `has_effect_with_tag(tag: String) -> Bool`
 /// Returns true if this entity has one or more active effects with the specified tag,
 /// false otherwise.
@@ -807,6 +811,19 @@ impl UserData for ScriptEntity {
 
         methods.add_method("targets", &targets);
 
+        methods.add_method("targets_from", |_, entity, targets: Vec<ScriptEntity>| {
+            let parent = entity.try_unwrap_index()?;
+            let indices = targets.into_iter().map(|target| target.index).collect();
+            let targets = ScriptEntitySet {
+                parent,
+                selected_point: None,
+                affected_points: Vec::new(),
+                indices,
+                surface: None,
+            };
+            Ok(targets)
+        });
+
         methods.add_method("get_effects_with_tag", |_, entity, tag: String| {
             let entity = entity.try_unwrap()?;
             let entity = entity.borrow();
@@ -934,9 +951,12 @@ impl UserData for ScriptEntity {
             },
         );
 
-        methods.add_method("create_subpos_anim", |_, entity, duration_secs: f32| {
+        methods.add_method("create_subpos_anim", |_, entity, duration_secs: Option<f32>| {
             let index = entity.try_unwrap_index()?;
-            let duration = ExtInt::Int((duration_secs * 1000.0) as u32);
+                let duration = match duration_secs {
+                    None => ExtInt::Infinity,
+                    Some(amount) => ExtInt::Int((amount * 1000.0) as u32),
+                };
             Ok(ScriptSubposAnimation::new(index, duration))
         });
 

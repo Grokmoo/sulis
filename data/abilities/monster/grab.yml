@@ -1,0 +1,21 @@
+id: grab
+name: "Grab"
+icon: empty
+description: |
+  You pick up and hold a smaller opponent near you.  While held, they cannot take any actions.  You cannot move while the ability is active.
+active:
+  script: "grab"
+  group: Special
+  ap: 2000
+  duration:
+    Rounds: 2
+  cooldown: 4
+  combat_only: true
+  range: Touch
+  ai:
+    priority: 20
+    kind: Debuff
+    group: Single
+    range: Touch
+  short_description: |
+    Grab and hold an opponent.

@@ -32,7 +32,6 @@ function on_target_select(parent, ability, targets)
   delta_x = delta_x / norm * ability:range()
   delta_y = delta_y / norm * ability:range()
   
-  
   local size = 8.0
   if parent:ability_level(ability) > 1 then
     size = 10.0
@@ -75,10 +74,13 @@ function attack_target(parent, ability, targets)
     base_dist = base_dist + 3
   end
   
-  local point = pick_random_point(target:x(), target:y())
   local direction = -1
   
-  push_target(base_dist, target, hit, point, direction)
+  for i = 1, 5 do
+    local point = pick_random_point(target:x(), target:y())
+    local dist = push_target(base_dist, target, hit, point, direction)
+	if dist > 0 then break end
+  end
 end
 
 function pick_random_point(x, y)

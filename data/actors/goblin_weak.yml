@@ -19,7 +19,7 @@ inventory:
 reward:
   xp: 8
   loot: level1_misc
-  loot_chance: 35
+  loot_chance: 100
 abilities:
   - armor_light
   - armor_medium

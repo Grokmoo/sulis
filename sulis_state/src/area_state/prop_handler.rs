@@ -24,7 +24,7 @@ use crate::{Location, save_state::PropSaveState, prop_state, PropState};
 pub struct PropHandler {
     area: Rc<Area>,
     props: Vec<Option<PropState>>,
-    prop_grid: Vec<Option<usize>>,
+    prop_grid: Vec<Vec<usize>>,
 
     prop_vis_grid: Vec<bool>,
     prop_pass_grid: Vec<bool>,
@@ -34,7 +34,7 @@ impl PropHandler {
     pub fn new(dim: usize, area: &Rc<Area>) -> PropHandler {
         PropHandler {
             props: Vec::new(),
-            prop_grid: vec![None; dim],
+            prop_grid: vec![Vec::new(); dim],
             prop_vis_grid: vec![true; dim],
             prop_pass_grid: vec![true; dim],
             area: Rc::clone(area),
@@ -89,11 +89,18 @@ impl PropHandler {
         self.props[index].is_some()
     }
 
-    pub fn index_at(&self, x: i32, y: i32) -> Option<usize> {
+    fn container_index_at(&self, x: i32, y: i32) -> Option<usize> {
         if !self.area.coords_valid(x, y) { return None; }
 
         let index = (x + y * self.area.width) as usize;
-        self.prop_grid[index]
+        for prop_index in &self.prop_grid[index] {
+            use prop_state::Interactive::*;
+            match self.props[*prop_index].as_ref().unwrap().interactive {
+                Not | Door { .. } | Hover { .. } => (),
+                Container { .. } => return Some(*prop_index),
+            }
+        }
+        None
     }
 
     pub fn remove_matching(&mut self, x: i32, y: i32, name: &str) {
@@ -129,20 +136,21 @@ impl PropHandler {
 
         for y in start_y..end_y {
             for x in start_x..end_x {
-                self.prop_grid[x + y * self.area.width as usize] = None;
+                self.prop_grid[x + y * self.area.width as usize].retain(|i| *i != index);
             }
         }
 
         self.props[index] = None;
     }
 
-    pub fn check_or_create_container(&mut self, x: i32, y: i32) {
-        if let Some(_) = self.index_at(x, y) { return; }
+    #[must_use]
+    pub fn check_or_create_container(&mut self, x: i32, y: i32) -> Option<usize> {
+        if let Some(idx) = self.container_index_at(x, y) { return Some(idx); }
 
         let prop = match Module::prop(&Module::rules().loot_drop_prop) {
             None => {
                 warn!("Unable to generate loot drop prop.");
-                return;
+                return None;
             }, Some(prop) => prop,
         };
 
@@ -155,9 +163,13 @@ impl PropHandler {
             hover_text: None,
         };
 
-        if let Err(e) = self.add(&data, location, true) {
-            warn!("Unable to add temp container at {},{}", x, y);
-            warn!("{}", e);
+        match self.add(&data, location, true) {
+            Err(e) => {
+                warn!("Unable to add temp container at {},{}", x, y);
+                warn!("{}", e);
+                None
+            },
+            Ok(idx) => Some(idx)
         }
     }
 
@@ -213,7 +225,7 @@ impl PropHandler {
 
         for y in start_y..end_y {
             for x in start_x..end_x {
-                self.prop_grid[x + y * self.area.width as usize] = Some(index);
+                self.prop_grid[x + y * self.area.width as usize].push(index);
             }
         }
 
@@ -237,7 +249,7 @@ impl PropHandler {
         }
     }
 
-    pub fn grid(&self) -> &[Option<usize>] {
+    pub fn grid(&self) -> &[Vec<usize>] {
         &self.prop_grid
     }
 
@@ -262,6 +274,13 @@ impl PropHandler {
             handler: &self,
             index: 0,
         }
+    }
+
+    pub fn index_at(&self, x: i32, y: i32) -> Option<usize> {
+        if !self.area.coords_valid(x, y) { return None; }
+
+        let index = (x + y * self.area.width) as usize;
+        self.prop_grid[index].get(0).copied()
     }
 
     pub fn get(&self, index: usize) -> &PropState {
@@ -296,13 +315,17 @@ impl PropHandler {
     }
 
     pub fn set_enabled_at(&mut self, x: i32, y: i32, enabled: bool) -> bool {
-        match self.get_mut_at(x, y) {
-            None => false,
-            Some(ref mut prop) => {
-                prop.set_enabled(enabled);
-                true
-            }
+        if !self.area.coords_valid(x, y) { return false; }
+
+        let mut result = false;
+        let index = (x + y * self.area.width) as usize;
+        for prop_index in &self.prop_grid[index] {
+            let prop = self.props[*prop_index].as_mut().unwrap();
+            prop.set_enabled(enabled);
+            result = true;
         }
+
+        result
     }
 
     // This method must be called by the owning AreaState in order

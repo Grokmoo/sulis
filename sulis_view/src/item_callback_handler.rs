@@ -206,9 +206,12 @@ fn drop_to_ground(entity: &Rc<RefCell<EntityState>>, item: ItemState) {
     let area_state = GameState::area_state();
     let mut area_state = area_state.borrow_mut();
 
-    area_state.props_mut().check_or_create_container(p.x, p.y);
-    if let Some(ref mut prop) = area_state.props_mut().get_mut_at(p.x, p.y) {
-        prop.add_item(item);
+    match area_state.props_mut().check_or_create_container(p.x, p.y) {
+        None => (),
+        Some(index) => {
+            let prop = area_state.props_mut().get_mut(index);
+            prop.add_item(item);
+        }
     }
 }
 

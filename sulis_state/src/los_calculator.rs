@@ -24,7 +24,7 @@ pub fn calculate_los(
     exp: &mut Vec<bool>,
     area: &GeneratedArea,
     prop_vis_grid: &[bool],
-    prop_grid: &[Option<usize>],
+    prop_grid: &[Vec<usize>],
     entity: &mut EntityState,
     delta_x: i32,
     delta_y: i32,
@@ -63,11 +63,8 @@ pub fn calculate_los(
                 los[index] = true;
                 exp[index] = true;
 
-                match prop_grid[index] {
-                    None => (),
-                    Some(prop) => {
-                        props_vis.insert(prop);
-                    }
+                for prop in &prop_grid[index] {
+                    props_vis.insert(*prop);
                 }
             } else {
                 los[index] = false;

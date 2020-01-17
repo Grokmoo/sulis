@@ -48,7 +48,7 @@ impl EntityTextureSlot {
         );
 
         let min_x = self.x as f32 + BORDER_SIZE_F;
-        let min_y = self.y as f32 + BORDER_SIZE_F;
+        let min_y = self.y as f32 + 2.0 * BORDER_SIZE_F;
         let (ui_x, ui_y) = Config::ui_size();
         let scale_x = ui_x as f32 / self.slots_dim as f32;
         let scale_y = ui_y as f32 / self.slots_dim as f32;
@@ -74,7 +74,7 @@ impl EntityTextureSlot {
             &self.texture_id,
             &self.tex_coords,
             x - BORDER_SIZE_F - offset_x,
-            y - BORDER_SIZE_F - offset_y,
+            y - 2.0 * BORDER_SIZE_F - offset_y,
             self.w as f32 + offset_x * 2.0,
             self.h as f32 + offset_y * 2.0,
         );
@@ -141,7 +141,7 @@ impl EntityTextureCache {
         let slot_index = self.find_slot(width, height);
         let slot = &self.entity_slots[slot_index];
         let x = slot.x as f32 + BORDER_SIZE_F;
-        let y = slot.y as f32 + BORDER_SIZE_F;
+        let y = slot.y as f32 + 2.0 * BORDER_SIZE_F;
 
         info!(
             "Drawing entity '{}' to slot {} at {},{}",

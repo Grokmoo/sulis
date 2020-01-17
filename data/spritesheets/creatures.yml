@@ -9,6 +9,8 @@ groups:
       dragon01: [37, 33, 5, 6]
       demon_lord01: [51, 33, 5, 6]
       demon_lord01_shadow: [56, 33, 5, 6]
+      skeletal_giant: [12, 53, 4, 6]
+      skeletal_dragon: [16, 53, 8, 6]
   1by1:
     size: [1, 1]
     areas:

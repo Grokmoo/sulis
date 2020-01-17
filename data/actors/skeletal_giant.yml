@@ -1,0 +1,22 @@
+id: skeletal_giant
+ai: ai_basic
+name: Skeletal Giant
+faction: Hostile
+images: {}
+race: skeletal_giant
+attributes:
+  str: 10
+  dex: 10
+  end: 10
+  per: 10
+  int: 10
+  wis: 10
+levels:
+  fighter: 12
+inventory: {}
+reward:
+  xp: 200
+  loot: level5_misc
+  loot_chance: 100
+abilities:
+  - mighty_blow

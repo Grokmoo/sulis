@@ -11,6 +11,10 @@ groups:
       demon_lord01_shadow: [56, 33, 5, 6]
       skeletal_giant: [12, 53, 4, 6]
       skeletal_dragon: [16, 53, 8, 6]
+      flameling_small: [27, 50, 3, 3]
+      flameling_medium: [27, 53, 4, 6]
+      flameling_large: [31, 50, 7, 8]    
+      minotaur: [12, 59, 4, 5]      
   1by1:
     size: [1, 1]
     areas:
@@ -30,6 +34,7 @@ groups:
       goblin3: [18, 33]
       goblin4: [20, 33]
       goblin_shadow: [22, 33]
+      goblin_mage: [24, 33]
       selected0: [0, 35]
       selected1: [2, 35]
       selected2: [4, 35]
@@ -372,6 +377,12 @@ groups:
       human38: [6, 9]
       human39: [9, 9]
       human40: [12, 9]
+  premades_misc:
+    size: [3, 3]
+    areas:
+      dwarf08: [30, 27]
+      dwarf09: [33, 27]
+      human41: [27, 27]
   premades_dracon:
     size: [3, 4]
     position: [40, 58]

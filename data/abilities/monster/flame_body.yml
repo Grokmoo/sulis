@@ -1,0 +1,20 @@
+id: flame_body
+name: "Flame Body"
+icon: empty
+description: |
+  You leave a trail of fire behind wherever you go
+active:
+  script: "flame_body"
+  group: Special
+  ap: 0
+  duration:
+    Mode
+  cooldown: 1
+  combat_only: false
+  ai:
+    priority: 1
+    kind: Buff
+    group: Single
+    range: Personal
+  short_description: |
+    Leave a trail of fire in your wake

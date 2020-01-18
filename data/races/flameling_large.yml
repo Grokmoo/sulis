@@ -1,0 +1,37 @@
+id: flameling_large
+name: "Flameling"
+description: "Monster"
+size: 4by4
+movement_rate: 0.8
+base_stats:
+  - kind: { attribute: { attribute: Strength, amount: 4 } }
+  - kind: { attribute: { attribute: Dexterity, amount: 4 } }
+  - kind: { attribute: { attribute: Endurance, amount: 2 } }
+  - kind: { hit_points: 40 }
+  - kind: { reach: 1.0 }
+  - kind: { resistance: { kind: "Shock", amount: 50 } }
+  - kind: { resistance: { kind: "Acid", amount: 50 } }
+  - kind: { resistance: { kind: "Fire", amount: 100 } }
+  - kind: { armor: 18 }
+base_attack:
+  damage:
+    min: 15
+    max: 20
+    kind: Fire
+  kind: #Melee
+    reach: 1.0
+  bonuses: {}
+default_images:
+  Male:
+    Background: creatures/flameling_large
+    Shadow: creatures/4x4_large_shadow
+  Female:
+    Background: creatures/flameling_large
+    Shadow: creatures/4x4_medium_shadow
+ticker_offset: [0.0, 1.5]
+image_layer_offset_scale: 16
+image_layer_offsets:
+  Shadow: [-2, 0]
+  Background: [-32, -64]
+image_layer_postfix: {}
+

@@ -1,0 +1,31 @@
+id: flaming_sword_large
+name: Flaming Sword
+kind:
+  Weapon:
+    kind: LargeSword
+icon: inventory/weapon_greatsword
+weight: 600
+value: 1000
+equippable:
+  slot: HeldMain
+  blocks_slot: HeldOff
+  bonuses:
+    - kind:
+        defense: 7
+  attack:
+    damage:
+      min: 22
+      max: 30
+      ap: 3
+      kind: Slashing
+    kind: # Melee
+      reach: 1.5
+    bonuses:
+      damage:
+        min: 5
+        max: 10
+        ap: 2
+        kind: Fire
+image:
+  HeldMain:
+    creatures/greatsword

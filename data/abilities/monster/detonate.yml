@@ -1,0 +1,24 @@
+id: detonate
+name: "Detonate"
+icon: empty
+description: |
+  Detonate your body, doing large fire damage to nearby targets but killing yourself.
+active:
+  script: "detonate"
+  group: "Special"
+  ap: 3000
+  duration:
+    Instant
+  cooldown: 3
+  combat_only: true
+  range:
+    Radius: 4.0
+  ai:
+    priority: 10
+    kind: Damage
+    group: Multiple
+    range: Touch
+  short_description: |
+    Kills yourself, but does fire damage to all nearby.
+prereqs:
+  total_level: 9

@@ -117,6 +117,6 @@ female_random_names: [
   "Farola", "Dormina", "Thola", "Storana" ]
 editor_creator_images:
   Background: [ creatures/dwarf01, creatures/dwarf02, creatures/dwarf03, creatures/dwarf04, creatures/dwarf05, creatures/dwarf06,
-    creatures/dwarf07 ]
+    creatures/dwarf07, creatures/dwarf08, creatures/dwarf09 ]
   Foreground: [ empty ]
   Shadow: [ empty ]

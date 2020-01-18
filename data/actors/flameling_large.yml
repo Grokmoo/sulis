@@ -1,9 +1,9 @@
-id: skeletal_giant
+id: flameling_large
 ai: ai_basic
-name: Skeletal Giant
+name: Flame Giant
 faction: Hostile
 images: {}
-race: skeletal_giant
+race: flameling_large
 attributes:
   str: 10
   dex: 10
@@ -13,11 +13,17 @@ attributes:
   wis: 10
 levels:
   fighter: 12
-inventory: {}
 reward:
   xp: 200
   loot: level10_misc
   loot_chance: 50
+inventory:
+  equipped:
+    HeldMain: { id: flaming_sword_large }
 abilities:
+  - weapon_small_sword
+  - weapon_large_sword
+  - weapon_simple
+  - flame_body
   - trample
   - grab

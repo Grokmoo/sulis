@@ -17,18 +17,12 @@ base_attack:
     kind: Crushing
   kind: #Melee
     reach: 1.0
-  bonuses: {}
 default_images:
-  Male:
-    Background: creatures/demon01
-    Shadow: creatures/4x4_large_shadow
-  Female:
-    Background: creatures/demon01
-    Shadow: creatures/4x4_large_shadow
+  Background: creatures/demon01
+  Shadow: creatures/4x4_large_shadow
 ticker_offset: [0.0, 1.5]
 image_layer_offset_scale: 16
 image_layer_offsets:
   Shadow: [-8, -16]
   Background: [-8, -20]
-image_layer_postfix: {}
 

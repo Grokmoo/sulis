@@ -19,16 +19,11 @@ base_attack:
     reach: 1.0
   bonuses: {}
 default_images:
-  Male:
-    Background: creatures/scorpion_medium
-    Shadow: creatures/scorpion_medium_shadow
-  Female:
-    Background: creatures/scorpion_medium
-    Shadow: creatures/scorpion_medium_shadow
+  Background: creatures/scorpion_medium
+  Shadow: creatures/scorpion_medium_shadow
 ticker_offset: [0.0, 0.75]
 image_layer_offset_scale: 16
 image_layer_offsets:
   Shadow: [-7, -10]
   Background: [-7, -10]
 image_layer_postfix: {}
-

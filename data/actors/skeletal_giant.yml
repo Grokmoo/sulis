@@ -2,8 +2,36 @@ id: skeletal_giant
 ai: ai_basic
 name: Skeletal Giant
 faction: Hostile
-images: {}
-race: skeletal_giant
+inline_race:
+  id: skeletal_giant
+  name: Skeletal Giant
+  description: "Monster"
+  size: 3by3
+  movement_rate: 1.2
+  base_stats:
+    - kind: { attribute: { attribute: Strength, amount: 8 } }
+    - kind: { attribute: { attribute: Dexterity, amount: -4 } }
+    - kind: { attribute: { attribute: Endurance, amount: 3 } }
+    - kind: { attribute: { attribute: Intellect, amount: -8 } }
+    - kind: { hit_points: 40 }
+    - kind: { reach: 1.0 }
+    - kind: { resistance: { kind: "Piercing", amount: 50 } }
+    - kind: { resistance: { kind: "Slashing", amount: 50 } }
+  base_attack:
+    damage:
+      min: 15
+      max: 22
+      kind: Crushing
+    kind: #Melee
+      reach: 1.0
+  default_images:
+    Background: creatures/skeletal_giant
+    Shadow: creatures/4x4_medium_shadow
+  ticker_offset: [0.0, 3.0]
+  image_layer_offset_scale: 16
+  image_layer_offsets:
+    Shadow: [-8, -20]
+    Background: [-8, -48]
 attributes:
   str: 10
   dex: 10

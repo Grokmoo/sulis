@@ -27,6 +27,10 @@ function push_target(base_dist, target, hit, point, direction)
   local dir_x = (target_x - point.x) * direction
   local dir_y = (target_y - point.y) * direction
   local mag = math.sqrt(dir_x * dir_x + dir_y * dir_y)
+  
+  -- don't divide by 0
+  if math.abs(mag) < 0.1 then return 0 end
+  
   local x_norm = dir_x / mag
   local y_norm = dir_y / mag
   

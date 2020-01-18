@@ -3,7 +3,37 @@ ai: ai_basic
 name: Chicken
 faction: Neutral
 images: {}
-race: chicken
+inline_race:
+  id: chicken
+  name: Chicken
+  size: 2by2
+  movement_rate: 0.4
+  base_stats:
+    - kind: { attribute: { attribute: Strength, amount: -3 } }
+    - kind: { attribute: { attribute: Endurance, amount: -2 } }
+    - kind: { attribute: { attribute: Perception, amount: -3 } }
+    - kind: { attribute: { attribute: Intellect, amount: -8 } }
+    - kind: { hit_points: 20 }
+    - kind: { reach: 0.0 }
+    - kind: { resistance: { kind: "Acid", amount: 100 } }
+    - kind: { resistance: { kind: "Fire", amount: -25 } }
+    - kind: { flanked_immunity }
+    - kind: { sneak_attack_immunity }
+  base_attack:
+    damage:
+      min: 4
+      max: 6
+      kind: Piercing
+    kind: #Melee
+      reach: 1.0
+  default_images:
+    Background: creatures/chicken0
+    Shadow: creatures/goblin_shadow
+  ticker_offset: [0.5, 1]
+  image_layer_offset_scale: 16
+  image_layer_offsets:
+    Shadow: [0, -4]
+    Background: [0, -6]
 attributes:
   str: 10
   dex: 10

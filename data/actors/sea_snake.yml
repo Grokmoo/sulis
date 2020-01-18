@@ -2,8 +2,32 @@ id: sea_snake
 ai: ai_basic
 name: Sea Snake
 faction: Hostile
-images: {}
-race: sea_snake
+inline_race:
+  id: sea_snake
+  name: Sea Snake
+  description: "Monster"
+  size: 3by3
+  movement_rate: 1.0
+  base_stats:
+    - kind: { attribute: { attribute: Strength, amount: 3 } }
+    - kind: { attribute: { attribute: Dexterity, amount: 2 } }
+    - kind: { attribute: { attribute: Endurance, amount: 1 } }
+    - kind: { attribute: { attribute: Intellect, amount: -5 } }
+    - kind: { hit_points: 40 }
+    - kind: { reach: 0.5 }
+  base_attack:
+    damage:
+      min: 15
+      max: 25
+      kind: Crushing
+    kind: #Melee
+      reach: 1.0
+  default_images:
+    Background: creatures/dragon_snake01
+  ticker_offset: [0.0, 0.0]
+  image_layer_offset_scale: 16
+  image_layer_offsets:
+    Background: [0, 0]
 attributes:
   str: 10
   dex: 10

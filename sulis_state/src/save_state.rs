@@ -471,7 +471,8 @@ impl EntitySaveState {
             Some(ActorBuilder {
                 id: actor.id.to_string(),
                 name: actor.name.to_string(),
-                race: actor.race.id.to_string(),
+                race: Some(actor.race.id.to_string()),
+                inline_race: None,
                 sex: Some(actor.sex),
                 portrait: actor.portrait.as_ref().map(|p| p.id().to_string()),
                 attributes: actor.attributes,

@@ -17,8 +17,7 @@ base_attack:
     kind: Crushing
   kind: #Melee
     reach: 0.5
-  bonuses: {}
-default_images:
+default_images_by_sex:
   Male:
     Foreground: creatures/dracon_fg
     Background: creatures/dracon_bg

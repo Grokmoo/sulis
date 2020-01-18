@@ -17,14 +17,9 @@ base_attack:
     kind: Crushing
   kind: #Melee
     reach: 0.25
-  bonuses: {}
 default_images:
-  Male:
-    Background: creatures/goblin0
-    Shadow: creatures/goblin_shadow
-  Female:
-    Background: creatures/goblin0
-    Shadow: creatures/goblin_shadow
+  Background: creatures/goblin0
+  Shadow: creatures/goblin_shadow
 ticker_offset: [0.5, 1]
 image_layer_offset_scale: 16
 image_layer_offsets:
@@ -32,5 +27,3 @@ image_layer_offsets:
   HeldOff: [6, -20]
   Shadow: [0, -4]
   Background: [0, -7]
-image_layer_postfix: {}
-

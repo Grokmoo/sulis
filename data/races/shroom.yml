@@ -20,18 +20,12 @@ base_attack:
     kind: Crushing
   kind: #Melee
     reach: 0.5
-  bonuses: {}
 default_images:
-  Male:
-    Background: creatures/shroom_med
-    Shadow: creatures/shroom_med_shadow
-  Female:
-    Background: creatures/shroom_med
-    Shadow: creatures/shroom_med_shadow
+  Background: creatures/shroom_med
+  Shadow: creatures/shroom_med_shadow
 ticker_offset: [0.5, 2]
 image_layer_offset_scale: 16
 image_layer_offsets:
   Shadow: [-8, -19]
   Background: [-8, -19]
-image_layer_postfix: {}
 

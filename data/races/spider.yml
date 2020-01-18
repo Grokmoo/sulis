@@ -19,16 +19,10 @@ base_attack:
     reach: 0.25
   bonuses: {}
 default_images:
-  Male:
-    Background: creatures/spider0
-    Shadow: creatures/goblin_shadow
-  Female:
-    Background: creatures/spider0
-    Shadow: creatures/goblin_shadow
+  Background: creatures/spider0
+  Shadow: creatures/goblin_shadow
 ticker_offset: [0.5, 1]
 image_layer_offset_scale: 16
 image_layer_offsets:
   Shadow: [0, -4]
   Background: [0, 0]
-image_layer_postfix: {}
-

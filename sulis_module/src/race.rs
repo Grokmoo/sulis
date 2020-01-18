@@ -83,7 +83,16 @@ impl Race {
             offsets.insert(layer, (p.x as f32 / scale, p.y as f32 / scale));
         }
 
-        let default_images = ImageLayerSet::new(builder.default_images)?;
+        let default_images = if builder.default_images.len() > 0 {
+            let default_images = builder.default_images.clone();
+            let images = Sex::iter().map(|s| (*s, default_images.clone())).collect();
+            ImageLayerSet::new(images)
+        } else if builder.default_images_by_sex.len() > 0 {
+            ImageLayerSet::new(builder.default_images_by_sex)
+        } else {
+            warn!("Must specify either default_images or default_images_by_sex");
+            return unable_to_create_error("race", &builder.id);
+        }?;
 
         if builder.base_attack.damage.kind.is_none() {
             warn!("Attack must always have a damage kind specified.");
@@ -213,16 +222,23 @@ impl Race {
 pub struct RaceBuilder {
     pub id: String,
     pub name: String,
+
+    #[serde(default)]
     pub description: String,
     pub size: String,
     pub movement_rate: f32,
     pub base_attack: AttackBuilder,
     pub base_stats: BonusList,
     pub pc_death_prop: Option<String>,
-    pub default_images: HashMap<Sex, HashMap<ImageLayer, String>>,
     pub hair_selections: Option<Vec<String>>,
     pub beard_selections: Option<Vec<String>>,
     pub portrait_selections: Option<Vec<String>>,
+
+    #[serde(default)]
+    pub default_images: HashMap<ImageLayer, String>,
+
+    #[serde(default)]
+    pub default_images_by_sex: HashMap<Sex, HashMap<ImageLayer, String>>,
 
     #[serde(default)]
     pub male_random_names: Vec<String>,
@@ -235,6 +251,8 @@ pub struct RaceBuilder {
     pub ticker_offset: (f32, f32),
     image_layer_offsets: HashMap<ImageLayer, Point>,
     image_layer_offset_scale: i32,
+
+    #[serde(default)]
     image_layer_postfix: HashMap<Sex, String>,
 
     #[serde(default)]

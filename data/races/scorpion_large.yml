@@ -17,18 +17,12 @@ base_attack:
     kind: Piercing
   kind: #Melee
     reach: 1.0
-  bonuses: {}
 default_images:
-  Male:
-    Background: creatures/scorpion_large
-    Shadow: creatures/scorpion_large_shadow
-  Female:
-    Background: creatures/scorpion_large
-    Shadow: creatures/scorpion_large_shadow
+  Background: creatures/scorpion_large
+  Shadow: creatures/scorpion_large_shadow
 ticker_offset: [-0.5, 0.0]
 image_layer_offset_scale: 16
 image_layer_offsets:
   Shadow: [-7, -10]
   Background: [-7, -10]
-image_layer_postfix: {}
 

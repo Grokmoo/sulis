@@ -17,18 +17,12 @@ base_attack:
     kind: Piercing
   kind: #Melee
     reach: 0.5
-  bonuses: {}
 default_images:
-  Male:
-    Background: creatures/wolf01
-    Shadow: creatures/wolf_shadow
-  Female:
-    Background: creatures/wolf01
-    Shadow: creatures/wolf_shadow
+  Background: creatures/wolf01
+  Shadow: creatures/wolf_shadow
 ticker_offset: [0.5, 2]
 image_layer_offset_scale: 16
 image_layer_offsets:
   Shadow: [-8, -19]
   Background: [-8, -19]
-image_layer_postfix: {}
 

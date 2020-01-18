@@ -2,7 +2,6 @@ id: spider
 ai: ai_basic
 name: Spider
 faction: Hostile
-images: {}
 race: spider
 attributes:
   str: 10

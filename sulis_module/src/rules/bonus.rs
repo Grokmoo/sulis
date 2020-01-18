@@ -645,6 +645,8 @@ impl Default for AttackBonuses {
 pub struct AttackBuilder {
     pub damage: Damage,
     pub kind: AttackKindBuilder,
+
+    #[serde(default)]
     pub bonuses: AttackBonuses,
 }
 

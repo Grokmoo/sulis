@@ -2,8 +2,31 @@ id: spirit_eye
 ai: ai_basic
 name: Spirit Eye
 faction: Hostile
-images: {}
-race: spirit_eye
+inline_race:
+  id: spirit_eye
+  name: Spirit Eye
+  description: "Monster"
+  size: 1by1
+  movement_rate: 0.4
+  base_stats:
+    - kind: { hit_points: 20 }
+    - kind: { hidden }
+    - kind: { attack_disabled }
+  base_attack:
+    damage:
+      min: 0
+      max: 0
+      kind: Raw
+    kind: #Melee
+      reach: 1.0
+  default_images:
+    Background: creatures/eye
+    Shadow: creatures/goblin_shadow
+  ticker_offset: [2.0, 2.5]
+  image_layer_offset_scale: 16
+  image_layer_offsets:
+    Shadow: [-9, -12]
+    Background: [-8, -13]
 attributes:
   str: 7
   dex: 13

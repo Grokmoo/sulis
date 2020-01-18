@@ -1,8 +1,36 @@
 id: stone
 name: Stone
 faction: Neutral
-images: {}
-race: stone
+inline_race:
+  id: stone
+  name: Stone
+  description: "Stone"
+  size: 1by1
+  movement_rate: 0.0
+  base_stats:
+    - kind: { hit_points: 20 }
+    - kind: { attack_disabled }
+    - kind: { move_disabled }
+    - kind: { resistance: { kind: "Slashing", amount: 50 } }
+    - kind: { resistance: { kind: "Piercing", amount: 75 } }
+    - kind: { resistance: { kind: "Crushing", amount: 10 } }
+    - kind: { resistance: { kind: "Acid", amount: 50 } }
+    - kind: { resistance: { kind: "Cold", amount: 25 } }
+    - kind: { resistance: { kind: "Shock", amount: 75 } }
+    - kind: { resistance: { kind: "Fire", amount: 75 } }
+  base_attack:
+    damage:
+      min: 0
+      max: 0
+      kind: Raw
+    kind: #Melee
+      reach: 1.0
+  default_images:
+    Background: creature_stone
+  ticker_offset: [2.0, 2.5]
+  image_layer_offset_scale: 16
+  image_layer_offsets:
+    Background: [0, 0]
 attributes:
   str: 10
   dex: 10

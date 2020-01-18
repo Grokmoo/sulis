@@ -1,8 +1,32 @@
 id: ancient_red_dragon
 name: Ancient Red Dragon
 faction: Hostile
-images: {}
-race: ancient_dragon
+inline_race:
+  id: ancient_dragon
+  name: Ancient Dragon
+  size: 6by5
+  movement_rate: 1.5
+  base_stats:
+    - kind: { attribute: { attribute: Strength, amount: 10 } }
+    - kind: { attribute: { attribute: Dexterity, amount: -2 } }
+    - kind: { attribute: { attribute: Endurance, amount: 10 } }
+    - kind: { attribute: { attribute: Intellect, amount: 4 } }
+    - kind: { hit_points: 100 }
+    - kind: { reach: 2.0 }
+  base_attack:
+    damage:
+      min: 25
+      max: 35
+      kind: Piercing
+    kind: #Melee
+      reach: 2.0
+  default_images:
+    Background: creatures/dragon_large01
+  ticker_offset: [-2.0, -2.0]
+  image_layer_offset_scale: 16
+  image_layer_offsets:
+    Shadow: [-32, -19]
+    Background: [-32, -19]
 attributes:
   str: 10
   dex: 10
@@ -12,8 +36,6 @@ attributes:
   wis: 10
 levels:
   mage: 19
-inventory:
-  equipped: {}
 reward:
   xp: 500
   loot: level5_misc

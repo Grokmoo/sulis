@@ -28,7 +28,7 @@ use sulis_core::util::unable_to_create_error;
 
 use crate::{
     AITemplate, Ability, Class, Conversation, ImageLayer, ImageLayerSet, InventoryBuilder,
-    LootList, Module, Race,
+    LootList, Module, Race, RaceBuilder,
 };
 
 #[derive(Deserialize, Serialize, Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -237,13 +237,25 @@ impl Actor {
         }
     }
 
-    pub fn new(builder: ActorBuilder, resources: &Module) -> Result<Actor, Error> {
-        let race = match resources.races.get(&builder.race) {
-            None => {
-                warn!("No match found for race '{}'", builder.race);
+    pub fn new(builder: ActorBuilder, resources: &mut Module) -> Result<Actor, Error> {
+        let race = if let Some(race_id) = builder.race {
+            match resources.races.get(&race_id) {
+                None => {
+                    warn!("No match found for race '{}'", race_id);
+                    return unable_to_create_error("actor", &builder.id);
+                }
+                Some(race) => Rc::clone(race),
+            }
+        } else {
+            if let Some(race_builder) = builder.inline_race {
+                let race = Rc::new(Race::new(race_builder, resources)?);
+                trace!("Inserting inline race with ID {} into module.", race.id);
+                resources.races.insert(race.id.clone(), Rc::clone(&race));
+                race
+            } else {
+                warn!("Must specify either race or inline race.");
                 return unable_to_create_error("actor", &builder.id);
             }
-            Some(race) => Rc::clone(race),
         };
 
         let conversation = match builder.conversation {
@@ -454,14 +466,22 @@ pub struct RewardBuilder {
 pub struct ActorBuilder {
     pub id: String,
     pub name: String,
-    pub race: String,
+
+    pub race: Option<String>,
+
+    #[serde(skip_serializing)]
+    pub inline_race: Option<RaceBuilder>,
+
     pub sex: Option<Sex>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub portrait: Option<String>,
     pub attributes: AttributeList,
     pub conversation: Option<String>,
     pub faction: Option<Faction>,
+
+    #[serde(default)]
     pub images: HashMap<ImageLayer, String>,
+
     pub hue: Option<f32>,
 
     #[serde(skip_serializing_if = "Option::is_none")]

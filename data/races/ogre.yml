@@ -17,14 +17,9 @@ base_attack:
     kind: Crushing
   kind: #Melee
     reach: 1.0
-  bonuses: {}
 default_images:
-  Male:
-    Background: creatures/ogre01
-    Shadow: creatures/ogre_shadow
-  Female:
-    Background: creatures/ogre01
-    Shadow: creatures/ogre_shadow
+  Background: creatures/ogre01
+  Shadow: creatures/ogre_shadow
 ticker_offset: [0.0, 1.5]
 image_layer_offset_scale: 16
 image_layer_offsets:
@@ -32,5 +27,4 @@ image_layer_offsets:
   HeldOff: [33, -15]
   Shadow: [-8, -24]
   Background: [-8, -24]
-image_layer_postfix: {}
 

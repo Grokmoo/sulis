@@ -345,8 +345,8 @@ impl Module {
                 };
 
             let actor = MODULE.with(|module| {
-                let module = module.borrow();
-                match Actor::new(actor_builder, &module) {
+                let mut module = module.borrow_mut();
+                match Actor::new(actor_builder, &mut module) {
                     Err(e) => {
                         warn!("Error reading actor: {}", e);
                         None
@@ -583,7 +583,9 @@ impl Module {
                 insert_if_ok(
                     "actor",
                     id,
-                    Actor::new(builder, &module),
+                    // takes mutable module.  will insert an inline race if
+                    // the actor defines it
+                    Actor::new(builder, &mut module),
                     &mut module.actors,
                 );
             }
@@ -652,15 +654,15 @@ impl Module {
 
     pub fn load_actor(builder: ActorBuilder) -> Result<Actor, Error> {
         MODULE.with(|module| {
-            let module = module.borrow();
-            Actor::new(builder, &module)
+            let mut module = module.borrow_mut();
+            Actor::new(builder, &mut module)
         })
     }
 
     pub fn add_actor_to_resources(builder: ActorBuilder) {
         let result: Result<(), Error> = MODULE.with(|module| {
             let mut module = module.borrow_mut();
-            let actor = Actor::new(builder, &module)?;
+            let actor = Actor::new(builder, &mut module)?;
             let id = actor.id.to_string();
             module.actors.insert(id, Rc::new(actor));
             Ok(())

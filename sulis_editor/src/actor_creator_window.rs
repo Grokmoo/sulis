@@ -95,7 +95,8 @@ impl ActorCreatorWindow {
         let actor = ActorBuilder {
             id,
             name: self.name_field.borrow().text(),
-            race: race.id.to_string(),
+            race: Some(race.id.to_string()),
+            inline_race: None,
             sex: Some(self.selected_sex),
             portrait: None,
             attributes: AttributeList::new(Module::rules().base_attribute as u8),

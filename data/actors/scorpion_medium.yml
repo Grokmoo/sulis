@@ -2,7 +2,6 @@ id: scorpion_medium
 ai: ai_basic
 name: Scorpion
 faction: Hostile
-images: {}
 race: scorpion_medium
 attributes:
   str: 10

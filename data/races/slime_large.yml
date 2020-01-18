@@ -25,15 +25,10 @@ base_attack:
     kind: Acid
   kind: #Melee
     reach: 1.5
-  bonuses: {}
 default_images:
-  Male:
-    Background: creatures/slime1
-  Female:
-    Background: creatures/slime1
+  Background: creatures/slime1
 ticker_offset: [0.0, 0.0]
 image_layer_offset_scale: 16
 image_layer_offsets:
   Background: [0, 0]
-image_layer_postfix: {}
 

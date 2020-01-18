@@ -16,18 +16,12 @@ base_attack:
     kind: Crushing
   kind: #Melee
     reach: 1.0
-  bonuses: {}
 default_images:
-  Male:
-    Background: creatures/forest_troll01
-    Shadow: creatures/forest_troll_shadow
-  Female:
-    Background: creatures/forest_troll01
-    Shadow: creatures/forest_troll_shadow
+  Background: creatures/forest_troll01
+  Shadow: creatures/forest_troll_shadow
 ticker_offset: [0.0, 1.5]
 image_layer_offset_scale: 16
 image_layer_offsets:
   Shadow: [-8, -34]
   Background: [-8, -24]
-image_layer_postfix: {}
 

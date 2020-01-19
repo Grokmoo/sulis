@@ -1,0 +1,63 @@
+---
+id: desert_bandit08
+name: Bandit Assassin
+race: human
+sex: Male
+attributes:
+  str: 12
+  dex: 16
+  end: 14
+  per: 13
+  int: 10
+  wis: 10
+conversation: ~
+faction: Hostile
+images:
+  Shadow: empty
+  Background: creatures/human35
+  Foreground: empty
+reward:
+  xp: 100
+  loot: level5_misc
+  loot_chance: 35
+hue: 0.5
+inventory:
+  equipped:
+    HeldMain:
+      id: crossbow
+      adjectives: [ fine ]
+    Torso:
+      id: torso_leather
+      adjectives: [ fine ]
+    Legs:
+      id: legs_leather
+      adjectives: [ fine ]
+    Feet:
+      id: boots_leather
+      adjectives: [ fine ]
+    Hands:
+      id: gloves_leather
+      adjectives: [ fine ]
+  quick:
+    AltHeldMain:
+      id: shortsword
+      adjectives: [ fine, acid5 ]
+    AltHeldOff:
+      id: dagger
+      adjectives: [ fine ]
+levels:
+  rogue: 10
+abilities:
+  - armor_light
+  - weapon_crossbow
+  - weapon_bow
+  - weapon_small_sword
+  - weapon_simple
+  - backstab
+  - speedy
+  - feint
+  - attacker
+  - flanker
+  - rupture
+  - rapid_strikes
+ai: ai_basic

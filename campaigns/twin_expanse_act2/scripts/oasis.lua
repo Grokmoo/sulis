@@ -99,3 +99,31 @@ end
 function on_exit_lonely_mesa(parent)
   game:set_world_map_location_enabled("lonely_mesa", true)
 end
+
+function flameling_ambush_1(parent)
+  game:spawn_encounter_at(16, 51)
+end
+
+function flameling_ambush_2(parent)
+  game:spawn_encounter_at(28, 47)
+end
+
+function flameling_ambush_3(parent)
+  game:spawn_encounter_at(49, 77)
+end
+
+function razethar_spoke(parent)
+  game:set_quest_entry_state("the_aegis", "spoke_to_razethar", "Visible")
+  game:player():set_flag("spoke_to_razethar")
+end
+
+function remove_aegis_book(parent)
+  local item = game:find_party_item("history_of_the_aegis")
+  game:remove_party_item(item)
+end
+
+function open_blazing_road(parent)
+  game:player():clear_flag("spoke_to_razethar")
+  game:enable_prop_at(96, 70)
+  game:set_world_map_location_visible("blazing_road_west", true)
+end

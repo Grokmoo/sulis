@@ -136,3 +136,10 @@ world_map:
         desert_canyon: 72
         oasis: 72
         southern_desert: 12
+    blazing_road_west:
+      name: "Blazing Road West"
+      position: [6.5, 2.75]
+      icon: cave01
+      initially_visible: false
+      initially_enabled: false
+      

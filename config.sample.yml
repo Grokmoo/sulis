@@ -2,7 +2,7 @@
 # The main game configuration file.  User preferences are set here.
 
 # If the user has an old revision, their config is automatically recreated from the sample.
-revision: 7
+revision: 8
 
 display:
     # Display Adapter - Glium is the only choice for now
@@ -123,7 +123,7 @@ logging:
 # Defaults used by the editor when creating areas
 editor:
   # The ID of the module that the editor will load
-  module: twin_expanse_act1
+  module: twin_expanse_act2
 
   transition_image: empty
   transition_sizes: [ 4by3, 4by4, 2by3, 2by4, 3by4, 4by5, 2by2 ]
@@ -156,6 +156,8 @@ editor:
       - gui/elev_high
       - gui/elev_higher
       - gui/elev_highest
+      - gui/elev_plus
+      - gui/elev_plus_plus
 
 # Debugging / Cheat options
 debug:

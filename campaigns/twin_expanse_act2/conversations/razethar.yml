@@ -1,0 +1,169 @@
+id: razethar
+initial_nodes:
+  - id: already_talked
+    to_view:
+      - target_flag: already_talked
+  - id: start01
+nodes:
+  already_talked:
+    text: |
+      Return to the Dracon camp and seek the Blazing Road.
+    responses: []
+  start01:
+    text: |
+      [c=6868FF|#target_name#] - [c=888|Before you stands an aged Dracon.  No doubt, the sage Razethar.]
+    on_view:
+      - target_flag: already_talked
+    responses:
+      - text: "Razethar, I presume.  We've come a long way to see you."
+        to: start02a
+      - text: "Greetings."
+        to: start02b
+      - text: "Oh great Sage Razethar, we have come seeking your wisdom!"
+        to: start02c
+  start02a:
+    text: |
+      [c=6868FF|#target_name#] -  You presume correct.  And tell me, why have you come so far?
+    responses:
+      - text: "[c=888|Tell him of Berkeley, the Aegis, and the book you found.]"
+        to: book01
+  start02b:
+    text: |
+      [c=6868FF|#target_name#] -  Greetings to you.  I am Razethar.  But I imagine you already knew that.
+      
+      Tell me, what are you doing here?
+    responses:
+      - text: "[c=888|Tell him of Berkeley, the Aegis, and the book you found.]"
+        to: book01
+  start02c:
+    text: |
+      [c=6868FF|#target_name#] - [c=888|You weren't aware Dracon could roll their eyes until this moment.]
+      
+      Flattery will get you nowhere here.  Just tell me what you want.
+    responses:
+      - text: "[c=888|Tell him of Berkeley, the Aegis, and the book you found.]"
+        to: book01
+  book01:
+    text: |
+      [c=6868FF|#target_name#] - [c=888|He listens intently to your story, without interrupting.]
+    responses:
+      - text: "[c=888|Continue]"
+        to: book02
+  book02:
+    text: |
+      [c=6868FF|#target_name#] - Yes, I know much of Berkeley and his quest for power.
+      
+      But I do not know of this book you speak of.  Let me see it.
+    responses:
+      - text: "[c=888|Hand him the book]"
+        on_select:
+          - fire_script:
+              id: oasis
+              func: remove_aegis_book
+        to: book03
+  book03:
+    text: |
+      [c=6868FF|#target_name#] - [c=888|He scans through the pages of the book.]
+      
+      You were correct in your assumption.  It is in old Draconic.  And I can read it.
+    responses:
+      - text: "What does it say?"
+        to: book04
+  book04:
+    text: |
+      [c=6868FF|#target_name#] - [c=888|He summarizes.]
+      
+      This book appears to have been written about one hundred years after the Sundering.  It was a time of great changes for the Dracon people, as the Sundering devastated our lands.
+    responses:
+      - text: "[c=888|Continue]"
+        to: book05
+  book05:
+    text: |
+      [c=6868FF|#target_name#] - [c=888|In the year 1263 before the Calamity, the Aegis first came to the Dracon people from distant Xandala.  A powerful magic item, it enhances all spells cast from the first four Circles of Magic, making their effects equal to a Seventh Circle spell.]
+    responses:
+      - text: "[c=888|Continue]"
+        to: book06
+  book06:
+    text: |
+      [c=6868FF|#target_name#] - [c=888|In these later days, with magic now restricted as a result of the Calamity, this makes it one of the most powerful artifacts in all Eao.
+      
+      For some reason, perhaps its remote location from Xandala, or perhaps a quirk in its enchantments, the Calamity did not diminish its powers.]
+    responses:
+      - text: "[c=888|Continue]"
+        to: book07
+  book07:
+    text: |
+      [c=6868FF|#target_name#] - [c=888|We surviving elders of the Dracon, knowing its true potential have made a difficult choice.  The Aegis is now too powerful to be used by any one individual.
+      
+      We cannot destroy it, but we can split it into pieces, and scatter it to the winds.]
+    responses:
+      - text: "[c=888|Continue]"
+        to: book08
+  book08:
+    text: |
+      [c=6868FF|#target_name#] - [c=888|Razethar stops.]
+      
+      That's it.  The remainder is a long listing of the author's names, and titles.  Old Draconic is a verbose language.
+    responses:
+      - text: "But, there is nothing there that will help us against Berkeley!"
+        to: berkeley01
+      - text: "An interesting history lesson.  But nothing that will help us."
+        to: berkeley01
+  berkeley01:
+    text: |
+      [c=6868FF|#target_name#] - Yes, I am afraid you are correct.  It is to be expected, really.  A device of that power, and you expect to find some countermeasure in a dusty old scroll?  Unlikely.
+    responses:
+      - text: "We've come so far.  Now what?"
+        to: berkeley02
+      - text: "I guess we have no choice but to face Berkeley anyway."
+        to: berkeley02
+  berkeley02:
+    text: |
+      [c=6868FF|#target_name#] - I don't believe your travels have been for nothing.  I know much of Berkeley, and I even trained him for a time, when he first sought the Aegis.
+    responses:
+      - text: "[c=888|Continue]"
+        to: berkeley03
+  berkeley03:
+    text: |
+      [c=6868FF|#target_name#] - At first I thought of him as just a young idealist, wishing only to help his family's home of Rose Lake.  But in time, he took a darker turn.
+    responses:
+      - text: "[c=888|Continue]"
+        to: berkeley04
+  berkeley04:
+    text: |
+      [c=6868FF|#target_name#] - He is deeply arrogant, and entirely sure of himself.  With the Aegis at his disposal, he will not consider you a threat.  You may be able to trick him, or even get him to agree to even the odds against you.
+    responses:
+      - text: "I'm not sure how helpful that is.  We don't even know how to get back to Rose Lake."
+        to: blazing_road01
+      - text: "I suppose we will have to try.  But, how to return to Rose Lake?"
+  blazing_road01:
+    text: |
+      [c=6868FF|#target_name#] - I believe I can provide more concrete help there.
+      
+      There is an ancient Dwarven tunnel, that used to stretch all the way from the Mountains of Naath across the Sciedan.  It was damaged in the Sundering, but is still passable.
+    responses:
+      - text: "[c=888|Continue]"
+        to: blazing_road02
+  blazing_road02:
+    text: |
+      [c=6868FF|#target_name#] -  I happen to know there is an entrance in the Dracon camp to the North.  And, you can exit near Last Edge.  It is a long trek, but it should be much safer crossing below the sands than on top of them.
+    on_view:
+      - fire_script:
+          id: oasis
+          func: razethar_spoke
+    responses:
+      - text: "[c=888|Continue]"
+        to: blazing_road03
+  blazing_road03:
+    text: |
+      [c=6868FF|#target_name#] - The Imperator in the Dracon camp will surely help you if you tell him I sent you.
+    responses:
+      - text: "[c=888|Continue]"
+        to: blazing_road04
+  blazing_road04:
+    text: |
+      [c=6868FF|#target_name#] - And one last thing.  I do not know Berkeley's full intentions with the Aegis, but I know he is very dangerous, and must be stopped.
+      
+      I believe you can do, it you are smart.  Good luck.
+    responses:
+      - text: "Thank you.  Farewell."

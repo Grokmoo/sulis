@@ -1,7 +1,6 @@
 id: fire_drake
 name: Fire Drake
 faction: Hostile
-images: {}
 inline_race:
   id: fire_drake
   name: Fire Drake

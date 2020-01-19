@@ -509,6 +509,8 @@ groups:
       elev_high: [64, 0]
       elev_higher: [80, 0]
       elev_highest: [96, 0]
+      elev_plus: [0, -16]
+      elev_plus_plus: [16, -16]
   menu_items:
     size: [128, 128]
     position: [384, 512]

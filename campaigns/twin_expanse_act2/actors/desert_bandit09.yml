@@ -1,0 +1,52 @@
+---
+id: desert_bandit09
+name: Bandit Wizard
+race: human
+sex: Male
+attributes:
+  str: 10
+  dex: 10
+  end: 10
+  per: 10
+  int: 10
+  wis: 10
+conversation: ~
+faction: Hostile
+images:
+  Background: creatures/human34
+  Foreground: empty
+  Shadow: empty
+reward:
+  xp: 80
+  loot: level5_misc
+  loot_chance: 35
+hue: 0.1
+inventory:
+  equipped:
+    Torso:
+      id: torso_robe
+      adjectives: [ fine ]
+    HeldMain:
+      id: crossbow
+      adjectives: [ fine ]
+    Legs:
+      id: legs_pants
+      adjectives: [ fine ]
+    Feet:
+      id: boots_leather
+      adjectives: [ fine ]
+  quick:
+    AltHeldMain:
+      id: shortsword
+      adjectives: [ fine, acid5 ]
+levels:
+  mage: 10
+abilities:
+  - weapon_simple
+  - weapon_crossbow
+  - shock
+  - air_shield
+  - petrify
+  - heal
+  - fireball
+ai: ai_basic

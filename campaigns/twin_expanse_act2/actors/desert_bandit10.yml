@@ -1,0 +1,60 @@
+---
+id: desert_bandit10
+name: Bandit Warlock
+race: human
+sex: Male
+attributes:
+  str: 10
+  dex: 13
+  end: 12
+  per: 16
+  int: 12
+  wis: 12
+conversation: ~
+faction: Hostile
+images:
+  Background: creatures/human32
+  Shadow: empty
+  Foreground: empty
+reward:
+  xp: 100
+  loot: level5_misc
+  loot_chance: 35
+hue: 0.9
+inventory:
+  equipped:
+    Torso:
+      id: torso_leather
+      adjectives: [ fine ]
+    HeldMain:
+      id: longspear
+      adjectives: [ fine ]
+    Legs:
+      id: legs_leather
+      adjectives: [ fine ]
+    Feet:
+      id: boots_leather
+      adjectives: [ fine ]
+    Hands:
+      id: gloves_leather
+      adjectives: [ fine ]
+  quick:
+    AltHeldMain:
+      id: shortbow
+      adjectives: [ fine ]
+levels:
+  warlock: 10
+abilities:
+  - armor_light
+  - weapon_axe
+  - weapon_crossbow
+  - weapon_bow
+  - weapon_spear
+  - weapon_mace
+  - weapon_simple
+  - illusory_locus
+  - vampiric_touch
+  - assay
+  - mind_shock
+  - imbue_weapon
+ai: ai_basic

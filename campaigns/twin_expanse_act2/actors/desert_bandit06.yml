@@ -1,0 +1,65 @@
+---
+id: desert_bandit06
+name: Bandit Warrior
+race: human_simple
+sex: Male
+attributes:
+  str: 16
+  dex: 13
+  end: 16
+  per: 10
+  int: 10
+  wis: 10
+conversation: ~
+faction: Hostile
+images:
+  Background: creatures/human30
+  Shadow: empty
+  Foreground: empty
+reward:
+  xp: 100
+  loot: level5_misc
+  loot_chance: 35
+hue: 0.4
+inventory:
+  equipped:
+    Torso:
+      id: torso_mail
+      adjectives: [ fine ]
+    HeldMain:
+      id: longsword
+      adjectives: [ fine ]
+    HeldOff:
+      id: shield_kite
+      adjectives: [ fine ]
+    Legs:
+      id: legs_leather
+      adjectives: [ fine ]
+    Feet:
+      id: boots_leather
+      adjectives: [ fine ]
+    Hands:
+      id: gloves_leather
+      adjectives: [ fine ]
+  quick:
+    AltHeldMain:
+      id: shortbow
+      adjectives: [ fine ]
+levels:
+  fighter: 10
+abilities:
+  - armor_light
+  - armor_medium
+  - weapon_axe
+  - weapon_crossbow
+  - weapon_bow
+  - weapon_small_sword
+  - weapon_large_sword
+  - weapon_spear
+  - weapon_mace
+  - weapon_simple
+  - powerful_blows
+  - stunning_blow
+  - grapple
+  - whirlwind_attack
+ai: ai_basic

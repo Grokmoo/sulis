@@ -1,0 +1,20 @@
+id: level11_bandits
+auto_spawn: true
+min_gen_actors: 5
+max_gen_actors: 6
+entries:
+  - id: desert_bandit06
+    weight: 1
+    limit: 2
+  - id: desert_bandit07
+    weight: 1
+    limit: 2
+  - id: desert_bandit08
+    weight: 1
+    limit: 2
+  - id: desert_bandit09
+    weight: 1
+    limit: 1
+  - id: desert_bandit10
+    weight: 1
+    limit: 1

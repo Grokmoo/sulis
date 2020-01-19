@@ -1,5 +1,8 @@
 id: dracon_imperator
 initial_nodes:
+  - id: after_razethar
+    to_view:
+      - player_flag: spoke_to_razethar
   - id: main
     to_view:
       - target_flag: already_talked
@@ -172,3 +175,36 @@ nodes:
       - target_flag:  shown_mesa
     responses:
       - text: "Thank you.  Farewell."
+  after_razethar:
+    text: |
+      [c=6868FF|#target_name#] - You have returned.  You found Razethar?
+    responses:
+      - text: "Yes.  But we did not discover any weaknesses in the Aegis."
+        to: after_razethar02
+  after_razethar02:
+    text: |
+      [c=6868FF|#target_name#] - That is bad news.
+      
+      I am sorry.
+    responses:
+      - text: "He believe we can still defeat Berkeley.  He told us to take the Blazing Road."
+        to: after_razethar03
+  after_razethar03:
+    text: |
+      [c=6868FF|#target_name#] - Indeed he did?  Well, I will not stand in your way.
+      
+      Enter the door at the back of the camp, behind me.  There is a stairway down to the Blazing Road there.
+    on_view:
+      - fire_script:
+          id: oasis
+          func: open_blazing_road
+    responses:
+      - text: "[c=888|Continue]"
+        to: after_razethar04
+  after_razethar04:
+    text: |
+      [c=6868FF|#target_name#] - But be warned, many dangers lurk in the deep places of Eao.
+      
+      Best of luck to you.
+    responses:
+      - text: "Farewell."

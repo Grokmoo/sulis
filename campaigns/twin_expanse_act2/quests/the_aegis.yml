@@ -15,3 +15,6 @@ entries:
   razethar_the_sage:
     description: |
       I have found a book that appears to contain a history of the Aegis.  But I cannot read it.  The only one who can is the Sage, Rathezar, who lives alone on top of a lonely mesa.
+  spoke_to_razethar:
+    description: |
+      The book did not provide any clarity on defending ourselves from the Aegis.  But, Rathezar believes we will still have a chance by exploting Berkeley's hubris, or perhaps with trickery.  He also suggested we can return to the Twin Expanse via the Blazing Road, an ancient Dwarven tunnel system.  We can find the entrance in the Dracon camp.

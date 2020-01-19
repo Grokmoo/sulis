@@ -42,10 +42,10 @@ attributes:
   int: 10
   wis: 10
 levels:
-  fighter: 6
+  fighter: 10
 reward:
-  xp: 15
-  loot: level1_misc
+  xp: 100
+  loot: level5_misc
   loot_chance: 35
 abilities:
   - flame_body

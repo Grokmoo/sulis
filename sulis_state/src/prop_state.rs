@@ -20,7 +20,7 @@ use std::rc::Rc;
 
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::ui::{animation_state, AnimationState, Color};
-use sulis_core::util::invalid_data_error;
+use sulis_core::util::{self, invalid_data_error};
 use sulis_module::area::PropData;
 use sulis_module::{prop, LootList, Module, ObjectSizeIterator, Prop, ItemState};
 
@@ -53,6 +53,8 @@ pub struct PropState {
     enabled: bool,
 
     marked_for_removal: bool,
+
+    millis_offset: u32,
 }
 
 impl fmt::Debug for PropState {
@@ -111,6 +113,13 @@ impl PropState {
             }
         };
 
+        let millis_offset_range = prop_data.prop.random_millis_offset;
+        let millis_offset = if millis_offset_range == 0 {
+            0
+        } else {
+            util::gen_rand(0, millis_offset_range)
+        };
+
         PropState {
             prop: Rc::clone(&prop_data.prop),
             enabled: prop_data.enabled,
@@ -119,6 +128,7 @@ impl PropState {
             animation_state: anim_state,
             listeners: ChangeListenerList::default(),
             marked_for_removal: false,
+            millis_offset,
         }
     }
 
@@ -420,7 +430,7 @@ impl AreaDrawable for PropState {
         let mut draw_list = DrawList::empty_sprite();
         draw_list.set_scale(scale_x, scale_y);
         draw_list.set_color(color);
-        self.append_to_draw_list(&mut draw_list, x, y, millis);
+        self.append_to_draw_list(&mut draw_list, x, y, millis + self.millis_offset);
         renderer.draw(draw_list);
     }
 

@@ -1,0 +1,23 @@
+id: lava_bubble01
+frame_time_millis: 80
+frames:
+  - "props/lava_bubble01"
+  - "props/lava_bubble01"
+  - "props/lava_bubble01"
+  - "props/lava_bubble01"
+  - "props/lava_bubble01"
+  - "props/lava_bubble01"
+  - "props/lava_bubble01"
+  - "props/lava_bubble01"
+  - "props/lava_bubble01"
+  - "props/lava_bubble02"
+  - "props/lava_bubble03"
+  - "props/lava_bubble04"
+  - "props/lava_bubble05"
+  - "props/lava_bubble06"
+  - "props/lava_bubble07"
+  - "props/lava_bubble08"
+  - "props/lava_bubble09"
+  - "props/lava_bubble10"
+  - "props/lava_bubble11"
+  - "props/lava_bubble12"

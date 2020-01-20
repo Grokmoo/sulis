@@ -1,6 +1,6 @@
 id: props
 src: "props.png"
-size: [ 1024, 512 ]
+size: [ 1024, 1024 ]
 simple_image_gen_scale: 16
 grid_multiplier: 16
 groups:
@@ -217,4 +217,28 @@ groups:
       torch02: [4, 2, 2, 2]
       torch03: [6, 2, 2, 2]
       torch04: [8, 2, 2, 2]
-     
+  brazier_b:
+    position: [0, 32]
+    size: [4, 4]
+    areas:
+      brazier_b01: [0, 0]
+      brazier_b02: [4, 0]
+      brazier_b03: [8, 0]
+      brazier_b04: [12, 0]
+      brazier_b05: [16, 0]
+  lava_anim:
+    position: [0, 36]
+    size: [4, 4]
+    areas:
+      lava_bubble01: [0, 0]
+      lava_bubble02: [4, 0]
+      lava_bubble03: [8, 0]
+      lava_bubble04: [12, 0]
+      lava_bubble05: [16, 0]
+      lava_bubble06: [20, 0]
+      lava_bubble07: [0, 4]
+      lava_bubble08: [4, 4]
+      lava_bubble09: [8, 4]
+      lava_bubble10: [12, 4]
+      lava_bubble11: [16, 4]
+      lava_bubble12: [20, 4]

@@ -1,0 +1,9 @@
+id: lava_bubble01
+name: lava_bubble01
+icon: inventory/misc_crate
+image: lava_bubble01
+random_millis_offset: 1600
+size: 4by4
+visible: true
+interactive:
+  Not

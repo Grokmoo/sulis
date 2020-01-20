@@ -1,0 +1,9 @@
+id: brazier_b
+name: Brazier
+icon: inventory/misc_crate
+image: brazier_b
+size: 4by4
+visible: true
+interactive:
+  Not
+impass: [[1, 1], [2, 1], [1, 2], [2, 2]]

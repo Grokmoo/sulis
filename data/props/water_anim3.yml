@@ -2,6 +2,7 @@ id: water_anim3
 name: water_anim3
 icon: inventory/misc_crate
 image: water_anim3
+random_millis_offset: 900
 size: 4by4
 visible: true
 interactive:

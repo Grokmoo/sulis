@@ -1,0 +1,8 @@
+id: brazier_b
+frame_time_millis: 150
+frames:
+  - "props/brazier_b01"
+  - "props/brazier_b02"
+  - "props/brazier_b03"
+  - "props/brazier_b04"
+  - "props/brazier_b05"

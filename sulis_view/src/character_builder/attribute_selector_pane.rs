@@ -298,7 +298,13 @@ impl WidgetKind for AbilityButton {
 
     fn on_mouse_move(&mut self, widget: &Rc<RefCell<Widget>>, _dx: f32, _dy: f32) -> bool {
         let hover = Widget::with_theme(TextArea::empty(), "kit_selector_ability_hover");
-        add_hover_text_args(&mut hover.borrow_mut().state, &self.ability, &self.class, None);
+        add_hover_text_args(
+            &mut hover.borrow_mut().state,
+            &self.ability,
+            &self.class,
+            None,
+            sulis_state::ability_state::DisabledReason::Enabled,
+        );
 
         Widget::set_mouse_over_widget(
             &widget,

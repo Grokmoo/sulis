@@ -26,7 +26,8 @@ use sulis_module::{Ability, Actor, ActorBuilder, Faction, ImageLayer, Module};
 use sulis_module::{BonusList, ItemKind, QuickSlot, Slot, StatList, ItemState};
 use crate::save_state::ActorSaveState;
 use crate::{
-    AbilityState, ChangeListenerList, Effect, EntityState, GameState, Inventory, PStats,
+    ability_state::DisabledReason, AbilityState, ChangeListenerList, Effect,
+    EntityState, GameState, Inventory, PStats,
 };
 
 pub struct ActorState {
@@ -359,30 +360,33 @@ impl ActorState {
         self.current_uses_per_day(group_id).greater_than(0)
     }
 
-    /// Returns true if the ability state for the given ability can be
-    /// activated (any active ability) or deactivated (only relevant for modes)
-    pub fn can_toggle(&self, id: &str) -> bool {
+    /// Returns an enum with the reason the ability cannot be activted, or
+    /// DisabledReason::Enabled if it can.  For modes, if it can be activated
+    /// or deactivated.
+    pub fn can_toggle(&self, id: &str) -> DisabledReason {
+        use DisabledReason::*;
+
         if self.stats.abilities_disabled {
-            return false;
+            return AbilitiesDisabled;
         }
 
         match self.ability_states.get(id) {
-            None => false,
+            None => NoSuchAbility,
             Some(ref state) => {
                 if state.is_active_mode() {
-                    return true;
+                    return Enabled;
                 }
 
                 if self.p_stats.ap() < state.activate_ap() {
-                    return false;
+                    return NotEnoughAP;
                 }
 
                 if !self.group_has_uses(&state.group) {
-                    return false;
+                    return NoAbilityGroupUses;
                 }
 
                 if !self.p_stats.has_required_class_stats(&state.ability) {
-                    return false;
+                    return NotEnoughClassStat;
                 }
 
                 state.is_available(&self.stats, &self.current_active_modes())
@@ -411,6 +415,7 @@ impl ActorState {
                 }
 
                 state.is_available(&self.stats, &self.current_active_modes())
+                    == DisabledReason::Enabled
             }
         }
     }

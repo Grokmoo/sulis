@@ -21,6 +21,22 @@ use crate::{ChangeListenerList, GameState};
 use sulis_core::util::ExtInt;
 use sulis_module::{ability::Duration, Ability, Module, StatList, ROUND_TIME_MILLIS};
 
+#[derive(Eq, PartialEq)]
+pub enum DisabledReason {
+    Enabled,
+    AbilitiesDisabled,
+    NoSuchAbility,
+    NotEnoughAP,
+    NoAbilityGroupUses,
+    NotEnoughClassStat,
+    RequiresShield,
+    RequiresMelee,
+    RequiresRanged,
+    RequiresActiveMode,
+    CombatOnly,
+    OnCooldown,
+}
+
 pub struct AbilityState {
     pub ability: Rc<Ability>,
     pub group: String,
@@ -98,10 +114,12 @@ impl AbilityState {
         self.ability.active.as_ref().unwrap().ap
     }
 
-    pub fn is_available(&self, stats: &StatList, current_modes: &[&str]) -> bool {
-        if self.requires_shield && !stats.has_shield() { return false; }
-        if self.requires_melee && !stats.attack_is_melee() { return false; }
-        if self.requires_ranged && !stats.attack_is_ranged() { return false; }
+    pub fn is_available(&self, stats: &StatList, current_modes: &[&str]) -> DisabledReason {
+        use DisabledReason::*;
+
+        if self.requires_shield && !stats.has_shield() { return RequiresShield; }
+        if self.requires_melee && !stats.attack_is_melee() { return RequiresMelee; }
+        if self.requires_ranged && !stats.attack_is_ranged() { return RequiresRanged; }
 
         if !self.requires_active_mode.is_empty() {
             let mut found = false;
@@ -112,13 +130,18 @@ impl AbilityState {
                 }
             }
 
-            if !found { return false; }
+            if !found { return RequiresActiveMode; }
         }
 
         if self.combat_only && !GameState::is_combat_active() {
-            return false;
+            return CombatOnly;
         }
-        self.remaining_duration.is_zero()
+
+        if self.remaining_duration.is_zero() {
+            return Enabled;
+        } else {
+            return OnCooldown;
+        }
     }
 
     pub fn is_active_mode(&self) -> bool {

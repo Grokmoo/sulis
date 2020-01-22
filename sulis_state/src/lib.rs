@@ -22,7 +22,7 @@ extern crate serde_derive;
 mod ai;
 pub use self::ai::AI;
 
-mod ability_state;
+pub mod ability_state;
 pub use self::ability_state::AbilityState;
 
 mod actor_state;

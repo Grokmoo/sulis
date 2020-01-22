@@ -24,7 +24,7 @@ use rlua::{self, Context, UserData, UserDataMethods};
 
 use crate::{AreaFeedbackText, ai, animation, script::*, entity_attack_handler};
 use crate::{area_feedback_text::ColorKind, EntityState, GameState, Location};
-use crate::{is_within_attack_dist, is_within_touch_dist, dist};
+use crate::{is_within_attack_dist, is_within_touch_dist, dist, ability_state::DisabledReason};
 use sulis_core::config::Config;
 use sulis_core::resource::ResourceSet;
 use sulis_core::util::ExtInt;
@@ -766,7 +766,8 @@ impl UserData for ScriptEntity {
 
                 let parent = entity.try_unwrap()?;
                 if !allow_invalid {
-                    if !parent.borrow().actor.can_toggle(&ability.id) {
+                    let can_toggle = parent.borrow().actor.can_toggle(&ability.id);
+                    if can_toggle != DisabledReason::Enabled {
                         return Ok(false);
                     }
                 }

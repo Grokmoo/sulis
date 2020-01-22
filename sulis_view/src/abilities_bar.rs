@@ -30,7 +30,8 @@ use sulis_module::{
     actor::OwnedAbility,
     Ability, Class, Module,
 };
-use sulis_state::{ChangeListener, EntityState, GameState, RangeIndicator, Script};
+use sulis_state::{ChangeListener, EntityState, GameState, RangeIndicator, Script,
+    ability_state::DisabledReason};
 
 pub const NAME: &str = "abilities_bar";
 
@@ -549,7 +550,9 @@ impl WidgetKind for AbilityButton {
     fn layout(&mut self, widget: &mut Widget) {
         widget.do_base_layout();
 
-        if self.entity.borrow().actor.can_toggle(&self.ability.id) {
+        let can_toggle = self.entity.borrow().actor.can_toggle(&self.ability.id);
+
+        if can_toggle == DisabledReason::Enabled {
             widget
                 .state
                 .animation_state
@@ -621,9 +624,16 @@ impl WidgetKind for AbilityButton {
     }
 
     fn on_mouse_move(&mut self, widget: &Rc<RefCell<Widget>>, _dx: f32, _dy: f32) -> bool {
+        let disabled_reason = self.entity.borrow().actor.can_toggle(&self.ability.id);
         let hover = Widget::with_theme(TextArea::empty(), "ability_hover");
         let class = self.entity.borrow_mut().actor.actor.base_class();
-        add_hover_text_args(&mut hover.borrow_mut().state, &self.ability, &class, self.key);
+        add_hover_text_args(
+            &mut hover.borrow_mut().state,
+            &self.ability,
+            &class,
+            self.key,
+            disabled_reason
+        );
 
         if self.newly_added {
             hover.borrow_mut().state.add_text_arg("newly_added", "true");
@@ -655,7 +665,7 @@ fn activate_ability(entity: &Rc<RefCell<EntityState>>, ability: &Rc<Ability>) ->
     }
 
     let can_toggle = entity.borrow().actor.can_toggle(&ability.id);
-    if can_toggle {
+    if can_toggle == DisabledReason::Enabled {
         let index = entity.borrow().index();
         Script::ability_on_deactivate(index, &ability);
     }
@@ -667,7 +677,8 @@ pub fn add_hover_text_args(
     state: &mut WidgetState,
     ability: &Ability,
     class: &Class,
-    key: Option<Key>
+    key: Option<Key>,
+    disabled_reason: DisabledReason,
 ) {
     state.disable();
     state.add_text_arg("name", &ability.name);
@@ -681,6 +692,7 @@ pub fn add_hover_text_args(
         state.add_text_arg(&format!("upgrade{}", index + 1), &upgrade.description);
     }
 
+    let mut class_stat: Option<&str> = None;
     if let Some(ref active) = ability.active {
         let ap = Module::rules().to_display_ap(active.ap as i32);
         state.add_text_arg("activate_ap", &ap.to_string());
@@ -694,6 +706,7 @@ pub fn add_hover_text_args(
                     state.add_text_arg("class_stat_name", &stat.name);
                     state.add_text_arg("class_stat_amount", &amount.to_string());
                 }
+                class_stat = Some(&stat.name);
             }
         }
 
@@ -709,5 +722,34 @@ pub fn add_hover_text_args(
         }
 
         state.add_text_arg("short_description", &active.short_description);
+
+        add_disabled_text_arg(state, class_stat, disabled_reason);
     }
+}
+
+fn add_disabled_text_arg(
+    state: &mut WidgetState,
+    class_stat_name: Option<&str>,
+    disabled_reason: DisabledReason
+) {
+    use DisabledReason::*;
+    let reason_text = match disabled_reason {
+        Enabled => return,
+        AbilitiesDisabled =>  "All abilities disabled",
+        NoSuchAbility =>      "Ability not possessed",
+        NotEnoughAP =>        "Not enough AP",
+        NoAbilityGroupUses => "No group uses remaining",
+        NotEnoughClassStat => {
+            let text = format!("Not enough {}", class_stat_name.unwrap_or(""));
+            state.add_text_arg("disabled", &text);
+            return;
+        },
+        RequiresShield =>     "Equip a shield",
+        RequiresMelee =>      "Equip a melee weapon",
+        RequiresRanged =>     "Equip a ranged weapon",
+        RequiresActiveMode => "Must first activate a mode",
+        CombatOnly =>         "May only be used in combat",
+        OnCooldown =>         "The cooldown is active",
+    };
+    state.add_text_arg("disabled", reason_text);
 }

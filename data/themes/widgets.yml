@@ -175,7 +175,8 @@ themes:
     border: { top: 1, bottom: 1, left: 2, right: 2 }
     background: 80_transparent_fill
     text: |
-      [?keybinding|\[[c=f0f|#keybinding#]\] - ][?newly_added;s=6.0;c=0f0|NEW ][s=6.0|#name#]   [!activate_ap;c=0ff|Passive][?activate_ap;s=5.0;c=f00|AP: #activate_ap#][?class_stat_name|[s=5.0;c=f0f|   #class_stat_name#: #class_stat_amount#]]
+      [?disabled|[c=f00|Disabled] - [c=f00;s=5.0|#disabled#]
+      ][?keybinding|\[[c=f0f|#keybinding#]\] - ][?newly_added;s=6.0;c=0f0|NEW ][s=6.0|#name#]   [!activate_ap;c=0ff|Passive][?activate_ap;s=5.0;c=f00|AP: #activate_ap#][?class_stat_name|[s=5.0;c=f0f|   #class_stat_name#: #class_stat_amount#]]
       [s=5.0|#short_description#]
     size: [70, 12]
     relative:

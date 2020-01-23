@@ -318,6 +318,19 @@ pub struct Time {
     pub millis: u32,
 }
 
+impl Time {
+    /// Creates a time with the specified number of hours.
+    /// Does not canonicalize the time.
+    pub fn from_hours(hours: u32) -> Time {
+        Time {
+            day: 0,
+            hour: hours,
+            round: 0,
+            millis: 0,
+        }
+    }
+}
+
 impl fmt::Display for Time {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let mut prev = false;

@@ -126,4 +126,10 @@ function open_blazing_road(parent)
   game:player():clear_flag("spoke_to_razethar")
   game:enable_prop_at(96, 70)
   game:set_world_map_location_visible("blazing_road_west", true)
+  game:set_world_map_location_enabled("blazing_road_west", true)
+end
+
+function exit_blazing_road_west(parent)
+  game:set_world_map_location_visible("blazing_road_east", true)
+  game:set_world_map_location_enabled("blazing_road_east", true)
 end

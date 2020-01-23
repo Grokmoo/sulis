@@ -2188,6 +2188,26 @@ tiles:
     size: [6, 4]
     impass: []
     sprite: tileset/entry_light
+  01entry_light_s:
+    layer: aerial
+    size: [6, 4]
+    impass: []
+    sprite: tileset/entry_light_s
+  01cave_entry_bright_w:
+    layer: aerial
+    size: [4, 6]
+    impass: []
+    sprite: tileset/cave_entry_bright_w
+  01cave_entry_bright_c:
+    layer: aerial
+    size: [2, 6]
+    impass: []
+    sprite: tileset/cave_entry_bright_c
+  01cave_entry_bright_e:
+    layer: aerial
+    size: [4, 6]
+    impass: []
+    sprite: tileset/cave_entry_bright_e
   cart01:
     layer: prop
     size: [5, 4]

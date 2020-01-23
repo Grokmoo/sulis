@@ -138,8 +138,22 @@ world_map:
         southern_desert: 12
     blazing_road_west:
       name: "Blazing Road West"
-      position: [6.5, 2.75]
+      position: [7.0, 2.75]
       icon: cave01
       initially_visible: false
       initially_enabled: false
+      linked_area: blazing_road_west
+      linked_area_pos: [118, 17]
+      travel_times:
+        blazing_road_east: 24
+    blazing_road_east:
+      name: "Blazing Road East"
+      position: [11.0, 3.5]
+      icon: cave01
+      initially_visible: false
+      initially_enabled: false
+      linked_area: blazing_road_east
+      linked_area_pos: [6, 15]
+      travel_times:
+        blazing_road_west: 24
       

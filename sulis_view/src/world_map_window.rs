@@ -21,7 +21,7 @@ use std::rc::Rc;
 use sulis_core::ui::{animation_state, Callback, Widget, WidgetKind};
 use sulis_core::util::Point;
 use sulis_core::widgets::{Button, TextArea};
-use sulis_module::{Module, Time};
+use sulis_module::{Module, Time, campaign::WorldMapLocation};
 use sulis_state::GameState;
 
 pub const NAME: &str = "world_map_window";
@@ -148,44 +148,9 @@ impl WidgetKind for WorldMapWindow {
             };
 
             if add_callback {
-                let mut travel_time = Time {
-                    day: 0,
-                    hour: 0,
-                    round: 0,
-                    millis: 0,
-                };
-                if let Some(cur_location) = &cur_location_id {
-                    if let Some(hours) = location.travel_times.get(cur_location) {
-                        travel_time.hour = *hours;
-                        Module::rules().canonicalize_time(&mut travel_time);
-
-                        label
-                            .borrow_mut()
-                            .state
-                            .add_text_arg("travel_time", &travel_time.to_string());
-                    }
+                if !add_travel_callback(&cur_location_id, &location, &button, &label) {
+                    button.borrow_mut().state.set_enabled(false);
                 }
-
-                let (x, y) = (location.linked_area_pos.x, location.linked_area_pos.y);
-                let area_id = location.linked_area.clone();
-                button
-                    .borrow_mut()
-                    .state
-                    .add_callback(Callback::new(Rc::new(move |widget, _| {
-                        let area_id = match area_id {
-                            None => return,
-                            Some(ref id) => id,
-                        };
-
-                        GameState::transition_to(
-                            Some(area_id),
-                            Some(Point::new(x, y)),
-                            Point::default(),
-                            travel_time,
-                        );
-                        let root = Widget::get_root(&widget);
-                        root.borrow_mut().invalidate_children();
-                    })));
             }
 
             let entry = Entry {
@@ -205,4 +170,51 @@ impl WidgetKind for WorldMapWindow {
 
         vec![bg, close, labels, Rc::clone(&self.content)]
     }
+}
+
+fn add_travel_callback(
+    cur_location_id: &Option<String>,
+    location: &WorldMapLocation,
+    button: &Rc<RefCell<Widget>>,
+    label: &Rc<RefCell<Widget>>,
+) -> bool {
+    let cur_location_id = match cur_location_id {
+        None => return false,
+        Some(id) => id,
+    };
+
+    let hours = match location.travel_times.get(cur_location_id) {
+        None => return false,
+        Some(hours) => *hours,
+    };
+
+    let mut travel_time = Time::from_hours(hours);
+    Module::rules().canonicalize_time(&mut travel_time);
+
+    label
+        .borrow_mut()
+        .state
+        .add_text_arg("travel_time", &travel_time.to_string());
+
+    let (x, y) = (location.linked_area_pos.x, location.linked_area_pos.y);
+    let area_id = match &location.linked_area {
+        None => return false,
+        Some(id) => id.to_string(),
+    };
+
+    button.borrow_mut().state.add_callback(travel_callback(area_id, x, y, travel_time));
+    true
+}
+
+fn travel_callback(area_id: String, x: i32, y: i32, travel_time: Time) -> Callback {
+    Callback::new(Rc::new(move |widget, _| {
+        GameState::transition_to(
+            Some(&area_id),
+            Some(Point::new(x, y)),
+            Point::default(),
+            travel_time,
+        );
+        let root = Widget::get_root(&widget);
+        root.borrow_mut().invalidate_children();
+    }))
 }

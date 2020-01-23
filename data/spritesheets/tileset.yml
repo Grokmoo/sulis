@@ -883,6 +883,7 @@ groups:
     size: [3, 2]
     areas:
       entry_light: [0, 0]
+      entry_light_s: [0, 2]
   windows:
     position: [53, 0]
     areas:
@@ -1061,10 +1062,10 @@ groups:
       bar_vert_west_c: [7, 3, 1, 1]
       bar_vert_west_s: [7, 4, 1, 2]
       
-      rug_small01: [8, 2, 1, 1]
-      rug_small02: [9, 2, 1, 1]
-      plate01: [8, 3, 1, 1]
-      plate02: [9, 3, 1, 1]
+      rug_small01: [8, 5, 1, 1]
+      rug_small02: [9, 5, 1, 1]
+      plate01: [10, 4, 1, 1]
+      plate02: [11, 4, 1, 1]
       plate03: [8, 4, 1, 1]
       plate04: [9, 4, 1, 1]
       
@@ -1355,3 +1356,9 @@ groups:
       chain01: [6, 2, 1, 2]
       chain02: [7, 2, 1, 2]
       hanging_cage: [8, 0, 2, 5]
+  cave_entry_bright:
+    position: [37, 33]
+    areas:
+      cave_entry_bright_w: [0, 0, 2, 3]
+      cave_entry_bright_c: [2, 0, 1, 3]
+      cave_entry_bright_e: [3, 0, 2, 3]

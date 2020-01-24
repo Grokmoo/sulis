@@ -892,7 +892,7 @@ impl WidgetKind for AreaView {
             return true;
         }
 
-        if kind == ClickKind::Middle {
+        if kind == ClickKind::Tertiary {
             return true;
         }
 
@@ -901,14 +901,14 @@ impl WidgetKind for AreaView {
         let targeter = area_state.borrow_mut().targeter();
         if let Some(targeter) = targeter {
             match kind {
-                ClickKind::Left => targeter.borrow_mut().on_activate(),
-                ClickKind::Right => targeter.borrow_mut().on_cancel(),
+                ClickKind::Primary => targeter.borrow_mut().on_activate(),
+                ClickKind::Secondary => targeter.borrow_mut().on_cancel(),
                 _ => (),
             }
         } else {
             let scroll = (self.scroll.x(), self.scroll.y());
             let fire_action = match kind {
-                ClickKind::Left => self
+                ClickKind::Primary => self
                     .overlay_handler
                     .handle_left_click(widget, self.scale, scroll),
                 _ => false,
@@ -945,10 +945,10 @@ impl WidgetKind for AreaView {
         );
 
         match kind {
-            ClickKind::Middle => {
+            ClickKind::Tertiary => {
                 self.scroll(delta_x, delta_y, 33);
             }
-            ClickKind::Left => {
+            ClickKind::Primary => {
                 if let Some(_) = area_state.borrow_mut().targeter() {
                     return true;
                 }

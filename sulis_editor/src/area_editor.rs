@@ -164,8 +164,8 @@ impl WidgetKind for AreaEditor {
 
         self.last_click_position = Some(Point::new(x, y));
         match kind {
-            ClickKind::Left => editor.borrow_mut().left_click(&mut self.model, x, y),
-            ClickKind::Right => editor.borrow_mut().right_click(&mut self.model, x, y),
+            ClickKind::Primary => editor.borrow_mut().left_click(&mut self.model, x, y),
+            ClickKind::Secondary => editor.borrow_mut().right_click(&mut self.model, x, y),
             _ => (),
         }
 
@@ -184,7 +184,7 @@ impl WidgetKind for AreaEditor {
         delta_x: f32,
         delta_y: f32,
     ) -> bool {
-        if let ClickKind::Middle = kind {
+        if let ClickKind::Tertiary = kind {
             self.scroll.compute_max(
                 &*widget.borrow(),
                 MAX_AREA_SIZE,
@@ -213,8 +213,8 @@ impl WidgetKind for AreaEditor {
 
         self.last_click_position = Some(Point::new(x, y));
         match kind {
-            ClickKind::Left => editor.borrow_mut().left_click(&mut self.model, x, y),
-            ClickKind::Right => editor.borrow_mut().right_click(&mut self.model, x, y),
+            ClickKind::Primary => editor.borrow_mut().left_click(&mut self.model, x, y),
+            ClickKind::Secondary => editor.borrow_mut().right_click(&mut self.model, x, y),
             _ => (),
         }
 

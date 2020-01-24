@@ -25,7 +25,7 @@ use lazy_static::lazy_static;
 use serde::{Deserialize, Deserializer};
 
 use crate::io::keyboard_event::Key;
-use crate::io::{InputAction, KeyboardEvent};
+use crate::io::{event::ClickKind, InputAction, KeyboardEvent};
 
 use dirs;
 use serde_yaml;
@@ -140,6 +140,10 @@ impl Config {
 
     pub fn get_keybindings() -> HashMap<InputAction, Key> {
         CONFIG.with(|c| c.borrow().input.keybindings.iter().map(|(k, v)| (*v, *k)).collect())
+    }
+
+    pub fn get_click_action(button: RawClick) -> ClickKind {
+        CONFIG.with(|c| *c.borrow().input.click_actions.get(&button).unwrap())
     }
 
     pub fn get_input_action(k: KeyboardEvent) -> Option<InputAction> {
@@ -267,6 +271,23 @@ pub struct InputConfig {
     pub edge_scrolling: bool,
     pub scroll_speed: f32,
     pub keybindings: HashMap<Key, InputAction>,
+    pub click_actions: HashMap<RawClick, ClickKind>,
+}
+
+#[derive(Debug, Deserialize, Serialize, Copy, Clone, Eq, PartialEq, Hash, PartialOrd, Ord)]
+#[serde(deny_unknown_fields)]
+pub enum RawClick {
+    Left,
+    Right,
+    Middle,
+}
+
+const RAW_CLICKS: [RawClick; 3] = [RawClick::Left, RawClick::Right, RawClick::Middle];
+
+impl RawClick {
+    pub fn iter() -> impl Iterator<Item=&'static RawClick> {
+        RAW_CLICKS.iter()
+    }
 }
 
 #[derive(Debug, Deserialize, Serialize, Copy, Clone)]
@@ -405,6 +426,13 @@ impl Config {
                 return Err(Error::new(ErrorKind::InvalidData, format!("{}", e)));
             }
         };
+
+        for key in RawClick::iter() {
+            if let None = config.input.click_actions.get(key) {
+                return Err(Error::new(ErrorKind::InvalidData,
+                        "Must specify an action for each of Left, Right & Middle Click"));
+            }
+        }
 
         if config.revision < required_revision {
             return Err(Error::new(ErrorKind::InvalidData,

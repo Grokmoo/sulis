@@ -20,7 +20,6 @@ use std::io::{Error, ErrorKind};
 use std::rc::Rc;
 
 use crate::config::{Config, DisplayMode};
-use crate::io::event::ClickKind;
 use crate::io::keyboard_event::Key;
 use crate::io::*;
 use crate::resource::ResourceSet;
@@ -580,10 +579,11 @@ fn process_window_event(event: glutin::WindowEvent) -> Vec<InputAction> {
             result
         }
         MouseInput { state, button, .. } => {
+            use crate::config::RawClick;
             let kind = match button {
-                glium::glutin::MouseButton::Left => ClickKind::Left,
-                glium::glutin::MouseButton::Right => ClickKind::Right,
-                glium::glutin::MouseButton::Middle => ClickKind::Middle,
+                glium::glutin::MouseButton::Left => Config::get_click_action(RawClick::Left),
+                glium::glutin::MouseButton::Right => Config::get_click_action(RawClick::Right),
+                glium::glutin::MouseButton::Middle => Config::get_click_action(RawClick::Middle),
                 _ => return Vec::new(),
             };
 

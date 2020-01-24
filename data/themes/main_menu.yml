@@ -98,6 +98,8 @@ themes:
         size: [0, -40]
       keybinding_popup:
         from: keybinding_popup
+      mouse_popup:
+        from: mouse_popup
       links_pane:
         from: links_pane
         position: [0, 40]
@@ -275,6 +277,33 @@ themes:
           height: Max
         size: [115, -15]
         position: [50, 10]
+  mouse_popup:
+    relative:
+      x: Center
+      y: Center
+    size: [100, 50]
+    background: bg_base
+    children:
+      title:
+        from: label
+        text_params:
+          scale: 8
+        relative:
+          x: Center
+          width: Max
+          height: Max
+        text: "Click a mouse button to bind to #action#"
+      note:
+        kind: Label
+        from: label
+        text_params:
+          scale: 6
+        position: [0, 10]
+        relative:
+          x: Center
+          width: Max
+          height: Max
+        text: "Press any key to cancel"
   keybinding_popup:
     relative:
       x: Center
@@ -291,6 +320,17 @@ themes:
           width: Max
           height: Max
         text: "Press a key to bind to #action#"
+      note:
+        kind: Label
+        from: label
+        text_params:
+          scale: 6
+        position: [0, 10]
+        relative:
+          x: Center
+          width: Max
+          height: Max
+        text: "Click the mouse to cancel"
   save_or_revert_options_window:
     background: bg_base
     border: [1, 1, 1, 1]
@@ -680,10 +720,51 @@ themes:
                 position: [-9, 0]
                 custom:
                   tooltip: "Do not scroll the view when the mouse is at the edge of the screen."
+          mouse_title:
+            from: options_window.content_title
+            text: "Mouse"
+            position: [0, 26]
+            relative:
+              x: Center
+          mouse_pane:
+            from: options_window.content_sub_content
+            background: bg_base
+            relative:
+              x: Center
+            size: [95, 23]
+            position: [0, 31]
+            layout: BoxVertical
+            layout_spacing: { bottom: 1 }
+            children:
+              click_action:
+                from: text_area
+                border: [1, 1, 1, 1]
+                text: |
+                  [?Primary|Primary: Select or Primary Action
+                  ][?Secondary|Secondary: Cancel or Action Menu
+                  ][?Tertiary|Tertiary: Scroll View]
+                size: [60, 6]
+                position: [27, 0]
+              row:
+                relative:
+                  width: Max
+                size: [0, 6]
+                children:
+                  mouse_button:
+                    from: button
+                    text: "#button# Click"
+                    text_params:
+                      horizontal_alignment: Right
+                      scale: 6.0
+                    size: [25, 6]
+                    custom:
+                      tooltip: "Press to rebind this action."
+                  action_label:
+                    from: options_window.content.mouse_pane.click_action
           keybindings_title:
             from: options_window.content_title
             text: "Keybindings"
-            position: [0, 30]
+            position: [0, 56]
             relative:
               x: Center
           keybindings_pane:
@@ -691,8 +772,8 @@ themes:
             background: bg_base
             relative:
               x: Center
-            size: [80, 73]
-            position: [0, 35]
+            size: [80, 47]
+            position: [0, 61]
             children:
               scrollbar:
                 from: scrollbar
@@ -716,11 +797,11 @@ themes:
                     custom:
                       tooltip: "Press to rebind this action."
                   action_label:
-                    from: button
-                    background: bg_base
+                    from: label
                     text: "#action#"
                     text_params:
                       horizontal_alignment: Left
+                      scale: 6.0
                     size: [45, 6]
   mods_selector:
     children:

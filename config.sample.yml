@@ -2,7 +2,7 @@
 # The main game configuration file.  User preferences are set here.
 
 # If the user has an old revision, their config is automatically recreated from the sample.
-revision: 8
+revision: 10
 
 display:
     # Display Adapter - Glium is the only choice for now
@@ -59,6 +59,12 @@ input:
 
     # scrolling rate for all scrolling methods
     scroll_speed: 1.5
+
+    # mapping of mouse clicks to actions
+    click_actions:
+      Left: Primary
+      Right: Secondary
+      Middle: Tertiary
 
     # a mapping of keyboard characters to game actions
     keybindings:

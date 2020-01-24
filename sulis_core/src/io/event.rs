@@ -62,10 +62,10 @@ pub enum Kind {
     RawKey(Key),
 }
 
-#[derive(Eq, Hash, Deserialize, Serialize, Copy, Clone, Debug, PartialEq, PartialOrd)]
+#[derive(Eq, Hash, Deserialize, Serialize, Copy, Clone, Debug, PartialEq, PartialOrd, Ord)]
 #[serde(deny_unknown_fields)]
 pub enum ClickKind {
-    Left,
-    Right,
-    Middle,
+    Primary,
+    Secondary,
+    Tertiary,
 }

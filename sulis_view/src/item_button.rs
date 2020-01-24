@@ -458,10 +458,10 @@ impl WidgetKind for ItemButton {
         self.remove_item_window();
 
         match kind {
-            event::ClickKind::Left => {
+            event::ClickKind::Primary => {
                 self.fire_left_click_action(widget);
             }
-            event::ClickKind::Right => {
+            event::ClickKind::Secondary | event::ClickKind::Tertiary => {
                 let menu = ItemActionMenu::new();
 
                 let mut at_least_one_action = false;
@@ -484,7 +484,6 @@ impl WidgetKind for ItemButton {
                     Widget::add_child_to(&root, menu);
                 }
             }
-            _ => return false,
         }
 
         true

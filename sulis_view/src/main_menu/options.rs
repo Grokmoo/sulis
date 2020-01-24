@@ -14,16 +14,17 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::collections::HashMap;
 use std::any::Any;
 use std::cell::RefCell;
 use std::path::Path;
 use std::rc::Rc;
 
 use sulis_core::config::DisplayMode;
-use sulis_core::config::{self, Config};
+use sulis_core::config::{self, Config, RawClick};
 use sulis_core::io::{event::ClickKind, keyboard_event::Key, DisplayConfiguration, InputAction};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
-use sulis_core::widgets::{Button, Label, ScrollPane, ScrollDirection};
+use sulis_core::widgets::{Button, Label, ScrollPane, ScrollDirection, TextArea};
 
 use crate::main_menu::MainMenu;
 
@@ -46,6 +47,7 @@ pub struct Options {
     cur_scroll_speed: f32,
     cur_edge_scrolling: bool,
     cur_keybindings: Vec<(Key, InputAction)>,
+    cur_click_actions: Vec<(RawClick, ClickKind)>,
 }
 
 impl Options {
@@ -58,6 +60,10 @@ impl Options {
             .map(|(k, v)| (*k, *v))
             .collect();
         cur_keybindings.sort_by(|(_, v1), (_, v2)| v1.partial_cmp(v2).unwrap());
+
+        let mut cur_click_actions: Vec<_> =
+            config.input.click_actions.iter().map(|(k, v)| (*k, *v)).collect();
+        cur_click_actions.sort_by(|(_, v1), (_, v2)| v1.cmp(v2));
 
         let cur_display_conf = if config.display.monitor >= display_confs.len() {
             0
@@ -79,6 +85,7 @@ impl Options {
             cur_edge_scrolling: config.input.edge_scrolling,
             cur_ui_scale: (config.display.width, config.display.height),
             cur_keybindings,
+            cur_click_actions,
         }))
     }
 
@@ -111,6 +118,11 @@ impl Options {
 
         config.input.scroll_speed = self.cur_scroll_speed;
         config.input.edge_scrolling = self.cur_edge_scrolling;
+        config.input.click_actions.clear();
+        for (k, v) in self.cur_click_actions.iter() {
+            config.input.click_actions.insert(*k, *v);
+        }
+
         config.input.keybindings.clear();
         for (k, v) in self.cur_keybindings.iter() {
             config.input.keybindings.insert(*k, *v);
@@ -418,6 +430,30 @@ impl Options {
         Widget::add_child_to(&edge_scroll_content, edge_scroll_on);
         Widget::add_child_to(&edge_scroll_content, edge_scroll_off);
 
+        let mouse_title = Widget::with_theme(Label::empty(), "mouse_title");
+        let mouse_pane = Widget::empty("mouse_pane");
+        for (raw, action) in &self.cur_click_actions {
+            let action = *action;
+            let row = Widget::empty("row");
+
+            let button = Widget::with_theme(Button::empty(), "mouse_button");
+            button.borrow_mut().state.add_text_arg("button", &format!("{:?}", raw));
+            button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
+                let (parent, _) = Widget::parent::<Options>(widget);
+
+                let root = Widget::get_root(widget);
+                let popup = MousePopup::new(action, parent);
+                Widget::add_child_to(&root, Widget::with_defaults(popup));
+            })));
+
+            let label = Widget::with_theme(TextArea::empty(), "action_label");
+            label.borrow_mut().state.add_text_arg(&format!("{:?}", action), "true");
+
+            Widget::add_children_to(&row, vec![button, label]);
+
+            Widget::add_child_to(&mouse_pane, row);
+        }
+
         let keybindings_title = Widget::with_theme(Label::empty(), "keybindings_title");
 
         let scrollpane = ScrollPane::new(ScrollDirection::Vertical);
@@ -456,6 +492,8 @@ impl Options {
             scroll_speed_content,
             fast_label,
             slow_label,
+            mouse_title,
+            mouse_pane,
             keybindings_title,
             keybindings_pane,
             edge_scroll_content,
@@ -545,6 +583,65 @@ impl WidgetKind for Options {
         Widget::add_children_to(&content, widgets);
 
         vec![title, apply, cancel, reset, content, display, input]
+    }
+}
+
+pub struct MousePopup {
+    action: ClickKind,
+    options_widget: Rc<RefCell<Widget>>,
+}
+
+impl MousePopup {
+    pub fn new(
+        action: ClickKind,
+        options_widget: Rc<RefCell<Widget>>,
+    ) -> Rc<RefCell<MousePopup>> {
+        Rc::new(RefCell::new(MousePopup {
+            action,
+            options_widget,
+        }))
+    }
+}
+
+impl WidgetKind for MousePopup {
+    widget_kind!("mouse_popup");
+
+    fn on_mouse_press(&mut self, widget: &Rc<RefCell<Widget>>, kind: ClickKind) -> bool {
+        self.super_on_mouse_press(widget, kind);
+
+        let options = Widget::kind_mut::<Options>(&self.options_widget);
+        let mut actions: HashMap<_, _> = options.cur_click_actions.iter()
+            .map(|(k, v)| (*v, *k)).collect();
+
+        let old_click = *actions.get(&kind).unwrap();
+        let new_click = *actions.get(&self.action).unwrap();
+
+        actions.insert(kind, new_click);
+        actions.insert(self.action, old_click);
+
+        options.cur_click_actions = actions.into_iter().map(|(k, v)| (v, k)).collect();
+        options.cur_click_actions.sort_by(|(_, v1), (_, v2)| v1.cmp(v2));
+
+        self.options_widget.borrow_mut().invalidate_children();
+        widget.borrow_mut().mark_for_removal();
+        true
+    }
+
+    fn on_raw_key(&mut self, widget: &Rc<RefCell<Widget>>, _: Key) -> bool {
+        widget.borrow_mut().mark_for_removal();
+        true
+    }
+
+    fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+        widget.borrow_mut().state.set_modal(true);
+
+        let title = Widget::with_theme(Label::empty(), "title");
+        title
+            .borrow_mut()
+            .state
+            .add_text_arg("action", &format!("{:?}", self.action));
+
+        vec![title]
     }
 }
 

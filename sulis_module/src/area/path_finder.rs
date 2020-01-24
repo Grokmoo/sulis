@@ -15,11 +15,9 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::cmp::Ordering;
-use std::collections::BinaryHeap;
+use std::collections::{HashMap, HashSet, BinaryHeap};
 use std::time;
 use std::{f32, ptr};
-
-use hashbrown::{HashMap, HashSet};
 
 use sulis_core::util::{self, Point};
 use crate::MOVE_TO_THRESHOLD;

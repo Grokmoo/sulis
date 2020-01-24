@@ -10,7 +10,7 @@ backtrace = "0.3"
 flexi_logger = "0.14"
 image = "0.22"
 glium = "0.25"
-lazy_static = "1.0"
+lazy_static = "1.4"
 log = "0.4"
 rand = "0.7"
 rand_pcg = { version = "0.2", features = [ "serde1" ] }

@@ -11,5 +11,5 @@ sulis_state = { path = "../sulis_state" }
 
 log = "0.4"
 chrono = "0.4"
-open = "1.2"
+open = "1.0"
 rlua = "0.17"

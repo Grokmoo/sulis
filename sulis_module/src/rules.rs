@@ -114,9 +114,23 @@ pub struct Rules {
     pub hour_names: Vec<String>,
 
     pub area_colors: HashMap<LocationKind, Vec<Color>>,
+
+    pub hints: Vec<String>,
 }
 
 impl Rules {
+    pub fn random_hint(&self) -> String {
+        match self.hints.len() {
+            0 => "",
+            1 => &self.hints[0],
+            _ => {
+                let index = gen_rand(0, self.hints.len() - 1);
+                &self.hints[index]
+            }
+        }.to_string()
+
+    }
+
     pub fn to_display_ap(&self, ap: i32) -> i32 {
         ap / self.display_ap as i32
     }

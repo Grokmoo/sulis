@@ -282,8 +282,19 @@ impl WidgetKind for MainMenu {
             title,
             module_title,
             menu_pane,
-            self.content.clone(),
         ];
+
+        if Module::is_initialized() {
+            let tip_text = Module::rules().random_hint();
+
+            let tip_pane = Widget::empty("tip_pane");
+            let tip = Widget::with_theme(TextArea::empty(), "tip");
+            tip.borrow_mut().state.add_text_arg("tip", &tip_text);
+            Widget::add_child_to(&tip_pane, tip);
+            children.push(tip_pane);
+        }
+
+        children.push(self.content.clone());
 
         if let Some(builder) = self.char_builder_to_add.take() {
             children.push(Widget::with_defaults(builder));

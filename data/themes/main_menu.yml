@@ -13,6 +13,35 @@ themes:
           y: Center
           width: Max
           height: Max
+      tip_pane:
+        background: 60_transparent_fill
+        border: [2, 2, 2, 2]
+        size: [100, 30]
+        relative:
+          x: Max
+          y: Max
+        position: [-10, -10]
+        children:
+          title:
+            kind: Label
+            from: label
+            text_params:
+              scale: 7
+            text: "Hint"
+            relative:
+              width: Max
+            size: [0, 6]
+          tip:
+            from: text_area
+            text_params:
+              scale: 6
+            text: |
+              #tip#
+            relative:
+              width: Max
+              height: Max
+            position: [0, 6]
+            size: [0, -6]
       tooltip:
         from: tooltip
       title:

@@ -409,7 +409,7 @@ impl WidgetKind for RootView {
             self.area_view.borrow_mut().clear_area_mouseover();
         }
 
-        if Config::edge_scrolling() {
+        if !has_modal && Config::edge_scrolling() {
             if cx == Config::ui_width() - 1 {
                 self.area_view.borrow_mut().scroll(-2.0, 0.0, millis);
             } else if cx == 0 {

@@ -721,7 +721,8 @@ impl MoveAction {
         let area_state = GameState::area_state();
         let area_state = area_state.borrow();
 
-        let pc = match GameState::selected().first() {
+        let selected = GameState::selected();
+        let pc = match selected.first() {
             None => return None,
             Some(pc) => Rc::clone(pc),
         };
@@ -736,13 +737,12 @@ impl MoveAction {
             }
         }
 
-        let selected = GameState::selected();
-        let parent_w = selected[0].borrow().size.width as f32;
-        let parent_h = selected[0].borrow().size.height as f32;
+        let parent_w = pc.borrow().size.width as f32;
+        let parent_h = pc.borrow().size.height as f32;
         let dest = Destination { x, y, w, h, parent_w, parent_h, dist };
 
         let path =
-            match GameState::can_move_towards_dest(&selected[0], entities_to_ignore(), dest)
+            match GameState::can_move_towards_dest(&pc.borrow(), entities_to_ignore(), dest)
             {
                 None => return None,
                 Some(path) => path,

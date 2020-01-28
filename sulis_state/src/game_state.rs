@@ -1094,8 +1094,8 @@ impl GameState {
 
     pub fn get_point_dest(entity: &EntityState, x: f32, y: f32) -> Destination {
         let dist = MOVE_TO_THRESHOLD;
-        let w = 0.0;
-        let h = 0.0;
+        let w = entity.size.width as f32;
+        let h = entity.size.height as f32;
         let parent_w = entity.size.width as f32;
         let parent_h = entity.size.height as f32;
         Destination { x, y, w, h, parent_w, parent_h, dist }
@@ -1106,7 +1106,7 @@ impl GameState {
         target: &Rc<RefCell<EntityState>>,
     ) -> Option<Vec<Point>> {
         let dest = GameState::get_target_dest(&entity.borrow(), &target.borrow());
-        GameState::can_move_towards_dest(entity, Vec::new(), dest)
+        GameState::can_move_towards_dest(&entity.borrow(), Vec::new(), dest)
     }
 
     pub fn move_towards(
@@ -1149,7 +1149,7 @@ impl GameState {
     }
 
     pub fn can_move_towards_dest(
-        entity: &Rc<RefCell<EntityState>>,
+        entity: &EntityState,
         entities_to_ignore: Vec<usize>,
         dest: Destination,
     ) -> Option<Vec<Point>> {
@@ -1162,6 +1162,25 @@ impl GameState {
             path_finder::can_move_towards_point(
                 &mut state.path_finder,
                 &area,
+                entity,
+                entities_to_ignore,
+                dest
+            )
+        })
+    }
+
+    pub fn can_move_ignore_ap(
+        entity: &EntityState,
+        area: &AreaState,
+        entities_to_ignore: Vec<usize>,
+        dest: Destination,
+    ) -> Option<Vec<Point>> {
+        STATE.with(|s| {
+            let mut state = s.borrow_mut();
+            let state = state.as_mut().unwrap();
+            path_finder::can_move_ignore_ap(
+                &mut state.path_finder,
+                area,
                 entity,
                 entities_to_ignore,
                 dest

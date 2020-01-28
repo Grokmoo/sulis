@@ -86,7 +86,7 @@ pub fn move_towards_point(
     cb: Option<Box<dyn ScriptCallback>>
 ) -> Option<Anim> {
 
-    let path = match find_path(finder, area, entity, entities_to_ignore, dest) {
+    let path = match find_path(finder, area, &entity.borrow(), entities_to_ignore, dest, true) {
         None => return None,
         Some(path) => path,
     };
@@ -102,30 +102,43 @@ pub fn move_towards_point(
 pub fn can_move_towards_point(
     finder: &mut PathFinder,
     area: &AreaState,
-    entity: &Rc<RefCell<EntityState>>,
+    entity: &EntityState,
     entities_to_ignore: Vec<usize>,
     dest: Destination,
 ) -> Option<Vec<Point>> {
-    find_path(finder, area, entity, entities_to_ignore, dest)
+    find_path(finder, area, entity, entities_to_ignore, dest, true)
+}
+
+pub fn can_move_ignore_ap(
+    finder: &mut PathFinder,
+    area: &AreaState,
+    entity: &EntityState,
+    entities_to_ignore: Vec<usize>,
+    dest: Destination,
+) -> Option<Vec<Point>> {
+    find_path(finder, area, entity, entities_to_ignore, dest, false)
 }
 
 fn find_path(
     path_finder: &mut PathFinder,
     area_state: &AreaState,
-    entity: &Rc<RefCell<EntityState>>,
+    entity: &EntityState,
     entities_to_ignore: Vec<usize>,
     dest: Destination,
+    check_ap: bool,
 ) -> Option<Vec<Point>> {
-    let entity = &entity.borrow();
     let checker = StateLocationChecker::new(area_state, entity, entities_to_ignore);
 
     debug!("Attempting move '{}' to {:?}", entity.actor.actor.name, dest);
 
-    if entity.actor.stats.move_disabled || entity.actor.ap() < entity.actor.get_move_ap_cost(1) {
-        return None;
-    }
+    if check_ap {
+        if entity.actor.stats.move_disabled ||
+            entity.actor.ap() < entity.actor.get_move_ap_cost(1) {
+            return None;
+        }
 
-    trace!("  Entity is able to move");
+        trace!("  Entity is able to move");
+    }
 
     let start_time = std::time::Instant::now();
 

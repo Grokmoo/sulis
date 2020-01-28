@@ -20,7 +20,7 @@ use std::time;
 use std::{f32, ptr};
 
 use sulis_core::util::{self, Point};
-use crate::MOVE_TO_THRESHOLD;
+use crate::{MOVE_TO_THRESHOLD};
 
 const MAX_ITERATIONS: i32 = 2_000;
 

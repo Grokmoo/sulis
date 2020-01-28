@@ -117,7 +117,7 @@ impl Formation {
                 let dist = dest.dist + dist_increase as f32 * 1.0;
                 let dest = Destination { x, y, w: dest.w, h: dest.h, parent_w, parent_h, dist };
                 if GameState::can_move_towards_dest(
-                    &to_move[index],
+                    &to_move[index].borrow(),
                     entities_to_ignore.clone(),
                     dest
                 )

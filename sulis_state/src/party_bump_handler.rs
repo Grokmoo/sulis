@@ -26,6 +26,7 @@ pub fn bump_party_overlap(area: &mut AreaState, mgr: &mut TurnManager) {
         return;
     }
 
+    let mut party_to_ignore = Vec::new();
     let mut bb = Vec::new();
     for member in party.iter() {
         let member = member.borrow();
@@ -34,6 +35,7 @@ pub fn bump_party_overlap(area: &mut AreaState, mgr: &mut TurnManager) {
         let w = member.size.width;
         let h = member.size.height;
         bb.push((x, y, w, h));
+        party_to_ignore.push(member.index());
     }
 
     let mut to_bump = HashSet::new();
@@ -60,7 +62,7 @@ pub fn bump_party_overlap(area: &mut AreaState, mgr: &mut TurnManager) {
         let (new, old) = {
             let member = member.borrow();
             let old = member.location.to_point();
-            let new = match find_bump_position(area, &member, old) {
+            let new = match find_bump_position(area, &member, &party_to_ignore, old) {
                 None => {
                     warn!("Unable to bump '{}' to avoid overlap", member.actor.actor.name);
                     continue;
@@ -77,18 +79,64 @@ pub fn bump_party_overlap(area: &mut AreaState, mgr: &mut TurnManager) {
     }
 }
 
-fn find_bump_position(area: &AreaState, entity: &EntityState, cur: Point) -> Option<Point> {
+fn find_bump_position(
+    area: &AreaState,
+    entity: &EntityState,
+    party: &[usize],
+    cur: Point
+) -> Option<Point> {
     let to_ignore = vec![entity.index()];
-    let radius = 3;
-    // for radius in 1..=3 {
-        for y in -radius..=radius {
-            for x in -radius..=radius {
-                let p = Point::new(cur.x + x, cur.y + y);
-                if area.is_passable(entity, &to_ignore, p.x, p.y) {
-                    return Some(p);
-                }
+
+    for radius in 1..4 {
+        for x in -radius..radius {
+            let p = Point::new(cur.x + x, cur.y - radius);
+            if check_bump_position(area, entity, &to_ignore, party, p) {
+                return Some(p);
             }
         }
-    // }
+
+        for y in -radius..radius {
+            let p = Point::new(cur.x + radius, cur.y + y);
+            if check_bump_position(area, entity, &to_ignore, party, p) {
+                return Some(p);
+            }
+        }
+
+        for x in -radius..=radius {
+            let p = Point::new(cur.x + x, cur.y + radius);
+            if check_bump_position(area, entity, &to_ignore, party, p) {
+                return Some(p);
+            }
+        }
+
+        for y in -radius..radius {
+            let p = Point::new(cur.x - radius, cur.y + y);
+            if check_bump_position(area, entity, &to_ignore, party, p) {
+                return Some(p);
+            }
+        }
+    }
+
     None
+}
+
+fn check_bump_position(
+    area: &AreaState,
+    entity: &EntityState,
+    entity_vec: &[usize],
+    party: &[usize],
+    p: Point) -> bool {
+    if !area.is_passable(entity, entity_vec, p.x, p.y) { return false; }
+
+    let dest = GameState::get_point_dest(entity, p.x as f32, p.y as f32);
+
+    let result = GameState::can_move_ignore_ap(entity,
+        area, party.to_vec(), dest);
+
+    warn!("Bump from {:?} to {:?}: result: {:?}",
+        entity.location, p, result);
+    match result {
+        None => false,
+        Some(path) => path.len() < 10,
+    }
 }

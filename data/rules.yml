@@ -73,7 +73,7 @@ hour_names: [ Midnight, Late Night, Late Night,    Early Morning,  Early Morning
 hints:
   - "The mouse wheel will zoom your view in or out."
   - "Right click on items to see all available actions.  You can remap mouse buttons in the Options Menu under Input."
-  - "The only items available to you in combat are those already equipped, your other weaponset, and anything in your quick slots, so be prepared."
+  - "The only items available to you in combat are those already equipped, your other weapon set, and anything in your quick slots, so be prepared."
   - "Press and hold the middle mouse button and drag the mouse to move the camera.  You can remap mouse buttons in the Options Menu under Input."
   - "Some enemies are either resistant or vulnerable to particular damage types.  Try out different weapons and abilities!"
   - "Ability Groups on the Quickbar can be expanded or collapsed by clicking on the title of the Group."

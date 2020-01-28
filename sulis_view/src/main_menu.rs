@@ -82,16 +82,25 @@ pub struct MainMenu {
     content: Rc<RefCell<Widget>>,
     pub(crate) char_builder_to_add: Option<Rc<RefCell<CharacterBuilder>>>,
     pub(crate) display_configurations: Vec<DisplayConfiguration>,
+
+    tip_text: Option<String>,
 }
 
 impl MainMenu {
     pub fn new(display_configurations: Vec<DisplayConfiguration>) -> Rc<RefCell<MainMenu>> {
+        let tip_text = if Module::is_initialized() {
+            Some(Module::rules().random_hint())
+        } else {
+            None
+        };
+
         Rc::new(RefCell::new(MainMenu {
             next_step: None,
             mode: Mode::NoChoice,
             content: Widget::empty("content"),
             char_builder_to_add: None,
             display_configurations,
+            tip_text
         }))
     }
 
@@ -284,12 +293,10 @@ impl WidgetKind for MainMenu {
             menu_pane,
         ];
 
-        if Module::is_initialized() {
-            let tip_text = Module::rules().random_hint();
-
+        if let Some(tip_text) = &self.tip_text {
             let tip_pane = Widget::empty("tip_pane");
             let tip = Widget::with_theme(TextArea::empty(), "tip");
-            tip.borrow_mut().state.add_text_arg("tip", &tip_text);
+            tip.borrow_mut().state.add_text_arg("tip", tip_text);
             Widget::add_child_to(&tip_pane, tip);
             children.push(tip_pane);
         }

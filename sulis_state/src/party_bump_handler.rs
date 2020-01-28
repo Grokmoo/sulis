@@ -79,7 +79,8 @@ pub fn bump_party_overlap(area: &mut AreaState, mgr: &mut TurnManager) {
 
 fn find_bump_position(area: &AreaState, entity: &EntityState, cur: Point) -> Option<Point> {
     let to_ignore = vec![entity.index()];
-    for radius in 1..=3 {
+    let radius = 3;
+    // for radius in 1..=3 {
         for y in -radius..=radius {
             for x in -radius..=radius {
                 let p = Point::new(cur.x + x, cur.y + y);
@@ -88,6 +89,6 @@ fn find_bump_position(area: &AreaState, entity: &EntityState, cur: Point) -> Opt
                 }
             }
         }
-    }
+    // }
     None
 }

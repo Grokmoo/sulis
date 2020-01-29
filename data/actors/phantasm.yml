@@ -1,5 +1,5 @@
 id: phantasm
-ai: ~
+ai: ai_basic
 name: Phantasm
 faction: Neutral
 inline_race:

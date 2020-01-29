@@ -39,7 +39,7 @@ abilities:
   - fireball
   - lightning_master
   - breach
-ai: ai_basic
+ai: ai_mage
 reward:
   xp: 100
   loot: arzel_loot

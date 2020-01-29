@@ -47,4 +47,4 @@ abilities:
   - ward
   - fire_shield
   - fire_breath
-ai: ai_basic
+ai: ai_mage

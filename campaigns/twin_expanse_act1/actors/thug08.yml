@@ -38,4 +38,4 @@ abilities:
   - weapon_small_sword
   - weapon_simple
   - shrapnel_grenade
-ai: ai_basic
+ai: ai_ranged

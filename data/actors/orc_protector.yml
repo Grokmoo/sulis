@@ -1,5 +1,5 @@
 id: orc_protector
-ai: ai_basic
+ai: ai_defender
 name: Orc Protector
 faction: Hostile
 images: {}

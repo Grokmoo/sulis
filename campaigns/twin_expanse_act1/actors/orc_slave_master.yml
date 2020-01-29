@@ -1,5 +1,5 @@
 id: orc_slave_master
-ai: ai_basic
+ai: ai_melee
 name: Orc Slavemaster
 faction: Hostile
 images: {}

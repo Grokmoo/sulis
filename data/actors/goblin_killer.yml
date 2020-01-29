@@ -1,5 +1,5 @@
 id: goblin_killer
-ai: ai_basic
+ai: ai_melee
 name: Goblin Killer
 faction: Hostile
 race: goblin

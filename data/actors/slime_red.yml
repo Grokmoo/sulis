@@ -1,5 +1,5 @@
 id: slime_red
-ai: ai_basic
+ai: ai_ranged
 name: Red Slime
 faction: Hostile
 images: {}

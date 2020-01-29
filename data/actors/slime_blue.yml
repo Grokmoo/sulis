@@ -1,5 +1,5 @@
 id: slime_blue
-ai: ai_basic
+ai: ai_ranged
 name: Blue Slime
 faction: Hostile
 images: {}

@@ -62,4 +62,4 @@ abilities:
   - stunning_blow
   - grapple
   - whirlwind_attack
-ai: ai_basic
+ai: ai_melee

@@ -1,5 +1,5 @@
 id: orc_rogue
-ai: ai_basic
+ai: ai_melee
 name: Orc Rogue
 faction: Hostile
 images: {}

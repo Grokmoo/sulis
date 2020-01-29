@@ -46,4 +46,4 @@ abilities:
   - slow
   - heal
   - flaming_fingers
-ai: ai_basic
+ai: ai_mage

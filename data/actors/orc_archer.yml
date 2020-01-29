@@ -1,5 +1,5 @@
 id: orc_archer
-ai: ai_basic
+ai: ai_ranged
 name: Orc Archer
 faction: Hostile
 images: {}

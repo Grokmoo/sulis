@@ -1,6 +1,6 @@
 ---
 id: "npc_jorzal"
-ai: ai_basic
+ai: ai_defender
 name: Jorzal
 race: human
 sex: Male

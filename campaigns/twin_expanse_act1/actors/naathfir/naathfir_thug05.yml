@@ -42,4 +42,4 @@ abilities:
   - flanker
   - flanker
   - rapid_strikes
-ai: ai_basic
+ai: ai_melee

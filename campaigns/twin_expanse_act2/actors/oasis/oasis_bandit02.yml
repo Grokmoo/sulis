@@ -55,4 +55,4 @@ abilities:
   - shield_slam
   - helping_hand
   - inspire
-ai: ai_basic
+ai: ai_melee

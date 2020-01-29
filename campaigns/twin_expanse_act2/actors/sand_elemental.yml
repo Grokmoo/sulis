@@ -1,5 +1,5 @@
 id: sand_elemental
-ai: ai_basic
+ai: ai_melee
 name: Sand Elemental
 faction: Hostile
 images: {}

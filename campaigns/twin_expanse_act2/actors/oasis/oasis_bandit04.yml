@@ -42,4 +42,4 @@ abilities:
   - fireball
   - slow
   - heal
-ai: ai_basic
+ai: ai_ranged

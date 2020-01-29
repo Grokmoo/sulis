@@ -1,8 +1,8 @@
-id: ai_basic
+id: ai_melee
 script: ai_basic
 hooks:
   OnDamaged: on_damaged
   AfterAttack: after_attack
 params:
-  AttackWhenHasAbilitiesChance: 0
+  AttackWhenHasAbilitiesChance: 50
   AlwaysUseAbilityPriority: 1

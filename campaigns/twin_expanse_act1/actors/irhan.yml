@@ -38,4 +38,4 @@ abilities:
   - chameleon
   - heal
   - petrify
-ai: ai_basic
+ai: ai_mage

@@ -1,5 +1,5 @@
 id: goblin_brute_01
-ai: ai_basic
+ai: ai_melee
 name: Goblin Brute
 faction: Hostile
 race: goblin

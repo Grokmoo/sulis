@@ -1,6 +1,6 @@
 ---
 id: "npc_ethel"
-ai: ai_basic
+ai: ai_ranged
 name: Ethel
 race: elf
 sex: Male

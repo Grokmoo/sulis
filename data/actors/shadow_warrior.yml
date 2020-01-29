@@ -1,5 +1,5 @@
 id: shadow_warrior
-ai: ~
+ai: ai_basic
 name: Shadow Warrior
 faction: Neutral
 images: {}

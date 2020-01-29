@@ -52,4 +52,4 @@ abilities:
   - vampiric_touch
   - assay
   - hex
-ai: ai_basic
+ai: ai_melee

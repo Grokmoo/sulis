@@ -40,4 +40,4 @@ abilities:
   - weapon_simple
   - whirlwind_attack
   - stunning_blow
-ai: ai_basic
+ai: ai_melee

@@ -1,5 +1,5 @@
 id: forest_troll
-ai: ai_basic
+ai: ai_melee
 name: Forest Troll
 faction: Hostile
 images: {}

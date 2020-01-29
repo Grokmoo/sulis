@@ -60,4 +60,4 @@ abilities:
   - flanker
   - rupture
   - rapid_strikes
-ai: ai_basic
+ai: ai_ranged

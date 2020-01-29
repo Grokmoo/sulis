@@ -1,5 +1,5 @@
 id: goblin_defender_02
-ai: ai_basic
+ai: ai_defender
 name: Goblin Defender
 faction: Hostile
 race: goblin

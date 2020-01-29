@@ -40,4 +40,4 @@ abilities:
   - weapon_simple
   - speed_of_thought
   - pierce
-ai: ai_basic
+ai: ai_melee

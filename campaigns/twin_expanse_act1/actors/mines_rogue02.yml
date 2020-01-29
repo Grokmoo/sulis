@@ -37,4 +37,4 @@ abilities:
   - stun_grenade
   - shrapnel_grenade
   - rupture
-ai: ai_basic
+ai: ai_ranged

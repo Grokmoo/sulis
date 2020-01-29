@@ -56,4 +56,4 @@ abilities:
   - flanker
   - weapon_small_sword
   - rupture
-ai: ai_basic
+ai: ai_melee

@@ -65,4 +65,4 @@ abilities:
   - whirlwind_attack
   - blitz
   - mark_target
-ai: ai_basic
+ai: ai_melee

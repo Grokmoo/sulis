@@ -40,4 +40,4 @@ abilities:
   - weapon_simple
   - mighty_blow
   - inspire
-ai: ai_basic
+ai: ai_melee

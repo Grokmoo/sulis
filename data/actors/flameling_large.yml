@@ -1,5 +1,5 @@
 id: flameling_large
-ai: ai_basic
+ai: ai_melee
 name: Flame Giant
 faction: Hostile
 images: {}

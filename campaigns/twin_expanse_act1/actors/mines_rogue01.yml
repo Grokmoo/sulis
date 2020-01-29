@@ -37,4 +37,4 @@ abilities:
   - speed_of_thought
   - rapid_strikes
   - pierce
-ai: ai_basic
+ai: ai_melee

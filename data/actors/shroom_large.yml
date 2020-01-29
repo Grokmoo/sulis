@@ -1,5 +1,5 @@
 id: shroom_large
-ai: ai_basic
+ai: ai_ranged
 name: Mushroom
 faction: Hostile
 images:

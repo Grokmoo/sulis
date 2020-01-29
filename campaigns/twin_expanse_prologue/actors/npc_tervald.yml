@@ -1,6 +1,6 @@
 ---
 id: npc_tervald
-ai: ai_basic
+ai: ai_melee
 name: Tervald
 race: dwarf
 sex: Male

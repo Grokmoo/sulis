@@ -39,4 +39,4 @@ abilities:
   - become_wind
   - backstab
   - flanker
-ai: ai_basic
+ai: ai_ranged

@@ -60,4 +60,4 @@ abilities:
   - fire_breath
   - tail_whip
   - trample
-ai: ai_basic
+ai: ai_melee

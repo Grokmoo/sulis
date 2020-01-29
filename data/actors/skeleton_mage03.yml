@@ -1,5 +1,5 @@
 id: skeleton_mage03
-ai: ai_basic
+ai: ai_mage
 name: Skeleton Mage
 faction: Hostile
 images: {}

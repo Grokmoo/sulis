@@ -38,4 +38,4 @@ abilities:
   - weapon_small_sword
   - weapon_simple
   - pierce
-ai: ai_basic
+ai: ai_melee

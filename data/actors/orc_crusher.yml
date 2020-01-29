@@ -1,5 +1,5 @@
 id: orc_crusher
-ai: ai_basic
+ai: ai_melee
 name: Orc Crusher
 faction: Hostile
 images: {}

@@ -1,5 +1,5 @@
 id: goblin_rogue
-ai: ai_basic
+ai: ai_melee
 name: Goblin Rogue
 faction: Hostile
 images: {}

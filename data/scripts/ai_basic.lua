@@ -1,9 +1,13 @@
-MIN_MULTIPLE_SCORE=2
-MOVE_THRESHOLD=0.1
+MIN_MULTIPLE_SCORE= 2
+MOVE_THRESHOLD = 0.1
 HEALING_FRAC = 0.5
 WAIT_TIME = 10
 
-function ai_action(parent)
+function ai_action(parent, params)
+    -- set default value of 0 for all params
+    local meta_default = { __index = function() return 0 end }
+	setmetatable(params, meta_default)
+
     game:log("AI turn for " .. parent:id())
     game:log("  Current AP " .. tostring(parent:stats().current_ap))
 
@@ -35,6 +39,15 @@ function ai_action(parent)
 
     local failed_use_count = 0
 
+    if not parent:has_flag("ai_force_attack") then
+      local skip_abilities_chance = math.random(100)
+	  if math.random(0, 99) < params["AttackWhenHasAbilitiesChance"] then
+	    parent:set_flag("ai_force_attack", "true")
+      else
+	    parent:set_flag("ai_force_attack", "false")
+      end
+	end
+
     -- only check items and abilities at most 10 times
     for i = 1,10 do
         local result = find_and_use_item(parent, items, hostiles, friendlies, failed_use_count)
@@ -47,7 +60,7 @@ function ai_action(parent)
             break
         end
 
-        local result = find_and_use_ability(parent, abilities, hostiles,
+        local result = find_and_use_ability(parent, params, abilities, hostiles,
             friendlies, failed_use_count)
         if result.done then
             game:log("  Ability used or moved")
@@ -91,6 +104,7 @@ function ai_action(parent)
         if result.attack then
             game:log("  Perform attack")
             parent:anim_weapon_attack(target, nil, true)
+            parent:clear_flag("ai_force_attack")
 
             return parent:state_wait(WAIT_TIME)
         end
@@ -262,13 +276,22 @@ function find_and_use_item(parent, items, hostiles, friendlies, failed_use_count
     return { done=false }
 end
 
-function find_and_use_ability(parent, abilities, hostiles, friendlies, failed_use_count)
+function find_and_use_ability(parent, params, abilities, hostiles, friendlies, failed_use_count)
     local abilities_table = abilities:to_table()
     for i = 1, #abilities_table do
         local ability = abilities_table[i]
+        local ai_data = ability:ai_data()
+
+        if parent:get_flag("ai_force_attack") == "true" then
+		    -- don't skip max priority ability
+			if ai_data.priority > params["AlwaysUseAbilityPriority"] then 
+				game:log("  Skipping abilities")
+				return { done=false, no_abilities=true }
+			end
+		end
 
         game:log("    Checking ability " .. ability:name())
-        local result = check_action(parent, ability:ai_data(), hostiles, friendlies, failed_use_count)
+        local result = check_action(parent, ai_data, hostiles, friendlies, failed_use_count)
         if result.done then
             return { done=true }
         end
@@ -276,7 +299,7 @@ function find_and_use_ability(parent, abilities, hostiles, friendlies, failed_us
         if result.target then
             game:log("      Use ability")
             parent:use_ability(ability)
-            local result = handle_targeter(parent, result.target, ability:ai_data(), hostiles, friendlies)
+            local result = handle_targeter(parent, result.target, ai_data, hostiles, friendlies)
 
             if result.done then
                 return { done=true }

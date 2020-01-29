@@ -41,4 +41,4 @@ abilities:
   - weapon_spear
   - weapon_mace
   - weapon_simple
-ai: ai_basic
+ai: ai_melee

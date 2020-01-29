@@ -1,5 +1,5 @@
 id: goblin_shaman_02
-ai: ai_basic
+ai: ai_mage
 name: Goblin Shaman
 faction: Hostile
 race: goblin

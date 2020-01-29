@@ -1,5 +1,5 @@
 id: spider_large_summon
-ai: ai_basic
+ai: ai_mage
 name: Large Spider
 faction: Hostile
 images: {}

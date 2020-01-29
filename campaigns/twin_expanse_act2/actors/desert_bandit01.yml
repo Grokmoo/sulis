@@ -61,4 +61,4 @@ abilities:
   - powerful_blows
   - stunning_blow
   - charge_attack
-ai: ai_basic
+ai: ai_melee

@@ -1,5 +1,5 @@
 id: desert_scorpion_large
-ai: ai_basic
+ai: ai_melee
 name: Large Scorpion
 faction: Hostile
 images: {}

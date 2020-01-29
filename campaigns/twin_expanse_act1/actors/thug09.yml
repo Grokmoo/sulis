@@ -39,4 +39,4 @@ abilities:
   - weapon_simple
   - become_wind
   - pierce
-ai: ai_basic
+ai: ai_melee

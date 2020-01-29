@@ -26,7 +26,7 @@ use crate::script::{
 };
 use crate::{ai, EntityState};
 use sulis_core::util::Point;
-use sulis_module::{Ability, Item, Module};
+use sulis_module::{Ability, Item, Module, ai::AITemplate};
 
 thread_local! {
     static SCRIPT_CACHE: RefCell<HashMap<String, Rc<ScriptState>>> = RefCell::new(HashMap::new());
@@ -159,9 +159,9 @@ where
 }
 
 pub fn ai_script(parent: &Rc<RefCell<EntityState>>, func: &str) -> Result<ai::State> {
-    let script = get_script_id_from_entity(parent)?;
+    let script_data = get_script_data_from_entity(parent)?;
     let parent = ScriptEntity::from(parent);
-    exec_func(&script, func, parent)
+    exec_func(&script_data.script, func, (parent, script_data.params.clone()))
 }
 
 pub fn entity_script<T>(
@@ -173,9 +173,9 @@ pub fn entity_script<T>(
 where
     T: for<'a> ToLua<'a> + Send,
 {
-    let script = get_script_id_from_entity(parent)?;
+    let script_data = get_script_data_from_entity(parent)?;
     let parent = ScriptEntity::from(parent);
-    exec_func(&script, func, (parent, targets, arg))
+    exec_func(&script_data.script, func, (parent, targets, arg))
 }
 
 pub fn item_on_activate(
@@ -306,7 +306,7 @@ where
     exec_func(script_id, func, args)
 }
 
-fn get_script_id_from_entity(entity: &Rc<RefCell<EntityState>>) -> Result<String> {
+fn get_script_data_from_entity(entity: &Rc<RefCell<EntityState>>) -> Result<Rc<AITemplate>> {
     let entity = entity.borrow();
     let id = entity.unique_id();
     match &entity.actor.actor.ai {
@@ -315,7 +315,7 @@ fn get_script_id_from_entity(entity: &Rc<RefCell<EntityState>>) -> Result<String
             to: "Script",
             message: Some(format!("Script called for entity '{}' with no AI", id)),
         }),
-        Some(ai) => Ok(ai.script.to_string()),
+        Some(ai) => Ok(Rc::clone(ai)),
     }
 }
 

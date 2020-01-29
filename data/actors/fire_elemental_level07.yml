@@ -1,5 +1,5 @@
 id: fire_elemental_level07
-ai: ai_basic
+ai: ai_ranged
 name: Fire Elemental
 faction: Hostile
 images: {}

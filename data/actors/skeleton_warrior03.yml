@@ -1,5 +1,5 @@
 id: skeleton_warrior03
-ai: ai_basic
+ai: ai_melee
 name: Skeleton Warrior
 faction: Hostile
 images: {}

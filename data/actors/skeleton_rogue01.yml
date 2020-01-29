@@ -1,5 +1,5 @@
 id: skeleton_rogue01
-ai: ai_basic
+ai: ai_melee
 name: Skeleton Rogue
 faction: Hostile
 images: {}

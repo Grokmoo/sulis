@@ -40,4 +40,4 @@ abilities:
   - backstab
   - flanker
   - flanker
-ai: ai_basic
+ai: ai_melee

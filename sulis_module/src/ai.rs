@@ -26,10 +26,15 @@ pub enum FuncKind {
     OnRoundElapsed,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct AITemplate {
     pub id: String,
     pub script: String,
+
+    #[serde(default)]
     pub hooks: HashMap<FuncKind, String>,
+
+    #[serde(default)]
+    pub params: HashMap<String, i32>,
 }

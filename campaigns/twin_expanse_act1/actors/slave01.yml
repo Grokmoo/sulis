@@ -52,4 +52,4 @@ abilities:
   - mighty_blow
   - backstab
   - flanker
-ai: ai_basic
+ai: ai_melee

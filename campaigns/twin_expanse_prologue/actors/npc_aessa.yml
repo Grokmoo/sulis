@@ -1,6 +1,6 @@
 ---
 id: "npc_aessa"
-ai: ai_basic
+ai: ai_mage
 name: Aessa
 race: kimer
 sex: Female

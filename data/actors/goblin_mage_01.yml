@@ -1,5 +1,5 @@
 id: goblin_mage_01
-ai: ai_basic
+ai: ai_mage
 name: Goblin Mage
 faction: Hostile
 race: goblin

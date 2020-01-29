@@ -1,6 +1,6 @@
 ---
 id: "npc_grazi"
-ai: ai_basic
+ai: ai_melee
 name: Grazi
 race: human
 sex: Male

@@ -1,5 +1,5 @@
 id: goblin_champion
-ai: ai_basic
+ai: ai_defender
 name: Goblin Champion
 faction: Hostile
 race: goblin

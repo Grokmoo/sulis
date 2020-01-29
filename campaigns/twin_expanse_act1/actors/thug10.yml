@@ -40,4 +40,4 @@ abilities:
   - weapon_simple
   - powerful_blows
   - stunning_blow
-ai: ai_basic
+ai: ai_melee

@@ -60,4 +60,4 @@ abilities:
   - weapon_simple
   - blitz
   - grapple
-ai: ai_basic
+ai: ai_melee

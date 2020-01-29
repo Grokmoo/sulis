@@ -1,5 +1,5 @@
 id: skeletal_dragon
-ai: ai_basic
+ai: ai_melee
 name: Skeletal Dragon
 faction: Hostile
 inline_race:

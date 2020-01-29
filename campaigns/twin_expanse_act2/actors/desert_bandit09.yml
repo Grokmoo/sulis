@@ -49,4 +49,4 @@ abilities:
   - petrify
   - heal
   - fireball
-ai: ai_basic
+ai: ai_ranged

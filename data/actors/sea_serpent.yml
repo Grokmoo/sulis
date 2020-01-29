@@ -1,5 +1,5 @@
 id: sea_serpent
-ai: ai_basic
+ai: ai_melee
 name: Sea Serpent
 faction: Hostile
 inline_race:

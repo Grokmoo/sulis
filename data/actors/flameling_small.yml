@@ -1,5 +1,5 @@
 id: flameling_small
-ai: ai_basic
+ai: ai_melee
 name: Flameling
 faction: Hostile
 inline_race:

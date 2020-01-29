@@ -1,5 +1,5 @@
 id: ogre
-ai: ai_basic
+ai: ai_melee
 name: Ogre
 faction: Hostile
 images: {}

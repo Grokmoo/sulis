@@ -1,5 +1,5 @@
 id: minotaur
-ai: ai_basic
+ai: ai_melee
 name: Minotaur
 faction: Hostile
 images: {}

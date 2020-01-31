@@ -43,7 +43,7 @@ inventory:
       id: shortbow
       adjectives: [ fine ]
 levels:
-  fighter: 1
+  fighter: 13
 abilities:
   - armor_light
   - armor_medium

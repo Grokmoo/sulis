@@ -46,7 +46,7 @@ inventory:
       id: crossbow
       adjectives: [ exceptional ]
 levels:
-  fighter: 1
+  fighter: 14
 abilities:
   - armor_light
   - armor_medium

@@ -40,7 +40,7 @@ inventory:
       id: shortsword
       adjectives: [ fine, acid5 ]
 levels:
-  mage: 1
+  mage: 13
 abilities:
   - weapon_simple
   - weapon_crossbow

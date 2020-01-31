@@ -46,7 +46,7 @@ inventory:
       id: shortsword
       adjectives: [ fine, cold5 ]
 levels:
-  rogue: 1
+  rogue: 13
 abilities:
   - armor_light
   - weapon_crossbow

@@ -1,0 +1,17 @@
+id: blazing_road_boss
+initial_nodes:
+  - id: start01
+nodes:
+  start01:
+    text: |
+      [c=6868FF|#target_name#] - [c=888|A group of thugs stand before you.  They look more hardened than the usual lot you face.]
+      
+      I must say I did not expect to see you.  Seems Berkeley was right - you are something special.
+    responses:
+      - text: "[c=888|Continue]"
+        to: start02
+  start02:
+    text: |
+      [c=6868FF|#target_name#] - Well, orders are orders.  Men, attack!
+    responses:
+      - text: "[c=f00|Fight!]"

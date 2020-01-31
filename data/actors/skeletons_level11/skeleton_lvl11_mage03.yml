@@ -1,0 +1,34 @@
+id: skeleton_lvl11_mage03
+ai: ai_mage
+name: Skeleton Mage
+faction: Hostile
+images: {}
+race: skeleton
+attributes:
+  str: 10
+  dex: 10
+  end: 10
+  per: 10
+  int: 10
+  wis: 10
+levels:
+  mage: 11
+inventory:
+  equipped:
+    HeldMain: { id: quarterstaff }
+  quick:
+    AltHeldMain:
+      id: crossbow
+images:
+  Background: creatures/undead01
+reward:
+  xp: 100
+  loot: level1_misc
+  loot_chance: 35
+abilities:
+  - weapon_crossbow
+  - weapon_simple
+  - air_shield
+  - lightning_bolt
+  - stun
+  - frostbite

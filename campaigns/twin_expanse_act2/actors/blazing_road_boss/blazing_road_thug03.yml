@@ -1,6 +1,6 @@
 ---
-id: desert_bandit09
-name: Bandit Wizard
+id: blazing_road_thug03
+name: Thug Wizard
 race: human_simple
 sex: Male
 attributes:
@@ -17,10 +17,10 @@ images:
   Foreground: empty
   Shadow: empty
 reward:
-  xp: 80
-  loot: level5_misc
+  xp: 150
+  loot: level10_misc
   loot_chance: 35
-hue: 0.1
+hue: 0.5
 inventory:
   equipped:
     Torso:
@@ -40,13 +40,13 @@ inventory:
       id: shortsword
       adjectives: [ fine, acid5 ]
 levels:
-  mage: 10
+  mage: 1
 abilities:
   - weapon_simple
   - weapon_crossbow
-  - shock
-  - air_shield
+  - acid_spores
+  - healing_circle
   - petrify
-  - heal
+  - haste
   - fireball
 ai: ai_ranged

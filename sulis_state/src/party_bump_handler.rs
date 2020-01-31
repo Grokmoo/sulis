@@ -133,8 +133,6 @@ fn check_bump_position(
     let result = GameState::can_move_ignore_ap(entity,
         area, party.to_vec(), dest);
 
-    warn!("Bump from {:?} to {:?}: result: {:?}",
-        entity.location, p, result);
     match result {
         None => false,
         Some(path) => path.len() < 10,

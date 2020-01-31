@@ -1,7 +1,7 @@
 ---
 id: desert_bandit08
 name: Bandit Assassin
-race: human
+race: human_simple
 sex: Male
 attributes:
   str: 12

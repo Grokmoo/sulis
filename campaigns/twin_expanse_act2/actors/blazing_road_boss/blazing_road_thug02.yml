@@ -1,33 +1,33 @@
 ---
-id: desert_bandit10
-name: Bandit Warlock
+id: blazing_road_thug02
+name: Thug Assassin
 race: human_simple
 sex: Male
 attributes:
-  str: 10
-  dex: 13
-  end: 12
-  per: 16
-  int: 12
-  wis: 12
+  str: 12
+  dex: 16
+  end: 14
+  per: 13
+  int: 10
+  wis: 10
 conversation: ~
 faction: Hostile
 images:
-  Background: creatures/human32
   Shadow: empty
+  Background: creatures/human35
   Foreground: empty
 reward:
-  xp: 100
-  loot: level5_misc
+  xp: 150
+  loot: level10_misc
   loot_chance: 35
-hue: 0.9
+hue: 0.8
 inventory:
   equipped:
+    HeldMain:
+      id: crossbow
+      adjectives: [ fine ]
     Torso:
       id: torso_leather
-      adjectives: [ fine ]
-    HeldMain:
-      id: longspear
       adjectives: [ fine ]
     Legs:
       id: legs_leather
@@ -40,21 +40,24 @@ inventory:
       adjectives: [ fine ]
   quick:
     AltHeldMain:
-      id: shortbow
-      adjectives: [ fine ]
+      id: shortsword
+      adjectives: [ fine, acid5 ]
+    AltHeldOff:
+      id: shortsword
+      adjectives: [ fine, cold5 ]
 levels:
-  warlock: 10
+  rogue: 1
 abilities:
   - armor_light
-  - weapon_axe
   - weapon_crossbow
   - weapon_bow
-  - weapon_spear
-  - weapon_mace
+  - weapon_small_sword
   - weapon_simple
-  - illusory_locus
-  - vampiric_touch
-  - assay
-  - mind_shock
-  - imbue_weapon
-ai: ai_melee
+  - backstab
+  - unspottable
+  - speedy
+  - feint
+  - flanker
+  - rupture
+  - rapid_strikes
+ai: ai_ranged

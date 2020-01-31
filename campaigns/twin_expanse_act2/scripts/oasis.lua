@@ -133,3 +133,63 @@ function exit_blazing_road_west(parent)
   game:set_world_map_location_visible("blazing_road_east", true)
   game:set_world_map_location_enabled("blazing_road_east", true)
 end
+
+function on_enter_blazing_road_exit(parent)
+  game:block_ui(4.0)
+  game:fade_out_in()
+  
+  game:cancel_blocking_anims()
+  
+  game:run_script_delayed("oasis", "blazing_road_exit_spawn", 2.0)
+end
+
+function blazing_road_exit_spawn(parent)
+  game:spawn_encounter_at(34, 9)
+  game:scroll_view(39, 13)
+  game:transition_party_to(39, 22)
+  
+  game:run_script_delayed("oasis", "blazing_road_exit_spawn2", 2.0)
+end
+
+function blazing_road_exit_spawn2(parent)
+  local target = game:entity_with_id("blazing_road_boss")
+  game:start_conversation("blazing_road_boss", target)
+  game:check_ai_activation(parent)
+end
+
+function on_blazing_road_exit_cleared(parent)
+  game:block_ui(4.0)
+  game:fade_out_in()
+  game:scroll_view(39, 5)
+  game:cancel_blocking_anims()
+  game:run_script_delayed("oasis", "campaign_end", 3.0)
+end
+
+function campaign_end(parent)
+  remove_items({"merchant_supplies", "history_of_the_aegis"})
+
+  game:show_game_over_window("Congratulations, you have completed Act 2 of the Twin Expanse.  Please keep an eye on the project in the coming months for the release of the third and final act.  Thanks for playing!")
+
+  --local export = game:create_module_export("twin_expanse_act2")
+  --export:set_include_stash(true)
+  --export:set_flag("completed_twin_expanse_act2")
+
+  --local player = game:player()
+  --local party = game:party()
+  --for i = 1, #party do
+  --    local member = party[i]
+  --    if not member:has_flag("__is_summoned_party_member") and player:id() ~= member:id() then
+  --        export:add_to_party(party[i])
+  --    end
+  --end
+  --export:activate()
+end
+
+function remove_items(ids)
+  for i = 1, #ids do
+    item = game:find_party_item(ids[i])
+	if item:is_valid() then
+	  game:remove_party_item(item)
+	end
+  end
+end

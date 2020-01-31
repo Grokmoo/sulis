@@ -1,0 +1,32 @@
+id: skeletons_level13
+auto_spawn: true
+min_gen_actors: 5
+max_gen_actors: 5
+entries:
+  - id: skeleton_lvl11_warrior01
+    weight: 1
+    limit: 2
+  - id: skeleton_lvl11_warrior02
+    weight: 1
+    limit: 2
+  - id: skeleton_lvl11_warrior03
+    weight: 1
+    limit: 2
+  - id: skeleton_lvl11_rogue01
+    weight: 1
+    limit: 2
+  - id: skeleton_lvl11_rogue02
+    weight: 1
+    limit: 2
+  - id: skeleton_lvl11_rogue03
+    weight: 1
+    limit: 1
+  - id: skeleton_lvl11_mage01
+    weight: 1
+    limit: 1
+  - id: skeleton_lvl11_mage02
+    weight: 1
+    limit: 1
+  - id: skeleton_lvl11_mage03
+    weight: 1
+    limit: 1

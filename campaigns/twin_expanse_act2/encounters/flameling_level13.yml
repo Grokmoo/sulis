@@ -1,0 +1,13 @@
+id: flameling_level13
+auto_spawn: false
+min_gen_actors: 4
+max_gen_actors: 5
+entries:
+  - id: flameling_small
+    weight: 1
+    limit: 3
+  - id: flameling_medium
+    weight: 1
+    limit: 2
+  - id: flameling_large
+    always: true

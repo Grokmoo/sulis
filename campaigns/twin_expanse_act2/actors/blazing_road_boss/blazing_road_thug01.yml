@@ -1,60 +1,63 @@
 ---
-id: desert_bandit10
-name: Bandit Warlock
+id: blazing_road_thug01
+name: Thug Fighter
 race: human_simple
 sex: Male
 attributes:
-  str: 10
+  str: 16
   dex: 13
-  end: 12
-  per: 16
-  int: 12
-  wis: 12
+  end: 16
+  per: 10
+  int: 10
+  wis: 10
 conversation: ~
 faction: Hostile
 images:
-  Background: creatures/human32
+  Background: creatures/human31
   Shadow: empty
   Foreground: empty
 reward:
-  xp: 100
-  loot: level5_misc
+  xp: 150
+  loot: level10_misc
   loot_chance: 35
-hue: 0.9
+hue: 0.2
 inventory:
   equipped:
     Torso:
-      id: torso_leather
+      id: torso_mail
       adjectives: [ fine ]
     HeldMain:
-      id: longspear
+      id: halberd
       adjectives: [ fine ]
     Legs:
-      id: legs_leather
+      id: legs_mail
       adjectives: [ fine ]
     Feet:
-      id: boots_leather
+      id: boots_mail
       adjectives: [ fine ]
     Hands:
-      id: gloves_leather
+      id: gloves_mail
       adjectives: [ fine ]
   quick:
     AltHeldMain:
       id: shortbow
       adjectives: [ fine ]
 levels:
-  warlock: 10
+  fighter: 1
 abilities:
   - armor_light
+  - armor_medium
+  - armor_heavy
   - weapon_axe
   - weapon_crossbow
   - weapon_bow
+  - weapon_small_sword
+  - weapon_large_sword
   - weapon_spear
   - weapon_mace
   - weapon_simple
-  - illusory_locus
-  - vampiric_touch
-  - assay
-  - mind_shock
-  - imbue_weapon
+  - helping_hand
+  - inspire
+  - mark_target
+  - overpower
 ai: ai_melee

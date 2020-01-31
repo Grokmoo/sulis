@@ -1,6 +1,6 @@
 ---
-id: desert_bandit10
-name: Bandit Warlock
+id: blazing_road_thug04
+name: Thug Warlock
 race: human_simple
 sex: Male
 attributes:
@@ -17,10 +17,10 @@ images:
   Shadow: empty
   Foreground: empty
 reward:
-  xp: 100
-  loot: level5_misc
+  xp: 150
+  loot: level10_misc
   loot_chance: 35
-hue: 0.9
+hue: 0.2
 inventory:
   equipped:
     Torso:
@@ -28,7 +28,7 @@ inventory:
       adjectives: [ fine ]
     HeldMain:
       id: longspear
-      adjectives: [ fine ]
+      adjectives: [ fine, fire5 ]
     Legs:
       id: legs_leather
       adjectives: [ fine ]
@@ -43,7 +43,7 @@ inventory:
       id: shortbow
       adjectives: [ fine ]
 levels:
-  warlock: 10
+  warlock: 1
 abilities:
   - armor_light
   - weapon_axe
@@ -53,8 +53,9 @@ abilities:
   - weapon_mace
   - weapon_simple
   - illusory_locus
-  - vampiric_touch
+  - draining_field
   - assay
   - mind_shock
   - imbue_weapon
+  - feedback
 ai: ai_melee

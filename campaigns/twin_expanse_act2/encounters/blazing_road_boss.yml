@@ -1,0 +1,16 @@
+id: blazing_road_boss
+auto_spawn: false
+min_gen_actors: 0
+max_gen_actors: 0
+entries:
+  - id: blazing_road_boss
+    always: true
+    unique_id: blazing_road_boss
+  - id: blazing_road_thug01
+    always: true
+  - id: blazing_road_thug02
+    always: true
+  - id: blazing_road_thug03
+    always: true
+  - id: blazing_road_thug04
+    always: true

@@ -1,0 +1,66 @@
+---
+id: blazing_road_boss
+name: Thug Boss
+race: human_simple
+sex: Male
+attributes:
+  str: 16
+  dex: 13
+  end: 16
+  per: 10
+  int: 10
+  wis: 10
+conversation: ~
+faction: Hostile
+images:
+  Background: creatures/human30
+  Shadow: empty
+  Foreground: empty
+reward:
+  xp: 200
+  loot: level10_misc
+  loot_chance: 50
+hue: 0.7
+inventory:
+  equipped:
+    Torso:
+      id: torso_plate
+      adjectives: [ exceptional ]
+    HeldMain:
+      id: longsword
+      adjectives: [ exceptional ]
+    HeldOff:
+      id: shield_large
+      adjectives: [ exceptional ]
+    Legs:
+      id: legs_plate
+      adjectives: [ exceptional ]
+    Feet:
+      id: boots_plate
+      adjectives: [ exceptional ]
+    Hands:
+      id: gloves_plate
+      adjectives: [ exceptional ]
+  quick:
+    AltHeldMain:
+      id: crossbow
+      adjectives: [ exceptional ]
+levels:
+  fighter: 1
+abilities:
+  - armor_light
+  - armor_medium
+  - armor_heavy
+  - weapon_axe
+  - weapon_crossbow
+  - weapon_bow
+  - weapon_small_sword
+  - weapon_large_sword
+  - weapon_spear
+  - weapon_mace
+  - weapon_simple
+  - powerful_blows
+  - blitz
+  - grapple
+  - whirlwind_attack
+ai: ai_melee

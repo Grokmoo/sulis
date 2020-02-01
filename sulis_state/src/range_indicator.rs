@@ -401,7 +401,7 @@ impl RangeIndicatorImageSet {
         ];
 
         let mut images = vec![None; 256];
-        for rule in rules.into_iter() {
+        for rule in rules.iter() {
             let rule = match ImageRule::new(&prefix, rule.0, rule.1) {
                 None => continue,
                 Some(rule) => rule,

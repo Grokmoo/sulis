@@ -600,7 +600,7 @@ pub enum LocationKind {
 impl LocationKind {
     pub fn iter() -> impl Iterator<Item = &'static LocationKind> {
         use crate::area::LocationKind::*;
-        [Outdoors, Indoors, Underground].into_iter()
+        [Outdoors, Indoors, Underground].iter()
     }
 }
 

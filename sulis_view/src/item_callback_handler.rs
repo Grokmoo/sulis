@@ -14,14 +14,14 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::rc::Rc;
 use std::cell::RefCell;
+use std::rc::Rc;
 
 use sulis_core::ui::{Callback, Widget};
-use sulis_module::{QuickSlot, Slot, ItemState};
-use sulis_state::{EntityState, GameState, Script, script::ScriptItemKind};
+use sulis_module::{ItemState, QuickSlot, Slot};
+use sulis_state::{script::ScriptItemKind, EntityState, GameState, Script};
 
-use crate::{RootView, MerchantWindow, PropWindow};
+use crate::{MerchantWindow, PropWindow, RootView};
 
 pub fn clear_quickslot_cb(entity: &Rc<RefCell<EntityState>>, slot: QuickSlot) -> Callback {
     let entity = Rc::clone(entity);

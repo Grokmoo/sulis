@@ -26,7 +26,7 @@ use crate::script::{
 };
 use crate::{ai, EntityState};
 use sulis_core::util::Point;
-use sulis_module::{Ability, Item, Module, ai::AITemplate};
+use sulis_module::{ai::AITemplate, Ability, Item, Module};
 
 thread_local! {
     static SCRIPT_CACHE: RefCell<HashMap<String, Rc<ScriptState>>> = RefCell::new(HashMap::new());
@@ -161,7 +161,11 @@ where
 pub fn ai_script(parent: &Rc<RefCell<EntityState>>, func: &str) -> Result<ai::State> {
     let script_data = get_script_data_from_entity(parent)?;
     let parent = ScriptEntity::from(parent);
-    exec_func(&script_data.script, func, (parent, script_data.params.clone()))
+    exec_func(
+        &script_data.script,
+        func,
+        (parent, script_data.params.clone()),
+    )
 }
 
 pub fn entity_script<T>(
@@ -181,7 +185,7 @@ where
 pub fn item_on_activate(
     parent: &Rc<RefCell<EntityState>>,
     func: String,
-    kind: ScriptItemKind
+    kind: ScriptItemKind,
 ) -> Result<()> {
     let t: Option<usize> = None;
     item_script(
@@ -234,12 +238,7 @@ where
     exec_func(&script, func, (parent, item, targets, arg))
 }
 
-pub fn ability_on_activate(
-    parent: usize,
-    func: String,
-    ability: &Rc<Ability>
-) -> Result<()> {
-
+pub fn ability_on_activate(parent: usize, func: String, ability: &Rc<Ability>) -> Result<()> {
     let script = get_ability_script_id(ability)?;
     let parent = ScriptEntity::new(parent);
     let ability = ScriptAbility::from(ability);

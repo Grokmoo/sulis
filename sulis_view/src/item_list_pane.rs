@@ -19,8 +19,8 @@ use std::cell::{Cell, RefCell};
 use std::rc::Rc;
 
 use sulis_core::ui::{Callback, Widget, WidgetKind};
-use sulis_core::widgets::{Button, ScrollPane, ScrollDirection};
-use sulis_module::{Item, Module, ItemState};
+use sulis_core::widgets::{Button, ScrollDirection, ScrollPane};
+use sulis_module::{Item, ItemState, Module};
 use sulis_state::{script::ScriptItemKind, EntityState, GameState};
 
 use crate::{item_callback_handler::*, ItemButton};

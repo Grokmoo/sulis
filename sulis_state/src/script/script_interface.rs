@@ -24,7 +24,7 @@ use crate::script::*;
 use crate::{animation::Anim, AreaState, EntityState, GameState, Location};
 use sulis_core::config::Config;
 use sulis_module::on_trigger::{self, QuestEntryState};
-use sulis_module::{Faction, Module, OnTrigger, Time, ItemState};
+use sulis_module::{Faction, ItemState, Module, OnTrigger, Time};
 
 /// The ScriptInterface, accessible in all Lua scripts as the global `game`.
 /// The following methods are available on this object (documentation WIP):

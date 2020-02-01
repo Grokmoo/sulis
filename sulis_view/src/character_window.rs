@@ -26,7 +26,7 @@ use sulis_core::config;
 use sulis_core::resource::write_to_file;
 use sulis_core::ui::{Callback, Widget, WidgetKind, WidgetState};
 use sulis_core::util::ExtInt;
-use sulis_core::widgets::{Button, ScrollPane, ScrollDirection, TextArea};
+use sulis_core::widgets::{Button, ScrollDirection, ScrollPane, TextArea};
 use sulis_module::{
     ActorBuilder, Attribute, DamageKind, InventoryBuilder, ItemListEntrySaveState, ItemSaveState,
     Module, QuickSlot, Slot,

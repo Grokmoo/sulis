@@ -21,7 +21,7 @@ use std::rc::Rc;
 
 use sulis_core::ui::*;
 use sulis_core::util::ActiveResources;
-use sulis_core::widgets::{Button, Label, ScrollPane, ScrollDirection, TextArea};
+use sulis_core::widgets::{Button, Label, ScrollDirection, ScrollPane, TextArea};
 use sulis_module::ModuleInfo;
 use sulis_state::NextGameStep;
 

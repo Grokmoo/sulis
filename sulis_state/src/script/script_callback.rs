@@ -28,7 +28,7 @@ use crate::script::{
 };
 use crate::{EntityState, GameState, Script};
 use sulis_core::util::invalid_data_error;
-use sulis_module::{on_trigger::Kind, DamageKind, HitKind, Module, Ability};
+use sulis_module::{on_trigger::Kind, Ability, DamageKind, HitKind, Module};
 
 pub fn fire_round_elapsed(cbs: Vec<Rc<CallbackData>>) {
     for cb in cbs {
@@ -108,9 +108,7 @@ fn get_on_activate_fn(cb: &CallbackData, ability: &Ability) -> String {
     let mgr = GameState::turn_manager();
     let mgr = mgr.borrow();
     match mgr.entity_checked(cb.parent) {
-        None => {
-            ON_ACTIVATE_DEFAULT.to_string()
-        },
+        None => ON_ACTIVATE_DEFAULT.to_string(),
         Some(entity) => {
             if entity.borrow().is_party_member() {
                 ON_ACTIVATE_DEFAULT.to_string()

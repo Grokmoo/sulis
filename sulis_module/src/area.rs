@@ -21,7 +21,7 @@ mod layer_set;
 pub use self::layer_set::LayerSet;
 
 mod path_finder;
-pub use self::path_finder::{LocationChecker, PathFinder, Destination};
+pub use self::path_finder::{Destination, LocationChecker, PathFinder};
 
 mod path_finder_grid;
 pub use self::path_finder_grid::PathFinderGrid;

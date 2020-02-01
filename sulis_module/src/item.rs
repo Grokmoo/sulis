@@ -106,7 +106,8 @@ fn read_image(image_id: &str, id: &str) -> Result<Rc<dyn Image>, Error> {
         None => {
             warn!("No image found for image '{}'", image_id);
             unable_to_create_error("item", id)
-        }, Some(image) => Ok(image),
+        }
+        Some(image) => Ok(image),
     }
 }
 
@@ -224,7 +225,11 @@ impl Item {
             let icon = read_image(&variant.icon, &builder.id)?;
             let image = build_hash_map(&builder.id, variant.image)?;
             let alternate_image = build_hash_map(&builder.id, variant.alternate_image)?;
-            variants.push(Variant { icon, image, alternate_image });
+            variants.push(Variant {
+                icon,
+                image,
+                alternate_image,
+            });
         }
 
         let (equippable, value, prereqs) = apply_adjectives(
@@ -284,14 +289,14 @@ impl Item {
     pub fn alt_image_iter(&self, variant: Option<usize>) -> Iter<ImageLayer, Rc<dyn Image>> {
         match variant {
             None => self.alternate_image.iter(),
-            Some(idx) => self.variants[idx].alternate_image.iter()
+            Some(idx) => self.variants[idx].alternate_image.iter(),
         }
     }
 
     pub fn image_iter(&self, variant: Option<usize>) -> Iter<ImageLayer, Rc<dyn Image>> {
         match variant {
             None => self.image.iter(),
-            Some(idx) => self.variants[idx].image.iter()
+            Some(idx) => self.variants[idx].image.iter(),
         }
     }
 

@@ -159,7 +159,7 @@ impl Class {
         None
     }
 
-    pub fn starting_abilities(&self) -> impl Iterator<Item=&Rc<Ability>> {
+    pub fn starting_abilities(&self) -> impl Iterator<Item = &Rc<Ability>> {
         self.starting_abilities.iter()
     }
 

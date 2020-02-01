@@ -19,8 +19,9 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 use sulis_core::ui::*;
-use sulis_core::widgets::{Button, ConfirmationWindow, Label,
-    ScrollPane, ScrollDirection, TextArea};
+use sulis_core::widgets::{
+    Button, ConfirmationWindow, Label, ScrollDirection, ScrollPane, TextArea,
+};
 use sulis_module::{Actor, Module};
 use sulis_state::{ActorState, NextGameStep};
 

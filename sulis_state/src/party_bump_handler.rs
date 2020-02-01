@@ -16,8 +16,8 @@
 
 use std::collections::HashSet;
 
-use sulis_core::util::Point;
 use crate::{AreaState, EntityState, GameState, TurnManager};
+use sulis_core::util::Point;
 
 pub fn bump_party_overlap(area: &mut AreaState, mgr: &mut TurnManager) {
     info!("Combat initiated.  Checking for party overlap");
@@ -64,12 +64,19 @@ pub fn bump_party_overlap(area: &mut AreaState, mgr: &mut TurnManager) {
             let old = member.location.to_point();
             let new = match find_bump_position(area, &member, &party_to_ignore, old) {
                 None => {
-                    warn!("Unable to bump '{}' to avoid overlap", member.actor.actor.name);
+                    warn!(
+                        "Unable to bump '{}' to avoid overlap",
+                        member.actor.actor.name
+                    );
                     continue;
-                }, Some(p) => p,
+                }
+                Some(p) => p,
             };
 
-            info!("Bumping '{} from {:?} to {:?}", member.actor.actor.name, old, new);
+            info!(
+                "Bumping '{} from {:?} to {:?}",
+                member.actor.actor.name, old, new
+            );
             (new, old)
         };
 
@@ -83,7 +90,7 @@ fn find_bump_position(
     area: &AreaState,
     entity: &EntityState,
     party: &[usize],
-    cur: Point
+    cur: Point,
 ) -> Option<Point> {
     let to_ignore = vec![entity.index()];
 
@@ -125,13 +132,15 @@ fn check_bump_position(
     entity: &EntityState,
     entity_vec: &[usize],
     party: &[usize],
-    p: Point) -> bool {
-    if !area.is_passable(entity, entity_vec, p.x, p.y) { return false; }
+    p: Point,
+) -> bool {
+    if !area.is_passable(entity, entity_vec, p.x, p.y) {
+        return false;
+    }
 
     let dest = GameState::get_point_dest(entity, p.x as f32, p.y as f32);
 
-    let result = GameState::can_move_ignore_ap(entity,
-        area, party.to_vec(), dest);
+    let result = GameState::can_move_ignore_ap(entity, area, party.to_vec(), dest);
 
     match result {
         None => false,

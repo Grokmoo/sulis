@@ -103,7 +103,9 @@ impl WidgetKind for LevelUpFinishPane {
             let ability = Rc::clone(ability);
 
             let icon = Widget::with_theme(Label::empty(), "icon");
-            icon.borrow_mut().state.add_text_arg("icon", &ability.icon.id());
+            icon.borrow_mut()
+                .state
+                .add_text_arg("icon", &ability.icon.id());
 
             let button = Widget::with_defaults(AbilityButton::new(ability, class));
 

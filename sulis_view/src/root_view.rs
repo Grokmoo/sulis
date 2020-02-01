@@ -14,26 +14,25 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::{any::Any, cell::RefCell, rc::Rc, time::Instant};
 use std::collections::HashMap;
+use std::{any::Any, cell::RefCell, rc::Rc, time::Instant};
 
+use crate::{
+    character_window, formation_window, inventory_window, merchant_window, prop_window,
+    quest_window, world_map_window, AbilitiesBar, ApBar, AreaView, CharacterWindow, ConsoleWindow,
+    FormationWindow, GameOverWindow, InGameMenu, InitiativeTicker, InventoryWindow, MerchantWindow,
+    PortraitPane, PropWindow, QuestWindow, QuickItemBar, WorldMapWindow,
+};
 use sulis_core::config::Config;
-use sulis_core::io::{InputAction, keyboard_event::Key};
+use sulis_core::io::{keyboard_event::Key, InputAction};
 use sulis_core::ui::{Callback, Cursor, Widget, WidgetKind};
 use sulis_core::util;
 use sulis_core::widgets::{Button, ConfirmationWindow, Label};
 use sulis_module::{area::OnRest, Module};
 use sulis_state::{
-    AreaFeedbackText,
     area_feedback_text::ColorKind, save_file::create_save, script::script_callback,
-    script::ScriptEntity, ChangeListener, EntityState, GameState, NextGameStep, Script,
-};
-use crate::{
-    AreaView, ConsoleWindow, character_window, inventory_window, merchant_window,
-    prop_window, quest_window, world_map_window, formation_window,
-    CharacterWindow, InventoryWindow, PropWindow, MerchantWindow, QuestWindow,
-    WorldMapWindow, FormationWindow, InGameMenu, PortraitPane, QuickItemBar,
-    AbilitiesBar, GameOverWindow, ApBar, InitiativeTicker,
+    script::ScriptEntity, AreaFeedbackText, ChangeListener, EntityState, GameState, NextGameStep,
+    Script,
 };
 
 const WINDOW_NAMES: [&str; 7] = [
@@ -317,10 +316,8 @@ impl RootView {
         let target = GameState::player();
         match area.on_rest {
             OnRest::Disabled { ref message } => {
-                let mut feedback = AreaFeedbackText::with_target(
-                    &target.borrow(),
-                    &area_state.borrow()
-                );
+                let mut feedback =
+                    AreaFeedbackText::with_target(&target.borrow(), &area_state.borrow());
                 feedback.add_entry(message.to_string(), ColorKind::Info);
                 area_state.borrow_mut().add_feedback_text(feedback);
             }
@@ -432,7 +429,7 @@ impl WidgetKind for RootView {
                 if !self.close_all_windows(widget) {
                     self.show_menu(widget);
                 }
-            },
+            }
             ToggleConsole => self.toggle_console_window(widget),
             ToggleInventory => self.toggle_inventory_window(widget),
             ToggleCharacter => self.toggle_character_window(widget),
@@ -455,7 +452,9 @@ impl WidgetKind for RootView {
             _ => {
                 if let Some(quick_item_bar) = &self.quick_item_bar {
                     let bar: &QuickItemBar = Widget::kind(&quick_item_bar);
-                    if bar.check_handle_keybinding(key) { return true; }
+                    if bar.check_handle_keybinding(key) {
+                        return true;
+                    }
                 }
 
                 if let Some(abilities_bar) = &self.abilities_bar {
@@ -484,37 +483,48 @@ impl WidgetKind for RootView {
             let portrait_pane = Widget::with_defaults(PortraitPane::new());
 
             let formations = create_button(
-                &keys, ToggleFormation, "formations_button", Rc::new(|widget, _| {
+                &keys,
+                ToggleFormation,
+                "formations_button",
+                Rc::new(|widget, _| {
                     let (root, view) = Widget::parent_mut::<RootView>(widget);
                     view.toggle_formation_window(&root);
-                })
+                }),
             );
 
             let select_all = create_button(
-                &keys, SelectAll, "select_all_button", Rc::new(|_, _| {
+                &keys,
+                SelectAll,
+                "select_all_button",
+                Rc::new(|_, _| {
                     GameState::select_party_members(GameState::party());
-                })
+                }),
             );
             let rest = create_button(
-                &keys, Rest, "rest_button", Rc::new(|widget, _| {
+                &keys,
+                Rest,
+                "rest_button",
+                Rc::new(|widget, _| {
                     let (_, view) = Widget::parent_mut::<RootView>(widget);
                     view.rest();
-                })
+                }),
             );
 
             let navi_pane = Widget::empty("navi_pane");
 
             let end_turn_button = create_button(
-                &keys, EndTurn, "end_turn_button", Rc::new(|widget, _| {
+                &keys,
+                EndTurn,
+                "end_turn_button",
+                Rc::new(|widget, _| {
                     let (_, view) = Widget::parent_mut::<RootView>(widget);
                     view.end_turn();
-                })
+                }),
             );
             end_turn_button
                 .borrow_mut()
                 .state
                 .set_enabled(GameState::is_pc_current());
-
 
             let end_turn_button_ref = Rc::clone(&end_turn_button);
             let mgr = GameState::turn_manager();
@@ -530,38 +540,53 @@ impl WidgetKind for RootView {
             ));
 
             let inv_button = create_button(
-                &keys, ToggleInventory, "inventory_button", Rc::new(|widget, _| {
+                &keys,
+                ToggleInventory,
+                "inventory_button",
+                Rc::new(|widget, _| {
                     let (root, view) = Widget::parent_mut::<RootView>(widget);
                     view.toggle_inventory_window(&root);
-                })
+                }),
             );
 
             let cha_button = create_button(
-                &keys, ToggleCharacter, "character_button", Rc::new(|widget, _| {
+                &keys,
+                ToggleCharacter,
+                "character_button",
+                Rc::new(|widget, _| {
                     let (root, view) = Widget::parent_mut::<RootView>(widget);
                     view.toggle_character_window(&root);
-                })
+                }),
             );
 
             let map_button = create_button(
-                &keys, ToggleMap, "map_button", Rc::new(|widget, _| {
+                &keys,
+                ToggleMap,
+                "map_button",
+                Rc::new(|widget, _| {
                     let (root, view) = Widget::parent_mut::<RootView>(widget);
                     view.toggle_map_window(&root);
-                })
+                }),
             );
 
             let log_button = create_button(
-                &keys, ToggleJournal, "journal_button", Rc::new(|widget, _| {
+                &keys,
+                ToggleJournal,
+                "journal_button",
+                Rc::new(|widget, _| {
                     let (root, view) = Widget::parent_mut::<RootView>(widget);
                     view.toggle_quest_window(&root);
-                })
+                }),
             );
 
             let men_button = create_button(
-                &keys, Back, "menu_button", Rc::new(|widget, _| {
+                &keys,
+                Back,
+                "menu_button",
+                Rc::new(|widget, _| {
                     let (root, view) = Widget::parent_mut::<RootView>(widget);
                     view.show_menu(&root);
-                })
+                }),
             );
 
             Widget::add_children_to(
@@ -679,9 +704,8 @@ fn create_button(
     keybindings: &HashMap<InputAction, Key>,
     action: InputAction,
     id: &str,
-    cb: Rc<dyn Fn(&Rc<RefCell<Widget>>, &mut dyn WidgetKind)>
+    cb: Rc<dyn Fn(&Rc<RefCell<Widget>>, &mut dyn WidgetKind)>,
 ) -> Rc<RefCell<Widget>> {
-
     let button = Widget::with_theme(Button::empty(), id);
     {
         let mut button = button.borrow_mut();

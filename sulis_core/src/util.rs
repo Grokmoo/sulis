@@ -370,7 +370,7 @@ pub fn error_and_exit(error: &str) {
 }
 
 pub fn main_loop(
-    io: &mut Box<dyn IO>,
+    io: &mut dyn IO,
     root: Rc<RefCell<Widget>>,
     updater: Box<dyn MainLoopUpdater>,
 ) -> Result<(), Error> {

@@ -14,18 +14,18 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::cmp::Ordering;
 use std::cell::RefCell;
+use std::cmp::Ordering;
 use std::rc::Rc;
 
-use sulis_core::util::Point;
 use sulis_core::image::Image;
 use sulis_core::io::DrawList;
 use sulis_core::resource::ResourceSet;
 use sulis_core::ui::animation_state;
+use sulis_core::util::Point;
 
+use crate::{is_within, EntityState, GameState};
 use sulis_module::{ability::Range, Ability};
-use crate::{GameState, EntityState, is_within};
 
 const NW: u8 = 1;
 const N: u8 = 2;
@@ -42,7 +42,9 @@ pub struct RangeIndicatorHandler {
 
 impl RangeIndicatorHandler {
     pub fn new() -> RangeIndicatorHandler {
-        RangeIndicatorHandler { indicators: Vec::new() }
+        RangeIndicatorHandler {
+            indicators: Vec::new(),
+        }
     }
 
     pub fn current(&self) -> Option<&RangeIndicator> {
@@ -69,29 +71,23 @@ impl RangeIndicatorHandler {
     }
 
     pub fn remove_ability(&mut self, ability: &Rc<Ability>) {
-        self.indicators.retain(|ind| {
-            match &ind.kind {
-                Kind::Ability(other) => !Rc::ptr_eq(ability, other),
-                _ => true,
-            }
+        self.indicators.retain(|ind| match &ind.kind {
+            Kind::Ability(other) => !Rc::ptr_eq(ability, other),
+            _ => true,
         });
     }
 
     pub fn remove_targeter(&mut self) {
-        self.indicators.retain(|ind| {
-            match &ind.kind {
-                Kind::Targeter => false,
-                _ => true,
-            }
+        self.indicators.retain(|ind| match &ind.kind {
+            Kind::Targeter => false,
+            _ => true,
         });
     }
 
     pub fn remove_attack(&mut self) {
-        self.indicators.retain(|ind| {
-            match &ind.kind {
-                Kind::Attack => false,
-                _ => true,
-            }
+        self.indicators.retain(|ind| match &ind.kind {
+            Kind::Attack => false,
+            _ => true,
         });
     }
 }
@@ -113,25 +109,19 @@ impl Ord for Kind {
     fn cmp(&self, other: &Kind) -> Ordering {
         use Kind::*;
         match self {
-            Ability(self_ability) => {
-                match other {
-                    Ability(other_ability) => self_ability.id.cmp(&other_ability.id),
-                    _ => Ordering::Less,
-                }
+            Ability(self_ability) => match other {
+                Ability(other_ability) => self_ability.id.cmp(&other_ability.id),
+                _ => Ordering::Less,
             },
-            Targeter => {
-                match other {
-                    Ability(..) => Ordering::Greater,
-                    Targeter => Ordering::Equal,
-                    Attack => Ordering::Less,
-                }
+            Targeter => match other {
+                Ability(..) => Ordering::Greater,
+                Targeter => Ordering::Equal,
+                Attack => Ordering::Less,
             },
-            Attack => {
-                match other {
-                    Attack => Ordering::Equal,
-                    _ => Ordering::Greater,
-                }
-            }
+            Attack => match other {
+                Attack => Ordering::Equal,
+                _ => Ordering::Greater,
+            },
         }
     }
 }
@@ -162,9 +152,16 @@ impl RangeIndicator {
             }
         };
 
-        let level = parent.borrow().actor.actor.ability_level(&ability.id).unwrap_or(0);
+        let level = parent
+            .borrow()
+            .actor
+            .actor
+            .ability_level(&ability.id)
+            .unwrap_or(0);
         for (index, upgrade) in ability.upgrades.iter().enumerate() {
-            if index as u32 >= level { break; }
+            if index as u32 >= level {
+                break;
+            }
 
             radius += upgrade.range_increase;
         }

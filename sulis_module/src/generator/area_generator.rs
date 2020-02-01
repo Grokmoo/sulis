@@ -25,7 +25,9 @@ use crate::generator::{
     TransitionParams, WallKinds, WeightedList,
 };
 use crate::{
-    area::{Destination, GeneratorParams, Layer, LocationChecker, PathFinder, Tile, TransitionBuilder},
+    area::{
+        Destination, GeneratorParams, Layer, LocationChecker, PathFinder, Tile, TransitionBuilder,
+    },
     Module, ObjectSize,
 };
 use sulis_core::util::{Point, ReproducibleRandom};
@@ -226,12 +228,7 @@ impl AreaGenerator {
 
             let dest = Destination::with_defaults(end_x, end_y);
             if path_finder
-                .find(
-                    &location_checker,
-                    start_x,
-                    start_y,
-                    dest
-                )
+                .find(&location_checker, start_x, start_y, dest)
                 .is_none()
             {
                 warn!("Unable to path between generated rooms {} and {}", i, i + 1);

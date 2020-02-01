@@ -45,8 +45,9 @@ use serde::{de, Deserialize, Deserializer};
 use serde_yaml;
 
 use crate::config::Config;
-use crate::image::{AnimatedImage, ComposedImage, EmptyImage, Image, SimpleImage,
-    WindowImage, TimerImage};
+use crate::image::{
+    AnimatedImage, ComposedImage, EmptyImage, Image, SimpleImage, TimerImage, WindowImage,
+};
 use crate::resource::resource_builder_set::ResourceBuilderSet;
 use crate::ui::{Theme, ThemeSet};
 use crate::util::invalid_data_error;
@@ -168,12 +169,7 @@ impl ResourceSet {
             }
 
             for (id, image) in builder_set.window_builders {
-                insert_if_ok_boxed(
-                    "image",
-                    id,
-                    WindowImage::new(image, &set),
-                    &mut set.images,
-                );
+                insert_if_ok_boxed("image", id, WindowImage::new(image, &set), &mut set.images);
             }
 
             Ok(())

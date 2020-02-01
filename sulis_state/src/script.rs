@@ -158,11 +158,7 @@ impl Script {
         }
     }
 
-    pub fn item_on_activate(
-        parent: &Rc<RefCell<EntityState>>,
-        func: String,
-        kind: ScriptItemKind
-    ) {
+    pub fn item_on_activate(parent: &Rc<RefCell<EntityState>>, func: String, kind: ScriptItemKind) {
         if let Err(e) = script_cache::item_on_activate(parent, func, kind) {
             warn!("Error in item on_activate script: {}", e);
         }

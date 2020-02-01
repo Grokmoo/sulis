@@ -25,15 +25,15 @@ use sulis_core::util::{invalid_data_error, ExtInt, Point};
 use sulis_module::on_trigger::QuestEntryState;
 use sulis_module::{
     area::{Destination, PathFinder, Trigger, TriggerKind},
-    Actor, Module, OnTrigger, Time, MOVE_TO_THRESHOLD, ItemState
+    Actor, ItemState, Module, OnTrigger, Time, MOVE_TO_THRESHOLD,
 };
 
 use crate::animation::{particle_generator::Param, Anim, AnimSaveState, AnimState};
 use crate::script::{script_cache, script_callback, Script, ScriptCallback, ScriptEntity};
 use crate::{
-    path_finder, AreaState, ChangeListener, ChangeListenerList, Effect, EntityState,
-    Formation, ItemList, Location, PartyStash, QuestStateSet, SaveState, TurnManager,
-    UICallback, WorldMapState, AI, transition_handler,
+    path_finder, transition_handler, AreaState, ChangeListener, ChangeListenerList, Effect,
+    EntityState, Formation, ItemList, Location, PartyStash, QuestStateSet, SaveState, TurnManager,
+    UICallback, WorldMapState, AI,
 };
 
 thread_local! {
@@ -828,7 +828,9 @@ impl GameState {
             let mut state = state.borrow_mut();
             let state = state.as_mut().unwrap();
 
-            if Rc::ptr_eq(&state.area_state, area) { return; }
+            if Rc::ptr_eq(&state.area_state, area) {
+                return;
+            }
 
             let width = area.borrow().area.area.width;
             let height = area.borrow().area.area.height;
@@ -1089,7 +1091,15 @@ impl GameState {
         let h = target.size.height as f32;
         let parent_w = entity.size.width as f32;
         let parent_h = entity.size.height as f32;
-        Destination { x, y, w, h, parent_w, parent_h, dist }
+        Destination {
+            x,
+            y,
+            w,
+            h,
+            parent_w,
+            parent_h,
+            dist,
+        }
     }
 
     pub fn get_point_dest(entity: &EntityState, x: f32, y: f32) -> Destination {
@@ -1098,7 +1108,15 @@ impl GameState {
         let h = entity.size.height as f32;
         let parent_w = entity.size.width as f32;
         let parent_h = entity.size.height as f32;
-        Destination { x, y, w, h, parent_w, parent_h, dist }
+        Destination {
+            x,
+            y,
+            w,
+            h,
+            parent_w,
+            parent_h,
+            dist,
+        }
     }
 
     pub fn can_move_towards(
@@ -1134,7 +1152,7 @@ impl GameState {
                 entity,
                 entities_to_ignore,
                 dest,
-                cb
+                cb,
             )
         });
 
@@ -1154,7 +1172,6 @@ impl GameState {
         dest: Destination,
     ) -> Option<Vec<Point>> {
         STATE.with(|s| {
-
             let mut state = s.borrow_mut();
             let state = state.as_mut().unwrap();
 
@@ -1164,7 +1181,7 @@ impl GameState {
                 &area,
                 entity,
                 entities_to_ignore,
-                dest
+                dest,
             )
         })
     }
@@ -1183,7 +1200,7 @@ impl GameState {
                 area,
                 entity,
                 entities_to_ignore,
-                dest
+                dest,
             )
         })
     }

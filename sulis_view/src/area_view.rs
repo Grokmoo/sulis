@@ -296,7 +296,9 @@ impl AreaView {
             // info!("{}|", cur_line);
         }
 
-        if draw_list.is_empty() { return; }
+        if draw_list.is_empty() {
+            return;
+        }
         AreaView::draw_list_to_texture(renderer, draw_list, VISIBILITY_TEX_ID);
     }
 
@@ -383,9 +385,11 @@ impl AreaView {
         }
 
         to_draw.sort_by(|a, b| {
-            if a.aerial() && ! b.aerial() { std::cmp::Ordering::Greater }
-            else if !a.aerial() && b.aerial() { std::cmp::Ordering::Less }
-            else {
+            if a.aerial() && !b.aerial() {
+                std::cmp::Ordering::Greater
+            } else if !a.aerial() && b.aerial() {
+                std::cmp::Ordering::Less
+            } else {
                 a.location().cmp(b.location())
             }
         });

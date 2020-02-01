@@ -16,9 +16,9 @@
 
 use std::fmt::Display;
 
-use sulis_core::ui::{WidgetState};
+use sulis_core::ui::WidgetState;
+use sulis_module::bonus::{AttackBuilder, AttackKindBuilder, Contingent};
 use sulis_module::{Armor, Bonus, BonusList, DamageKind, Module, PrereqList};
-use sulis_module::bonus::{AttackKindBuilder, AttackBuilder, Contingent};
 
 pub fn format_bonus_or_penalty(amount: i32) -> String {
     if amount >= 0 {

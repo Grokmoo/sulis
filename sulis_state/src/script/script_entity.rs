@@ -22,15 +22,15 @@ use std::{self, f32, u32};
 
 use rlua::{self, Context, UserData, UserDataMethods};
 
-use crate::{AreaFeedbackText, ai, animation, script::*, entity_attack_handler};
+use crate::{ability_state::DisabledReason, dist, is_within_attack_dist, is_within_touch_dist};
+use crate::{ai, animation, entity_attack_handler, script::*, AreaFeedbackText};
 use crate::{area_feedback_text::ColorKind, EntityState, GameState, Location};
-use crate::{is_within_attack_dist, is_within_touch_dist, dist, ability_state::DisabledReason};
 use sulis_core::config::Config;
 use sulis_core::resource::ResourceSet;
 use sulis_core::util::ExtInt;
 use sulis_module::{
-    Actor, Attack, AttackKind, Attribute, DamageKind, Faction, HitFlags, HitKind, ImageLayer,
-    InventoryBuilder, MOVE_TO_THRESHOLD, ability::AIData,
+    ability::AIData, Actor, Attack, AttackKind, Attribute, DamageKind, Faction, HitFlags, HitKind,
+    ImageLayer, InventoryBuilder, MOVE_TO_THRESHOLD,
 };
 
 /// Represents a single entity for Lua scripts.  Also can represent an invalid,
@@ -650,9 +650,9 @@ impl UserData for ScriptEntity {
             let other = other.try_unwrap()?;
 
             let result = if entity.borrow().is_hostile(&other.borrow()) {
-              -1
+                -1
             } else {
-              1
+                1
             };
 
             Ok(result)
@@ -772,10 +772,7 @@ impl UserData for ScriptEntity {
                     }
                 }
                 let index = parent.borrow().index();
-                let func = get_on_activate_fn(
-                    parent.borrow().is_party_member(),
-                    ability.ai_data()
-                );
+                let func = get_on_activate_fn(parent.borrow().is_party_member(), ability.ai_data());
                 Script::ability_on_activate(index, func, &ability.to_ability());
                 Ok(true)
             },
@@ -787,10 +784,7 @@ impl UserData for ScriptEntity {
             if !parent.borrow().actor.can_use_quick(slot) {
                 return Ok(false);
             }
-            let func = get_on_activate_fn(
-                parent.borrow().is_party_member(),
-                item.ai_data()
-            );
+            let func = get_on_activate_fn(parent.borrow().is_party_member(), item.ai_data());
             Script::item_on_activate(&parent, func, ScriptItemKind::Quick(slot));
             Ok(true)
         });
@@ -952,14 +946,17 @@ impl UserData for ScriptEntity {
             },
         );
 
-        methods.add_method("create_subpos_anim", |_, entity, duration_secs: Option<f32>| {
-            let index = entity.try_unwrap_index()?;
+        methods.add_method(
+            "create_subpos_anim",
+            |_, entity, duration_secs: Option<f32>| {
+                let index = entity.try_unwrap_index()?;
                 let duration = match duration_secs {
                     None => ExtInt::Infinity,
                     Some(amount) => ExtInt::Int((amount * 1000.0) as u32),
                 };
-            Ok(ScriptSubposAnimation::new(index, duration))
-        });
+                Ok(ScriptSubposAnimation::new(index, duration))
+            },
+        );
 
         methods.add_method(
             "create_color_anim",
@@ -1065,12 +1062,15 @@ impl UserData for ScriptEntity {
             Ok(result)
         });
 
-        methods.add_method("is_within_attack_dist", |_, entity, target: ScriptEntity| {
-            let parent = entity.try_unwrap()?;
-            let target = target.try_unwrap()?;
-            let result = is_within_attack_dist(&*parent.borrow(), &*target.borrow());
-            Ok(result)
-        });
+        methods.add_method(
+            "is_within_attack_dist",
+            |_, entity, target: ScriptEntity| {
+                let parent = entity.try_unwrap()?;
+                let target = target.try_unwrap()?;
+                let result = is_within_attack_dist(&*parent.borrow(), &*target.borrow());
+                Ok(result)
+            },
+        );
 
         methods.add_method("is_within_touch_dist", |_, entity, target: ScriptEntity| {
             let parent = entity.try_unwrap()?;
@@ -1153,7 +1153,7 @@ impl UserData for ScriptEntity {
                     &area_state.borrow(),
                     hit_kind,
                     hit_flags,
-                    &damage
+                    &damage,
                 );
                 area_state.borrow_mut().add_feedback_text(feedback);
             }
@@ -1254,7 +1254,7 @@ impl UserData for ScriptEntity {
                     &area_state.borrow(),
                     hit_kind,
                     hit_flags,
-                    &damage
+                    &damage,
                 );
                 area_state.borrow_mut().add_feedback_text(feedback);
                 let hit_kind = ScriptHitKind::new(hit_kind, damage);
@@ -1311,7 +1311,7 @@ impl UserData for ScriptEntity {
                     &area_state.borrow(),
                     HitKind::Auto,
                     HitFlags::default(),
-                    &damage
+                    &damage,
                 );
                 area_state.borrow_mut().add_feedback_text(feedback);
                 Ok(())
@@ -1324,7 +1324,8 @@ impl UserData for ScriptEntity {
             parent.borrow_mut().actor.add_hp(amount);
             let area_state = GameState::area_state();
 
-            let mut feedback = AreaFeedbackText::with_target(&parent.borrow(), &area_state.borrow());
+            let mut feedback =
+                AreaFeedbackText::with_target(&parent.borrow(), &area_state.borrow());
             feedback.add_entry(format!("{}", amount), ColorKind::Heal);
             area_state.borrow_mut().add_feedback_text(feedback);
 
@@ -1352,7 +1353,7 @@ impl UserData for ScriptEntity {
                 let amount = amount as u32;
                 let parent = entity.try_unwrap()?;
                 parent.borrow_mut().actor.remove_class_stat(&stat, amount);
-                let area= GameState::area_state();
+                let area = GameState::area_state();
 
                 let mut feedback = AreaFeedbackText::with_target(&parent.borrow(), &area.borrow());
                 feedback.add_entry(format!("{}", amount), ColorKind::Hit);
@@ -1721,7 +1722,7 @@ fn create_stats_table<'a>(
     stats.set("will", src.will)?;
 
     stats.set("touch_distance", src.touch_distance())?;
-    stats.set("attack_distance",src.attack_distance())?;
+    stats.set("attack_distance", src.attack_distance())?;
     stats.set("attack_is_melee", src.attack_is_melee())?;
     stats.set("attack_is_ranged", src.attack_is_ranged())?;
 

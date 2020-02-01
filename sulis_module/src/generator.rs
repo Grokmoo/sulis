@@ -50,8 +50,7 @@ use std::collections::HashMap;
 use std::io::{Error, ErrorKind};
 use std::rc::Rc;
 
-use crate::area::{EncounterDataBuilder, Layer, LocationChecker,
-    PathFinderGrid, PropDataBuilder};
+use crate::area::{EncounterDataBuilder, Layer, LocationChecker, PathFinderGrid, PropDataBuilder};
 use crate::{ObjectSize, WallKind};
 use sulis_core::util::{Point, ReproducibleRandom};
 
@@ -65,7 +64,6 @@ impl LayerListLocationChecker {
         layers: &[Layer],
         size: Rc<ObjectSize>,
     ) -> LayerListLocationChecker {
-
         // set up passability matrix based on the layers
         let mut pass = vec![false; (width * height) as usize];
         for y in 0..height {

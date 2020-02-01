@@ -307,10 +307,8 @@ impl DrawList {
                 avg_x /= self.quads.len() as f32;
                 avg_y /= self.quads.len() as f32;
                 (avg_x, avg_y)
-            },
-            Some(centroid) => {
-                (centroid[0], centroid[1])
             }
+            Some(centroid) => (centroid[0], centroid[1]),
         };
 
         for ref mut vertex in self.quads.iter_mut() {

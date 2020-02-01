@@ -14,9 +14,9 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use crate::{EntityState, PropState};
 use sulis_core::util::Point;
 use sulis_module::area::Transition;
-use crate::{EntityState, PropState};
 
 pub trait Locatable {
     fn size(&self) -> (f32, f32);
@@ -96,8 +96,12 @@ pub fn dist(parent: &impl Locatable, target: &impl Locatable) -> f32 {
     let mut dx = (cx - tx).abs() - w / 2.0;
     let mut dy = (cy - ty).abs() - h / 2.0;
 
-    if dx < 0.0 { dx = 0.0; }
-    if dy < 0.0 { dy = 0.0; }
+    if dx < 0.0 {
+        dx = 0.0;
+    }
+    if dy < 0.0 {
+        dy = 0.0;
+    }
 
     dx.hypot(dy)
 }
@@ -124,11 +128,11 @@ pub fn is_threat(attacker: &EntityState, defender: &EntityState) -> bool {
         return false;
     }
 
-   if !a.is_hostile(d) {
-       return false;
-   }
+    if !a.is_hostile(d) {
+        return false;
+    }
 
-   is_within_attack_dist(a, d)
+    is_within_attack_dist(a, d)
 }
 
 pub fn can_attack(attacker: &EntityState, defender: &EntityState) -> bool {

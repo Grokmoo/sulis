@@ -22,7 +22,7 @@ use std::rc::Rc;
 use rlua::{self, Context, UserData, UserDataMethods};
 
 use crate::script::{CallbackData, ScriptEntity};
-use crate::{AreaFeedbackText, area_feedback_text::ColorKind, EntityState, GameState};
+use crate::{area_feedback_text::ColorKind, AreaFeedbackText, EntityState, GameState};
 use sulis_module::{
     ability::{self, AIData, Range},
     Ability, Module,
@@ -448,7 +448,9 @@ fn activate(
     let mut text = AreaFeedbackText::with_target(&entity.borrow(), &area.borrow());
     text.add_entry(ability.name.to_string(), ColorKind::Info);
     area.borrow_mut().add_feedback_text(text);
-    area.borrow_mut().range_indicators().remove_ability(&ability);
+    area.borrow_mut()
+        .range_indicators()
+        .remove_ability(&ability);
     entity
         .borrow_mut()
         .actor

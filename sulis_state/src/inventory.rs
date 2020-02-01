@@ -22,8 +22,8 @@ use std::slice::Iter;
 use sulis_core::image::Image;
 use sulis_core::util::invalid_data_error;
 use sulis_module::{
-    bonus::AttackKindBuilder, Actor, ImageLayer, ItemKind, ItemSaveState, Module, QuickSlot, Slot,
-    StatList, WeaponStyle, ItemState
+    bonus::AttackKindBuilder, Actor, ImageLayer, ItemKind, ItemSaveState, ItemState, Module,
+    QuickSlot, Slot, StatList, WeaponStyle,
 };
 
 #[derive(Clone)]

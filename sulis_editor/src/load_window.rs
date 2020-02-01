@@ -23,7 +23,7 @@ use std::rc::Rc;
 
 use sulis_core::config::Config;
 use sulis_core::ui::{Callback, Widget, WidgetKind};
-use sulis_core::widgets::{list_box, Button, ListBox, ScrollPane, ScrollDirection};
+use sulis_core::widgets::{list_box, Button, ListBox, ScrollDirection, ScrollPane};
 
 use crate::AreaEditor;
 

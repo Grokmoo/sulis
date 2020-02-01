@@ -14,11 +14,11 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::collections::{hash_map::Iter};
+use std::collections::hash_map::Iter;
 use std::rc::Rc;
 
+use crate::{ImageLayer, Item, Module};
 use sulis_core::image::Image;
-use crate::{Item, Module, ImageLayer};
 
 #[derive(Debug, Clone)]
 pub struct ItemState {
@@ -35,11 +35,17 @@ impl PartialEq for ItemState {
 impl ItemState {
     pub fn new(item: Rc<Item>, variant: Option<usize>) -> ItemState {
         match variant {
-            None => ItemState { item, variant: None },
+            None => ItemState {
+                item,
+                variant: None,
+            },
             Some(idx) => {
                 if idx >= item.num_variants() {
                     warn!("Invalid variant {} for item {}", idx, item.id);
-                    ItemState { item, variant: None }
+                    ItemState {
+                        item,
+                        variant: None,
+                    }
                 } else {
                     ItemState { item, variant }
                 }

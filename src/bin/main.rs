@@ -81,7 +81,7 @@ fn load_resources() {
     }
 }
 
-fn main_menu(io: &mut Box<dyn IO>) -> NextGameStep {
+fn main_menu(io: &mut dyn IO) -> NextGameStep {
     let view = main_menu::MainMenu::new(io.get_display_configurations());
     let loop_updater = main_menu::LoopUpdater::new(&view);
     let root = ui::create_ui_tree(view.clone());
@@ -99,7 +99,7 @@ fn main_menu(io: &mut Box<dyn IO>) -> NextGameStep {
 }
 
 fn new_campaign(
-    io: &mut Box<dyn IO>,
+    io: &mut dyn IO,
     pc_actor: Rc<Actor>,
     party_actors: Vec<Rc<Actor>>,
     flags: HashMap<String, String>,
@@ -113,7 +113,7 @@ fn new_campaign(
     run_campaign(io)
 }
 
-fn load_campaign(io: &mut Box<dyn IO>, save_state: SaveState) -> NextGameStep {
+fn load_campaign(io: &mut dyn IO, save_state: SaveState) -> NextGameStep {
     info!("Loading game state.");
     if let Err(e) = GameState::load(save_state) {
         error!("{}", e);
@@ -123,7 +123,7 @@ fn load_campaign(io: &mut Box<dyn IO>, save_state: SaveState) -> NextGameStep {
     run_campaign(io)
 }
 
-fn run_campaign(io: &mut Box<dyn IO>) -> NextGameStep {
+fn run_campaign(io: &mut dyn IO) -> NextGameStep {
     let view = RootView::new();
     let loop_updater = sulis_view::GameMainLoopUpdater::new(&view);
     let root = ui::create_ui_tree(view.clone());
@@ -148,12 +148,14 @@ fn main() {
         use sulis_state::NextGameStep::*;
         next_step = match next_step {
             Exit => break,
-            NewCampaign { pc_actor } => new_campaign(&mut io, pc_actor, Vec::new(), HashMap::new()),
-            LoadCampaign { save_state } => load_campaign(&mut io, save_state),
-            MainMenu => main_menu(&mut io),
+            NewCampaign { pc_actor } => {
+                new_campaign(io.as_mut(), pc_actor, Vec::new(), HashMap::new())
+            }
+            LoadCampaign { save_state } => load_campaign(io.as_mut(), save_state),
+            MainMenu => main_menu(io.as_mut()),
             MainMenuReloadResources => {
                 load_resources();
-                main_menu(&mut io)
+                main_menu(io.as_mut())
             }
             LoadModuleAndNewCampaign {
                 pc_actor,
@@ -165,11 +167,11 @@ fn main() {
                 active.campaign = Some(module_dir);
                 active.write();
                 load_resources();
-                new_campaign(&mut io, pc_actor, party_actors, flags)
+                new_campaign(io.as_mut(), pc_actor, party_actors, flags)
             }
             RecreateIO => {
                 io = create_io();
-                main_menu(&mut io)
+                main_menu(io.as_mut())
             }
         };
     }

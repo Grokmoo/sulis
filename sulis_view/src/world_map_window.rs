@@ -21,7 +21,7 @@ use std::rc::Rc;
 use sulis_core::ui::{animation_state, Callback, Widget, WidgetKind};
 use sulis_core::util::Point;
 use sulis_core::widgets::{Button, TextArea};
-use sulis_module::{Module, Time, campaign::WorldMapLocation};
+use sulis_module::{campaign::WorldMapLocation, Module, Time};
 use sulis_state::GameState;
 
 pub const NAME: &str = "world_map_window";
@@ -202,7 +202,10 @@ fn add_travel_callback(
         Some(id) => id.to_string(),
     };
 
-    button.borrow_mut().state.add_callback(travel_callback(area_id, x, y, travel_time));
+    button
+        .borrow_mut()
+        .state
+        .add_callback(travel_callback(area_id, x, y, travel_time));
     true
 }
 

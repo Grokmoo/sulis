@@ -28,9 +28,9 @@ use sulis_module::{
 
 use crate::script::{
     script_color_animation, script_image_layer_animation, script_particle_generator,
-    script_scale_animation, CallbackData, Result, ScriptAbility, ScriptCallback,
-    ScriptColorAnimation, ScriptEntity, ScriptImageLayerAnimation, ScriptParticleGenerator,
-    ScriptScaleAnimation, script_subpos_animation, ScriptSubposAnimation,
+    script_scale_animation, script_subpos_animation, CallbackData, Result, ScriptAbility,
+    ScriptCallback, ScriptColorAnimation, ScriptEntity, ScriptImageLayerAnimation,
+    ScriptParticleGenerator, ScriptScaleAnimation, ScriptSubposAnimation,
 };
 use crate::{effect, Effect, GameState};
 
@@ -511,10 +511,13 @@ impl UserData for ScriptEffect {
             effect.color_anims.push(anim);
             Ok(())
         });
-        methods.add_method_mut("add_subpos_anim", |_, effect, anim: ScriptSubposAnimation| {
-            effect.subpos_anims.push(anim);
-            Ok(())
-        });
+        methods.add_method_mut(
+            "add_subpos_anim",
+            |_, effect, anim: ScriptSubposAnimation| {
+                effect.subpos_anims.push(anim);
+                Ok(())
+            },
+        );
         methods.add_method_mut("add_anim", |_, effect, pgen: ScriptParticleGenerator| {
             effect.pgens.push(pgen);
             Ok(())

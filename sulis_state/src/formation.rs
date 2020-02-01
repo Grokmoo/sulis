@@ -18,9 +18,9 @@ use std::cell::RefCell;
 use std::f32;
 use std::rc::Rc;
 
-use sulis_core::util;
-use sulis_module::{area::Destination};
 use crate::{EntityState, GameState};
+use sulis_core::util;
+use sulis_module::area::Destination;
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 #[serde(deny_unknown_fields)]
@@ -79,12 +79,7 @@ impl Formation {
         dest: Destination,
     ) {
         if entities_to_move.len() == 1 {
-            GameState::move_towards_dest(
-                &entities_to_move[0],
-                entities_to_ignore,
-                dest,
-                None,
-            );
+            GameState::move_towards_dest(&entities_to_move[0], entities_to_ignore, dest, None);
             return;
         }
 
@@ -115,23 +110,26 @@ impl Formation {
 
             for dist_increase in 0..3 {
                 let dist = dest.dist + dist_increase as f32 * 1.0;
-                let dest = Destination { x, y, w: dest.w, h: dest.h, parent_w, parent_h, dist };
+                let dest = Destination {
+                    x,
+                    y,
+                    w: dest.w,
+                    h: dest.h,
+                    parent_w,
+                    parent_h,
+                    dist,
+                };
                 if GameState::can_move_towards_dest(
                     &to_move[index].borrow(),
                     entities_to_ignore.clone(),
-                    dest
+                    dest,
                 )
                 .is_none()
                 {
                     continue;
                 }
 
-                GameState::move_towards_dest(
-                    parent,
-                    entities_to_ignore.clone(),
-                    dest,
-                    None,
-                );
+                GameState::move_towards_dest(parent, entities_to_ignore.clone(), dest, None);
                 break;
             }
         }

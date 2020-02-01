@@ -23,8 +23,8 @@ use sulis_core::ui::{theme, Widget, WidgetKind};
 use sulis_core::widgets::TextArea;
 use sulis_module::{conversation::Response, Conversation, OnTrigger};
 use sulis_state::{
-    AreaFeedbackText,
-    area_feedback_text::ColorKind, script::entity_with_id, ChangeListener, EntityState, GameState,
+    area_feedback_text::ColorKind, script::entity_with_id, AreaFeedbackText, ChangeListener,
+    EntityState, GameState,
 };
 
 use crate::trigger_activator::{activate, is_match, scroll_view};

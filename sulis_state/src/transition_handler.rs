@@ -14,12 +14,15 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::rc::Rc;
 use std::cell::RefCell;
+use std::rc::Rc;
 
-use sulis_core::util::Point;
-use sulis_module::{Area, area::{ToKind, TriggerKind}, ObjectSize, Time};
 use crate::{AreaState, EntityState, GameState, Location, TurnManager};
+use sulis_core::util::Point;
+use sulis_module::{
+    area::{ToKind, TriggerKind},
+    Area, ObjectSize, Time,
+};
 
 pub(crate) fn transition_to(area_id: Option<&str>, p: Option<Point>, offset: Point, time: Time) {
     info!("Area transition to {:?}: {:?}", area_id, p);
@@ -75,7 +78,7 @@ pub(crate) fn transition_to(area_id: Option<&str>, p: Option<Point>, offset: Poi
             &area.area.area.triggers,
             TriggerKind::OnAreaLoad,
             &pc,
-            &pc
+            &pc,
         );
     }
 }
@@ -84,7 +87,7 @@ fn transition_party(
     mgr: &Rc<RefCell<TurnManager>>,
     area: &Rc<RefCell<AreaState>>,
     p: Point,
-    party: &[Rc<RefCell<EntityState>>]
+    party: &[Rc<RefCell<EntityState>>],
 ) {
     let base_location = Location::new(p.x, p.y, &area.borrow().area.area);
 
@@ -93,17 +96,31 @@ fn transition_party(
         let mut cur_location = base_location.clone();
         find_transition_location(&mut cur_location, &entity.borrow().size, &area.borrow());
 
-        info!("Transitioning '{}' to {:?}", entity.borrow().actor.actor.name, cur_location);
+        info!(
+            "Transitioning '{}' to {:?}",
+            entity.borrow().actor.actor.name,
+            cur_location
+        );
 
         let (index, dx, dy) = {
             let entity = entity.borrow();
-            (entity.index(), entity.location.x - cur_location.x, entity.location.y - cur_location.y)
+            (
+                entity.index(),
+                entity.location.x - cur_location.x,
+                entity.location.y - cur_location.y,
+            )
         };
 
         add_member_auras(&mut mgr.borrow_mut(), &mut area.borrow_mut(), index, dx, dy);
 
-        if let Err(e) = area.borrow_mut().transition_entity_to(entity, index, cur_location) {
-            warn!("Unable to add party member '{}'", entity.borrow().actor.actor.id);
+        if let Err(e) = area
+            .borrow_mut()
+            .transition_entity_to(entity, index, cur_location)
+        {
+            warn!(
+                "Unable to add party member '{}'",
+                entity.borrow().actor.actor.id
+            );
             warn!("{}", e);
         }
     }
@@ -173,15 +190,15 @@ fn remove_party_auras(mgr: &mut TurnManager, party: &[Rc<RefCell<EntityState>>])
 }
 
 fn remove_party_from_surfaces(mgr: &mut TurnManager, party: &[Rc<RefCell<EntityState>>]) {
- for entity in party {
-     let area = entity_area(&entity.borrow());
+    for entity in party {
+        let area = entity_area(&entity.borrow());
 
-     let surfaces = area.borrow_mut().remove_entity(entity, mgr);
-     let entity_index = entity.borrow().index();
-     for surface in surfaces {
-         mgr.remove_from_surface(entity_index, surface);
-     }
- }
+        let surfaces = area.borrow_mut().remove_entity(entity, mgr);
+        let entity_index = entity.borrow().index();
+        for surface in surfaces {
+            mgr.remove_from_surface(entity_index, surface);
+        }
+    }
 }
 
 fn entity_area(entity: &EntityState) -> Rc<RefCell<AreaState>> {
@@ -197,16 +214,17 @@ fn get_area(area_id: Option<&str>, p: Option<Point>) -> Option<(Rc<RefCell<AreaS
                 None => {
                     error!("No point specified for intra area transition");
                     return None;
-                }, Some(p) => {
-                    Some((area, p))
                 }
+                Some(p) => Some((area, p)),
             }
-        }, Some(id) => {
+        }
+        Some(id) => {
             let state = match GameState::get_area_state(id) {
                 None => {
                     error!("Invalid area id '{}' in transition", id);
                     return None;
-                }, Some(state) => state,
+                }
+                Some(state) => state,
             };
 
             let location = match p {
@@ -218,7 +236,7 @@ fn get_area(area_id: Option<&str>, p: Option<Point>) -> Option<(Rc<RefCell<AreaS
                         None => {
                             error!("Error finding linked coords for transition {}", id);
                             return None;
-                        },
+                        }
                         Some(location) => location,
                     }
                 }

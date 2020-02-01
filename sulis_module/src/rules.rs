@@ -127,8 +127,8 @@ impl Rules {
                 let index = gen_rand(0, self.hints.len() - 1);
                 &self.hints[index]
             }
-        }.to_string()
-
+        }
+        .to_string()
     }
 
     pub fn to_display_ap(&self, ap: i32) -> i32 {

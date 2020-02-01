@@ -14,11 +14,11 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::rc::Rc;
 use std::cell::RefCell;
+use std::rc::Rc;
 
+use crate::{center, is_threat, ActorState, EntityState, GameState};
 use sulis_module::{AccuracyKind, Attack, AttackKind, DamageKind, HitFlags, HitKind, Module};
-use crate::{ActorState, GameState, EntityState, is_threat, center};
 
 fn is_sneak_attack(parent: &EntityState, target: &EntityState) -> bool {
     parent.actor.stats.hidden && !target.actor.stats.sneak_attack_immunity
@@ -63,10 +63,7 @@ fn is_flanking(parent: &EntityState, target: &EntityState) -> bool {
 
         debug!(
             "Got angle {} between {} and {} attacking {}",
-            angle,
-            parent.actor.actor.name,
-            entity.actor.actor.name,
-            target.actor.actor.name
+            angle, parent.actor.actor.name, entity.actor.actor.name, target.actor.actor.name
         );
 
         if angle > parent.actor.stats.flanking_angle as f32 {
@@ -104,13 +101,8 @@ pub fn weapon_attack(
             attack
         };
 
-        let (hit_kind, hit_flags, damage) = attack_internal(
-            parent,
-            target,
-            &mut attack,
-            is_flanking,
-            is_sneak_attack,
-        );
+        let (hit_kind, hit_flags, damage) =
+            attack_internal(parent, target, &mut attack, is_flanking, is_sneak_attack);
         result.push((hit_kind, hit_flags, damage));
     }
 
@@ -155,8 +147,7 @@ fn attack_internal(
 
     let concealment = std::cmp::max(
         0,
-        target.borrow().actor.stats.concealment
-        - parent.borrow().actor.stats.concealment_ignore,
+        target.borrow().actor.stats.concealment - parent.borrow().actor.stats.concealment_ignore,
     );
 
     if !rules.concealment_roll(concealment) {

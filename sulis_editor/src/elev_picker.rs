@@ -86,7 +86,9 @@ impl EditorMode for ElevPicker {
         for y in 0..MAX_AREA_SIZE {
             for x in 0..MAX_AREA_SIZE {
                 let elev = model.tiles().elevation(x, y) as usize;
-                if elev >= self.elev_tiles.len() { continue; }
+                if elev >= self.elev_tiles.len() {
+                    continue;
+                }
                 let sprite = &self.elev_tiles[elev];
                 let x = x as f32 + x_offset;
                 let y = y as f32 + y_offset;

@@ -149,8 +149,7 @@ impl WidgetKind for InventoryWindow {
                 }
                 Some(item_state) => {
                     let quantity = 1 + stash.borrow().items().get_quantity(&item_state);
-                    let but =
-                        ItemButton::quick(&self.entity, quantity, &item_state, *quick_slot);
+                    let but = ItemButton::quick(&self.entity, quantity, &item_state, *quick_slot);
 
                     if actor.can_use_quick(*quick_slot) {
                         let kind = ScriptItemKind::Quick(*quick_slot);

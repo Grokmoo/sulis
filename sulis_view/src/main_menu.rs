@@ -100,7 +100,7 @@ impl MainMenu {
             content: Widget::empty("content"),
             char_builder_to_add: None,
             display_configurations,
-            tip_text
+            tip_text,
         }))
     }
 
@@ -286,12 +286,7 @@ impl WidgetKind for MainMenu {
             vec![module, new, load, mods, options, links, exit],
         );
 
-        let mut children = vec![
-            background,
-            title,
-            module_title,
-            menu_pane,
-        ];
+        let mut children = vec![background, title, module_title, menu_pane];
 
         if let Some(tip_text) = &self.tip_text {
             let tip_pane = Widget::empty("tip_pane");

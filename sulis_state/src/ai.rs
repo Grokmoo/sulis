@@ -120,7 +120,10 @@ impl EntityAI {
         self.cur_wait_time += time;
 
         if self.cur_wait_time > MAX_WAIT_TIME {
-            warn!("Wait time for {} exceeded maximum", self.entity.borrow().unique_id());
+            warn!(
+                "Wait time for {} exceeded maximum",
+                self.entity.borrow().unique_id()
+            );
             return State::End;
         }
         let wait_time = Config::animation_base_time_millis() * time;
@@ -132,7 +135,10 @@ impl EntityAI {
 
     fn run_script(&mut self) -> State {
         if self.actions_taken_this_turn == MAX_ACTIONS {
-            warn!("Action count for {} exceeded maximum", self.entity.borrow().unique_id());
+            warn!(
+                "Action count for {} exceeded maximum",
+                self.entity.borrow().unique_id()
+            );
             return State::End;
         }
 

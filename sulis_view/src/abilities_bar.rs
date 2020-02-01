@@ -14,24 +14,25 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::collections::HashMap;
 use std::any::Any;
 use std::cell::RefCell;
 use std::cmp;
+use std::collections::HashMap;
 use std::collections::HashSet;
 use std::rc::Rc;
 
-use sulis_core::io::{keyboard_event::Key, event, InputAction};
+use sulis_core::io::{event, keyboard_event::Key, InputAction};
 use sulis_core::ui::{animation_state, Callback, Widget, WidgetKind, WidgetState};
 use sulis_core::util::{ExtInt, Size};
-use sulis_core::widgets::{Button, Label, TextArea, ScrollPane, ScrollDirection};
+use sulis_core::widgets::{Button, Label, ScrollDirection, ScrollPane, TextArea};
 use sulis_module::{
     ability::{self, AbilityGroup, Duration},
     actor::OwnedAbility,
     Ability, Class, Module,
 };
-use sulis_state::{ChangeListener, EntityState, GameState, RangeIndicator, Script,
-    ability_state::DisabledReason};
+use sulis_state::{
+    ability_state::DisabledReason, ChangeListener, EntityState, GameState, RangeIndicator, Script,
+};
 
 pub const NAME: &str = "abilities_bar";
 
@@ -46,7 +47,7 @@ pub struct AbilitiesBar {
 impl AbilitiesBar {
     pub fn new(
         entity: Rc<RefCell<EntityState>>,
-        keys: &HashMap<InputAction, Key>
+        keys: &HashMap<InputAction, Key>,
     ) -> Rc<RefCell<AbilitiesBar>> {
         use InputAction::*;
         let keys = vec![
@@ -71,7 +72,7 @@ impl AbilitiesBar {
         }))
     }
 
-    pub fn check_handle_keybinding(&self, key: InputAction) -> bool{
+    pub fn check_handle_keybinding(&self, key: InputAction) -> bool {
         use InputAction::*;
         match key {
             ActivateAbility1 => self.do_ability(0),
@@ -195,7 +196,11 @@ impl WidgetKind for AbilitiesBar {
 
         for group in groups {
             let group_pane = GroupPane::new(
-                group, &self.entity, &abilities, collapse_enabled, &mut remaining_keys
+                group,
+                &self.entity,
+                &abilities,
+                collapse_enabled,
+                &mut remaining_keys,
             );
 
             if group_pane.borrow().abilities.is_empty() {
@@ -366,7 +371,9 @@ impl GroupPane {
         let height = widget.state.height();
 
         let mut items_count = self.abilities.len();
-        if self.skip_first_position { items_count += 1; }
+        if self.skip_first_position {
+            items_count += 1;
+        }
 
         let cols = (items_count as f32 / self.vertical_count as f32).ceil() as u32;
         let cols = cmp::max(cols, self.min_horizontal_count) as i32;
@@ -498,7 +505,7 @@ impl WidgetKind for GroupPane {
 
 fn create_range_indicator(
     ability: &Rc<Ability>,
-    entity: &Rc<RefCell<EntityState>>
+    entity: &Rc<RefCell<EntityState>>,
 ) -> Option<RangeIndicator> {
     let active = match &ability.active {
         None => return None,
@@ -518,14 +525,14 @@ struct AbilityButton {
     ability: Rc<Ability>,
     newly_added: bool,
     range_indicator: Option<RangeIndicator>,
-    key: Option<Key>
+    key: Option<Key>,
 }
 
 impl AbilityButton {
     fn new(
         ability: &Rc<Ability>,
         entity: &Rc<RefCell<EntityState>>,
-        key: Option<Key>
+        key: Option<Key>,
     ) -> Rc<RefCell<AbilityButton>> {
         let mut newly_added = false;
         if let Some(state) = entity.borrow_mut().actor.ability_state(&ability.id) {
@@ -571,9 +578,15 @@ impl WidgetKind for AbilityButton {
             .ability_state(&self.ability.id)
         {
             if self.newly_added {
-                widget.state.animation_state.add(animation_state::Kind::Custom2);
+                widget
+                    .state
+                    .animation_state
+                    .add(animation_state::Kind::Custom2);
             } else {
-                widget.state.animation_state.remove(animation_state::Kind::Custom2);
+                widget
+                    .state
+                    .animation_state
+                    .remove(animation_state::Kind::Custom2);
             }
 
             widget.children[1].borrow_mut().state.clear_text_args();
@@ -600,7 +613,10 @@ impl WidgetKind for AbilityButton {
 
         let key_label = Widget::with_theme(Label::empty(), "key_label");
         if let Some(key) = self.key {
-            key_label.borrow_mut().state.add_text_arg("keybinding", &key.short_name());
+            key_label
+                .borrow_mut()
+                .state
+                .add_text_arg("keybinding", &key.short_name());
         }
 
         vec![icon, duration_label, key_label]
@@ -610,7 +626,9 @@ impl WidgetKind for AbilityButton {
         let can_activate = self.entity.borrow().actor.can_activate(&self.ability.id);
         if can_activate {
             let area = GameState::area_state();
-            area.borrow_mut().range_indicators().add(self.range_indicator.clone());
+            area.borrow_mut()
+                .range_indicators()
+                .add(self.range_indicator.clone());
         }
         self.super_on_mouse_enter(widget);
         true
@@ -618,7 +636,9 @@ impl WidgetKind for AbilityButton {
 
     fn on_mouse_exit(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
         let area = GameState::area_state();
-        area.borrow_mut().range_indicators().remove_ability(&self.ability);
+        area.borrow_mut()
+            .range_indicators()
+            .remove_ability(&self.ability);
         self.super_on_mouse_exit(widget);
         true
     }
@@ -632,7 +652,7 @@ impl WidgetKind for AbilityButton {
             &self.ability,
             &class,
             self.key,
-            disabled_reason
+            disabled_reason,
         );
 
         if self.newly_added {
@@ -730,26 +750,26 @@ pub fn add_hover_text_args(
 fn add_disabled_text_arg(
     state: &mut WidgetState,
     class_stat_name: Option<&str>,
-    disabled_reason: DisabledReason
+    disabled_reason: DisabledReason,
 ) {
     use DisabledReason::*;
     let reason_text = match disabled_reason {
         Enabled => return,
-        AbilitiesDisabled =>  "All abilities disabled",
-        NoSuchAbility =>      "Ability not possessed",
-        NotEnoughAP =>        "Not enough AP",
+        AbilitiesDisabled => "All abilities disabled",
+        NoSuchAbility => "Ability not possessed",
+        NotEnoughAP => "Not enough AP",
         NoAbilityGroupUses => "No group uses remaining",
         NotEnoughClassStat => {
             let text = format!("Not enough {}", class_stat_name.unwrap_or(""));
             state.add_text_arg("disabled", &text);
             return;
-        },
-        RequiresShield =>     "Equip a shield",
-        RequiresMelee =>      "Equip a melee weapon",
-        RequiresRanged =>     "Equip a ranged weapon",
+        }
+        RequiresShield => "Equip a shield",
+        RequiresMelee => "Equip a melee weapon",
+        RequiresRanged => "Equip a ranged weapon",
         RequiresActiveMode => "Must first activate a mode",
-        CombatOnly =>         "May only be used in combat",
-        OnCooldown =>         "The cooldown is active",
+        CombatOnly => "May only be used in combat",
+        OnCooldown => "The cooldown is active",
     };
     state.add_text_arg("disabled", reason_text);
 }

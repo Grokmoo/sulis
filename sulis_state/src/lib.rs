@@ -41,8 +41,10 @@ pub use self::change_listener::ChangeListener;
 pub use self::change_listener::ChangeListenerList;
 
 mod distance_finder;
-pub use self::distance_finder::{Locatable, center, center_i32, is_within,
-    is_within_attack_dist, is_within_touch_dist, is_threat, can_attack, dist};
+pub use self::distance_finder::{
+    can_attack, center, center_i32, dist, is_threat, is_within, is_within_attack_dist,
+    is_within_touch_dist, Locatable,
+};
 
 mod effect;
 pub use self::effect::Effect;
@@ -100,7 +102,7 @@ pub use self::quest_state::QuestState;
 pub use self::quest_state::QuestStateSet;
 
 mod range_indicator;
-pub use self::range_indicator::{RangeIndicatorHandler, RangeIndicator, RangeIndicatorImageSet};
+pub use self::range_indicator::{RangeIndicator, RangeIndicatorHandler, RangeIndicatorImageSet};
 
 pub mod save_file;
 pub use self::save_file::SaveFile;

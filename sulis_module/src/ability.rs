@@ -387,4 +387,6 @@ pub enum Range {
     Visible,
 }
 
-fn range_none() -> Range { Range::None }
+fn range_none() -> Range {
+    Range::None
+}

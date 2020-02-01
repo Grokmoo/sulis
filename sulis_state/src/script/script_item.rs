@@ -21,8 +21,8 @@ use std::rc::Rc;
 use rlua::{self, Context, UserData, UserDataMethods};
 
 use crate::script::*;
-use crate::{AreaFeedbackText, area_feedback_text::ColorKind, EntityState, GameState};
-use sulis_module::{ability, Item, Module, ItemState};
+use crate::{area_feedback_text::ColorKind, AreaFeedbackText, EntityState, GameState};
+use sulis_module::{ability, Item, ItemState, Module};
 
 /// A kind of Item, represented by its owner (Stash, QuickSlot, or a generic
 /// item with a specified ID)

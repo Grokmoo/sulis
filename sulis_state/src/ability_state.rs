@@ -58,7 +58,8 @@ fn get_modes(ability: &Ability, input: &[String]) -> Vec<Rc<Ability>> {
         match Module::ability(id) {
             None => {
                 warn!("Invalid requires_active_mode for {}", ability.id);
-            }, Some(ability) => {
+            }
+            Some(ability) => {
                 out.push(ability);
             }
         }
@@ -79,7 +80,7 @@ impl AbilityState {
                     modes,
                     active.requires_melee,
                     active.requires_ranged,
-                    active.requires_shield
+                    active.requires_shield,
                 )
             }
         };
@@ -117,9 +118,15 @@ impl AbilityState {
     pub fn is_available(&self, stats: &StatList, current_modes: &[&str]) -> DisabledReason {
         use DisabledReason::*;
 
-        if self.requires_shield && !stats.has_shield() { return RequiresShield; }
-        if self.requires_melee && !stats.attack_is_melee() { return RequiresMelee; }
-        if self.requires_ranged && !stats.attack_is_ranged() { return RequiresRanged; }
+        if self.requires_shield && !stats.has_shield() {
+            return RequiresShield;
+        }
+        if self.requires_melee && !stats.attack_is_melee() {
+            return RequiresMelee;
+        }
+        if self.requires_ranged && !stats.attack_is_ranged() {
+            return RequiresRanged;
+        }
 
         if !self.requires_active_mode.is_empty() {
             let mut found = false;
@@ -130,7 +137,9 @@ impl AbilityState {
                 }
             }
 
-            if !found { return RequiresActiveMode; }
+            if !found {
+                return RequiresActiveMode;
+            }
         }
 
         if self.combat_only && !GameState::is_combat_active() {

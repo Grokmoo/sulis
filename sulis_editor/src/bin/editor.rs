@@ -69,7 +69,7 @@ fn main() {
 
     let root = ui::create_ui_tree(EditorView::new());
 
-    if let Err(e) = util::main_loop(&mut io, root, Box::new(EditorMainLoopUpdater {})) {
+    if let Err(e) = util::main_loop(io.as_mut(), root, Box::new(EditorMainLoopUpdater {})) {
         error!("{}", e);
         error!("Error in main loop.  Exiting...");
     }

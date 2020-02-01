@@ -15,12 +15,12 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::cmp::Ordering;
-use std::collections::{HashMap, HashSet, BinaryHeap};
+use std::collections::{BinaryHeap, HashMap, HashSet};
 use std::time;
 use std::{f32, ptr};
 
+use crate::MOVE_TO_THRESHOLD;
 use sulis_core::util::{self, Point};
-use crate::{MOVE_TO_THRESHOLD};
 
 const MAX_ITERATIONS: i32 = 2_000;
 
@@ -44,7 +44,7 @@ impl Destination {
             h: 0.0,
             parent_w: 0.0,
             parent_h: 0.0,
-            dist: MOVE_TO_THRESHOLD
+            dist: MOVE_TO_THRESHOLD,
         }
     }
 }
@@ -151,7 +151,7 @@ impl PathFinder {
         if dest.x < 0.0 || dest.y < 0.0 {
             return None;
         }
-        if dest.x + dest.w > self.width as f32 + 0.1|| dest.y + dest.h > self.height as f32 + 0.1 {
+        if dest.x + dest.w > self.width as f32 + 0.1 || dest.y + dest.h > self.height as f32 + 0.1 {
             return None;
         }
 
@@ -370,8 +370,12 @@ impl PathFinder {
 
         let mut dx = (s_x - self.dest_x).abs() - self.dest_w_over2;
         let mut dy = (s_y - self.dest_y).abs() - self.dest_h_over2;
-        if dx < 0.0 { dx = 0.0; }
-        if dy < 0.0 { dy = 0.0; }
+        if dx < 0.0 {
+            dx = 0.0;
+        }
+        if dy < 0.0 {
+            dy = 0.0;
+        }
 
         (dx * dx + dy * dy) as i32
     }

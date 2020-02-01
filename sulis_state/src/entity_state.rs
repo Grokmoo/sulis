@@ -27,13 +27,14 @@ use crate::animation::{self, Anim};
 use crate::save_state::EntitySaveState;
 use crate::script::{self, CallbackData, ScriptEntitySet};
 use crate::{
-    ActorState, AreaState, ChangeListenerList, EntityTextureCache, EntityTextureSlot, GameState,
-    Location, ScriptCallback, TurnManager, entity_attack_handler::weapon_attack, is_within_attack_dist,
+    entity_attack_handler::weapon_attack, is_within_attack_dist, ActorState, AreaState,
+    ChangeListenerList, EntityTextureCache, EntityTextureSlot, GameState, Location, ScriptCallback,
+    TurnManager,
 };
 use sulis_core::io::GraphicsRenderer;
 use sulis_core::ui::{color, Color};
-use sulis_core::util::{invalid_data_error};
-use sulis_module::area::{MAX_AREA_SIZE};
+use sulis_core::util::invalid_data_error;
+use sulis_module::area::MAX_AREA_SIZE;
 use sulis_module::{
     actor::Faction, ai, Actor, DamageKind, HitKind, Module, ObjectSize, ObjectSizeIterator,
 };
@@ -390,7 +391,9 @@ impl EntityState {
     }
 
     pub fn swap_weapon_set(entity: &Rc<RefCell<EntityState>>) {
-        if !entity.borrow_mut().actor.do_swap_weapons() { return; }
+        if !entity.borrow_mut().actor.do_swap_weapons() {
+            return;
+        }
 
         if entity.borrow().is_party_member() && GameState::is_combat_active() {
             let area = GameState::area_state();
@@ -424,7 +427,6 @@ impl EntityState {
         if !self.actor.has_ap_to_attack() {
             return false;
         }
-
 
         is_within_attack_dist(self, target)
     }
@@ -653,5 +655,7 @@ impl AreaDrawable for EntityState {
         &self.location
     }
 
-    fn aerial(&self) -> bool { false }
+    fn aerial(&self) -> bool {
+        false
+    }
 }

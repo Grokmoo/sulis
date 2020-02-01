@@ -23,7 +23,7 @@ use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::resource::{Font, ResourceSet};
 use sulis_core::ui::{animation_state, Color, LineRenderer};
 use sulis_core::util::{self, Point};
-use sulis_module::{HitKind, HitFlags, DamageKind};
+use sulis_module::{DamageKind, HitFlags, HitKind};
 
 use crate::{AreaState, EntityState};
 
@@ -118,7 +118,7 @@ impl AreaFeedbackText {
         area: &AreaState,
         hit_kind: HitKind,
         hit_flags: HitFlags,
-        damage: &[(DamageKind, u32)]
+        damage: &[(DamageKind, u32)],
     ) -> AreaFeedbackText {
         let mut text = AreaFeedbackText::with_target(target, area);
 
@@ -171,7 +171,9 @@ impl AreaFeedbackText {
                 }
             }
 
-            if valid || area_pos.y == 0 { break; }
+            if valid || area_pos.y == 0 {
+                break;
+            }
         }
 
         let width = target.size.width as f32;

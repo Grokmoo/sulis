@@ -21,7 +21,7 @@ use std::rc::Rc;
 use sulis_core::io::GraphicsRenderer;
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_core::util::Point;
-use sulis_core::widgets::{Button, ScrollPane, ScrollDirection};
+use sulis_core::widgets::{Button, ScrollDirection, ScrollPane};
 use sulis_module::{Actor, Module};
 
 use crate::{AreaModel, EditorMode};

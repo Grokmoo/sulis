@@ -105,9 +105,10 @@ impl LootList {
         id: String,
         entry_in: EntryBuilder,
     ) -> Result<Entry, Error> {
-        if entry_in.adjective1.len() != 0 ||
-            entry_in.adjective2.len() != 0 ||
-            entry_in.variant.len() != 0 {
+        if entry_in.adjective1.len() != 0
+            || entry_in.adjective2.len() != 0
+            || entry_in.variant.len() != 0
+        {
             warn!(
                 "Item adjective and variant may not be specified in loot sub_list entries: '{}'",
                 id

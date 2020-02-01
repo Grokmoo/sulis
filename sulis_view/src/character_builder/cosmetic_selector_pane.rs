@@ -24,7 +24,7 @@ use sulis_core::io::GraphicsRenderer;
 use sulis_core::resource::ResourceSet;
 use sulis_core::ui::{Callback, Color, Widget, WidgetKind};
 use sulis_core::util::Point;
-use sulis_core::widgets::{Button, InputField, Label, ScrollPane, ScrollDirection};
+use sulis_core::widgets::{Button, InputField, Label, ScrollDirection, ScrollPane};
 use sulis_module::actor::Sex;
 use sulis_module::{ImageLayer, ImageLayerSet, ItemState, Race, Slot};
 

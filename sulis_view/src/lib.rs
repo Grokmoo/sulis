@@ -133,7 +133,7 @@ use std::any::Any;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use sulis_core::io::{MainLoopUpdater};
+use sulis_core::io::MainLoopUpdater;
 use sulis_core::ui::{Widget, WidgetKind};
 use sulis_core::widgets::{Button, ConfirmationWindow, Label};
 use sulis_state::{ChangeListener, GameState};

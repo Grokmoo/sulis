@@ -14,12 +14,15 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::rc::Rc;
 use std::cell::RefCell;
+use std::rc::Rc;
 
-use sulis_core::{config::Config, util::{self, Point}};
-use sulis_module::{area::{Destination, LocationChecker, PathFinder, PathFinderGrid}};
-use crate::{animation, animation::Anim, AreaState, EntityState, script::ScriptCallback};
+use crate::{animation, animation::Anim, script::ScriptCallback, AreaState, EntityState};
+use sulis_core::{
+    config::Config,
+    util::{self, Point},
+};
+use sulis_module::area::{Destination, LocationChecker, PathFinder, PathFinderGrid};
 
 pub struct StateLocationChecker<'a, 'b> {
     width: i32,
@@ -83,15 +86,22 @@ pub fn move_towards_point(
     entity: &Rc<RefCell<EntityState>>,
     entities_to_ignore: Vec<usize>,
     dest: Destination,
-    cb: Option<Box<dyn ScriptCallback>>
+    cb: Option<Box<dyn ScriptCallback>>,
 ) -> Option<Anim> {
-
-    let path = match find_path(finder, area, &entity.borrow(), entities_to_ignore, dest, true) {
+    let path = match find_path(
+        finder,
+        area,
+        &entity.borrow(),
+        entities_to_ignore,
+        dest,
+        true,
+    ) {
         None => return None,
         Some(path) => path,
     };
 
-    let mut anim = animation::move_animation::new(entity, path, Config::animation_base_time_millis());
+    let mut anim =
+        animation::move_animation::new(entity, path, Config::animation_base_time_millis());
     if let Some(cb) = cb {
         anim.add_completion_callback(cb);
     }
@@ -129,11 +139,14 @@ fn find_path(
 ) -> Option<Vec<Point>> {
     let checker = StateLocationChecker::new(area_state, entity, entities_to_ignore);
 
-    debug!("Attempting move '{}' to {:?}", entity.actor.actor.name, dest);
+    debug!(
+        "Attempting move '{}' to {:?}",
+        entity.actor.actor.name, dest
+    );
 
     if check_ap {
-        if entity.actor.stats.move_disabled ||
-            entity.actor.ap() < entity.actor.get_move_ap_cost(1) {
+        if entity.actor.stats.move_disabled || entity.actor.ap() < entity.actor.get_move_ap_cost(1)
+        {
             return None;
         }
 
@@ -144,6 +157,9 @@ fn find_path(
 
     let path = path_finder.find(&checker, entity.location.x, entity.location.y, dest);
 
-    debug!("Pathing complete in {} secs", util::format_elapsed_secs(start_time.elapsed()));
+    debug!(
+        "Pathing complete in {} secs",
+        util::format_elapsed_secs(start_time.elapsed())
+    );
     path
 }

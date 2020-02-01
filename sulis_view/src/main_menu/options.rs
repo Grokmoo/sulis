@@ -14,9 +14,9 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::collections::HashMap;
 use std::any::Any;
 use std::cell::RefCell;
+use std::collections::HashMap;
 use std::path::Path;
 use std::rc::Rc;
 
@@ -24,7 +24,7 @@ use sulis_core::config::DisplayMode;
 use sulis_core::config::{self, Config, RawClick};
 use sulis_core::io::{event::ClickKind, keyboard_event::Key, DisplayConfiguration, InputAction};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
-use sulis_core::widgets::{Button, Label, ScrollPane, ScrollDirection, TextArea};
+use sulis_core::widgets::{Button, Label, ScrollDirection, ScrollPane, TextArea};
 
 use crate::main_menu::MainMenu;
 
@@ -61,8 +61,12 @@ impl Options {
             .collect();
         cur_keybindings.sort_by(|(_, v1), (_, v2)| v1.partial_cmp(v2).unwrap());
 
-        let mut cur_click_actions: Vec<_> =
-            config.input.click_actions.iter().map(|(k, v)| (*k, *v)).collect();
+        let mut cur_click_actions: Vec<_> = config
+            .input
+            .click_actions
+            .iter()
+            .map(|(k, v)| (*k, *v))
+            .collect();
         cur_click_actions.sort_by(|(_, v1), (_, v2)| v1.cmp(v2));
 
         let cur_display_conf = if config.display.monitor >= display_confs.len() {
@@ -437,17 +441,26 @@ impl Options {
             let row = Widget::empty("row");
 
             let button = Widget::with_theme(Button::empty(), "mouse_button");
-            button.borrow_mut().state.add_text_arg("button", &format!("{:?}", raw));
-            button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-                let (parent, _) = Widget::parent::<Options>(widget);
+            button
+                .borrow_mut()
+                .state
+                .add_text_arg("button", &format!("{:?}", raw));
+            button
+                .borrow_mut()
+                .state
+                .add_callback(Callback::new(Rc::new(move |widget, _| {
+                    let (parent, _) = Widget::parent::<Options>(widget);
 
-                let root = Widget::get_root(widget);
-                let popup = MousePopup::new(action, parent);
-                Widget::add_child_to(&root, Widget::with_defaults(popup));
-            })));
+                    let root = Widget::get_root(widget);
+                    let popup = MousePopup::new(action, parent);
+                    Widget::add_child_to(&root, Widget::with_defaults(popup));
+                })));
 
             let label = Widget::with_theme(TextArea::empty(), "action_label");
-            label.borrow_mut().state.add_text_arg(&format!("{:?}", action), "true");
+            label
+                .borrow_mut()
+                .state
+                .add_text_arg(&format!("{:?}", action), "true");
 
             Widget::add_children_to(&row, vec![button, label]);
 
@@ -592,10 +605,7 @@ pub struct MousePopup {
 }
 
 impl MousePopup {
-    pub fn new(
-        action: ClickKind,
-        options_widget: Rc<RefCell<Widget>>,
-    ) -> Rc<RefCell<MousePopup>> {
+    pub fn new(action: ClickKind, options_widget: Rc<RefCell<Widget>>) -> Rc<RefCell<MousePopup>> {
         Rc::new(RefCell::new(MousePopup {
             action,
             options_widget,
@@ -610,8 +620,11 @@ impl WidgetKind for MousePopup {
         self.super_on_mouse_press(widget, kind);
 
         let options = Widget::kind_mut::<Options>(&self.options_widget);
-        let mut actions: HashMap<_, _> = options.cur_click_actions.iter()
-            .map(|(k, v)| (*v, *k)).collect();
+        let mut actions: HashMap<_, _> = options
+            .cur_click_actions
+            .iter()
+            .map(|(k, v)| (*v, *k))
+            .collect();
 
         let old_click = *actions.get(&kind).unwrap();
         let new_click = *actions.get(&self.action).unwrap();
@@ -620,7 +633,9 @@ impl WidgetKind for MousePopup {
         actions.insert(self.action, old_click);
 
         options.cur_click_actions = actions.into_iter().map(|(k, v)| (v, k)).collect();
-        options.cur_click_actions.sort_by(|(_, v1), (_, v2)| v1.cmp(v2));
+        options
+            .cur_click_actions
+            .sort_by(|(_, v1), (_, v2)| v1.cmp(v2));
 
         self.options_widget.borrow_mut().invalidate_children();
         widget.borrow_mut().mark_for_removal();

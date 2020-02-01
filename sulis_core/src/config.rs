@@ -139,7 +139,14 @@ impl Config {
     }
 
     pub fn get_keybindings() -> HashMap<InputAction, Key> {
-        CONFIG.with(|c| c.borrow().input.keybindings.iter().map(|(k, v)| (*v, *k)).collect())
+        CONFIG.with(|c| {
+            c.borrow()
+                .input
+                .keybindings
+                .iter()
+                .map(|(k, v)| (*v, *k))
+                .collect()
+        })
     }
 
     pub fn get_click_action(button: RawClick) -> ClickKind {
@@ -285,7 +292,7 @@ pub enum RawClick {
 const RAW_CLICKS: [RawClick; 3] = [RawClick::Left, RawClick::Right, RawClick::Middle];
 
 impl RawClick {
-    pub fn iter() -> impl Iterator<Item=&'static RawClick> {
+    pub fn iter() -> impl Iterator<Item = &'static RawClick> {
         RAW_CLICKS.iter()
     }
 }
@@ -341,16 +348,14 @@ impl Config {
     fn init() -> Config {
         let revision = match Config::new(Path::new(CONFIG_BASE), 0) {
             Ok(config) => config.revision,
-            Err(orig_e) => {
-                match Config::new(&Path::new("../").join(CONFIG_BASE), 0) {
-                    Err(_) => {
-                        eprintln!("{}", orig_e);
-                        eprintln!("Unable to parse revision from config.sample");
-                        std::process::exit(1);
-                    },
-                    Ok(config) => config.revision,
+            Err(orig_e) => match Config::new(&Path::new("../").join(CONFIG_BASE), 0) {
+                Err(_) => {
+                    eprintln!("{}", orig_e);
+                    eprintln!("Unable to parse revision from config.sample");
+                    std::process::exit(1);
                 }
-            }
+                Ok(config) => config.revision,
+            },
         };
 
         let mut config_path = USER_DIR.clone();
@@ -429,14 +434,18 @@ impl Config {
 
         for key in RawClick::iter() {
             if let None = config.input.click_actions.get(key) {
-                return Err(Error::new(ErrorKind::InvalidData,
-                        "Must specify an action for each of Left, Right & Middle Click"));
+                return Err(Error::new(
+                    ErrorKind::InvalidData,
+                    "Must specify an action for each of Left, Right & Middle Click",
+                ));
             }
         }
 
         if config.revision < required_revision {
-            return Err(Error::new(ErrorKind::InvalidData,
-                    format!("Config has old revision: {}", config.revision)));
+            return Err(Error::new(
+                ErrorKind::InvalidData,
+                format!("Config has old revision: {}", config.revision),
+            ));
         }
 
         match config.logging.log_level.as_ref() {

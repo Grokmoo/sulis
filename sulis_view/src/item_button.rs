@@ -18,15 +18,21 @@ use std::any::Any;
 use std::cell::RefCell;
 use std::rc::Rc;
 
+use crate::bonus_text_arg_handler::{
+    add_attack_text_args, add_bonus_text_args, add_prereq_text_args,
+};
+use crate::item_callback_handler::sell_item_cb;
 use crate::{ItemActionMenu, MerchantWindow, RootView};
-use sulis_core::io::{keyboard_event::Key, event};
+use sulis_core::io::{event, keyboard_event::Key};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_core::widgets::{Label, TextArea};
-use sulis_module::{ability, item::{format_item_value, format_item_weight}, Module};
-use sulis_module::{QuickSlot, Slot, ItemState};
+use sulis_module::{
+    ability,
+    item::{format_item_value, format_item_weight},
+    Module,
+};
+use sulis_module::{ItemState, QuickSlot, Slot};
 use sulis_state::{inventory::has_proficiency, EntityState, GameState};
-use crate::bonus_text_arg_handler::{add_prereq_text_args, add_attack_text_args, add_bonus_text_args};
-use crate::item_callback_handler::sell_item_cb;
 
 enum Kind {
     Prop {
@@ -70,7 +76,11 @@ pub struct ItemButton {
 const ITEM_BUTTON_NAME: &str = "item_button";
 
 impl ItemButton {
-    pub fn inventory(item: &ItemState, quantity: u32, item_index: usize) -> Rc<RefCell<ItemButton>> {
+    pub fn inventory(
+        item: &ItemState,
+        quantity: u32,
+        item_index: usize,
+    ) -> Rc<RefCell<ItemButton>> {
         ItemButton::new(item, quantity, Kind::Inventory { item_index })
     }
 
@@ -327,7 +337,10 @@ impl WidgetKind for ItemButton {
 
         let key_label = Widget::with_theme(Label::empty(), "key_label");
         if let Some(key) = self.keyboard_shortcut {
-            key_label.borrow_mut().state.add_text_arg("keybinding", &key.short_name());
+            key_label
+                .borrow_mut()
+                .state
+                .add_text_arg("keybinding", &key.short_name());
         }
 
         vec![icon, adj, qty_label, key_label]
@@ -357,7 +370,9 @@ impl WidgetKind for ItemButton {
             );
 
             if let Some(key) = self.keyboard_shortcut {
-                item_window.state.add_text_arg("keybinding", &key.short_name());
+                item_window
+                    .state
+                    .add_text_arg("keybinding", &key.short_name());
             }
 
             match self.kind {

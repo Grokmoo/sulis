@@ -28,7 +28,7 @@ pub struct ItemListEntrySaveState {
 }
 
 impl ItemListEntrySaveState {
-    pub fn new(quantity: u32, item: &ItemState)-> ItemListEntrySaveState {
+    pub fn new(quantity: u32, item: &ItemState) -> ItemListEntrySaveState {
         ItemListEntrySaveState {
             quantity,
             item: ItemSaveState::new(item),
@@ -49,7 +49,8 @@ pub struct ItemSaveState {
 
 impl ItemSaveState {
     pub fn new(item: &ItemState) -> ItemSaveState {
-        let adjectives = item.item
+        let adjectives = item
+            .item
             .added_adjectives
             .iter()
             .map(|adj| adj.id.clone())
@@ -139,7 +140,7 @@ impl InventoryBuilder {
                         item.id, item.adjectives
                     );
                     None
-                },
+                }
                 Some(item) => {
                     let state = ItemState::new(item, entry.item.variant);
                     Some((qty, state))

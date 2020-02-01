@@ -19,16 +19,16 @@ use std::collections::HashMap;
 use std::io::Error;
 use std::rc::Rc;
 
+use crate::save_state::ActorSaveState;
+use crate::{
+    ability_state::DisabledReason, AbilityState, ChangeListenerList, Effect, EntityState,
+    GameState, Inventory, PStats,
+};
 use sulis_core::image::{Image, LayeredImage};
 use sulis_core::io::GraphicsRenderer;
 use sulis_core::util::{invalid_data_error, ExtInt};
 use sulis_module::{Ability, Actor, ActorBuilder, Faction, ImageLayer, Module};
-use sulis_module::{BonusList, ItemKind, QuickSlot, Slot, StatList, ItemState};
-use crate::save_state::ActorSaveState;
-use crate::{
-    ability_state::DisabledReason, AbilityState, ChangeListenerList, Effect,
-    EntityState, GameState, Inventory, PStats,
-};
+use sulis_module::{BonusList, ItemKind, ItemState, QuickSlot, Slot, StatList};
 
 pub struct ActorState {
     pub actor: Rc<Actor>,
@@ -502,7 +502,8 @@ impl ActorState {
 
             let mut ability_state = AbilityState::new(ability);
             ability_state.newly_added_ability = true;
-            self.ability_states.insert(ability.id.to_string(), ability_state);
+            self.ability_states
+                .insert(ability.id.to_string(), ability_state);
         }
 
         let mut to_remove = Vec::new();

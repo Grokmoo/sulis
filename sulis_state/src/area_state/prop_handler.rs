@@ -14,12 +14,12 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::rc::Rc;
 use std::io::Error;
+use std::rc::Rc;
 
-use sulis_core::util::{Point, invalid_data_error};
-use sulis_module::{Module, Area, Prop, area::PropData, prop::Interactive};
-use crate::{Location, save_state::PropSaveState, prop_state, PropState};
+use crate::{prop_state, save_state::PropSaveState, Location, PropState};
+use sulis_core::util::{invalid_data_error, Point};
+use sulis_module::{area::PropData, prop::Interactive, Area, Module, Prop};
 
 pub struct PropHandler {
     area: Rc<Area>,
@@ -42,11 +42,11 @@ impl PropHandler {
     }
 
     pub fn load(&mut self, props: Vec<PropSaveState>) -> Result<(), Error> {
-      for prop in props {
-          self.load_prop(prop)?;
-      }
+        for prop in props {
+            self.load_prop(prop)?;
+        }
 
-      Ok(())
+        Ok(())
     }
 
     pub fn populate(&mut self, props: &[PropData]) {
@@ -76,21 +76,27 @@ impl PropHandler {
         };
 
         let index = self.add(&prop_data, location, false)?;
-        self.props[index].as_mut().unwrap().
-            load_interactive(data.interactive)?;
+        self.props[index]
+            .as_mut()
+            .unwrap()
+            .load_interactive(data.interactive)?;
 
         self.update_vis_pass_grid(index);
         Ok(())
     }
 
     pub fn index_valid(&self, index: usize) -> bool {
-        if index >= self.props.len() { return false; }
+        if index >= self.props.len() {
+            return false;
+        }
 
         self.props[index].is_some()
     }
 
     fn container_index_at(&self, x: i32, y: i32) -> Option<usize> {
-        if !self.area.coords_valid(x, y) { return None; }
+        if !self.area.coords_valid(x, y) {
+            return None;
+        }
 
         let index = (x + y * self.area.width) as usize;
         for prop_index in &self.prop_grid[index] {
@@ -145,13 +151,16 @@ impl PropHandler {
 
     #[must_use]
     pub fn check_or_create_container(&mut self, x: i32, y: i32) -> Option<usize> {
-        if let Some(idx) = self.container_index_at(x, y) { return Some(idx); }
+        if let Some(idx) = self.container_index_at(x, y) {
+            return Some(idx);
+        }
 
         let prop = match Module::prop(&Module::rules().loot_drop_prop) {
             None => {
                 warn!("Unable to generate loot drop prop.");
                 return None;
-            }, Some(prop) => prop,
+            }
+            Some(prop) => prop,
         };
 
         let location = Location::new(x, y, &self.area);
@@ -168,8 +177,8 @@ impl PropHandler {
                 warn!("Unable to add temp container at {},{}", x, y);
                 warn!("{}", e);
                 None
-            },
-            Ok(idx) => Some(idx)
+            }
+            Ok(idx) => Some(idx),
         }
     }
 
@@ -200,18 +209,25 @@ impl PropHandler {
         &mut self,
         prop_data: &PropData,
         location: Location,
-        temporary: bool
+        temporary: bool,
     ) -> Result<usize, Error> {
         let prop = &prop_data.prop;
 
         if !self.area.coords_valid(location.x, location.y) {
-            return invalid_data_error(&format!("Prop location: {},{} in {} invalid",
-                    location.x, location.y, location.area_id));
+            return invalid_data_error(&format!(
+                "Prop location: {},{} in {} invalid",
+                location.x, location.y, location.area_id
+            ));
         }
 
-        if !self.area.coords_valid(location.x + prop.size.width, location.y + prop.size.height) {
-            return invalid_data_error(&format!("Prop location: {},{} in {} invalid due to prop size",
-                    location.x, location.y, location.area_id));
+        if !self
+            .area
+            .coords_valid(location.x + prop.size.width, location.y + prop.size.height)
+        {
+            return invalid_data_error(&format!(
+                "Prop location: {},{} in {} invalid due to prop size",
+                location.x, location.y, location.area_id
+            ));
         }
 
         let state = PropState::new(prop_data, location, temporary);
@@ -243,7 +259,9 @@ impl PropHandler {
                 Some(ref prop) => prop,
             };
 
-            if !prop.is_marked_for_removal() { continue; }
+            if !prop.is_marked_for_removal() {
+                continue;
+            }
 
             self.remove(index);
         }
@@ -277,7 +295,9 @@ impl PropHandler {
     }
 
     pub fn index_at(&self, x: i32, y: i32) -> Option<usize> {
-        if !self.area.coords_valid(x, y) { return None; }
+        if !self.area.coords_valid(x, y) {
+            return None;
+        }
 
         let index = (x + y * self.area.width) as usize;
         self.prop_grid[index].get(0).copied()
@@ -315,7 +335,9 @@ impl PropHandler {
     }
 
     pub fn set_enabled_at(&mut self, x: i32, y: i32, enabled: bool) -> bool {
-        if !self.area.coords_valid(x, y) { return false; }
+        if !self.area.coords_valid(x, y) {
+            return false;
+        }
 
         let mut result = false;
         let index = (x + y * self.area.width) as usize;
@@ -330,10 +352,12 @@ impl PropHandler {
 
     // This method must be called by the owning AreaState in order
     // to compute visibility correctly
-    pub (in crate::area_state) fn toggle_active(&mut self, index: usize) -> bool {
+    pub(in crate::area_state) fn toggle_active(&mut self, index: usize) -> bool {
         let state = self.get_mut(index);
         state.toggle_active();
-        if !state.is_door() { return false; }
+        if !state.is_door() {
+            return false;
+        }
 
         self.update_vis_pass_grid(index);
 
@@ -355,7 +379,9 @@ impl PropHandler {
         let prop = self.props[index].as_mut();
         let state = prop.unwrap();
 
-        if !state.is_door() { return; }
+        if !state.is_door() {
+            return;
+        }
 
         let width = self.area.width;
         let start_x = state.location.x;
@@ -374,7 +400,10 @@ impl PropHandler {
         } else {
             if let Interactive::Door {
                 ref closed_invis,
-                ref closed_impass, .. } = state.prop.interactive {
+                ref closed_impass,
+                ..
+            } = state.prop.interactive
+            {
                 for p in closed_invis {
                     self.prop_vis_grid[(p.x + start_x + (p.y + start_y) * width) as usize] = false;
                 }
@@ -405,7 +434,7 @@ impl<'a> Iterator for PropIterator<'a> {
                 Some(prop) => match prop {
                     None => continue,
                     Some(ref prop) => return Some(prop),
-                }
+                },
             }
         }
     }

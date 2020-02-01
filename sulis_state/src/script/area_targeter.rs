@@ -26,8 +26,8 @@ use sulis_module::{Ability, Module, ObjectSize};
 
 use crate::script::{targeter, ScriptItemKind, TargeterData};
 use crate::{
-    area_feedback_text::Params, AreaState, EntityState, GameState, RangeIndicator, Script,
-    TurnManager, center_i32, is_within, dist
+    area_feedback_text::Params, center_i32, dist, is_within, AreaState, EntityState, GameState,
+    RangeIndicator, Script, TurnManager,
 };
 
 #[derive(Clone)]
@@ -142,10 +142,10 @@ impl Shape {
     pub fn get_cursor_offset(&self) -> Point {
         use Shape::*;
         match self {
-            Single | Circle { .. } | Cone { .. } =>
-                Point::default(),
-            LineSegment { ref size, .. } | Line { ref size, .. } | ObjectSize { ref size } =>
-                get_cursor_offset_from_size(size),
+            Single | Circle { .. } | Cone { .. } => Point::default(),
+            LineSegment { ref size, .. } | Line { ref size, .. } | ObjectSize { ref size } => {
+                get_cursor_offset_from_size(size)
+            }
         }
     }
 
@@ -815,17 +815,18 @@ impl AreaTargeter {
 
         let range_indicator = match data.selection_area {
             targeter::SelectionArea::None => None,
-            targeter::SelectionArea::Radius(radius) =>
-                Some(RangeIndicator::targeter(radius, &parent)),
+            targeter::SelectionArea::Radius(radius) => {
+                Some(RangeIndicator::targeter(radius, &parent))
+            }
             targeter::SelectionArea::Visible => {
                 let area = GameState::area_state();
                 let r = area.borrow().area.area.vis_dist;
                 Some(RangeIndicator::targeter(r as f32, &parent))
-            },
+            }
             targeter::SelectionArea::Attackable => {
-              let r = parent.borrow().actor.stats.attack_distance();
-              Some(RangeIndicator::targeter(r, &parent))
-            },
+                let r = parent.borrow().actor.stats.attack_distance();
+                Some(RangeIndicator::targeter(r, &parent))
+            }
             targeter::SelectionArea::Touchable => {
                 let r = parent.borrow().actor.stats.touch_distance();
                 Some(RangeIndicator::targeter(r, &parent))
@@ -1166,7 +1167,9 @@ impl AreaTargeter {
     }
 
     pub fn is_valid_to_activate(&self) -> bool {
-        if self.cancel() { return false; }
+        if self.cancel() {
+            return false;
+        }
 
         if self.free_select.is_none() {
             match self.cur_target {

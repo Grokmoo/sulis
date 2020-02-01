@@ -17,7 +17,7 @@
 mod prop_handler;
 use prop_handler::PropHandler;
 
-use std::cell::{RefCell};
+use std::cell::RefCell;
 use std::collections::HashSet;
 use std::io::Error;
 use std::rc::Rc;
@@ -107,7 +107,7 @@ impl AreaState {
         Ok(AreaState {
             area: gened,
             area_gen_seed,
-            props: props,
+            props,
             entities: Vec::new(),
             surfaces: Vec::new(),
             triggers: Vec::new(),
@@ -619,7 +619,9 @@ impl AreaState {
     }
 
     pub fn toggle_prop_active(&mut self, index: usize) {
-        if !self.props.toggle_active(index) { return; }
+        if !self.props.toggle_active(index) {
+            return;
+        }
 
         self.pc_vis_partial_redraw(0, 0);
         for member in GameState::party().iter() {
@@ -627,7 +629,6 @@ impl AreaState {
         }
         self.update_view_visibility();
     }
-
 
     pub fn has_visibility(&self, parent: &EntityState, target: &EntityState) -> bool {
         has_visibility(&self.area, &self.props.entire_vis_grid(), parent, target)
@@ -736,7 +737,9 @@ impl AreaState {
         }
 
         let index = (x + y * self.area.width) as usize;
-        if !self.props.pass_grid(index) { return false; }
+        if !self.props.pass_grid(index) {
+            return false;
+        }
 
         let grid_index = &self.entity_grid[index];
 
@@ -749,7 +752,9 @@ impl AreaState {
         }
 
         let index = (x + y * self.area.width) as usize;
-        if !self.props.pass_grid(index) { return false; }
+        if !self.props.pass_grid(index) {
+            return false;
+        }
 
         let grid = &self.entity_grid[index];
 
@@ -1120,7 +1125,7 @@ impl AreaState {
         self.feedback_text.push(text);
     }
 
-    pub fn feedback_text_iter(&self) -> impl Iterator<Item=&AreaFeedbackText> {
+    pub fn feedback_text_iter(&self) -> impl Iterator<Item = &AreaFeedbackText> {
         self.feedback_text.iter()
     }
 
@@ -1132,4 +1137,3 @@ impl AreaState {
         self.entities.iter()
     }
 }
-

@@ -21,10 +21,12 @@ use std::rc::Rc;
 use crate::RootView;
 use sulis_core::ui::{animation_state, Widget};
 use sulis_core::util::Point;
-use sulis_module::{area::{Destination, ToKind}, Faction, Module, ObjectSize,
-    OnTrigger, Time, MOVE_TO_THRESHOLD};
+use sulis_module::{
+    area::{Destination, ToKind},
+    Faction, Module, ObjectSize, OnTrigger, Time, MOVE_TO_THRESHOLD,
+};
+use sulis_state::{can_attack, is_within};
 use sulis_state::{AreaState, EntityState, GameState, PropState, ScriptCallback};
-use sulis_state::{is_within, can_attack};
 
 pub fn get_action(x_f32: f32, y_f32: f32) -> Box<dyn ActionKind> {
     let (x, y) = (x_f32 as i32, y_f32 as i32);
@@ -739,14 +741,21 @@ impl MoveAction {
 
         let parent_w = pc.borrow().size.width as f32;
         let parent_h = pc.borrow().size.height as f32;
-        let dest = Destination { x, y, w, h, parent_w, parent_h, dist };
+        let dest = Destination {
+            x,
+            y,
+            w,
+            h,
+            parent_w,
+            parent_h,
+            dist,
+        };
 
-        let path =
-            match GameState::can_move_towards_dest(&pc.borrow(), entities_to_ignore(), dest)
-            {
-                None => return None,
-                Some(path) => path,
-            };
+        let path = match GameState::can_move_towards_dest(&pc.borrow(), entities_to_ignore(), dest)
+        {
+            None => return None,
+            Some(path) => path,
+        };
 
         let (ap, path) = if path.len() > 0 {
             let pc = pc.borrow();
@@ -786,9 +795,13 @@ impl MoveAction {
         })
     }
 
-    fn create_if_valid(x: f32, y: f32, w: f32, h: f32,
-        dist: Option<f32>) -> Option<Box<dyn ActionKind>> {
-
+    fn create_if_valid(
+        x: f32,
+        y: f32,
+        w: f32,
+        h: f32,
+        dist: Option<f32>,
+    ) -> Option<Box<dyn ActionKind>> {
         match MoveAction::new_if_valid(x, y, w, h, dist) {
             None => None,
             Some(action) => Some(Box::new(action)),
@@ -797,12 +810,7 @@ impl MoveAction {
 
     fn move_one(&mut self) {
         let cb = self.cb.take();
-        GameState::move_towards_dest(
-            &self.selected[0],
-            entities_to_ignore(),
-            self.dest,
-            cb,
-        );
+        GameState::move_towards_dest(&self.selected[0], entities_to_ignore(), self.dest, cb);
     }
 
     fn move_all(&mut self) {

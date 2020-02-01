@@ -17,7 +17,7 @@
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use crate::{AreaFeedbackText, animation::Anim, entity_attack_handler::weapon_attack};
+use crate::{animation::Anim, entity_attack_handler::weapon_attack, AreaFeedbackText};
 use crate::{script::ScriptEntitySet, EntityState, GameState, ScriptCallback};
 use sulis_core::image::Image;
 use sulis_core::io::{DrawList, GraphicsRenderer};
@@ -66,7 +66,7 @@ pub(in crate::animation) fn update(
                     &area_state.borrow(),
                     hit_kind,
                     hit_flags,
-                    &damage
+                    &damage,
                 );
                 area_state.borrow_mut().add_feedback_text(feedback);
 

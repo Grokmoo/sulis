@@ -18,8 +18,8 @@ use std::io::Error;
 use std::rc::Rc;
 
 use crate::config::Config;
-use crate::io::{DrawList, GraphicsRenderer};
 use crate::image::Image;
+use crate::io::{DrawList, GraphicsRenderer};
 use crate::resource::{ResourceSet, Sprite};
 use crate::ui::AnimationState;
 use crate::util::Size;
@@ -39,7 +39,7 @@ pub struct WindowImage {
 impl WindowImage {
     pub fn new(
         builder: WindowImageBuilder,
-        resources: &ResourceSet
+        resources: &ResourceSet,
     ) -> Result<Rc<dyn Image>, Error> {
         let sprite = resources.sprite_internal(&builder.image)?;
 
@@ -60,7 +60,6 @@ impl WindowImage {
         let rel_w = self.initial.w + self.delta.w * time;
         let rel_h = self.initial.h + self.delta.h * time;
 
-
         let abs_tc = &self.image.tex_coords;
         let abs_x = abs_tc[0];
         let abs_w = abs_tc[4] - abs_x;
@@ -73,9 +72,8 @@ impl WindowImage {
         let y_max = abs_y + abs_h * rel_h;
 
         let tc = [x_min, y_max, x_min, y_min, x_max, y_max, x_max, y_min];
-        let mut list = DrawList::from_texture_id(
-            &self.image.sheet_id, &tc, x, y, w * rel_w, h * rel_h
-        );
+        let mut list =
+            DrawList::from_texture_id(&self.image.sheet_id, &tc, x, y, w * rel_w, h * rel_h);
 
         let y_max = Config::ui_height() as f32 - y;
         let y_min = y_max - h;

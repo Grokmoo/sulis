@@ -86,7 +86,9 @@ impl ScrollPane {
 
         if self.content_size == 0 {
             self.content_size = self.content.borrow().state.height();
-            self.scrollbar.borrow_mut().set_content_size(self.content_size);
+            self.scrollbar
+                .borrow_mut()
+                .set_content_size(self.content_size);
         }
 
         let w = self.content.borrow().state.width();
@@ -107,15 +109,23 @@ impl ScrollPane {
         widget.state.set_position(x, y);
 
         let (sx, sy) = self.scrollbar_widget.borrow().state.position().as_tuple();
-        self.scrollbar_widget.borrow_mut().state.set_position(sx + scroll, sy);
+        self.scrollbar_widget
+            .borrow_mut()
+            .state
+            .set_position(sx + scroll, sy);
 
         if self.content_size == 0 {
             self.content_size = self.content.borrow().state.width();
-            self.scrollbar.borrow_mut().set_content_size(self.content_size);
+            self.scrollbar
+                .borrow_mut()
+                .set_content_size(self.content_size);
         }
 
         let h = self.content.borrow().state.height();
-        self.content.borrow_mut().state.set_size(Size::new(self.content_size + scroll, h));
+        self.content
+            .borrow_mut()
+            .state
+            .set_size(Size::new(self.content_size + scroll, h));
     }
 }
 
@@ -198,7 +208,7 @@ struct Scrollbar {
 impl Scrollbar {
     fn new(
         direction: ScrollDirection,
-        widget_to_scroll: &Rc<RefCell<Widget>>
+        widget_to_scroll: &Rc<RefCell<Widget>>,
     ) -> Rc<RefCell<Scrollbar>> {
         let up = Widget::with_theme(Button::empty(), "up");
         let down = Widget::with_theme(Button::empty(), "down");
@@ -249,15 +259,14 @@ impl Scrollbar {
 
         for child in &widget.children {
             let child = &child.borrow();
-            max_x = cmp::max(
-                max_x,
-                child.state.left() + child.state.width()
-            );
+            max_x = cmp::max(max_x, child.state.left() + child.state.width());
         }
 
         let state = &widget.state;
         self.max_pos = max_x - self.content_size + state.border().horizontal() - state.left();
-        if self.max_pos < self.min_pos { self.max_pos = self.min_pos }
+        if self.max_pos < self.min_pos {
+            self.max_pos = self.min_pos
+        }
     }
 
     fn compute_min_max_y(&mut self, widget: &Widget) {
@@ -266,10 +275,7 @@ impl Scrollbar {
         for child in &widget.children {
             let child = &child.borrow();
 
-            max_y = cmp::max(
-                max_y,
-                child.state.top() + child.state.height(),
-            );
+            max_y = cmp::max(max_y, child.state.top() + child.state.height());
         }
 
         let state = &widget.state;
@@ -294,8 +300,8 @@ impl Scrollbar {
         let thumb_x = self.thumb.borrow().state.left();
         let thumb_base_y = self.up.borrow().state.top() + self.up.borrow().state.height();
 
-        let thumb_pos_frac = (self.cur_pos as f32 - self.min_pos as f32) /
-            (self.max_pos as f32 - self.min_pos as f32);
+        let thumb_pos_frac = (self.cur_pos as f32 - self.min_pos as f32)
+            / (self.max_pos as f32 - self.min_pos as f32);
         let thumb_max_y = self.down.borrow().state.top() - thumb_height - thumb_base_y;
 
         let thumb_y = thumb_base_y + (thumb_pos_frac * thumb_max_y as f32).round() as i32;
@@ -306,9 +312,8 @@ impl Scrollbar {
     fn set_thumb_state_horizontal(&mut self, state: &WidgetState, thumb_frac: f32) {
         let thumb = &mut self.thumb.borrow_mut();
 
-        let inner_width = state.inner_width()
-            - self.up.borrow().state.width()
-            - self.down.borrow().state.width();
+        let inner_width =
+            state.inner_width() - self.up.borrow().state.width() - self.down.borrow().state.width();
         let thumb_width = (thumb_frac * inner_width as f32).round() as i32;
         let thumb_height = thumb.state.height();
         thumb.state.set_size(Size::new(thumb_width, thumb_height));
@@ -316,8 +321,8 @@ impl Scrollbar {
         let thumb_y = thumb.state.top();
         let thumb_base_x = self.up.borrow().state.left() + self.up.borrow().state.width();
 
-        let thumb_pos_frac = (self.cur_pos as f32 - self.min_pos as f32) /
-            (self.max_pos as f32 - self.min_pos as f32);
+        let thumb_pos_frac = (self.cur_pos as f32 - self.min_pos as f32)
+            / (self.max_pos as f32 - self.min_pos as f32);
         let thumb_max_x = self.down.borrow().state.left() - thumb_width - thumb_base_x;
 
         let thumb_x = thumb_base_x + (thumb_pos_frac * thumb_max_x as f32).round() as i32;
@@ -354,17 +359,16 @@ impl WidgetKind for Scrollbar {
             .set_enabled(self.cur_pos != self.max_pos);
 
         let widget_size = self.content_size as f32;
-        let thumb_frac = widget_size /
-            ((self.max_pos as f32 - self.min_pos as f32) + widget_size);
+        let thumb_frac = widget_size / ((self.max_pos as f32 - self.min_pos as f32) + widget_size);
 
         self.thumb.borrow_mut().state.set_enabled(false);
         widget.state.set_visible(thumb_frac < 1.0);
 
         match self.direction {
-            ScrollDirection::Vertical =>
-                self.set_thumb_state_vertical(&widget.state, thumb_frac),
-            ScrollDirection::Horizontal =>
-                self.set_thumb_state_horizontal(&widget.state, thumb_frac),
+            ScrollDirection::Vertical => self.set_thumb_state_vertical(&widget.state, thumb_frac),
+            ScrollDirection::Horizontal => {
+                self.set_thumb_state_horizontal(&widget.state, thumb_frac)
+            }
         }
     }
 

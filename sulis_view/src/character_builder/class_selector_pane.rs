@@ -14,17 +14,17 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::collections::HashMap;
 use std::any::Any;
 use std::cell::RefCell;
+use std::collections::HashMap;
 use std::rc::Rc;
 
-use sulis_core::util::ExtInt;
 use sulis_core::ui::{Callback, Widget, WidgetKind, WidgetState};
+use sulis_core::util::ExtInt;
 use sulis_core::widgets::{Button, Label, TextArea};
 use sulis_module::{Class, Module};
 
-use crate::bonus_text_arg_handler::{format_bonus_or_penalty, add_bonus_text_args};
+use crate::bonus_text_arg_handler::{add_bonus_text_args, format_bonus_or_penalty};
 use crate::character_builder::{attribute_selector_pane::AbilityButton, BuilderPane};
 use crate::{CharacterBuilder, ClassPane};
 
@@ -41,7 +41,7 @@ impl ClassSelectorPane {
     pub fn new(
         choices: Vec<String>,
         allow_prev: bool,
-        level: u32
+        level: u32,
     ) -> Rc<RefCell<ClassSelectorPane>> {
         Rc::new(RefCell::new(ClassSelectorPane {
             selected_class: None,
@@ -154,8 +154,8 @@ impl WidgetKind for ClassSelectorPane {
         Widget::add_child_to(&selected, bonuses);
 
         if self.level == 1 {
-            let starting_abilities_title = Widget::with_theme(Label::empty(),
-                "starting_abilities_title");
+            let starting_abilities_title =
+                Widget::with_theme(Label::empty(), "starting_abilities_title");
             Widget::add_child_to(&selected, starting_abilities_title);
 
             let starting_abilities = Widget::empty("starting_abilities");
@@ -163,7 +163,9 @@ impl WidgetKind for ClassSelectorPane {
                 let button =
                     Widget::with_defaults(AbilityButton::new(Rc::clone(ability), Rc::clone(class)));
                 let icon = Widget::with_theme(Label::empty(), "icon");
-                icon.borrow_mut().state.add_text_arg("icon", &ability.icon.id());
+                icon.borrow_mut()
+                    .state
+                    .add_text_arg("icon", &ability.icon.id());
                 Widget::add_child_to(&button, icon);
                 Widget::add_child_to(&starting_abilities, button);
             }
@@ -185,12 +187,12 @@ fn build_upgrades_data(state: &mut WidgetState, class: &Class, level: u32) {
 
     let mut up_per_day = get_up_per(
         class.group_uses_per_day(level - 1),
-        class.group_uses_per_day(level)
+        class.group_uses_per_day(level),
     );
 
     let up_per_enc = get_up_per(
         class.group_uses_per_encounter(level - 1),
-        class.group_uses_per_encounter(level)
+        class.group_uses_per_encounter(level),
     );
 
     let mut uses = HashMap::new();
@@ -208,12 +210,18 @@ fn build_upgrades_data(state: &mut WidgetState, class: &Class, level: u32) {
 
     let mut i = 0;
     for (id, (per_enc, per_day)) in uses {
-        if per_enc == 0 && per_day == 0 { continue; }
+        if per_enc == 0 && per_day == 0 {
+            continue;
+        }
         state.add_text_arg(&format!("ability_uses_{}_id", i), &id);
-        state.add_text_arg(&format!("ability_uses_{}_per_enc", i),
-            &format_bonus_or_penalty(per_enc));
-        state.add_text_arg(&format!("ability_uses_{}_per_day", i),
-            &format_bonus_or_penalty(per_day));
+        state.add_text_arg(
+            &format!("ability_uses_{}_per_enc", i),
+            &format_bonus_or_penalty(per_enc),
+        );
+        state.add_text_arg(
+            &format!("ability_uses_{}_per_day", i),
+            &format_bonus_or_penalty(per_day),
+        );
 
         i += 1;
     }
@@ -223,7 +231,7 @@ fn build_upgrades_data(state: &mut WidgetState, class: &Class, level: u32) {
 
     let stats_up = get_up_per(
         class.stats_max(level - 1).into_iter().collect(),
-        class.stats_max(level).into_iter().collect()
+        class.stats_max(level).into_iter().collect(),
     );
 
     let mut i = 0;

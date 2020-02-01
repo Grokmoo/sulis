@@ -16,18 +16,18 @@
 
 use std::any::Any;
 use std::cell::RefCell;
-use std::rc::Rc;
 use std::collections::HashMap;
+use std::rc::Rc;
 
+use crate::{
+    item_callback_handler::{clear_quickslot_cb, use_item_cb},
+    ItemButton,
+};
 use sulis_core::io::{keyboard_event::Key, InputAction};
 use sulis_core::ui::{animation_state, Callback, Widget, WidgetKind};
 use sulis_core::widgets::{Button, Label};
 use sulis_module::QuickSlot;
 use sulis_state::{script::ScriptItemKind, ChangeListener, EntityState, GameState};
-use crate::{
-    item_callback_handler::{clear_quickslot_cb, use_item_cb},
-    ItemButton,
-};
 
 pub const NAME: &str = "quick_item_bar";
 
@@ -39,9 +39,10 @@ pub struct QuickItemBar {
 }
 
 impl QuickItemBar {
-    pub fn new(entity: &Rc<RefCell<EntityState>>,
-        keybindings: &HashMap<InputAction, Key>) -> Rc<RefCell<QuickItemBar>> {
-
+    pub fn new(
+        entity: &Rc<RefCell<EntityState>>,
+        keybindings: &HashMap<InputAction, Key>,
+    ) -> Rc<RefCell<QuickItemBar>> {
         let swap_weapons_key = keybindings.get(&InputAction::SwapWeapons).cloned();
         let quick_item_keys = [
             keybindings.get(&InputAction::QuickItem1).cloned(),
@@ -73,7 +74,9 @@ impl QuickItemBar {
     }
 
     fn do_quick_item(&self, index: usize) {
-        if self.quick_items.len() <= index { return; }
+        if self.quick_items.len() <= index {
+            return;
+        }
 
         let widget = match &self.quick_items[index] {
             None => return,
@@ -145,11 +148,10 @@ impl WidgetKind for QuickItemBar {
         let swap_weapons = Widget::with_theme(Button::empty(), "swap_weapons");
         {
             let state = &mut swap_weapons.borrow_mut().state;
-            state
-                .add_callback(Callback::new(Rc::new(|widget, _| {
-                    let (_, bar) = Widget::parent_mut::<QuickItemBar>(widget);
-                    bar.swap();
-                })));
+            state.add_callback(Callback::new(Rc::new(|widget, _| {
+                let (_, bar) = Widget::parent_mut::<QuickItemBar>(widget);
+                bar.swap();
+            })));
             state.set_enabled(self.entity.borrow().actor.can_swap_weapons());
 
             if let Some(key) = self.swap_weapons_key {

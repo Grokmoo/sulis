@@ -113,7 +113,9 @@ impl Encounter {
 
             if let Some(limit) = entry.limit {
                 let cur_count = *count.get(&entry.actor.id).unwrap_or(&0);
-                if cur_count >= limit { continue; }
+                if cur_count >= limit {
+                    continue;
+                }
                 count.insert(entry.actor.id.to_string(), cur_count + 1);
             }
 
@@ -150,7 +152,8 @@ impl Encounter {
                 None => {
                     warn!("Unable to generate actor for encounter '{}'", self.id);
                     return actors;
-                }, Some(actor) => actor,
+                }
+                Some(actor) => actor,
             };
 
             actors.push(actor);

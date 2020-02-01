@@ -22,7 +22,9 @@ use std::rc::Rc;
 use rlua::{self, Context, UserData, UserDataMethods};
 
 use crate::script::{Result, ScriptActiveSurface, ScriptEntity};
-use crate::{EntityState, GameState, is_within, is_within_attack_dist, is_within_touch_dist, is_threat};
+use crate::{
+    is_threat, is_within, is_within_attack_dist, is_within_touch_dist, EntityState, GameState,
+};
 use sulis_core::util::{gen_rand, invalid_data_error};
 use sulis_module::Faction;
 
@@ -233,9 +235,7 @@ impl ScriptEntitySet {
 
 impl UserData for ScriptEntitySet {
     fn add_methods<'lua, M: UserDataMethods<'lua, Self>>(methods: &mut M) {
-        methods.add_method("num_targets", |_, set, ()| {
-            Ok(set.indices.len())
-        });
+        methods.add_method("num_targets", |_, set, ()| Ok(set.indices.len()));
 
         methods.add_method("to_table", |_, set, ()| {
             let table: Vec<ScriptEntity> = set

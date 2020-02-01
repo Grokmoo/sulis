@@ -15,7 +15,7 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use crate::{ChangeListenerList, GameState, ItemList};
-use sulis_module::{ItemListEntrySaveState, Module, ItemState};
+use sulis_module::{ItemListEntrySaveState, ItemState, Module};
 
 pub struct PartyStash {
     items: ItemList,

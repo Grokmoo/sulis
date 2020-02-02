@@ -10,11 +10,12 @@ active:
   duration:
     Instant
   cooldown: 3
-  range: Touch
+  range:
+    Radius: 6
   ai:
     priority: 20
     kind: Heal
     group: Single
-    range: Touch
+    range: Short
   short_description: |
     Heal a significant amount of damage to one ally instantly.

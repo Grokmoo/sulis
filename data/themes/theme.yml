@@ -1191,9 +1191,9 @@ themes:
               [?1_damage_min;s=6;x=35;y=25|Off Hand]
               [?1_damage_min;s=5;x=35|Damage: #1_damage_min# to #1_damage_max#
               ][?1_armor_penetration;s=5;x=35|Armor Pen: #1_armor_penetration#
-              ][?1_melee_accuracy;s=5;x=0|Accuracy: #1_melee_accuracy#
-              ][?1_ranged_accuracy;s=5;x=0|Accuracy: #1_ranged_accuracy#
-              ][?1_spell_accuracy;s=5;x=0|Accuracy: #1_spell_accuracy#
+              ][?1_melee_accuracy;s=5;x=35|Accuracy: #1_melee_accuracy#
+              ][?1_ranged_accuracy;s=5;x=35|Accuracy: #1_ranged_accuracy#
+              ][?1_spell_accuracy;s=5;x=35|Accuracy: #1_spell_accuracy#
               ][?1_crit_chance;s=5;x=35|Crit Chance: #1_crit_chance#%
               ][?1_hit_threshold;s=5;x=35|Hit Threshold: #1_hit_threshold#
               ][?1_graze_threshold;s=5;x=35|Graze Threshold: #1_graze_threshold#

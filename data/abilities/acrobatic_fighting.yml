@@ -5,6 +5,6 @@ description: |
   You are able to move in and around targets more easily in combat, striking opponents that are further away.
 bonuses:
   - kind:
-      reach: 1.0
+      reach: 0.5
 prereqs:
   abilities: [ attacker, speedy ]

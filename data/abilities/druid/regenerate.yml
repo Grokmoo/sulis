@@ -11,7 +11,7 @@ active:
     Rounds: 2
   cooldown: 4
   range:
-    Radius: 10.0
+    Radius: 6
   ai:
     priority: 20
     kind: Heal

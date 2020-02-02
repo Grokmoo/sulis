@@ -17,6 +17,15 @@ function on_target_select(parent, ability, targets)
   local duration = dist / speed
   
   local hide = parent:get_ability("hide")
+  
+  if hide:is_active_mode(parent) then
+    local cb = hide:create_callback(parent)
+	cb:set_on_anim_complete_fn("deactivate")
+	local hide_anim = parent:wait_anim(0.0)
+	hide_anim:set_completion_callback(cb)
+	hide_anim:activate()
+  end
+  
   local cb = hide:create_callback(parent)
   cb:set_on_anim_complete_fn("activate_no_ap")
   local hide_anim = parent:wait_anim(duration + 0.5)

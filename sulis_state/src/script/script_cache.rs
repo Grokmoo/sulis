@@ -41,7 +41,7 @@ pub fn setup() -> Result<()> {
         cache.clear();
         for id in Module::all_scripts() {
             let script = get_script_from_id(&id)?;
-            let mut state = ScriptState::new();
+            let mut state = ScriptState::default();
             state.load(&id, &script)?;
             cache.insert(id, Rc::new(state));
         }
@@ -64,7 +64,7 @@ fn parse_traceback_line_num(traceback: &str) -> Option<i32> {
     // place on the call stack
 
     for line in traceback.lines() {
-        let num_str = match line.split(':').skip(1).next() {
+        let num_str = match line.split(':').nth(1) {
             None => continue,
             Some(num_str) => num_str,
         };
@@ -103,8 +103,7 @@ fn print_nearby_lines(state: &ScriptState, traceback: &str) -> (String, i32) {
     let start_num = std::cmp::max(0, num - 5) as usize;
     let lines = script.lines().skip(start_num);
 
-    let mut i = 0;
-    for line in lines {
+    for (i, line) in lines.enumerate() {
         if i >= 9 {
             break;
         }
@@ -115,7 +114,6 @@ fn print_nearby_lines(state: &ScriptState, traceback: &str) -> (String, i32) {
             out.push_str("    ");
         }
         out.push_str(&format!(" | {}\n", line));
-        i += 1;
     }
 
     (out, num)
@@ -323,7 +321,7 @@ fn get_item_script_id(item: &Rc<Item>) -> Result<String> {
         None => Err(rlua::Error::ToLuaConversionError {
             from: "ScriptItem",
             to: "Item",
-            message: Some(format!("The item is not usable {}", item.id).to_string()),
+            message: Some(format!("The item is not usable {}", item.id)),
         }),
         Some(usable) => Ok(usable.script.to_string()),
     }

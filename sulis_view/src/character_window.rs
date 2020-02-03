@@ -225,7 +225,7 @@ fn export_character(pc: &ActorState) {
 
     let portrait = match pc.actor.portrait {
         None => None,
-        Some(ref img) => Some(img.id().to_string()),
+        Some(ref img) => Some(img.id()),
     };
 
     let abilities = pc
@@ -254,9 +254,9 @@ fn export_character(pc: &ActorState) {
         faction: Some(pc.actor.faction()),
         conversation: None,
         images: pc.actor.builder_images.clone(),
-        hue: pc.actor.hue.clone(),
-        hair_color: pc.actor.hair_color.clone(),
-        skin_color: pc.actor.skin_color.clone(),
+        hue: pc.actor.hue,
+        hair_color: pc.actor.hair_color,
+        skin_color: pc.actor.skin_color,
         abilities,
         levels,
         inventory,
@@ -461,12 +461,9 @@ pub fn create_details_text_box(pc: &ActorState, is_pc: bool) -> Rc<RefCell<Widge
             )
         }
 
-        let mut index = 0;
-        for &(ref class, level) in pc.actor.levels.iter() {
+        for (index, &(ref class, level)) in pc.actor.levels.iter().enumerate() {
             state.add_text_arg(&format!("class_{}", index), &class.name);
             state.add_text_arg(&format!("level_{}", index), &level.to_string());
-
-            index += 1;
         }
 
         for (index, attack) in stats.attacks.iter().enumerate() {

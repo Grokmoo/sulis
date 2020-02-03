@@ -40,7 +40,7 @@ impl CutsceneWindow {
 }
 
 pub fn add_on_end_cbs(cutscene: &Rc<Cutscene>) {
-    if cutscene.on_end.len() > 0 {
+    if !cutscene.on_end.is_empty() {
         let pc = GameState::player();
         GameState::add_ui_callback(cutscene.on_end.clone(), &pc, &pc);
     }

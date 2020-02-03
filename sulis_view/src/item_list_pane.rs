@@ -43,7 +43,7 @@ pub enum Filter {
 }
 
 impl Filter {
-    fn is_allowed(&self, item: &Rc<Item>) -> bool {
+    fn is_allowed(self, item: &Rc<Item>) -> bool {
         use self::Filter::*;
         match self {
             All => true,
@@ -177,7 +177,7 @@ impl ItemListPane {
     fn create_content_inventory(&self) -> Rc<RefCell<Widget>> {
         let combat_active = GameState::is_combat_active();
 
-        let ref actor = self.entity.borrow().actor;
+        let actor = &self.entity.borrow().actor;
 
         let scrollpane = ScrollPane::new(ScrollDirection::Vertical);
         let list_content = Widget::with_theme(scrollpane.clone(), "items_list");
@@ -241,24 +241,21 @@ impl WidgetKind for ItemListPane {
         };
         children.push(content);
 
-        match &self.kind {
-            Kind::Entity => {
-                let coins_item = match Module::item(&Module::rules().coins_item) {
-                    None => {
-                        warn!("Unable to find coins item");
-                        return Vec::new();
-                    }
-                    Some(item) => item,
-                };
-                let coins_item_state = ItemState::new(coins_item, None);
-                let amount =
-                    GameState::party_coins() as f32 / Module::rules().item_value_display_factor;
-                let button = ItemButton::inventory(&coins_item_state, amount as u32, 0);
-                let coins_button = Widget::with_theme(button, "coins_button");
-                coins_button.borrow_mut().state.set_enabled(false);
-                children.push(coins_button);
-            }
-            _ => (),
+        if let Kind::Entity = &self.kind {
+            let coins_item = match Module::item(&Module::rules().coins_item) {
+                None => {
+                    warn!("Unable to find coins item");
+                    return Vec::new();
+                }
+                Some(item) => item,
+            };
+            let coins_item_state = ItemState::new(coins_item, None);
+            let amount =
+                GameState::party_coins() as f32 / Module::rules().item_value_display_factor;
+            let button = ItemButton::inventory(&coins_item_state, amount as u32, 0);
+            let coins_button = Widget::with_theme(button, "coins_button");
+            coins_button.borrow_mut().state.set_enabled(false);
+            children.push(coins_button);
         }
 
         for filter in FILTERS_LIST.iter() {

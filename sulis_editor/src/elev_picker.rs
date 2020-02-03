@@ -50,7 +50,7 @@ impl ElevPicker {
         };
 
         let mut elev_tiles = Vec::new();
-        for ref sprite_id in Config::editor_config().area.elev_tiles.iter() {
+        for sprite_id in Config::editor_config().area.elev_tiles.iter() {
             let sprite = match ResourceSet::sprite(sprite_id) {
                 Err(_) => {
                     warn!("Editor elevation tile '{}' not found", sprite_id);

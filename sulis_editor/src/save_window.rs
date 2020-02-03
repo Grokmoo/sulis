@@ -283,7 +283,7 @@ impl WidgetKind for SaveWindow {
                     };
 
                     let text = input_field.text.to_string();
-                    if text.len() == 0 {
+                    if text.is_empty() {
                         area_editor_ref.borrow_mut().model.world_map_location = None;
                     } else {
                         area_editor_ref.borrow_mut().model.world_map_location = Some(text);

@@ -131,8 +131,8 @@ pub fn find_transition_location(location: &mut Location, size: &ObjectSize, area
     let mut search_size = 0;
     while search_size < 10 {
         // TODO a lot of duplicate effort here
-        for y in -search_size..search_size + 1 {
-            for x in -search_size..search_size + 1 {
+        for y in -search_size..=search_size {
+            for x in -search_size..=search_size {
                 if area.is_passable_size(size, base_x + x, base_y + y) {
                     location.x = base_x + x;
                     location.y = base_y + y;
@@ -262,7 +262,7 @@ fn find_link(state: &AreaState, from: &str) -> Option<Point> {
 }
 
 fn check_location(p: Point, area: &Area) -> bool {
-    let location = Location::from_point(&p, area);
+    let location = Location::from_point(p, area);
     if !location.coords_valid(location.x, location.y) {
         error!(
             "Location coordinates {},{} are not valid for area {}",

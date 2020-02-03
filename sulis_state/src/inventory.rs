@@ -132,18 +132,14 @@ impl Inventory {
             None => return WeaponStyle::Single,
             Some(ref item_state) => match &item_state.item.equippable {
                 Some(ref equippable) => {
-                    match equippable.attack {
-                        Some(ref attack_builder) => {
-                            if let AttackKindBuilder::Ranged { .. } = attack_builder.kind {
-                                return WeaponStyle::Ranged;
-                            }
+                    if let Some(attack_builder) = &equippable.attack {
+                        if let AttackKindBuilder::Ranged { .. } = attack_builder.kind {
+                            return WeaponStyle::Ranged;
                         }
-                        _ => (),
                     }
 
-                    match equippable.blocks_slot {
-                        Some(Slot::HeldOff) => return WeaponStyle::TwoHanded,
-                        _ => (),
+                    if let Some(Slot::HeldOff) = equippable.blocks_slot {
+                        return WeaponStyle::TwoHanded;
                     }
 
                     WeaponStyle::Single

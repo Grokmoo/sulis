@@ -51,7 +51,7 @@ impl PropHandler {
 
     pub fn populate(&mut self, props: &[PropData]) {
         for data in props {
-            let location = Location::from_point(&data.location, &self.area);
+            let location = Location::from_point(data.location, &self.area);
             if let Err(e) = self.add(&data, location, false) {
                 warn!("Unable to add prop at {:?}", &data.location);
                 warn!("{}", e);
@@ -65,7 +65,7 @@ impl PropHandler {
             Some(prop) => Ok(prop),
         }?;
 
-        let location = Location::from_point(&data.location, &self.area);
+        let location = Location::from_point(data.location, &self.area);
 
         let prop_data = PropData {
             prop,

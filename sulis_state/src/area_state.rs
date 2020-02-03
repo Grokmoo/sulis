@@ -121,7 +121,7 @@ impl AreaState {
             feedback_text: Vec::new(),
             scroll_to_callback: None,
             targeter: None,
-            range_indicators: RangeIndicatorHandler::new(),
+            range_indicators: RangeIndicatorHandler::default(),
             merchants: Vec::new(),
             on_load_fired: false,
         })
@@ -146,7 +146,7 @@ impl AreaState {
                     }
                     area_state.pc_explored[pc_exp_index] = true;
                 }
-                buf = buf / 2;
+                buf /= 2;
             }
         }
 
@@ -154,7 +154,7 @@ impl AreaState {
 
         for (index, trigger_save) in save.triggers.into_iter().enumerate() {
             if index >= area_state.area.area.triggers.len() {
-                return invalid_data_error(&format!("Too many triggers defined in save"));
+                return invalid_data_error("Too many triggers defined in save");
             }
 
             let trigger_state = TriggerState {
@@ -184,14 +184,11 @@ impl AreaState {
     }
 
     fn pc_vis_partial_redraw(&mut self, x: i32, y: i32) {
-        match self.pc_vis_redraw {
-            PCVisRedraw::Not => {
-                self.pc_vis_redraw = PCVisRedraw::Partial {
-                    delta_x: x,
-                    delta_y: y,
-                }
+        if let PCVisRedraw::Not = self.pc_vis_redraw {
+            self.pc_vis_redraw = PCVisRedraw::Partial {
+                delta_x: x,
+                delta_y: y,
             }
-            _ => (),
         }
     }
 
@@ -255,7 +252,7 @@ impl AreaState {
                 Some(ref uid) => uid.to_string(),
             };
 
-            let location = Location::from_point(&actor_data.location, &area);
+            let location = Location::from_point(actor_data.location, &area);
             debug!("Adding actor '{}' at '{:?}'", actor.id, location);
             match self.add_actor(actor, location, Some(unique_id), false, None) {
                 Ok(_) => (),
@@ -405,12 +402,9 @@ impl AreaState {
             }
             self.triggers[*trigger_index].fired = true;
 
-            match trigger.kind {
-                TriggerKind::OnEncounterActivated { .. } => {
-                    info!("    Calling OnEncounterActivated");
-                    GameState::add_ui_callback(trigger.on_activate.clone(), &player, target);
-                }
-                _ => (),
+            if let TriggerKind::OnEncounterActivated { .. } = trigger.kind {
+                info!("    Calling OnEncounterActivated");
+                GameState::add_ui_callback(trigger.on_activate.clone(), &player, target);
             }
         }
     }
@@ -423,12 +417,9 @@ impl AreaState {
             let trigger = &self.area.area.triggers[*trigger_index];
             self.triggers[*trigger_index].fired = true;
 
-            match trigger.kind {
-                TriggerKind::OnEncounterCleared { .. } => {
-                    info!("    Calling OnEncounterCleared");
-                    GameState::add_ui_callback(trigger.on_activate.clone(), &player, target);
-                }
-                _ => (),
+            if let TriggerKind::OnEncounterCleared { .. } = trigger.kind {
+                info!("    Calling OnEncounterCleared");
+                GameState::add_ui_callback(trigger.on_activate.clone(), &player, target);
             }
         }
     }
@@ -506,7 +497,7 @@ impl AreaState {
         let roll = gen_rand(0, available.len());
 
         let point = available[roll];
-        let location = Location::from_point(&point, &self.area.area);
+        let location = Location::from_point(point, &self.area.area);
         Some(location)
     }
 
@@ -532,7 +523,7 @@ impl AreaState {
                 for y in y..(y + actor.race.size.height) {
                     for x in x..(x + actor.race.size.width) {
                         let index = (x + y * self.area.width) as usize;
-                        if self.entity_grid[index].len() > 0 {
+                        if !self.entity_grid[index].is_empty() {
                             impass = true;
                             break;
                         }

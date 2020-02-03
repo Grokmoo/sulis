@@ -282,7 +282,7 @@ impl AreaFeedbackText {
                     params.damage_colors[index]
                 }
             };
-            color.a = color.a * self.alpha;
+            color.a *= self.alpha;
 
             if let Some(icon) = entry.icon {
                 let w = params.scale / 1.5;

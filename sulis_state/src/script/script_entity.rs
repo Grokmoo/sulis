@@ -1113,15 +1113,13 @@ impl UserData for ScriptEntity {
                 }
 
                 let new_loc = Location::new(x, y, &area_state.borrow().area.area);
-                match area_state
-                    .borrow_mut()
-                    .transition_entity_to(&entity, entity_index, new_loc)
+                if let Err(e) =
+                    area_state
+                        .borrow_mut()
+                        .transition_entity_to(&entity, entity_index, new_loc)
                 {
-                    Err(e) => {
-                        warn!("Unable to move entity using script function");
-                        warn!("{}", e);
-                    }
-                    Ok(_) => (),
+                    warn!("Unable to move entity using script function");
+                    warn!("{}", e);
                 }
             } else {
                 let mut area_state = area_state.borrow_mut();
@@ -1447,7 +1445,7 @@ impl UserData for ScriptEntity {
             let actor = &entity.borrow().actor;
 
             let mut table = Vec::new();
-            for (_, state) in &actor.ability_states {
+            for state in actor.ability_states.values() {
                 if state.group != group {
                     continue;
                 }
@@ -1509,14 +1507,13 @@ impl UserData for ScriptEntity {
             };
 
             let entity = entity.try_unwrap()?;
+            let entity = entity.borrow();
             let offset = entity
-                .borrow()
                 .actor
                 .actor
                 .race
                 .get_image_layer_offset(layer)
-                .unwrap_or(&(0.0, 0.0))
-                .clone();
+                .unwrap_or(&(0.0, 0.0));
             let mut table: HashMap<&str, f32> = HashMap::new();
             table.insert("x", offset.0);
             table.insert("y", offset.1);

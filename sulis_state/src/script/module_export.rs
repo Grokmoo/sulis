@@ -75,7 +75,7 @@ impl UserData for ModuleExport {
         methods.add_method_mut(
             "set_flag",
             |_, export, (flag, value): (String, Option<String>)| {
-                let val = value.unwrap_or("true".to_string());
+                let val = value.unwrap_or_else(|| "true".to_string());
                 export.custom_flags.insert(flag, val);
                 Ok(())
             },

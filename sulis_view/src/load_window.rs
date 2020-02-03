@@ -83,10 +83,14 @@ impl LoadWindow {
         // TODO remove the bool flag passed in the constructor
         if self.main_menu_mode {
             let main_menu = Widget::kind_mut::<MainMenu>(root);
-            main_menu.next_step = Some(NextGameStep::LoadCampaign { save_state });
+            main_menu.next_step = Some(NextGameStep::LoadCampaign {
+                save_state: Box::new(save_state),
+            });
         } else {
             let root_view = Widget::kind_mut::<RootView>(root);
-            root_view.next_step = Some(NextGameStep::LoadCampaign { save_state });
+            root_view.next_step = Some(NextGameStep::LoadCampaign {
+                save_state: Box::new(save_state),
+            });
         }
 
         let loading_screen = Widget::with_defaults(LoadingScreen::new());

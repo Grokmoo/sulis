@@ -51,8 +51,8 @@ pub struct AreaModel {
     pub on_rest: OnRest,
 }
 
-impl AreaModel {
-    pub fn new() -> AreaModel {
+impl Default for AreaModel {
+    fn default() -> AreaModel {
         let config = Config::editor_config();
 
         let encounter_sprite = match ResourceSet::sprite(&config.area.encounter_tile) {
@@ -99,7 +99,9 @@ impl AreaModel {
             },
         }
     }
+}
 
+impl AreaModel {
     pub fn id(&self) -> &str {
         &self.id
     }
@@ -309,9 +311,8 @@ impl AreaModel {
     }
 
     pub fn add_tile(&mut self, tile: &Option<Rc<Tile>>, x: i32, y: i32) {
-        match tile {
-            None => return,
-            Some(tile) => self.tiles.add(Rc::clone(tile), x, y),
+        if let Some(tile) = tile {
+            self.tiles.add(Rc::clone(tile), x, y);
         }
     }
 
@@ -416,7 +417,7 @@ impl AreaModel {
             Some(ref font) => font,
         };
 
-        for ref transition in self.transitions.iter() {
+        for transition in self.transitions.iter() {
             let x = transition.from.x as f32 + x;
             let y = transition.from.y as f32 + y;
             let w = transition.size.width as f32;
@@ -437,7 +438,7 @@ impl AreaModel {
             renderer.draw(draw_list);
         }
 
-        for ref encounter_data in self.encounters.iter() {
+        for encounter_data in self.encounters.iter() {
             let x = encounter_data.location.x as f32 + x;
             let y = encounter_data.location.y as f32 + y;
             let w = encounter_data.size.width as f32;
@@ -446,13 +447,13 @@ impl AreaModel {
             draw_list.set_scale(scale_x, scale_y);
             renderer.draw(draw_list);
 
-            let text = format!("{}", encounter_data.encounter.id);
-            let (mut draw_list, _) = font_renderer.get_draw_list(&text, x, y, 1.0);
+            let text = &encounter_data.encounter.id;
+            let (mut draw_list, _) = font_renderer.get_draw_list(text, x, y, 1.0);
             draw_list.set_scale(scale_x, scale_y);
             renderer.draw(draw_list);
         }
 
-        for ref trigger_data in self.triggers.iter() {
+        for trigger_data in self.triggers.iter() {
             let (loc, size) = match trigger_data.kind {
                 TriggerKind::OnPlayerEnter { location, size } => (location, size),
                 _ => continue,
@@ -494,120 +495,48 @@ impl AreaModel {
         self.on_rest = area_builder.on_rest.clone();
         self.location_kind = area_builder.location_kind;
 
-        trace!("Loading terrain");
         let width = area_builder.width as i32;
-        let (mut x, mut y) = (0, 0);
-        for id in area_builder.terrain {
-            if x + y * MAX_AREA_SIZE >= MAX_AREA_SIZE * MAX_AREA_SIZE {
-                break;
-            }
 
-            match id {
-                None => self.tiles.set_terrain_index(x, y, None),
-                Some(id) => {
-                    for (index, kind) in self.tiles.terrain_kinds().iter().enumerate() {
-                        if kind.id == id {
-                            self.tiles.set_terrain_index(x, y, Some(index));
-                            break;
-                        }
-                    }
+        self.load_terrain(area_builder.terrain, width);
+
+        self.load_walls(area_builder.walls, width);
+
+        self.load_layer_set(area_builder.layer_set);
+
+        self.load_actors(area_builder.actors);
+
+        self.load_encounters(area_builder.encounters);
+
+        self.load_props(area_builder.props);
+
+        self.load_transitions(area_builder.transitions);
+
+        trace!("Loading area triggers.");
+        self.triggers.clear();
+        self.triggers.append(&mut area_builder.triggers);
+
+        trace!("Loading area elevation.");
+        let elev = &area_builder.elevation;
+        let dest_elev = self.tiles.raw_elevation();
+        if elev.len() != area_builder.height * area_builder.width {
+            warn!("Invalid elevation array in {}", path);
+            for i in 0..(MAX_AREA_SIZE * MAX_AREA_SIZE) as usize {
+                dest_elev[i] = 0;
+            }
+        } else {
+            for y in 0..area_builder.height {
+                for x in 0..area_builder.width {
+                    let val = elev[x + y * area_builder.width];
+                    dest_elev[x + y * MAX_AREA_SIZE as usize] = val;
                 }
-            }
-
-            x += 1;
-            if x == width {
-                x = 0;
-                y += 1;
             }
         }
+    }
 
-        trace!("Loading walls");
-        let (mut x, mut y) = (0, 0);
-        for (elev, id) in area_builder.walls {
-            if x + y * MAX_AREA_SIZE >= MAX_AREA_SIZE * MAX_AREA_SIZE {
-                break;
-            }
-
-            match id {
-                None => self.tiles.set_wall(x, y, elev, None),
-                Some(id) => {
-                    for (index, kind) in self.tiles().wall_kinds().iter().enumerate() {
-                        if kind.id == id {
-                            self.tiles.set_wall(x, y, elev, Some(index));
-                            break;
-                        }
-                    }
-                }
-            }
-
-            x += 1;
-            if x == width {
-                x = 0;
-                y += 1;
-            }
-        }
-
-        trace!("Loading area layer_set.");
-        self.tiles.clear();
-
-        for (tile_id, positions) in area_builder.layer_set {
-            let tile = match Module::tile(&tile_id) {
-                None => {
-                    warn!("No tile with ID {} found", tile_id);
-                    continue;
-                }
-                Some(tile) => tile,
-            };
-
-            for position in positions {
-                if position.len() != 2 {
-                    warn!("tile position vector is not length 2.");
-                    continue;
-                }
-
-                self.tiles
-                    .add(Rc::clone(&tile), position[0] as i32, position[1] as i32);
-            }
-        }
-
-        trace!("Loading area actors.");
-        self.actors.clear();
-        for actor_data in area_builder.actors {
-            let actor = match Module::actor(&actor_data.id) {
-                None => {
-                    warn!("No actor with ID {} found", actor_data.id);
-                    continue;
-                }
-                Some(actor) => actor,
-            };
-
-            self.actors
-                .push((actor_data.location, actor, actor_data.unique_id));
-        }
-
-        trace!("Loading area encounters.");
-        self.encounters.clear();
-        for enc_builder in area_builder.encounters {
-            let enc = match Module::encounter(&enc_builder.id) {
-                None => {
-                    warn!("No encounter '{}' found", enc_builder.id);
-                    continue;
-                }
-                Some(encounter) => encounter,
-            };
-
-            let enc_data = EncounterData {
-                encounter: enc,
-                location: enc_builder.location,
-                size: enc_builder.size,
-                triggers: Vec::new(),
-            };
-            self.encounters.push(enc_data);
-        }
-
+    pub fn load_props(&mut self, props: Vec<PropDataBuilder>) {
         trace!("Loading area props.");
         self.props.clear();
-        for prop_builder in area_builder.props {
+        for prop_builder in props {
             let prop = match Module::prop(&prop_builder.id) {
                 None => {
                     warn!("No prop with ID {} found", prop_builder.id);
@@ -626,10 +555,12 @@ impl AreaModel {
 
             self.props.push(prop_data);
         }
+    }
 
+    pub fn load_transitions(&mut self, transitions: Vec<TransitionBuilder>) {
         trace!("Loading area transitions.");
         self.transitions.clear();
-        for transition_builder in area_builder.transitions {
+        for transition_builder in transitions {
             let image = match ResourceSet::image(&transition_builder.image_display) {
                 None => {
                     warn!(
@@ -657,25 +588,124 @@ impl AreaModel {
                 image_display: image,
             });
         }
+    }
 
-        trace!("Loading area triggers.");
-        self.triggers.clear();
-        self.triggers.append(&mut area_builder.triggers);
+    pub fn load_layer_set(&mut self, layer_set: HashMap<String, Vec<Vec<u16>>>) {
+        trace!("Loading area layer_set.");
+        self.tiles.clear();
 
-        trace!("Loading area elevation.");
-        let elev = &area_builder.elevation;
-        let dest_elev = self.tiles.raw_elevation();
-        if elev.len() != area_builder.height * area_builder.width {
-            warn!("Invalid elevation array in {}", path);
-            for i in 0..(MAX_AREA_SIZE * MAX_AREA_SIZE) as usize {
-                dest_elev[i] = 0;
-            }
-        } else {
-            for y in 0..area_builder.height {
-                for x in 0..area_builder.width {
-                    let val = elev[x + y * area_builder.width];
-                    dest_elev[x + y * MAX_AREA_SIZE as usize] = val;
+        for (tile_id, positions) in layer_set {
+            let tile = match Module::tile(&tile_id) {
+                None => {
+                    warn!("No tile with ID {} found", tile_id);
+                    continue;
                 }
+                Some(tile) => tile,
+            };
+
+            for position in positions {
+                if position.len() != 2 {
+                    warn!("tile position vector is not length 2.");
+                    continue;
+                }
+
+                self.tiles
+                    .add(Rc::clone(&tile), position[0] as i32, position[1] as i32);
+            }
+        }
+    }
+
+    pub fn load_encounters(&mut self, encounters: Vec<EncounterDataBuilder>) {
+        trace!("Loading area encounters.");
+        self.encounters.clear();
+        for enc_builder in encounters {
+            let enc = match Module::encounter(&enc_builder.id) {
+                None => {
+                    warn!("No encounter '{}' found", enc_builder.id);
+                    continue;
+                }
+                Some(encounter) => encounter,
+            };
+
+            let enc_data = EncounterData {
+                encounter: enc,
+                location: enc_builder.location,
+                size: enc_builder.size,
+                triggers: Vec::new(),
+            };
+            self.encounters.push(enc_data);
+        }
+    }
+
+    pub fn load_actors(&mut self, actors: Vec<ActorData>) {
+        trace!("Loading area actors.");
+        self.actors.clear();
+        for actor_data in actors {
+            let actor = match Module::actor(&actor_data.id) {
+                None => {
+                    warn!("No actor with ID {} found", actor_data.id);
+                    continue;
+                }
+                Some(actor) => actor,
+            };
+
+            self.actors
+                .push((actor_data.location, actor, actor_data.unique_id));
+        }
+    }
+
+    pub fn load_walls(&mut self, walls: Vec<(u8, Option<String>)>, width: i32) {
+        trace!("Loading walls");
+        let (mut x, mut y) = (0, 0);
+        for (elev, id) in walls {
+            if x + y * MAX_AREA_SIZE >= MAX_AREA_SIZE * MAX_AREA_SIZE {
+                break;
+            }
+
+            match id {
+                None => self.tiles.set_wall(x, y, elev, None),
+                Some(id) => {
+                    for (index, kind) in self.tiles().wall_kinds().iter().enumerate() {
+                        if kind.id == id {
+                            self.tiles.set_wall(x, y, elev, Some(index));
+                            break;
+                        }
+                    }
+                }
+            }
+
+            x += 1;
+            if x == width {
+                x = 0;
+                y += 1;
+            }
+        }
+    }
+
+    pub fn load_terrain(&mut self, terrain: Vec<Option<String>>, width: i32) {
+        trace!("Loading terrain");
+        let (mut x, mut y) = (0, 0);
+        for id in terrain {
+            if x + y * MAX_AREA_SIZE >= MAX_AREA_SIZE * MAX_AREA_SIZE {
+                break;
+            }
+
+            match id {
+                None => self.tiles.set_terrain_index(x, y, None),
+                Some(id) => {
+                    for (index, kind) in self.tiles.terrain_kinds().iter().enumerate() {
+                        if kind.id == id {
+                            self.tiles.set_terrain_index(x, y, Some(index));
+                            break;
+                        }
+                    }
+                }
+            }
+
+            x += 1;
+            if x == width {
+                x = 0;
+                y += 1;
             }
         }
     }
@@ -701,7 +731,9 @@ impl AreaModel {
                 if position.x >= MAX_AREA_SIZE || position.y >= MAX_AREA_SIZE {
                     continue;
                 }
-                let tiles_vec = layer_set.entry(tile.id.to_string()).or_insert(Vec::new());
+                let tiles_vec = layer_set
+                    .entry(tile.id.to_string())
+                    .or_insert_with(Vec::new);
                 tiles_vec.push(vec![position.x as u16, position.y as u16]);
             }
         }
@@ -745,7 +777,7 @@ impl AreaModel {
 
         trace!("Saving transitions");
         let mut transitions: Vec<TransitionBuilder> = Vec::new();
-        for ref transition in self.transitions.iter() {
+        for transition in self.transitions.iter() {
             transitions.push(TransitionBuilder {
                 from: transition.from,
                 size: transition.size.id.to_string(),
@@ -755,30 +787,7 @@ impl AreaModel {
             });
         }
 
-        trace!("Saving elevation");
-        let mut elevation = Vec::new();
-        for y in 0..height {
-            for x in 0..width {
-                elevation.push(self.tiles.elevation(x, y));
-            }
-        }
-
-        trace!("Saving terrain");
-        let mut terrain = Vec::new();
-        for y in 0..height {
-            for x in 0..width {
-                let index = match self.tiles.terrain_index_at(x, y) {
-                    None => {
-                        terrain.push(None);
-                        continue;
-                    }
-                    Some(index) => index,
-                };
-
-                let tiles = self.tiles.terrain_kind(index);
-                terrain.push(Some(tiles.id.to_string()));
-            }
-        }
+        let (elevation, terrain) = self.save_terrain(width, height);
 
         trace!("Saving walls");
         let mut walls = Vec::new();
@@ -831,5 +840,34 @@ impl AreaModel {
             }
             Ok(()) => {}
         }
+    }
+
+    fn save_terrain(&self, width: i32, height: i32) -> (Vec<u8>, Vec<Option<String>>) {
+        trace!("Saving elevation");
+        let mut elevation = Vec::new();
+        for y in 0..height {
+            for x in 0..width {
+                elevation.push(self.tiles.elevation(x, y));
+            }
+        }
+
+        trace!("Saving terrain");
+        let mut terrain = Vec::new();
+        for y in 0..height {
+            for x in 0..width {
+                let index = match self.tiles.terrain_index_at(x, y) {
+                    None => {
+                        terrain.push(None);
+                        continue;
+                    }
+                    Some(index) => index,
+                };
+
+                let tiles = self.tiles.terrain_kind(index);
+                terrain.push(Some(tiles.id.to_string()));
+            }
+        }
+
+        (elevation, terrain)
     }
 }

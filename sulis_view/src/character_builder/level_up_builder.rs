@@ -80,7 +80,7 @@ impl BuilderSet for LevelUpBuilder {
             children.push(widget);
         }
 
-        builder.builder_panes.push(level_up_finish_pane.clone());
+        builder.builder_panes.push(level_up_finish_pane);
         children.push(level_up_finish_widget);
 
         class_selector_pane_ref

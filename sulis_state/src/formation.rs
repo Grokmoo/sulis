@@ -43,7 +43,7 @@ impl Default for Formation {
     }
 }
 
-fn center_of_group(entities: &Vec<Rc<RefCell<EntityState>>>) -> (f32, f32) {
+fn center_of_group(entities: &[Rc<RefCell<EntityState>>]) -> (f32, f32) {
     let mut x = 0.0;
     let mut y = 0.0;
 
@@ -74,7 +74,7 @@ impl Formation {
 
     pub fn move_group(
         &self,
-        entities_to_move: &Vec<Rc<RefCell<EntityState>>>,
+        entities_to_move: &[Rc<RefCell<EntityState>>],
         entities_to_ignore: Vec<usize>,
         dest: Destination,
     ) {

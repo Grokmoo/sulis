@@ -61,7 +61,7 @@ impl WidgetKind for ModuleSelector {
 
         let mut groups = HashMap::new();
         for (index, module) in self.modules.iter().enumerate() {
-            let vec = groups.entry(module.group.clone()).or_insert(Vec::new());
+            let vec = groups.entry(module.group.clone()).or_insert_with(Vec::new);
             vec.push(index);
         }
 

@@ -31,16 +31,18 @@ impl Index<usize> for ItemList {
     }
 }
 
-impl ItemList {
-    pub fn new() -> ItemList {
+impl Default for ItemList {
+    fn default() -> ItemList {
         ItemList { items: Vec::new() }
     }
+}
 
+impl ItemList {
     pub fn clear(&mut self) {
         self.items.clear();
     }
 
-    pub fn iter<'a>(&'a self) -> Iter<'a, (u32, ItemState)> {
+    pub fn iter(&self) -> Iter<(u32, ItemState)> {
         self.items.iter()
     }
 

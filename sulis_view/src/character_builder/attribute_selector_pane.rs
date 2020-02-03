@@ -84,7 +84,7 @@ impl BuilderPane for AttributeSelectorPane {
 
         if let Some(ref class) = self.selected_class {
             self.selected_kit = Some(0);
-            self.attrs = class.kits[0].default_attributes.clone();
+            self.attrs = class.kits[0].default_attributes;
         }
 
         builder.attributes = None;
@@ -100,14 +100,14 @@ impl BuilderPane for AttributeSelectorPane {
     }
 
     fn next(&mut self, builder: &mut CharacterBuilder, widget: Rc<RefCell<Widget>>) {
-        let ref class = match self.selected_class {
+        let class = match &self.selected_class {
             None => return,
             Some(ref class) => class,
         };
 
-        let ref kit = match self.selected_kit {
+        let kit = match &self.selected_kit {
             None => return,
-            Some(index) => &class.kits[index],
+            Some(index) => &class.kits[*index],
         };
 
         builder.kit = self.selected_kit;
@@ -142,12 +142,12 @@ impl WidgetKind for AttributeSelectorPane {
         let title = Widget::with_theme(Label::empty(), "title");
         children.push(title);
 
-        let ref class = match self.selected_class {
+        let class = match &self.selected_class {
             None => return children,
             Some(ref class) => class,
         };
 
-        let ref race = match self.selected_race {
+        let race = match &self.selected_race {
             None => return children,
             Some(ref race) => race,
         };
@@ -172,7 +172,7 @@ impl WidgetKind for AttributeSelectorPane {
                 .add_callback(Callback::new(Rc::new(move |widget, _| {
                     let (parent, pane) = Widget::parent_mut::<AttributeSelectorPane>(widget);
                     pane.selected_kit = Some(index);
-                    pane.attrs = class_ref.kits[index].default_attributes.clone();
+                    pane.attrs = class_ref.kits[index].default_attributes;
                     pane.set_next_enabled(&parent);
 
                     parent.borrow_mut().invalidate_children();
@@ -181,9 +181,9 @@ impl WidgetKind for AttributeSelectorPane {
         }
         children.push(kits_pane);
 
-        let ref selected_kit = match self.selected_kit {
+        let selected_kit = match &self.selected_kit {
             None => return children,
-            Some(index) => &class.kits[index],
+            Some(index) => &class.kits[*index],
         };
 
         let kit_area = Widget::with_theme(TextArea::empty(), "kit_area");
@@ -213,11 +213,8 @@ impl WidgetKind for AttributeSelectorPane {
 
         let mut attr_bonuses: HashMap<Attribute, i32> = HashMap::new();
         for bonus in race.base_stats.iter() {
-            match bonus.kind {
-                BonusKind::Attribute { attribute, amount } => {
-                    attr_bonuses.insert(attribute, amount as i32);
-                }
-                _ => (),
+            if let BonusKind::Attribute { attribute, amount } = bonus.kind {
+                attr_bonuses.insert(attribute, amount as i32);
             }
         }
 

@@ -219,7 +219,7 @@ impl GameState {
 
             let party_coins = save_state.coins;
 
-            let mut stash = ItemList::new();
+            let mut stash = ItemList::default();
             for item_save in save_state.stash {
                 let item = &item_save.item;
                 let item = match Module::create_get_item(&item.id, &item.adjectives) {
@@ -323,7 +323,7 @@ impl GameState {
         flags: HashMap<String, String>,
     ) -> Result<GameState, Error> {
         let party_coins = pc.inventory.pc_starting_coins();
-        let mut party_stash = ItemList::new();
+        let mut party_stash = ItemList::default();
         for (qty, item) in pc.inventory.pc_starting_item_iter() {
             party_stash.add_quantity(qty, item);
         }
@@ -337,7 +337,7 @@ impl GameState {
             &pc.name, &campaign.starting_location
         );
         let location =
-            Location::from_point(&campaign.starting_location, &area_state.borrow().area.area);
+            Location::from_point(campaign.starting_location, &area_state.borrow().area.area);
 
         if !location.coords_valid(location.x, location.y) {
             error!("Starting location coordinates must be valid for the starting area.");
@@ -419,7 +419,7 @@ impl GameState {
             party_death_listeners: ChangeListenerList::default(),
             ui_callbacks: Vec::new(),
             world_map: WorldMapState::new(),
-            quests: QuestStateSet::new(),
+            quests: QuestStateSet::default(),
         })
     }
 
@@ -634,12 +634,9 @@ impl GameState {
                 location.y,
                 &member.borrow().actor.actor.name,
             );
-            match area_state.transition_entity_to(&member, index, location) {
-                Err(e) => {
-                    warn!("Error re-adding disabled party member:");
-                    warn!("{}", e);
-                }
-                Ok(_) => (),
+            if let Err(e) = area_state.transition_entity_to(&member, index, location) {
+                warn!("Error re-adding disabled party member:");
+                warn!("{}", e);
             }
             let mgr = GameState::turn_manager();
             mgr.borrow_mut().readd_entity(&member);
@@ -731,7 +728,7 @@ impl GameState {
 
     pub fn has_party_member(id: &str) -> bool {
         for entity in GameState::party() {
-            if &entity.borrow().actor.actor.id == id {
+            if entity.borrow().actor.actor.id == id {
                 return true;
             }
         }
@@ -808,7 +805,7 @@ impl GameState {
     }
 
     pub(crate) fn preload_area(area_id: &str) -> Result<(), Error> {
-        if let Some(_) = GameState::get_area_state(area_id) {
+        if GameState::get_area_state(area_id).is_some() {
             return Ok(());
         }
 
@@ -878,7 +875,7 @@ impl GameState {
     }
 
     pub fn add_ui_callbacks_of_kind(
-        callbacks: &Vec<Trigger>,
+        callbacks: &[Trigger],
         kind: TriggerKind,
         parent: &Rc<RefCell<EntityState>>,
         target: &Rc<RefCell<EntityState>>,

@@ -566,7 +566,7 @@ impl UserData for ScriptInterface {
             "set_quest_state",
             |_, _, (quest, state): (String, String)| {
                 let state = QuestEntryState::from_str(&state);
-                if let None = Module::quest(&quest) {
+                if Module::quest(&quest).is_none() {
                     warn!("Set quest state for invalid quest '{}'", quest);
                 }
                 GameState::set_quest_state(quest, state);
@@ -596,7 +596,7 @@ impl UserData for ScriptInterface {
         );
 
         methods.add_method("get_quest_state", |_, _, quest: String| {
-            if let None = Module::quest(&quest) {
+            if Module::quest(&quest).is_none() {
                 warn!("Requested state for invalid quest '{}'", quest);
             }
             Ok(format!("{:?}", GameState::get_quest_state(quest)))
@@ -1044,7 +1044,7 @@ pub fn entity_with_id(id: String) -> Option<Rc<RefCell<EntityState>>> {
     for entity in mgr.borrow().entity_iter() {
         {
             let entity = entity.borrow();
-            if entity.unique_id() != &id {
+            if entity.unique_id() != id {
                 continue;
             }
         }

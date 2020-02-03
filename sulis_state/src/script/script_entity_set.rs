@@ -178,7 +178,7 @@ impl ScriptEntitySet {
 
     pub fn append(&mut self, other: &ScriptEntitySet) {
         self.indices.append(&mut other.indices.clone());
-        self.selected_point = other.selected_point.clone();
+        self.selected_point = other.selected_point;
         self.affected_points
             .append(&mut other.affected_points.clone());
         self.surface = other.surface.clone();
@@ -219,8 +219,8 @@ impl ScriptEntitySet {
         let indices = entities
             .iter()
             .map(|e| match e {
-                &None => None,
-                &Some(ref e) => Some(e.borrow().index()),
+                None => None,
+                Some(e) => Some(e.borrow().index()),
             })
             .collect();
         ScriptEntitySet {
@@ -311,8 +311,8 @@ impl UserData for ScriptEntitySet {
         methods.add_method("is_empty", |_, set, ()| Ok(set.indices.is_empty()));
         methods.add_method("first", |_, set, ()| {
             for index in set.indices.iter() {
-                if let &Some(index) = index {
-                    return Ok(ScriptEntity::new(index));
+                if let Some(index) = index {
+                    return Ok(ScriptEntity::new(*index));
                 }
             }
 
@@ -450,8 +450,8 @@ fn filter_entities<T: Copy>(
     let mut indices = Vec::new();
     for index in set.indices.iter() {
         let entity = match index {
-            &None => continue,
-            &Some(index) => mgr.entity_checked(index),
+            None => continue,
+            Some(index) => mgr.entity_checked(*index),
         };
 
         let entity = match entity {

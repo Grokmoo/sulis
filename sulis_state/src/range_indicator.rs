@@ -40,13 +40,15 @@ pub struct RangeIndicatorHandler {
     indicators: Vec<RangeIndicator>,
 }
 
-impl RangeIndicatorHandler {
-    pub fn new() -> RangeIndicatorHandler {
-        RangeIndicatorHandler {
-            indicators: Vec::new(),
+impl Default for RangeIndicatorHandler {
+    fn default() -> Self {
+        Self {
+            indicators: Vec::default(),
         }
     }
+}
 
+impl RangeIndicatorHandler {
     pub fn current(&self) -> Option<&RangeIndicator> {
         self.indicators.first()
     }

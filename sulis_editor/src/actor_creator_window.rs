@@ -65,7 +65,7 @@ impl ActorCreatorWindow {
 
     fn save(&mut self) {
         let id = self.id_field.borrow().text();
-        if id.trim().len() == 0 {
+        if id.trim().is_empty() {
             return;
         }
 
@@ -175,7 +175,7 @@ impl ActorCreatorWindow {
 
     fn populate_images_pane(&mut self, race: Rc<Race>, pane: &Rc<RefCell<Widget>>) {
         for (layer, images) in race.editor_creator_images() {
-            if images.len() == 0 {
+            if images.is_empty() {
                 continue;
             }
 

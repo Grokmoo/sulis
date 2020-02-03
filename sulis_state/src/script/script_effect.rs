@@ -611,7 +611,7 @@ impl UserData for ScriptEffect {
             let ap = ap.unwrap_or(0.0) as u32;
             let dmg_kind = DamageKind::from_str(&kind);
             let kind = BonusKind::Damage(
-                Damage { min, max, ap: ap, kind: Some(dmg_kind) }
+                Damage { min, max, ap, kind: Some(dmg_kind) }
             );
             add_bonus_to_effect(effect, kind, when);
             Ok(())
@@ -663,7 +663,7 @@ impl UserData for ScriptEffect {
 
 fn add_bonus_to_effect(effect: &mut ScriptEffect, bonus_kind: BonusKind, when: Option<String>) {
     if let Some(when) = when {
-        let split: Vec<_> = when.split(" ").collect();
+        let split: Vec<_> = when.split(' ').collect();
         if split.is_empty() {
             warn!("Unable to parse bonus when of '{}'", when);
             return;

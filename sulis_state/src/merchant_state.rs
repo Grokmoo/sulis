@@ -36,7 +36,7 @@ pub struct MerchantState {
 
 impl MerchantState {
     pub fn load(save: MerchantSaveState) -> Result<MerchantState, Error> {
-        let mut items = ItemList::new();
+        let mut items = ItemList::default();
         for item_save in save.items {
             let item = item_save.item;
             let variant = item.variant;
@@ -71,7 +71,7 @@ impl MerchantState {
         let last_refresh_millis = mgr.borrow().total_elapsed_millis();
         let refresh_rate_millis = Module::rules().compute_millis(refresh_time);
 
-        let mut items = ItemList::new();
+        let mut items = ItemList::default();
 
         for (qty, item) in loot_list.generate() {
             items.add_quantity(qty, item);

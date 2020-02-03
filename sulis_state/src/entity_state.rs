@@ -219,7 +219,7 @@ impl EntityState {
             self.ai_callbacks = Some(Rc::new(cbs));
         }
 
-        if self.unique_id.len() == 0 {
+        if self.unique_id.is_empty() {
             self.unique_id = format!("__uid__{}{}", self.actor.actor.id, index);
         }
     }
@@ -248,7 +248,7 @@ impl EntityState {
         result
     }
 
-    pub fn custom_flags<'a>(&'a self) -> impl Iterator<Item = (&String, &String)> {
+    pub fn custom_flags(&self) -> impl Iterator<Item = (&String, &String)> {
         self.custom_flags.iter()
     }
 

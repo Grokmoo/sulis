@@ -147,10 +147,8 @@ impl WidgetKind for WorldMapWindow {
                 )
             };
 
-            if add_callback {
-                if !add_travel_callback(&cur_location_id, &location, &button, &label) {
-                    button.borrow_mut().state.set_enabled(false);
-                }
+            if add_callback && !add_travel_callback(&cur_location_id, &location, &button, &label) {
+                button.borrow_mut().state.set_enabled(false);
             }
 
             let entry = Entry {

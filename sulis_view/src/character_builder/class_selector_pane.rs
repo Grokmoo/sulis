@@ -234,19 +234,15 @@ fn build_upgrades_data(state: &mut WidgetState, class: &Class, level: u32) {
         class.stats_max(level).into_iter().collect(),
     );
 
-    let mut i = 0;
-    for (id, amount) in stats {
+    for (i, (id, amount)) in stats.into_iter().enumerate() {
         let gain = *stats_up.get(&id).unwrap_or(&0);
         state.add_text_arg(&format!("stat_{}_id", i), &id);
         state.add_text_arg(&format!("stat_{}_total", i), &format!("{}", amount));
         state.add_text_arg(&format!("stat_{}_gain", i), &format!("{}", gain));
-        i += 1;
     }
 
-    let mut i = 0;
-    for list in class.ability_choices(level) {
+    for (i, list) in class.ability_choices(level).into_iter().enumerate() {
         state.add_text_arg(&format!("choice_{}_name", i), &list.name);
-        i += 1;
     }
 }
 

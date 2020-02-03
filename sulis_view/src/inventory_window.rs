@@ -105,7 +105,7 @@ impl WidgetKind for InventoryWindow {
             .state
             .set_enabled(self.entity.borrow().actor.can_swap_weapons());
 
-        let ref actor = self.entity.borrow().actor;
+        let actor = &self.entity.borrow().actor;
 
         let item_list_pane =
             Widget::with_defaults(ItemListPane::new_entity(&self.entity, &self.filter));

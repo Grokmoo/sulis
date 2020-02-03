@@ -179,7 +179,7 @@ impl WidgetKind for AbilitiesBar {
         let scrollpane = ScrollPane::new(ScrollDirection::Horizontal);
 
         let collapse_enabled = (collapsed_groups.len() as u32) < self.max_collapsed;
-        if collapsed_groups.len() > 0 {
+        if !collapsed_groups.is_empty() {
             let all_collapsed = Widget::empty("collapsed_panes");
             for group in collapsed_groups {
                 let pane = CollapsedGroupPane::new(group, &self.entity);
@@ -329,7 +329,7 @@ impl GroupPane {
     fn new(
         group: AbilityGroup,
         entity: &Rc<RefCell<EntityState>>,
-        abilities: &Vec<OwnedAbility>,
+        abilities: &[OwnedAbility],
         collapse_enabled: bool,
         remaining_keys: &mut Vec<Option<Key>>,
     ) -> Rc<RefCell<GroupPane>> {
@@ -512,10 +512,9 @@ fn create_range_indicator(
         Some(active) => active,
     };
 
-    match active.range {
-        ability::Range::None => return None,
-        _ => (),
-    };
+    if let ability::Range::None = active.range {
+        return None;
+    }
 
     Some(RangeIndicator::ability(entity, ability))
 }
@@ -672,7 +671,7 @@ impl WidgetKind for AbilityButton {
     fn on_mouse_release(&mut self, widget: &Rc<RefCell<Widget>>, kind: event::ClickKind) -> bool {
         self.super_on_mouse_release(widget, kind);
 
-        return activate_ability(&self.entity, &self.ability);
+        activate_ability(&self.entity, &self.ability)
     }
 }
 

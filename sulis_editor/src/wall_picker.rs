@@ -170,8 +170,8 @@ impl EditorMode for WallPicker {
                 }
 
                 model.set_wall(x, y, self.level as u8, self.cur_wall);
-                for ye in y..y + self.grid_height + 1 {
-                    for xe in x - 1..x + self.grid_height + 1 {
+                for ye in y..=y + self.grid_height {
+                    for xe in x - 1..=x + self.grid_height {
                         model.set_elevation(2 * self.level as u8, xe, ye);
                     }
                 }

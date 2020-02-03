@@ -209,8 +209,8 @@ impl UserData for TargeterData {
         );
         methods.add_method_mut(
             "add_all_selectable",
-            |_, targeter, selectable: ScriptEntitySet| {
-                targeter.selectable.append(&mut selectable.indices.clone());
+            |_, targeter, mut selectable: ScriptEntitySet| {
+                targeter.selectable.append(&mut selectable.indices);
                 Ok(())
             },
         );
@@ -277,8 +277,8 @@ impl UserData for TargeterData {
         );
         methods.add_method_mut(
             "add_all_effectable",
-            |_, targeter, targets: ScriptEntitySet| {
-                targeter.effectable.append(&mut targets.indices.clone());
+            |_, targeter, mut targets: ScriptEntitySet| {
+                targeter.effectable.append(&mut targets.indices);
                 Ok(())
             },
         );

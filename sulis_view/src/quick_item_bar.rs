@@ -193,7 +193,7 @@ fn create_button(
             button
                 .borrow_mut()
                 .add_action("Clear Slot", clear_quickslot_cb(entity, slot), false);
-            let widget = Widget::with_theme(button.clone(), theme_id);
+            let widget = Widget::with_theme(button, theme_id);
             if actor.can_use_quick(slot) {
                 widget
                     .borrow_mut()

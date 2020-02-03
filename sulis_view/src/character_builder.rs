@@ -247,10 +247,10 @@ impl BuilderSet for CharacterCreator {
         builder.builder_panes.clear();
         builder.builder_pane_index = 0;
         builder.builder_panes.push(race_selector_pane.clone());
-        builder.builder_panes.push(class_selector_pane.clone());
-        builder.builder_panes.push(attribute_selector_pane.clone());
-        builder.builder_panes.push(cosmetic_selector_pane.clone());
-        builder.builder_panes.push(backstory_selector_pane.clone());
+        builder.builder_panes.push(class_selector_pane);
+        builder.builder_panes.push(attribute_selector_pane);
+        builder.builder_panes.push(cosmetic_selector_pane);
+        builder.builder_panes.push(backstory_selector_pane);
         race_selector_pane
             .borrow_mut()
             .on_selected(builder, Rc::clone(&race_sel_widget));

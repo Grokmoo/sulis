@@ -45,7 +45,7 @@ impl ConsoleWindow {
             output: Widget::with_theme(Label::empty(), "output"),
             history: Vec::new(),
             history_index: 0,
-            script_state: ScriptState::new(),
+            script_state: ScriptState::default(),
         }))
     }
 

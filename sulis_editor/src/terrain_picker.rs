@@ -138,8 +138,8 @@ impl EditorMode for TerrainPicker {
         let y_min = if y % 2 == 0 { y } else { y + 1 };
         model.remove_tiles_within(
             &self.terrain_rules.border_layer,
-            x_min - 1 * self.grid_width,
-            y_min - 1 * self.grid_height,
+            x_min - self.grid_width,
+            y_min - self.grid_height,
             (self.brush_size + 2) * self.grid_width,
             (self.brush_size + 2) * self.grid_height,
         );

@@ -150,7 +150,7 @@ impl PStats {
     }
 
     pub fn is_threatened(&self) -> bool {
-        self.threatened_by.len() > 0
+        !self.threatened_by.is_empty()
     }
 
     pub fn add_threatening(&mut self, index: usize) {
@@ -279,7 +279,7 @@ impl PStats {
     pub fn init_day(&mut self, stats: &StatList) {
         self.hp = stats.max_hp;
 
-        for (ref group, amount) in stats.uses_per_day_iter() {
+        for (group, amount) in stats.uses_per_day_iter() {
             self.current_group_uses_per_day
                 .insert(group.to_string(), *amount);
         }
@@ -301,7 +301,7 @@ impl PStats {
     /// Called once at the end of each combat encounter - does per encounter
     /// actions as well as `init_turn`
     pub fn end_encounter(&mut self, stats: &StatList) {
-        for (ref group, amount) in stats.uses_per_encounter_iter() {
+        for (group, amount) in stats.uses_per_encounter_iter() {
             self.current_group_uses_per_encounter
                 .insert(group.to_string(), *amount);
         }

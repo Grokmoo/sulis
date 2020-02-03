@@ -305,7 +305,7 @@ impl Options {
                     options.cur_default_zoom = zoom;
                     parent.borrow_mut().invalidate_children();
                 })));
-            if zoom == self.cur_default_zoom {
+            if (zoom - self.cur_default_zoom).abs() < std::f32::EPSILON {
                 button.borrow_mut().state.set_active(true);
                 zoom_found = true;
             }
@@ -385,7 +385,7 @@ impl Options {
                     options.cur_scroll_speed = speed;
                     parent.borrow_mut().invalidate_children();
                 })));
-            if speed == self.cur_scroll_speed {
+            if (speed - self.cur_scroll_speed).abs() < std::f32::EPSILON {
                 button.borrow_mut().state.set_active(true);
                 speed_found = true;
             }
@@ -478,7 +478,7 @@ impl Options {
                 .state
                 .add_text_arg("key", &format!("{:?}", key));
 
-            let action_ref = action.clone();
+            let action_ref = *action;
             key_button
                 .borrow_mut()
                 .state
@@ -486,7 +486,7 @@ impl Options {
                     let (parent, _) = Widget::parent::<Options>(widget);
 
                     let root = Widget::get_root(widget);
-                    let popup = KeybindingPopup::new(action_ref.clone(), parent);
+                    let popup = KeybindingPopup::new(action_ref, parent);
                     Widget::add_child_to(&root, Widget::with_defaults(popup));
                 })));
 
@@ -696,7 +696,7 @@ impl WidgetKind for KeybindingPopup {
             }
         }
 
-        options.cur_keybindings[matched_index] = (key, self.action.clone());
+        options.cur_keybindings[matched_index] = (key, self.action);
         self.options_widget.borrow_mut().invalidate_children();
         widget.borrow_mut().mark_for_removal();
         false

@@ -177,7 +177,7 @@ impl WidgetKind for MainMenu {
 
                 parent.borrow_mut().invalidate_children();
                 starter.mode = Mode::New;
-                starter.content = Widget::with_defaults(CharacterSelector::new(parent.clone()));
+                starter.content = Widget::with_defaults(CharacterSelector::new(parent));
             })));
 
         let load = Widget::with_theme(Button::empty(), "load");
@@ -219,7 +219,7 @@ impl WidgetKind for MainMenu {
 
                 window.mode = Mode::Module;
                 let modules_list = Module::get_available_modules();
-                if modules_list.len() == 0 {
+                if modules_list.is_empty() {
                     util::error_and_exit("No valid modules found.");
                 }
                 let module_selector = ModuleSelector::new(modules_list);

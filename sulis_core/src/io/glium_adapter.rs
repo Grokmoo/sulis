@@ -32,7 +32,7 @@ use glium::texture::{RawImage2d, SrgbTexture2d};
 use glium::uniforms::{MagnifySamplerFilter, MinifySamplerFilter, Sampler};
 use glium::{self, glutin, CapabilitiesSource, Rect, Surface};
 
-const VERTEX_SHADER_SRC: &'static str = r#"
+const VERTEX_SHADER_SRC: &str = r#"
   #version 140
   in vec2 position;
   in vec2 tex_coords;
@@ -45,7 +45,7 @@ const VERTEX_SHADER_SRC: &'static str = r#"
   }
 "#;
 
-const FRAGMENT_SHADER_SRC: &'static str = r#"
+const FRAGMENT_SHADER_SRC: &str = r#"
   #version 140
   in vec2 v_tex_coords;
   out vec4 color;
@@ -58,7 +58,7 @@ const FRAGMENT_SHADER_SRC: &'static str = r#"
   }
 "#;
 
-const SWAP_FRAGMENT_SHADER_SRC: &'static str = r#"
+const SWAP_FRAGMENT_SHADER_SRC: &str = r#"
   #version 140
   in vec2 v_tex_coords;
   out vec4 color;
@@ -360,7 +360,7 @@ fn try_get_display(
         .with_hardware_acceleration(None)
         .with_pixel_format(24, 8);
 
-    return glium::Display::new(window, context, &events_loop);
+    glium::Display::new(window, context, &events_loop)
 }
 
 impl GliumDisplay {

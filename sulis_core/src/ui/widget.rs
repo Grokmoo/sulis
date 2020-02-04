@@ -251,38 +251,38 @@ impl Widget {
 
     pub fn get_root(widget: &Rc<RefCell<Widget>>) -> Rc<RefCell<Widget>> {
         match &widget.borrow().parent {
-            None => return Rc::clone(widget),
+            None => Rc::clone(widget),
             Some(parent) => Widget::get_root(parent),
         }
     }
 
-    pub fn kind<'a, T: WidgetKind + 'static>(widget: &'a Rc<RefCell<Widget>>) -> &'a T {
+    pub fn kind<T: WidgetKind + 'static>(widget: &Rc<RefCell<Widget>>) -> &T {
         let kind = Rc::clone(&widget.borrow().kind);
         let kind = kind.borrow();
         let result = match kind.as_any().downcast_ref::<T>() {
             None => panic!("Failed to downcast Kind"),
             Some(result) => result,
         };
-        unsafe { mem::transmute::<&T, &'a T>(result) }
+        unsafe { mem::transmute::<&T, &T>(result) }
     }
 
-    pub fn kind_mut<'a, T: WidgetKind + 'static>(widget: &'a Rc<RefCell<Widget>>) -> &'a mut T {
+    pub fn kind_mut<T: WidgetKind + 'static>(widget: &Rc<RefCell<Widget>>) -> &mut T {
         let kind = Rc::clone(&widget.borrow().kind);
         let mut kind = kind.borrow_mut();
         let result = match kind.as_any_mut().downcast_mut::<T>() {
             None => panic!("Failed to downcast_mut Kind"),
             Some(result) => result,
         };
-        unsafe { mem::transmute::<&mut T, &'a mut T>(result) }
+        unsafe { mem::transmute::<&mut T, &mut T>(result) }
     }
-    pub fn downcast<'a, T: WidgetKind + 'static>(kind: &'a dyn WidgetKind) -> &'a T {
+    pub fn downcast<T: WidgetKind + 'static>(kind: &dyn WidgetKind) -> &T {
         match kind.as_any().downcast_ref::<T>() {
             None => panic!("Failed to downcast kind"),
             Some(result) => result,
         }
     }
 
-    pub fn downcast_mut<'a, T: WidgetKind + 'static>(kind: &'a mut dyn WidgetKind) -> &'a mut T {
+    pub fn downcast_mut<T: WidgetKind + 'static>(kind: &mut dyn WidgetKind) -> &mut T {
         match kind.as_any_mut().downcast_mut::<T>() {
             None => panic!("Failed to downcast kind"),
             Some(result) => result,
@@ -587,7 +587,7 @@ impl Widget {
 
             // add theme specified children
             for id in theme.children.iter() {
-                let subname = match id.split(".").last() {
+                let subname = match id.split('.').last() {
                     None => {
                         warn!("Invalid theme child name {}", id);
                         continue;
@@ -696,7 +696,7 @@ impl Widget {
             ),
         }
 
-        let ref widget_kind = Rc::clone(&widget.borrow().kind);
+        let widget_kind = Rc::clone(&widget.borrow().kind);
 
         let has_keyboard_child = widget.borrow().keyboard_focus_child.is_some();
         if has_keyboard_child {
@@ -717,11 +717,8 @@ impl Widget {
                 }
                 _ => (),
             }
-        } else {
-            match event.kind {
-                event::Kind::CharTyped(_) => return false,
-                _ => (),
-            }
+        } else if let event::Kind::CharTyped(_) = event.kind {
+            return false;
         }
 
         let has_modal = widget.borrow().modal_child.is_some();

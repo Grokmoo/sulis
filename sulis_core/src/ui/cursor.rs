@@ -120,17 +120,14 @@ impl Cursor {
         });
         Widget::dispatch_event(&root, event);
 
-        match Cursor::button_down() {
-            Some(kind) => {
-                trace!("Cursor {:?} drag.", kind);
-                let event = Event::new(event::Kind::MouseDrag {
-                    button: kind,
-                    delta_x: x,
-                    delta_y: y,
-                });
-                Widget::dispatch_event(&root, event);
-            }
-            None => (),
+        if let Some(kind) = Cursor::button_down() {
+            trace!("Cursor {:?} drag.", kind);
+            let event = Event::new(event::Kind::MouseDrag {
+                button: kind,
+                delta_x: x,
+                delta_y: y,
+            });
+            Widget::dispatch_event(&root, event);
         }
     }
 

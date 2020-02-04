@@ -278,7 +278,7 @@ impl DrawList {
         if self.texture.is_empty() {
             self.texture = other.texture.to_string();
         }
-        if let None = self.centroid {
+        if self.centroid.is_none() {
             if let Some(centroid) = other.centroid {
                 self.centroid = Some(centroid);
             }
@@ -299,7 +299,7 @@ impl DrawList {
                 let mut avg_x = 0.0;
                 let mut avg_y = 0.0;
 
-                for ref vertex in self.quads.iter() {
+                for vertex in self.quads.iter() {
                     avg_x += vertex.position[0];
                     avg_y += vertex.position[1];
                 }

@@ -35,7 +35,7 @@ use std::cell::RefCell;
 use std::collections::HashMap;
 use std::fmt::Display;
 use std::fs;
-use std::hash::Hash;
+use std::hash::{Hash};
 use std::io::{Error, ErrorKind};
 use std::path::Path;
 use std::path::PathBuf;
@@ -66,7 +66,7 @@ pub struct ResourceSet {
 
 impl ResourceSet {
     pub fn load_resources(mut dirs: Vec<String>) -> Result<YamlResourceSet, Error> {
-        if dirs.len() == 0 {
+        if dirs.is_empty() {
             return Err(Error::new(
                 ErrorKind::InvalidInput,
                 "Must specify at least \
@@ -244,7 +244,7 @@ impl ResourceSet {
         };
 
         let (spritesheet_id, sprite_id) = id.split_at(split_index);
-        if sprite_id.len() == 0 {
+        if sprite_id.is_empty() {
             return format_error;
         }
         let sprite_id = &sprite_id[1..];

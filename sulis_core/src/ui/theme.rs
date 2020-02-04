@@ -126,7 +126,7 @@ impl Default for Relative {
     }
 }
 
-pub const DEFAULT_THEME_ID: &'static str = "default";
+pub const DEFAULT_THEME_ID: &str = "default";
 
 #[derive(Deserialize, Debug, Copy, Clone)]
 pub enum Kind {
@@ -343,7 +343,7 @@ pub fn expand_text_args(text: &str, state: &WidgetState) -> String {
         if arg_accum {
             if c.is_whitespace() {
             } else if c == '#' {
-                if cur_arg.len() == 0 {
+                if cur_arg.is_empty() {
                     // ## code just gives a #
                     out.push(c);
                 } else {
@@ -368,7 +368,7 @@ pub fn expand_text_args(text: &str, state: &WidgetState) -> String {
         }
     }
 
-    if cur_arg.len() > 0 {
+    if !cur_arg.is_empty() {
         let text_arg = match state.get_text_arg(&cur_arg) {
             None => {
                 warn!("Non existant text arg '{}' in text '{}'", cur_arg, text);

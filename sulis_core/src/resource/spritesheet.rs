@@ -45,7 +45,7 @@ impl Sprite {
     fn new(
         sheet_id: &str,
         sprite_id: &str,
-        image_size: &Size,
+        image_size: Size,
         position: Point,
         size: Size,
     ) -> Sprite {
@@ -84,12 +84,9 @@ impl Spritesheet {
             let mut filepath = PathBuf::from(dir);
             filepath.push(&builder.src);
 
-            match extern_image::open(&filepath) {
-                Ok(read_image) => {
-                    image = Some(read_image);
-                    break;
-                }
-                Err(_) => (),
+            if let Ok(read_image) = extern_image::open(&filepath) {
+                image = Some(read_image);
+                break;
             }
         }
 
@@ -110,7 +107,7 @@ impl Spritesheet {
         let multiplier = builder.grid_multiplier.unwrap_or(1) as i32;
 
         let mut sprites: HashMap<String, Rc<Sprite>> = HashMap::new();
-        for (_id, mut group) in builder.groups {
+        for (_, group) in builder.groups {
             let mut template: Option<SpritesheetGroupTemplate> = match group.from_template {
                 None => None,
                 Some(ref id) => {
@@ -132,10 +129,7 @@ impl Spritesheet {
                 }
             };
 
-            let multiplier = match group.grid_multiplier {
-                None => multiplier,
-                Some(mult) => mult as i32,
-            };
+            let multiplier = group.grid_multiplier.unwrap_or(multiplier as u32) as i32;
 
             let base_size = match template {
                 None => group.size,
@@ -144,10 +138,7 @@ impl Spritesheet {
 
             let base_pos = group.position;
 
-            let mut areas: HashMap<String, Vec<i32>> = HashMap::new();
-            group.areas.drain().for_each(|(k, v)| {
-                areas.insert(k, v);
-            });
+            let mut areas: HashMap<String, Vec<i32>> = group.areas.into_iter().collect();
 
             if let Some(template) = template.as_mut() {
                 template.areas.drain().for_each(|(k, v)| {
@@ -185,7 +176,7 @@ impl Spritesheet {
                     builder.id,
                     size
                 );
-                let sprite = Sprite::new(&builder.id, &id, &image_size, pos, size);
+                let sprite = Sprite::new(&builder.id, &id, image_size, pos, size);
 
                 if sprites.contains_key(&id) {
                     warn!("Duplicate sprite ID in sheet '{}': '{}'", builder.id, id);

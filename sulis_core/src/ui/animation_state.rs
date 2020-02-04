@@ -136,7 +136,7 @@ impl AnimationState {
     /// adds `Kind::Normal`
     pub fn remove(&mut self, kind: Kind) {
         self.kinds.retain(|k| *k != kind);
-        if self.kinds.len() == 0 {
+        if self.kinds.is_empty() {
             self.kinds.push(Kind::Normal);
         }
     }
@@ -187,14 +187,14 @@ impl AnimationState {
             };
         }
 
-        if kinds.len() == 0 {
+        if kinds.is_empty() {
             return Err(Error::new(
                 ErrorKind::InvalidData,
                 "Empty AnimationState string",
             ));
         }
 
-        return Ok(AnimationState { kinds });
+        Ok(AnimationState { kinds })
     }
 
     fn validate_push(kind: Kind, kinds: &mut Vec<Kind>) -> Result<(), Error> {
@@ -205,12 +205,8 @@ impl AnimationState {
             ));
         }
 
-        if kind == Kind::Normal && kinds.len() > 0 {
-            return Err(Error::new(
-                ErrorKind::InvalidData,
-                "Normal state cannot be present with others.",
-            ));
-        } else if kinds.contains(&Kind::Normal) {
+        if (kind == Kind::Normal && !kinds.is_empty()) ||
+            kinds.contains(&Kind::Normal) {
             return Err(Error::new(
                 ErrorKind::InvalidData,
                 "Normal state cannot be present with others.",
@@ -229,7 +225,7 @@ impl AnimationState {
     /// with the highest rank is chosen and the associated `T` is returned.
     pub fn find_match_in_vec<'a, T>(
         desired_state: &'a AnimationState,
-        choices: &'a Vec<(AnimationState, T)>,
+        choices: &'a [(AnimationState, T)],
     ) -> &'a T {
         // TODO each animation state is sorted, so we can do this with a single
         // lock step loop instead of double loop

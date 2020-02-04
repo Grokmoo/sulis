@@ -43,7 +43,7 @@ impl From<(i32, i32)> for Point {
 }
 
 impl Point {
-    fn cmp_hash(&self) -> i32 {
+    fn cmp_hash(self) -> i32 {
         self.x + self.y * 65536
     }
 
@@ -65,7 +65,7 @@ impl Point {
         }
     }
 
-    pub fn as_tuple(&self) -> (i32, i32) {
+    pub fn as_tuple(self) -> (i32, i32) {
         (self.x, self.y)
     }
 
@@ -74,10 +74,10 @@ impl Point {
         self.y *= val;
     }
 
-    pub fn add(&self, x: i32, y: i32) -> Point {
+    pub fn add(self, x: i32, y: i32) -> Point {
         Point {
-            x: &self.x + x,
-            y: &self.y + y,
+            x: self.x + x,
+            y: self.y + y,
         }
     }
 
@@ -127,7 +127,7 @@ impl Point {
         vec
     }
 
-    pub fn inner(&self, border: &Border) -> Point {
+    pub fn inner(self, border: &Border) -> Point {
         Point {
             x: self.x + border.left,
             y: self.y + border.top,
@@ -137,7 +137,7 @@ impl Point {
     /// Returns true if this point's x coordinate is in
     /// the interval [0, max_x) and the y coordinate is in
     /// the interval [0, max_y).  Returns false otherwise.
-    pub fn in_bounds(&self, max_x: i32, max_y: i32) -> bool {
+    pub fn in_bounds(self, max_x: i32, max_y: i32) -> bool {
         if self.x < 0 || self.y < 0 {
             return false;
         }
@@ -148,7 +148,7 @@ impl Point {
     }
 
     /// Returns the eucliden distance between these two points
-    pub fn dist(&self, other: &Point) -> f32 {
+    pub fn dist(self, other: Point) -> f32 {
         (((self.x - other.x) * (self.x - other.x) + (self.y - other.y) * (self.y - other.y)) as f32)
             .sqrt()
     }

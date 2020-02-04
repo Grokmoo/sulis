@@ -93,16 +93,18 @@ pub struct Scrollable {
     max_y: f32,
 }
 
-impl Scrollable {
-    pub fn new() -> Scrollable {
-        Scrollable {
+impl Default for Scrollable {
+    fn default() -> Self {
+        Self {
             x: 0.0,
             y: 0.0,
             max_x: 0.0,
             max_y: 0.0,
         }
     }
+}
 
+impl Scrollable {
     pub fn compute_max(
         &mut self,
         widget: &Widget,

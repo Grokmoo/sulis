@@ -248,7 +248,7 @@ fn read_file(
         }
     };
 
-    let map = resources.entry(kind).or_insert(HashMap::new());
+    let map = resources.entry(kind).or_insert_with(HashMap::new);
     // use of entry API here seems to require us to clone our value since
     // we want to either append it or insert it
     //map.entry(id).and_modify(|entry| merge_doc(entry, value)).or_insert(value);

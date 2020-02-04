@@ -663,7 +663,7 @@ impl TurnManager {
             }
 
             for p in &party_pos {
-                if p.dist(&entity.location.to_point()) < run_away_dist {
+                if p.dist(entity.location.to_point()) < run_away_dist {
                     return false;
                 }
             }

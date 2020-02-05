@@ -44,7 +44,7 @@ impl Faction {
         [Faction::Friendly, Faction::Hostile, Faction::Neutral].iter()
     }
 
-    pub fn from_str(val: &str) -> Option<Faction> {
+    pub fn option_from_str(val: &str) -> Option<Faction> {
         match val {
             "Hostile" => Some(Faction::Hostile),
             "Neutral" => Some(Faction::Neutral),
@@ -53,7 +53,7 @@ impl Faction {
         }
     }
 
-    pub fn to_str(&self) -> String {
+    pub fn to_str(self) -> String {
         match &self {
             Faction::Hostile => "Hostile",
             Faction::Neutral => "Neutral",
@@ -62,22 +62,22 @@ impl Faction {
         .to_owned()
     }
 
-    pub fn is_hostile(&self, other: &Faction) -> bool {
-        if self == &Faction::Neutral {
+    pub fn is_hostile(self, other: Faction) -> bool {
+        if self == Faction::Neutral {
             return false;
         }
-        if other == &Faction::Neutral {
+        if other == Faction::Neutral {
             return false;
         }
 
         self != other
     }
 
-    pub fn is_friendly(&self, other: &Faction) -> bool {
-        if self == &Faction::Neutral {
+    pub fn is_friendly(self, other: Faction) -> bool {
+        if self == Faction::Neutral {
             return false;
         }
-        if other == &Faction::Neutral {
+        if other == Faction::Neutral {
             return false;
         }
 
@@ -246,16 +246,14 @@ impl Actor {
                 }
                 Some(race) => Rc::clone(race),
             }
+        } else if let Some(race_builder) = builder.inline_race {
+            let race = Rc::new(Race::new(race_builder, resources)?);
+            trace!("Inserting inline race with ID {} into module.", race.id);
+            resources.races.insert(race.id.clone(), Rc::clone(&race));
+            race
         } else {
-            if let Some(race_builder) = builder.inline_race {
-                let race = Rc::new(Race::new(race_builder, resources)?);
-                trace!("Inserting inline race with ID {} into module.", race.id);
-                resources.races.insert(race.id.clone(), Rc::clone(&race));
-                race
-            } else {
-                warn!("Must specify either race or inline race.");
-                return unable_to_create_error("actor", &builder.id);
-            }
+            warn!("Must specify either race or inline race.");
+            return unable_to_create_error("actor", &builder.id);
         };
 
         let conversation = match builder.conversation {

@@ -28,7 +28,7 @@ pub struct DamageList {
 }
 
 impl DamageList {
-    pub fn to_vec(self) -> Vec<Damage> {
+    pub fn as_vec(self) -> Vec<Damage> {
         self.damage
     }
 
@@ -59,7 +59,7 @@ impl DamageList {
         }
     }
 
-    pub fn new(base_damage: Damage, bonus_damage: &Vec<Damage>) -> DamageList {
+    pub fn new(base_damage: Damage, bonus_damage: &[Damage]) -> DamageList {
         if base_damage.kind.is_none() {
             warn!("Attempted to create damage list with no base damage kind");
             return DamageList::empty();
@@ -71,7 +71,7 @@ impl DamageList {
         let mut ap = base_damage.ap;
         damage_list.push(base_damage);
 
-        let mut bonus_damage = bonus_damage.clone();
+        let mut bonus_damage: Vec<Damage> = bonus_damage.iter().cloned().collect();
         bonus_damage.sort_by_key(|d| d.kind);
 
         let mut cur_damage = None;
@@ -195,21 +195,21 @@ impl DamageKind {
         DAMAGE_KINDS.iter()
     }
 
-    pub fn index(&self) -> usize {
+    pub fn index(self) -> usize {
         use crate::rules::DamageKind::*;
         match self {
-            &Slashing => 0,
-            &Piercing => 1,
-            &Crushing => 2,
-            &Acid => 3,
-            &Cold => 4,
-            &Shock => 5,
-            &Fire => 6,
-            &Raw => 7,
+            Slashing => 0,
+            Piercing => 1,
+            Crushing => 2,
+            Acid => 3,
+            Cold => 4,
+            Shock => 5,
+            Fire => 6,
+            Raw => 7,
         }
     }
 
-    pub fn from_str(s: &str) -> DamageKind {
+    pub fn unwrap_from_str(s: &str) -> DamageKind {
         match s {
             "Slashing" => DamageKind::Slashing,
             "Piercing" => DamageKind::Piercing,

@@ -51,10 +51,12 @@ impl<'a> TransitionGen<'a> {
         let mut gened = Vec::new();
         let mut out = Vec::new();
         for transition in transitions {
-            let kind = self.params.kinds.get(&transition.kind).ok_or(Error::new(
-                ErrorKind::InvalidInput,
-                format!("Invalid transition kind '{}'", transition.kind),
-            ))?;
+            let kind = self.params.kinds.get(&transition.kind).ok_or_else(|| {
+                Error::new(
+                    ErrorKind::InvalidInput,
+                    format!("Invalid transition kind '{}'", transition.kind),
+                )
+            })?;
 
             // keep trying until we succeed.  we always want to place transitions
             let mut placed = false;
@@ -191,10 +193,12 @@ impl TransitionParams {
                         .features
                         .get(&feature_id)
                         .map(|f| Rc::clone(f))
-                        .ok_or(Error::new(
-                            ErrorKind::InvalidInput,
-                            format!("Invalid feature '{}'", feature_id),
-                        ))?,
+                        .ok_or_else(|| {
+                            Error::new(
+                                ErrorKind::InvalidInput,
+                                format!("Invalid feature '{}'", feature_id),
+                            )
+                        })?,
                 ),
             };
 

@@ -37,6 +37,12 @@ pub struct TilesModel {
     walls: Vec<(u8, Option<usize>)>,
 }
 
+impl Default for TilesModel {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl TilesModel {
     pub fn new() -> TilesModel {
         let terrain_rules = Module::terrain_rules();
@@ -261,7 +267,7 @@ impl TilesModel {
     }
 
     pub fn gen_choice(&self, tiles: &TerrainTiles) -> Rc<Tile> {
-        if tiles.variants.len() == 0 {
+        if tiles.variants.is_empty() {
             return Rc::clone(&tiles.base);
         }
 
@@ -274,7 +280,7 @@ impl TilesModel {
             return Rc::clone(&tiles.base);
         }
 
-        return Rc::clone(&tiles.variants[(roll - base_weight) as usize]);
+        Rc::clone(&tiles.variants[(roll - base_weight) as usize])
     }
 
     pub fn check_add_terrain(&mut self, x: i32, y: i32) {
@@ -288,6 +294,7 @@ impl TilesModel {
         self.add(choice, x, y);
     }
 
+    #[allow(clippy::many_single_char_names)]
     pub fn check_add_terrain_border(&mut self, x: i32, y: i32) {
         let self_index = match self.terrain_index_at(x, y) {
             Some(index) => index,
@@ -381,6 +388,7 @@ impl TilesModel {
         }
     }
 
+    #[allow(clippy::many_single_char_names)]
     fn check_add_wall_border_exterior(&mut self, x: i32, y: i32, self_elev: u8, tiles: WallTiles) {
         self.add_some(&tiles.fill_tile, x, y);
 

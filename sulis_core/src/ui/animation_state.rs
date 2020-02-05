@@ -205,8 +205,7 @@ impl AnimationState {
             ));
         }
 
-        if (kind == Kind::Normal && !kinds.is_empty()) ||
-            kinds.contains(&Kind::Normal) {
+        if (kind == Kind::Normal && !kinds.is_empty()) || kinds.contains(&Kind::Normal) {
             return Err(Error::new(
                 ErrorKind::InvalidData,
                 "Normal state cannot be present with others.",

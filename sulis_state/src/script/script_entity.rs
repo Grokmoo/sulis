@@ -681,7 +681,7 @@ impl UserData for ScriptEntity {
         methods.add_method("set_faction", |_, entity, faction: String| {
             let entity = entity.try_unwrap()?;
 
-            match Faction::from_str(&faction) {
+            match Faction::option_from_str(&faction) {
                 None => warn!("Invalid faction '{}' in script", faction),
                 Some(faction) => entity.borrow_mut().actor.set_faction(faction),
             }
@@ -1188,7 +1188,7 @@ impl UserData for ScriptEntity {
             entity.check_not_equal(&target)?;
             let parent = entity.try_unwrap()?;
             let target = target.try_unwrap()?;
-            let damage_kind = DamageKind::from_str(&damage_kind);
+            let damage_kind = DamageKind::unwrap_from_str(&damage_kind);
             let attack_kind = AttackKind::from_str(&attack_kind, &accuracy_kind);
             let mut cbs: Vec<Box<dyn ScriptCallback>> = Vec::new();
             if let Some(cb) = cb {
@@ -1225,7 +1225,7 @@ impl UserData for ScriptEntity {
 
                 let damage_kind = match damage_kind {
                     None => DamageKind::Raw,
-                    Some(ref kind) => DamageKind::from_str(kind),
+                    Some(ref kind) => DamageKind::unwrap_from_str(kind),
                 };
                 let attack_kind = AttackKind::from_str(&attack_kind, &accuracy_kind);
 
@@ -1280,7 +1280,7 @@ impl UserData for ScriptEntity {
                 let rules = Module::rules();
                 let parent = entity.try_unwrap()?;
                 let attacker = attacker.try_unwrap()?;
-                let damage_kind = DamageKind::from_str(&damage_kind);
+                let damage_kind = DamageKind::unwrap_from_str(&damage_kind);
 
                 let min_damage = min_damage as u32;
                 let max_damage = max_damage as u32;

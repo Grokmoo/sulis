@@ -609,7 +609,7 @@ impl UserData for ScriptEffect {
             let min = min as u32;
             let max = max as u32;
             let ap = ap.unwrap_or(0.0) as u32;
-            let dmg_kind = DamageKind::from_str(&kind);
+            let dmg_kind = DamageKind::unwrap_from_str(&kind);
             let kind = BonusKind::Damage(
                 Damage { min, max, ap, kind: Some(dmg_kind) }
             );
@@ -620,7 +620,7 @@ impl UserData for ScriptEffect {
             "add_armor_of_kind",
             |_, effect, (value, kind, when): (f32, String, Option<String>)| {
                 let value = value as i32;
-                let armor_kind = DamageKind::from_str(&kind);
+                let armor_kind = DamageKind::unwrap_from_str(&kind);
                 let kind = BonusKind::ArmorKind {
                     kind: armor_kind,
                     amount: value,
@@ -633,7 +633,7 @@ impl UserData for ScriptEffect {
             "add_resistance",
             |_, effect, (value, kind, when): (f32, String, Option<String>)| {
                 let value = value as i32;
-                let dmg_kind = DamageKind::from_str(&kind);
+                let dmg_kind = DamageKind::unwrap_from_str(&kind);
                 let kind = BonusKind::Resistance {
                     kind: dmg_kind,
                     amount: value,
@@ -748,7 +748,7 @@ fn add_bonus_to_effect(effect: &mut ScriptEffect, bonus_kind: BonusKind, when: O
                         return;
                     }
 
-                    Contingent::AttackWithDamageKind(DamageKind::from_str(split[1]))
+                    Contingent::AttackWithDamageKind(DamageKind::unwrap_from_str(split[1]))
                 }
                 _ => {
                     warn!(

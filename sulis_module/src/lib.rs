@@ -296,7 +296,7 @@ impl Module {
 
         let mut actors = Vec::new();
 
-        if let Err(_) = fs::create_dir_all(&path) {
+        if fs::create_dir_all(&path).is_err() {
             warn!("Unable to create directory: '{}'", path.to_string_lossy());
             return actors;
         }
@@ -325,7 +325,7 @@ impl Module {
             }
 
             let extension: String =
-                OsStr::to_str(entry.path().extension().unwrap_or(OsStr::new("")))
+                OsStr::to_str(entry.path().extension().unwrap_or_else(|| OsStr::new("")))
                     .unwrap_or("")
                     .to_string();
 
@@ -382,13 +382,14 @@ impl Module {
                 for (id, yaml) in map {
                     if let serde_yaml::Value::Mapping(ref map) = yaml {
                         if let Some(serde_yaml::Value::Sequence(files)) = map.get(&file_key) {
-                            if files.iter().all(|file| {
+                            let is_campaign_only = |file: &serde_yaml::Value| {
                                 if let serde_yaml::Value::String(file) = file {
                                     !file.ends_with("campaign.yml")
                                 } else {
                                     false
                                 }
-                            }) {
+                            };
+                            if files.iter().all(is_campaign_only) {
                                 continue;
                             }
                         }
@@ -698,8 +699,8 @@ impl Module {
         MODULE.with(|m| m.borrow().terrain_kinds.clone())
     }
 
-    pub fn create_get_item(id: &str, adjectives: &Vec<String>) -> Option<Rc<Item>> {
-        if adjectives.len() == 0 {
+    pub fn create_get_item(id: &str, adjectives: &[String]) -> Option<Rc<Item>> {
+        if adjectives.is_empty() {
             return Module::item(id);
         }
 
@@ -770,7 +771,7 @@ impl Module {
             let module = r.borrow();
             match module.scripts.get(id) {
                 None => None,
-                Some(ref script) => Some(script.to_string()),
+                Some(script) => Some(script.to_string()),
             }
         })
     }

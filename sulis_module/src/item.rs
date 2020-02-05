@@ -117,7 +117,7 @@ impl Item {
         mut adjectives: Vec<Rc<ItemAdjective>>,
         new_id: String,
     ) -> Item {
-        assert!(adjectives.len() > 0);
+        assert!(!adjectives.is_empty());
 
         let mut added_adjectives = item.added_adjectives.clone();
         added_adjectives.append(&mut adjectives);
@@ -167,8 +167,8 @@ impl Item {
     }
 
     pub fn new(builder: ItemBuilder, module: &Module) -> Result<Item, Error> {
-        if let &Some(ref equippable) = &builder.equippable {
-            if let Some(ref attack) = equippable.attack {
+        if let Some(equippable) = &builder.equippable {
+            if let Some(attack) = &equippable.attack {
                 if attack.damage.kind.is_none() {
                     warn!("Kind must be specified for attack damage.");
                     return unable_to_create_error("item", &builder.id);
@@ -319,7 +319,7 @@ fn apply_adjectives(
     base_prereqs: &Option<PrereqList>,
     equippable: &Option<Equippable>,
     value: i32,
-    adjectives: &Vec<Rc<ItemAdjective>>,
+    adjectives: &[Rc<ItemAdjective>],
 ) -> (Option<Equippable>, i32, Option<PrereqList>) {
     // first, add bonuses from adjectives and accumulate modifiers
     let mut value_add = 0;
@@ -365,7 +365,7 @@ fn apply_adjectives(
                     .apply_modifier(attack_penalty_mod, attack_bonus_mod);
             }
 
-            if attack_damage_mod != 1.0 {
+            if (attack_damage_mod - 1.0).abs() > std::f32::EPSILON {
                 let damage = attack.damage.mult_f32(attack_damage_mod);
                 attack.damage = damage;
             }

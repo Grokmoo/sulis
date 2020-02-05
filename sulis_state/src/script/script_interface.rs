@@ -565,7 +565,7 @@ impl UserData for ScriptInterface {
         methods.add_method(
             "set_quest_state",
             |_, _, (quest, state): (String, String)| {
-                let state = QuestEntryState::from_str(&state);
+                let state = QuestEntryState::unwrap_from_str(&state);
                 if Module::quest(&quest).is_none() {
                     warn!("Set quest state for invalid quest '{}'", quest);
                 }
@@ -577,7 +577,7 @@ impl UserData for ScriptInterface {
         methods.add_method(
             "set_quest_entry_state",
             |_, _, (quest, entry, state): (String, String, String)| {
-                let state = QuestEntryState::from_str(&state);
+                let state = QuestEntryState::unwrap_from_str(&state);
                 match Module::quest(&quest) {
                     None => warn!("Set quest entry state for invalid quest '{}'", quest),
                     Some(ref quest) => {
@@ -688,7 +688,7 @@ impl UserData for ScriptInterface {
 
                 let entity = result.try_unwrap()?;
                 if let Some(faction) = faction {
-                    match Faction::from_str(&faction) {
+                    match Faction::option_from_str(&faction) {
                         None => warn!("Invalid faction '{}' in script", faction),
                         Some(faction) => entity.borrow_mut().actor.set_faction(faction),
                     }

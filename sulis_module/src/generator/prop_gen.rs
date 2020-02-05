@@ -61,10 +61,8 @@ impl<'a, 'b> PropGen<'a, 'b> {
                 let (w, h) = (self.model.area_width, self.model.area_height);
                 let data = PropData::gen(&mut self.model, w, h, prop);
 
-                if pass.require_passable {
-                    if !data.is_passable(&self.layers) {
-                        continue;
-                    }
+                if pass.require_passable && !data.is_passable(&self.layers) {
+                    continue;
                 }
 
                 let p1 = Point::from(self.model.to_region_coords(data.x, data.y));

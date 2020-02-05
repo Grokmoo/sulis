@@ -77,10 +77,8 @@ impl<'a, 'b> FeatureGen<'a, 'b> {
                     continue;
                 }
 
-                if pass.require_passable {
-                    if !data.is_passable(&self.layers) {
-                        continue;
-                    }
+                if pass.require_passable && !data.is_passable(&self.layers) {
+                    continue;
                 }
 
                 features.push(data);
@@ -164,10 +162,12 @@ impl FeatureParams {
 
         let mut fixed = Vec::new();
         for (id, p) in builder.fixed {
-            let feature = module.features.get(&id).ok_or(Error::new(
-                ErrorKind::InvalidInput,
-                format!("Invalid feature '{}' in gen fixed.", id),
-            ))?;
+            let feature = module.features.get(&id).ok_or_else(|| {
+                Error::new(
+                    ErrorKind::InvalidInput,
+                    format!("Invalid feature '{}' in gen fixed.", id),
+                )
+            })?;
             fixed.push(FeatureData {
                 feature: Rc::clone(feature),
                 x: p.x,

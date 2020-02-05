@@ -60,7 +60,7 @@ impl AbilityList {
         })
     }
 
-    pub fn iter<'a>(&'a self) -> Iter<'a, Entry> {
+    pub fn iter(&self) -> Iter<Entry> {
         self.entries.iter()
     }
 }

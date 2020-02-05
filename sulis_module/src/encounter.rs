@@ -40,7 +40,7 @@ pub struct Encounter {
 
 impl Encounter {
     pub fn new(builder: EncounterBuilder, module: &Module) -> Result<Encounter, Error> {
-        if builder.entries.len() == 0 {
+        if builder.entries.is_empty() {
             warn!("Cannot have an encounter with no entries");
             return unable_to_create_error("encounter", &builder.id);
         }

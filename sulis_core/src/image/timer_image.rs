@@ -58,7 +58,7 @@ impl TimerImage {
                     if size != *image.get_size() {
                         return invalid_data_error(
                             "All frames in a timer image must have the\
-                             same size."
+                             same size.",
                         );
                     }
                 }

@@ -341,12 +341,10 @@ impl ThemeBuilderSet {
         }
 
         match result {
-            None => {
-                Err(Error::new(
-                    ErrorKind::InvalidInput,
-                    format!("From ref '{}' is invalid", id),
-                ))
-            }
+            None => Err(Error::new(
+                ErrorKind::InvalidInput,
+                format!("From ref '{}' is invalid", id),
+            )),
             Some(theme) => Ok(theme),
         }
     }

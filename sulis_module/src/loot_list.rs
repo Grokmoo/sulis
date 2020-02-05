@@ -105,9 +105,9 @@ impl LootList {
         id: String,
         entry_in: EntryBuilder,
     ) -> Result<Entry, Error> {
-        if entry_in.adjective1.len() != 0
-            || entry_in.adjective2.len() != 0
-            || entry_in.variant.len() != 0
+        if !entry_in.adjective1.is_empty()
+            || !entry_in.adjective2.is_empty()
+            || !entry_in.variant.is_empty()
         {
             warn!(
                 "Item adjective and variant may not be specified in loot sub_list entries: '{}'",
@@ -140,7 +140,7 @@ impl LootList {
         id: String,
         entry_in: EntryBuilder,
     ) -> Result<Entry, Error> {
-        if let None = module.items.get(&id) {
+        if module.items.get(&id).is_none() {
             warn!("Unable to find item '{}'", id);
             return unable_to_create_error("loot_list", &builder_id);
         }
@@ -157,7 +157,7 @@ impl LootList {
             if id == "none" {
                 continue;
             }
-            if let None = module.item_adjectives.get(&id) {
+            if module.item_adjectives.get(&id).is_none() {
                 warn!("Unable to find item adjective '{}'", id);
                 return unable_to_create_error("loot_list", &builder_id);
             }
@@ -171,7 +171,7 @@ impl LootList {
             if id == "none" {
                 continue;
             }
-            if let None = module.item_adjectives.get(&id) {
+            if module.item_adjectives.get(&id).is_none() {
                 warn!("Unable to find item adjective '{}'", id);
                 return unable_to_create_error("loot_list", &builder_id);
             }

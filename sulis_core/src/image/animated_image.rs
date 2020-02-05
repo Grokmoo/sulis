@@ -63,7 +63,7 @@ impl AnimatedImage {
                     if *size != *image.get_size() {
                         return invalid_data_error(
                             "All images in an animated image \
-                             must have the same size."
+                             must have the same size.",
                         );
                     }
                 }

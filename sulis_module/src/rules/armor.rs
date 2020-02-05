@@ -69,7 +69,7 @@ impl Armor {
             return 0;
         }
 
-        return self.kinds[check_kind.index()];
+        self.kinds[check_kind.index()]
     }
 
     pub fn base(&self) -> u32 {
@@ -95,6 +95,6 @@ impl Armor {
             return true;
         }
 
-        return self.kinds[kind.index()] != self.base;
+        self.kinds[kind.index()] != self.base
     }
 }

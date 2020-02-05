@@ -192,6 +192,7 @@ macro_rules! apply_kind_mod_f32 {
     };
 }
 
+#[allow(clippy::cognitive_complexity)]
 fn apply_modifiers(bonus: &mut Bonus, neg: f32, pos: f32) {
     use self::BonusKind::*;
     let new_kind = match bonus.kind {
@@ -304,6 +305,7 @@ macro_rules! merge_int_bonus {
     };
 }
 
+#[allow(clippy::cognitive_complexity)]
 pub fn merge_if_dup(first: &Bonus, sec: &Bonus) -> Option<Bonus> {
     if first.when != sec.when {
         return None;
@@ -366,12 +368,11 @@ pub fn merge_if_dup(first: &Bonus, sec: &Bonus) -> Option<Bonus> {
                 });
             }
         }
-        Damage(damage) => {
+        Damage(mut damage) => {
             if let Damage(other) = sec.kind {
                 if damage.kind != other.kind {
                     return None;
                 }
-                let mut damage = damage.clone();
                 damage.add(other);
                 return Some(Bonus {
                     when,
@@ -576,7 +577,7 @@ macro_rules! mod_field {
 macro_rules! mod_field_f32 {
     ($field:expr, $pos:ident, $neg:ident) => {
         if $field > 0.0 {
-            $field = $field * $pos;
+            $field *= $pos;
         } else {
             $field = $field as f32 * $neg;
         }
@@ -587,12 +588,10 @@ impl AttackBonuses {
     pub fn add(&mut self, other: &AttackBonuses) {
         if let Some(mut damage) = self.damage {
             if let Some(other) = other.damage {
-                damage.add(other.clone());
+                damage.add(other);
             }
-        } else {
-            if let Some(other) = other.damage {
-                self.damage = Some(other.clone());
-            }
+        } else if let Some(other) = other.damage {
+            self.damage = Some(other);
         }
 
         self.melee_accuracy += other.melee_accuracy;

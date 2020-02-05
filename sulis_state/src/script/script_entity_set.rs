@@ -390,7 +390,7 @@ fn touchable(_lua: Context, set: &ScriptEntitySet, _args: ()) -> Result<ScriptEn
 }
 
 fn hostile_to(_lua: Context, set: &ScriptEntitySet, faction: String) -> Result<ScriptEntitySet> {
-    let faction = match Faction::from_str(&faction) {
+    let faction = match Faction::option_from_str(&faction) {
         None => {
             warn!("Attempted to check hostile_to invalid faction {}", faction);
             return Err(rlua::Error::FromLuaConversionError {
@@ -402,12 +402,12 @@ fn hostile_to(_lua: Context, set: &ScriptEntitySet, faction: String) -> Result<S
         Some(faction) => faction,
     };
     filter_entities(set, (), &|_, entity, _| {
-        faction.is_hostile(&entity.borrow().actor.faction())
+        faction.is_hostile(entity.borrow().actor.faction())
     })
 }
 
 fn friendly_to(_lua: Context, set: &ScriptEntitySet, faction: String) -> Result<ScriptEntitySet> {
-    let faction = match Faction::from_str(&faction) {
+    let faction = match Faction::option_from_str(&faction) {
         None => {
             warn!("Attempted to check friendly_to invalid faction {}", faction);
             return Err(rlua::Error::FromLuaConversionError {
@@ -420,7 +420,7 @@ fn friendly_to(_lua: Context, set: &ScriptEntitySet, faction: String) -> Result<
     };
 
     filter_entities(set, (), &|_, entity, _| {
-        faction.is_friendly(&entity.borrow().actor.faction())
+        faction.is_friendly(entity.borrow().actor.faction())
     })
 }
 

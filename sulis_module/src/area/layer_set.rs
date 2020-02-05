@@ -36,7 +36,7 @@ pub struct LayerSet {
 impl LayerSet {
     pub fn new(
         builder: &AreaBuilder,
-        props: &Vec<PropData>,
+        props: &[PropData],
         mut layers: Vec<Layer>,
     ) -> Result<LayerSet, Error> {
         let width = builder.width as i32;
@@ -112,7 +112,7 @@ impl LayerSet {
             }
         }
 
-        for ref layer in layers.iter() {
+        for layer in layers.iter() {
             for &(point, ref tile) in layer.impass_override_tiles.iter() {
                 let start_x = point.x;
                 let start_y = point.y;
@@ -133,7 +133,7 @@ impl LayerSet {
             }
         }
 
-        for ref prop_data in props.iter() {
+        for prop_data in props.iter() {
             let prop = &prop_data.prop;
             let start_x = prop_data.location.x as usize;
             let start_y = prop_data.location.y as usize;

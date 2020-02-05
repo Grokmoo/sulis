@@ -47,7 +47,7 @@ const DIRECTIONS: [Direction; 4] = [
 ];
 
 impl Direction {
-    fn add(&self, p: Point, mult: i32) -> Point {
+    fn add(self, p: Point, mult: i32) -> Point {
         match self {
             Direction::North => Point::new(p.x, p.y - mult),
             Direction::South => Point::new(p.x, p.y + mult),
@@ -171,7 +171,7 @@ impl Maze {
             }
         }
 
-        let mut connectors: Vec<Point> = connector_regions.keys().map(|k| k.clone()).collect();
+        let mut connectors: Vec<Point> = connector_regions.keys().copied().collect();
         rand.shuffle(&mut connectors);
         info!("Found connectors: {}", connectors.len());
 
@@ -321,7 +321,7 @@ impl Maze {
                 if *b == last_dir {
                     return Ordering::Greater;
                 }
-                return Ordering::Equal;
+                Ordering::Equal
             });
 
             if unmade_cells.is_empty() {
@@ -370,13 +370,13 @@ impl Maze {
     /// Returns an array of the tilekind of the specified tile and its 4 neighbors.
     /// In order: self (center), North, East, South, West
     pub fn neighbors(&self, x: i32, y: i32) -> [Option<TileKind>; 5] {
-        let c = self.tile_checked(x, y);
-        let n = self.tile_checked(x, y - 1);
-        let e = self.tile_checked(x + 1, y);
-        let s = self.tile_checked(x, y + 1);
-        let w = self.tile_checked(x - 1, y);
+        let center = self.tile_checked(x, y);
+        let north = self.tile_checked(x, y - 1);
+        let east = self.tile_checked(x + 1, y);
+        let south = self.tile_checked(x, y + 1);
+        let west = self.tile_checked(x - 1, y);
 
-        [c, n, e, s, w]
+        [center, north, east, south, west]
     }
 
     pub fn region(&self, x: i32, y: i32) -> Option<usize> {

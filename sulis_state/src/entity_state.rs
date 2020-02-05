@@ -376,14 +376,14 @@ impl EntityState {
         let self_faction = self.actor.faction();
         let other_faction = other.actor.faction();
 
-        self_faction.is_hostile(&other_faction)
+        self_faction.is_hostile(other_faction)
     }
 
     pub fn is_friendly(&self, other: &EntityState) -> bool {
         let self_faction = self.actor.faction();
         let other_faction = other.actor.faction();
 
-        self_faction.is_friendly(&other_faction)
+        self_faction.is_friendly(other_faction)
     }
 
     pub(crate) fn is_marked_for_removal(&self) -> bool {

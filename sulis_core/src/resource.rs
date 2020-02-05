@@ -35,7 +35,7 @@ use std::cell::RefCell;
 use std::collections::HashMap;
 use std::fmt::Display;
 use std::fs;
-use std::hash::{Hash};
+use std::hash::Hash;
 use std::io::{Error, ErrorKind};
 use std::path::Path;
 use std::path::PathBuf;

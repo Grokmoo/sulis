@@ -45,7 +45,7 @@ impl Resistance {
             return 0;
         }
 
-        return self.kinds[check_kind.index()];
+        self.kinds[check_kind.index()]
     }
 
     pub fn is_empty(&self) -> bool {

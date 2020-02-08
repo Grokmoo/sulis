@@ -397,20 +397,18 @@ impl PropHandler {
                     self.prop_pass_grid[idx] = true;
                 }
             }
-        } else {
-            if let Interactive::Door {
-                ref closed_invis,
-                ref closed_impass,
-                ..
-            } = state.prop.interactive
-            {
-                for p in closed_invis {
-                    self.prop_vis_grid[(p.x + start_x + (p.y + start_y) * width) as usize] = false;
-                }
+        } else if let Interactive::Door {
+            ref closed_invis,
+            ref closed_impass,
+            ..
+        } = state.prop.interactive
+        {
+            for p in closed_invis {
+                self.prop_vis_grid[(p.x + start_x + (p.y + start_y) * width) as usize] = false;
+            }
 
-                for p in closed_impass {
-                    self.prop_pass_grid[(p.x + start_x + (p.y + start_y) * width) as usize] = false;
-                }
+            for p in closed_impass {
+                self.prop_pass_grid[(p.x + start_x + (p.y + start_y) * width) as usize] = false;
             }
         }
     }

@@ -106,7 +106,7 @@ pub(in crate::animation) fn draw(
     scale_y: f32,
     millis: u32,
 ) {
-    if model.path.len() == 0 {
+    if model.path.is_empty() {
         return;
     }
 

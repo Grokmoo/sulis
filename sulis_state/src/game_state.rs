@@ -946,10 +946,7 @@ impl GameState {
 
         let to_add: Vec<Anim> = ANIMS_TO_ADD.with(|a| {
             let mut anims = a.borrow_mut();
-
-            let to_add = anims.drain(0..).collect();
-
-            to_add
+            anims.drain(0..).collect()
         });
 
         let (update_cbs, complete_cbs) = ANIMATIONS.with(|a| a.borrow_mut().update(to_add, millis));

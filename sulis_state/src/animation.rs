@@ -56,6 +56,12 @@ pub struct AnimState {
     above_anims: Vec<Anim>,
 }
 
+impl Default for AnimState {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl AnimState {
     pub fn new() -> AnimState {
         AnimState {
@@ -201,7 +207,7 @@ impl AnimState {
         AnimState::clear_all_blocking_vec(&mut self.above_anims);
     }
 
-    fn has_any_blocking_vec(vec: &Vec<Anim>) -> bool {
+    fn has_any_blocking_vec(vec: &[Anim]) -> bool {
         for anim in vec.iter() {
             if !anim.is_blocking() {
                 continue;
@@ -212,7 +218,7 @@ impl AnimState {
         false
     }
 
-    fn has_blocking_vec(vec: &Vec<Anim>, entity: &Rc<RefCell<EntityState>>) -> bool {
+    fn has_blocking_vec(vec: &[Anim], entity: &Rc<RefCell<EntityState>>) -> bool {
         for anim in vec.iter() {
             if !anim.is_blocking() {
                 continue;
@@ -497,20 +503,15 @@ impl Anim {
 
         self.update_kind(elapsed);
 
-        if !self.update_callbacks.is_empty() {
-            if elapsed > self.update_callbacks[0].0 {
-                self.update_callbacks[0].1.on_anim_update();
-                self.update_callbacks.remove(0);
-            }
+        if !self.update_callbacks.is_empty() && elapsed > self.update_callbacks[0].0 {
+            self.update_callbacks[0].1.on_anim_update();
+            self.update_callbacks.remove(0);
         }
 
-        if (self.duration_millis.less_than(elapsed) && self.ok_to_remove())
-            || self.marked_for_removal.get()
-        {
-            false
-        } else {
-            true
-        }
+        let keep = (self.duration_millis.less_than(elapsed) && self.ok_to_remove())
+            || self.marked_for_removal.get();
+
+        !keep
     }
 
     fn get_completion_callbacks(

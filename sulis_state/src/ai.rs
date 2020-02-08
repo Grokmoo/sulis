@@ -28,6 +28,12 @@ pub struct AI {
     next_state: State,
 }
 
+impl Default for AI {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl AI {
     pub fn new() -> AI {
         AI {

@@ -169,7 +169,7 @@ impl Effect {
         let area_id = area.to_string();
         self.surface = Some(Surface {
             area_id,
-            points: points.iter().cloned().collect(),
+            points: points.to_vec(),
             squares_to_fire_on_moved,
             aura,
         })

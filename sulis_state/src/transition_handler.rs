@@ -213,7 +213,7 @@ fn get_area(area_id: Option<&str>, p: Option<Point>) -> Option<(Rc<RefCell<AreaS
             match p {
                 None => {
                     error!("No point specified for intra area transition");
-                    return None;
+                    None
                 }
                 Some(p) => Some((area, p)),
             }

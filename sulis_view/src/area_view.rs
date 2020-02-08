@@ -507,7 +507,7 @@ impl AreaView {
 impl WidgetKind for AreaView {
     widget_kind!(NAME);
 
-    #[deny(clippy::float_cmp)]
+    #[allow(clippy::float_cmp)]
     fn update(&mut self, _widget: &Rc<RefCell<Widget>>, millis: u32) {
         let (dest_x, dest_y) = match self.scroll_target {
             None => return,

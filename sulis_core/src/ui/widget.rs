@@ -266,6 +266,7 @@ impl Widget {
         unsafe { mem::transmute::<&T, &T>(result) }
     }
 
+    #[allow(clippy::mut_from_ref)]
     pub fn kind_mut<T: WidgetKind + 'static>(widget: &Rc<RefCell<Widget>>) -> &mut T {
         let kind = Rc::clone(&widget.borrow().kind);
         let mut kind = kind.borrow_mut();

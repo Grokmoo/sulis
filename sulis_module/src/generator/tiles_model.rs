@@ -466,6 +466,7 @@ impl TilesModel {
         }
     }
 
+    #[allow(clippy::many_single_char_names)]
     fn check_add_wall_border_interior(&mut self, x: i32, y: i32, self_elev: u8, tiles: WallTiles) {
         let (gh, gw) = (self.grid_height, self.grid_width);
 

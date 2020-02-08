@@ -90,7 +90,7 @@ impl SaveState {
         let quest_state = GameState::quest_state();
         let current_quest = quest_state.current_quest_stack();
         let mut quests = Vec::new();
-        for (_, quest_state) in quest_state.into_iter() {
+        for (_, quest_state) in quest_state.quests_iter() {
             quests.push(quest_state);
         }
 

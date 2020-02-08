@@ -71,7 +71,7 @@ impl DamageList {
         let mut ap = base_damage.ap;
         damage_list.push(base_damage);
 
-        let mut bonus_damage: Vec<Damage> = bonus_damage.iter().cloned().collect();
+        let mut bonus_damage: Vec<Damage> = bonus_damage.to_vec();
         bonus_damage.sort_by_key(|d| d.kind);
 
         let mut cur_damage = None;
@@ -226,16 +226,16 @@ impl DamageKind {
         }
     }
 
-    pub fn to_str(&self) -> &'static str {
+    pub fn to_str(self) -> &'static str {
         match self {
-            &Slashing => "Slashing",
-            &Piercing => "Piercing",
-            &Crushing => "Crushing",
-            &Acid => "Acid",
-            &Cold => "Cold",
-            &Shock => "Shock",
-            &Fire => "Fire",
-            &Raw => "Raw",
+            Slashing => "Slashing",
+            Piercing => "Piercing",
+            Crushing => "Crushing",
+            Acid => "Acid",
+            Cold => "Cold",
+            Shock => "Shock",
+            Fire => "Fire",
+            Raw => "Raw",
         }
     }
 }

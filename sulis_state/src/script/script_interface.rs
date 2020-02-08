@@ -403,7 +403,7 @@ impl UserData for ScriptInterface {
             let targeter = get_targeter()?;
             let targeter = targeter.borrow();
             let parent = targeter.parent();
-            let affected = targeter
+            let affected: Vec<_> = targeter
                 .cur_affected()
                 .iter()
                 .map(|e| Some(Rc::clone(e)))
@@ -415,7 +415,7 @@ impl UserData for ScriptInterface {
             let targeter = get_targeter()?;
             let targeter = targeter.borrow();
             let parent = targeter.parent();
-            let selectable = targeter
+            let selectable: Vec<_> = targeter
                 .selectable()
                 .iter()
                 .map(|e| Some(Rc::clone(e)))

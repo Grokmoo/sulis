@@ -26,6 +26,7 @@ use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::ui::{animation_state, Color};
 use sulis_core::util::{approx_eq, gen_rand, ExtInt};
 
+#[allow(clippy::trivially_copy_pass_by_ref)]
 fn is_zero(val: &f32) -> bool {
     *val == 0.0
 }
@@ -133,32 +134,32 @@ impl Dist {
 
     fn generate_pair(&self) -> (f32, f32) {
         match self {
-            &Dist::Fixed { value } => (value, value),
-            &Dist::Uniform { min, max } => (gen_rand(min, max), gen_rand(min, max)),
-            &Dist::FixedAngleUniformSpeed {
+            Dist::Fixed { value } => (*value, *value),
+            Dist::Uniform { min, max } => (gen_rand(*min, *max), gen_rand(*min, *max)),
+            Dist::FixedAngleUniformSpeed {
                 angle,
                 min_speed,
                 max_speed,
             } => {
-                let speed = gen_rand(min_speed, max_speed);
-                radial_to_cart(angle, speed)
+                let speed = gen_rand(*min_speed, *max_speed);
+                radial_to_cart(*angle, speed)
             }
-            &Dist::UniformAngleFixedSpeed {
+            Dist::UniformAngleFixedSpeed {
                 min_angle,
                 max_angle,
                 speed,
             } => {
-                let angle = gen_rand(min_angle, max_angle);
-                radial_to_cart(angle, speed)
+                let angle = gen_rand(*min_angle, *max_angle);
+                radial_to_cart(angle, *speed)
             }
-            &Dist::UniformAngleUniformSpeed {
+            Dist::UniformAngleUniformSpeed {
                 min_angle,
                 max_angle,
                 min_speed,
                 max_speed,
             } => {
-                let speed = gen_rand(min_speed, max_speed);
-                let angle = gen_rand(min_angle, max_angle);
+                let speed = gen_rand(*min_speed, *max_speed);
+                let angle = gen_rand(*min_angle, *max_angle);
                 radial_to_cart(angle, speed)
             }
         }
@@ -166,8 +167,8 @@ impl Dist {
 
     fn generate(&self) -> f32 {
         match self {
-            &Dist::Fixed { value } => value,
-            &Dist::Uniform { min, max } => gen_rand(min, max),
+            Dist::Fixed { value } => *value,
+            Dist::Uniform { min, max } => gen_rand(*min, *max),
             _ => {
                 warn!("2D dists should only be used as the sole dist in a position component");
                 0.0
@@ -241,7 +242,7 @@ impl UserData for Param {}
 
 impl Param {
     pub fn is_non_zero(&self) -> bool {
-        return self.initial_value != 0.0 || self.dt != 0.0 || self.d2t != 0.0 || self.d3t != 0.0;
+        self.initial_value != 0.0 || self.dt != 0.0 || self.d2t != 0.0 || self.d3t != 0.0
     }
 
     pub fn offset(&self, offset: f32) -> Param {
@@ -509,7 +510,7 @@ impl GeneratorModel {
     }
 
     fn generate_particle(&self) -> Particle {
-        let mut position = self.position.clone(); // inherit position from generator
+        let mut position = self.position; // inherit position from generator
         position.0.initial_value = position.0.value;
         position.1.initial_value = position.1.value;
 

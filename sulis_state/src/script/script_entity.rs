@@ -1787,11 +1787,9 @@ fn targets(_lua: Context, parent: &ScriptEntity, _args: ()) -> Result<ScriptEnti
 fn get_on_activate_fn(is_party_member: bool, ai_data: &AIData) -> String {
     if is_party_member {
         "on_activate".to_string()
+    } else if let Some(func) = &ai_data.on_activate_fn {
+        func.to_string()
     } else {
-        if let Some(func) = &ai_data.on_activate_fn {
-            func.to_string()
-        } else {
-            "on_activate".to_string()
-        }
+        "on_activate".to_string()
     }
 }

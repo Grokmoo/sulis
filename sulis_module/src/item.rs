@@ -359,7 +359,7 @@ fn apply_adjectives(
         equippable.bonuses.merge_duplicates();
 
         if let Some(ref mut attack) = equippable.attack {
-            if attack_bonus_mod != 1.0 || attack_penalty_mod != 1.0 {
+            if (attack_bonus_mod - 1.0).abs() > std::f32::EPSILON || (attack_penalty_mod - 1.0).abs() > std::f32::EPSILON {
                 attack
                     .bonuses
                     .apply_modifier(attack_penalty_mod, attack_bonus_mod);

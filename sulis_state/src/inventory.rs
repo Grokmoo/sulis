@@ -129,7 +129,7 @@ impl Inventory {
         }
 
         match main {
-            None => return WeaponStyle::Single,
+            None => WeaponStyle::Single,
             Some(ref item_state) => match &item_state.item.equippable {
                 Some(ref equippable) => {
                     if let Some(attack_builder) = &equippable.attack {

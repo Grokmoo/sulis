@@ -400,7 +400,7 @@ impl Config {
             create_dir_and_warn(path);
         }
 
-        if let Err(_) = fs::copy(config_base_path, config_path) {
+        if fs::copy(config_base_path, config_path).is_err() {
             let config_base_str = format!("../{}", CONFIG_BASE);
             let config_base_path = Path::new(&config_base_str);
             if let Err(e) = fs::copy(config_base_path, config_path) {

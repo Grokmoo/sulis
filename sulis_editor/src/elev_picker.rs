@@ -41,19 +41,13 @@ pub struct ElevPicker {
 
 impl ElevPicker {
     pub fn new() -> Rc<RefCell<ElevPicker>> {
-        let cursor_sprite = match ResourceSet::sprite(&Config::editor_config().cursor) {
-            Err(_) => panic!(
-                "Unable to find cursor sprite '{}'",
-                Config::editor_config().cursor
-            ),
-            Ok(sprite) => sprite,
-        };
+        let cursor_sprite = ResourceSet::panic_or_sprite(&Config::editor_config().cursor);
 
         let mut elev_tiles = Vec::new();
         for sprite_id in Config::editor_config().area.elev_tiles.iter() {
             let sprite = match ResourceSet::sprite(sprite_id) {
-                Err(_) => {
-                    warn!("Editor elevation tile '{}' not found", sprite_id);
+                Err(e) => {
+                    warn!("Editor elevation tile '{}' not found: {}", sprite_id, e);
                     continue;
                 }
                 Ok(sprite) => sprite,

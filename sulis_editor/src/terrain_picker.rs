@@ -46,13 +46,7 @@ pub struct TerrainPicker {
 
 impl TerrainPicker {
     pub fn new() -> Rc<RefCell<TerrainPicker>> {
-        let cursor_sprite = match ResourceSet::sprite(&Config::editor_config().cursor) {
-            Err(_) => panic!(
-                "Unable to find cursor sprite '{}'",
-                Config::editor_config().cursor
-            ),
-            Ok(sprite) => sprite,
-        };
+        let cursor_sprite = ResourceSet::panic_or_sprite(&Config::editor_config().cursor);
 
         let terrain_rules = Module::terrain_rules();
         let brush_size = 4;

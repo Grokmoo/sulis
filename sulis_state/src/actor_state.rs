@@ -206,8 +206,8 @@ impl ActorState {
     }
 
     pub fn remove_anim_image_layers(&mut self, images: &HashMap<ImageLayer, Rc<dyn Image>>) {
-        for ref layer in images.keys() {
-            self.anim_image_layers.remove(*layer);
+        for layer in images.keys() {
+            self.anim_image_layers.remove(layer);
         }
 
         self.texture_cache_invalid = true;
@@ -328,7 +328,7 @@ impl ActorState {
     /// Returns true if this actor can use the item at some point - not
     /// taking AP into consideration, false otherwise
     pub fn can_use_sometime(&self, item_state: &ItemState) -> bool {
-        if !item_state.item.usable.is_some() {
+        if item_state.item.usable.is_none() {
             return false;
         }
 
@@ -475,7 +475,7 @@ impl ActorState {
 
     pub fn current_active_modes(&self) -> Vec<&str> {
         let mut result = Vec::new();
-        for (_, state) in &self.ability_states {
+        for state in self.ability_states.values() {
             if state.is_active_mode() {
                 result.push(&state.ability.id[..]);
             }
@@ -484,7 +484,7 @@ impl ActorState {
         result
     }
 
-    pub fn effects_iter<'a>(&'a self) -> impl Iterator<Item = &'a usize> {
+    pub fn effects_iter(&self) -> impl Iterator<Item = &usize> {
         self.effects.iter().map(|(index, _)| index)
     }
 
@@ -592,7 +592,7 @@ impl ActorState {
         if GameState::is_combat_active() {
             self.remove_ap(swap_ap);
         }
-        return true;
+        true
     }
 
     /// Attempts to equip the specified item to this actor's inventory.
@@ -625,7 +625,7 @@ impl ActorState {
             return false;
         }
 
-        return !GameState::is_combat_active();
+        !GameState::is_combat_active()
     }
 
     #[must_use]
@@ -783,7 +783,7 @@ impl ActorState {
         self.listeners.notify(&self);
     }
 
-    pub fn elapse_time(&mut self, millis_elapsed: u32, all_effects: &Vec<Option<Effect>>) {
+    pub fn elapse_time(&mut self, millis_elapsed: u32, all_effects: &[Option<Effect>]) {
         for (_, ability_state) in self.ability_states.iter_mut() {
             ability_state.update(millis_elapsed);
         }
@@ -882,11 +882,11 @@ impl ActorState {
         }
 
         let mut attacks_list = Vec::new();
-        for ref item_state in self.inventory.equipped_iter() {
-            let equippable = match item_state.item.equippable {
+        for item_state in self.inventory.equipped_iter() {
+            let equippable = match &item_state.item.equippable {
                 None => continue,
-                Some(ref equippable) => {
-                    if let Some(ref attack) = equippable.attack {
+                Some(equippable) => {
+                    if let Some(attack) = &equippable.attack {
                         let weapon_kind = match item_state.item.kind {
                             ItemKind::Weapon { kind } => kind,
                             _ => {
@@ -913,11 +913,8 @@ impl ActorState {
         let mut equipped_armor = HashMap::new();
         for slot in Slot::iter() {
             if let Some(ref item_state) = self.inventory.equipped(*slot) {
-                match item_state.item.kind {
-                    ItemKind::Armor { kind } => {
-                        equipped_armor.insert(*slot, kind);
-                    }
-                    _ => (),
+                if let ItemKind::Armor { kind } = item_state.item.kind {
+                    equipped_armor.insert(*slot, kind);
                 }
             }
         }

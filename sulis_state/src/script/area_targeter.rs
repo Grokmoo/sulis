@@ -1132,12 +1132,10 @@ impl AreaTargeter {
                 None => animation_state::Kind::MouseInvalid,
                 Some(_) => animation_state::Kind::MouseSelect,
             }
+        } else if self.free_select_valid {
+            animation_state::Kind::MouseSelect
         } else {
-            if self.free_select_valid {
-                animation_state::Kind::MouseSelect
-            } else {
-                animation_state::Kind::MouseInvalid
-            }
+            animation_state::Kind::MouseInvalid
         };
         Cursor::set_cursor_state(kind);
 

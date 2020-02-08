@@ -35,7 +35,7 @@ impl Resistance {
         }
 
         let index = kind.index();
-        self.kinds[index] = self.kinds[index] + amount;
+        self.kinds[index] += amount;
     }
 
     /// Returns the amount of damage resistance that this armor value

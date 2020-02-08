@@ -76,12 +76,12 @@ impl GeneratedArea {
             );
         }
 
-        let mut props: Vec<_> = area.props.iter().cloned().collect();
+        let mut props: Vec<_> = area.props.to_vec();
         for builder in generated_props {
             props.push(create_prop(&builder)?);
         }
 
-        let mut encounters: Vec<_> = area.encounters.iter().cloned().collect();
+        let mut encounters: Vec<_> = area.encounters.to_vec();
         for builder in generated_encounters {
             let encounter = match Module::encounter(&builder.id) {
                 None => {

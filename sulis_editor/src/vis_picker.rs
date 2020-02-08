@@ -33,13 +33,7 @@ pub struct VisPicker {
 
 impl VisPicker {
     pub fn new() -> Rc<RefCell<VisPicker>> {
-        let cursor_sprite = match ResourceSet::sprite(&Config::editor_config().cursor) {
-            Err(_) => panic!(
-                "Unable to find cursor sprite '{}'",
-                Config::editor_config().cursor
-            ),
-            Ok(sprite) => sprite,
-        };
+        let cursor_sprite = ResourceSet::panic_or_sprite(&Config::editor_config().cursor);
 
         Rc::new(RefCell::new(VisPicker { cursor_sprite }))
     }

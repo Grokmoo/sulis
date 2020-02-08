@@ -599,9 +599,9 @@ fn process_window_event(event: glutin::WindowEvent) -> Vec<InputAction> {
             };
 
             // scrolling the mouse wheeel seems to be buggy at the moment, only take some events
-            let amount = if amount == 1.0 {
+            let amount = if (amount - 1.0).abs() < std::f32::EPSILON {
                 1
-            } else if amount == -1.0 {
+            } else if (amount + 1.0).abs() < std::f32::EPSILON {
                 -1
             } else {
                 return Vec::new();

@@ -33,13 +33,7 @@ pub struct PassPicker {
 
 impl PassPicker {
     pub fn new() -> Rc<RefCell<PassPicker>> {
-        let cursor_sprite = match ResourceSet::sprite(&Config::editor_config().cursor) {
-            Err(_) => panic!(
-                "Unable to find cursor sprite '{}'",
-                Config::editor_config().cursor
-            ),
-            Ok(sprite) => sprite,
-        };
+        let cursor_sprite = ResourceSet::panic_or_sprite(&Config::editor_config().cursor);
 
         Rc::new(RefCell::new(PassPicker { cursor_sprite }))
     }

@@ -147,7 +147,7 @@ impl QuestStateSet {
         self.set_current_quest_and_notify(quest_id);
     }
 
-    pub fn into_iter(self) -> impl Iterator<Item = (String, QuestState)> {
+    pub fn quests_iter(self) -> impl Iterator<Item = (String, QuestState)> {
         self.quests.into_iter()
     }
 }

@@ -212,7 +212,7 @@ impl ScriptEntitySet {
 
     pub fn new(
         parent: &Rc<RefCell<EntityState>>,
-        entities: &Vec<Option<Rc<RefCell<EntityState>>>>,
+        entities: &[Option<Rc<RefCell<EntityState>>>],
     ) -> ScriptEntitySet {
         let parent = parent.borrow().index();
 

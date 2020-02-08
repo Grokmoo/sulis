@@ -296,11 +296,11 @@ impl ScriptStashItem {
     pub fn unwrap_index(&self) -> Result<usize> {
         match self.index {
             None => {
-                return Err(rlua::Error::FromLuaConversionError {
+                Err(rlua::Error::FromLuaConversionError {
                     from: "ScriptStashItem",
                     to: "Item",
                     message: Some("ScriptStashItem is invalid / does not exist.".to_string()),
-                });
+                })
             }
             Some(index) => Ok(index),
         }

@@ -131,7 +131,7 @@ impl PrereqList {
             levels,
             total_level: builder.total_level,
             race: builder.race,
-            abilities: builder.abilities.unwrap_or(Vec::new()),
+            abilities: builder.abilities.unwrap_or_default(),
         })
     }
 
@@ -175,7 +175,7 @@ impl PrereqList {
             }
         }
 
-        for ref ability_id in self.abilities.iter() {
+        for ability_id in self.abilities.iter() {
             if !actor.has_ability_with_id(ability_id) {
                 return false;
             }

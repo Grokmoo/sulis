@@ -72,7 +72,7 @@ impl LayerListLocationChecker {
             }
         }
 
-        for ref layer in layers.iter() {
+        for layer in layers.iter() {
             for &(point, ref tile) in layer.impass_override_tiles.iter() {
                 let start_x = point.x;
                 let start_y = point.y;
@@ -121,10 +121,12 @@ impl<T> WeightedList<T> {
         let mut entries = Vec::new();
         let mut total_weight = 0;
         for (id, entry) in kinds {
-            let t = getter(&id).ok_or(Error::new(
-                ErrorKind::InvalidInput,
-                format!("Invalid {} '{}'", name, id),
-            ))?;
+            let t = getter(&id).ok_or_else(|| {
+                Error::new(
+                    ErrorKind::InvalidInput,
+                    format!("Invalid {} '{}'", name, id),
+                )
+            })?;
 
             total_weight += entry.weight;
             entries.push((id, t, entry.weight));
@@ -132,7 +134,7 @@ impl<T> WeightedList<T> {
 
         entries.sort_by(|a, b| a.0.cmp(&b.0));
 
-        if total_weight == 0 || entries.len() == 0 {
+        if total_weight == 0 || entries.is_empty() {
             return Err(Error::new(
                 ErrorKind::InvalidInput,
                 format!("Must specify at least one {}", name),
@@ -186,7 +188,7 @@ impl WallKinds {
             }
         }
 
-        if let None = wall_index {
+        if wall_index.is_none() {
             error!("Invalid wall kind '{}'.  This is a bug", wall_kind.id);
             panic!();
         }
@@ -288,7 +290,7 @@ impl TileIter {
         }
     }
 
-    fn new<'a>(model: &'a GenModel) -> TileIter {
+    fn new(model: &GenModel) -> TileIter {
         TileIter {
             x: 0,
             y: 0,

@@ -148,7 +148,7 @@ impl TerrainTiles {
     pub fn new(
         rules: &TerrainRules,
         kind: &TerrainKind,
-        all_kinds: &Vec<TerrainKind>,
+        all_kinds: &[TerrainKind],
     ) -> Result<TerrainTiles, Error> {
         let base_tile_id = format!("{}{}{}", rules.prefix, kind.id, rules.base_postfix);
         let base = match Module::tile(&base_tile_id) {

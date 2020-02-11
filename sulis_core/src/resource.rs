@@ -66,7 +66,7 @@ pub struct ResourceSet {
 
 impl ResourceSet {
     pub fn load_resources(mut dirs: Vec<String>) -> Result<YamlResourceSet, Error> {
-        if dirs.len() == 0 {
+        if dirs.is_empty() {
             return Err(Error::new(
                 ErrorKind::InvalidInput,
                 "Must specify at least \
@@ -202,6 +202,17 @@ impl ResourceSet {
         RESOURCE_SET.with(|r| get_resource(id, &r.borrow().spritesheets))
     }
 
+    pub fn panic_or_sprite(id: &str) -> Rc<Sprite> {
+        RESOURCE_SET.with(|r| {
+            match r.borrow().sprite_internal(id) {
+                Ok(sprite) => sprite,
+                Err(e) => {
+                    panic!("Unable to find sprite: '{}': {}", id, e);
+                }
+            }
+        })
+    }
+
     pub fn sprite(id: &str) -> Result<Rc<Sprite>, Error> {
         RESOURCE_SET.with(|r| r.borrow().sprite_internal(id))
     }
@@ -244,7 +255,7 @@ impl ResourceSet {
         };
 
         let (spritesheet_id, sprite_id) = id.split_at(split_index);
-        if sprite_id.len() == 0 {
+        if sprite_id.is_empty() {
             return format_error;
         }
         let sprite_id = &sprite_id[1..];
@@ -273,10 +284,12 @@ impl ResourceSet {
     }
 }
 
+#[allow(clippy::implicit_hasher)]
 pub fn all_resources<V: ?Sized>(map: &HashMap<String, Rc<V>>) -> Vec<Rc<V>> {
     map.iter().map(|ref res| Rc::clone(res.1)).collect()
 }
 
+#[allow(clippy::implicit_hasher)]
 pub fn get_resource<V: ?Sized>(id: &str, map: &HashMap<String, Rc<V>>) -> Option<Rc<V>> {
     let resource = map.get(id);
 
@@ -286,6 +299,7 @@ pub fn get_resource<V: ?Sized>(id: &str, map: &HashMap<String, Rc<V>>) -> Option
     }
 }
 
+#[allow(clippy::implicit_hasher)]
 pub fn insert_if_ok<K: Eq + Hash + Display, V>(
     type_str: &str,
     key: K,

@@ -178,7 +178,7 @@ impl ScriptEntitySet {
 
     pub fn append(&mut self, other: &ScriptEntitySet) {
         self.indices.append(&mut other.indices.clone());
-        self.selected_point = other.selected_point.clone();
+        self.selected_point = other.selected_point;
         self.affected_points
             .append(&mut other.affected_points.clone());
         self.surface = other.surface.clone();
@@ -212,15 +212,15 @@ impl ScriptEntitySet {
 
     pub fn new(
         parent: &Rc<RefCell<EntityState>>,
-        entities: &Vec<Option<Rc<RefCell<EntityState>>>>,
+        entities: &[Option<Rc<RefCell<EntityState>>>],
     ) -> ScriptEntitySet {
         let parent = parent.borrow().index();
 
         let indices = entities
             .iter()
             .map(|e| match e {
-                &None => None,
-                &Some(ref e) => Some(e.borrow().index()),
+                None => None,
+                Some(e) => Some(e.borrow().index()),
             })
             .collect();
         ScriptEntitySet {
@@ -311,8 +311,8 @@ impl UserData for ScriptEntitySet {
         methods.add_method("is_empty", |_, set, ()| Ok(set.indices.is_empty()));
         methods.add_method("first", |_, set, ()| {
             for index in set.indices.iter() {
-                if let &Some(index) = index {
-                    return Ok(ScriptEntity::new(index));
+                if let Some(index) = index {
+                    return Ok(ScriptEntity::new(*index));
                 }
             }
 
@@ -390,7 +390,7 @@ fn touchable(_lua: Context, set: &ScriptEntitySet, _args: ()) -> Result<ScriptEn
 }
 
 fn hostile_to(_lua: Context, set: &ScriptEntitySet, faction: String) -> Result<ScriptEntitySet> {
-    let faction = match Faction::from_str(&faction) {
+    let faction = match Faction::option_from_str(&faction) {
         None => {
             warn!("Attempted to check hostile_to invalid faction {}", faction);
             return Err(rlua::Error::FromLuaConversionError {
@@ -402,12 +402,12 @@ fn hostile_to(_lua: Context, set: &ScriptEntitySet, faction: String) -> Result<S
         Some(faction) => faction,
     };
     filter_entities(set, (), &|_, entity, _| {
-        faction.is_hostile(&entity.borrow().actor.faction())
+        faction.is_hostile(entity.borrow().actor.faction())
     })
 }
 
 fn friendly_to(_lua: Context, set: &ScriptEntitySet, faction: String) -> Result<ScriptEntitySet> {
-    let faction = match Faction::from_str(&faction) {
+    let faction = match Faction::option_from_str(&faction) {
         None => {
             warn!("Attempted to check friendly_to invalid faction {}", faction);
             return Err(rlua::Error::FromLuaConversionError {
@@ -420,7 +420,7 @@ fn friendly_to(_lua: Context, set: &ScriptEntitySet, faction: String) -> Result<
     };
 
     filter_entities(set, (), &|_, entity, _| {
-        faction.is_friendly(&entity.borrow().actor.faction())
+        faction.is_friendly(entity.borrow().actor.faction())
     })
 }
 
@@ -450,8 +450,8 @@ fn filter_entities<T: Copy>(
     let mut indices = Vec::new();
     for index in set.indices.iter() {
         let entity = match index {
-            &None => continue,
-            &Some(index) => mgr.entity_checked(index),
+            None => continue,
+            Some(index) => mgr.entity_checked(*index),
         };
 
         let entity = match entity {

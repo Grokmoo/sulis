@@ -92,7 +92,7 @@ pub enum QuestEntryState {
 }
 
 impl QuestEntryState {
-    pub fn from_str(s: &str) -> QuestEntryState {
+    pub fn unwrap_from_str(s: &str) -> QuestEntryState {
         match s {
             "Hidden" => QuestEntryState::Hidden,
             "Visible" => QuestEntryState::Visible,

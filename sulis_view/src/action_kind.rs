@@ -113,7 +113,7 @@ impl ActionHoverInfo {
                 if let Some(append) = append {
                     base.total_ap = cmp::max(append.total_ap, base.total_ap);
                     if base.ap + append.ap < base.total_ap {
-                        base.ap = base.ap + append.ap;
+                        base.ap += append.ap;
                     } else {
                         base.ap = append.ap;
                     }
@@ -162,7 +162,7 @@ impl ActionHoverInfo {
             size,
             x: point.x,
             y: point.y,
-            path: path.iter().map(|p| *p).collect(),
+            path: path.iter().copied().collect(),
             ap,
             total_ap: entity.actor.ap() as i32,
         })
@@ -249,9 +249,9 @@ impl DialogAction {
                 if entity.borrow().is_party_member() {
                     return None;
                 }
-                if entity.borrow().actor.actor.conversation.is_none() {
-                    return None;
-                }
+
+                entity.borrow().actor.actor.conversation.as_ref()?;
+
                 Rc::clone(entity)
             }
         };
@@ -268,14 +268,14 @@ impl DialogAction {
                 target: Rc::clone(&target),
                 pc: Rc::clone(&pc),
             });
-            return MoveThenAction::create_if_valid(
+            MoveThenAction::create_if_valid(
                 &pc,
                 target.borrow().location.to_point(),
                 &target.borrow().size,
                 max_dist,
                 cb_action,
                 animation_state::Kind::MouseDialog,
-            );
+            )
         }
     }
 }
@@ -575,14 +575,14 @@ impl AttackAction {
                 target: Rc::clone(&target),
                 ap,
             });
-            return MoveThenAction::create_if_valid(
+            MoveThenAction::create_if_valid(
                 &pc,
                 target.borrow().location.to_point(),
                 &target.borrow().size,
                 pc.borrow().actor.stats.attack_distance(),
                 cb_action,
                 animation_state::Kind::MouseAttack,
-            );
+            )
         }
     }
 }
@@ -757,7 +757,7 @@ impl MoveAction {
             Some(path) => path,
         };
 
-        let (ap, path) = if path.len() > 0 {
+        let (ap, path) = if !path.is_empty() {
             let pc = pc.borrow();
             let cost_per_move = pc.actor.get_move_ap_cost(1) as i32;
 

@@ -183,11 +183,8 @@ impl ImageLayerSet {
                         None => continue,
                         Some((x, y)) => (*x, *y),
                     };
-                    match sex_map.get(&layer) {
-                        Some(ref image) => {
-                            list.push((x, y, get_color(*layer, hair, skin), Rc::clone(image)));
-                        }
-                        None => (),
+                    if let Some(image) = sex_map.get(&layer) {
+                        list.push((x, y, get_color(*layer, hair, skin), Rc::clone(image)));
                     }
                 }
             }
@@ -206,7 +203,7 @@ impl ImageLayerSet {
         sex: Sex,
         refs: HashMap<ImageLayer, String>,
     ) -> Result<(), Error> {
-        let sex_map = images.entry(sex).or_insert(HashMap::new());
+        let sex_map = images.entry(sex).or_insert_with(HashMap::new);
 
         for (image_layer, image_str) in refs {
             let image = match ResourceSet::image(&image_str) {
@@ -215,7 +212,7 @@ impl ImageLayerSet {
                         "Image '{}' not found for layer '{:?}'",
                         image_str, image_layer
                     );
-                    return invalid_data_error(&format!("Unable to create image_layer_set"));
+                    return invalid_data_error("Unable to create image_layer_set");
                 }
                 Some(image) => image,
             };

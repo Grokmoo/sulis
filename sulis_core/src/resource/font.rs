@@ -126,12 +126,9 @@ impl Font {
             let mut filepath = PathBuf::from(dir);
             filepath.push(&builder.src);
 
-            match extern_image::open(&filepath) {
-                Ok(read_image) => {
-                    image = Some(read_image);
-                    break;
-                }
-                Err(_) => (),
+            if let Ok(read_image) = extern_image::open(&filepath) {
+                image = Some(read_image);
+                break;
             }
         }
 

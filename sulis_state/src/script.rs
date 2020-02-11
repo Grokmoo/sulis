@@ -119,7 +119,7 @@ impl Script {
         match script_cache::ai_script(parent, func) {
             Err(e) => {
                 warn!("Error in lua AI script: '{}'", e);
-                return ai::State::End;
+                ai::State::End
             }
             Ok(val) => val,
         }
@@ -328,8 +328,8 @@ pub struct ScriptState {
     current_depth: Cell<u32>,
 }
 
-impl ScriptState {
-    pub fn new() -> ScriptState {
+impl Default for ScriptState {
+    fn default() -> ScriptState {
         let lua = Lua::new_with(get_rlua_std_lib());
         lua.set_memory_limit(Some(MEM_LIMIT));
 
@@ -387,7 +387,9 @@ impl ScriptState {
 
         state
     }
+}
 
+impl ScriptState {
     fn print_report(&self, func: &str) {
         let (count, time) = {
             let inst = &(*self.instructions.lock().unwrap());
@@ -449,7 +451,7 @@ impl ScriptState {
     }
 
     pub fn console(&self, script: String, party: &[Rc<RefCell<EntityState>>]) -> Result<String> {
-        assert!(party.len() > 0);
+        assert!(!party.is_empty());
         self.reset_instruction_state();
         let result = self.lua.context(|lua| {
             lua.globals().set("player", ScriptEntity::from(&party[0]))?;

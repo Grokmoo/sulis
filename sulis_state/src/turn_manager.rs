@@ -663,7 +663,7 @@ impl TurnManager {
             }
 
             for p in &party_pos {
-                if p.dist(&entity.location.to_point()) < run_away_dist {
+                if p.dist(entity.location.to_point()) < run_away_dist {
                     return false;
                 }
             }
@@ -747,9 +747,8 @@ impl TurnManager {
         entries.sort_by_key(|&(_, initiative)| initiative);
 
         for (entry, _) in entries {
-            match entry {
-                Entry::TurnChange => continue,
-                _ => (),
+            if let Entry::TurnChange = entry {
+                continue;
             }
             self.order.push_front(entry);
         }
@@ -912,7 +911,7 @@ impl TurnManager {
         let index = self.add_effect_internal(effect, cbs, removal_markers);
         self.surfaces.push(index);
         if let Some(aura_parent) = aura_parent {
-            let auras_for_parent = self.auras.entry(aura_parent).or_insert(Vec::new());
+            let auras_for_parent = self.auras.entry(aura_parent).or_insert_with(Vec::new);
             (*auras_for_parent).push(index);
         }
         let entities = area_state.borrow_mut().add_surface(index, &points);
@@ -1127,9 +1126,9 @@ impl<'a> Iterator for EntityIterator<'a> {
 
             match next {
                 None => return None,
-                Some(e) => match e {
-                    &None => continue,
-                    &Some(ref entity) => return Some(Rc::clone(entity)),
+                Some(e) => match &e {
+                    None => continue,
+                    Some(entity) => return Some(Rc::clone(entity)),
                 },
             }
         }

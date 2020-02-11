@@ -45,7 +45,7 @@ const WINDOW_NAMES: [&str; 7] = [
     self::prop_window::NAME,
 ];
 
-const NAME: &'static str = "game";
+const NAME: &str = "game";
 
 pub struct RootView {
     pub(crate) next_step: Option<NextGameStep>,
@@ -719,7 +719,7 @@ fn create_button(
 }
 
 fn is_defeated(party: &[Rc<RefCell<EntityState>>]) -> bool {
-    if party.len() == 0 {
+    if party.is_empty() {
         return true;
     }
 

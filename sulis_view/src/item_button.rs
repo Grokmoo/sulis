@@ -378,7 +378,7 @@ impl WidgetKind for ItemButton {
             match self.kind {
                 Kind::Prop { .. } | Kind::Inventory { .. } | Kind::Merchant { .. } => {
                     let player = GameState::selected();
-                    if player.len() > 0 {
+                    if !player.is_empty() {
                         if !has_proficiency(&item_state, &player[0].borrow().actor.stats) {
                             item_window.state.add_text_arg("prof_not_met", "true");
                         }

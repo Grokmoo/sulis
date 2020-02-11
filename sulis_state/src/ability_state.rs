@@ -147,9 +147,9 @@ impl AbilityState {
         }
 
         if self.remaining_duration.is_zero() {
-            return Enabled;
+            Enabled
         } else {
-            return OnCooldown;
+            OnCooldown
         }
     }
 

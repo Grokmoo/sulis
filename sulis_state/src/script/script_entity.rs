@@ -681,7 +681,7 @@ impl UserData for ScriptEntity {
         methods.add_method("set_faction", |_, entity, faction: String| {
             let entity = entity.try_unwrap()?;
 
-            match Faction::from_str(&faction) {
+            match Faction::option_from_str(&faction) {
                 None => warn!("Invalid faction '{}' in script", faction),
                 Some(faction) => entity.borrow_mut().actor.set_faction(faction),
             }
@@ -1113,15 +1113,13 @@ impl UserData for ScriptEntity {
                 }
 
                 let new_loc = Location::new(x, y, &area_state.borrow().area.area);
-                match area_state
-                    .borrow_mut()
-                    .transition_entity_to(&entity, entity_index, new_loc)
+                if let Err(e) =
+                    area_state
+                        .borrow_mut()
+                        .transition_entity_to(&entity, entity_index, new_loc)
                 {
-                    Err(e) => {
-                        warn!("Unable to move entity using script function");
-                        warn!("{}", e);
-                    }
-                    Ok(_) => (),
+                    warn!("Unable to move entity using script function");
+                    warn!("{}", e);
                 }
             } else {
                 let mut area_state = area_state.borrow_mut();
@@ -1190,7 +1188,7 @@ impl UserData for ScriptEntity {
             entity.check_not_equal(&target)?;
             let parent = entity.try_unwrap()?;
             let target = target.try_unwrap()?;
-            let damage_kind = DamageKind::from_str(&damage_kind);
+            let damage_kind = DamageKind::unwrap_from_str(&damage_kind);
             let attack_kind = AttackKind::from_str(&attack_kind, &accuracy_kind);
             let mut cbs: Vec<Box<dyn ScriptCallback>> = Vec::new();
             if let Some(cb) = cb {
@@ -1227,7 +1225,7 @@ impl UserData for ScriptEntity {
 
                 let damage_kind = match damage_kind {
                     None => DamageKind::Raw,
-                    Some(ref kind) => DamageKind::from_str(kind),
+                    Some(ref kind) => DamageKind::unwrap_from_str(kind),
                 };
                 let attack_kind = AttackKind::from_str(&attack_kind, &accuracy_kind);
 
@@ -1282,7 +1280,7 @@ impl UserData for ScriptEntity {
                 let rules = Module::rules();
                 let parent = entity.try_unwrap()?;
                 let attacker = attacker.try_unwrap()?;
-                let damage_kind = DamageKind::from_str(&damage_kind);
+                let damage_kind = DamageKind::unwrap_from_str(&damage_kind);
 
                 let min_damage = min_damage as u32;
                 let max_damage = max_damage as u32;
@@ -1447,7 +1445,7 @@ impl UserData for ScriptEntity {
             let actor = &entity.borrow().actor;
 
             let mut table = Vec::new();
-            for (_, state) in &actor.ability_states {
+            for state in actor.ability_states.values() {
                 if state.group != group {
                     continue;
                 }
@@ -1509,14 +1507,13 @@ impl UserData for ScriptEntity {
             };
 
             let entity = entity.try_unwrap()?;
+            let entity = entity.borrow();
             let offset = entity
-                .borrow()
                 .actor
                 .actor
                 .race
                 .get_image_layer_offset(layer)
-                .unwrap_or(&(0.0, 0.0))
-                .clone();
+                .unwrap_or(&(0.0, 0.0));
             let mut table: HashMap<&str, f32> = HashMap::new();
             table.insert("x", offset.0);
             table.insert("y", offset.1);
@@ -1790,11 +1787,9 @@ fn targets(_lua: Context, parent: &ScriptEntity, _args: ()) -> Result<ScriptEnti
 fn get_on_activate_fn(is_party_member: bool, ai_data: &AIData) -> String {
     if is_party_member {
         "on_activate".to_string()
+    } else if let Some(func) = &ai_data.on_activate_fn {
+        func.to_string()
     } else {
-        if let Some(func) = &ai_data.on_activate_fn {
-            func.to_string()
-        } else {
-            "on_activate".to_string()
-        }
+        "on_activate".to_string()
     }
 }

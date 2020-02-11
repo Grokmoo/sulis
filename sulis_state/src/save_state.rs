@@ -90,7 +90,7 @@ impl SaveState {
         let quest_state = GameState::quest_state();
         let current_quest = quest_state.current_quest_stack();
         let mut quests = Vec::new();
-        for (_, quest_state) in quest_state.into_iter() {
+        for (_, quest_state) in quest_state.quests_iter() {
             quests.push(quest_state);
         }
 
@@ -215,7 +215,7 @@ impl EffectSaveState {
             total_duration: effect.total_duration,
             deactivate_with_ability: effect.deactivate_with_ability.clone(),
             surface: effect.surface.clone(),
-            entity: effect.entity.clone(),
+            entity: effect.entity,
             bonuses: effect.bonuses.clone(),
             callbacks,
             icon: effect.icon.clone(),
@@ -255,7 +255,7 @@ impl AreaSaveState {
                 pc_explored.push(cur_buf);
                 cur_buf = 0;
             } else {
-                mask = mask * 2;
+                mask *= 2;
             }
         }
         if mask != 1 {
@@ -458,7 +458,7 @@ impl EntitySaveState {
 
             let mut abilities: Vec<String> = Vec::new();
             for owned_ability in actor.abilities.iter() {
-                for _ in 0..(owned_ability.level + 1) {
+                for _ in 0..=owned_ability.level {
                     abilities.push(owned_ability.ability.id.to_string());
                 }
             }
@@ -474,7 +474,7 @@ impl EntitySaveState {
                 race: Some(actor.race.id.to_string()),
                 inline_race: None,
                 sex: Some(actor.sex),
-                portrait: actor.portrait.as_ref().map(|p| p.id().to_string()),
+                portrait: actor.portrait.as_ref().map(|p| p.id()),
                 attributes: actor.attributes,
                 conversation: actor.conversation.as_ref().map(|c| c.id.to_string()),
                 faction: Some(actor.faction()),

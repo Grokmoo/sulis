@@ -184,22 +184,20 @@ impl<'a, 'b> TerrainGen<'a, 'b> {
         } else if *accum == -1 || *accum == -2 {
             *accum -= 1;
             false
-        } else {
-            if self.model.rand.gen(1, 101) < chance {
-                if *accum > 1 {
-                    *accum += 1;
-                } else {
-                    *accum = 1;
-                }
-                true
+        } else if self.model.rand.gen(1, 101) < chance {
+            if *accum > 1 {
+                *accum += 1;
             } else {
-                if *accum < -1 {
-                    *accum -= 1;
-                } else {
-                    *accum = -1;
-                }
-                false
+                *accum = 1;
             }
+            true
+        } else {
+            if *accum < -1 {
+                *accum -= 1;
+            } else {
+                *accum = -1;
+            }
+            false
         }
     }
 

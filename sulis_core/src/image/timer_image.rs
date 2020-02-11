@@ -56,10 +56,10 @@ impl TimerImage {
                 None => size = Some(*image.get_size()),
                 Some(size) => {
                     if size != *image.get_size() {
-                        return invalid_data_error(&format!(
+                        return invalid_data_error(
                             "All frames in a timer image must have the\
-                             same size."
-                        ));
+                             same size.",
+                        );
                     }
                 }
             }

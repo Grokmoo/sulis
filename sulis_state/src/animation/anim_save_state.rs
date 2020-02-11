@@ -41,11 +41,11 @@ impl AnimSaveState {
     pub fn new(anim: &Anim) -> AnimSaveState {
         let kind = match &anim.kind {
             AnimKind::EntityColor { color, color_sec } => Kind::EntityColor {
-                color: color.clone(),
-                color_sec: color_sec.clone(),
+                color: *color,
+                color_sec: *color_sec,
             },
             AnimKind::EntityScale { scale } => Kind::EntityScale {
-                scale: scale.clone(),
+                scale: *scale,
             },
             AnimKind::EntityImageLayer { images } => {
                 let mut imgs = HashMap::new();
@@ -156,7 +156,7 @@ impl AnimSaveState {
 
             anim.removal_effect = Some(new_index);
 
-            let vec = marked.entry(new_index).or_insert(Vec::new());
+            let vec = marked.entry(new_index).or_insert_with(Vec::new);
             vec.push(anim.get_marked_for_removal());
         }
 

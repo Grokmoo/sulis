@@ -39,7 +39,7 @@ impl fmt::Debug for PathFinderGrid {
             }
             write!(f, "\n  ")?;
         }
-        write!(f, "\n")
+        writeln!(f)
     }
 }
 

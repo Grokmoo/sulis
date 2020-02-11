@@ -226,10 +226,10 @@ impl ExtInt {
         }
     }
 
-    pub fn divide(&self, other: &ExtInt) -> f32 {
+    pub fn divide(self, other: ExtInt) -> f32 {
         match self {
             ExtInt::Int(amount) => match other {
-                ExtInt::Int(other_amount) => *amount as f32 / *other_amount as f32,
+                ExtInt::Int(other_amount) => amount as f32 / other_amount as f32,
                 ExtInt::Infinity => 0.0,
             },
             ExtInt::Infinity => match other {
@@ -239,37 +239,37 @@ impl ExtInt {
         }
     }
 
-    pub fn is_zero(&self) -> bool {
+    pub fn is_zero(self) -> bool {
         match self {
-            ExtInt::Int(amount) => *amount == 0,
+            ExtInt::Int(amount) => amount == 0,
             ExtInt::Infinity => false,
         }
     }
 
-    pub fn is_infinite(&self) -> bool {
+    pub fn is_infinite(self) -> bool {
         match self {
             ExtInt::Int(_) => false,
             ExtInt::Infinity => true,
         }
     }
 
-    pub fn to_f32(&self) -> f32 {
+    pub fn to_f32(self) -> f32 {
         match self {
-            ExtInt::Int(amount) => *amount as f32,
+            ExtInt::Int(amount) => amount as f32,
             ExtInt::Infinity => 1e12, // use a value that serde json can serialize properly
         }
     }
 
-    pub fn less_than(&self, other: u32) -> bool {
+    pub fn less_than(self, other: u32) -> bool {
         match self {
-            ExtInt::Int(amount) => *amount < other,
+            ExtInt::Int(amount) => amount < other,
             ExtInt::Infinity => false,
         }
     }
 
-    pub fn greater_than(&self, other: u32) -> bool {
+    pub fn greater_than(self, other: u32) -> bool {
         match self {
-            ExtInt::Int(amount) => *amount > other,
+            ExtInt::Int(amount) => amount > other,
             ExtInt::Infinity => true,
         }
     }
@@ -347,7 +347,7 @@ pub fn unable_to_create_error<T>(kind: &str, id: &str) -> Result<T, Error> {
 /// Helper function to return the number of milliseconds elapsed in
 /// the given duration.
 pub fn get_elapsed_millis(elapsed: Duration) -> u32 {
-    (elapsed.as_secs() as u32) * 1_000 + elapsed.subsec_nanos() / 1_000_000
+    (elapsed.as_secs() as u32) * 1_000 + elapsed.subsec_millis()
 }
 
 /// Helper function to return a string representation of the elapsed time

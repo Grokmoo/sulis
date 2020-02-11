@@ -61,10 +61,10 @@ impl AnimatedImage {
                 None => size = Some(*image.get_size()),
                 Some(ref size) => {
                     if *size != *image.get_size() {
-                        return invalid_data_error(&format!(
+                        return invalid_data_error(
                             "All images in an animated image \
-                             must have the same size."
-                        ));
+                             must have the same size.",
+                        );
                     }
                 }
             }

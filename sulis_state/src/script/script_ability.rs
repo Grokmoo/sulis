@@ -139,7 +139,7 @@ impl UserData for ScriptAbilitySet {
         });
 
         methods.add_method("remove_kind", |_, set, kind: String| {
-            let kind = ability::AIKind::from_str(&kind);
+            let kind = ability::AIKind::unwrap_from_str(&kind);
 
             let abilities = set
                 .abilities
@@ -159,7 +159,7 @@ impl UserData for ScriptAbilitySet {
         });
 
         methods.add_method("only_kind", |_, set, kind: String| {
-            let kind = ability::AIKind::from_str(&kind);
+            let kind = ability::AIKind::unwrap_from_str(&kind);
 
             let abilities = set
                 .abilities
@@ -179,7 +179,7 @@ impl UserData for ScriptAbilitySet {
         });
 
         methods.add_method("only_group", |_, set, group: String| {
-            let group = ability::AIGroup::from_str(&group);
+            let group = ability::AIGroup::unwrap_from_str(&group);
             let abilities = set
                 .abilities
                 .iter()
@@ -198,7 +198,7 @@ impl UserData for ScriptAbilitySet {
         });
 
         methods.add_method("only_range", |_, set, range: String| {
-            let range = ability::AIRange::from_str(&range);
+            let range = ability::AIRange::unwrap_from_str(&range);
             let abilities = set
                 .abilities
                 .iter()

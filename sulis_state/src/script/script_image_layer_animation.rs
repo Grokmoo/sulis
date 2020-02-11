@@ -80,7 +80,7 @@ impl UserData for ScriptImageLayerAnimation {
                 }
             };
 
-            if let None = ResourceSet::image(&image) {
+            if ResourceSet::image(&image).is_none() {
                 return Err(rlua::Error::FromLuaConversionError {
                     from: "String",
                     to: "Image",

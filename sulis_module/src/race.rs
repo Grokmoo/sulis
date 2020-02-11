@@ -83,11 +83,11 @@ impl Race {
             offsets.insert(layer, (p.x as f32 / scale, p.y as f32 / scale));
         }
 
-        let default_images = if builder.default_images.len() > 0 {
+        let default_images = if !builder.default_images.is_empty() {
             let default_images = builder.default_images.clone();
             let images = Sex::iter().map(|s| (*s, default_images.clone())).collect();
             ImageLayerSet::new(images)
-        } else if builder.default_images_by_sex.len() > 0 {
+        } else if !builder.default_images_by_sex.is_empty() {
             ImageLayerSet::new(builder.default_images_by_sex)
         } else {
             warn!("Must specify either default_images or default_images_by_sex");
@@ -101,11 +101,11 @@ impl Race {
 
         let mut hair_colors = Vec::new();
         let mut skin_colors = Vec::new();
-        for color_str in builder.hair_colors.unwrap_or(Vec::new()).iter() {
+        for color_str in builder.hair_colors.unwrap_or_default().iter() {
             hair_colors.push(Color::from_string(color_str));
         }
 
-        for color_str in builder.skin_colors.unwrap_or(Vec::new()).iter() {
+        for color_str in builder.skin_colors.unwrap_or_default().iter() {
             skin_colors.push(Color::from_string(color_str));
         }
 
@@ -147,9 +147,9 @@ impl Race {
             default_images,
             image_layer_offsets: offsets,
             image_layer_postfix: builder.image_layer_postfix,
-            hair_selections: builder.hair_selections.unwrap_or(Vec::new()),
-            beard_selections: builder.beard_selections.unwrap_or(Vec::new()),
-            portrait_selections: builder.portrait_selections.unwrap_or(Vec::new()),
+            hair_selections: builder.hair_selections.unwrap_or_default(),
+            beard_selections: builder.beard_selections.unwrap_or_default(),
+            portrait_selections: builder.portrait_selections.unwrap_or_default(),
             male_random_names: builder.male_random_names,
             female_random_names: builder.female_random_names,
             hair_colors,

@@ -177,7 +177,7 @@ fn read_builder_internal<T: serde::de::DeserializeOwned>(
                 }
             };
 
-            Err(Error::new(ErrorKind::InvalidData, format!("{}", details)))
+            Err(Error::new(ErrorKind::InvalidData, details))
         }
     }
 }
@@ -192,7 +192,7 @@ fn handle_merged_error<T: serde::de::DeserializeOwned>(
     match result {
         Ok(_) => Err(Error::new(
             ErrorKind::InvalidData,
-            format!("There was no error when parsing the value as a string"),
+            "There was no error when parsing the value as a string".to_string(),
         )),
         Err(e) => Ok(e.to_string()),
     }
@@ -258,7 +258,7 @@ pub fn read_single_resource<T: serde::de::DeserializeOwned>(filename: &str) -> R
     }
 }
 
-pub fn read_to_string(root_dirs: &Vec<String>, dir: &str) -> HashMap<String, String> {
+pub fn read_to_string(root_dirs: &[String], dir: &str) -> HashMap<String, String> {
     let mut resources = HashMap::new();
 
     for root in root_dirs.iter() {
@@ -318,7 +318,7 @@ fn read_file_to_string(path: PathBuf, resources: &mut HashMap<String, String>) {
 
     let id: String = path
         .file_stem()
-        .unwrap_or(OsStr::new(""))
+        .unwrap_or_else(|| OsStr::new(""))
         .to_string_lossy()
         .to_string();
     resources.insert(id, data);

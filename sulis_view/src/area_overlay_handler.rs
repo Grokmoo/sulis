@@ -48,8 +48,8 @@ pub struct AreaOverlayHandler {
     path_ap: Option<i32>,
 }
 
-impl AreaOverlayHandler {
-    pub fn new() -> AreaOverlayHandler {
+impl Default for AreaOverlayHandler {
+    fn default() -> AreaOverlayHandler {
         AreaOverlayHandler {
             hover_sprite: None,
             selection_box_start: None,
@@ -62,7 +62,9 @@ impl AreaOverlayHandler {
             path_ap: None,
         }
     }
+}
 
+impl AreaOverlayHandler {
     fn get_selection_box_coords(&self) -> Option<(f32, f32, f32, f32)> {
         if let Some((x, y)) = self.selection_box_start {
             let (x2, y2) = Cursor::get_position_f32();
@@ -114,9 +116,7 @@ impl AreaOverlayHandler {
             let loc = &entity.borrow().location;
             let size = &entity.borrow().size;
 
-            if loc.x >= x2 || x1 >= loc.x + size.width {
-                continue;
-            } else if loc.y >= y2 || y1 >= loc.y + size.height {
+            if loc.x >= x2 || x1 >= loc.x + size.width || loc.y >= y2 || y1 >= loc.y + size.height {
                 continue;
             }
 
@@ -144,7 +144,7 @@ impl AreaOverlayHandler {
         let area_state = area_state.borrow();
         if let Some(entity) = area_state.get_entity_at(x, y) {
             Some(AreaMouseover::new_entity(&entity))
-        } else if let Some(_) = self.check_closed_door(x, y, &area_state) {
+        } else if self.check_closed_door(x, y, &area_state).is_some() {
             None
         } else if let Some(transition) = area_state.get_transition_at(x, y) {
             Some(AreaMouseover::new_transition(&transition.hover_text))
@@ -222,7 +222,7 @@ impl AreaOverlayHandler {
 
         self.hover_sprite = None;
 
-        if let Some(_) = self.selection_box_start {
+        if self.selection_box_start.is_some() {
             Cursor::set_cursor_state(animation_state::Kind::Normal);
             return;
         }

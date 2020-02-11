@@ -79,7 +79,7 @@ impl Class {
             let group_uses_per_encounter = upgrades_builder.group_uses_per_encounter;
             let stats = upgrades_builder.stats;
 
-            for (id, _) in &stats {
+            for id in stats.keys() {
                 if !builder.stats.iter().any(|stat| id == &stat.id) {
                     warn!("Unable to find stat for class upgrades: '{}'", id);
                     return unable_to_create_error("class", &builder.id);

@@ -60,7 +60,7 @@ pub enum Shape {
     },
 }
 
-fn contains(target: &Rc<RefCell<EntityState>>, list: &Vec<Rc<RefCell<EntityState>>>) -> bool {
+fn contains(target: &Rc<RefCell<EntityState>>, list: &[Rc<RefCell<EntityState>>]) -> bool {
     for entity in list.iter() {
         if Rc::ptr_eq(target, entity) {
             return true;
@@ -186,31 +186,31 @@ impl Shape {
             .elevation(origin_x as i32, origin_y as i32);
 
         let mut points = match self {
-            &Shape::Single => Vec::new(),
-            &Shape::Circle { min_radius, radius } => {
-                self.get_points_circle(min_radius, radius, pos, shift, &area_state)
+            Shape::Single => Vec::new(),
+            Shape::Circle { min_radius, radius } => {
+                self.get_points_circle(*min_radius, *radius, pos, shift, &area_state)
             }
-            &Shape::Line {
+            Shape::Line {
                 ref size,
                 origin_x,
                 origin_y,
                 length,
             } => self.get_points_line(
-                Point::new(origin_x, origin_y),
+                Point::new(*origin_x, *origin_y),
                 pos,
-                length,
+                *length,
                 size,
                 &area_state,
                 src_elev,
                 impass_blocks,
                 invis_blocks,
             ),
-            &Shape::LineSegment {
+            Shape::LineSegment {
                 ref size,
                 origin_x,
                 origin_y,
             } => self.get_points_line_segment(
-                Point::new(origin_x, origin_y),
+                Point::new(*origin_x, *origin_y),
                 pos,
                 size,
                 &area_state,
@@ -218,20 +218,20 @@ impl Shape {
                 impass_blocks,
                 invis_blocks,
             ),
-            &Shape::ObjectSize { ref size } => self.get_points_object_size(pos, size, &area_state),
-            &Shape::Cone {
+            Shape::ObjectSize { ref size } => self.get_points_object_size(pos, size, &area_state),
+            Shape::Cone {
                 origin_x,
                 origin_y,
                 min_radius,
                 radius,
                 angle,
             } => self.get_points_cone(
-                origin_x,
-                origin_y,
+                *origin_x,
+                *origin_y,
                 pos,
-                min_radius,
-                radius,
-                angle,
+                *min_radius,
+                *radius,
+                *angle,
                 &area_state,
             ),
         };
@@ -297,12 +297,12 @@ impl Shape {
 
     pub fn get_effected_entities(
         &self,
-        points: &Vec<Point>,
+        points: &[Point],
         target: Option<&Rc<RefCell<EntityState>>>,
-        effectable: &Vec<Rc<RefCell<EntityState>>>,
+        effectable: &[Rc<RefCell<EntityState>>],
     ) -> Vec<Rc<RefCell<EntityState>>> {
         match self {
-            &Shape::Single => match target {
+            Shape::Single => match target {
                 None => Vec::new(),
                 Some(ref target) => {
                     if contains(target, effectable) {
@@ -318,8 +318,8 @@ impl Shape {
 
     fn get_effected(
         &self,
-        points: &Vec<Point>,
-        effectable: &Vec<Rc<RefCell<EntityState>>>,
+        points: &[Point],
+        effectable: &[Rc<RefCell<EntityState>>],
     ) -> Vec<Rc<RefCell<EntityState>>> {
         let mut effected = Vec::new();
 
@@ -331,7 +331,7 @@ impl Shape {
                 Some(entity) => entity,
             };
 
-            if !contains(&entity, &effectable) {
+            if !contains(&entity, effectable) {
                 continue;
             }
 
@@ -627,7 +627,7 @@ impl Shape {
         if index == 0 {
             points.remove(0);
         } else {
-            points.drain(0..index + 1);
+            points.drain(0..=index);
         }
 
         true
@@ -761,13 +761,13 @@ pub struct AreaTargeter {
 
 fn create_entity_state_vec(
     mgr: &TurnManager,
-    input: &Vec<Option<usize>>,
+    input: &[Option<usize>],
 ) -> Vec<Rc<RefCell<EntityState>>> {
     let mut out = Vec::new();
     for index in input.iter() {
         let index = match index {
-            &None => continue,
-            &Some(ref index) => *index,
+            None => continue,
+            Some(index) => *index,
         };
 
         match mgr.entity_checked(index) {
@@ -1041,19 +1041,16 @@ impl AreaTargeter {
         draw_list.set_scale(scale_x, scale_y);
         renderer.draw(draw_list);
 
-        match &self.script_source {
-            ScriptSource::Ability(ability) => {
-                if let Some(active) = &ability.active {
-                    self.draw_ap_usage(
-                        renderer,
-                        params,
-                        (scale_x, scale_y),
-                        (x_offset, y_offset),
-                        active.ap as i32,
-                    );
-                }
+        if let ScriptSource::Ability(ability) = &self.script_source {
+            if let Some(active) = &ability.active {
+                self.draw_ap_usage(
+                    renderer,
+                    params,
+                    (scale_x, scale_y),
+                    (x_offset, y_offset),
+                    active.ap as i32,
+                );
             }
-            _ => (),
         }
     }
 
@@ -1135,11 +1132,10 @@ impl AreaTargeter {
                 None => animation_state::Kind::MouseInvalid,
                 Some(_) => animation_state::Kind::MouseSelect,
             }
+        } else if self.free_select_valid {
+            animation_state::Kind::MouseSelect
         } else {
-            match self.free_select_valid {
-                false => animation_state::Kind::MouseInvalid,
-                true => animation_state::Kind::MouseSelect,
-            }
+            animation_state::Kind::MouseInvalid
         };
         Cursor::set_cursor_state(kind);
 
@@ -1172,10 +1168,7 @@ impl AreaTargeter {
         }
 
         if self.free_select.is_none() {
-            match self.cur_target {
-                None => false,
-                Some(_) => true,
-            }
+            self.cur_target.is_some()
         } else {
             self.free_select_valid
         }

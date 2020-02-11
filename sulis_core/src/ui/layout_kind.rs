@@ -37,10 +37,10 @@ impl Default for LayoutKind {
 }
 
 impl LayoutKind {
-    pub fn layout(&self, widget: &Widget) {
+    pub fn layout(self, widget: &Widget) {
         let theme = Rc::clone(&widget.theme);
         use self::LayoutKind::*;
-        match *self {
+        match self {
             Normal => LayoutKind::layout_normal(widget, theme),
             BoxVertical => LayoutKind::layout_box_vertical(widget, theme),
             BoxHorizontal => LayoutKind::layout_box_horizontal(widget, theme),
@@ -197,12 +197,8 @@ impl LayoutKind {
                 }
                 height += theme.border.vertical();
 
-                match theme.layout {
-                    LayoutKind::BoxVertical => {
-                        height +=
-                            theme.layout_spacing.vertical() * (widget.children.len() as i32 - 1);
-                    }
-                    _ => (),
+                if let LayoutKind::BoxVertical = theme.layout {
+                    height += theme.layout_spacing.vertical() * (widget.children.len() as i32 - 1);
                 }
             }
             Custom => height += widget.state.size().height,
@@ -234,12 +230,8 @@ impl LayoutKind {
                 }
                 width += theme.border.horizontal();
 
-                match theme.layout {
-                    LayoutKind::BoxHorizontal => {
-                        width +=
-                            theme.layout_spacing.horizontal() * (widget.children.len() as i32 - 1);
-                    }
-                    _ => (),
+                if let LayoutKind::BoxHorizontal = theme.layout {
+                    width += theme.layout_spacing.horizontal() * (widget.children.len() as i32 - 1);
                 }
             }
             Custom => width += widget.state.size().width,

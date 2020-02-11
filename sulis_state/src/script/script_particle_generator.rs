@@ -283,33 +283,22 @@ fn dist_param(
     _: &ScriptParticleGenerator,
     (value, dt, d2t, d3t): (Dist, Option<Dist>, Option<Dist>, Option<Dist>),
 ) -> Result<DistParam> {
-    if dt.is_none() {
-        Ok(DistParam::new(
-            value,
-            Dist::create_fixed(0.0),
-            Dist::create_fixed(0.0),
-            Dist::create_fixed(0.0),
-        ))
-    } else if d2t.is_none() {
-        Ok(DistParam::new(
-            value,
-            dt.unwrap(),
-            Dist::create_fixed(0.0),
-            Dist::create_fixed(0.0),
-        ))
-    } else if d3t.is_none() {
-        Ok(DistParam::new(
-            value,
-            dt.unwrap(),
-            d2t.unwrap(),
-            Dist::create_fixed(0.0),
-        ))
+    if let Some(dt) = dt {
+        if let Some(d2t) = d2t {
+            if let Some(d3t) = d3t {
+                Ok(DistParam::new(value, dt, d2t, d3t))
+            } else {
+                Ok(DistParam::new(value, dt, d2t, Dist::create_fixed(0.0)))
+            }
+        } else {
+            Ok(DistParam::new(value, dt, Dist::create_fixed(0.0), Dist::create_fixed(0.0)))
+        }
     } else {
         Ok(DistParam::new(
             value,
-            dt.unwrap(),
-            d2t.unwrap(),
-            d3t.unwrap(),
+            Dist::create_fixed(0.0),
+            Dist::create_fixed(0.0),
+            Dist::create_fixed(0.0),
         ))
     }
 }
@@ -319,19 +308,18 @@ pub fn param<T>(
     _: &T,
     (value, dt, d2t, d3t): (f32, Option<f32>, Option<f32>, Option<f32>),
 ) -> Result<Param> {
-    if dt.is_none() {
-        Ok(Param::fixed(value))
-    } else if d2t.is_none() {
-        Ok(Param::with_speed(value, dt.unwrap()))
-    } else if d3t.is_none() {
-        Ok(Param::with_accel(value, dt.unwrap(), d2t.unwrap()))
+    if let Some(dt) = dt {
+        if let Some(d2t) = d2t {
+            if let Some(d3t) = d3t {
+                Ok(Param::with_jerk(value, dt, d2t, d3t))
+            } else {
+                Ok(Param::with_accel(value, dt, d2t))
+            }
+        } else {
+            Ok(Param::with_speed(value, dt))
+        }
     } else {
-        Ok(Param::with_jerk(
-            value,
-            dt.unwrap(),
-            d2t.unwrap(),
-            d3t.unwrap(),
-        ))
+        Ok(Param::fixed(value))
     }
 }
 

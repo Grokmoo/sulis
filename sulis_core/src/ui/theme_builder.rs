@@ -43,7 +43,7 @@ impl RelativeBuilder {
         }
     }
 
-    fn merge(to: &mut Option<RelativeBuilder>, from: &Option<RelativeBuilder>) {
+    fn merge(to: &mut Option<RelativeBuilder>, from: Option<RelativeBuilder>) {
         let from = match from {
             None => return,
             Some(from) => from,
@@ -83,7 +83,7 @@ impl TextParamsBuilder {
             vertical_alignment: self.vertical_alignment.unwrap_or_default(),
             color: self.color.unwrap_or_default(),
             scale: self.scale.unwrap_or(1.0),
-            font: self.font.unwrap_or("normal".to_string()),
+            font: self.font.unwrap_or_else(|| "normal".to_string()),
         }
     }
 
@@ -101,7 +101,7 @@ impl TextParamsBuilder {
                 to.horizontal_alignment = to.horizontal_alignment.or(from.horizontal_alignment);
                 to.vertical_alignment = to.vertical_alignment.or(from.vertical_alignment);
                 if to.color.is_none() {
-                    to.color = from.color.clone();
+                    to.color = from.color;
                 }
                 to.scale = to.scale.or(from.scale);
                 if to.font.is_none() {
@@ -325,7 +325,7 @@ impl ThemeBuilderSet {
     ) -> Result<&'a ThemeBuilder, Error> {
         let mut parent = themes;
         let mut result = None;
-        for part in id.split(".") {
+        for part in id.split('.') {
             parent = match parent.get(part) {
                 None => {
                     return Err(Error::new(
@@ -341,12 +341,10 @@ impl ThemeBuilderSet {
         }
 
         match result {
-            None => {
-                return Err(Error::new(
-                    ErrorKind::InvalidInput,
-                    format!("From ref '{}' is invalid", id),
-                ));
-            }
+            None => Err(Error::new(
+                ErrorKind::InvalidInput,
+                format!("From ref '{}' is invalid", id),
+            )),
             Some(theme) => Ok(theme),
         }
     }
@@ -372,13 +370,13 @@ impl ThemeBuilderSet {
             to.foreground = from.foreground.clone();
         }
 
-        RelativeBuilder::merge(&mut to.relative, &from.relative);
+        RelativeBuilder::merge(&mut to.relative, from.relative);
         TextParamsBuilder::merge(&mut to.text_params, &from.text_params);
 
         for (key, value) in from.custom.iter() {
             to.custom
                 .entry(key.to_string())
-                .or_insert(value.to_string());
+                .or_insert_with(|| value.to_string());
         }
 
         for (from_id, from_child) in from.children.iter() {

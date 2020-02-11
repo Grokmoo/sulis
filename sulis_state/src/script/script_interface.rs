@@ -403,7 +403,7 @@ impl UserData for ScriptInterface {
             let targeter = get_targeter()?;
             let targeter = targeter.borrow();
             let parent = targeter.parent();
-            let affected = targeter
+            let affected: Vec<_> = targeter
                 .cur_affected()
                 .iter()
                 .map(|e| Some(Rc::clone(e)))
@@ -415,7 +415,7 @@ impl UserData for ScriptInterface {
             let targeter = get_targeter()?;
             let targeter = targeter.borrow();
             let parent = targeter.parent();
-            let selectable = targeter
+            let selectable: Vec<_> = targeter
                 .selectable()
                 .iter()
                 .map(|e| Some(Rc::clone(e)))
@@ -565,8 +565,8 @@ impl UserData for ScriptInterface {
         methods.add_method(
             "set_quest_state",
             |_, _, (quest, state): (String, String)| {
-                let state = QuestEntryState::from_str(&state);
-                if let None = Module::quest(&quest) {
+                let state = QuestEntryState::unwrap_from_str(&state);
+                if Module::quest(&quest).is_none() {
                     warn!("Set quest state for invalid quest '{}'", quest);
                 }
                 GameState::set_quest_state(quest, state);
@@ -577,7 +577,7 @@ impl UserData for ScriptInterface {
         methods.add_method(
             "set_quest_entry_state",
             |_, _, (quest, entry, state): (String, String, String)| {
-                let state = QuestEntryState::from_str(&state);
+                let state = QuestEntryState::unwrap_from_str(&state);
                 match Module::quest(&quest) {
                     None => warn!("Set quest entry state for invalid quest '{}'", quest),
                     Some(ref quest) => {
@@ -596,7 +596,7 @@ impl UserData for ScriptInterface {
         );
 
         methods.add_method("get_quest_state", |_, _, quest: String| {
-            if let None = Module::quest(&quest) {
+            if Module::quest(&quest).is_none() {
                 warn!("Requested state for invalid quest '{}'", quest);
             }
             Ok(format!("{:?}", GameState::get_quest_state(quest)))
@@ -688,7 +688,7 @@ impl UserData for ScriptInterface {
 
                 let entity = result.try_unwrap()?;
                 if let Some(faction) = faction {
-                    match Faction::from_str(&faction) {
+                    match Faction::option_from_str(&faction) {
                         None => warn!("Invalid faction '{}' in script", faction),
                         Some(faction) => entity.borrow_mut().actor.set_faction(faction),
                     }
@@ -1044,7 +1044,7 @@ pub fn entity_with_id(id: String) -> Option<Rc<RefCell<EntityState>>> {
     for entity in mgr.borrow().entity_iter() {
         {
             let entity = entity.borrow();
-            if entity.unique_id() != &id {
+            if entity.unique_id() != id {
                 continue;
             }
         }

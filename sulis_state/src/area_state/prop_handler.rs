@@ -51,7 +51,7 @@ impl PropHandler {
 
     pub fn populate(&mut self, props: &[PropData]) {
         for data in props {
-            let location = Location::from_point(&data.location, &self.area);
+            let location = Location::from_point(data.location, &self.area);
             if let Err(e) = self.add(&data, location, false) {
                 warn!("Unable to add prop at {:?}", &data.location);
                 warn!("{}", e);
@@ -65,7 +65,7 @@ impl PropHandler {
             Some(prop) => Ok(prop),
         }?;
 
-        let location = Location::from_point(&data.location, &self.area);
+        let location = Location::from_point(data.location, &self.area);
 
         let prop_data = PropData {
             prop,
@@ -397,20 +397,18 @@ impl PropHandler {
                     self.prop_pass_grid[idx] = true;
                 }
             }
-        } else {
-            if let Interactive::Door {
-                ref closed_invis,
-                ref closed_impass,
-                ..
-            } = state.prop.interactive
-            {
-                for p in closed_invis {
-                    self.prop_vis_grid[(p.x + start_x + (p.y + start_y) * width) as usize] = false;
-                }
+        } else if let Interactive::Door {
+            ref closed_invis,
+            ref closed_impass,
+            ..
+        } = state.prop.interactive
+        {
+            for p in closed_invis {
+                self.prop_vis_grid[(p.x + start_x + (p.y + start_y) * width) as usize] = false;
+            }
 
-                for p in closed_impass {
-                    self.prop_pass_grid[(p.x + start_x + (p.y + start_y) * width) as usize] = false;
-                }
+            for p in closed_impass {
+                self.prop_pass_grid[(p.x + start_x + (p.y + start_y) * width) as usize] = false;
             }
         }
     }

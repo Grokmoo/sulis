@@ -21,7 +21,7 @@ use crate::io::event::{ClickKind, Kind};
 use crate::io::{keyboard_event::Key, Event};
 use crate::ui::{Cursor, Widget};
 
-#[derive(Debug, Deserialize, Serialize, Copy, Clone, PartialOrd, PartialEq)]
+#[derive(Debug, Deserialize, Serialize, Copy, Clone, PartialOrd)]
 #[serde(deny_unknown_fields)]
 pub enum InputAction {
     ToggleConsole,
@@ -70,6 +70,13 @@ pub enum InputAction {
 }
 
 impl std::cmp::Eq for InputAction {}
+
+// input action hashmap should never include the variants with data
+impl std::cmp::PartialEq for InputAction {
+    fn eq(&self, other: &InputAction) -> bool {
+        std::mem::discriminant(self) == std::mem::discriminant(other)
+    }
+}
 
 impl std::hash::Hash for InputAction {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {

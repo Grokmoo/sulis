@@ -73,10 +73,7 @@ impl WidgetKind for InitiativeTicker {
         let pane = Widget::empty("pane");
         let mut first = true;
         for entity in mgr.borrow().active_iter() {
-            let theme = match first {
-                true => "current_entry",
-                false => "entry",
-            };
+            let theme = if first { "current_entry" } else { "entry" };
             let widget = Widget::with_theme(TickerLabel::new(&entity), theme);
             Widget::add_child_to(&pane, widget);
             first = false;
@@ -118,13 +115,13 @@ impl WidgetKind for TickerLabel {
 
         let w = inner_width / (entity.size.width as f32 + 2.0);
         let h = inner_height / (entity.size.height as f32 + 2.0);
-        let s = if w > h { h } else { w };
+        let size = if w > h { h } else { w };
 
-        let cx = x + (inner_width - s) / 2.0 - 2.0 + entity.actor.actor.race.ticker_offset.0;
-        let cy = y + (inner_height - s) / 2.0 - 2.0 + entity.actor.actor.race.ticker_offset.1;
+        let cx = x + (inner_width - size) / 2.0 - 2.0 + entity.actor.actor.race.ticker_offset.0;
+        let cy = y + (inner_height - size) / 2.0 - 2.0 + entity.actor.actor.race.ticker_offset.1;
 
         self.entity
             .borrow()
-            .draw_no_pos(renderer, s, s, cx / s, cy / s, 1.0);
+            .draw_no_pos(renderer, size, size, cx / size, cy / size, 1.0);
     }
 }

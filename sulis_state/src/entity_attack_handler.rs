@@ -227,5 +227,5 @@ fn attack_internal(
         EntityState::remove_hp(target, parent, hit_kind, damage.clone());
     }
 
-    return (hit_kind, hit_flags, damage);
+    (hit_kind, hit_flags, damage)
 }

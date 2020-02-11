@@ -26,6 +26,33 @@ pub struct QuestStateSet {
     pub listeners: ChangeListenerList<QuestStateSet>,
 }
 
+impl Clone for QuestStateSet {
+    fn clone(&self) -> QuestStateSet {
+        QuestStateSet {
+            quests: self.quests.clone(),
+            current_quest: self.current_quest.clone(),
+            listeners: ChangeListenerList::default(),
+        }
+    }
+}
+
+impl Default for QuestStateSet {
+    fn default() -> QuestStateSet {
+        let mut quests = HashMap::new();
+
+        for quest in Module::all_quests() {
+            let id = quest.id.to_string();
+            quests.insert(id, QuestState::new(quest.id.to_string()));
+        }
+
+        QuestStateSet {
+            quests,
+            current_quest: Vec::new(),
+            listeners: ChangeListenerList::default(),
+        }
+    }
+}
+
 impl QuestStateSet {
     pub fn load(data: QuestSaveState) -> QuestStateSet {
         let mut quests = HashMap::new();
@@ -40,21 +67,6 @@ impl QuestStateSet {
         }
     }
 
-    pub fn new() -> QuestStateSet {
-        let mut quests = HashMap::new();
-
-        for quest in Module::all_quests() {
-            let id = quest.id.to_string();
-            quests.insert(id, QuestState::new(quest.id.to_string()));
-        }
-
-        QuestStateSet {
-            quests,
-            current_quest: Vec::new(),
-            listeners: ChangeListenerList::default(),
-        }
-    }
-
     pub(crate) fn current_quest_stack(&self) -> Vec<String> {
         self.current_quest.clone()
     }
@@ -64,18 +76,7 @@ impl QuestStateSet {
     }
 
     pub fn quest(&self, quest: &str) -> Option<&QuestState> {
-        match self.quests.get(quest) {
-            None => None,
-            Some(ref quest) => Some(quest),
-        }
-    }
-
-    pub fn clone(&self) -> QuestStateSet {
-        QuestStateSet {
-            quests: self.quests.clone(),
-            current_quest: self.current_quest.clone(),
-            listeners: ChangeListenerList::default(),
-        }
+        self.quests.get(quest)
     }
 
     pub fn state(&self, quest: &str) -> QuestEntryState {
@@ -146,7 +147,7 @@ impl QuestStateSet {
         self.set_current_quest_and_notify(quest_id);
     }
 
-    pub fn into_iter(self) -> impl Iterator<Item = (String, QuestState)> {
+    pub fn quests_iter(self) -> impl Iterator<Item = (String, QuestState)> {
         self.quests.into_iter()
     }
 }

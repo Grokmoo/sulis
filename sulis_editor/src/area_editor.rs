@@ -41,17 +41,17 @@ pub struct AreaEditor {
 impl AreaEditor {
     pub fn new() -> Rc<RefCell<AreaEditor>> {
         Rc::new(RefCell::new(AreaEditor {
-            model: AreaModel::new(),
+            model: AreaModel::default(),
             cur_editor: None,
-            scroll: Scrollable::new(),
+            scroll: Scrollable::default(),
             scale: (1.0, 1.0),
             last_click_position: None,
         }))
     }
 
     pub fn clear_area(&mut self) {
-        self.model = AreaModel::new();
-        self.scroll = Scrollable::new();
+        self.model = AreaModel::default();
+        self.scroll = Scrollable::default();
         self.cur_editor = None;
     }
 

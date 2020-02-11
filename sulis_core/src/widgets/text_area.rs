@@ -160,8 +160,8 @@ impl WidgetKind for TextArea {
         _millis: u32,
     ) {
         let font_rend = match &widget.state.text_renderer {
-            &None => return,
-            &Some(ref renderer) => renderer,
+            None => return,
+            Some(renderer) => renderer,
         };
 
         // let start_time = time::Instant::now();

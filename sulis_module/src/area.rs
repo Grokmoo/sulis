@@ -264,7 +264,7 @@ impl Area {
                 * builder.max_vis_up_one_distance,
             world_map_location: builder.world_map_location.clone(),
             on_rest: builder.on_rest.clone(),
-            location_kind: builder.location_kind.clone(),
+            location_kind: builder.location_kind,
             generator,
             builder,
         })
@@ -395,7 +395,7 @@ fn entry_index<'a>(
     })
 }
 
-fn serialize_u8_with_kinds<'a, S>(
+fn serialize_u8_with_kinds<S>(
     kinds: HashMap<&str, u8>,
     name: &'static str,
     vec: Vec<u8>,
@@ -437,7 +437,7 @@ where
     Ok(out)
 }
 
-fn ser_terrain<S>(input: &Vec<Option<String>>, serializer: S) -> Result<S::Ok, S::Error>
+fn ser_terrain<S>(input: &[Option<String>], serializer: S) -> Result<S::Ok, S::Error>
 where
     S: Serializer,
 {
@@ -495,7 +495,7 @@ where
     Ok(out)
 }
 
-fn ser_walls<S>(input: &Vec<(u8, Option<String>)>, serializer: S) -> Result<S::Ok, S::Error>
+fn ser_walls<S>(input: &[(u8, Option<String>)], serializer: S) -> Result<S::Ok, S::Error>
 where
     S: Serializer,
 {

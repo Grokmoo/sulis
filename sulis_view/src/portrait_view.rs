@@ -75,7 +75,7 @@ impl WidgetKind for PortraitView {
             Some(ref stat) => {
                 let cur = entity.actor.current_class_stat(&stat.id);
                 let max = entity.actor.stats.class_stat_max(&stat.id);
-                let frac = cur.divide(&max);
+                let frac = cur.divide(max);
                 let bar = Widget::with_theme(ProgressBar::new(frac), "class_stat_bar");
 
                 {

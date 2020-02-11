@@ -66,7 +66,7 @@ impl fmt::Debug for PropState {
 
 impl PropState {
     pub(crate) fn new(prop_data: &PropData, location: Location, temporary: bool) -> PropState {
-        let mut items = ItemList::new();
+        let mut items = ItemList::default();
         for item_save in prop_data.items.iter() {
             let quantity = item_save.quantity;
             let item = &item_save.item;
@@ -88,7 +88,7 @@ impl PropState {
 
         let interactive = match prop_data.prop.interactive {
             prop::Interactive::Hover => {
-                let text = prop_data.hover_text.clone().unwrap_or(String::new());
+                let text = prop_data.hover_text.clone().unwrap_or_default();
                 Interactive::Hover { text }
             }
             prop::Interactive::Not => {
@@ -158,7 +158,7 @@ impl PropState {
                     _ => return Ok(()),
                 }
 
-                let mut item_list = ItemList::new();
+                let mut item_list = ItemList::default();
                 for item_save_state in items {
                     let item = &item_save_state.item;
                     let variant = item.variant;
@@ -211,7 +211,7 @@ impl PropState {
                     _ => return Ok(()),
                 }
 
-                self.interactive = Interactive::Hover { text: text.clone() };
+                self.interactive = Interactive::Hover { text };
             }
         }
 
@@ -382,17 +382,15 @@ impl PropState {
 
     fn notify_and_check(&mut self) {
         self.listeners.notify(&self);
-        match self.interactive {
-            Interactive::Container {
-                ref items,
-                temporary,
-                ..
-            } => {
-                if items.is_empty() && temporary {
-                    self.marked_for_removal = true;
-                }
+        if let Interactive::Container {
+            ref items,
+            temporary,
+            ..
+        } = self.interactive
+        {
+            if items.is_empty() && temporary {
+                self.marked_for_removal = true;
             }
-            _ => (),
         }
     }
 

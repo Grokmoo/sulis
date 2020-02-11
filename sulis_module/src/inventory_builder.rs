@@ -204,9 +204,7 @@ impl InventoryBuilder {
                     }
                 }
                 Usable1 | Usable2 | Usable3 | Usable4 => {
-                    if item.usable.is_none() {
-                        return None;
-                    }
+                    item.usable.as_ref()?;
                 }
             }
 

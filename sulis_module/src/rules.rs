@@ -148,17 +148,17 @@ impl Rules {
 
         if millis >= ROUND_TIME_MILLIS {
             round += millis / ROUND_TIME_MILLIS;
-            millis = millis % ROUND_TIME_MILLIS;
+            millis %= ROUND_TIME_MILLIS;
         }
 
         if round >= self.rounds_per_hour {
             hour += round / self.rounds_per_hour;
-            round = round % self.rounds_per_hour;
+            round %= self.rounds_per_hour;
         }
 
         if hour >= self.hours_per_day {
             day += hour / self.hours_per_day;
-            hour = hour % self.hours_per_day;
+            hour %= self.hours_per_day;
         }
 
         time.millis = millis;
@@ -297,7 +297,7 @@ impl Rules {
         if cur_level < 1 {
             return 0;
         }
-        if cur_level - 1 >= self.experience_for_level.len() as u32 {
+        if cur_level > self.experience_for_level.len() as u32 {
             return 0;
         }
 

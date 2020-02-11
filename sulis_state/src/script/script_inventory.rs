@@ -224,10 +224,7 @@ impl UserData for ScriptInventory {
         methods.add_method("has_equipped_weapon", |_, data, ()| {
             try_unwrap!(data => inv);
 
-            Ok(match inv.equipped(Slot::HeldMain) {
-                None => false,
-                Some(_) => true,
-            })
+            Ok(inv.equipped(Slot::HeldMain).is_some())
         });
 
         methods.add_method("has_equipped_shield", |_, data, ()| {
@@ -299,11 +296,11 @@ impl ScriptStashItem {
     pub fn unwrap_index(&self) -> Result<usize> {
         match self.index {
             None => {
-                return Err(rlua::Error::FromLuaConversionError {
+                Err(rlua::Error::FromLuaConversionError {
                     from: "ScriptStashItem",
                     to: "Item",
-                    message: Some(format!("ScriptStashItem is invalid / does not exist.")),
-                });
+                    message: Some("ScriptStashItem is invalid / does not exist.".to_string()),
+                })
             }
             Some(index) => Ok(index),
         }
@@ -374,7 +371,7 @@ impl UserData for ScriptUsableItem {
                     return Err(rlua::Error::FromLuaConversionError {
                         from: "ScriptUsableItem",
                         to: "Item",
-                        message: Some(format!("ScriptUsableItem is invalid / does not exist.")),
+                        message: Some("ScriptUsableItem is invalid / does not exist.".to_string()),
                     });
                 }
                 Some(item) => item,

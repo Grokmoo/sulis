@@ -400,21 +400,15 @@ impl Config {
             create_dir_and_warn(path);
         }
 
-        match fs::copy(config_base_path, config_path) {
-            Err(_) => {
-                let config_base_str = format!("../{}", CONFIG_BASE);
-                let config_base_path = Path::new(&config_base_str);
-                match fs::copy(config_base_path, config_path) {
-                    Err(e) => {
-                        eprintln!("{}", e);
-                        eprintln!("Unable to create configuration file '{}'", CONFIG_FILENAME);
-                        eprintln!("Exiting...");
-                        ::std::process::exit(1);
-                    }
-                    _ => {}
-                }
+        if fs::copy(config_base_path, config_path).is_err() {
+            let config_base_str = format!("../{}", CONFIG_BASE);
+            let config_base_path = Path::new(&config_base_str);
+            if let Err(e) = fs::copy(config_base_path, config_path) {
+                eprintln!("{}", e);
+                eprintln!("Unable to create configuration file '{}'", CONFIG_FILENAME);
+                eprintln!("Exiting...");
+                ::std::process::exit(1);
             }
-            _ => {}
         }
     }
 
@@ -433,7 +427,7 @@ impl Config {
         };
 
         for key in RawClick::iter() {
-            if let None = config.input.click_actions.get(key) {
+            if config.input.click_actions.get(key).is_none() {
                 return Err(Error::new(
                     ErrorKind::InvalidData,
                     "Must specify an action for each of Left, Right & Middle Click",
@@ -453,7 +447,7 @@ impl Config {
             _ => {
                 return Err(Error::new(
                     ErrorKind::InvalidData,
-                    format!("log_level must be one of error, warn, info, debug, or trace"),
+                    "log_level must be one of error, warn, info, debug, or trace".to_string(),
                 ));
             }
         };

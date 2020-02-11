@@ -1,0 +1,2 @@
+blacklisted-names = ["foo", "baz", "quux"]
+too-many-arguments-threshold = 8

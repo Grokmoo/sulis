@@ -76,12 +76,12 @@ impl GeneratedArea {
             );
         }
 
-        let mut props: Vec<_> = area.props.iter().map(|p| p.clone()).collect();
+        let mut props: Vec<_> = area.props.to_vec();
         for builder in generated_props {
             props.push(create_prop(&builder)?);
         }
 
-        let mut encounters: Vec<_> = area.encounters.iter().map(|e| e.clone()).collect();
+        let mut encounters: Vec<_> = area.encounters.to_vec();
         for builder in generated_encounters {
             let encounter = match Module::encounter(&builder.id) {
                 None => {
@@ -114,15 +114,19 @@ impl GeneratedArea {
         let mut transitions = Vec::new();
         for (index, t_builder) in transition_builders.into_iter().enumerate() {
             let img_id = &t_builder.image_display;
-            let image = ResourceSet::image(img_id).ok_or(Error::new(
-                ErrorKind::InvalidInput,
-                format!("No image '{}' found", img_id),
-            ))?;
+            let image = ResourceSet::image(img_id).ok_or_else(|| {
+                Error::new(
+                    ErrorKind::InvalidInput,
+                    format!("No image '{}' found", img_id),
+                )
+            })?;
 
-            let size = Module::size(&t_builder.size).ok_or(Error::new(
-                ErrorKind::InvalidInput,
-                format!("No size '{}' found", t_builder.size),
-            ))?;
+            let size = Module::size(&t_builder.size).ok_or_else(|| {
+                Error::new(
+                    ErrorKind::InvalidInput,
+                    format!("No size '{}' found", t_builder.size),
+                )
+            })?;
 
             let p = t_builder.from;
             if !p.in_bounds(area.width, area.height) {
@@ -184,10 +188,12 @@ impl PregenOutput {
             Some(params) => params,
         };
 
-        let generator = Module::generator(&params.id).ok_or(Error::new(
-            ErrorKind::InvalidInput,
-            format!("Generator '{}' not found", params.id),
-        ))?;
+        let generator = Module::generator(&params.id).ok_or_else(|| {
+            Error::new(
+                ErrorKind::InvalidInput,
+                format!("Generator '{}' not found", params.id),
+            )
+        })?;
 
         let (w, h) = (area.width, area.height);
         let transition_out = generator.generate_transitions(w, h, &mut rand, &params)?;

@@ -149,7 +149,7 @@ fn get_area_entries(dir_str: &str) -> Vec<String> {
             continue;
         }
 
-        let extension: String = OsStr::to_str(path.extension().unwrap_or(OsStr::new("")))
+        let extension: String = OsStr::to_str(path.extension().unwrap_or_else(|| OsStr::new("")))
             .unwrap_or("")
             .to_string();
 
@@ -157,7 +157,7 @@ fn get_area_entries(dir_str: &str) -> Vec<String> {
             continue;
         }
 
-        match OsStr::to_str(path.file_stem().unwrap_or(OsStr::new(""))) {
+        match OsStr::to_str(path.file_stem().unwrap_or_else(|| OsStr::new(""))) {
             None => (),
             Some(filename) => areas.push(filename.to_string()),
         }

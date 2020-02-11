@@ -125,12 +125,12 @@ impl WidgetKind for QuestWindow {
                 .borrow_mut()
                 .state
                 .add_text_arg("name", &quest.name);
-            match quests.state(&quest.id) {
-                QuestEntryState::Complete => text_area
+
+            if let QuestEntryState::Complete = quests.state(&quest.id) {
+                text_area
                     .borrow_mut()
                     .state
-                    .add_text_arg("complete", "true"),
-                _ => (),
+                    .add_text_arg("complete", "true");
             }
 
             Widget::add_child_to(&button, text_area);

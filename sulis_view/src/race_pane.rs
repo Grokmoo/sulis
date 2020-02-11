@@ -80,10 +80,8 @@ impl WidgetKind for RacePane {
             add_bonus_text_args(&race.base_stats, state);
             add_attack_text_args(&race.base_attack, state);
 
-            let mut i = 0;
-            for slot in &race.disabled_slots {
+            for (i, slot) in race.disabled_slots.iter().enumerate() {
                 state.add_text_arg(&format!("disabled_slot_{}", i), &format!("{:?}", slot));
-                i += 1;
             }
         }
 

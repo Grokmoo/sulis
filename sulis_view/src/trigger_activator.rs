@@ -34,7 +34,7 @@ use crate::{
 };
 
 pub fn is_match(
-    on_trigger: &Vec<OnTrigger>,
+    on_trigger: &[OnTrigger],
     pc: &Rc<RefCell<EntityState>>,
     target: &Rc<RefCell<EntityState>>,
 ) -> bool {
@@ -144,7 +144,7 @@ pub fn is_match(
 
 pub fn activate(
     widget: &Rc<RefCell<Widget>>,
-    on_select: &Vec<OnTrigger>,
+    on_select: &[OnTrigger],
     pc: &Rc<RefCell<EntityState>>,
     target: &Rc<RefCell<EntityState>>,
 ) {
@@ -375,7 +375,7 @@ fn load_module(widget: &Rc<RefCell<Widget>>, module_data: &ModuleLoadData) {
             pc_actor: Rc::new(actor),
             party_actors,
             flags: module_data.flags.clone(),
-            module_dir: module.dir.to_string(),
+            module_dir: module.dir,
         };
         view.set_next_step(step);
 

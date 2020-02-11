@@ -43,7 +43,7 @@ impl Default for Formation {
     }
 }
 
-fn center_of_group(entities: &Vec<Rc<RefCell<EntityState>>>) -> (f32, f32) {
+fn center_of_group(entities: &[Rc<RefCell<EntityState>>]) -> (f32, f32) {
     let mut x = 0.0;
     let mut y = 0.0;
 
@@ -74,7 +74,7 @@ impl Formation {
 
     pub fn move_group(
         &self,
-        entities_to_move: &Vec<Rc<RefCell<EntityState>>>,
+        entities_to_move: &[Rc<RefCell<EntityState>>],
         entities_to_ignore: Vec<usize>,
         dest: Destination,
     ) {
@@ -96,7 +96,7 @@ impl Formation {
         };
 
         let start_time = ::std::time::Instant::now();
-        for index in 0..to_move.len() {
+        for (index, to_move) in to_move.iter().enumerate() {
             // first rotate the stored positions by 90 degrees
             let xi = -self.positions[index].1;
             let yi = self.positions[index].0;
@@ -104,9 +104,8 @@ impl Formation {
             let x = (xi * cos - yi * sin).round() + dest.x;
             let y = (xi * sin + yi * cos).round() + dest.y;
 
-            let parent = &to_move[index];
-            let parent_w = parent.borrow().size.width as f32;
-            let parent_h = parent.borrow().size.height as f32;
+            let parent_w = to_move.borrow().size.width as f32;
+            let parent_h = to_move.borrow().size.height as f32;
 
             for dist_increase in 0..3 {
                 let dist = dest.dist + dist_increase as f32 * 1.0;
@@ -120,7 +119,7 @@ impl Formation {
                     dist,
                 };
                 if GameState::can_move_towards_dest(
-                    &to_move[index].borrow(),
+                    &to_move.borrow(),
                     entities_to_ignore.clone(),
                     dest,
                 )
@@ -129,7 +128,7 @@ impl Formation {
                     continue;
                 }
 
-                GameState::move_towards_dest(parent, entities_to_ignore.clone(), dest, None);
+                GameState::move_towards_dest(to_move, entities_to_ignore.clone(), dest, None);
                 break;
             }
         }

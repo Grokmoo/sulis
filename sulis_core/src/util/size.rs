@@ -43,22 +43,22 @@ impl Size {
         }
     }
 
-    pub fn as_tuple(&self) -> (i32, i32) {
+    pub fn as_tuple(self) -> (i32, i32) {
         (self.width, self.height)
     }
 
-    pub fn inner(&self, border: &Border) -> Size {
+    pub fn inner(self, border: &Border) -> Size {
         Size {
             width: self.width - border.left - border.right,
             height: self.height - border.top - border.bottom,
         }
     }
 
-    pub fn in_bounds(&self, x: i32, y: i32) -> bool {
+    pub fn in_bounds(self, x: i32, y: i32) -> bool {
         x >= 0 && y >= 0 && x < self.width && y < self.height
     }
 
-    pub fn product(&self) -> i32 {
+    pub fn product(self) -> i32 {
         self.width * self.height
     }
 
@@ -67,7 +67,7 @@ impl Size {
         self.height *= val;
     }
 
-    pub fn add(&self, w: i32, h: i32) -> Size {
+    pub fn add(self, w: i32, h: i32) -> Size {
         Size::new(self.width + w, self.height + h)
     }
 
@@ -84,11 +84,11 @@ impl Size {
         self.height += height;
     }
 
-    pub fn add_width_from(&mut self, size: &Size) {
+    pub fn add_width_from(&mut self, size: Size) {
         self.width += size.width;
     }
 
-    pub fn add_height_from(&mut self, size: &Size) {
+    pub fn add_height_from(&mut self, size: Size) {
         self.height += size.height;
     }
 
@@ -105,12 +105,12 @@ impl Size {
         self.height = height;
     }
 
-    pub fn max_from(&mut self, other: &Size) {
+    pub fn max_from(&mut self, other: Size) {
         self.width = cmp::max(self.width, other.width);
         self.height = cmp::max(self.height, other.height);
     }
 
-    pub fn min_from(&mut self, other: &Size) {
+    pub fn min_from(&mut self, other: Size) {
         self.width = cmp::min(self.width, other.width);
         self.height = cmp::min(self.height, other.height);
     }

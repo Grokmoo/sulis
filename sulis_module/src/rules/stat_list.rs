@@ -435,9 +435,8 @@ impl StatList {
             }
         }
 
-        match weapon_style {
-            WeaponStyle::Shielded => self.has_shield = true,
-            _ => (),
+        if let WeaponStyle::Shielded = weapon_style {
+            self.has_shield = true;
         }
 
         let multiplier = if attacks.is_empty() {

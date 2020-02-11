@@ -42,7 +42,7 @@ fn get_images_from_grid(
     let mut images_vec: Vec<Rc<dyn Image>> = Vec::new();
     for id in grid {
         let image = resources.images.get(&id);
-        if let None = image {
+        if image.is_none() {
             return invalid_data_error(&format!("Unable to locate sub image {}", id));
         }
 

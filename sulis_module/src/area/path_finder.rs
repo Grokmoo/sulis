@@ -228,8 +228,8 @@ impl PathFinder {
             self.closed.insert(current);
 
             let neighbors = self.get_neighbors(current);
-            for i in 0..4 {
-                let neighbor = neighbors[i];
+            for neighbor in neighbors.iter() {
+                let neighbor = *neighbor;
                 if neighbor == -1 {
                     continue;
                 }

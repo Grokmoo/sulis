@@ -420,7 +420,7 @@ impl CallbackData {
     fn exec_standard_script(&self, targets: ScriptEntitySet, func_kind: FuncKind) {
         let func = match self.funcs.get(&func_kind) {
             None => return,
-            Some(ref func) => func.to_string(),
+            Some(func) => func.to_string(),
         };
 
         let mgr = GameState::turn_manager();
@@ -454,7 +454,7 @@ impl CallbackData {
     {
         let func = match self.funcs.get(&func_kind) {
             None => return,
-            Some(ref func) => func.to_string(),
+            Some(func) => func.to_string(),
         };
 
         let mgr = GameState::turn_manager();
@@ -492,7 +492,7 @@ impl CallbackData {
     ) {
         let func = match self.funcs.get(&func_kind) {
             None => return,
-            Some(ref func) => func.to_string(),
+            Some(func) => func.to_string(),
         };
 
         let mgr = GameState::turn_manager();
@@ -702,7 +702,7 @@ fn compute_surface_targets(
                 targets.indices.push(Some(target));
             } else {
                 let inside = area.borrow().entities_with_points(points);
-                targets.indices = inside.into_iter().map(|i| Some(i)).collect();
+                targets.indices = inside.into_iter().map(Some).collect();
             }
         }
     }
@@ -927,7 +927,7 @@ impl UserData for ScriptHitKind {
         methods.add_method("damage_of_type", |_, hit, kind: String| {
             let mut total = 0;
             for entry in hit.entries.iter() {
-                if entry.kind != &kind {
+                if entry.kind != kind {
                     continue;
                 }
                 total += entry.amount;

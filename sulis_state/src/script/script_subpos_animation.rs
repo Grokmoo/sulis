@@ -95,8 +95,8 @@ pub fn create_anim(data: &ScriptSubposAnimation) -> Result<Anim> {
     let mgr = GameState::turn_manager();
     let parent = mgr.borrow().entity(data.parent);
 
-    let x = data.position.0.clone();
-    let y = data.position.1.clone();
+    let x = data.position.0;
+    let y = data.position.1;
 
     let mut anim = Anim::new_entity_subpos(&parent, data.duration_millis, x, y);
 

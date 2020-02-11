@@ -148,18 +148,18 @@ impl BuilderPane for CosmeticSelectorPane {
     fn on_selected(&mut self, builder: &mut CharacterBuilder, widget: Rc<RefCell<Widget>>) {
         self.race = builder.race.clone();
         if let Some(ref race) = self.race {
-            if race.hair_selections.len() > 0 {
+            if !race.hair_selections.is_empty() {
                 self.hair_index = Some(0);
             } else {
                 self.hair_index = None;
             }
             self.beard_index = None;
-            if race.hair_colors.len() > 0 {
+            if !race.hair_colors.is_empty() {
                 self.hair_color = Some(race.hair_colors[0]);
             } else {
                 self.hair_color = None;
             }
-            if race.skin_colors.len() > 0 {
+            if !race.skin_colors.is_empty() {
                 self.skin_color = Some(race.skin_colors[0]);
             } else {
                 self.skin_color = None;

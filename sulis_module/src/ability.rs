@@ -301,7 +301,7 @@ pub enum AIKind {
 }
 
 impl AIKind {
-    pub fn from_str(s: &str) -> AIKind {
+    pub fn unwrap_from_str(s: &str) -> AIKind {
         match s {
             "Damage" => AIKind::Damage,
             "Heal" => AIKind::Heal,
@@ -325,7 +325,7 @@ pub enum AIGroup {
 }
 
 impl AIGroup {
-    pub fn from_str(s: &str) -> AIGroup {
+    pub fn unwrap_from_str(s: &str) -> AIGroup {
         match s {
             "Single" => AIGroup::Single,
             "Multiple" => AIGroup::Multiple,
@@ -348,7 +348,7 @@ pub enum AIRange {
 }
 
 impl AIRange {
-    pub fn from_str(s: &str) -> AIRange {
+    pub fn unwrap_from_str(s: &str) -> AIRange {
         match s {
             "Personal" => AIRange::Personal,
             "Touch" => AIRange::Touch,

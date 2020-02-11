@@ -241,7 +241,7 @@ impl WidgetKind for AbilitySelectorPane {
             Widget::add_child_to(&ability_button, icon);
 
             let upgrade = Widget::with_theme(Label::empty(), "upgrade0");
-            if let Some(_) = level {
+            if level.is_some() {
                 upgrade.borrow_mut().state.set_active(true);
             }
             Widget::add_child_to(&ability_button, upgrade);

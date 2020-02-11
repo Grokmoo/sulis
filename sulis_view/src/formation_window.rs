@@ -209,7 +209,7 @@ impl WidgetKind for FormationWindow {
                 .state
                 .add_callback(Callback::new(Rc::new(move |widget, _| {
                     let (_, window) = Widget::parent_mut::<FormationWindow>(widget);
-                    if !window.active_entry.is_some() {
+                    if window.active_entry.is_none() {
                         window.set_active_entry(Some(index));
                     } else {
                         window.set_active_entry(None);

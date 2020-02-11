@@ -151,7 +151,7 @@ fn main() {
             NewCampaign { pc_actor } => {
                 new_campaign(io.as_mut(), pc_actor, Vec::new(), HashMap::new())
             }
-            LoadCampaign { save_state } => load_campaign(io.as_mut(), save_state),
+            LoadCampaign { save_state } => load_campaign(io.as_mut(), *save_state),
             MainMenu => main_menu(io.as_mut()),
             MainMenuReloadResources => {
                 load_resources();

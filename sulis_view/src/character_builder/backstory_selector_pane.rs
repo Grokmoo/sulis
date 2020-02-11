@@ -37,13 +37,10 @@ pub struct BackstorySelectorPane {
 }
 
 pub fn get_initial_node(convo: &Rc<Conversation>) -> String {
-    let mut cur_node = "";
-    for (node, _) in convo.initial_nodes() {
-        cur_node = node;
-        break;
+    match convo.initial_nodes().next() {
+        None => String::new(),
+        Some((node, _)) => node.to_string(),
     }
-
-    cur_node.to_string()
 }
 
 impl BackstorySelectorPane {
@@ -62,7 +59,7 @@ impl BackstorySelectorPane {
     pub fn set_next_enabled(&mut self, widget: &Rc<RefCell<Widget>>) {
         let (_, builder) = Widget::parent_mut::<CharacterBuilder>(widget);
 
-        let next = self.complete || self.convo.responses(&self.cur_node).len() == 0;
+        let next = self.complete || self.convo.responses(&self.cur_node).is_empty();
 
         builder.finish.borrow_mut().state.set_enabled(next);
     }
@@ -72,7 +69,7 @@ impl BuilderPane for BackstorySelectorPane {
     fn on_selected(&mut self, builder: &mut CharacterBuilder, widget: Rc<RefCell<Widget>>) {
         builder.abilities.clear();
 
-        let next = self.complete || self.convo.responses(&self.cur_node).len() == 0;
+        let next = self.complete || self.convo.responses(&self.cur_node).is_empty();
         builder.finish.borrow_mut().state.set_enabled(next);
         builder.next.borrow_mut().state.set_visible(false);
         builder.finish.borrow_mut().state.set_visible(true);

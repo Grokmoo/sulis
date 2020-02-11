@@ -40,7 +40,7 @@ use sulis_state::{AreaDrawable, AreaState, EntityState, EntityTextureCache, Game
 
 use crate::{action_kind, window_fade, AreaOverlayHandler, WindowFade};
 
-const NAME: &'static str = "area";
+const NAME: &str = "area";
 
 pub struct AreaView {
     scale: (f32, f32),
@@ -65,8 +65,8 @@ const TILE_CACHE_TEXTURE_SIZE: u32 = 2048;
 const TILE_SIZE: u32 = 16;
 const TEX_COORDS: [f32; 8] = [0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0];
 
-const ENTITY_TEX_ID: &'static str = "__entities__";
-const VISIBILITY_TEX_ID: &'static str = "__visibility__";
+const ENTITY_TEX_ID: &str = "__entities__";
+const VISIBILITY_TEX_ID: &str = "__visibility__";
 const BASE_LAYER_ID: &str = "__base_layer__";
 const AERIAL_LAYER_ID: &str = "__aerial_layer__";
 
@@ -82,13 +82,13 @@ impl AreaView {
                 TILE_SIZE,
             ),
             layers: Vec::new(),
-            scroll: Scrollable::new(),
+            scroll: Scrollable::default(),
             targeter_tile: None,
             range_indicator_image_set: None,
             active_entity: None,
             feedback_text_params: area_feedback_text::Params::default(),
             scroll_target: None,
-            overlay_handler: AreaOverlayHandler::new(),
+            overlay_handler: AreaOverlayHandler::default(),
         }))
     }
 
@@ -161,8 +161,8 @@ impl AreaView {
         let mut y = Cursor::get_y_f32() - pos_y as f32;
 
         let (scale_x, scale_y) = self.scale;
-        x = x / scale_x;
-        y = y / scale_y;
+        x /= scale_x;
+        y /= scale_y;
 
         (x, y)
     }
@@ -446,11 +446,68 @@ impl AreaView {
     pub fn set_active_entity(&mut self, entity: Option<Rc<RefCell<EntityState>>>) {
         self.active_entity = entity;
     }
+
+    fn handle_targeter_label(&mut self, state: &mut AreaState) {
+        if let Some(targeter) = state.targeter() {
+            let mut targeter_label = self.targeter_label.borrow_mut();
+            if !targeter_label.state.is_visible() {
+                targeter_label.state.set_visible(true);
+                // temporarily clear text so we don't show old data on this frame
+                targeter_label.state.text = String::new();
+                targeter_label
+                    .state
+                    .add_text_arg("ability_id", targeter.borrow().name());
+                targeter_label.invalidate_layout();
+            }
+        } else {
+            self.targeter_label.borrow_mut().state.set_visible(false);
+        }
+    }
+
+    fn cache_textures(&mut self, renderer: &mut dyn GraphicsRenderer, state: &mut AreaState) {
+        info!("Caching area '{}' layers to texture", state.area.area.id);
+
+        let texture_ids = vec![
+            VISIBILITY_TEX_ID,
+            BASE_LAYER_ID,
+            AERIAL_LAYER_ID,
+            ENTITY_TEX_ID,
+        ];
+        for texture_id in texture_ids {
+            if renderer.has_texture(texture_id) {
+                renderer.clear_texture(texture_id);
+            } else {
+                renderer.register_texture(
+                    texture_id,
+                    ImageBuffer::new(TILE_CACHE_TEXTURE_SIZE, TILE_CACHE_TEXTURE_SIZE),
+                    TextureMinFilter::NearestMipmapNearest,
+                    TextureMagFilter::Nearest,
+                );
+            }
+        }
+
+        for (index, layer) in state.area.layer_set.layers.iter().enumerate() {
+            let texture_id = if index <= state.area.layer_set.entity_layer_index {
+                BASE_LAYER_ID
+            } else {
+                AERIAL_LAYER_ID
+            };
+            trace!("Caching layer '{}'", layer.id);
+
+            self.draw_layer_to_texture(renderer, &layer, texture_id);
+        }
+
+        self.entity_texture_cache.invalidate();
+        // cause full area visibility redraw at the next step
+        state.pc_vis_full_redraw();
+        self.cache_invalid = false;
+    }
 }
 
 impl WidgetKind for AreaView {
     widget_kind!(NAME);
 
+    #[allow(clippy::float_cmp)]
     fn update(&mut self, _widget: &Rc<RefCell<Widget>>, millis: u32) {
         let (dest_x, dest_y) = match self.scroll_target {
             None => return,
@@ -567,7 +624,7 @@ impl WidgetKind for AreaView {
 
     fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         info!("Adding area to widget tree");
-        self.overlay_handler = AreaOverlayHandler::new();
+        self.overlay_handler = AreaOverlayHandler::default();
 
         let area_state = GameState::area_state();
         let area = &area_state.borrow().area;
@@ -634,65 +691,14 @@ impl WidgetKind for AreaView {
 
         // TODO figure out a better way to do this - we don't have an easy
         // way for the targeter to cause a layout of the label
-        if let Some(targeter) = state.targeter() {
-            let mut targeter_label = self.targeter_label.borrow_mut();
-            if !targeter_label.state.is_visible() {
-                targeter_label.state.set_visible(true);
-                // temporarily clear text so we don't show old data on this frame
-                targeter_label.state.text = String::new();
-                targeter_label
-                    .state
-                    .add_text_arg("ability_id", targeter.borrow().name());
-                targeter_label.invalidate_layout();
-            }
-        } else {
-            self.targeter_label.borrow_mut().state.set_visible(false);
-        }
+        self.handle_targeter_label(&mut state);
 
-        match state.pop_scroll_to_callback() {
-            None => (),
-            Some(entity) => {
-                self.center_scroll_on(&entity, state.area.width, state.area.height, widget)
-            }
+        if let Some(entity) = state.pop_scroll_to_callback() {
+            self.center_scroll_on(&entity, state.area.width, state.area.height, widget)
         }
 
         if self.cache_invalid {
-            info!("Caching area '{}' layers to texture", state.area.area.id);
-
-            let texture_ids = vec![
-                VISIBILITY_TEX_ID,
-                BASE_LAYER_ID,
-                AERIAL_LAYER_ID,
-                ENTITY_TEX_ID,
-            ];
-            for texture_id in texture_ids {
-                if renderer.has_texture(texture_id) {
-                    renderer.clear_texture(texture_id);
-                } else {
-                    renderer.register_texture(
-                        texture_id,
-                        ImageBuffer::new(TILE_CACHE_TEXTURE_SIZE, TILE_CACHE_TEXTURE_SIZE),
-                        TextureMinFilter::NearestMipmapNearest,
-                        TextureMagFilter::Nearest,
-                    );
-                }
-            }
-
-            for (index, layer) in state.area.layer_set.layers.iter().enumerate() {
-                let texture_id = if index <= state.area.layer_set.entity_layer_index {
-                    BASE_LAYER_ID
-                } else {
-                    AERIAL_LAYER_ID
-                };
-                trace!("Caching layer '{}'", layer.id);
-
-                self.draw_layer_to_texture(renderer, &layer, texture_id);
-            }
-
-            self.entity_texture_cache.invalidate();
-            // cause full area visibility redraw at the next step
-            state.pc_vis_full_redraw();
-            self.cache_invalid = false;
+            self.cache_textures(renderer, &mut state);
         }
 
         match state.take_pc_vis() {
@@ -953,7 +959,7 @@ impl WidgetKind for AreaView {
                 self.scroll(delta_x, delta_y, 33);
             }
             ClickKind::Primary => {
-                if let Some(_) = area_state.borrow_mut().targeter() {
+                if area_state.borrow_mut().targeter().is_some() {
                     return true;
                 }
 

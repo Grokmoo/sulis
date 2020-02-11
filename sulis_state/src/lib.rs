@@ -132,7 +132,7 @@ pub enum NextGameStep {
         pc_actor: Rc<Actor>,
     },
     LoadCampaign {
-        save_state: SaveState,
+        save_state: Box<SaveState>,
     },
     LoadModuleAndNewCampaign {
         pc_actor: Rc<Actor>,

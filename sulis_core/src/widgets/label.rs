@@ -142,8 +142,8 @@ impl WidgetKind for Label {
         _millis: u32,
     ) {
         let font_rend = match &widget.state.text_renderer {
-            &None => return,
-            &Some(ref renderer) => renderer,
+            None => return,
+            Some(renderer) => renderer,
         };
 
         let font = font_rend.get_font();

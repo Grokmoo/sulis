@@ -46,6 +46,12 @@ pub struct WidgetState {
     pub(in crate::ui) has_keyboard_focus: bool,
 }
 
+impl Default for WidgetState {
+    fn default() -> Self {
+        WidgetState::new()
+    }
+}
+
 impl WidgetState {
     pub fn new() -> WidgetState {
         WidgetState {

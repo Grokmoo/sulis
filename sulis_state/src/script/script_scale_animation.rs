@@ -94,7 +94,7 @@ pub fn create_anim(data: &ScriptScaleAnimation) -> Result<Anim> {
     let mgr = GameState::turn_manager();
     let parent = mgr.borrow().entity(data.parent);
 
-    let scale = data.scale.clone();
+    let scale = data.scale;
 
     let mut anim = Anim::new_entity_scale(&parent, data.duration_millis, scale);
 

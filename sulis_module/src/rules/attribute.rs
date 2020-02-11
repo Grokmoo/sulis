@@ -64,11 +64,11 @@ impl AttributeList {
         }
     }
 
-    pub fn bonus(&self, attr: Attribute, base_attr: i32) -> i32 {
+    pub fn bonus(self, attr: Attribute, base_attr: i32) -> i32 {
         (self.get(attr) as i32 - base_attr)
     }
 
-    pub fn get(&self, attr: Attribute) -> u8 {
+    pub fn get(self, attr: Attribute) -> u8 {
         match attr {
             Strength => self.strength,
             Dexterity => self.dexterity,
@@ -107,7 +107,7 @@ impl AttributeList {
         }
     }
 
-    pub fn sum(&self, other: &AttributeList) -> AttributeList {
+    pub fn sum(self, other: AttributeList) -> AttributeList {
         AttributeList {
             strength: self.strength + other.strength,
             dexterity: self.dexterity + other.dexterity,

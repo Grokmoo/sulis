@@ -49,13 +49,7 @@ pub struct WallPicker {
 
 impl WallPicker {
     pub fn new() -> Rc<RefCell<WallPicker>> {
-        let cursor_sprite = match ResourceSet::sprite(&Config::editor_config().cursor) {
-            Err(_) => panic!(
-                "Unable to find cursor sprite '{}'",
-                Config::editor_config().cursor
-            ),
-            Ok(sprite) => sprite,
-        };
+        let cursor_sprite = ResourceSet::panic_or_sprite(&Config::editor_config().cursor);
 
         let wall_rules = Module::wall_rules();
         let brush_size = 4;
@@ -170,8 +164,8 @@ impl EditorMode for WallPicker {
                 }
 
                 model.set_wall(x, y, self.level as u8, self.cur_wall);
-                for ye in y..y + self.grid_height + 1 {
-                    for xe in x - 1..x + self.grid_height + 1 {
+                for ye in y..=y + self.grid_height {
+                    for xe in x - 1..=x + self.grid_height {
                         model.set_elevation(2 * self.level as u8, xe, ye);
                     }
                 }

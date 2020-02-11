@@ -28,9 +28,9 @@ pub(in crate::animation) fn update(
 ) {
     if !model.has_attacked && frac > 0.5 {
         let cb_def_targets =
-            ScriptEntitySet::new(&model.defender, &vec![Some(Rc::clone(attacker))]);
+            ScriptEntitySet::new(&model.defender, &[Some(Rc::clone(attacker))]);
         let cb_att_targets =
-            ScriptEntitySet::new(attacker, &vec![Some(Rc::clone(&model.defender))]);
+            ScriptEntitySet::new(attacker, &[Some(Rc::clone(&model.defender))]);
 
         for cb in model.callbacks.iter() {
             cb.before_attack(&cb_def_targets);

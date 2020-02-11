@@ -23,7 +23,7 @@ use sulis_core::ui::{Widget, WidgetKind};
 use sulis_core::util::Point;
 use sulis_core::widgets::TextArea;
 
-const NAME: &'static str = "prop_mouseover";
+const NAME: &str = "prop_mouseover";
 
 pub struct BasicMouseover {
     text_area: Rc<RefCell<TextArea>>,

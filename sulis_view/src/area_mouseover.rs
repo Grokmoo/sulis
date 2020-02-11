@@ -24,7 +24,7 @@ use sulis_core::util::Point;
 use sulis_core::widgets::TextArea;
 use sulis_state::{ChangeListener, EntityState, GameState};
 
-const NAME: &'static str = "area_mouseover";
+const NAME: &str = "area_mouseover";
 
 enum Kind {
     Entity(Rc<RefCell<EntityState>>),
@@ -160,15 +160,12 @@ impl WidgetKind for AreaMouseover {
         // prevent focus grab in root view where we compute mouse state each frame
         widget.borrow_mut().state.set_enabled(false);
 
-        match self.kind {
-            Kind::Entity(ref entity) => {
-                entity
-                    .borrow_mut()
-                    .actor
-                    .listeners
-                    .add(ChangeListener::invalidate_layout(NAME, widget));
-            }
-            _ => (),
+        if let Kind::Entity(ref entity) = self.kind {
+            entity
+                .borrow_mut()
+                .actor
+                .listeners
+                .add(ChangeListener::invalidate_layout(NAME, widget));
         }
 
         Vec::new()

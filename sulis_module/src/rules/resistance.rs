@@ -35,7 +35,7 @@ impl Resistance {
         }
 
         let index = kind.index();
-        self.kinds[index] = self.kinds[index] + amount;
+        self.kinds[index] += amount;
     }
 
     /// Returns the amount of damage resistance that this armor value
@@ -45,7 +45,7 @@ impl Resistance {
             return 0;
         }
 
-        return self.kinds[check_kind.index()];
+        self.kinds[check_kind.index()]
     }
 
     pub fn is_empty(&self) -> bool {

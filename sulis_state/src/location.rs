@@ -65,7 +65,7 @@ impl PartialEq for Location {
             return false;
         }
 
-        if &self.area_id != &other.area_id {
+        if self.area_id != other.area_id {
             return false;
         }
 
@@ -84,7 +84,7 @@ impl Location {
         }
     }
 
-    pub fn from_point(p: &Point, area: &Area) -> Location {
+    pub fn from_point(p: Point, area: &Area) -> Location {
         Location {
             x: p.x,
             y: p.y,
@@ -122,6 +122,6 @@ impl Location {
     }
 
     pub fn is_in_area_id(&self, id: &str) -> bool {
-        &self.area_id == id
+        self.area_id == id
     }
 }

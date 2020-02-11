@@ -155,21 +155,21 @@ impl Effect {
             // frequently - from the script that is resulting in a call to this
             // func.  in that case, using make_mut to clone on write should be fine.
             let cb = Rc::make_mut(cb);
-            cb.clear_funcs_except(&vec![FuncKind::OnRemoved, FuncKind::OnExitedSurface]);
+            cb.clear_funcs_except(&[FuncKind::OnRemoved, FuncKind::OnExitedSurface]);
         }
     }
 
     pub fn set_surface_for_area(
         &mut self,
         area: &str,
-        points: &Vec<Point>,
+        points: &[Point],
         squares_to_fire_on_moved: u32,
         aura: Option<usize>,
     ) {
         let area_id = area.to_string();
         self.surface = Some(Surface {
             area_id,
-            points: points.clone(),
+            points: points.to_vec(),
             squares_to_fire_on_moved,
             aura,
         })

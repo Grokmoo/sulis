@@ -54,7 +54,7 @@ impl AreaGenerator {
             Error::new(
                 ErrorKind::InvalidInput,
                 format!(
-                    "Invalid size {} in {}",
+                    "Invalid min passable size {} in {}",
                     builder.min_passable_size, builder.id
                 ),
             ),
@@ -272,13 +272,11 @@ impl AreaGenerator {
             return (0, None);
         }
 
-        if mapped.contains_key(&region) {
-            (1, mapped[&region])
-        } else {
-            let wall_index = self.wall_kinds.pick_index(&mut model.rand, &model.model);
-            mapped.insert(region, wall_index);
-            (1, wall_index)
-        }
+        let index = mapped
+            .entry(region)
+            .or_insert_with(|| self.wall_kinds.pick_index(&mut model.rand, &model.model));
+
+        (1, *index)
     }
 
     fn add_walls(&self, model: &mut GenModel, maze: &Maze) {
@@ -430,10 +428,7 @@ fn is_rough_edge(
     }
 
     match neighbors[0] {
-        Some(TileKind::Room { .. }) => match edge_choice {
-            None => false,
-            Some(_) => true,
-        },
+        Some(TileKind::Room { .. }) => edge_choice.is_some(),
         Some(TileKind::Corridor(_)) => match edge_choice {
             None => false,
             Some(choice) => choice == index,

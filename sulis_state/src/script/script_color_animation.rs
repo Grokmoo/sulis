@@ -119,12 +119,8 @@ pub fn create_anim(data: &ScriptColorAnimation) -> Result<Anim> {
     let mgr = GameState::turn_manager();
     let parent = mgr.borrow().entity(data.parent);
 
-    let mut anim = Anim::new_entity_color(
-        &parent,
-        data.duration_millis,
-        data.color.clone(),
-        data.color_sec.clone(),
-    );
+    let mut anim =
+        Anim::new_entity_color(&parent, data.duration_millis, data.color, data.color_sec);
 
     if let Some(ref cb) = data.completion_callback {
         anim.add_completion_callback(Box::new(cb.clone()));

@@ -16,6 +16,7 @@ inline_race:
     - kind: { armor: 17 }
     - kind: { resistance: { kind: "Fire", amount: 50 } }
     - kind: { resistance: { kind: "Cold", amount: -25 } }
+    - kind: { melee_accuracy: 15 }
   base_attack:
     damage:
       min: 20
@@ -39,7 +40,7 @@ attributes:
   int: 10
   wis: 10
 levels:
-  fighter: 9
+  fighter: 10
 inventory:
   equipped: {}
 reward:

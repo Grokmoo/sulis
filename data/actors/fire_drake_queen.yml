@@ -16,6 +16,7 @@ inline_race:
     - kind: { armor: 20 }
     - kind: { resistance: { kind: "Fire", amount: 50 } }
     - kind: { resistance: { kind: "Cold", amount: -25 } }
+    - kind: { melee_accuracy: 15 }
   base_attack:
     damage:
       min: 25

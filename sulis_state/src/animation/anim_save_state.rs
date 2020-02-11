@@ -76,7 +76,7 @@ impl AnimSaveState {
                 }
             }
             _ => {
-                warn!("Attempted to serialize invalid anim kind");
+                info!("Attempted to serialize invalid anim kind.  This is ok.");
                 Kind::Invalid
             }
         };

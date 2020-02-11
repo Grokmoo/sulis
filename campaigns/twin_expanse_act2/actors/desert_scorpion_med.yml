@@ -12,9 +12,10 @@ attributes:
   int: 10
   wis: 10
 levels:
-  fighter: 6
+  fighter: 7
 reward:
   xp: 40
   loot: level1_misc
   loot_chance: 35
-abilities: []
+abilities:
+  - scorpion_sting

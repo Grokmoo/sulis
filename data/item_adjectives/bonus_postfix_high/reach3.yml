@@ -11,5 +11,5 @@ attack_bonus_modifier: 1.0
 attack_penalty_modifier: 1.0
 bonuses:
   - kind:
-      reach: 1.5
+      reach: 0.9
 attack_bonuses: {}

@@ -21,16 +21,18 @@ use crate::io::{DrawList, GraphicsRenderer};
 use crate::ui::{animation_state, AnimationState, Color};
 use crate::util::Size;
 
+type Layer = (f32, f32, Option<Color>, Rc<dyn Image>);
+
 #[derive(Debug)]
 pub struct LayeredImage {
-    layers: Vec<(f32, f32, Option<Color>, Rc<dyn Image>)>,
+    layers: Vec<Layer>,
     hue: Option<f32>,
     size: Size,
 }
 
 impl LayeredImage {
     pub fn new(
-        images: Vec<(f32, f32, Option<Color>, Rc<dyn Image>)>,
+        images: Vec<Layer>,
         swap_hue: Option<f32>,
     ) -> LayeredImage {
         let mut max_x = 0.0;

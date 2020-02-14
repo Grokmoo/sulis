@@ -52,12 +52,16 @@ pub(crate) fn transition_to(area_id: Option<&str>, p: Option<Point>, offset: Poi
 
     // Point of no return - we are actually transitioning now
 
-    GameState::set_current_area(&area);
+    let new_area = GameState::set_current_area(&area);
     GameState::set_clear_anims(); // cleanup anims and surfaces
 
     let mgr = GameState::turn_manager();
     let party = GameState::party();
     let area = GameState::area_state(); // it changed above in set_current_area
+
+    if !new_area {
+        area.borrow_mut().pc_vis_full_redraw();
+    }
 
     remove_party_from_surfaces(&mut mgr.borrow_mut(), &party);
 
@@ -71,7 +75,9 @@ pub(crate) fn transition_to(area_id: Option<&str>, p: Option<Point>, offset: Poi
     area.borrow_mut().push_scroll_to_callback(Rc::clone(&pc));
 
     let mut area = area.borrow_mut();
+
     area.update_view_visibility();
+
     if !area.on_load_fired {
         area.on_load_fired = true;
         GameState::add_ui_callbacks_of_kind(

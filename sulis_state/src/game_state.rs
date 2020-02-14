@@ -820,13 +820,14 @@ impl GameState {
         Ok(())
     }
 
-    pub(crate) fn set_current_area(area: &Rc<RefCell<AreaState>>) {
+    #[must_use]
+    pub(crate) fn set_current_area(area: &Rc<RefCell<AreaState>>) -> bool {
         STATE.with(|state| {
             let mut state = state.borrow_mut();
             let state = state.as_mut().unwrap();
 
             if Rc::ptr_eq(&state.area_state, area) {
-                return;
+                return false;
             }
 
             let width = area.borrow().area.area.width;
@@ -834,7 +835,8 @@ impl GameState {
             let path_finder = PathFinder::new(width, height);
             state.path_finder = path_finder;
             state.area_state = Rc::clone(area);
-        });
+            true
+        })
     }
 
     fn setup_area_state(area_id: &str) -> Result<Rc<RefCell<AreaState>>, Error> {

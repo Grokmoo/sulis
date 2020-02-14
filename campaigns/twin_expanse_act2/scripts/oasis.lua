@@ -145,16 +145,18 @@ end
 
 function blazing_road_exit_spawn(parent)
   game:spawn_encounter_at(34, 9)
-  game:scroll_view(39, 13)
-  game:transition_party_to(39, 22)
+  game:scroll_view(39, 18)
   
-  game:run_script_delayed("oasis", "blazing_road_exit_spawn2", 2.0)
-end
-
-function blazing_road_exit_spawn2(parent)
   local target = game:entity_with_id("blazing_road_boss")
   game:start_conversation("blazing_road_boss", target)
   game:check_ai_activation(parent)
+  
+  local dest = { {x=39, y=22}, {x=42, y=23}, {x=36, y=23}, {x=39, y=25}}
+  local party = game:party()
+  for i = 1, #party do
+    local member = party[i]
+	member:teleport_to(dest[i])
+  end
 end
 
 function on_blazing_road_exit_cleared(parent)

@@ -31,7 +31,7 @@ pub struct SimpleImage {
 }
 
 impl SimpleImage {
-    pub fn new(
+    pub fn generate(
         builder: SimpleImageBuilder,
         resources: &ResourceSet,
     ) -> Result<Rc<dyn Image>, Error> {

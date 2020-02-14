@@ -37,7 +37,7 @@ pub struct WindowImage {
 }
 
 impl WindowImage {
-    pub fn new(
+    pub fn generate(
         builder: WindowImageBuilder,
         resources: &ResourceSet,
     ) -> Result<Rc<dyn Image>, Error> {

@@ -95,7 +95,7 @@ world_map:
         lonely_mesa: 60
     ancient_library:
       name: "Ancient Library"
-      position: [5.5, 4.5]
+      position: [6.5, 5.0]
       icon: mountain_town01
       initially_visible: false
       linked_area: ancient_library

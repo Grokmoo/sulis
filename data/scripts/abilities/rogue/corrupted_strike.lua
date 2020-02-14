@@ -1,5 +1,5 @@
 function on_activate(parent, ability)
-  local targets = parent:targets():hostile():attackable()
+  local targets = parent:targets():visible():hostile():attackable()
   
   local targeter = parent:create_targeter(ability)
   targeter:set_selection_attackable()
@@ -33,7 +33,7 @@ function after_attack(parent, ability, targets, hit)
   end
   
   local stats = parent:stats()
-  local amount = (stats.level / 8 + stats.intellect_bonus / 8) * factor
+  local amount = 1 + (stats.level / 8 + stats.intellect_bonus / 8) * factor
 
   local effect = target:create_effect(ability:name())
   effect:set_tag("disease")

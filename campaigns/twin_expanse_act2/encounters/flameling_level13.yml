@@ -1,5 +1,5 @@
 id: flameling_level13
-auto_spawn: false
+auto_spawn: true
 min_gen_actors: 4
 max_gen_actors: 5
 entries:

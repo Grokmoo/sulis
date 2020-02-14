@@ -44,7 +44,7 @@ attributes:
 levels:
   fighter: 10
 reward:
-  xp: 100
+  xp: 80
   loot: level5_misc
   loot_chance: 35
 abilities:

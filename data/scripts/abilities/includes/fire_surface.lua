@@ -47,6 +47,9 @@ end
 function fire_surface_on_round_elapsed(parent, ability, targets)
   local targets = targets:to_table()
   for i = 1, #targets do
-	targets[i]:take_damage(parent, 3, 6, "Fire", 2)
+    local target = targets[i]
+	if not target:is_dead() then
+	  target:take_damage(parent, 3, 6, "Fire", 2)
+	end
   end
 end

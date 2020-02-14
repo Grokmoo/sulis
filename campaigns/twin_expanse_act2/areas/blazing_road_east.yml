@@ -115,13 +115,13 @@ props:
     enabled: true
   - id: lava_bubble01
     location:
-      x: 124
+      x: 123
       y: 110
     enabled: true
   - id: lava_bubble01
     location:
       x: 97
-      y: 124
+      y: 123
     enabled: true
   - id: lava_bubble01
     location:

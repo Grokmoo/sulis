@@ -4,7 +4,7 @@ function on_activate(parent, ability)
   local targeter = parent:create_targeter(ability)
   targeter:set_selection_radius(ability:range())
   targeter:set_free_select(ability:range())
-  targeter:set_shape_circle(8.0)
+  targeter:set_shape_circle(7.0)
   targeter:add_all_effectable(targets)
   targeter:allow_affected_points_impass(false)
   targeter:activate()
@@ -82,16 +82,17 @@ end
 
 function apply_damage(parent, ability, targets)
   local target = targets:first()
+  if target:is_dead() then return end
   
   local stats = parent:stats()
-  local min_dmg = 5 + stats.caster_level / 4 + stats.intellect_bonus / 8
-  local max_dmg = 10 + stats.intellect_bonus / 4 + stats.caster_level / 2
+  local min_dmg = 3 + stats.caster_level / 4 + stats.intellect_bonus / 8
+  local max_dmg = 6 + stats.intellect_bonus / 4 + stats.caster_level / 2
   target:take_damage(parent, min_dmg, max_dmg, "Acid", 8)
 end
 
 function create_acid_surface(parent, ability, targets)
-  local points = targets:random_affected_points(0.6)
-  local surf = parent:create_surface(ability:name(), points, 4)
+  local points = targets:random_affected_points(0.5)
+  local surf = parent:create_surface(ability:name(), points, 3)
   surf:set_squares_to_fire_on_moved(3)
   
   local cb = ability:create_callback(parent)
@@ -122,6 +123,9 @@ end
 function on_round_elapsed(parent, ability, targets)
   local targets = targets:to_table()
   for i = 1, #targets do
-	targets[i]:take_damage(parent, 2, 4, "Acid", 3)
+    local target = targets[i]
+	if not target:is_dead() then
+	  target:take_damage(parent, 2, 4, "Acid", 3)
+	end
   end
 end

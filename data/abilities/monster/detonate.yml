@@ -14,7 +14,7 @@ active:
   range:
     Radius: 4.0
   ai:
-    priority: 10
+    priority: 1
     kind: Damage
     group: Multiple
     range: Touch

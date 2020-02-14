@@ -17,7 +17,7 @@ images:
   Background: creatures/undead06
 inventory: {}
 reward:
-  xp: 45
+  xp: 25
   loot: level1_misc
   loot_chance: 35
 abilities: []

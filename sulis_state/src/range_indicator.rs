@@ -150,7 +150,7 @@ impl RangeIndicator {
             Range::Visible => {
                 let area = GameState::area_state();
                 let area = &area.borrow().area.area;
-                area.vis_dist as f32
+                area.vis_dist as f32 - 1.0
             }
         };
 

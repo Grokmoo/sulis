@@ -143,7 +143,7 @@ pub fn can_attack(attacker: &EntityState, defender: &EntityState) -> bool {
         return false;
     }
 
-    if !a.is_hostile(d) {
+    if !a.is_hostile(d) || d.actor.stats.hidden {
         return false;
     }
 

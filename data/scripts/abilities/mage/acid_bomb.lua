@@ -53,6 +53,7 @@ end
 function apply_damage(parent, ability, targets)
   local stats = parent:stats()
   local target = targets:first()
+  if target:is_dead() then return end
   
   local max_dmg = 8 + stats.caster_level / 2
   target:take_damage(parent, 4, max_dmg, "Acid", 5)

@@ -143,7 +143,12 @@ impl AreaOverlayHandler {
 
         let area_state = area_state.borrow();
         if let Some(entity) = area_state.get_entity_at(x, y) {
-            Some(AreaMouseover::new_entity(&entity))
+            let pc = GameState::player();
+            if pc.borrow().is_hostile(&entity.borrow()) && entity.borrow().actor.stats.hidden {
+                None
+            } else {
+                Some(AreaMouseover::new_entity(&entity))
+            }
         } else if self.check_closed_door(x, y, &area_state).is_some() {
             None
         } else if let Some(transition) = area_state.get_transition_at(x, y) {

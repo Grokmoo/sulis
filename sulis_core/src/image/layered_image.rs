@@ -22,27 +22,39 @@ use crate::ui::{animation_state, AnimationState, Color};
 use crate::util::Size;
 
 #[derive(Debug)]
+pub struct Layer {
+    x: f32,
+    y: f32,
+    color: Option<Color>,
+    image: Rc<dyn Image>,
+}
+
+impl Layer {
+    pub fn new(x: f32, y: f32, color: Option<Color>, image: Rc<dyn Image>) -> Layer {
+        Layer { x, y, color, image }
+    }
+}
+
+#[derive(Debug)]
 pub struct LayeredImage {
-    layers: Vec<(f32, f32, Option<Color>, Rc<dyn Image>)>,
+    layers: Vec<Layer>,
     hue: Option<f32>,
     size: Size,
 }
 
 impl LayeredImage {
-    pub fn new(
-        images: Vec<(f32, f32, Option<Color>, Rc<dyn Image>)>,
-        swap_hue: Option<f32>,
-    ) -> LayeredImage {
+    #[allow(clippy::new_ret_no_self)]
+    pub fn new(images: Vec<Layer>, swap_hue: Option<f32>) -> LayeredImage {
         let mut max_x = 0.0;
         let mut max_y = 0.0;
 
-        for &(_x, _y, _color, ref image) in images.iter() {
-            if image.get_width_f32() > max_x {
-                max_x = image.get_width_f32();
+        for layer in images.iter() {
+            if layer.image.get_width_f32() > max_x {
+                max_x = layer.image.get_width_f32();
             }
 
-            if image.get_height_f32() > max_y {
-                max_y = image.get_height_f32();
+            if layer.image.get_height_f32() > max_y {
+                max_y = layer.image.get_height_f32();
             }
         }
 
@@ -56,19 +68,26 @@ impl LayeredImage {
     #[inline]
     fn draw_layer(
         &self,
-        color: &Option<Color>,
-        image: &Rc<dyn Image>,
-        x: f32,
-        y: f32,
+        layer: &Layer,
+        offset_x: f32,
+        offset_y: f32,
         scale_x: f32,
         scale_y: f32,
         millis: u32,
     ) -> DrawList {
         let mut draw_list = DrawList::empty_sprite();
-        let w = image.get_width_f32();
-        let h = image.get_height_f32();
-        image.append_to_draw_list(&mut draw_list, &animation_state::NORMAL, x, y, w, h, millis);
-        if let Some(color) = color {
+        let w = layer.image.get_width_f32();
+        let h = layer.image.get_height_f32();
+        layer.image.append_to_draw_list(
+            &mut draw_list,
+            &animation_state::NORMAL,
+            layer.x + offset_x,
+            layer.y + offset_y,
+            w,
+            h,
+            millis,
+        );
+        if let Some(color) = &layer.color {
             draw_list.set_color(*color);
         }
         if let Some(hue) = self.hue {
@@ -88,16 +107,8 @@ impl LayeredImage {
         x: f32,
         y: f32,
     ) {
-        for &(offset_x, offset_y, color, ref image) in self.layers.iter() {
-            let draw_list = self.draw_layer(
-                &color,
-                image,
-                x + offset_x,
-                y + offset_y,
-                scale_x,
-                scale_y,
-                0,
-            );
+        for layer in self.layers.iter() {
+            let draw_list = self.draw_layer(layer, x, y, scale_x, scale_y, 0);
             renderer.draw_to_texture(texture_id, draw_list);
         }
     }
@@ -111,16 +122,8 @@ impl LayeredImage {
         y: f32,
         millis: u32,
     ) {
-        for &(offset_x, offset_y, color, ref image) in self.layers.iter() {
-            let draw_list = self.draw_layer(
-                &color,
-                image,
-                x + offset_x,
-                y + offset_y,
-                scale_x,
-                scale_y,
-                millis,
-            );
+        for layer in self.layers.iter() {
+            let draw_list = self.draw_layer(layer, x, y, scale_x, scale_y, millis);
             renderer.draw(draw_list);
         }
     }

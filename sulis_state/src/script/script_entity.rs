@@ -1031,10 +1031,10 @@ impl UserData for ScriptEntity {
                 dest.max_path_len = max_len;
 
                 Ok(GameState::move_towards_dest(
-                        &parent,
-                        Vec::new(),
-                        dest,
-                        None,
+                    &parent,
+                    Vec::new(),
+                    dest,
+                    None,
                 ))
             },
         );
@@ -1209,6 +1209,7 @@ impl UserData for ScriptEntity {
             Ok(())
         });
 
+        #[allow(clippy::type_complexity)]
         methods.add_method(
             "special_attack",
             |_,

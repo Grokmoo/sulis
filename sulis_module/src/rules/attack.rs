@@ -100,7 +100,7 @@ impl Attack {
     pub fn from(other: &Attack, bonuses_to_add: &BonusList) -> Attack {
         let kind = other.kind.clone();
         let mut bonuses = other.bonuses.clone();
-        let mut bonus_damage = other.damage.clone().as_vec();
+        let mut bonus_damage = other.damage.clone().into_vec();
         assert!(!bonus_damage.is_empty());
 
         let base_damage = bonus_damage.remove(0);

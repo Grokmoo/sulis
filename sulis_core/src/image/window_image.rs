@@ -37,6 +37,7 @@ pub struct WindowImage {
 }
 
 impl WindowImage {
+    #[allow(clippy::new_ret_no_self)]
     pub fn new(
         builder: WindowImageBuilder,
         resources: &ResourceSet,

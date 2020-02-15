@@ -33,6 +33,7 @@ pub struct TimerImage {
 }
 
 impl TimerImage {
+    #[allow(clippy::new_ret_no_self)]
     pub fn new(
         builder: TimerImageBuilder,
         images: &HashMap<String, Rc<dyn Image>>,

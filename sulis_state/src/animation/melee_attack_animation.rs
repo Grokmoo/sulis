@@ -27,10 +27,8 @@ pub(in crate::animation) fn update(
     frac: f32,
 ) {
     if !model.has_attacked && frac > 0.5 {
-        let cb_def_targets =
-            ScriptEntitySet::new(&model.defender, &[Some(Rc::clone(attacker))]);
-        let cb_att_targets =
-            ScriptEntitySet::new(attacker, &[Some(Rc::clone(&model.defender))]);
+        let cb_def_targets = ScriptEntitySet::new(&model.defender, &[Some(Rc::clone(attacker))]);
+        let cb_att_targets = ScriptEntitySet::new(attacker, &[Some(Rc::clone(&model.defender))]);
 
         for cb in model.callbacks.iter() {
             cb.before_attack(&cb_def_targets);
@@ -99,30 +97,23 @@ pub(in crate::animation) fn cleanup(owner: &Rc<RefCell<EntityState>>) {
     }
 }
 
+type Entity = Rc<RefCell<EntityState>>;
+type AttackResult = Vec<(HitKind, HitFlags, Vec<(DamageKind, u32)>)>;
+
 pub(in crate::animation) struct MeleeAttackAnimModel {
     defender: Rc<RefCell<EntityState>>,
     callbacks: Vec<Box<dyn ScriptCallback>>,
     vector: (f32, f32),
     pub(in crate::animation) has_attacked: bool,
-    attack_func: Box<
-        dyn Fn(
-            &Rc<RefCell<EntityState>>,
-            &Rc<RefCell<EntityState>>,
-        ) -> Vec<(HitKind, HitFlags, Vec<(DamageKind, u32)>)>,
-    >,
+    attack_func: Box<dyn Fn(&Entity, &Entity) -> AttackResult>,
 }
 
 pub fn new(
-    attacker: &Rc<RefCell<EntityState>>,
-    defender: &Rc<RefCell<EntityState>>,
+    attacker: &Entity,
+    defender: &Entity,
     duration_millis: u32,
     callbacks: Vec<Box<dyn ScriptCallback>>,
-    attack_func: Box<
-        dyn Fn(
-            &Rc<RefCell<EntityState>>,
-            &Rc<RefCell<EntityState>>,
-        ) -> Vec<(HitKind, HitFlags, Vec<(DamageKind, u32)>)>,
-    >,
+    attack_func: Box<dyn Fn(&Entity, &Entity) -> AttackResult>,
 ) -> Anim {
     let x = defender.borrow().location.x + defender.borrow().size.width / 2
         - attacker.borrow().location.x

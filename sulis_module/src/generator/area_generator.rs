@@ -50,15 +50,17 @@ impl AreaGenerator {
     pub fn new(builder: GeneratorBuilder, module: &Module) -> Result<AreaGenerator, Error> {
         let wall_kinds_list =
             WeightedList::new(builder.wall_kinds, "WallKind", |id| module.wall_kind(id))?;
-        let min_passable_size = Rc::clone(module.sizes.get(&builder.min_passable_size).ok_or(
-            Error::new(
-                ErrorKind::InvalidInput,
-                format!(
-                    "Invalid min passable size {} in {}",
-                    builder.min_passable_size, builder.id
-                ),
+
+        let error = Error::new(
+            ErrorKind::InvalidInput,
+            format!(
+                "Invalid min passable size {} in {}",
+                builder.min_passable_size, builder.id
             ),
-        )?);
+        );
+
+        let min_passable_size =
+            Rc::clone(module.sizes.get(&builder.min_passable_size).ok_or(error)?);
 
         Ok(AreaGenerator {
             id: builder.id,
@@ -337,11 +339,12 @@ impl AreaGenerator {
                 if model.rand.gen(1, 101) < self.room_params.corridor_edge_overfill_chance {
                     // pregen a single potential overfill for each corridor, preventing
                     // both sides from becoming blocked at room coord intersection
+                    let region_default = model.rand.gen(1, 5);
                     Some(
                         *model
                             .region_overfill_edges
                             .entry(region)
-                            .or_insert(model.rand.gen(1, 5)),
+                            .or_insert(region_default),
                     )
                 } else {
                     None

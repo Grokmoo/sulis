@@ -131,6 +131,7 @@ fn check_vis(
     }
 }
 
+#[allow(clippy::collapsible_if)]
 fn cast_ray(
     area: &GeneratedArea,
     prop_vis_grid: &[bool],

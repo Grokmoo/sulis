@@ -203,12 +203,10 @@ impl ResourceSet {
     }
 
     pub fn panic_or_sprite(id: &str) -> Rc<Sprite> {
-        RESOURCE_SET.with(|r| {
-            match r.borrow().sprite_internal(id) {
-                Ok(sprite) => sprite,
-                Err(e) => {
-                    panic!("Unable to find sprite: '{}': {}", id, e);
-                }
+        RESOURCE_SET.with(|r| match r.borrow().sprite_internal(id) {
+            Ok(sprite) => sprite,
+            Err(e) => {
+                panic!("Unable to find sprite: '{}': {}", id, e);
             }
         })
     }

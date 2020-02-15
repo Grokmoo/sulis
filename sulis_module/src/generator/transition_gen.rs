@@ -202,10 +202,13 @@ impl TransitionParams {
                 ),
             };
 
-            let size = module.sizes.get(&kind.size).ok_or(Error::new(
-                ErrorKind::InvalidInput,
-                format!("Invalid size '{}'", kind.size),
-            ))?;
+            let kind_size = kind.size;
+            let size = module.sizes.get(&kind_size).ok_or_else(|| {
+                Error::new(
+                    ErrorKind::InvalidInput,
+                    format!("Invalid size '{}'", kind_size),
+                )
+            })?;
 
             kinds.insert(
                 id,

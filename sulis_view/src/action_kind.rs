@@ -567,7 +567,9 @@ impl AttackAction {
             pc.actor.stats.attack_cost
         };
 
-        if target.borrow().actor.stats.hidden { return None; }
+        if target.borrow().actor.stats.hidden {
+            return None;
+        }
 
         if can_attack(&*pc.borrow(), &*target.borrow()) {
             Some(Box::new(AttackAction { pc, target, ap }))

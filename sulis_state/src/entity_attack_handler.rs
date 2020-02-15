@@ -74,10 +74,12 @@ fn is_flanking(parent: &EntityState, target: &EntityState) -> bool {
     false
 }
 
+type AttackResult = Vec<(HitKind, HitFlags, Vec<(DamageKind, u32)>)>;
+
 pub fn weapon_attack(
     parent: &Rc<RefCell<EntityState>>,
     target: &Rc<RefCell<EntityState>>,
-) -> Vec<(HitKind, HitFlags, Vec<(DamageKind, u32)>)> {
+) -> AttackResult {
     if target.borrow_mut().actor.hp() <= 0 {
         return vec![(HitKind::Miss, HitFlags::default(), Vec::new())];
     }

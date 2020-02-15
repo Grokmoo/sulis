@@ -22,11 +22,13 @@ use crate::Module;
 use sulis_core::config::Config;
 use sulis_core::util::{gen_rand, Point};
 
+type PositionedTile = (Point, Rc<Tile>);
+
 pub struct TilesModel {
     pub grid_width: i32,
     pub grid_height: i32,
 
-    tiles: Vec<(String, Vec<(Point, Rc<Tile>)>)>,
+    tiles: Vec<(String, Vec<PositionedTile>)>,
 
     elevation: Vec<u8>,
 
@@ -147,7 +149,7 @@ impl TilesModel {
         y: i32,
         width: i32,
         height: i32,
-    ) -> Vec<(Point, Rc<Tile>)> {
+    ) -> Vec<PositionedTile> {
         let mut within = Vec::new();
 
         for &(ref cur_layer_id, ref tiles) in self.tiles.iter() {

@@ -31,6 +31,7 @@ pub struct SimpleImage {
 }
 
 impl SimpleImage {
+    #[allow(clippy::new_ret_no_self)]
     pub fn new(
         builder: SimpleImageBuilder,
         resources: &ResourceSet,

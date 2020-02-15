@@ -27,6 +27,8 @@ use crate::widgets::Label;
 
 const NAME: &str = "input_field";
 
+type KeyPressCallback = Rc<dyn Fn(&Rc<RefCell<Widget>>, &mut InputField, InputAction)>;
+
 pub struct InputField {
     pub text: String,
     label: Rc<RefCell<Label>>,
@@ -35,7 +37,7 @@ pub struct InputField {
     carat_height: f32,
     carat_offset: f32,
     enter_callback: Option<Callback>,
-    key_press_callback: Option<Rc<dyn Fn(&Rc<RefCell<Widget>>, &mut InputField, InputAction)>>,
+    key_press_callback: Option<KeyPressCallback>,
     ignore_next: bool, // hack to prevent console from receiving a character
 }
 
@@ -58,10 +60,7 @@ impl InputField {
         self.ignore_next = true;
     }
 
-    pub fn set_key_press_callback(
-        &mut self,
-        cb: Rc<dyn Fn(&Rc<RefCell<Widget>>, &mut InputField, InputAction)>,
-    ) {
+    pub fn set_key_press_callback(&mut self, cb: KeyPressCallback) {
         self.key_press_callback = Some(cb);
     }
 

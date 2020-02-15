@@ -62,6 +62,8 @@ impl Default for AnimState {
     }
 }
 
+type BoxedCB = Box<dyn ScriptCallback>;
+
 impl AnimState {
     pub fn new() -> AnimState {
         AnimState {
@@ -81,11 +83,7 @@ impl AnimState {
     /// Returns two vecs, the first is the list of animations that should be `on_anim_update`,
     /// the second is the list that should be `on_anim_complete`
     #[must_use]
-    pub fn update(
-        &mut self,
-        to_add: Vec<Anim>,
-        elapsed: u32,
-    ) -> (Vec<Box<dyn ScriptCallback>>, Vec<Box<dyn ScriptCallback>>) {
+    pub fn update(&mut self, to_add: Vec<Anim>, elapsed: u32) -> (Vec<BoxedCB>, Vec<BoxedCB>) {
         let mut update_cbs = Vec::new();
         let mut complete_cbs = Vec::new();
 
@@ -328,8 +326,8 @@ pub(in crate::animation) enum AnimKind {
     /// A particle effect from a script - can also be used for simple
     /// single image animations
     ParticleGenerator {
-        model: GeneratorModel,
-        state: GeneratorState,
+        model: Box<GeneratorModel>,
+        state: Box<GeneratorState>,
     },
 
     /// Animation triggered when an entity is killed
@@ -439,7 +437,10 @@ impl Anim {
         Anim::new(
             owner,
             duration_millis,
-            AnimKind::ParticleGenerator { model, state },
+            AnimKind::ParticleGenerator {
+                model: Box::new(model),
+                state: Box::new(state),
+            },
         )
     }
 

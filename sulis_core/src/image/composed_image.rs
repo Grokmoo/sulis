@@ -78,6 +78,7 @@ fn get_images_from_inline(
 }
 
 impl ComposedImage {
+    #[allow(clippy::new_ret_no_self)]
     pub fn new(
         builder: ComposedImageBuilder,
         resources: &mut ResourceSet,

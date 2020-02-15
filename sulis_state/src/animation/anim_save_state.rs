@@ -44,9 +44,7 @@ impl AnimSaveState {
                 color: *color,
                 color_sec: *color_sec,
             },
-            AnimKind::EntityScale { scale } => Kind::EntityScale {
-                scale: *scale,
-            },
+            AnimKind::EntityScale { scale } => Kind::EntityScale { scale: *scale },
             AnimKind::EntityImageLayer { images } => {
                 let mut imgs = HashMap::new();
                 for (layer, image) in images.iter() {
@@ -72,7 +70,7 @@ impl AnimSaveState {
 
                 Kind::ParticleGenerator {
                     model: model.clone(),
-                    state,
+                    state: Box::new(state),
                 }
             }
             _ => {
@@ -139,7 +137,7 @@ impl AnimSaveState {
                     previous_secs: state.previous_secs,
                 };
 
-                Anim::new_pgen(&entity, self.duration_millis, model, state)
+                Anim::new_pgen(&entity, self.duration_millis, *model, state)
             }
         };
 
@@ -173,8 +171,8 @@ enum Kind {
         color_sec: [Param; 4],
     },
     ParticleGenerator {
-        model: GeneratorModel,
-        state: GeneratorSaveState,
+        model: Box<GeneratorModel>,
+        state: Box<GeneratorSaveState>,
     },
     EntityScale {
         scale: Param,

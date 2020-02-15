@@ -226,7 +226,11 @@ impl PathFinder {
 
                 if let Some(max_path_len) = dest.max_path_len {
                     if path.len() > max_path_len as usize {
-                        debug!("Found path with too many moves: {} > {}", path.len(), max_path_len);
+                        debug!(
+                            "Found path with too many moves: {} > {}",
+                            path.len(),
+                            max_path_len
+                        );
                         return None;
                     }
                 }

@@ -37,11 +37,13 @@ pub struct FeatureEntry {
     tiles: HashMap<String, Vec<Point>>,
 }
 
+type PositionedTile = (Rc<Tile>, Point);
+
 pub struct Feature {
     pub id: String,
     pub size: Size,
-    entries: Vec<(Vec<(Rc<Tile>, Point)>, u32)>,
-    pub preview: Vec<(Rc<Tile>, Point)>,
+    entries: Vec<(Vec<PositionedTile>, u32)>,
+    pub preview: Vec<PositionedTile>,
 }
 
 impl Feature {
@@ -82,7 +84,7 @@ impl Feature {
         })
     }
 
-    pub fn rand_entry(&self) -> &[(Rc<Tile>, Point)] {
+    pub fn rand_entry(&self) -> &[PositionedTile] {
         if self.entries.len() == 1 {
             &self.entries[0].0
         } else {

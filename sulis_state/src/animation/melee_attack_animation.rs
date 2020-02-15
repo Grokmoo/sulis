@@ -106,12 +106,7 @@ pub(in crate::animation) struct MeleeAttackAnimModel {
     callbacks: Vec<Box<dyn ScriptCallback>>,
     vector: (f32, f32),
     pub(in crate::animation) has_attacked: bool,
-    attack_func: Box<
-        dyn Fn(
-            &RcRfc<EntityState>,
-            &RcRfc<EntityState>,
-        ) -> Vec<(HitKind, HitFlags, Vec<(DamageKind, u32)>)>,
-    >,
+    attack_func: Box<dyn Fn(&Entity, &Entity) -> AttackResult>,
 }
 
 pub fn new(

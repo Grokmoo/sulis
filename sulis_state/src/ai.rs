@@ -14,13 +14,12 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::cell::RefCell;
 use std::rc::Rc;
 
 use rlua;
 
 use crate::script::script_callback;
-use crate::{animation::Anim, EntityState, GameState, Script};
+use crate::{animation::Anim, EntityState, GameState, Script, RcRfc};
 use sulis_core::config::Config;
 
 pub struct AI {
@@ -42,7 +41,7 @@ impl AI {
         }
     }
 
-    pub fn update(&mut self, entity: Rc<RefCell<EntityState>>) {
+    pub fn update(&mut self, entity: RcRfc<EntityState>) {
         if GameState::is_modal_locked() {
             return;
         }
@@ -104,13 +103,13 @@ const MAX_ACTIONS: u32 = 10;
 const MAX_WAIT_TIME: u32 = 200;
 
 struct EntityAI {
-    entity: Rc<RefCell<EntityState>>,
+    entity: RcRfc<EntityState>,
     actions_taken_this_turn: u32,
     cur_wait_time: u32,
 }
 
 impl EntityAI {
-    fn new(entity: &Rc<RefCell<EntityState>>) -> EntityAI {
+    fn new(entity: &RcRfc<EntityState>) -> EntityAI {
         EntityAI {
             entity: Rc::clone(entity),
             actions_taken_this_turn: 0,

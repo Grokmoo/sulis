@@ -25,7 +25,7 @@ pub use self::input_action::InputAction;
 pub mod keyboard_event;
 pub use self::keyboard_event::KeyboardEvent;
 
-use std::cell::{Ref, RefCell};
+use std::cell::Ref;
 use std::io::Error;
 use std::rc::Rc;
 
@@ -33,7 +33,7 @@ use crate::extern_image::{ImageBuffer, Rgba};
 
 use crate::config::{Config, IOAdapter};
 use crate::resource::Sprite;
-use crate::ui::{Color, Widget};
+use crate::ui::{Color, Widget, RcRfc};
 use crate::util::{Point, Size};
 
 #[derive(Debug, Clone)]
@@ -44,13 +44,13 @@ pub struct DisplayConfiguration {
 }
 
 pub trait MainLoopUpdater {
-    fn update(&self, root: &Rc<RefCell<Widget>>, millis: u32);
+    fn update(&self, root: &RcRfc<Widget>, millis: u32);
 
     fn is_exit(&self) -> bool;
 }
 
 pub trait IO {
-    fn process_input(&mut self, root: Rc<RefCell<Widget>>);
+    fn process_input(&mut self, root: RcRfc<Widget>);
 
     fn render_output(&mut self, root: Ref<Widget>, millis: u32);
 

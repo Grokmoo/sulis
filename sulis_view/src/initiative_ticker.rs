@@ -20,7 +20,7 @@ use std::rc::Rc;
 
 use sulis_core::io::event::ClickKind;
 use sulis_core::io::GraphicsRenderer;
-use sulis_core::ui::{Widget, WidgetKind};
+use sulis_core::ui::{Widget, WidgetKind, RcRfc};
 use sulis_core::util::Point;
 use sulis_state::{ChangeListener, EntityState, GameState};
 
@@ -29,7 +29,7 @@ pub const NAME: &str = "initiative_ticker";
 pub struct InitiativeTicker {}
 
 impl InitiativeTicker {
-    pub fn new() -> Rc<RefCell<InitiativeTicker>> {
+    pub fn new() -> RcRfc<InitiativeTicker> {
         Rc::new(RefCell::new(InitiativeTicker {}))
     }
 }
@@ -37,24 +37,24 @@ impl InitiativeTicker {
 impl WidgetKind for InitiativeTicker {
     widget_kind!(NAME);
 
-    fn on_mouse_enter(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
+    fn on_mouse_enter(&mut self, widget: &RcRfc<Widget>) -> bool {
         self.super_on_mouse_enter(widget);
         false
     }
 
-    fn on_mouse_press(&mut self, widget: &Rc<RefCell<Widget>>, kind: ClickKind) -> bool {
+    fn on_mouse_press(&mut self, widget: &RcRfc<Widget>, kind: ClickKind) -> bool {
         self.super_on_mouse_press(widget, kind);
         false
     }
 
-    fn on_mouse_release(&mut self, widget: &Rc<RefCell<Widget>>, kind: ClickKind) -> bool {
+    fn on_mouse_release(&mut self, widget: &RcRfc<Widget>, kind: ClickKind) -> bool {
         self.super_on_mouse_release(widget, kind);
         false
     }
 
     fn on_mouse_drag(
         &mut self,
-        _widget: &Rc<RefCell<Widget>>,
+        _widget: &RcRfc<Widget>,
         _kind: ClickKind,
         _delta_x: f32,
         _delta_y: f32,
@@ -62,7 +62,7 @@ impl WidgetKind for InitiativeTicker {
         false
     }
 
-    fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+    fn on_add(&mut self, widget: &RcRfc<Widget>) -> Vec<RcRfc<Widget>> {
         widget.borrow_mut().state.set_enabled(false);
 
         let mgr = GameState::turn_manager();
@@ -84,11 +84,11 @@ impl WidgetKind for InitiativeTicker {
 }
 
 struct TickerLabel {
-    entity: Rc<RefCell<EntityState>>,
+    entity: RcRfc<EntityState>,
 }
 
 impl TickerLabel {
-    fn new(entity: &Rc<RefCell<EntityState>>) -> Rc<RefCell<TickerLabel>> {
+    fn new(entity: &RcRfc<EntityState>) -> RcRfc<TickerLabel> {
         Rc::new(RefCell::new(TickerLabel {
             entity: Rc::clone(entity),
         }))

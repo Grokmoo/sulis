@@ -19,19 +19,19 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 use sulis_core::io::GraphicsRenderer;
-use sulis_core::ui::{Widget, WidgetKind};
+use sulis_core::ui::{Widget, WidgetKind, RcRfc};
 use sulis_core::util::Point;
 use sulis_core::widgets::TextArea;
 
 const NAME: &str = "prop_mouseover";
 
 pub struct BasicMouseover {
-    text_area: Rc<RefCell<TextArea>>,
+    text_area: RcRfc<TextArea>,
     text: String,
 }
 
 impl BasicMouseover {
-    pub fn new(text: &str) -> Rc<RefCell<BasicMouseover>> {
+    pub fn new(text: &str) -> RcRfc<BasicMouseover> {
         Rc::new(RefCell::new(BasicMouseover {
             text_area: TextArea::empty(),
             text: text.to_string(),

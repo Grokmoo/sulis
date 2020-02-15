@@ -20,13 +20,13 @@ use std::rc::Rc;
 
 use crate::io::event::ClickKind;
 use crate::io::{keyboard_event::Key, GraphicsRenderer, InputAction};
-use crate::ui::{animation_state, Cursor, Widget};
+use crate::ui::{animation_state, Cursor, Widget, RcRfc};
 use crate::util::Point;
 
 pub(crate) struct EmptyWidget {}
 
 impl EmptyWidget {
-    pub fn new() -> Rc<RefCell<EmptyWidget>> {
+    pub fn new() -> RcRfc<EmptyWidget> {
         Rc::new(RefCell::new(EmptyWidget {}))
     }
 }
@@ -34,19 +34,19 @@ impl EmptyWidget {
 impl WidgetKind for EmptyWidget {
     widget_kind!["content"];
 
-    fn on_mouse_press(&mut self, widget: &Rc<RefCell<Widget>>, kind: ClickKind) -> bool {
+    fn on_mouse_press(&mut self, widget: &RcRfc<Widget>, kind: ClickKind) -> bool {
         self.super_on_mouse_press(widget, kind);
         false
     }
 
-    fn on_mouse_release(&mut self, widget: &Rc<RefCell<Widget>>, kind: ClickKind) -> bool {
+    fn on_mouse_release(&mut self, widget: &RcRfc<Widget>, kind: ClickKind) -> bool {
         self.super_on_mouse_release(widget, kind);
         false
     }
 
     fn on_mouse_drag(
         &mut self,
-        _widget: &Rc<RefCell<Widget>>,
+        _widget: &RcRfc<Widget>,
         _kind: ClickKind,
         _delta_x: f32,
         _delta_y: f32,
@@ -56,19 +56,19 @@ impl WidgetKind for EmptyWidget {
 
     fn on_mouse_move(
         &mut self,
-        _widget: &Rc<RefCell<Widget>>,
+        _widget: &RcRfc<Widget>,
         _delta_x: f32,
         _delta_y: f32,
     ) -> bool {
         true
     }
 
-    fn on_mouse_enter(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
+    fn on_mouse_enter(&mut self, widget: &RcRfc<Widget>) -> bool {
         self.super_on_mouse_enter(widget);
         false
     }
 
-    fn on_mouse_exit(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
+    fn on_mouse_exit(&mut self, widget: &RcRfc<Widget>) -> bool {
         self.super_on_mouse_exit(widget);
         false
     }
@@ -78,7 +78,7 @@ impl WidgetKind for EmptyWidget {
 /// object which contains the common functionality across all Widgets.
 pub trait WidgetKind {
     /// called every frame
-    fn update(&mut self, _widget: &Rc<RefCell<Widget>>, _millis: u32) {}
+    fn update(&mut self, _widget: &RcRfc<Widget>, _millis: u32) {}
 
     fn draw(
         &mut self,
@@ -114,7 +114,7 @@ pub trait WidgetKind {
     /// parent widget.  If you implement this but do not need to add any children,
     /// returning 'Vec::new()' is best.
     /// Widgets are added according to their order in the vector.
-    fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+    fn on_add(&mut self, _widget: &RcRfc<Widget>) -> Vec<RcRfc<Widget>> {
         Vec::with_capacity(0)
     }
 
@@ -123,9 +123,9 @@ pub trait WidgetKind {
     /// when a widget is removed from the tree.  Note that this is called when
     /// the actual removal takes place, not when the widget is first marked
     /// for removal.
-    fn on_remove(&mut self, _widget: &Rc<RefCell<Widget>>) {}
+    fn on_remove(&mut self, _widget: &RcRfc<Widget>) {}
 
-    fn super_on_mouse_press(&self, widget: &Rc<RefCell<Widget>>, _kind: ClickKind) {
+    fn super_on_mouse_press(&self, widget: &RcRfc<Widget>, _kind: ClickKind) {
         widget
             .borrow_mut()
             .state
@@ -139,7 +139,7 @@ pub trait WidgetKind {
         }
     }
 
-    fn super_on_mouse_release(&self, widget: &Rc<RefCell<Widget>>, _kind: ClickKind) {
+    fn super_on_mouse_release(&self, widget: &RcRfc<Widget>, _kind: ClickKind) {
         widget
             .borrow_mut()
             .state
@@ -159,19 +159,19 @@ pub trait WidgetKind {
         }
     }
 
-    fn on_mouse_press(&mut self, widget: &Rc<RefCell<Widget>>, kind: ClickKind) -> bool {
+    fn on_mouse_press(&mut self, widget: &RcRfc<Widget>, kind: ClickKind) -> bool {
         self.super_on_mouse_press(widget, kind);
         true
     }
 
-    fn on_mouse_release(&mut self, widget: &Rc<RefCell<Widget>>, kind: ClickKind) -> bool {
+    fn on_mouse_release(&mut self, widget: &RcRfc<Widget>, kind: ClickKind) -> bool {
         self.super_on_mouse_release(widget, kind);
         true
     }
 
     fn on_mouse_drag(
         &mut self,
-        _widget: &Rc<RefCell<Widget>>,
+        _widget: &RcRfc<Widget>,
         _kind: ClickKind,
         _delta_x: f32,
         _delta_y: f32,
@@ -181,36 +181,36 @@ pub trait WidgetKind {
 
     fn on_mouse_move(
         &mut self,
-        _widget: &Rc<RefCell<Widget>>,
+        _widget: &RcRfc<Widget>,
         _delta_x: f32,
         _delta_y: f32,
     ) -> bool {
         true
     }
 
-    fn on_mouse_enter(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
+    fn on_mouse_enter(&mut self, widget: &RcRfc<Widget>) -> bool {
         self.super_on_mouse_enter(widget);
         true
     }
 
-    fn on_mouse_exit(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
+    fn on_mouse_exit(&mut self, widget: &RcRfc<Widget>) -> bool {
         self.super_on_mouse_exit(widget);
         true
     }
 
-    fn on_raw_key(&mut self, _widget: &Rc<RefCell<Widget>>, _key: Key) -> bool {
+    fn on_raw_key(&mut self, _widget: &RcRfc<Widget>, _key: Key) -> bool {
         false
     }
 
-    fn on_key_press(&mut self, _widget: &Rc<RefCell<Widget>>, _key: InputAction) -> bool {
+    fn on_key_press(&mut self, _widget: &RcRfc<Widget>, _key: InputAction) -> bool {
         false
     }
 
-    fn on_char_typed(&mut self, _widget: &Rc<RefCell<Widget>>, _c: char) -> bool {
+    fn on_char_typed(&mut self, _widget: &RcRfc<Widget>, _c: char) -> bool {
         false
     }
 
-    fn super_on_mouse_enter(&self, widget: &Rc<RefCell<Widget>>) {
+    fn super_on_mouse_enter(&self, widget: &RcRfc<Widget>) {
         let mut widget = widget.borrow_mut();
         widget.state.set_mouse_inside(true);
         widget
@@ -224,7 +224,7 @@ pub trait WidgetKind {
         );
     }
 
-    fn super_on_mouse_exit(&self, widget: &Rc<RefCell<Widget>>) {
+    fn super_on_mouse_exit(&self, widget: &RcRfc<Widget>) {
         let mut widget = widget.borrow_mut();
         widget.state.set_mouse_inside(false);
         widget

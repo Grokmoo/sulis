@@ -18,7 +18,7 @@ use std::any::Any;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use sulis_core::ui::{Callback, Widget, WidgetKind};
+use sulis_core::ui::{Callback, Widget, WidgetKind, RcRfc};
 use sulis_core::widgets::{list_box, Label, ListBox};
 
 pub const NAME: &str = "item_action_menu";
@@ -28,7 +28,7 @@ pub struct ItemActionMenu {
 }
 
 impl ItemActionMenu {
-    pub fn new() -> Rc<RefCell<ItemActionMenu>> {
+    pub fn new() -> RcRfc<ItemActionMenu> {
         Rc::new(RefCell::new(ItemActionMenu {
             actions: Vec::new(),
         }))
@@ -42,7 +42,7 @@ impl ItemActionMenu {
 impl WidgetKind for ItemActionMenu {
     widget_kind!(NAME);
 
-    fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+    fn on_add(&mut self, _widget: &RcRfc<Widget>) -> Vec<RcRfc<Widget>> {
         let title = Widget::with_theme(Label::empty(), "title");
 
         let mut entries: Vec<list_box::Entry<String>> = Vec::new();

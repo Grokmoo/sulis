@@ -20,13 +20,13 @@ use std::rc::Rc;
 use std::time::Instant;
 
 use crate::io::{event, GraphicsRenderer};
-use crate::ui::{theme, LineRenderer, Widget, WidgetKind};
+use crate::ui::{theme, LineRenderer, Widget, WidgetKind, RcRfc};
 use crate::util::{self, Point};
 use crate::widget_kind;
 use crate::widgets::{Label, TextArea};
 
 pub struct Button {
-    label: Rc<RefCell<Label>>,
+    label: RcRfc<Label>,
     mouse_pressed_time: Option<Instant>,
     last_repeat_time: Option<Instant>,
     repeat_init_time: u32,
@@ -35,7 +35,7 @@ pub struct Button {
 }
 
 impl Button {
-    pub fn empty() -> Rc<RefCell<Button>> {
+    pub fn empty() -> RcRfc<Button> {
         Rc::new(RefCell::new(Button {
             label: Label::empty(),
             mouse_pressed_time: None,
@@ -46,7 +46,7 @@ impl Button {
         }))
     }
 
-    pub fn with_text(text: &str) -> Rc<RefCell<Button>> {
+    pub fn with_text(text: &str) -> RcRfc<Button> {
         Rc::new(RefCell::new(Button {
             label: Label::new(text),
             mouse_pressed_time: None,
@@ -61,7 +61,7 @@ impl Button {
 impl WidgetKind for Button {
     widget_kind!["button"];
 
-    fn update(&mut self, widget: &Rc<RefCell<Widget>>, _millis: u32) {
+    fn update(&mut self, widget: &RcRfc<Widget>, _millis: u32) {
         if self.repeat_time == 0 {
             return;
         }
@@ -120,7 +120,7 @@ impl WidgetKind for Button {
 
     // TODO refactor tooltip code into a common case somewhere - can probably
     // also include item button, ability button
-    fn on_mouse_move(&mut self, widget: &Rc<RefCell<Widget>>, _dx: f32, _dy: f32) -> bool {
+    fn on_mouse_move(&mut self, widget: &RcRfc<Widget>, _dx: f32, _dy: f32) -> bool {
         if self.tooltip.is_empty() {
             return false;
         }
@@ -138,14 +138,14 @@ impl WidgetKind for Button {
         true
     }
 
-    fn on_mouse_press(&mut self, widget: &Rc<RefCell<Widget>>, kind: event::ClickKind) -> bool {
+    fn on_mouse_press(&mut self, widget: &RcRfc<Widget>, kind: event::ClickKind) -> bool {
         self.super_on_mouse_press(widget, kind);
 
         self.mouse_pressed_time = Some(Instant::now());
         true
     }
 
-    fn on_mouse_release(&mut self, widget: &Rc<RefCell<Widget>>, kind: event::ClickKind) -> bool {
+    fn on_mouse_release(&mut self, widget: &RcRfc<Widget>, kind: event::ClickKind) -> bool {
         self.super_on_mouse_release(widget, kind);
         Widget::fire_callback(widget, self);
         self.mouse_pressed_time = None;

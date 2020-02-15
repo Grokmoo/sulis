@@ -14,11 +14,9 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::cell::RefCell;
 use std::f32;
-use std::rc::Rc;
 
-use crate::{EntityState, GameState};
+use crate::{EntityState, GameState, RcRfc};
 use sulis_core::util;
 use sulis_module::area::Destination;
 
@@ -43,7 +41,7 @@ impl Default for Formation {
     }
 }
 
-fn center_of_group(entities: &[Rc<RefCell<EntityState>>]) -> (f32, f32) {
+fn center_of_group(entities: &[RcRfc<EntityState>]) -> (f32, f32) {
     let mut x = 0.0;
     let mut y = 0.0;
 
@@ -74,7 +72,7 @@ impl Formation {
 
     pub fn move_group(
         &self,
-        entities_to_move: &[Rc<RefCell<EntityState>>],
+        entities_to_move: &[RcRfc<EntityState>],
         entities_to_ignore: Vec<usize>,
         dest: Destination,
     ) {

@@ -46,7 +46,7 @@ use std::cell::RefCell;
 use std::collections::HashMap;
 use std::rc::Rc;
 
-use sulis_core::ui::{Callback, Color, Widget, WidgetKind};
+use sulis_core::ui::{Callback, Color, Widget, WidgetKind, RcRfc};
 use sulis_core::widgets::Button;
 use sulis_module::actor::Sex;
 use sulis_module::{
@@ -61,18 +61,18 @@ use crate::main_menu::CharacterSelector;
 pub const NAME: &str = "character_builder";
 
 trait BuilderPane {
-    fn on_selected(&mut self, builder: &mut CharacterBuilder, widget: Rc<RefCell<Widget>>);
+    fn on_selected(&mut self, builder: &mut CharacterBuilder, widget: RcRfc<Widget>);
 
-    fn prev(&mut self, builder: &mut CharacterBuilder, widget: Rc<RefCell<Widget>>);
+    fn prev(&mut self, builder: &mut CharacterBuilder, widget: RcRfc<Widget>);
 
-    fn next(&mut self, builder: &mut CharacterBuilder, widget: Rc<RefCell<Widget>>);
+    fn next(&mut self, builder: &mut CharacterBuilder, widget: RcRfc<Widget>);
 }
 
 pub struct CharacterBuilder {
-    pub(in crate::character_builder) next: Rc<RefCell<Widget>>,
-    pub(in crate::character_builder) prev: Rc<RefCell<Widget>>,
-    pub(in crate::character_builder) finish: Rc<RefCell<Widget>>,
-    builder_panes: Vec<Rc<RefCell<dyn BuilderPane>>>,
+    pub(in crate::character_builder) next: RcRfc<Widget>,
+    pub(in crate::character_builder) prev: RcRfc<Widget>,
+    pub(in crate::character_builder) finish: RcRfc<Widget>,
+    builder_panes: Vec<RcRfc<dyn BuilderPane>>,
     builder_pane_index: usize,
     // we rely on the builder panes in the above vec having the same
     // index in the children vec of this widget
@@ -95,17 +95,17 @@ pub struct CharacterBuilder {
 }
 
 impl CharacterBuilder {
-    pub fn new(char_selector_widget: &Rc<RefCell<Widget>>) -> Rc<RefCell<CharacterBuilder>> {
+    pub fn new(char_selector_widget: &RcRfc<Widget>) -> RcRfc<CharacterBuilder> {
         CharacterBuilder::with(Rc::new(CharacterCreator {
             character_selector_widget: Rc::clone(char_selector_widget),
         }))
     }
 
-    pub fn level_up(pc: Rc<RefCell<EntityState>>) -> Rc<RefCell<CharacterBuilder>> {
+    pub fn level_up(pc: RcRfc<EntityState>) -> RcRfc<CharacterBuilder> {
         CharacterBuilder::with(Rc::new(LevelUpBuilder { pc }))
     }
 
-    fn with(builder_set: Rc<dyn BuilderSet>) -> Rc<RefCell<CharacterBuilder>> {
+    fn with(builder_set: Rc<dyn BuilderSet>) -> RcRfc<CharacterBuilder> {
         let next = Widget::with_theme(Button::empty(), "next");
         next.borrow_mut()
             .state
@@ -162,15 +162,15 @@ impl CharacterBuilder {
         }))
     }
 
-    pub fn next(&mut self, widget: &Rc<RefCell<Widget>>) {
+    pub fn next(&mut self, widget: &RcRfc<Widget>) {
         self.change_index(widget, 1);
     }
 
-    pub fn prev(&mut self, widget: &Rc<RefCell<Widget>>) {
+    pub fn prev(&mut self, widget: &RcRfc<Widget>) {
         self.change_index(widget, -1);
     }
 
-    fn change_index(&mut self, widget: &Rc<RefCell<Widget>>, delta: i32) {
+    fn change_index(&mut self, widget: &RcRfc<Widget>, delta: i32) {
         let cur_child = Rc::clone(&widget.borrow().children[self.builder_pane_index]);
         cur_child.borrow_mut().state.set_visible(false);
 
@@ -193,7 +193,7 @@ impl WidgetKind for CharacterBuilder {
         self
     }
 
-    fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+    fn on_add(&mut self, widget: &RcRfc<Widget>) -> Vec<RcRfc<Widget>> {
         let close = Widget::with_theme(Button::empty(), "close");
         close
             .borrow_mut()
@@ -217,15 +217,15 @@ impl WidgetKind for CharacterBuilder {
 }
 
 struct CharacterCreator {
-    character_selector_widget: Rc<RefCell<Widget>>,
+    character_selector_widget: RcRfc<Widget>,
 }
 
 impl BuilderSet for CharacterCreator {
     fn on_add(
         &self,
         builder: &mut CharacterBuilder,
-        _widget: &Rc<RefCell<Widget>>,
-    ) -> Vec<Rc<RefCell<Widget>>> {
+        _widget: &RcRfc<Widget>,
+    ) -> Vec<RcRfc<Widget>> {
         let class_choices = Module::rules().selectable_classes.clone();
 
         let race_selector_pane = RaceSelectorPane::new();
@@ -264,7 +264,7 @@ impl BuilderSet for CharacterCreator {
         ]
     }
 
-    fn finish(&self, builder: &mut CharacterBuilder, _widget: &Rc<RefCell<Widget>>) {
+    fn finish(&self, builder: &mut CharacterBuilder, _widget: &RcRfc<Widget>) {
         let (filename, id) = match get_character_export_filename(&builder.name) {
             Err(e) => {
                 warn!("{}", e);
@@ -349,8 +349,8 @@ pub trait BuilderSet {
     fn on_add(
         &self,
         builder: &mut CharacterBuilder,
-        widget: &Rc<RefCell<Widget>>,
-    ) -> Vec<Rc<RefCell<Widget>>>;
+        widget: &RcRfc<Widget>,
+    ) -> Vec<RcRfc<Widget>>;
 
-    fn finish(&self, builder: &mut CharacterBuilder, widget: &Rc<RefCell<Widget>>);
+    fn finish(&self, builder: &mut CharacterBuilder, widget: &RcRfc<Widget>);
 }

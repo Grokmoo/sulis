@@ -18,7 +18,7 @@ use std::any::Any;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use sulis_core::ui::{Widget, WidgetKind};
+use sulis_core::ui::{Widget, WidgetKind, RcRfc};
 use sulis_core::widgets::Label;
 
 pub const NAME: &str = "loading_screen";
@@ -26,7 +26,7 @@ pub const NAME: &str = "loading_screen";
 pub struct LoadingScreen {}
 
 impl LoadingScreen {
-    pub fn new() -> Rc<RefCell<LoadingScreen>> {
+    pub fn new() -> RcRfc<LoadingScreen> {
         Rc::new(RefCell::new(LoadingScreen {}))
     }
 }
@@ -44,7 +44,7 @@ impl WidgetKind for LoadingScreen {
         self
     }
 
-    fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+    fn on_add(&mut self, _widget: &RcRfc<Widget>) -> Vec<RcRfc<Widget>> {
         let loading_label = Widget::with_theme(Label::empty(), "loading_label");
         let background = Widget::empty("background");
         vec![background, loading_label]

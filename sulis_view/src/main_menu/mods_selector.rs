@@ -34,7 +34,7 @@ pub struct ModsSelector {
 }
 
 impl ModsSelector {
-    pub fn new(mods: Vec<ModificationInfo>) -> Rc<RefCell<ModsSelector>> {
+    pub fn new(mods: Vec<ModificationInfo>) -> RcRfc<ModsSelector> {
         let mut available_mods = Vec::new();
         let mut active_mods = Vec::new();
 
@@ -65,7 +65,7 @@ impl ModsSelector {
 impl WidgetKind for ModsSelector {
     widget_kind!("mods_selector");
 
-    fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+    fn on_add(&mut self, _widget: &RcRfc<Widget>) -> Vec<RcRfc<Widget>> {
         let title = Widget::with_theme(Label::empty(), "title");
         let available_title = Widget::with_theme(Label::empty(), "available_title");
         let active_title = Widget::with_theme(Label::empty(), "active_title");
@@ -164,7 +164,7 @@ impl ModPane {
         active: bool,
         index: usize,
         vec_len: usize,
-    ) -> Rc<RefCell<ModPane>> {
+    ) -> RcRfc<ModPane> {
         Rc::new(RefCell::new(ModPane {
             modif,
             active,
@@ -177,7 +177,7 @@ impl ModPane {
 impl WidgetKind for ModPane {
     widget_kind!("mod_pane");
 
-    fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+    fn on_add(&mut self, _widget: &RcRfc<Widget>) -> Vec<RcRfc<Widget>> {
         let description = Widget::with_theme(TextArea::empty(), "description");
 
         {

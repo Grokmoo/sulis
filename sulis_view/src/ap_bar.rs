@@ -19,7 +19,7 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 use sulis_core::io::event::ClickKind;
-use sulis_core::ui::{Widget, WidgetKind};
+use sulis_core::ui::{Widget, WidgetKind, RcRfc};
 use sulis_core::widgets::ProgressBar;
 use sulis_module::{Module, OnTrigger};
 use sulis_state::{ChangeListener, EntityState, GameState};
@@ -28,7 +28,7 @@ use crate::RootView;
 
 pub const NAME: &str = "ap_bar";
 
-pub fn check_end_turn(widget: &Rc<RefCell<Widget>>) {
+pub fn check_end_turn(widget: &RcRfc<Widget>) {
     let mut end_turn = false;
     {
         let mgr = GameState::turn_manager();
@@ -58,11 +58,11 @@ pub fn check_end_turn(widget: &Rc<RefCell<Widget>>) {
 }
 
 pub struct ApBar {
-    entity: Rc<RefCell<EntityState>>,
+    entity: RcRfc<EntityState>,
 }
 
 impl ApBar {
-    pub fn new(entity: Rc<RefCell<EntityState>>) -> Rc<RefCell<ApBar>> {
+    pub fn new(entity: RcRfc<EntityState>) -> RcRfc<ApBar> {
         Rc::new(RefCell::new(ApBar { entity }))
     }
 }
@@ -70,19 +70,19 @@ impl ApBar {
 impl WidgetKind for ApBar {
     widget_kind!(NAME);
 
-    fn on_mouse_press(&mut self, widget: &Rc<RefCell<Widget>>, kind: ClickKind) -> bool {
+    fn on_mouse_press(&mut self, widget: &RcRfc<Widget>, kind: ClickKind) -> bool {
         self.super_on_mouse_press(widget, kind);
         false
     }
 
-    fn on_mouse_release(&mut self, widget: &Rc<RefCell<Widget>>, kind: ClickKind) -> bool {
+    fn on_mouse_release(&mut self, widget: &RcRfc<Widget>, kind: ClickKind) -> bool {
         self.super_on_mouse_release(widget, kind);
         false
     }
 
     fn on_mouse_drag(
         &mut self,
-        _widget: &Rc<RefCell<Widget>>,
+        _widget: &RcRfc<Widget>,
         _kind: ClickKind,
         _delta_x: f32,
         _delta_y: f32,
@@ -90,7 +90,7 @@ impl WidgetKind for ApBar {
         false
     }
 
-    fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+    fn on_add(&mut self, widget: &RcRfc<Widget>) -> Vec<RcRfc<Widget>> {
         let visible = GameState::is_current(&self.entity);
 
         let mut entity = self.entity.borrow_mut();

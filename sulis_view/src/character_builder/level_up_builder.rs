@@ -14,25 +14,24 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::cell::RefCell;
 use std::rc::Rc;
 
-use sulis_core::ui::Widget;
+use sulis_core::ui::{Widget, RcRfc};
 use sulis_module::Actor;
 use sulis_state::EntityState;
 
 use crate::character_builder::*;
 
 pub struct LevelUpBuilder {
-    pub pc: Rc<RefCell<EntityState>>,
+    pub pc: RcRfc<EntityState>,
 }
 
 impl BuilderSet for LevelUpBuilder {
     fn on_add(
         &self,
         builder: &mut CharacterBuilder,
-        _widget: &Rc<RefCell<Widget>>,
-    ) -> Vec<Rc<RefCell<Widget>>> {
+        _widget: &RcRfc<Widget>,
+    ) -> Vec<RcRfc<Widget>> {
         let mut children = Vec::new();
 
         let (choices, level) = {
@@ -89,7 +88,7 @@ impl BuilderSet for LevelUpBuilder {
         children
     }
 
-    fn finish(&self, builder: &mut CharacterBuilder, _widget: &Rc<RefCell<Widget>>) {
+    fn finish(&self, builder: &mut CharacterBuilder, _widget: &RcRfc<Widget>) {
         let class = match builder.class {
             None => return,
             Some(ref class) => Rc::clone(class),

@@ -18,7 +18,7 @@ use std::any::Any;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use sulis_core::ui::{Widget, WidgetKind};
+use sulis_core::ui::{Widget, WidgetKind, RcRfc};
 use sulis_core::widgets::TextArea;
 use sulis_module::Class;
 
@@ -29,11 +29,11 @@ pub struct ClassPane {
 }
 
 impl ClassPane {
-    pub fn empty() -> Rc<RefCell<ClassPane>> {
+    pub fn empty() -> RcRfc<ClassPane> {
         Rc::new(RefCell::new(ClassPane { class: None }))
     }
 
-    pub fn new(class: Rc<Class>) -> Rc<RefCell<ClassPane>> {
+    pub fn new(class: Rc<Class>) -> RcRfc<ClassPane> {
         Rc::new(RefCell::new(ClassPane { class: Some(class) }))
     }
 
@@ -57,7 +57,7 @@ impl WidgetKind for ClassPane {
         self
     }
 
-    fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+    fn on_add(&mut self, _widget: &RcRfc<Widget>) -> Vec<RcRfc<Widget>> {
         let class = match self.class {
             None => return Vec::new(),
             Some(ref class) => class,

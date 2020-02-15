@@ -18,7 +18,7 @@ use std::any::Any;
 use std::cell::{Cell, RefCell};
 use std::rc::Rc;
 
-use sulis_core::ui::{Callback, Widget, WidgetKind};
+use sulis_core::ui::{Callback, Widget, WidgetKind, RcRfc};
 use sulis_core::widgets::Button;
 use sulis_state::{ChangeListener, EntityState, GameState};
 
@@ -28,12 +28,12 @@ pub const NAME: &str = "merchant_window";
 
 pub struct MerchantWindow {
     merchant_id: String,
-    player: Rc<RefCell<EntityState>>,
+    player: RcRfc<EntityState>,
     filter: Rc<Cell<Filter>>,
 }
 
 impl MerchantWindow {
-    pub fn new(merchant_id: &str, player: Rc<RefCell<EntityState>>) -> Rc<RefCell<MerchantWindow>> {
+    pub fn new(merchant_id: &str, player: RcRfc<EntityState>) -> RcRfc<MerchantWindow> {
         Rc::new(RefCell::new(MerchantWindow {
             merchant_id: merchant_id.to_string(),
             player,
@@ -45,7 +45,7 @@ impl MerchantWindow {
         &self.merchant_id
     }
 
-    pub fn player(&self) -> &Rc<RefCell<EntityState>> {
+    pub fn player(&self) -> &RcRfc<EntityState> {
         &self.player
     }
 }
@@ -57,7 +57,7 @@ impl WidgetKind for MerchantWindow {
         widget.do_base_layout();
     }
 
-    fn on_remove(&mut self, _widget: &Rc<RefCell<Widget>>) {
+    fn on_remove(&mut self, _widget: &RcRfc<Widget>) {
         let area_state = GameState::area_state();
         let mut area_state = area_state.borrow_mut();
 
@@ -66,7 +66,7 @@ impl WidgetKind for MerchantWindow {
         }
     }
 
-    fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+    fn on_add(&mut self, widget: &RcRfc<Widget>) -> Vec<RcRfc<Widget>> {
         {
             let area_state = GameState::area_state();
             let mut area_state = area_state.borrow_mut();

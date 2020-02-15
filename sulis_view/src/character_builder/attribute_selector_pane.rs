@@ -20,7 +20,7 @@ use std::any::Any;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use sulis_core::ui::{Callback, Widget, WidgetKind};
+use sulis_core::ui::{Callback, Widget, WidgetKind, RcRfc};
 use sulis_core::widgets::{Button, Label, Spinner, TextArea};
 use sulis_module::{Ability, Attribute, AttributeList, BonusKind, Class, Module, Race};
 
@@ -39,7 +39,7 @@ pub struct AttributeSelectorPane {
 }
 
 impl AttributeSelectorPane {
-    pub fn new() -> Rc<RefCell<AttributeSelectorPane>> {
+    pub fn new() -> RcRfc<AttributeSelectorPane> {
         let rules = Module::rules();
         let attrs = AttributeList::new(rules.base_attribute as u8);
 
@@ -65,7 +65,7 @@ impl AttributeSelectorPane {
         self.available = rules.builder_attribute_points - total;
     }
 
-    fn set_next_enabled(&mut self, widget: &Rc<RefCell<Widget>>) {
+    fn set_next_enabled(&mut self, widget: &RcRfc<Widget>) {
         self.calculate_available();
 
         let (_, builder) = Widget::parent_mut::<CharacterBuilder>(widget);
@@ -78,7 +78,7 @@ impl AttributeSelectorPane {
 }
 
 impl BuilderPane for AttributeSelectorPane {
-    fn on_selected(&mut self, builder: &mut CharacterBuilder, widget: Rc<RefCell<Widget>>) {
+    fn on_selected(&mut self, builder: &mut CharacterBuilder, widget: RcRfc<Widget>) {
         self.selected_class = builder.class.clone();
         self.selected_race = builder.race.clone();
 
@@ -99,7 +99,7 @@ impl BuilderPane for AttributeSelectorPane {
         widget.borrow_mut().invalidate_children();
     }
 
-    fn next(&mut self, builder: &mut CharacterBuilder, widget: Rc<RefCell<Widget>>) {
+    fn next(&mut self, builder: &mut CharacterBuilder, widget: RcRfc<Widget>) {
         let class = match &self.selected_class {
             None => return,
             Some(ref class) => class,
@@ -116,7 +116,7 @@ impl BuilderPane for AttributeSelectorPane {
         builder.next(&widget);
     }
 
-    fn prev(&mut self, builder: &mut CharacterBuilder, widget: Rc<RefCell<Widget>>) {
+    fn prev(&mut self, builder: &mut CharacterBuilder, widget: RcRfc<Widget>) {
         let rules = Module::rules();
         self.attrs = AttributeList::new(rules.base_attribute as u8);
         self.selected_kit = None;
@@ -135,7 +135,7 @@ impl WidgetKind for AttributeSelectorPane {
         self
     }
 
-    fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+    fn on_add(&mut self, _widget: &RcRfc<Widget>) -> Vec<RcRfc<Widget>> {
         let rules = Module::rules();
         let mut children = Vec::new();
 
@@ -285,7 +285,7 @@ pub struct AbilityButton {
 }
 
 impl AbilityButton {
-    pub fn new(ability: Rc<Ability>, class: Rc<Class>) -> Rc<RefCell<AbilityButton>> {
+    pub fn new(ability: Rc<Ability>, class: Rc<Class>) -> RcRfc<AbilityButton> {
         Rc::new(RefCell::new(AbilityButton { ability, class }))
     }
 }
@@ -293,7 +293,7 @@ impl AbilityButton {
 impl WidgetKind for AbilityButton {
     widget_kind!("ability_button");
 
-    fn on_mouse_move(&mut self, widget: &Rc<RefCell<Widget>>, _dx: f32, _dy: f32) -> bool {
+    fn on_mouse_move(&mut self, widget: &RcRfc<Widget>, _dx: f32, _dy: f32) -> bool {
         let hover = Widget::with_theme(TextArea::empty(), "kit_selector_ability_hover");
         add_hover_text_args(
             &mut hover.borrow_mut().state,

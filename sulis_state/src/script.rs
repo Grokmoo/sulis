@@ -98,14 +98,14 @@ pub mod targeter;
 pub use self::targeter::TargeterData;
 
 use std;
-use std::cell::{Cell, RefCell};
+use std::cell::Cell;
 use std::rc::Rc;
 use std::sync::{Arc, Mutex};
 use std::time;
 
 use rlua::{self, FromLuaMulti, Function, Lua, ToLuaMulti};
 
-use crate::{ai, EntityState, GameState};
+use crate::{ai, EntityState, GameState, RcRfc};
 use sulis_core::util::Point;
 use sulis_module::{Ability, DamageKind, HitKind, Module, QuickSlot};
 
@@ -115,7 +115,7 @@ pub type Result<T> = std::result::Result<T, rlua::Error>;
 pub struct Script {}
 
 impl Script {
-    pub fn ai(parent: &Rc<RefCell<EntityState>>, func: &str) -> ai::State {
+    pub fn ai(parent: &RcRfc<EntityState>, func: &str) -> ai::State {
         match script_cache::ai_script(parent, func) {
             Err(e) => {
                 warn!("Error in lua AI script: '{}'", e);
@@ -125,7 +125,7 @@ impl Script {
         }
     }
 
-    pub fn entity(parent: &Rc<RefCell<EntityState>>, targets: ScriptEntitySet, func: &str) {
+    pub fn entity(parent: &RcRfc<EntityState>, targets: ScriptEntitySet, func: &str) {
         let t: Option<usize> = None;
         if let Err(e) = script_cache::entity_script(parent, targets, t, func) {
             warn!("Error in entity script '{}': {}", func, e);
@@ -133,7 +133,7 @@ impl Script {
     }
 
     pub fn entity_with_attack_data(
-        parent: &Rc<RefCell<EntityState>>,
+        parent: &RcRfc<EntityState>,
         targets: ScriptEntitySet,
         kind: HitKind,
         damage: Vec<(DamageKind, u32)>,
@@ -146,7 +146,7 @@ impl Script {
     }
 
     pub fn entity_with_arg<T>(
-        parent: &Rc<RefCell<EntityState>>,
+        parent: &RcRfc<EntityState>,
         targets: ScriptEntitySet,
         arg: T,
         func: &str,
@@ -158,14 +158,14 @@ impl Script {
         }
     }
 
-    pub fn item_on_activate(parent: &Rc<RefCell<EntityState>>, func: String, kind: ScriptItemKind) {
+    pub fn item_on_activate(parent: &RcRfc<EntityState>, func: String, kind: ScriptItemKind) {
         if let Err(e) = script_cache::item_on_activate(parent, func, kind) {
             warn!("Error in item on_activate script: {}", e);
         }
     }
 
     pub fn item(
-        parent: &Rc<RefCell<EntityState>>,
+        parent: &RcRfc<EntityState>,
         kind: ScriptItemKind,
         targets: ScriptEntitySet,
         func: &str,
@@ -177,7 +177,7 @@ impl Script {
     }
 
     pub fn item_with_attack_data(
-        parent: &Rc<RefCell<EntityState>>,
+        parent: &RcRfc<EntityState>,
         i_kind: ScriptItemKind,
         targets: ScriptEntitySet,
         kind: HitKind,
@@ -191,7 +191,7 @@ impl Script {
     }
 
     pub fn item_with_arg<T>(
-        parent: &Rc<RefCell<EntityState>>,
+        parent: &RcRfc<EntityState>,
         i_kind: ScriptItemKind,
         targets: ScriptEntitySet,
         arg: T,
@@ -205,13 +205,13 @@ impl Script {
     }
 
     pub fn item_on_target_select(
-        parent: &Rc<RefCell<EntityState>>,
+        parent: &RcRfc<EntityState>,
         kind: ScriptItemKind,
-        targets: Vec<Option<Rc<RefCell<EntityState>>>>,
+        targets: Vec<Option<RcRfc<EntityState>>>,
         selected_point: Point,
         affected_points: Vec<Point>,
         func: &str,
-        custom_target: Option<Rc<RefCell<EntityState>>>,
+        custom_target: Option<RcRfc<EntityState>>,
     ) {
         if let Err(e) = script_cache::item_on_target_select(
             parent,
@@ -239,13 +239,13 @@ impl Script {
     }
 
     pub fn ability_on_target_select(
-        parent: &Rc<RefCell<EntityState>>,
+        parent: &RcRfc<EntityState>,
         ability: &Rc<Ability>,
-        targets: Vec<Option<Rc<RefCell<EntityState>>>>,
+        targets: Vec<Option<RcRfc<EntityState>>>,
         selected_point: Point,
         affected_points: Vec<Point>,
         func: &str,
-        custom_target: Option<Rc<RefCell<EntityState>>>,
+        custom_target: Option<RcRfc<EntityState>>,
     ) {
         if let Err(e) = script_cache::ability_on_target_select(
             parent,
@@ -261,7 +261,7 @@ impl Script {
     }
 
     pub fn ability_with_attack_data(
-        parent: &Rc<RefCell<EntityState>>,
+        parent: &RcRfc<EntityState>,
         ability: &Rc<Ability>,
         targets: ScriptEntitySet,
         kind: HitKind,
@@ -275,7 +275,7 @@ impl Script {
     }
 
     pub fn ability_with_arg<T>(
-        parent: &Rc<RefCell<EntityState>>,
+        parent: &RcRfc<EntityState>,
         ability: &Rc<Ability>,
         targets: ScriptEntitySet,
         arg: T,
@@ -289,7 +289,7 @@ impl Script {
     }
 
     pub fn ability(
-        parent: &Rc<RefCell<EntityState>>,
+        parent: &RcRfc<EntityState>,
         ability: &Rc<Ability>,
         targets: ScriptEntitySet,
         func: &str,
@@ -450,7 +450,7 @@ impl ScriptState {
         result
     }
 
-    pub fn console(&self, script: String, party: &[Rc<RefCell<EntityState>>]) -> Result<String> {
+    pub fn console(&self, script: String, party: &[RcRfc<EntityState>]) -> Result<String> {
         assert!(!party.is_empty());
         self.reset_instruction_state();
         let result = self.lua.context(|lua| {
@@ -470,7 +470,7 @@ impl ScriptState {
     }
 }
 
-fn get_targeter() -> Result<Rc<RefCell<AreaTargeter>>> {
+fn get_targeter() -> Result<RcRfc<AreaTargeter>> {
     let area_state = GameState::area_state();
     let mut area_state = area_state.borrow_mut();
     match area_state.targeter() {

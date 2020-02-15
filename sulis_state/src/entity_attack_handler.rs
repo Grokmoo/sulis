@@ -14,10 +14,8 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::cell::RefCell;
-use std::rc::Rc;
 
-use crate::{center, is_threat, ActorState, EntityState, GameState};
+use crate::{center, is_threat, ActorState, EntityState, GameState, RcRfc};
 use sulis_module::{AccuracyKind, Attack, AttackKind, DamageKind, HitFlags, HitKind, Module};
 
 fn is_sneak_attack(parent: &EntityState, target: &EntityState) -> bool {
@@ -75,8 +73,8 @@ fn is_flanking(parent: &EntityState, target: &EntityState) -> bool {
 }
 
 pub fn weapon_attack(
-    parent: &Rc<RefCell<EntityState>>,
-    target: &Rc<RefCell<EntityState>>,
+    parent: &RcRfc<EntityState>,
+    target: &RcRfc<EntityState>,
 ) -> Vec<(HitKind, HitFlags, Vec<(DamageKind, u32)>)> {
     if target.borrow_mut().actor.hp() <= 0 {
         return vec![(HitKind::Miss, HitFlags::default(), Vec::new())];
@@ -111,8 +109,8 @@ pub fn weapon_attack(
 }
 
 pub fn attack(
-    parent: &Rc<RefCell<EntityState>>,
-    target: &Rc<RefCell<EntityState>>,
+    parent: &RcRfc<EntityState>,
+    target: &RcRfc<EntityState>,
     attack: &mut Attack,
 ) -> (HitKind, HitFlags, Vec<(DamageKind, u32)>) {
     if target.borrow_mut().actor.hp() <= 0 {
@@ -137,8 +135,8 @@ pub fn attack(
 }
 
 fn attack_internal(
-    parent: &Rc<RefCell<EntityState>>,
-    target: &Rc<RefCell<EntityState>>,
+    parent: &RcRfc<EntityState>,
+    target: &RcRfc<EntityState>,
     attack: &mut Attack,
     flanking: bool,
     sneak_attack: bool,

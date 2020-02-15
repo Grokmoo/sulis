@@ -14,10 +14,9 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::cell::RefCell;
 use std::rc::Rc;
 
-use sulis_core::ui::{Callback, Widget};
+use sulis_core::ui::{Callback, Widget, RcRfc};
 use sulis_module::{
     on_trigger::{self, Kind, ModuleLoadData, QuestStateData},
     Actor, ItemState, MerchantData, Module, OnTrigger,
@@ -35,8 +34,8 @@ use crate::{
 
 pub fn is_match(
     on_trigger: &[OnTrigger],
-    pc: &Rc<RefCell<EntityState>>,
-    target: &Rc<RefCell<EntityState>>,
+    pc: &RcRfc<EntityState>,
+    target: &RcRfc<EntityState>,
 ) -> bool {
     for trigger in on_trigger.iter() {
         use sulis_module::OnTrigger::*;
@@ -143,10 +142,10 @@ pub fn is_match(
 }
 
 pub fn activate(
-    widget: &Rc<RefCell<Widget>>,
+    widget: &RcRfc<Widget>,
     on_select: &[OnTrigger],
-    pc: &Rc<RefCell<EntityState>>,
-    target: &Rc<RefCell<EntityState>>,
+    pc: &RcRfc<EntityState>,
+    target: &RcRfc<EntityState>,
 ) {
     use sulis_module::OnTrigger::*;
     for trigger in on_select.iter() {
@@ -280,7 +279,7 @@ fn verify_quest(data: &QuestStateData) {
     }
 }
 
-fn show_menu(widget: &Rc<RefCell<Widget>>, data: &on_trigger::MenuData) {
+fn show_menu(widget: &RcRfc<Widget>, data: &on_trigger::MenuData) {
     let root = Widget::get_root(widget);
 
     let mut script_cb = match &data.cb_kind {
@@ -296,7 +295,7 @@ fn show_menu(widget: &Rc<RefCell<Widget>>, data: &on_trigger::MenuData) {
     Widget::add_child_to(&root, widget);
 }
 
-fn show_confirm(widget: &Rc<RefCell<Widget>>, data: &on_trigger::DialogData) {
+fn show_confirm(widget: &RcRfc<Widget>, data: &on_trigger::DialogData) {
     let root = Widget::get_root(widget);
 
     let cb = if let Some(ref on_accept) = data.on_accept {
@@ -332,7 +331,7 @@ fn show_confirm(widget: &Rc<RefCell<Widget>>, data: &on_trigger::DialogData) {
     Widget::add_child_to(&root, widget);
 }
 
-fn load_module(widget: &Rc<RefCell<Widget>>, module_data: &ModuleLoadData) {
+fn load_module(widget: &RcRfc<Widget>, module_data: &ModuleLoadData) {
     let (root, view) = Widget::parent_mut::<RootView>(widget);
 
     let pc = GameState::player();
@@ -391,7 +390,7 @@ fn load_module(widget: &Rc<RefCell<Widget>>, module_data: &ModuleLoadData) {
     );
 }
 
-fn fade_out_in(widget: &Rc<RefCell<Widget>>) {
+fn fade_out_in(widget: &RcRfc<Widget>) {
     let root = Widget::get_root(widget);
     let (_, area_view_widget) = {
         let view = Widget::kind_mut::<RootView>(&root);
@@ -403,7 +402,7 @@ fn fade_out_in(widget: &Rc<RefCell<Widget>>) {
     Widget::add_child_to(&area_view_widget, fade);
 }
 
-pub fn scroll_view(widget: &Rc<RefCell<Widget>>, x: i32, y: i32) {
+pub fn scroll_view(widget: &RcRfc<Widget>, x: i32, y: i32) {
     let root = Widget::get_root(widget);
 
     let (area_view, area_view_widget) = {
@@ -426,7 +425,7 @@ pub fn scroll_view(widget: &Rc<RefCell<Widget>>, x: i32, y: i32) {
     );
 }
 
-fn game_over_window(widget: &Rc<RefCell<Widget>>, text: String) {
+fn game_over_window(widget: &RcRfc<Widget>, text: String) {
     let menu_cb = Callback::new(Rc::new(|widget, _| {
         let (_, view) = Widget::parent_mut::<RootView>(widget);
         view.next_step = Some(NextGameStep::MainMenu);
@@ -443,8 +442,8 @@ fn game_over_window(widget: &Rc<RefCell<Widget>>, text: String) {
 fn fire_script(
     script_id: &str,
     func: &str,
-    parent: &Rc<RefCell<EntityState>>,
-    target: &Rc<RefCell<EntityState>>,
+    parent: &RcRfc<EntityState>,
+    target: &RcRfc<EntityState>,
 ) {
     Script::trigger(
         script_id,
@@ -453,7 +452,7 @@ fn fire_script(
     );
 }
 
-fn show_merchant(widget: &Rc<RefCell<Widget>>, merch: &MerchantData) {
+fn show_merchant(widget: &RcRfc<Widget>, merch: &MerchantData) {
     let id = &merch.id;
     let loot = match Module::loot_list(&merch.loot_list) {
         None => {
@@ -483,7 +482,7 @@ fn show_merchant(widget: &Rc<RefCell<Widget>>, merch: &MerchantData) {
     view.set_merchant_window(&root, true, &id);
 }
 
-fn show_cutscene(widget: &Rc<RefCell<Widget>>, cutscene_id: &str) {
+fn show_cutscene(widget: &RcRfc<Widget>, cutscene_id: &str) {
     let cutscene = match Module::cutscene(cutscene_id) {
         None => {
             warn!("Unable to find cutscene '{}' for on_trigger", cutscene_id);
@@ -505,10 +504,10 @@ fn show_cutscene(widget: &Rc<RefCell<Widget>>, cutscene_id: &str) {
 }
 
 fn start_convo(
-    widget: &Rc<RefCell<Widget>>,
+    widget: &RcRfc<Widget>,
     convo_id: &str,
-    pc: &Rc<RefCell<EntityState>>,
-    target: &Rc<RefCell<EntityState>>,
+    pc: &RcRfc<EntityState>,
+    target: &RcRfc<EntityState>,
 ) {
     let convo = match Module::conversation(convo_id) {
         None => {

@@ -20,7 +20,7 @@ use std::cmp;
 use std::rc::Rc;
 
 use crate::io::{GraphicsRenderer, InputAction};
-use crate::ui::{Callback, Widget, WidgetKind, WidgetState};
+use crate::ui::{Callback, Widget, WidgetKind, WidgetState, RcRfc};
 use crate::util::{Point, Size};
 use crate::widget_kind;
 
@@ -36,15 +36,15 @@ pub enum ScrollDirection {
 /// nested scroll panes are not supported
 /// only does vertical scrolling
 pub struct ScrollPane {
-    content: Rc<RefCell<Widget>>,
+    content: RcRfc<Widget>,
     content_size: i32,
-    scrollbar: Rc<RefCell<Scrollbar>>,
-    scrollbar_widget: Rc<RefCell<Widget>>,
+    scrollbar: RcRfc<Scrollbar>,
+    scrollbar_widget: RcRfc<Widget>,
     scroll_direction: ScrollDirection,
 }
 
 impl ScrollPane {
-    pub fn new(direction: ScrollDirection) -> Rc<RefCell<ScrollPane>> {
+    pub fn new(direction: ScrollDirection) -> RcRfc<ScrollPane> {
         let content = Widget::empty("content");
         let scrollbar = Scrollbar::new(direction, &content);
 
@@ -58,7 +58,7 @@ impl ScrollPane {
         }))
     }
 
-    pub fn add_to_content(&self, child: Rc<RefCell<Widget>>) {
+    pub fn add_to_content(&self, child: RcRfc<Widget>) {
         // for text areas inside scroll panes don't limit drawing
         // inside the screen area on layout as scroll panes
         // need to allow widgets to be off screen
@@ -129,7 +129,7 @@ impl ScrollPane {
     }
 }
 
-fn disable_text_area_limit_recursive(parent: &Rc<RefCell<Widget>>) {
+fn disable_text_area_limit_recursive(parent: &RcRfc<Widget>) {
     let kind = Rc::clone(&parent.borrow().kind);
     match kind.borrow_mut().as_any_mut().downcast_mut::<TextArea>() {
         None => (),
@@ -160,7 +160,7 @@ impl WidgetKind for ScrollPane {
         renderer.set_scissor(Point::new(x, y), Size::new(width, height));
     }
 
-    fn on_key_press(&mut self, _widget: &Rc<RefCell<Widget>>, key: InputAction) -> bool {
+    fn on_key_press(&mut self, _widget: &RcRfc<Widget>, key: InputAction) -> bool {
         let delta = match key {
             InputAction::ZoomIn => -1,
             InputAction::ZoomOut => 1,
@@ -185,14 +185,14 @@ impl WidgetKind for ScrollPane {
         renderer.clear_scissor();
     }
 
-    fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+    fn on_add(&mut self, _widget: &RcRfc<Widget>) -> Vec<RcRfc<Widget>> {
         vec![Rc::clone(&self.content), Rc::clone(&self.scrollbar_widget)]
     }
 }
 
 struct Scrollbar {
     direction: ScrollDirection,
-    widget: Rc<RefCell<Widget>>,
+    widget: RcRfc<Widget>,
     content_size: i32,
     delta: u32,
 
@@ -200,16 +200,16 @@ struct Scrollbar {
     cur_pos: i32,
     max_pos: i32,
 
-    up: Rc<RefCell<Widget>>,
-    down: Rc<RefCell<Widget>>,
-    thumb: Rc<RefCell<Widget>>,
+    up: RcRfc<Widget>,
+    down: RcRfc<Widget>,
+    thumb: RcRfc<Widget>,
 }
 
 impl Scrollbar {
     fn new(
         direction: ScrollDirection,
-        widget_to_scroll: &Rc<RefCell<Widget>>,
-    ) -> Rc<RefCell<Scrollbar>> {
+        widget_to_scroll: &RcRfc<Widget>,
+    ) -> RcRfc<Scrollbar> {
         let up = Widget::with_theme(Button::empty(), "up");
         let down = Widget::with_theme(Button::empty(), "down");
         let thumb = Widget::with_theme(Button::empty(), "thumb");
@@ -236,7 +236,7 @@ impl Scrollbar {
         self.cur_pos
     }
 
-    fn update_children_position(&mut self, parent: &Rc<RefCell<Widget>>, dir: i32) {
+    fn update_children_position(&mut self, parent: &RcRfc<Widget>, dir: i32) {
         match self.direction {
             ScrollDirection::Vertical => self.compute_min_max_y(&parent.borrow()),
             ScrollDirection::Horizontal => self.compute_min_max_x(&parent.borrow()),
@@ -372,7 +372,7 @@ impl WidgetKind for Scrollbar {
         }
     }
 
-    fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+    fn on_add(&mut self, _widget: &RcRfc<Widget>) -> Vec<RcRfc<Widget>> {
         let widget_ref = Rc::clone(&self.widget);
         self.up
             .borrow_mut()

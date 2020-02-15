@@ -19,7 +19,7 @@ use std::cell::RefCell;
 use std::collections::HashSet;
 use std::rc::Rc;
 
-use sulis_core::ui::{animation_state, Callback, Widget, WidgetKind};
+use sulis_core::ui::{animation_state, Callback, Widget, WidgetKind, RcRfc};
 use sulis_core::widgets::{Button, Label};
 use sulis_module::{actor::OwnedAbility, Ability, AbilityList, Actor};
 use sulis_state::EntityState;
@@ -35,16 +35,16 @@ pub struct AbilitySelectorPane {
     choices: Rc<AbilityList>,
     selected_ability: Option<Rc<Ability>>,
     index: usize,
-    pc: Rc<RefCell<EntityState>>,
+    pc: RcRfc<EntityState>,
 }
 
 impl AbilitySelectorPane {
     pub fn new(
         choices: Rc<AbilityList>,
         index: usize,
-        pc: Rc<RefCell<EntityState>>,
+        pc: RcRfc<EntityState>,
         already_selected: Vec<OwnedAbility>,
-    ) -> Rc<RefCell<AbilitySelectorPane>> {
+    ) -> RcRfc<AbilitySelectorPane> {
         Rc::new(RefCell::new(AbilitySelectorPane {
             selected_ability: None,
             index,
@@ -97,7 +97,7 @@ impl AbilitySelectorPane {
 }
 
 impl BuilderPane for AbilitySelectorPane {
-    fn on_selected(&mut self, builder: &mut CharacterBuilder, widget: Rc<RefCell<Widget>>) {
+    fn on_selected(&mut self, builder: &mut CharacterBuilder, widget: RcRfc<Widget>) {
         // remove any abilities selected by this pane and subsequent ability panes
         builder.abilities.truncate(self.index);
         builder.prev.borrow_mut().state.set_enabled(true);
@@ -141,7 +141,7 @@ impl BuilderPane for AbilitySelectorPane {
             .set_enabled(self.selected_ability.is_some());
     }
 
-    fn next(&mut self, builder: &mut CharacterBuilder, widget: Rc<RefCell<Widget>>) {
+    fn next(&mut self, builder: &mut CharacterBuilder, widget: RcRfc<Widget>) {
         let ability = match self.selected_ability {
             None => return,
             Some(ref ability) => Rc::clone(ability),
@@ -150,7 +150,7 @@ impl BuilderPane for AbilitySelectorPane {
         builder.next(&widget);
     }
 
-    fn prev(&mut self, builder: &mut CharacterBuilder, widget: Rc<RefCell<Widget>>) {
+    fn prev(&mut self, builder: &mut CharacterBuilder, widget: RcRfc<Widget>) {
         self.selected_ability = None;
         for ability in builder.abilities.iter() {
             self.remove_already_selected(ability);
@@ -212,7 +212,7 @@ impl WidgetKind for AbilitiesPane {
 impl WidgetKind for AbilitySelectorPane {
     widget_kind![NAME];
 
-    fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+    fn on_add(&mut self, _widget: &RcRfc<Widget>) -> Vec<RcRfc<Widget>> {
         let title = Widget::with_theme(Label::empty(), "title");
 
         let pane = Rc::new(RefCell::new(AbilitiesPane::new(&self.choices.id)));

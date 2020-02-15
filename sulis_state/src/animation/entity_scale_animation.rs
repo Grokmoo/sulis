@@ -14,15 +14,12 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::cell::RefCell;
-use std::rc::Rc;
-
 use crate::animation::particle_generator::Param;
-use crate::EntityState;
+use crate::{EntityState, RcRfc};
 
 pub(in crate::animation) fn update(
     scale: &mut Param,
-    owner: &Rc<RefCell<EntityState>>,
+    owner: &RcRfc<EntityState>,
     millis: u32,
 ) {
     let secs = millis as f32 / 1000.0;
@@ -35,6 +32,6 @@ pub(in crate::animation) fn update(
     owner.borrow_mut().scale = scale.value;
 }
 
-pub(in crate::animation) fn cleanup(owner: &Rc<RefCell<EntityState>>) {
+pub(in crate::animation) fn cleanup(owner: &RcRfc<EntityState>) {
     owner.borrow_mut().scale = 1.0;
 }

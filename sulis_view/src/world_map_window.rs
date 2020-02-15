@@ -18,7 +18,7 @@ use std::any::Any;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use sulis_core::ui::{animation_state, Callback, Widget, WidgetKind};
+use sulis_core::ui::{animation_state, Callback, Widget, WidgetKind, RcRfc};
 use sulis_core::util::Point;
 use sulis_core::widgets::{Button, TextArea};
 use sulis_module::{campaign::WorldMapLocation, Module, Time};
@@ -27,8 +27,8 @@ use sulis_state::GameState;
 pub const NAME: &str = "world_map_window";
 
 pub struct Entry {
-    child: Rc<RefCell<Widget>>,
-    label: Rc<RefCell<Widget>>,
+    child: RcRfc<Widget>,
+    label: RcRfc<Widget>,
     position: (f32, f32),
 }
 
@@ -36,12 +36,12 @@ pub struct WorldMapWindow {
     entries: Vec<Entry>,
     size: (f32, f32),
     offset: (f32, f32),
-    content: Rc<RefCell<Widget>>,
+    content: RcRfc<Widget>,
     transition_enabled: bool,
 }
 
 impl WorldMapWindow {
-    pub fn new(transition_enabled: bool) -> Rc<RefCell<WorldMapWindow>> {
+    pub fn new(transition_enabled: bool) -> RcRfc<WorldMapWindow> {
         Rc::new(RefCell::new(WorldMapWindow {
             entries: Vec::new(),
             size: (0.0, 0.0),
@@ -81,7 +81,7 @@ impl WidgetKind for WorldMapWindow {
         widget.do_children_layout();
     }
 
-    fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+    fn on_add(&mut self, _widget: &RcRfc<Widget>) -> Vec<RcRfc<Widget>> {
         let bg = Widget::empty("bg");
 
         let close = Widget::with_theme(Button::empty(), "close");
@@ -173,8 +173,8 @@ impl WidgetKind for WorldMapWindow {
 fn add_travel_callback(
     cur_location_id: &Option<String>,
     location: &WorldMapLocation,
-    button: &Rc<RefCell<Widget>>,
-    label: &Rc<RefCell<Widget>>,
+    button: &RcRfc<Widget>,
+    label: &RcRfc<Widget>,
 ) -> bool {
     let cur_location_id = match cur_location_id {
         None => return false,

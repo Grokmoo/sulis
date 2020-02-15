@@ -76,7 +76,7 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 use sulis_core::io::{GraphicsRenderer, InputAction, MainLoopUpdater};
-use sulis_core::ui::{Callback, Widget, WidgetKind};
+use sulis_core::ui::{Callback, Widget, WidgetKind, RcRfc};
 use sulis_core::widgets::{list_box, Button, ConfirmationWindow, DropDown};
 
 thread_local! {
@@ -86,7 +86,7 @@ thread_local! {
 pub struct EditorMainLoopUpdater {}
 
 impl MainLoopUpdater for EditorMainLoopUpdater {
-    fn update(&self, _root: &Rc<RefCell<Widget>>, _millis: u32) {}
+    fn update(&self, _root: &RcRfc<Widget>, _millis: u32) {}
 
     fn is_exit(&self) -> bool {
         EXIT.with(|exit| *exit.borrow())
@@ -121,7 +121,7 @@ const NAME: &str = "editor";
 pub struct EditorView {}
 
 impl EditorView {
-    pub fn new() -> Rc<RefCell<EditorView>> {
+    pub fn new() -> RcRfc<EditorView> {
         Rc::new(RefCell::new(EditorView {}))
     }
 }
@@ -139,7 +139,7 @@ impl WidgetKind for EditorView {
         self
     }
 
-    fn on_key_press(&mut self, widget: &Rc<RefCell<Widget>>, key: InputAction) -> bool {
+    fn on_key_press(&mut self, widget: &RcRfc<Widget>, key: InputAction) -> bool {
         use crate::InputAction::*;
         match key {
             Back => {
@@ -158,7 +158,7 @@ impl WidgetKind for EditorView {
         true
     }
 
-    fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+    fn on_add(&mut self, _widget: &RcRfc<Widget>) -> Vec<RcRfc<Widget>> {
         debug!("Adding to editor widget");
 
         let area_editor_kind = AreaEditor::new();
@@ -305,7 +305,7 @@ impl WidgetKind for EditorView {
             picker.borrow_mut().state.set_visible(false);
         }
 
-        let picker_kinds: Vec<Rc<RefCell<dyn EditorMode>>> = vec![
+        let picker_kinds: Vec<RcRfc<dyn EditorMode>> = vec![
             tile_picker_kind,
             terrain_picker_kind,
             wall_picker_kind,

@@ -47,11 +47,11 @@ use sulis_state::{save_file, NextGameStep};
 use crate::{CharacterBuilder, LoadWindow};
 
 pub struct LoopUpdater {
-    view: Rc<RefCell<MainMenu>>,
+    view: RcRfc<MainMenu>,
 }
 
 impl LoopUpdater {
-    pub fn new(view: &Rc<RefCell<MainMenu>>) -> LoopUpdater {
+    pub fn new(view: &RcRfc<MainMenu>) -> LoopUpdater {
         LoopUpdater {
             view: Rc::clone(view),
         }
@@ -59,7 +59,7 @@ impl LoopUpdater {
 }
 
 impl MainLoopUpdater for LoopUpdater {
-    fn update(&self, _root: &Rc<RefCell<Widget>>, _millis: u32) {}
+    fn update(&self, _root: &RcRfc<Widget>, _millis: u32) {}
 
     fn is_exit(&self) -> bool {
         self.view.borrow().is_exit()
@@ -79,15 +79,15 @@ enum Mode {
 pub struct MainMenu {
     pub(crate) next_step: Option<NextGameStep>,
     mode: Mode,
-    content: Rc<RefCell<Widget>>,
-    pub(crate) char_builder_to_add: Option<Rc<RefCell<CharacterBuilder>>>,
+    content: RcRfc<Widget>,
+    pub(crate) char_builder_to_add: Option<RcRfc<CharacterBuilder>>,
     pub(crate) display_configurations: Vec<DisplayConfiguration>,
 
     tip_text: Option<String>,
 }
 
 impl MainMenu {
-    pub fn new(display_configurations: Vec<DisplayConfiguration>) -> Rc<RefCell<MainMenu>> {
+    pub fn new(display_configurations: Vec<DisplayConfiguration>) -> RcRfc<MainMenu> {
         let tip_text = if Module::is_initialized() {
             Some(Module::rules().random_hint())
         } else {
@@ -125,7 +125,7 @@ impl MainMenu {
 impl WidgetKind for MainMenu {
     widget_kind!("main_menu");
 
-    fn on_key_press(&mut self, widget: &Rc<RefCell<Widget>>, key: InputAction) -> bool {
+    fn on_key_press(&mut self, widget: &RcRfc<Widget>, key: InputAction) -> bool {
         use sulis_core::io::InputAction::*;
         match key {
             Exit | Back => {
@@ -145,7 +145,7 @@ impl WidgetKind for MainMenu {
         true
     }
 
-    fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+    fn on_add(&mut self, _widget: &RcRfc<Widget>) -> Vec<RcRfc<Widget>> {
         debug!("Adding to main menu widget");
 
         let title = Widget::with_theme(TextArea::empty(), "title");

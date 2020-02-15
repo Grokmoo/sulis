@@ -16,14 +16,14 @@
 
 use rlua::UserData;
 
-use std::cell::{Cell, RefCell};
+use std::cell::Cell;
 use std::rc::Rc;
 
 use crate::{animation::Anim, EntityState};
 use sulis_core::config::Config;
 use sulis_core::image::Image;
 use sulis_core::io::{DrawList, GraphicsRenderer};
-use sulis_core::ui::{animation_state, Color};
+use sulis_core::ui::{animation_state, Color, RcRfc};
 use sulis_core::util::{approx_eq, gen_rand, ExtInt};
 
 #[allow(clippy::trivially_copy_pass_by_ref)]
@@ -306,7 +306,7 @@ impl Param {
 }
 
 pub(in crate::animation) fn update(
-    owner: &Rc<RefCell<EntityState>>,
+    owner: &RcRfc<EntityState>,
     model: &mut GeneratorModel,
     state: &mut GeneratorState,
     marked_for_removal: &Rc<Cell<bool>>,
@@ -371,7 +371,7 @@ pub(in crate::animation) fn update(
 pub(in crate::animation) fn draw(
     state: &GeneratorState,
     model: &GeneratorModel,
-    owner: &Rc<RefCell<EntityState>>,
+    owner: &RcRfc<EntityState>,
     renderer: &mut dyn GraphicsRenderer,
     offset_x: f32,
     offset_y: f32,
@@ -428,7 +428,7 @@ pub(in crate::animation) fn draw(
     }
 }
 
-pub fn new(owner: &Rc<RefCell<EntityState>>, image: Rc<dyn Image>, model: GeneratorModel) -> Anim {
+pub fn new(owner: &RcRfc<EntityState>, image: Rc<dyn Image>, model: GeneratorModel) -> Anim {
     let state = GeneratorState {
         image,
         particles: Vec::new(),

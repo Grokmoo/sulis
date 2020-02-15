@@ -15,14 +15,13 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std;
-use std::cell::RefCell;
 use std::cmp;
 use std::rc::Rc;
 
 use rlua::{self, Context, UserData, UserDataMethods};
 
 use crate::script::{CallbackData, ScriptEntity};
-use crate::{area_feedback_text::ColorKind, AreaFeedbackText, EntityState, GameState};
+use crate::{area_feedback_text::ColorKind, AreaFeedbackText, EntityState, GameState, RcRfc};
 use sulis_module::{
     ability::{self, AIData, Range},
     Ability, Module,
@@ -98,7 +97,7 @@ pub struct ScriptAbilitySet {
 }
 
 impl ScriptAbilitySet {
-    pub fn from(entity: &Rc<RefCell<EntityState>>) -> ScriptAbilitySet {
+    pub fn from(entity: &RcRfc<EntityState>) -> ScriptAbilitySet {
         let parent = entity.borrow().index();
         let mut abilities = Vec::new();
         for (id, _) in entity.borrow().actor.ability_states.iter() {

@@ -14,13 +14,12 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::cell::RefCell;
 use std::rc::Rc;
 
-use crate::ui::{Widget, WidgetKind};
+use crate::ui::{Widget, WidgetKind, RcRfc};
 
 pub struct Callback {
-    cb: Rc<dyn Fn(&Rc<RefCell<Widget>>, &mut dyn WidgetKind)>,
+    cb: Rc<dyn Fn(&RcRfc<Widget>, &mut dyn WidgetKind)>,
 }
 
 impl Clone for Callback {
@@ -38,11 +37,11 @@ impl Callback {
         }
     }
 
-    pub fn new(f: Rc<dyn Fn(&Rc<RefCell<Widget>>, &mut dyn WidgetKind)>) -> Callback {
+    pub fn new(f: Rc<dyn Fn(&RcRfc<Widget>, &mut dyn WidgetKind)>) -> Callback {
         Callback { cb: f }
     }
 
-    pub fn with_widget(f: Rc<dyn Fn(&Rc<RefCell<Widget>>)>) -> Callback {
+    pub fn with_widget(f: Rc<dyn Fn(&RcRfc<Widget>)>) -> Callback {
         Callback {
             cb: Rc::new(move |widget, _kind| f(widget)),
         }
@@ -66,7 +65,7 @@ impl Callback {
         }
     }
 
-    pub fn call(&self, widget: &Rc<RefCell<Widget>>, kind: &mut dyn WidgetKind) {
+    pub fn call(&self, widget: &RcRfc<Widget>, kind: &mut dyn WidgetKind) {
         (self.cb)(widget, kind);
     }
 }

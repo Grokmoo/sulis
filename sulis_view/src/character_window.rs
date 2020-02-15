@@ -24,7 +24,7 @@ use chrono::prelude::*;
 
 use sulis_core::config;
 use sulis_core::resource::write_to_file;
-use sulis_core::ui::{Callback, Widget, WidgetKind, WidgetState};
+use sulis_core::ui::{Callback, Widget, WidgetKind, WidgetState, RcRfc};
 use sulis_core::util::ExtInt;
 use sulis_core::widgets::{Button, ScrollDirection, ScrollPane, TextArea};
 use sulis_module::{
@@ -46,13 +46,13 @@ enum ActivePane {
 }
 
 pub struct CharacterWindow {
-    character: Rc<RefCell<EntityState>>,
+    character: RcRfc<EntityState>,
 
     active_pane: ActivePane,
 }
 
 impl CharacterWindow {
-    pub fn new(character: &Rc<RefCell<EntityState>>) -> Rc<RefCell<CharacterWindow>> {
+    pub fn new(character: &RcRfc<EntityState>) -> RcRfc<CharacterWindow> {
         Rc::new(RefCell::new(CharacterWindow {
             character: Rc::clone(character),
             active_pane: ActivePane::Character,
@@ -67,12 +67,12 @@ impl WidgetKind for CharacterWindow {
         widget.do_base_layout();
     }
 
-    fn on_remove(&mut self, _widget: &Rc<RefCell<Widget>>) {
+    fn on_remove(&mut self, _widget: &RcRfc<Widget>) {
         self.character.borrow_mut().actor.listeners.remove(NAME);
         debug!("Removed character window.");
     }
 
-    fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+    fn on_add(&mut self, widget: &RcRfc<Widget>) -> Vec<RcRfc<Widget>> {
         self.character
             .borrow_mut()
             .actor
@@ -299,7 +299,7 @@ pub fn get_character_export_filename(name: &str) -> Result<(String, String), Err
     Ok((filename, id))
 }
 
-pub fn create_abilities_pane(pc: &ActorState, show_passive: bool) -> Rc<RefCell<Widget>> {
+pub fn create_abilities_pane(pc: &ActorState, show_passive: bool) -> RcRfc<Widget> {
     let abilities = Widget::empty("abilities");
 
     let passive = Widget::with_theme(Button::empty(), "show_passives");
@@ -361,7 +361,7 @@ pub fn create_abilities_pane(pc: &ActorState, show_passive: bool) -> Rc<RefCell<
     abilities
 }
 
-pub fn create_effects_pane(pc: &mut ActorState) -> Rc<RefCell<Widget>> {
+pub fn create_effects_pane(pc: &mut ActorState) -> RcRfc<Widget> {
     let scrollpane = ScrollPane::new(ScrollDirection::Vertical);
     let effects = Widget::with_theme(scrollpane.clone(), "effects");
 
@@ -426,7 +426,7 @@ fn add_if_nonzero(state: &mut WidgetState, index: usize, name: &str, value: f32)
     state.add_text_arg(&format!("{}_{}", index, name), &value.to_string());
 }
 
-pub fn create_details_text_box(pc: &ActorState, is_pc: bool) -> Rc<RefCell<Widget>> {
+pub fn create_details_text_box(pc: &ActorState, is_pc: bool) -> RcRfc<Widget> {
     let details = Widget::with_theme(TextArea::empty(), "details");
     {
         if is_pc {

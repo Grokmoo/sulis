@@ -19,7 +19,7 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 use sulis_core::io::{DrawList, GraphicsRenderer};
-use sulis_core::ui::{Callback, Color, Widget, WidgetKind};
+use sulis_core::ui::{Callback, Color, Widget, WidgetKind, RcRfc};
 use sulis_core::util::Point;
 use sulis_core::widgets::{Button, ScrollDirection, ScrollPane};
 use sulis_module::area::Tile;
@@ -37,7 +37,7 @@ pub struct TilePicker {
 }
 
 impl TilePicker {
-    pub fn new() -> Rc<RefCell<TilePicker>> {
+    pub fn new() -> RcRfc<TilePicker> {
         Rc::new(RefCell::new(TilePicker {
             cur_tile: None,
             cur_layer: None,
@@ -158,7 +158,7 @@ impl WidgetKind for TilePicker {
         self
     }
 
-    fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+    fn on_add(&mut self, _widget: &RcRfc<Widget>) -> Vec<RcRfc<Widget>> {
         let mut all_tiles = Module::all_tiles();
         all_tiles.sort_by(|a, b| a.id.cmp(&b.id));
 

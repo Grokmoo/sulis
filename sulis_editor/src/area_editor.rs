@@ -20,7 +20,7 @@ use std::rc::Rc;
 
 use sulis_core::io::event::ClickKind;
 use sulis_core::io::{GraphicsRenderer, InputAction};
-use sulis_core::ui::{compute_area_scaling, Cursor, Scrollable, Widget, WidgetKind};
+use sulis_core::ui::{compute_area_scaling, Cursor, Scrollable, Widget, WidgetKind, RcRfc};
 use sulis_core::util::Point;
 use sulis_module::area::MAX_AREA_SIZE;
 
@@ -29,7 +29,7 @@ use crate::{AreaModel, EditorMode};
 const NAME: &str = "area_editor";
 
 pub struct AreaEditor {
-    cur_editor: Option<Rc<RefCell<dyn EditorMode>>>,
+    cur_editor: Option<RcRfc<dyn EditorMode>>,
     pub(crate) model: AreaModel,
 
     scroll: Scrollable,
@@ -39,7 +39,7 @@ pub struct AreaEditor {
 }
 
 impl AreaEditor {
-    pub fn new() -> Rc<RefCell<AreaEditor>> {
+    pub fn new() -> RcRfc<AreaEditor> {
         Rc::new(RefCell::new(AreaEditor {
             model: AreaModel::default(),
             cur_editor: None,
@@ -55,11 +55,11 @@ impl AreaEditor {
         self.cur_editor = None;
     }
 
-    pub fn set_editor(&mut self, editor: Rc<RefCell<dyn EditorMode>>) {
+    pub fn set_editor(&mut self, editor: RcRfc<dyn EditorMode>) {
         self.cur_editor = Some(editor);
     }
 
-    fn get_cursor_pos(&self, widget: &Rc<RefCell<Widget>>, width: i32, height: i32) -> (i32, i32) {
+    fn get_cursor_pos(&self, widget: &RcRfc<Widget>, width: i32, height: i32) -> (i32, i32) {
         let mut x = Cursor::get_x_f32() - widget.borrow().state.inner_left() as f32;
         let mut y = Cursor::get_y_f32() - widget.borrow().state.inner_top() as f32;
 
@@ -76,8 +76,8 @@ impl AreaEditor {
 
     fn get_event_data(
         &self,
-        widget: &Rc<RefCell<Widget>>,
-    ) -> Option<(Rc<RefCell<dyn EditorMode>>, i32, i32)> {
+        widget: &RcRfc<Widget>,
+    ) -> Option<(RcRfc<dyn EditorMode>, i32, i32)> {
         let editor = match self.cur_editor {
             None => return None,
             Some(ref editor) => editor,
@@ -139,7 +139,7 @@ impl WidgetKind for AreaEditor {
         }
     }
 
-    fn on_key_press(&mut self, _widget: &Rc<RefCell<Widget>>, key: InputAction) -> bool {
+    fn on_key_press(&mut self, _widget: &RcRfc<Widget>, key: InputAction) -> bool {
         let delta = match key {
             InputAction::ZoomIn => 1,
             InputAction::ZoomOut => -1,
@@ -156,7 +156,7 @@ impl WidgetKind for AreaEditor {
         true
     }
 
-    fn on_mouse_press(&mut self, widget: &Rc<RefCell<Widget>>, kind: ClickKind) -> bool {
+    fn on_mouse_press(&mut self, widget: &RcRfc<Widget>, kind: ClickKind) -> bool {
         let (editor, x, y) = match self.get_event_data(widget) {
             None => return true,
             Some(value) => value,
@@ -172,14 +172,14 @@ impl WidgetKind for AreaEditor {
         true
     }
 
-    fn on_mouse_release(&mut self, _: &Rc<RefCell<Widget>>, _: ClickKind) -> bool {
+    fn on_mouse_release(&mut self, _: &RcRfc<Widget>, _: ClickKind) -> bool {
         self.last_click_position = None;
         true
     }
 
     fn on_mouse_drag(
         &mut self,
-        widget: &Rc<RefCell<Widget>>,
+        widget: &RcRfc<Widget>,
         kind: ClickKind,
         delta_x: f32,
         delta_y: f32,
@@ -223,7 +223,7 @@ impl WidgetKind for AreaEditor {
 
     fn on_mouse_move(
         &mut self,
-        widget: &Rc<RefCell<Widget>>,
+        widget: &RcRfc<Widget>,
         _delta_x: f32,
         _delta_y: f32,
     ) -> bool {

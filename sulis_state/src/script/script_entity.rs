@@ -14,7 +14,6 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::cell::RefCell;
 use std::collections::HashMap;
 use std::rc::Rc;
 use std::str::FromStr;
@@ -24,7 +23,7 @@ use rlua::{self, Context, UserData, UserDataMethods};
 
 use crate::{ability_state::DisabledReason, dist, is_within_attack_dist, is_within_touch_dist};
 use crate::{ai, animation, entity_attack_handler, script::*, AreaFeedbackText};
-use crate::{area_feedback_text::ColorKind, EntityState, GameState, Location};
+use crate::{area_feedback_text::ColorKind, EntityState, GameState, Location, RcRfc};
 use sulis_core::config::Config;
 use sulis_core::resource::ResourceSet;
 use sulis_core::util::ExtInt;
@@ -464,7 +463,7 @@ impl ScriptEntity {
         ScriptEntity { index: Some(index) }
     }
 
-    pub fn from(entity: &Rc<RefCell<EntityState>>) -> ScriptEntity {
+    pub fn from(entity: &RcRfc<EntityState>) -> ScriptEntity {
         ScriptEntity {
             index: Some(entity.borrow().index()),
         }
@@ -503,7 +502,7 @@ impl ScriptEntity {
         }
     }
 
-    pub fn try_unwrap(&self) -> Result<Rc<RefCell<EntityState>>> {
+    pub fn try_unwrap(&self) -> Result<RcRfc<EntityState>> {
         match self.index {
             None => Err(rlua::Error::FromLuaConversionError {
                 from: "ScriptEntity",

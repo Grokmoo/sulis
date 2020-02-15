@@ -21,23 +21,23 @@ use std::rc::Rc;
 use rlua;
 
 use sulis_core::io::InputAction;
-use sulis_core::ui::{Callback, Widget, WidgetKind};
+use sulis_core::ui::{Callback, Widget, WidgetKind, RcRfc};
 use sulis_core::widgets::{InputField, Label};
 use sulis_state::{GameState, ScriptState};
 
 pub const NAME: &str = "console_window";
 
 pub struct ConsoleWindow {
-    input: Rc<RefCell<InputField>>,
-    input_widget: Rc<RefCell<Widget>>,
-    output: Rc<RefCell<Widget>>,
+    input: RcRfc<InputField>,
+    input_widget: RcRfc<Widget>,
+    output: RcRfc<Widget>,
     history: Vec<String>,
     history_index: usize,
     script_state: ScriptState,
 }
 
 impl ConsoleWindow {
-    pub fn new() -> Rc<RefCell<ConsoleWindow>> {
+    pub fn new() -> RcRfc<ConsoleWindow> {
         let input = InputField::new("");
         Rc::new(RefCell::new(ConsoleWindow {
             input: Rc::clone(&input),
@@ -86,7 +86,7 @@ impl ConsoleWindow {
 impl WidgetKind for ConsoleWindow {
     widget_kind!(NAME);
 
-    fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+    fn on_add(&mut self, _widget: &RcRfc<Widget>) -> Vec<RcRfc<Widget>> {
         let prompt = Widget::with_theme(Label::empty(), "prompt");
 
         self.input

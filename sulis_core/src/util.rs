@@ -20,7 +20,6 @@ pub use self::point::Point;
 pub mod size;
 pub use self::size::Size;
 
-use std::cell::RefCell;
 use std::cmp::Ordering;
 use std::f32;
 use std::fmt;
@@ -42,7 +41,7 @@ use serde_yaml;
 use crate::config::{self, Config};
 use crate::io::{MainLoopUpdater, IO};
 use crate::resource::write_to_file;
-use crate::ui::Widget;
+use crate::ui::{Widget,RcRfc};
 
 const MAX_ULPS: i32 = 100;
 const MAX_DIFF: f32 = 2.0 * std::f32::EPSILON;
@@ -371,7 +370,7 @@ pub fn error_and_exit(error: &str) {
 
 pub fn main_loop(
     io: &mut dyn IO,
-    root: Rc<RefCell<Widget>>,
+    root: RcRfc<Widget>,
     updater: Box<dyn MainLoopUpdater>,
 ) -> Result<(), Error> {
     let fpms = (1000.0 / (Config::frame_rate() as f32)) as u64;

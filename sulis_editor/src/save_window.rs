@@ -19,7 +19,7 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 use sulis_core::config::Config;
-use sulis_core::ui::{Callback, Widget, WidgetKind};
+use sulis_core::ui::{Callback, Widget, WidgetKind, RcRfc};
 use sulis_core::widgets::{Button, InputField, Label, Spinner};
 use sulis_module::area::{LocationKind, OnRest};
 
@@ -28,11 +28,11 @@ use crate::AreaEditor;
 pub const NAME: &str = "save_window";
 
 pub struct SaveWindow {
-    area_editor: Rc<RefCell<AreaEditor>>,
+    area_editor: RcRfc<AreaEditor>,
 }
 
 impl SaveWindow {
-    pub fn new(area_editor: Rc<RefCell<AreaEditor>>) -> Rc<RefCell<SaveWindow>> {
+    pub fn new(area_editor: RcRfc<AreaEditor>) -> RcRfc<SaveWindow> {
         Rc::new(RefCell::new(SaveWindow { area_editor }))
     }
 }
@@ -50,7 +50,7 @@ impl WidgetKind for SaveWindow {
         self
     }
 
-    fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+    fn on_add(&mut self, _widget: &RcRfc<Widget>) -> Vec<RcRfc<Widget>> {
         let close = Widget::with_theme(Button::empty(), "close");
         close
             .borrow_mut()

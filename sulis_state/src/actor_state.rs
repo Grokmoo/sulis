@@ -14,12 +14,11 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::cell::RefCell;
 use std::collections::HashMap;
 use std::io::Error;
 use std::rc::Rc;
 
-use crate::save_state::ActorSaveState;
+use crate::{save_state::ActorSaveState, RcRfc};
 use crate::{
     ability_state::DisabledReason, AbilityState, ChangeListenerList, Effect, EntityState,
     GameState, Inventory, PStats,
@@ -648,7 +647,7 @@ impl ActorState {
         self.hp() <= 0
     }
 
-    pub fn check_death(parent: &Rc<RefCell<EntityState>>, target: &Rc<RefCell<EntityState>>) {
+    pub fn check_death(parent: &RcRfc<EntityState>, target: &RcRfc<EntityState>) {
         if target.borrow().actor.hp() > 0 {
             return;
         }

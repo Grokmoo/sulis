@@ -19,7 +19,7 @@ use std::cell::{Cell, RefCell};
 use std::rc::Rc;
 
 use crate::{item_list_pane::Filter, ItemListPane, RootView};
-use sulis_core::ui::{Callback, Widget, WidgetKind};
+use sulis_core::ui::{Callback, Widget, WidgetKind, RcRfc};
 use sulis_core::widgets::{Button, Label};
 use sulis_state::{ChangeListener, EntityState, GameState};
 
@@ -27,12 +27,12 @@ pub const NAME: &str = "prop_window";
 
 pub struct PropWindow {
     prop_index: usize,
-    player: Rc<RefCell<EntityState>>,
+    player: RcRfc<EntityState>,
     filter: Rc<Cell<Filter>>,
 }
 
 impl PropWindow {
-    pub fn new(prop_index: usize, player: Rc<RefCell<EntityState>>) -> Rc<RefCell<PropWindow>> {
+    pub fn new(prop_index: usize, player: RcRfc<EntityState>) -> RcRfc<PropWindow> {
         Rc::new(RefCell::new(PropWindow {
             prop_index,
             player,
@@ -44,7 +44,7 @@ impl PropWindow {
         self.prop_index
     }
 
-    pub fn player(&self) -> &Rc<RefCell<EntityState>> {
+    pub fn player(&self) -> &RcRfc<EntityState> {
         &self.player
     }
 }
@@ -56,7 +56,7 @@ impl WidgetKind for PropWindow {
         widget.do_base_layout();
     }
 
-    fn on_remove(&mut self, _widget: &Rc<RefCell<Widget>>) {
+    fn on_remove(&mut self, _widget: &RcRfc<Widget>) {
         let area_state = GameState::area_state();
         let mut area_state = area_state.borrow_mut();
 
@@ -72,7 +72,7 @@ impl WidgetKind for PropWindow {
         }
     }
 
-    fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+    fn on_add(&mut self, widget: &RcRfc<Widget>) -> Vec<RcRfc<Widget>> {
         let icon = Widget::with_theme(Label::empty(), "icon");
         let close = Widget::with_theme(Button::empty(), "close");
         let take_all = Widget::with_theme(Button::empty(), "take_all");

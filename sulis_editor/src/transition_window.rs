@@ -19,7 +19,7 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 use sulis_core::config::{Config, EditorConfig};
-use sulis_core::ui::{Callback, Widget, WidgetKind};
+use sulis_core::ui::{Callback, Widget, WidgetKind, RcRfc};
 use sulis_core::util::Point;
 use sulis_core::widgets::{list_box, Button, InputField, Label, ListBox, Spinner};
 use sulis_module::{
@@ -32,17 +32,17 @@ use crate::AreaEditor;
 pub const NAME: &str = "transition_window";
 
 pub struct TransitionWindow {
-    area_editor: Rc<RefCell<AreaEditor>>,
-    top_bar: Rc<RefCell<Widget>>,
+    area_editor: RcRfc<AreaEditor>,
+    top_bar: RcRfc<Widget>,
     selected_transition: Option<usize>,
     config: EditorConfig,
 }
 
 impl TransitionWindow {
     pub fn new(
-        area_editor: Rc<RefCell<AreaEditor>>,
-        top_bar: Rc<RefCell<Widget>>,
-    ) -> Rc<RefCell<TransitionWindow>> {
+        area_editor: RcRfc<AreaEditor>,
+        top_bar: RcRfc<Widget>,
+    ) -> RcRfc<TransitionWindow> {
         Rc::new(RefCell::new(TransitionWindow {
             area_editor,
             top_bar,
@@ -65,13 +65,13 @@ impl WidgetKind for TransitionWindow {
         self
     }
 
-    fn on_remove(&mut self, _widget: &Rc<RefCell<Widget>>) {
+    fn on_remove(&mut self, _widget: &RcRfc<Widget>) {
         self.top_bar.borrow_mut().state.set_enabled(true);
     }
 
-    fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+    fn on_add(&mut self, _widget: &RcRfc<Widget>) -> Vec<RcRfc<Widget>> {
         self.top_bar.borrow_mut().state.set_enabled(false);
-        let mut widgets: Vec<Rc<RefCell<Widget>>> = Vec::new();
+        let mut widgets: Vec<RcRfc<Widget>> = Vec::new();
 
         let close = Widget::with_theme(Button::empty(), "close");
         close

@@ -14,7 +14,6 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::cell::RefCell;
 use std::collections::HashMap;
 use std::io::Error;
 use std::ptr;
@@ -32,7 +31,7 @@ use crate::{
     TurnManager,
 };
 use sulis_core::io::GraphicsRenderer;
-use sulis_core::ui::{color, Color};
+use sulis_core::ui::{color, Color, RcRfc};
 use sulis_core::util::invalid_data_error;
 use sulis_module::area::MAX_AREA_SIZE;
 use sulis_module::{
@@ -76,7 +75,7 @@ impl PartialEq for EntityState {
 impl EntityState {
     pub(crate) fn load(
         save: EntitySaveState,
-        areas: &HashMap<String, Rc<RefCell<AreaState>>>,
+        areas: &HashMap<String, RcRfc<AreaState>>,
     ) -> Result<EntityState, Error> {
         let ai_state = match save.actor_base.as_ref() {
             None => AIState::AI {
@@ -390,7 +389,7 @@ impl EntityState {
         self.marked_for_removal
     }
 
-    pub fn swap_weapon_set(entity: &Rc<RefCell<EntityState>>) {
+    pub fn swap_weapon_set(entity: &RcRfc<EntityState>) {
         if !entity.borrow_mut().actor.do_swap_weapons() {
             return;
         }
@@ -432,8 +431,8 @@ impl EntityState {
     }
 
     pub fn attack(
-        entity: &Rc<RefCell<EntityState>>,
-        target: &Rc<RefCell<EntityState>>,
+        entity: &RcRfc<EntityState>,
+        target: &RcRfc<EntityState>,
         callback: Option<Box<dyn ScriptCallback>>,
         remove_ap: bool,
     ) {
@@ -464,8 +463,8 @@ impl EntityState {
     }
 
     pub fn remove_hp(
-        entity: &Rc<RefCell<EntityState>>,
-        attacker: &Rc<RefCell<EntityState>>,
+        entity: &RcRfc<EntityState>,
+        attacker: &RcRfc<EntityState>,
         hit_kind: HitKind,
         damage: Vec<(DamageKind, u32)>,
     ) {

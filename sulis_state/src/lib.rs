@@ -122,6 +122,7 @@ pub(crate) use self::turn_manager::TurnManager;
 use std::cell::RefCell;
 use std::collections::HashMap;
 use std::rc::Rc;
+pub type RcRfc<T> = Rc<RefCell<T>>;
 
 use sulis_module::{Actor, Module, OnTrigger};
 
@@ -147,8 +148,8 @@ pub enum NextGameStep {
 
 pub struct UICallback {
     pub on_trigger: Vec<OnTrigger>,
-    pub parent: Rc<RefCell<EntityState>>,
-    pub target: Rc<RefCell<EntityState>>,
+    pub parent: RcRfc<EntityState>,
+    pub target: RcRfc<EntityState>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]

@@ -19,7 +19,7 @@ use std::cell::RefCell;
 use std::collections::HashMap;
 use std::rc::Rc;
 
-use sulis_core::ui::{Callback, Widget, WidgetKind, WidgetState};
+use sulis_core::ui::{Callback, Widget, WidgetKind, WidgetState, RcRfc};
 use sulis_core::util::ExtInt;
 use sulis_core::widgets::{Button, Label, TextArea};
 use sulis_module::{Class, Module};
@@ -42,7 +42,7 @@ impl ClassSelectorPane {
         choices: Vec<String>,
         allow_prev: bool,
         level: u32,
-    ) -> Rc<RefCell<ClassSelectorPane>> {
+    ) -> RcRfc<ClassSelectorPane> {
         Rc::new(RefCell::new(ClassSelectorPane {
             selected_class: None,
             class_choices: choices,
@@ -53,7 +53,7 @@ impl ClassSelectorPane {
 }
 
 impl BuilderPane for ClassSelectorPane {
-    fn on_selected(&mut self, builder: &mut CharacterBuilder, widget: Rc<RefCell<Widget>>) {
+    fn on_selected(&mut self, builder: &mut CharacterBuilder, widget: RcRfc<Widget>) {
         builder.class = None;
         builder.prev.borrow_mut().state.set_enabled(self.allow_prev);
         builder
@@ -64,7 +64,7 @@ impl BuilderPane for ClassSelectorPane {
         widget.borrow_mut().invalidate_children();
     }
 
-    fn next(&mut self, builder: &mut CharacterBuilder, widget: Rc<RefCell<Widget>>) {
+    fn next(&mut self, builder: &mut CharacterBuilder, widget: RcRfc<Widget>) {
         let class = match self.selected_class {
             None => return,
             Some(ref class) => class,
@@ -73,7 +73,7 @@ impl BuilderPane for ClassSelectorPane {
         builder.next(&widget);
     }
 
-    fn prev(&mut self, builder: &mut CharacterBuilder, widget: Rc<RefCell<Widget>>) {
+    fn prev(&mut self, builder: &mut CharacterBuilder, widget: RcRfc<Widget>) {
         if self.allow_prev {
             self.selected_class = None;
             builder.prev(&widget);
@@ -92,7 +92,7 @@ impl WidgetKind for ClassSelectorPane {
         self
     }
 
-    fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+    fn on_add(&mut self, _widget: &RcRfc<Widget>) -> Vec<RcRfc<Widget>> {
         let title = Widget::with_theme(Label::empty(), "title");
 
         let classes_pane = Widget::empty("classes_pane");

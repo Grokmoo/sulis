@@ -19,7 +19,7 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 use sulis_core::io::GraphicsRenderer;
-use sulis_core::ui::{Callback, Widget, WidgetKind};
+use sulis_core::ui::{Callback, Widget, WidgetKind, RcRfc};
 use sulis_core::util::Point;
 use sulis_core::widgets::{Button, ScrollDirection, ScrollPane};
 use sulis_module::{Actor, Module};
@@ -35,7 +35,7 @@ pub struct ActorPicker {
 }
 
 impl ActorPicker {
-    pub fn new() -> Rc<RefCell<ActorPicker>> {
+    pub fn new() -> RcRfc<ActorPicker> {
         Rc::new(RefCell::new(ActorPicker {
             cur_actor: None,
             removal_actors: Vec::new(),
@@ -142,7 +142,7 @@ impl WidgetKind for ActorPicker {
         self
     }
 
-    fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+    fn on_add(&mut self, _widget: &RcRfc<Widget>) -> Vec<RcRfc<Widget>> {
         let mut all_actors = Module::all_actors();
         all_actors.sort_by(|a, b| a.id.cmp(&b.id));
 

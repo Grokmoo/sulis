@@ -34,7 +34,7 @@ pub struct ModuleSelector {
 }
 
 impl ModuleSelector {
-    pub fn new(modules: Vec<ModuleInfo>) -> Rc<RefCell<ModuleSelector>> {
+    pub fn new(modules: Vec<ModuleInfo>) -> RcRfc<ModuleSelector> {
         Rc::new(RefCell::new(ModuleSelector {
             modules,
             selected_module: None,
@@ -45,7 +45,7 @@ impl ModuleSelector {
 impl WidgetKind for ModuleSelector {
     widget_kind!("module_selector");
 
-    fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+    fn on_add(&mut self, _widget: &RcRfc<Widget>) -> Vec<RcRfc<Widget>> {
         let title = Widget::with_theme(Label::empty(), "title");
         let modules_title = Widget::with_theme(Label::empty(), "modules_title");
         let play = Widget::with_theme(Button::empty(), "play_button");

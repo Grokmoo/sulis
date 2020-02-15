@@ -14,10 +14,8 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::cell::RefCell;
 use std::collections::HashMap;
 use std::io::Error;
-use std::rc::Rc;
 use std::u64;
 
 use sulis_core::util::{ExtInt, Point};
@@ -31,7 +29,7 @@ use crate::area_state::TriggerState;
 use crate::script::CallbackData;
 use crate::{
     effect, prop_state::Interactive, turn_manager::EncounterRef, ActorState, Effect, EntityState,
-    Formation, GameState, Location, MerchantState, PStats, PropState, QuestState, WorldMapState,
+    Formation, GameState, Location, MerchantState, PStats, PropState, QuestState, WorldMapState, RcRfc,
 };
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -436,7 +434,7 @@ pub struct EntitySaveState {
 }
 
 impl EntitySaveState {
-    pub fn new(entity: Rc<RefCell<EntityState>>) -> EntitySaveState {
+    pub fn new(entity: RcRfc<EntityState>) -> EntitySaveState {
         let entity = entity.borrow();
 
         let actor_base = if entity.is_party_member() {

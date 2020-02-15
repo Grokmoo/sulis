@@ -14,15 +14,14 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::cell::RefCell;
 use std::rc::Rc;
 
-use crate::{animation::Anim, AreaFeedbackText, EntityState, GameState};
+use crate::{animation::Anim, AreaFeedbackText, EntityState, GameState, RcRfc};
 use crate::{script::ScriptEntitySet, ScriptCallback};
 use sulis_module::{DamageKind, HitFlags, HitKind};
 
 pub(in crate::animation) fn update(
-    attacker: &Rc<RefCell<EntityState>>,
+    attacker: &RcRfc<EntityState>,
     model: &mut MeleeAttackAnimModel,
     frac: f32,
 ) {
@@ -88,7 +87,7 @@ pub(in crate::animation) fn update(
     }
 }
 
-pub(in crate::animation) fn cleanup(owner: &Rc<RefCell<EntityState>>) {
+pub(in crate::animation) fn cleanup(owner: &RcRfc<EntityState>) {
     owner.borrow_mut().sub_pos = (0.0, 0.0);
 
     if !GameState::is_combat_active() {
@@ -100,27 +99,27 @@ pub(in crate::animation) fn cleanup(owner: &Rc<RefCell<EntityState>>) {
 }
 
 pub(in crate::animation) struct MeleeAttackAnimModel {
-    defender: Rc<RefCell<EntityState>>,
+    defender: RcRfc<EntityState>,
     callbacks: Vec<Box<dyn ScriptCallback>>,
     vector: (f32, f32),
     pub(in crate::animation) has_attacked: bool,
     attack_func: Box<
         dyn Fn(
-            &Rc<RefCell<EntityState>>,
-            &Rc<RefCell<EntityState>>,
+            &RcRfc<EntityState>,
+            &RcRfc<EntityState>,
         ) -> Vec<(HitKind, HitFlags, Vec<(DamageKind, u32)>)>,
     >,
 }
 
 pub fn new(
-    attacker: &Rc<RefCell<EntityState>>,
-    defender: &Rc<RefCell<EntityState>>,
+    attacker: &RcRfc<EntityState>,
+    defender: &RcRfc<EntityState>,
     duration_millis: u32,
     callbacks: Vec<Box<dyn ScriptCallback>>,
     attack_func: Box<
         dyn Fn(
-            &Rc<RefCell<EntityState>>,
-            &Rc<RefCell<EntityState>>,
+            &RcRfc<EntityState>,
+            &RcRfc<EntityState>,
         ) -> Vec<(HitKind, HitFlags, Vec<(DamageKind, u32)>)>,
     >,
 ) -> Anim {

@@ -14,16 +14,15 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::cell::RefCell;
 use std::rc::Rc;
 
-use sulis_core::ui::{Callback, Widget};
+use sulis_core::ui::{Callback, Widget, RcRfc};
 use sulis_module::{ItemState, QuickSlot, Slot};
 use sulis_state::{script::ScriptItemKind, EntityState, GameState, Script};
 
 use crate::{MerchantWindow, PropWindow, RootView};
 
-pub fn clear_quickslot_cb(entity: &Rc<RefCell<EntityState>>, slot: QuickSlot) -> Callback {
+pub fn clear_quickslot_cb(entity: &RcRfc<EntityState>, slot: QuickSlot) -> Callback {
     let entity = Rc::clone(entity);
     Callback::new(Rc::new(move |_, _| {
         let item = {
@@ -37,7 +36,7 @@ pub fn clear_quickslot_cb(entity: &Rc<RefCell<EntityState>>, slot: QuickSlot) ->
     }))
 }
 
-pub fn set_quickslot_cb(entity: &Rc<RefCell<EntityState>>, index: usize) -> Callback {
+pub fn set_quickslot_cb(entity: &RcRfc<EntityState>, index: usize) -> Callback {
     let entity = Rc::clone(entity);
     Callback::new(Rc::new(move |_, _| {
         let stash = GameState::party_stash();
@@ -64,7 +63,7 @@ pub fn set_quickslot_cb(entity: &Rc<RefCell<EntityState>>, index: usize) -> Call
     }))
 }
 
-pub fn use_item_cb(entity: &Rc<RefCell<EntityState>>, kind: ScriptItemKind) -> Callback {
+pub fn use_item_cb(entity: &RcRfc<EntityState>, kind: ScriptItemKind) -> Callback {
     let entity = Rc::clone(entity);
     Callback::new(Rc::new(move |_, _| {
         if let ScriptItemKind::Quick(slot) = kind {
@@ -83,7 +82,7 @@ pub fn take_item_cb(prop_index: usize, index: usize) -> Callback {
     }))
 }
 
-pub fn equip_item_cb(entity: &Rc<RefCell<EntityState>>, index: usize) -> Callback {
+pub fn equip_item_cb(entity: &RcRfc<EntityState>, index: usize) -> Callback {
     let entity = Rc::clone(entity);
     Callback::with(Box::new(move || {
         let stash = GameState::party_stash();
@@ -130,7 +129,7 @@ pub fn buy_item_cb(merchant_id: &str, index: usize) -> Callback {
     }))
 }
 
-pub fn sell_item_cb(entity: &Rc<RefCell<EntityState>>, index: usize) -> Callback {
+pub fn sell_item_cb(entity: &RcRfc<EntityState>, index: usize) -> Callback {
     let entity = Rc::clone(entity);
     Callback::new(Rc::new(move |widget, _| {
         let (root, root_view) = Widget::parent_mut::<RootView>(widget);
@@ -163,7 +162,7 @@ pub fn sell_item_cb(entity: &Rc<RefCell<EntityState>>, index: usize) -> Callback
     }))
 }
 
-pub fn drop_item_cb(entity: &Rc<RefCell<EntityState>>, index: usize) -> Callback {
+pub fn drop_item_cb(entity: &RcRfc<EntityState>, index: usize) -> Callback {
     let entity = Rc::clone(entity);
     Callback::new(Rc::new(move |widget, _| {
         let stash = GameState::party_stash();
@@ -174,7 +173,7 @@ pub fn drop_item_cb(entity: &Rc<RefCell<EntityState>>, index: usize) -> Callback
     }))
 }
 
-fn drop_item(widget: &Rc<RefCell<Widget>>, entity: &Rc<RefCell<EntityState>>, item: ItemState) {
+fn drop_item(widget: &RcRfc<Widget>, entity: &RcRfc<EntityState>, item: ItemState) {
     let (root, root_view) = Widget::parent_mut::<RootView>(widget);
     match root_view.get_prop_window(&root) {
         None => drop_to_ground(entity, item),
@@ -198,7 +197,7 @@ fn drop_to_prop(item: ItemState, prop_index: usize) {
     prop_state.add_item(item);
 }
 
-fn drop_to_ground(entity: &Rc<RefCell<EntityState>>, item: ItemState) {
+fn drop_to_ground(entity: &RcRfc<EntityState>, item: ItemState) {
     let p = entity.borrow().location.to_point();
     let area_state = GameState::area_state();
     let mut area_state = area_state.borrow_mut();
@@ -212,7 +211,7 @@ fn drop_to_ground(entity: &Rc<RefCell<EntityState>>, item: ItemState) {
     }
 }
 
-pub fn unequip_and_drop_item_cb(entity: &Rc<RefCell<EntityState>>, slot: Slot) -> Callback {
+pub fn unequip_and_drop_item_cb(entity: &RcRfc<EntityState>, slot: Slot) -> Callback {
     let entity = Rc::clone(entity);
     Callback::new(Rc::new(move |widget, _| {
         let item = entity.borrow_mut().actor.unequip(slot);
@@ -222,7 +221,7 @@ pub fn unequip_and_drop_item_cb(entity: &Rc<RefCell<EntityState>>, slot: Slot) -
     }))
 }
 
-pub fn unequip_item_cb(entity: &Rc<RefCell<EntityState>>, slot: Slot) -> Callback {
+pub fn unequip_item_cb(entity: &RcRfc<EntityState>, slot: Slot) -> Callback {
     let entity = Rc::clone(entity);
     Callback::with(Box::new(move || {
         let item = entity.borrow_mut().actor.unequip(slot);

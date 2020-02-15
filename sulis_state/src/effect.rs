@@ -14,13 +14,12 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::cell::RefCell;
 use std::collections::HashMap;
 use std::io::Error;
 use std::rc::Rc;
 
 use crate::script::{script_callback::FuncKind, CallbackData};
-use crate::{save_state::EffectSaveState, ChangeListenerList, EntityState};
+use crate::{save_state::EffectSaveState, ChangeListenerList, EntityState, RcRfc};
 use sulis_core::util::{invalid_data_error, ExtInt, Point};
 use sulis_module::{BonusList, ROUND_TIME_MILLIS};
 
@@ -71,7 +70,7 @@ impl Effect {
     pub fn load(
         data: EffectSaveState,
         new_index: usize,
-        entities: &HashMap<usize, Rc<RefCell<EntityState>>>,
+        entities: &HashMap<usize, RcRfc<EntityState>>,
     ) -> Result<Effect, Error> {
         let mut callbacks = Vec::new();
         for mut cb in data.callbacks {

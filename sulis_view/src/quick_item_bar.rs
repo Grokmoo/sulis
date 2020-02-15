@@ -24,7 +24,7 @@ use crate::{
     ItemButton,
 };
 use sulis_core::io::{keyboard_event::Key, InputAction};
-use sulis_core::ui::{animation_state, Callback, Widget, WidgetKind};
+use sulis_core::ui::{animation_state, Callback, Widget, WidgetKind, RcRfc};
 use sulis_core::widgets::{Button, Label};
 use sulis_module::QuickSlot;
 use sulis_state::{script::ScriptItemKind, ChangeListener, EntityState, GameState};
@@ -32,17 +32,17 @@ use sulis_state::{script::ScriptItemKind, ChangeListener, EntityState, GameState
 pub const NAME: &str = "quick_item_bar";
 
 pub struct QuickItemBar {
-    entity: Rc<RefCell<EntityState>>,
+    entity: RcRfc<EntityState>,
     swap_weapons_key: Option<Key>,
     quick_item_keys: [Option<Key>; 4],
-    quick_items: Vec<Option<Rc<RefCell<Widget>>>>,
+    quick_items: Vec<Option<RcRfc<Widget>>>,
 }
 
 impl QuickItemBar {
     pub fn new(
-        entity: &Rc<RefCell<EntityState>>,
+        entity: &RcRfc<EntityState>,
         keybindings: &HashMap<InputAction, Key>,
-    ) -> Rc<RefCell<QuickItemBar>> {
+    ) -> RcRfc<QuickItemBar> {
         let swap_weapons_key = keybindings.get(&InputAction::SwapWeapons).cloned();
         let quick_item_keys = [
             keybindings.get(&InputAction::QuickItem1).cloned(),
@@ -96,7 +96,7 @@ impl QuickItemBar {
         slot: QuickSlot,
         key_index: usize,
         theme_id: &str,
-    ) -> Rc<RefCell<Widget>> {
+    ) -> RcRfc<Widget> {
         let key = self.quick_item_keys[key_index];
         let (button, add) = create_button(&self.entity, slot, key, theme_id);
 
@@ -112,7 +112,7 @@ impl QuickItemBar {
 impl WidgetKind for QuickItemBar {
     widget_kind!(NAME);
 
-    fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+    fn on_add(&mut self, widget: &RcRfc<Widget>) -> Vec<RcRfc<Widget>> {
         self.quick_items.clear();
 
         {
@@ -169,11 +169,11 @@ impl WidgetKind for QuickItemBar {
 }
 
 fn create_button(
-    entity: &Rc<RefCell<EntityState>>,
+    entity: &RcRfc<EntityState>,
     slot: QuickSlot,
     key: Option<Key>,
     theme_id: &str,
-) -> (Rc<RefCell<Widget>>, bool) {
+) -> (RcRfc<Widget>, bool) {
     let stash = GameState::party_stash();
     let actor = &entity.borrow().actor;
     match actor.inventory().quick(slot) {

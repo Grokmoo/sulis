@@ -18,7 +18,7 @@ use std::any::Any;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use sulis_core::ui::{Widget, WidgetKind};
+use sulis_core::ui::{Widget, WidgetKind, RcRfc};
 use sulis_core::widgets::{Label, TextArea};
 use sulis_module::{Ability, Class};
 
@@ -34,7 +34,7 @@ pub struct LevelUpFinishPane {
 }
 
 impl LevelUpFinishPane {
-    pub fn new(level: u32) -> Rc<RefCell<LevelUpFinishPane>> {
+    pub fn new(level: u32) -> RcRfc<LevelUpFinishPane> {
         Rc::new(RefCell::new(LevelUpFinishPane {
             class: None,
             abilities: Vec::new(),
@@ -44,7 +44,7 @@ impl LevelUpFinishPane {
 }
 
 impl BuilderPane for LevelUpFinishPane {
-    fn on_selected(&mut self, builder: &mut CharacterBuilder, widget: Rc<RefCell<Widget>>) {
+    fn on_selected(&mut self, builder: &mut CharacterBuilder, widget: RcRfc<Widget>) {
         builder.prev.borrow_mut().state.set_enabled(true);
         builder.next.borrow_mut().state.set_enabled(false);
         builder.next.borrow_mut().state.set_visible(false);
@@ -61,9 +61,9 @@ impl BuilderPane for LevelUpFinishPane {
         widget.borrow_mut().invalidate_children();
     }
 
-    fn next(&mut self, _builder: &mut CharacterBuilder, _widget: Rc<RefCell<Widget>>) {}
+    fn next(&mut self, _builder: &mut CharacterBuilder, _widget: RcRfc<Widget>) {}
 
-    fn prev(&mut self, builder: &mut CharacterBuilder, widget: Rc<RefCell<Widget>>) {
+    fn prev(&mut self, builder: &mut CharacterBuilder, widget: RcRfc<Widget>) {
         builder.next.borrow_mut().state.set_visible(true);
         builder.finish.borrow_mut().state.set_visible(false);
         builder.prev(&widget);
@@ -81,7 +81,7 @@ impl WidgetKind for LevelUpFinishPane {
         self
     }
 
-    fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+    fn on_add(&mut self, _widget: &RcRfc<Widget>) -> Vec<RcRfc<Widget>> {
         let title = Widget::with_theme(Label::empty(), "title");
 
         let class = match &self.class {

@@ -21,18 +21,18 @@ use std::rc::Rc;
 use crate::{main_menu::MainMenu, Button, Label};
 use sulis_core::config::{self, Config};
 use sulis_core::resource::write_to_file;
-use sulis_core::ui::{Callback, Widget, WidgetKind};
+use sulis_core::ui::{Callback, Widget, WidgetKind, RcRfc};
 
 pub struct SaveOrRevertOptionsWindow {
     old_config: Config,
     elapsed: u32,
-    timer: Rc<RefCell<Widget>>,
+    timer: RcRfc<Widget>,
 }
 
 const TIMER_LEN: u32 = 10000;
 
 impl SaveOrRevertOptionsWindow {
-    pub fn new(old_config: Config) -> Rc<RefCell<SaveOrRevertOptionsWindow>> {
+    pub fn new(old_config: Config) -> RcRfc<SaveOrRevertOptionsWindow> {
         let timer = Widget::with_theme(Label::empty(), "timer");
         timer.borrow_mut().state.text = (TIMER_LEN / 1000).to_string();
         Rc::new(RefCell::new(SaveOrRevertOptionsWindow {
@@ -42,7 +42,7 @@ impl SaveOrRevertOptionsWindow {
         }))
     }
 
-    fn revert(&self, widget: &Rc<RefCell<Widget>>) {
+    fn revert(&self, widget: &RcRfc<Widget>) {
         let config = self.old_config.clone();
 
         Config::set(config);
@@ -52,7 +52,7 @@ impl SaveOrRevertOptionsWindow {
         main_menu.recreate_io();
     }
 
-    fn accept(&self, widget: &Rc<RefCell<Widget>>) {
+    fn accept(&self, widget: &RcRfc<Widget>) {
         let config = Config::get_clone();
         let mut path = config::USER_DIR.clone();
         path.push("config.yml");
@@ -72,7 +72,7 @@ impl WidgetKind for SaveOrRevertOptionsWindow {
         widget.do_base_layout();
     }
 
-    fn update(&mut self, widget: &Rc<RefCell<Widget>>, millis: u32) {
+    fn update(&mut self, widget: &RcRfc<Widget>, millis: u32) {
         self.elapsed += millis;
 
         let remaining = ((TIMER_LEN - self.elapsed) as f32 / 1000.0).round() as i32;
@@ -83,7 +83,7 @@ impl WidgetKind for SaveOrRevertOptionsWindow {
         }
     }
 
-    fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+    fn on_add(&mut self, _widget: &RcRfc<Widget>) -> Vec<RcRfc<Widget>> {
         let title = Widget::with_theme(Label::empty(), "title");
         let accept = Widget::with_theme(Button::empty(), "accept");
         accept

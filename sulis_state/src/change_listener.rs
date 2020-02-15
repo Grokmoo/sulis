@@ -14,10 +14,9 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::cell::RefCell;
 use std::rc::Rc;
 
-use sulis_core::ui::Widget;
+use sulis_core::ui::{Widget, RcRfc};
 
 pub struct ChangeListenerList<T> {
     listeners: Vec<ChangeListener<T>>,
@@ -61,7 +60,7 @@ impl<T> ChangeListener<T> {
         }
     }
 
-    pub fn remove_widget(id: &str, widget: &Rc<RefCell<Widget>>) -> ChangeListener<T> {
+    pub fn remove_widget(id: &str, widget: &RcRfc<Widget>) -> ChangeListener<T> {
         let widget_ref = Rc::clone(widget);
         ChangeListener {
             cb: Box::new(move |_t| {
@@ -71,7 +70,7 @@ impl<T> ChangeListener<T> {
         }
     }
 
-    pub fn invalidate(id: &str, widget: &Rc<RefCell<Widget>>) -> ChangeListener<T> {
+    pub fn invalidate(id: &str, widget: &RcRfc<Widget>) -> ChangeListener<T> {
         let widget_ref = Rc::clone(widget);
         ChangeListener {
             cb: Box::new(move |_t| {
@@ -81,7 +80,7 @@ impl<T> ChangeListener<T> {
         }
     }
 
-    pub fn invalidate_layout(id: &str, widget: &Rc<RefCell<Widget>>) -> ChangeListener<T> {
+    pub fn invalidate_layout(id: &str, widget: &RcRfc<Widget>) -> ChangeListener<T> {
         let widget_ref = Rc::clone(widget);
         ChangeListener {
             cb: Box::new(move |_t| {

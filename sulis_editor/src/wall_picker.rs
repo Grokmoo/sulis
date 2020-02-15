@@ -21,7 +21,7 @@ use std::rc::Rc;
 use sulis_core::config::Config;
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::resource::{ResourceSet, Sprite};
-use sulis_core::ui::{Callback, Color, Widget, WidgetKind};
+use sulis_core::ui::{Callback, Color, Widget, WidgetKind, RcRfc};
 use sulis_core::util::Point;
 use sulis_core::widgets::{Button, Label, ScrollDirection, ScrollPane, Spinner};
 use sulis_module::{area::tile::WallRules, area::MAX_AREA_SIZE, Module};
@@ -31,10 +31,10 @@ use crate::{AreaModel, EditorMode};
 const NAME: &str = "wall_picker";
 
 pub struct WallPicker {
-    level_widget: Rc<RefCell<Widget>>,
+    level_widget: RcRfc<Widget>,
 
-    brush_size_spinner: Rc<RefCell<Spinner>>,
-    brush_size_widget: Rc<RefCell<Widget>>,
+    brush_size_spinner: RcRfc<Spinner>,
+    brush_size_widget: RcRfc<Widget>,
     cursor_sprite: Rc<Sprite>,
 
     cursor_pos: Option<Point>,
@@ -48,7 +48,7 @@ pub struct WallPicker {
 }
 
 impl WallPicker {
-    pub fn new() -> Rc<RefCell<WallPicker>> {
+    pub fn new() -> RcRfc<WallPicker> {
         let cursor_sprite = ResourceSet::panic_or_sprite(&Config::editor_config().cursor);
 
         let wall_rules = Module::wall_rules();
@@ -233,7 +233,7 @@ impl WidgetKind for WallPicker {
         self
     }
 
-    fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+    fn on_add(&mut self, _widget: &RcRfc<Widget>) -> Vec<RcRfc<Widget>> {
         self.level_widget
             .borrow_mut()
             .state

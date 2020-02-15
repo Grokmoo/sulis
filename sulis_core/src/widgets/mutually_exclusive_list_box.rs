@@ -20,7 +20,7 @@ use std::fmt::Display;
 use std::rc::Rc;
 use std::slice::Iter;
 
-use crate::ui::{Callback, Widget, WidgetKind};
+use crate::ui::{Callback, Widget, WidgetKind, RcRfc};
 
 use crate::widgets::{
     list_box::{self, Entry},
@@ -34,7 +34,7 @@ pub struct MutuallyExclusiveListBox<T: Display + Clone + 'static> {
 }
 
 impl<T: Display + Clone + 'static> MutuallyExclusiveListBox<T> {
-    pub fn new(entries: Vec<Entry<T>>) -> Rc<RefCell<MutuallyExclusiveListBox<T>>> {
+    pub fn new(entries: Vec<Entry<T>>) -> RcRfc<MutuallyExclusiveListBox<T>> {
         Rc::new(RefCell::new(MutuallyExclusiveListBox {
             list_box: ListBox { entries },
             cb: Rc::new(|_entry| {}),
@@ -45,7 +45,7 @@ impl<T: Display + Clone + 'static> MutuallyExclusiveListBox<T> {
     pub fn with_callback(
         entries: Vec<Entry<T>>,
         cb: Rc<dyn Fn(Option<&Entry<T>>)>,
-    ) -> Rc<RefCell<MutuallyExclusiveListBox<T>>> {
+    ) -> RcRfc<MutuallyExclusiveListBox<T>> {
         Rc::new(RefCell::new(MutuallyExclusiveListBox {
             list_box: ListBox { entries },
             cb,
@@ -81,7 +81,7 @@ impl<T: Display + Clone> WidgetKind for MutuallyExclusiveListBox<T> {
         self
     }
 
-    fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+    fn on_add(&mut self, widget: &RcRfc<Widget>) -> Vec<RcRfc<Widget>> {
         let mut children = Vec::new();
         for widget in self.list_box.on_add(widget) {
             widget

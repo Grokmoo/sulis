@@ -6,3 +6,4 @@ hooks:
 params:
   AttackWhenHasAbilitiesChance: 0
   AlwaysUseAbilityPriority: 1
+  MeleeAttackMoveTries: 2

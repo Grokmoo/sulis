@@ -20,7 +20,7 @@ use std::collections::HashMap;
 use std::rc::Rc;
 
 use sulis_core::config::Config;
-use sulis_core::image::{Image, LayeredImage};
+use sulis_core::image::{layered_image::Layer, Image, LayeredImage};
 use sulis_core::io::GraphicsRenderer;
 use sulis_core::resource::write_to_file;
 use sulis_core::ui::{Callback, Widget, WidgetKind, RcRfc};
@@ -133,7 +133,8 @@ impl ActorCreatorWindow {
                 Some((_, ref image)) => Rc::clone(image),
             };
 
-            images.push((0.0, 0.0, None, image));
+            let out = Layer::new(0.0, 0.0, None, image);
+            images.push(out);
         }
         self.preview = Some(Rc::new(LayeredImage::new(images, Some(self.selected_hue))));
     }

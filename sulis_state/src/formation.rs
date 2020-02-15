@@ -115,6 +115,7 @@ impl Formation {
                     parent_w,
                     parent_h,
                     dist,
+                    max_path_len: None,
                 };
                 if GameState::can_move_towards_dest(
                     &to_move.borrow(),

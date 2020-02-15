@@ -700,11 +700,13 @@ impl WidgetKind for RootView {
     }
 }
 
+type CB = dyn Fn(&RcRfc<Widget>, &mut dyn WidgetKind);
+
 fn create_button(
     keybindings: &HashMap<InputAction, Key>,
     action: InputAction,
     id: &str,
-    cb: Rc<dyn Fn(&RcRfc<Widget>, &mut dyn WidgetKind)>,
+    cb: Rc<CB>,
 ) -> RcRfc<Widget> {
     let button = Widget::with_theme(Button::empty(), id);
     {

@@ -1095,6 +1095,7 @@ impl GameState {
             parent_w,
             parent_h,
             dist,
+            max_path_len: None,
         }
     }
 
@@ -1112,23 +1113,8 @@ impl GameState {
             parent_w,
             parent_h,
             dist,
+            max_path_len: None,
         }
-    }
-
-    pub fn can_move_towards(
-        entity: &RcRfc<EntityState>,
-        target: &RcRfc<EntityState>,
-    ) -> Option<Vec<Point>> {
-        let dest = GameState::get_target_dest(&entity.borrow(), &target.borrow());
-        GameState::can_move_towards_dest(&entity.borrow(), Vec::new(), dest)
-    }
-
-    pub fn move_towards(
-        entity: &RcRfc<EntityState>,
-        target: &RcRfc<EntityState>,
-    ) -> bool {
-        let dest = GameState::get_target_dest(&entity.borrow(), &target.borrow());
-        GameState::move_towards_dest(entity, Vec::new(), dest, None)
     }
 
     pub fn move_towards_dest(

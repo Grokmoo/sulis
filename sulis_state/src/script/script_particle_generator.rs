@@ -291,7 +291,12 @@ fn dist_param(
                 Ok(DistParam::new(value, dt, d2t, Dist::create_fixed(0.0)))
             }
         } else {
-            Ok(DistParam::new(value, dt, Dist::create_fixed(0.0), Dist::create_fixed(0.0)))
+            Ok(DistParam::new(
+                value,
+                dt,
+                Dist::create_fixed(0.0),
+                Dist::create_fixed(0.0),
+            ))
         }
     } else {
         Ok(DistParam::new(

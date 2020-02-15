@@ -161,7 +161,7 @@ fn add_member_auras(mgr: &mut TurnManager, area: &mut AreaState, index: usize, d
             Some(ref mut surface) => surface,
         };
         surface.area_id = area.area.area.id.to_string();
-        for ref mut p in surface.points.iter_mut() {
+        for p in surface.points.iter_mut() {
             p.x -= dx;
             p.y -= dy;
         }

@@ -2,6 +2,17 @@ MIN_MULTIPLE_SCORE= 2
 MOVE_THRESHOLD = 0.1
 HEALING_FRAC = 0.5
 WAIT_TIME = 10
+MAX_MOVE_LEN = 60
+
+-- This AI reads the following params
+-- AttackWhenHasAbilitiesChance value from 0 to 100.  Percent chance to use a standard attack
+-- when the parent has a potential ability use
+-- AlwaysUseAbilityPriority integer value.  Abilities with this ai_priority or less will always
+-- be used over standard attacks, disregarding AttackWhenHasAbilitiesChance
+-- MeleeAttackMoveTries integer from 0 to 5.  When greater than 0, the parent will attempt to
+-- move closer to targets even if they cannot directly attack, up to the specified distance
+-- multiplied by the parent size.  This normally will make it easy
+-- for the player to dispatch them with area of effect attacks.
 
 function ai_action(parent, params)
     -- set default value of 0 for all params
@@ -96,22 +107,27 @@ function ai_action(parent, params)
         return end_turn(parent)
     end
 
-    for i = 1, #targets do
-        local target = targets[i]
-        game:log("  Checking for attack against " .. target:id())
+    local max_retries = params["MeleeAttackMoveTries"]
 
-        local result = check_move_for_attack(parent, target)
-        if result.attack then
-            game:log("  Perform attack")
-            parent:anim_weapon_attack(target, nil, true)
-            parent:clear_flag("ai_force_attack")
+    for retry = 0, max_retries do
+        game:log("Trying to find attack target attempt " .. tostring(retry))
+        for i = 1, #targets do
+            local target = targets[i]
+            game:log("  Checking for attack against " .. target:id())
 
-            return parent:state_wait(WAIT_TIME)
-        end
+            local result = check_move_for_attack(parent, target, retry)
+            if result.attack then
+                game:log("  Perform attack")
+                parent:anim_weapon_attack(target, nil, true)
+                parent:clear_flag("ai_force_attack")
 
-        if result.moved then
-            game:log("  Moved.")
-            return parent:state_wait(WAIT_TIME)
+                return parent:state_wait(WAIT_TIME)
+            end
+
+            if result.moved then
+                game:log("  Moved.")
+                return parent:state_wait(WAIT_TIME)
+            end
         end
     end
 
@@ -165,7 +181,7 @@ function attempt_run_away(parent, hostiles)
     end
 end
 
-function check_move_for_attack(parent, target)
+function check_move_for_attack(parent, target, attempt)
     if not parent:stats().attack_is_ranged then
         game:log("    Melee attack")
         if parent:is_within_attack_dist(target) then
@@ -173,8 +189,11 @@ function check_move_for_attack(parent, target)
             return { attack=true }
         end
 
+        local increase = attempt * math.max(parent:width(), parent:height())
+
         game:log("    Attempt move towards target")
-        if not parent:move_towards_entity(target) then
+        local target_dist = parent:stats().attack_distance
+        if not parent:move_towards_entity(target, target_dist + increase, MAX_MOVE_LEN) then
             game:log("    Unable to move.")
 
             return { attack=false }
@@ -182,6 +201,12 @@ function check_move_for_attack(parent, target)
 
         return { attack=false, moved=true }
     else
+        if attempt > 0 then
+          -- Don't retry ranged attacks since we aren't doing anything different
+          game:log("  Not retrying ranged attacks.")
+          return { attack=false }
+        end
+
         game:log("    Ranged attack")
         local dist = parent:dist_to_entity(target)
         local target_dist = parent:stats().attack_distance - 1
@@ -189,7 +214,7 @@ function check_move_for_attack(parent, target)
         game:log("At dist " .. tostring(dist) .. " target dist is " .. tostring(target_dist))
         if dist > target_dist then
             game:log("    Attempt move towards target")
-            if not parent:move_towards_entity(target, target_dist) then
+            if not parent:move_towards_entity(target, target_dist, MAX_MOVE_LEN) then
                 game:log("    Unable to move.")
                 return { attack=false }
             end
@@ -199,9 +224,9 @@ function check_move_for_attack(parent, target)
 
         if not parent:has_visibility(target) then
             game:log("    No visibility.  Move towards")
-            if not parent:move_towards_entity(target, dist - 2) then
+            if not parent:move_towards_entity(target, dist - 2, MAX_MOVE_LEN) then
                 game:log("    Unable to move.")
-                return { attack=false, done=true }
+                return { attack=false }
             end
 
             return { attack=false, moved=true }
@@ -488,7 +513,7 @@ function check_action(parent, ai_data, hostiles, friendlies, failed_use_count)
 end
 
 function check_move_towards(parent, target, dist)
-    if parent:move_towards_entity(target, dist) then
+    if parent:move_towards_entity(target, dist, MAX_MOVE_LEN) then
         return { done=true }
     else
         game:log("      Unable to path towards " .. target:id())

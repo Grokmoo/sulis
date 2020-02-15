@@ -438,6 +438,7 @@ impl Shape {
         points
     }
 
+    #[allow(clippy::collapsible_if)]
     fn get_points_line_internal(
         &self,
         start: Point,

@@ -980,7 +980,7 @@ impl AreaState {
                 Some(ref mut surface) => surface,
             };
             let old_entities = self.remove_surface(aura_index, &surface.points);
-            for ref mut p in surface.points.iter_mut() {
+            for p in surface.points.iter_mut() {
                 p.x -= d_x;
                 p.y -= d_y;
             }

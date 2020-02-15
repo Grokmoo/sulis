@@ -22,12 +22,10 @@ use std::str::FromStr;
 
 use crate::actor::Sex;
 use crate::Race;
-use sulis_core::image::Image;
+use sulis_core::image::{layered_image::Layer, Image};
 use sulis_core::resource::ResourceSet;
 use sulis_core::ui::Color;
 use sulis_core::util::invalid_data_error;
-
-type ImageList = Vec<(f32, f32, Option<Color>, Rc<dyn Image>)>;
 
 #[derive(Deserialize, Serialize, Debug, Copy, Clone, PartialEq, Eq, Hash)]
 #[serde(deny_unknown_fields)]
@@ -132,12 +130,7 @@ impl ImageLayerSet {
 
     /// Gets the list of images from this ImageLayerSet for the given Sex.
     /// The images are ordered based on the iteration order of ImageLayer
-    pub fn get_list(
-        &self,
-        sex: Sex,
-        hair: Option<Color>,
-        skin: Option<Color>,
-    ) -> ImageList {
+    pub fn get_list(&self, sex: Sex, hair: Option<Color>, skin: Option<Color>) -> Vec<Layer> {
         let mut list = Vec::new();
 
         match self.images.get(&sex) {
@@ -149,7 +142,8 @@ impl ImageLayerSet {
                         Some(ref image) => Rc::clone(image),
                     };
 
-                    list.push((0.0, 0.0, get_color(*layer, hair, skin), image));
+                    let out = Layer::new(0.0, 0.0, get_color(*layer, hair, skin), image);
+                    list.push(out);
                 }
             }
         }
@@ -166,7 +160,7 @@ impl ImageLayerSet {
         hair: Option<Color>,
         skin: Option<Color>,
         insert: HashMap<ImageLayer, Rc<dyn Image>>,
-    ) -> ImageList {
+    ) -> Vec<Layer> {
         let mut list = Vec::new();
 
         match self.images.get(&sex) {
@@ -186,7 +180,8 @@ impl ImageLayerSet {
                         Some((x, y)) => (*x, *y),
                     };
                     if let Some(image) = sex_map.get(&layer) {
-                        list.push((x, y, get_color(*layer, hair, skin), Rc::clone(image)));
+                        let out = Layer::new(x, y, get_color(*layer, hair, skin), Rc::clone(image));
+                        list.push(out);
                     }
                 }
             }
@@ -234,7 +229,7 @@ fn get_color(layer: ImageLayer, hair: Option<Color>, skin: Option<Color>) -> Opt
 }
 
 fn insert_for_race_sex(
-    list: &mut ImageList,
+    list: &mut Vec<Layer>,
     insert: &HashMap<ImageLayer, Rc<dyn Image>>,
     sex: Sex,
     race: &Rc<Race>,
@@ -253,7 +248,8 @@ fn insert_for_race_sex(
                 y -= (image.get_height_f32() - height_base) / 2.0;
             }
 
-            list.push((x, y, None, race.image_for_sex(sex, image)));
+            let out = Layer::new(x, y, None, race.image_for_sex(sex, image));
+            list.push(out);
             true
         }
         None => false,

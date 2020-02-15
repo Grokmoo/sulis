@@ -18,8 +18,10 @@ use std::rc::Rc;
 
 use crate::ui::{Widget, WidgetKind, RcRfc};
 
+type CallbackFn = dyn Fn(&RcRfc<Widget>, &mut dyn WidgetKind);
+
 pub struct Callback {
-    cb: Rc<dyn Fn(&RcRfc<Widget>, &mut dyn WidgetKind)>,
+    cb: Rc<CallbackFn>,
 }
 
 impl Clone for Callback {
@@ -37,7 +39,7 @@ impl Callback {
         }
     }
 
-    pub fn new(f: Rc<dyn Fn(&RcRfc<Widget>, &mut dyn WidgetKind)>) -> Callback {
+    pub fn new(f: Rc<CallbackFn>) -> Callback {
         Callback { cb: f }
     }
 

@@ -567,7 +567,9 @@ impl AttackAction {
             pc.actor.stats.attack_cost
         };
 
-        if target.borrow().actor.stats.hidden { return None; }
+        if target.borrow().actor.stats.hidden {
+            return None;
+        }
 
         if can_attack(&*pc.borrow(), &*target.borrow()) {
             Some(Box::new(AttackAction { pc, target, ap }))
@@ -751,6 +753,7 @@ impl MoveAction {
             parent_w,
             parent_h,
             dist,
+            max_path_len: None,
         };
 
         let path = match GameState::can_move_towards_dest(&pc.borrow(), entities_to_ignore(), dest)

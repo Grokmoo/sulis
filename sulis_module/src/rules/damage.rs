@@ -28,7 +28,7 @@ pub struct DamageList {
 }
 
 impl DamageList {
-    pub fn as_vec(self) -> Vec<Damage> {
+    pub fn into_vec(self) -> Vec<Damage> {
         self.damage
     }
 

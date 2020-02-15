@@ -244,13 +244,14 @@ use sulis_module::{
 /// functions.  The targeter can then be configured before calling `activate()`.  See
 /// `create_targeter` above.
 ///
-/// # `move_towards_entity(target: ScriptEntity, distance: Float (Optional)) -> Bool`
+/// # `move_towards_entity(target: ScriptEntity, distance: Float (Optional), max_len: Int
+/// (Optional)) -> Bool`
 /// Causes this entity to attempt to begin moving towards the specified `target`.  If this
 /// entity cannot move at all towards the desired target, returns false, otherwise, returns
 /// true and creates a move animation that will proceed to be run asynchronously.
 /// Optionally, a `distance` can be specified which is the distance this entity should be
 /// within the target to complete the move.  If no distance is specified, the entity
-/// attempts to move within attack range.
+/// attempts to move within attack range.  Can optionally specify a maximum path distance.
 ///
 /// # `move_towards_point(x: Float, y: Float, distance: Float (Optional)) -> Bool`
 /// Causes this entity to attempt to begin moving towards the specified point at
@@ -1017,22 +1018,23 @@ impl UserData for ScriptEntity {
 
         methods.add_method(
             "move_towards_entity",
-            |_, entity, (dest, dist): (ScriptEntity, Option<f32>)| {
+            |_, entity, (dest, dist, max_len): (ScriptEntity, Option<f32>, Option<u32>)| {
                 let parent = entity.try_unwrap()?;
                 let target = dest.try_unwrap()?;
 
+                let mut dest = GameState::get_target_dest(&*parent.borrow(), &*target.borrow());
                 if let Some(dist) = dist {
-                    let mut dest = GameState::get_target_dest(&*parent.borrow(), &*target.borrow());
                     dest.dist = dist;
-                    Ok(GameState::move_towards_dest(
-                        &parent,
-                        Vec::new(),
-                        dest,
-                        None,
-                    ))
-                } else {
-                    Ok(GameState::move_towards(&parent, &target))
                 }
+
+                dest.max_path_len = max_len;
+
+                Ok(GameState::move_towards_dest(
+                    &parent,
+                    Vec::new(),
+                    dest,
+                    None,
+                ))
             },
         );
 
@@ -1206,6 +1208,7 @@ impl UserData for ScriptEntity {
             Ok(())
         });
 
+        #[allow(clippy::type_complexity)]
         methods.add_method(
             "special_attack",
             |_,

@@ -22,8 +22,6 @@ use crate::Module;
 use sulis_core::resource::{ResourceSet, Sprite};
 use sulis_core::util::{gen_rand, invalid_data_error, unable_to_create_error, Point, Size};
 
-type Preview = Vec<(Rc<Tile>, Point)>;
-
 #[derive(Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct FeatureBuilder {
@@ -39,11 +37,13 @@ pub struct FeatureEntry {
     tiles: HashMap<String, Vec<Point>>,
 }
 
+type PositionedTile = (Rc<Tile>, Point);
+
 pub struct Feature {
     pub id: String,
     pub size: Size,
-    entries: Vec<(Preview, u32)>,
-    pub preview: Preview,
+    entries: Vec<(Vec<PositionedTile>, u32)>,
+    pub preview: Vec<PositionedTile>,
 }
 
 impl Feature {
@@ -84,7 +84,7 @@ impl Feature {
         })
     }
 
-    pub fn rand_entry(&self) -> &[(Rc<Tile>, Point)] {
+    pub fn rand_entry(&self) -> &[PositionedTile] {
         if self.entries.len() == 1 {
             &self.entries[0].0
         } else {

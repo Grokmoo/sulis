@@ -311,7 +311,7 @@ impl DrawList {
             Some(centroid) => (centroid[0], centroid[1]),
         };
 
-        for vertex in &mut self.quads.iter_mut() {
+        for vertex in self.quads.iter_mut() {
             let x = vertex.position[0] - avg_x;
             let y = vertex.position[1] - avg_y;
 

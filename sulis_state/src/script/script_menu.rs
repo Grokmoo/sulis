@@ -82,7 +82,7 @@ impl UserData for ScriptMenu {
                 warn!("Attempted to show menu for a non-player");
                 warn!(
                     "You may want to specify an AI-specific on_activate \
-                      in the Ability/Item AIData"
+                     in the Ability/Item AIData"
                 );
                 return Ok(());
             }

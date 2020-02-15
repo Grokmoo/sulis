@@ -98,6 +98,9 @@ pub(in crate::animation) fn cleanup(owner: &RcRfc<EntityState>) {
     }
 }
 
+type Entity = RcRfc<EntityState>;
+type AttackResult = Vec<(HitKind, HitFlags, Vec<(DamageKind, u32)>)>;
+
 pub(in crate::animation) struct MeleeAttackAnimModel {
     defender: RcRfc<EntityState>,
     callbacks: Vec<Box<dyn ScriptCallback>>,
@@ -116,12 +119,7 @@ pub fn new(
     defender: &RcRfc<EntityState>,
     duration_millis: u32,
     callbacks: Vec<Box<dyn ScriptCallback>>,
-    attack_func: Box<
-        dyn Fn(
-            &RcRfc<EntityState>,
-            &RcRfc<EntityState>,
-        ) -> Vec<(HitKind, HitFlags, Vec<(DamageKind, u32)>)>,
-    >,
+    attack_func: Box<dyn Fn(&Entity, &Entity) -> AttackResult>,
 ) -> Anim {
     let x = defender.borrow().location.x + defender.borrow().size.width / 2
         - attacker.borrow().location.x

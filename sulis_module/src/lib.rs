@@ -474,50 +474,7 @@ impl Module {
                 insert_if_ok("size", id, ObjectSize::new(builder), &mut module.sizes);
             }
 
-            let mut feature_builders = Vec::new();
-            for (_, mut tiles_list) in builder_set.tile_builders {
-                tiles_list.move_tiles();
-
-                if let Some(rules) = tiles_list.terrain_rules {
-                    if module.terrain_rules.is_some() {
-                        warn!("Overwritting terrain rules.");
-                    }
-                    module.terrain_rules = Some(rules);
-                }
-
-                if let Some(rules) = tiles_list.wall_rules {
-                    if module.wall_rules.is_some() {
-                        warn!("Overwritting wall rules.");
-                    }
-                    module.wall_rules = Some(rules);
-                }
-
-                module.terrain_kinds.append(&mut tiles_list.terrain_kinds);
-                module.wall_kinds.append(&mut tiles_list.wall_kinds);
-
-                for (id, tile_builder) in tiles_list.tiles {
-                    insert_if_ok(
-                        "tile",
-                        id.to_string(),
-                        Tile::new(id, tile_builder),
-                        &mut module.tiles,
-                    );
-                }
-
-                tiles_list
-                    .features
-                    .drain()
-                    .for_each(|f| feature_builders.push(f));
-            }
-
-            for (id, feature_builder) in feature_builders {
-                insert_if_ok(
-                    "feature",
-                    id.to_string(),
-                    Feature::new(id, feature_builder, &module),
-                    &mut module.features,
-                );
-            }
+            Module::load_tiles(&mut module, builder_set.tile_builders);
 
             for (id, builder) in builder_set.ai_builders {
                 module.ai_templates.insert(id, Rc::new(builder));
@@ -640,6 +597,53 @@ impl Module {
         });
 
         Ok(())
+    }
+
+    fn load_tiles(module: &mut Module, tile_builders: HashMap<String, Tileset>) {
+        let mut feature_builders = Vec::new();
+        for (_, mut tiles_list) in tile_builders {
+            tiles_list.move_tiles();
+
+            if let Some(rules) = tiles_list.terrain_rules {
+                if module.terrain_rules.is_some() {
+                    warn!("Overwritting terrain rules.");
+                }
+                module.terrain_rules = Some(rules);
+            }
+
+            if let Some(rules) = tiles_list.wall_rules {
+                if module.wall_rules.is_some() {
+                    warn!("Overwritting wall rules.");
+                }
+                module.wall_rules = Some(rules);
+            }
+
+            module.terrain_kinds.append(&mut tiles_list.terrain_kinds);
+            module.wall_kinds.append(&mut tiles_list.wall_kinds);
+
+            for (id, tile_builder) in tiles_list.tiles {
+                insert_if_ok(
+                    "tile",
+                    id.to_string(),
+                    Tile::new(id, tile_builder),
+                    &mut module.tiles,
+                );
+            }
+
+            tiles_list
+                .features
+                .drain()
+                .for_each(|f| feature_builders.push(f));
+        }
+
+        for (id, feature_builder) in feature_builders {
+            insert_if_ok(
+                "feature",
+                id.to_string(),
+                Feature::new(id, feature_builder, &module),
+                &mut module.features,
+            );
+        }
     }
 
     pub fn module_dir() -> Option<String> {

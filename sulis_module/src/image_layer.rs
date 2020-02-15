@@ -27,6 +27,8 @@ use sulis_core::resource::ResourceSet;
 use sulis_core::ui::Color;
 use sulis_core::util::invalid_data_error;
 
+type ImageList = Vec<(f32, f32, Option<Color>, Rc<dyn Image>)>;
+
 #[derive(Deserialize, Serialize, Debug, Copy, Clone, PartialEq, Eq, Hash)]
 #[serde(deny_unknown_fields)]
 pub enum ImageLayer {
@@ -135,7 +137,7 @@ impl ImageLayerSet {
         sex: Sex,
         hair: Option<Color>,
         skin: Option<Color>,
-    ) -> Vec<(f32, f32, Option<Color>, Rc<dyn Image>)> {
+    ) -> ImageList {
         let mut list = Vec::new();
 
         match self.images.get(&sex) {
@@ -164,7 +166,7 @@ impl ImageLayerSet {
         hair: Option<Color>,
         skin: Option<Color>,
         insert: HashMap<ImageLayer, Rc<dyn Image>>,
-    ) -> Vec<(f32, f32, Option<Color>, Rc<dyn Image>)> {
+    ) -> ImageList {
         let mut list = Vec::new();
 
         match self.images.get(&sex) {
@@ -232,7 +234,7 @@ fn get_color(layer: ImageLayer, hair: Option<Color>, skin: Option<Color>) -> Opt
 }
 
 fn insert_for_race_sex(
-    list: &mut Vec<(f32, f32, Option<Color>, Rc<dyn Image>)>,
+    list: &mut ImageList,
     insert: &HashMap<ImageLayer, Rc<dyn Image>>,
     sex: Sex,
     race: &Rc<Race>,

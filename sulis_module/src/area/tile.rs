@@ -22,6 +22,8 @@ use crate::Module;
 use sulis_core::resource::{ResourceSet, Sprite};
 use sulis_core::util::{gen_rand, invalid_data_error, unable_to_create_error, Point, Size};
 
+type Preview = Vec<(Rc<Tile>, Point)>;
+
 #[derive(Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct FeatureBuilder {
@@ -40,8 +42,8 @@ pub struct FeatureEntry {
 pub struct Feature {
     pub id: String,
     pub size: Size,
-    entries: Vec<(Vec<(Rc<Tile>, Point)>, u32)>,
-    pub preview: Vec<(Rc<Tile>, Point)>,
+    entries: Vec<(Preview, u32)>,
+    pub preview: Preview,
 }
 
 impl Feature {

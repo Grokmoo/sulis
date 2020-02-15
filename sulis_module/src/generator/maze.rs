@@ -177,9 +177,9 @@ impl Maze {
 
         let mut merged = vec![0; self.cur_region as usize];
         let mut open_regions = IndexSet::new();
-        for i in 0..self.cur_region {
+        for (i, merge) in merged.iter_mut().enumerate().take(self.cur_region) {
             open_regions.insert(i);
-            merged[i] = i;
+            *merge = i;
         }
 
         while open_regions.len() > 1 {

@@ -751,6 +751,7 @@ impl MoveAction {
             parent_w,
             parent_h,
             dist,
+            max_path_len: None,
         };
 
         let path = match GameState::can_move_towards_dest(&pc.borrow(), entities_to_ignore(), dest)

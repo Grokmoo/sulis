@@ -6,7 +6,7 @@ description: |
 active:
   script: "shadow_step"
   group: Rogue
-  ap: 2000
+  ap: 1000
   duration:
     Instant
   cooldown: 3

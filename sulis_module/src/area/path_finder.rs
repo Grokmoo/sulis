@@ -33,6 +33,7 @@ pub struct Destination {
     pub w: f32,
     pub h: f32,
     pub dist: f32,
+    pub max_path_len: Option<u32>,
 }
 
 impl Destination {
@@ -45,6 +46,7 @@ impl Destination {
             parent_w: 0.0,
             parent_h: 0.0,
             dist: MOVE_TO_THRESHOLD,
+            max_path_len: None,
         }
     }
 }
@@ -220,9 +222,16 @@ impl PathFinder {
                 if path.len() == 1 && path[0].x == start_x && path[0].y == start_y {
                     debug!("Found path with no moves.");
                     return None;
-                } else {
-                    return Some(path);
                 }
+
+                if let Some(max_path_len) = dest.max_path_len {
+                    if path.len() > max_path_len as usize {
+                        debug!("Found path with too many moves: {} > {}", path.len(), max_path_len);
+                        return None;
+                    }
+                }
+
+                return Some(path);
             }
 
             self.closed.insert(current);

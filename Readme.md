@@ -1,5 +1,5 @@
 # Sulis
-Sulis is a game and game engine written in Rust.  The engine is fairly mature and there are currently several available campaigns to play in the game.
+Sulis is a turn based Role Playing Game with an engine written from scratch in Rust.  The game is in a fairly mature state with several available campaigns to play through.
 
 ![Screenshot](screenshot.png)
 
@@ -30,9 +30,7 @@ Note that Running with release mode is recommended.  The compilation process tak
 
 ## Troubleshooting
 
-If you have issues running the game after upgrading to a new version, try removing your Sulis user data folder (see above).  Save games, characters, and other data are not generally compatible between different major versions.
-
-For other problems, you can [create an issue](https://github.com/Grokmoo/sulis/issues/new).  Please leave as much information as you can, including logs from your sulis user folder /log directory
+Please check the [Issue Tracker](https://github.com/Grokmoo/sulis/issues) for known bugs.  You can [create an issue](https://github.com/Grokmoo/sulis/issues/new).  Please leave as much information as you can, including logs from your sulis user folder /log directory
 
 ### Running the editor
 

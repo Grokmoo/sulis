@@ -5,6 +5,47 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html) is used with major version changes for breaking save game and data format compatibility.
 
+## [0.4.0] - 2020-02-14
+
+### Added
+- The second act of the Twin Expanse campaign is now fully playable
+- New mid to high level spells and abilities for the different classes
+- Larger and more powerful monsters with new abilities are present in Act 2.
+- The game shows an indicator for ability range on hover
+- Many new tiles and placeable features in the editor
+- New keybindings for nearly every button on the main UI as well as mouse bindings
+- Keybindings are now shown when hovering over buttons
+- A random hint / tip is now shown on the main menu
+- Items can now have cosmetic variations
+- New animated props and randomized animation timings where appropriate
+
+### Changed
+- Reworked and expanded the AI with different profiles and much more intelligent behavior
+- The level up process and associated screens have been overhauled
+- The class and kit selection process has been reworked and expanded
+- Rebalanced many weapons and abilities
+- Reworked racial abilities and starting stats
+- The game is much more intelligent about showing when abilities are disabled on the abilities bar
+- Many improved animations for magical effects
+- Improved handling, logging, and debugging for scripting errors
+- Edge scrolling is now enabled by default.  This can be changed in the Main Menu Options
+- Significant code refactoring and cleanup.  Much more to come.
+- Texture cache now better allocates space for drawing entities
+
+### Fixed
+- Ability and attack range and the indicator preview are now computed consistently
+- Out of date or invalid config files should be automatically recreated
+- Transitions on the very edge of the map could cause problems in some cases
+- Fixed OpenGL shader support on OS X
+- The abilities bar now handles high level characters with many abilities
+- Party members should no longer be bumped to impassable or invalid locations at combat start
+- Inconsistent treatment of the Escape Key
+- Stunned characters now have their AP restored at the end of combat
+- Several bugs around prop passability / line of sight
+- Rare crash when computing visibility
+- Editor crash with very high or low elevations
+- Overlapping props will no longer cause potential issues such as item loss
+
 ## [0.3.1] - 2019-11-09
 
 ### Added

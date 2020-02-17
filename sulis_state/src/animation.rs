@@ -326,8 +326,8 @@ pub(in crate::animation) enum AnimKind {
     /// A particle effect from a script - can also be used for simple
     /// single image animations
     ParticleGenerator {
-        model: GeneratorModel,
-        state: GeneratorState,
+        model: Box<GeneratorModel>,
+        state: Box<GeneratorState>,
     },
 
     /// Animation triggered when an entity is killed
@@ -437,7 +437,10 @@ impl Anim {
         Anim::new(
             owner,
             duration_millis,
-            AnimKind::ParticleGenerator { model, state },
+            AnimKind::ParticleGenerator {
+                model: Box::new(model),
+                state: Box::new(state),
+            },
         )
     }
 

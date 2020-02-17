@@ -700,7 +700,7 @@ impl WidgetKind for RootView {
     }
 }
 
-type CB = dyn Fn(&RcRfc<Widget>, &mut dyn WidgetKind);
+type CB = dyn Fn(&Rc<RefCell<Widget>>, &mut dyn WidgetKind);
 
 fn create_button(
     keybindings: &HashMap<InputAction, Key>,

@@ -19,7 +19,7 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 use sulis_core::io::event;
-use sulis_core::ui::{Callback, Widget, WidgetKind, RcRfc};
+use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_core::widgets::{Button, Label, TextArea};
 use sulis_module::{conversation::Response, Ability, Conversation, Module, OnTrigger};
 
@@ -29,7 +29,7 @@ use crate::CharacterBuilder;
 pub const NAME: &str = "backstory_selector_pane";
 
 pub struct BackstorySelectorPane {
-    node: RcRfc<TextArea>,
+    node: Rc<RefCell<TextArea>>,
     complete: bool,
     cur_node: String,
     convo: Rc<Conversation>,
@@ -44,7 +44,7 @@ pub fn get_initial_node(convo: &Rc<Conversation>) -> String {
 }
 
 impl BackstorySelectorPane {
-    pub fn new() -> RcRfc<BackstorySelectorPane> {
+    pub fn new() -> Rc<RefCell<BackstorySelectorPane>> {
         let convo = Rc::clone(&Module::campaign().backstory_conversation);
         let cur_node = get_initial_node(&convo);
         Rc::new(RefCell::new(BackstorySelectorPane {
@@ -56,7 +56,7 @@ impl BackstorySelectorPane {
         }))
     }
 
-    pub fn set_next_enabled(&mut self, widget: &RcRfc<Widget>) {
+    pub fn set_next_enabled(&mut self, widget: &Rc<RefCell<Widget>>) {
         let (_, builder) = Widget::parent_mut::<CharacterBuilder>(widget);
 
         let next = self.complete || self.convo.responses(&self.cur_node).is_empty();
@@ -66,7 +66,7 @@ impl BackstorySelectorPane {
 }
 
 impl BuilderPane for BackstorySelectorPane {
-    fn on_selected(&mut self, builder: &mut CharacterBuilder, widget: RcRfc<Widget>) {
+    fn on_selected(&mut self, builder: &mut CharacterBuilder, widget: Rc<RefCell<Widget>>) {
         builder.abilities.clear();
 
         let next = self.complete || self.convo.responses(&self.cur_node).is_empty();
@@ -77,13 +77,13 @@ impl BuilderPane for BackstorySelectorPane {
     }
 
     // since this is the last pane, this is called before save
-    fn next(&mut self, builder: &mut CharacterBuilder, _widget: RcRfc<Widget>) {
+    fn next(&mut self, builder: &mut CharacterBuilder, _widget: Rc<RefCell<Widget>>) {
         for ability in self.abilities.iter() {
             builder.abilities.push(Rc::clone(ability));
         }
     }
 
-    fn prev(&mut self, builder: &mut CharacterBuilder, widget: RcRfc<Widget>) {
+    fn prev(&mut self, builder: &mut CharacterBuilder, widget: Rc<RefCell<Widget>>) {
         self.cur_node = get_initial_node(&self.convo);
         self.abilities.clear();
         builder.next.borrow_mut().state.set_visible(true);
@@ -95,7 +95,7 @@ impl BuilderPane for BackstorySelectorPane {
 impl WidgetKind for BackstorySelectorPane {
     widget_kind!(NAME);
 
-    fn on_add(&mut self, _widget: &RcRfc<Widget>) -> Vec<RcRfc<Widget>> {
+    fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let title = Widget::with_theme(Label::empty(), "title");
 
         self.node.borrow_mut().text = Some(self.convo.text(&self.cur_node).to_string());
@@ -133,7 +133,7 @@ struct ResponseButton {
 }
 
 impl ResponseButton {
-    fn new(response: &Response) -> RcRfc<ResponseButton> {
+    fn new(response: &Response) -> Rc<RefCell<ResponseButton>> {
         Rc::new(RefCell::new(ResponseButton {
             text: response.text.to_string(),
             to: response.to.clone(),
@@ -145,11 +145,11 @@ impl ResponseButton {
 impl WidgetKind for ResponseButton {
     widget_kind!("response_button");
 
-    fn on_add(&mut self, _: &RcRfc<Widget>) -> Vec<RcRfc<Widget>> {
+    fn on_add(&mut self, _: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         vec![Widget::with_defaults(TextArea::new(&self.text))]
     }
 
-    fn on_mouse_release(&mut self, widget: &RcRfc<Widget>, kind: event::ClickKind) -> bool {
+    fn on_mouse_release(&mut self, widget: &Rc<RefCell<Widget>>, kind: event::ClickKind) -> bool {
         self.super_on_mouse_release(widget, kind);
 
         let (parent, pane) = Widget::parent_mut::<BackstorySelectorPane>(widget);

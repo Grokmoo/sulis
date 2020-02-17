@@ -18,7 +18,7 @@ use std::any::Any;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use sulis_core::ui::{Callback, Widget, WidgetKind, RcRfc};
+use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_core::widgets::{Button, Label, Spinner};
 
 use crate::AreaEditor;
@@ -26,11 +26,11 @@ use crate::AreaEditor;
 pub const NAME: &str = "shift_tiles_window";
 
 pub struct ShiftTilesWindow {
-    area_editor: RcRfc<AreaEditor>,
+    area_editor: Rc<RefCell<AreaEditor>>,
 }
 
 impl ShiftTilesWindow {
-    pub fn new(area_editor: RcRfc<AreaEditor>) -> RcRfc<ShiftTilesWindow> {
+    pub fn new(area_editor: Rc<RefCell<AreaEditor>>) -> Rc<RefCell<ShiftTilesWindow>> {
         Rc::new(RefCell::new(ShiftTilesWindow { area_editor }))
     }
 }
@@ -48,7 +48,7 @@ impl WidgetKind for ShiftTilesWindow {
         self
     }
 
-    fn on_add(&mut self, _widget: &RcRfc<Widget>) -> Vec<RcRfc<Widget>> {
+    fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let close = Widget::with_theme(Button::empty(), "close");
         close
             .borrow_mut()

@@ -21,7 +21,7 @@ use std::rc::Rc;
 use sulis_core::config::Config;
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::resource::{ResourceSet, Sprite};
-use sulis_core::ui::{Callback, Widget, WidgetKind, RcRfc};
+use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_core::util::Point;
 use sulis_core::widgets::{Label, Spinner};
 
@@ -38,7 +38,7 @@ pub struct TriggerPicker {
 }
 
 impl TriggerPicker {
-    pub fn new() -> RcRfc<TriggerPicker> {
+    pub fn new() -> Rc<RefCell<TriggerPicker>> {
         let enc_tile = Config::editor_config().area.encounter_tile;
 
         let sprite = match ResourceSet::sprite(&enc_tile) {
@@ -115,7 +115,7 @@ impl WidgetKind for TriggerPicker {
         self
     }
 
-    fn on_add(&mut self, _widget: &RcRfc<Widget>) -> Vec<RcRfc<Widget>> {
+    fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let width = Widget::with_theme(Spinner::new(self.cur_width, 1, 50), "width");
         width
             .borrow_mut()

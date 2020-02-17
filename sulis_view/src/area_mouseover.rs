@@ -19,7 +19,7 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 use sulis_core::io::{event::ClickKind, GraphicsRenderer};
-use sulis_core::ui::{Widget, WidgetKind, WidgetState, RcRfc};
+use sulis_core::ui::{Widget, WidgetKind, WidgetState};
 use sulis_core::util::Point;
 use sulis_core::widgets::TextArea;
 use sulis_state::{ChangeListener, EntityState, GameState};
@@ -27,7 +27,7 @@ use sulis_state::{ChangeListener, EntityState, GameState};
 const NAME: &str = "area_mouseover";
 
 enum Kind {
-    Entity(RcRfc<EntityState>),
+    Entity(Rc<RefCell<EntityState>>),
     Prop(usize),
     Transition(String),
 }
@@ -53,23 +53,23 @@ impl PartialEq for AreaMouseover {
 
 pub struct AreaMouseover {
     kind: Kind,
-    text_area: RcRfc<TextArea>,
+    text_area: Rc<RefCell<TextArea>>,
 }
 
 impl AreaMouseover {
-    pub fn new_entity(entity: &RcRfc<EntityState>) -> RcRfc<AreaMouseover> {
+    pub fn new_entity(entity: &Rc<RefCell<EntityState>>) -> Rc<RefCell<AreaMouseover>> {
         AreaMouseover::new(Kind::Entity(Rc::clone(entity)))
     }
 
-    pub fn new_prop(index: usize) -> RcRfc<AreaMouseover> {
+    pub fn new_prop(index: usize) -> Rc<RefCell<AreaMouseover>> {
         AreaMouseover::new(Kind::Prop(index))
     }
 
-    pub fn new_transition(name: &str) -> RcRfc<AreaMouseover> {
+    pub fn new_transition(name: &str) -> Rc<RefCell<AreaMouseover>> {
         AreaMouseover::new(Kind::Transition(name.to_string()))
     }
 
-    fn new(kind: Kind) -> RcRfc<AreaMouseover> {
+    fn new(kind: Kind) -> Rc<RefCell<AreaMouseover>> {
         Rc::new(RefCell::new(AreaMouseover {
             kind,
             text_area: TextArea::empty(),
@@ -117,19 +117,19 @@ impl AreaMouseover {
 impl WidgetKind for AreaMouseover {
     widget_kind!(NAME);
 
-    fn on_mouse_press(&mut self, widget: &RcRfc<Widget>, kind: ClickKind) -> bool {
+    fn on_mouse_press(&mut self, widget: &Rc<RefCell<Widget>>, kind: ClickKind) -> bool {
         self.super_on_mouse_press(widget, kind);
         false
     }
 
-    fn on_mouse_release(&mut self, widget: &RcRfc<Widget>, kind: ClickKind) -> bool {
+    fn on_mouse_release(&mut self, widget: &Rc<RefCell<Widget>>, kind: ClickKind) -> bool {
         self.super_on_mouse_release(widget, kind);
         false
     }
 
     fn on_mouse_drag(
         &mut self,
-        _widget: &RcRfc<Widget>,
+        _widget: &Rc<RefCell<Widget>>,
         _kind: ClickKind,
         _delta_x: f32,
         _delta_y: f32,
@@ -139,24 +139,24 @@ impl WidgetKind for AreaMouseover {
 
     fn on_mouse_move(
         &mut self,
-        _widget: &RcRfc<Widget>,
+        _widget: &Rc<RefCell<Widget>>,
         _delta_x: f32,
         _delta_y: f32,
     ) -> bool {
         true
     }
 
-    fn on_mouse_enter(&mut self, widget: &RcRfc<Widget>) -> bool {
+    fn on_mouse_enter(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
         self.super_on_mouse_enter(widget);
         false
     }
 
-    fn on_mouse_exit(&mut self, widget: &RcRfc<Widget>) -> bool {
+    fn on_mouse_exit(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
         self.super_on_mouse_exit(widget);
         false
     }
 
-    fn on_add(&mut self, widget: &RcRfc<Widget>) -> Vec<RcRfc<Widget>> {
+    fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         // prevent focus grab in root view where we compute mouse state each frame
         widget.borrow_mut().state.set_enabled(false);
 

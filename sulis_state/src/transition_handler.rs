@@ -14,9 +14,10 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::cell::RefCell;
 use std::rc::Rc;
 
-use crate::{AreaState, EntityState, GameState, Location, TurnManager, RcRfc};
+use crate::{AreaState, EntityState, GameState, Location, TurnManager};
 use sulis_core::util::Point;
 use sulis_module::{
     area::{ToKind, TriggerKind},
@@ -89,10 +90,10 @@ pub(crate) fn transition_to(area_id: Option<&str>, p: Option<Point>, offset: Poi
 }
 
 fn transition_party(
-    mgr: &RcRfc<TurnManager>,
-    area: &RcRfc<AreaState>,
+    mgr: &Rc<RefCell<TurnManager>>,
+    area: &Rc<RefCell<AreaState>>,
     p: Point,
-    party: &[RcRfc<EntityState>],
+    party: &[Rc<RefCell<EntityState>>],
 ) {
     let base_location = Location::new(p.x, p.y, &area.borrow().area.area);
 
@@ -173,7 +174,7 @@ fn add_member_auras(mgr: &mut TurnManager, area: &mut AreaState, index: usize, d
     }
 }
 
-fn remove_party_auras(mgr: &mut TurnManager, party: &[RcRfc<EntityState>]) {
+fn remove_party_auras(mgr: &mut TurnManager, party: &[Rc<RefCell<EntityState>>]) {
     for entity in party {
         let area = entity_area(&entity.borrow());
         let mut area = area.borrow_mut();
@@ -194,7 +195,7 @@ fn remove_party_auras(mgr: &mut TurnManager, party: &[RcRfc<EntityState>]) {
     }
 }
 
-fn remove_party_from_surfaces(mgr: &mut TurnManager, party: &[RcRfc<EntityState>]) {
+fn remove_party_from_surfaces(mgr: &mut TurnManager, party: &[Rc<RefCell<EntityState>>]) {
     for entity in party {
         let area = entity_area(&entity.borrow());
 
@@ -206,12 +207,12 @@ fn remove_party_from_surfaces(mgr: &mut TurnManager, party: &[RcRfc<EntityState>
     }
 }
 
-fn entity_area(entity: &EntityState) -> RcRfc<AreaState> {
+fn entity_area(entity: &EntityState) -> Rc<RefCell<AreaState>> {
     let id = &entity.location.area_id;
     GameState::get_area_state(id).unwrap()
 }
 
-fn get_area(area_id: Option<&str>, p: Option<Point>) -> Option<(RcRfc<AreaState>, Point)> {
+fn get_area(area_id: Option<&str>, p: Option<Point>) -> Option<(Rc<RefCell<AreaState>>, Point)> {
     match area_id {
         None => {
             let area = GameState::area_state();

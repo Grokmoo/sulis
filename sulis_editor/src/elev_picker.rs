@@ -21,7 +21,7 @@ use std::rc::Rc;
 use sulis_core::config::Config;
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::resource::{ResourceSet, Sprite};
-use sulis_core::ui::{Callback, Color, Widget, WidgetKind, RcRfc};
+use sulis_core::ui::{Callback, Color, Widget, WidgetKind};
 use sulis_core::util::Point;
 use sulis_core::widgets::{Label, Spinner};
 use sulis_module::area::MAX_AREA_SIZE;
@@ -40,7 +40,7 @@ pub struct ElevPicker {
 }
 
 impl ElevPicker {
-    pub fn new() -> RcRfc<ElevPicker> {
+    pub fn new() -> Rc<RefCell<ElevPicker>> {
         let cursor_sprite = ResourceSet::panic_or_sprite(&Config::editor_config().cursor);
 
         let mut elev_tiles = Vec::new();
@@ -152,7 +152,7 @@ impl WidgetKind for ElevPicker {
         self
     }
 
-    fn on_add(&mut self, _widget: &RcRfc<Widget>) -> Vec<RcRfc<Widget>> {
+    fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let brush_size = Widget::with_theme(Spinner::new(self.brush_size, 1, 10), "brush_size");
         brush_size
             .borrow_mut()

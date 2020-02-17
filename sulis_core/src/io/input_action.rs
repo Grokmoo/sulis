@@ -14,9 +14,12 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::cell::RefCell;
+use std::rc::Rc;
+
 use crate::io::event::{ClickKind, Kind};
 use crate::io::{keyboard_event::Key, Event};
-use crate::ui::{Cursor, Widget, RcRfc};
+use crate::ui::{Cursor, Widget};
 
 #[derive(Debug, Deserialize, Serialize, Copy, Clone, PartialOrd)]
 #[serde(deny_unknown_fields)]
@@ -83,7 +86,7 @@ impl std::hash::Hash for InputAction {
 }
 
 impl InputAction {
-    pub fn handle_action(action: InputAction, root: &RcRfc<Widget>) {
+    pub fn handle_action(action: InputAction, root: &Rc<RefCell<Widget>>) {
         // don't spam tons of mouse move actions in the event logs
         match action {
             MouseMove(_, _) => (),
@@ -112,7 +115,7 @@ impl InputAction {
         }
     }
 
-    fn fire_action(action: InputAction, root: &RcRfc<Widget>) {
+    fn fire_action(action: InputAction, root: &Rc<RefCell<Widget>>) {
         debug!("Firing action {:?}", action);
 
         let event = Event::new(Kind::KeyPress(action));

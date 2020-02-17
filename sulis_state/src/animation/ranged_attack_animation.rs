@@ -14,16 +14,17 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::cell::RefCell;
 use std::rc::Rc;
 
 use crate::{animation::Anim, entity_attack_handler::weapon_attack, AreaFeedbackText};
 use crate::{script::ScriptEntitySet, EntityState, GameState, ScriptCallback};
 use sulis_core::image::Image;
 use sulis_core::io::{DrawList, GraphicsRenderer};
-use sulis_core::ui::{animation_state, RcRfc};
+use sulis_core::ui::animation_state;
 
 pub(in crate::animation) fn update(
-    attacker: &RcRfc<EntityState>,
+    attacker: &Rc<RefCell<EntityState>>,
     model: &mut RangedAttackAnimModel,
     frac: f32,
 ) {
@@ -89,7 +90,7 @@ pub(in crate::animation) fn update(
     }
 }
 
-pub(in crate::animation) fn cleanup(owner: &RcRfc<EntityState>) {
+pub(in crate::animation) fn cleanup(owner: &Rc<RefCell<EntityState>>) {
     if !GameState::is_combat_active() {
         let area_state = GameState::get_area_state(&owner.borrow().location.area_id).unwrap();
         let mgr = GameState::turn_manager();
@@ -125,8 +126,8 @@ pub(in crate::animation) fn draw(
 }
 
 pub fn new(
-    attacker: &RcRfc<EntityState>,
-    defender: &RcRfc<EntityState>,
+    attacker: &Rc<RefCell<EntityState>>,
+    defender: &Rc<RefCell<EntityState>>,
     callbacks: Vec<Box<dyn ScriptCallback>>,
     duration_millis: u32,
 ) -> Anim {
@@ -163,7 +164,7 @@ pub fn new(
 }
 
 pub(in crate::animation) struct RangedAttackAnimModel {
-    defender: RcRfc<EntityState>,
+    defender: Rc<RefCell<EntityState>>,
     angle: f32,
     vec: (f32, f32),
     start_pos: (f32, f32),

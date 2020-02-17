@@ -15,12 +15,13 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std;
+use std::cell::RefCell;
 use std::rc::Rc;
 
 use rlua::{self, Context, UserData, UserDataMethods};
 
 use crate::script::*;
-use crate::{area_feedback_text::ColorKind, AreaFeedbackText, EntityState, GameState, RcRfc};
+use crate::{area_feedback_text::ColorKind, AreaFeedbackText, EntityState, GameState};
 use sulis_module::{ability, Item, ItemState, Module};
 
 /// A kind of Item, represented by its owner (Stash, QuickSlot, or a generic
@@ -33,7 +34,7 @@ pub enum ScriptItemKind {
 }
 
 impl ScriptItemKind {
-    pub fn item_checked(&self, parent: &RcRfc<EntityState>) -> Option<ItemState> {
+    pub fn item_checked(&self, parent: &Rc<RefCell<EntityState>>) -> Option<ItemState> {
         match self {
             ScriptItemKind::Stash(index) => {
                 let stash = GameState::party_stash();
@@ -54,7 +55,7 @@ impl ScriptItemKind {
         }
     }
 
-    pub fn item(&self, parent: &RcRfc<EntityState>) -> ItemState {
+    pub fn item(&self, parent: &Rc<RefCell<EntityState>>) -> ItemState {
         match self {
             ScriptItemKind::Stash(index) => {
                 let stash = GameState::party_stash();
@@ -112,7 +113,7 @@ pub struct ScriptItem {
 }
 
 impl ScriptItem {
-    pub fn new(parent: &RcRfc<EntityState>, kind: ScriptItemKind) -> Result<ScriptItem> {
+    pub fn new(parent: &Rc<RefCell<EntityState>>, kind: ScriptItemKind) -> Result<ScriptItem> {
         let item = match kind.item_checked(parent) {
             None => {
                 return Err(rlua::Error::FromLuaConversionError {
@@ -223,7 +224,7 @@ fn activate_item(_lua: Context, script_item: &ScriptItem, target: ScriptEntity) 
 }
 
 fn add_another_to_quickbar(
-    parent: &RcRfc<EntityState>,
+    parent: &Rc<RefCell<EntityState>>,
     item: Option<ItemState>,
     slot: QuickSlot,
 ) {

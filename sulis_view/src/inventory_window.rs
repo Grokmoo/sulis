@@ -19,7 +19,7 @@ use std::cell::{Cell, RefCell};
 use std::rc::Rc;
 use std::time;
 
-use sulis_core::ui::{Callback, Widget, WidgetKind, RcRfc};
+use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_core::util;
 use sulis_core::widgets::{Button, Label};
 use sulis_module::{QuickSlot, Slot};
@@ -30,12 +30,12 @@ use crate::{item_callback_handler::*, item_list_pane::Filter, ItemButton, ItemLi
 pub const NAME: &str = "inventory_window";
 
 pub struct InventoryWindow {
-    entity: RcRfc<EntityState>,
+    entity: Rc<RefCell<EntityState>>,
     filter: Rc<Cell<Filter>>,
 }
 
 impl InventoryWindow {
-    pub fn new(entity: &RcRfc<EntityState>) -> RcRfc<InventoryWindow> {
+    pub fn new(entity: &Rc<RefCell<EntityState>>) -> Rc<RefCell<InventoryWindow>> {
         Rc::new(RefCell::new(InventoryWindow {
             entity: Rc::clone(entity),
             filter: Rc::new(Cell::new(Filter::All)),
@@ -50,12 +50,12 @@ impl WidgetKind for InventoryWindow {
         widget.do_base_layout();
     }
 
-    fn on_remove(&mut self, _widget: &RcRfc<Widget>) {
+    fn on_remove(&mut self, _widget: &Rc<RefCell<Widget>>) {
         self.entity.borrow_mut().actor.listeners.remove(NAME);
         debug!("Removed inventory window.");
     }
 
-    fn on_add(&mut self, widget: &RcRfc<Widget>) -> Vec<RcRfc<Widget>> {
+    fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let start_time = time::Instant::now();
 
         let stash = GameState::party_stash();

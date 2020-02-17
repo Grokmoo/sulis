@@ -20,7 +20,7 @@ use std::fmt::Display;
 use std::rc::Rc;
 use std::slice::Iter;
 
-use crate::ui::{animation_state, AnimationState, Callback, Widget, WidgetKind, RcRfc};
+use crate::ui::{animation_state, AnimationState, Callback, Widget, WidgetKind};
 use crate::widgets::Button;
 
 #[derive(Clone)]
@@ -71,7 +71,7 @@ pub struct ListBox<T: Display + Clone + 'static> {
 }
 
 impl<T: Display + Clone + 'static> ListBox<T> {
-    pub fn new(entries: Vec<Entry<T>>) -> RcRfc<ListBox<T>> {
+    pub fn new(entries: Vec<Entry<T>>) -> Rc<RefCell<ListBox<T>>> {
         Rc::new(RefCell::new(ListBox { entries }))
     }
 
@@ -97,8 +97,8 @@ impl<T: Display + Clone> WidgetKind for ListBox<T> {
         self
     }
 
-    fn on_add(&mut self, _widget: &RcRfc<Widget>) -> Vec<RcRfc<Widget>> {
-        let mut children: Vec<RcRfc<Widget>> = Vec::with_capacity(self.entries.len());
+    fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+        let mut children: Vec<Rc<RefCell<Widget>>> = Vec::with_capacity(self.entries.len());
 
         for entry in self.entries.iter() {
             let widget = Widget::with_theme(Button::with_text(&entry.item.to_string()), "entry");

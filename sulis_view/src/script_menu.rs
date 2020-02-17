@@ -18,7 +18,7 @@ use std::any::Any;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use sulis_core::ui::{Callback, Widget, WidgetKind, RcRfc};
+use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_core::widgets::{Button, TextArea};
 use sulis_module::on_trigger::ScriptMenuChoice;
 use sulis_state::script::{CallbackData, ScriptCallback, ScriptMenuSelection};
@@ -36,7 +36,7 @@ impl ScriptMenu {
         callback: CallbackData,
         title: String,
         choices: Vec<ScriptMenuChoice>,
-    ) -> RcRfc<ScriptMenu> {
+    ) -> Rc<RefCell<ScriptMenu>> {
         Rc::new(RefCell::new(ScriptMenu {
             callback,
             title,
@@ -48,7 +48,7 @@ impl ScriptMenu {
 impl WidgetKind for ScriptMenu {
     widget_kind!(NAME);
 
-    fn on_add(&mut self, widget: &RcRfc<Widget>) -> Vec<RcRfc<Widget>> {
+    fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         widget.borrow_mut().state.set_modal(true);
 
         let cancel = Widget::with_theme(Button::empty(), "cancel");

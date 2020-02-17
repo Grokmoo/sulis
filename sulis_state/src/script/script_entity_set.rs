@@ -14,6 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::cell::RefCell;
 use std::collections::HashMap;
 use std::io::Error;
 use std::rc::Rc;
@@ -22,7 +23,7 @@ use rlua::{self, Context, UserData, UserDataMethods};
 
 use crate::script::{Result, ScriptActiveSurface, ScriptEntity};
 use crate::{
-    is_threat, is_within, is_within_attack_dist, is_within_touch_dist, EntityState, GameState, RcRfc
+    is_threat, is_within, is_within_attack_dist, is_within_touch_dist, EntityState, GameState,
 };
 use sulis_core::util::{gen_rand, invalid_data_error};
 use sulis_module::Faction;
@@ -143,7 +144,7 @@ pub struct ScriptEntitySet {
 impl ScriptEntitySet {
     pub fn update_entity_refs_on_load(
         &mut self,
-        entities: &HashMap<usize, RcRfc<EntityState>>,
+        entities: &HashMap<usize, Rc<RefCell<EntityState>>>,
     ) -> ::std::result::Result<(), Error> {
         match entities.get(&self.parent) {
             None => {
@@ -194,8 +195,8 @@ impl ScriptEntitySet {
     }
 
     pub fn from_pair(
-        parent: &RcRfc<EntityState>,
-        target: &RcRfc<EntityState>,
+        parent: &Rc<RefCell<EntityState>>,
+        target: &Rc<RefCell<EntityState>>,
     ) -> ScriptEntitySet {
         let parent = parent.borrow().index();
         let indices = vec![Some(target.borrow().index())];
@@ -210,8 +211,8 @@ impl ScriptEntitySet {
     }
 
     pub fn new(
-        parent: &RcRfc<EntityState>,
-        entities: &[Option<RcRfc<EntityState>>],
+        parent: &Rc<RefCell<EntityState>>,
+        entities: &[Option<Rc<RefCell<EntityState>>>],
     ) -> ScriptEntitySet {
         let parent = parent.borrow().index();
 
@@ -438,7 +439,7 @@ fn is_friendly(_lua: Context, set: &ScriptEntitySet) -> Result<ScriptEntitySet> 
 fn filter_entities<T: Copy>(
     set: &ScriptEntitySet,
     t: T,
-    filter: &dyn Fn(&RcRfc<EntityState>, &RcRfc<EntityState>, T) -> bool,
+    filter: &dyn Fn(&Rc<RefCell<EntityState>>, &Rc<RefCell<EntityState>>, T) -> bool,
 ) -> Result<ScriptEntitySet> {
     let parent = ScriptEntity::new(set.parent);
     let parent = parent.try_unwrap()?;

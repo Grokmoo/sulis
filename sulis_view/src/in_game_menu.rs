@@ -18,7 +18,7 @@ use std::any::Any;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use sulis_core::ui::{Callback, Widget, WidgetKind, RcRfc};
+use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_core::widgets::{Button, ConfirmationWindow};
 use sulis_state::GameState;
 
@@ -32,7 +32,7 @@ pub struct InGameMenu {
 }
 
 impl InGameMenu {
-    pub fn new(exit_callback: Callback, menu_callback: Callback) -> RcRfc<InGameMenu> {
+    pub fn new(exit_callback: Callback, menu_callback: Callback) -> Rc<RefCell<InGameMenu>> {
         Rc::new(RefCell::new(InGameMenu {
             exit_callback,
             menu_callback,
@@ -43,7 +43,7 @@ impl InGameMenu {
 impl WidgetKind for InGameMenu {
     widget_kind!(NAME);
 
-    fn on_add(&mut self, widget: &RcRfc<Widget>) -> Vec<RcRfc<Widget>> {
+    fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         widget.borrow_mut().state.set_modal(true);
 
         let back = Widget::with_theme(Button::empty(), "back");

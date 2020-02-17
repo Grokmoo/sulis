@@ -18,7 +18,7 @@ use std::any::Any;
 use std::cell::{Cell, RefCell};
 use std::rc::Rc;
 
-use sulis_core::ui::{Callback, Widget, WidgetKind, RcRfc};
+use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_core::widgets::{Button, ScrollDirection, ScrollPane};
 use sulis_module::{Item, ItemState, Module};
 use sulis_state::{script::ScriptItemKind, EntityState, GameState};
@@ -64,17 +64,17 @@ use self::Filter::*;
 const FILTERS_LIST: [Filter; 5] = [All, Weapon, Armor, Accessory, Usable];
 
 pub struct ItemListPane {
-    entity: RcRfc<EntityState>,
+    entity: Rc<RefCell<EntityState>>,
     kind: Kind,
     cur_filter: Rc<Cell<Filter>>,
 }
 
 impl ItemListPane {
     fn new(
-        entity: &RcRfc<EntityState>,
+        entity: &Rc<RefCell<EntityState>>,
         kind: Kind,
         cur_filter: &Rc<Cell<Filter>>,
-    ) -> RcRfc<ItemListPane> {
+    ) -> Rc<RefCell<ItemListPane>> {
         Rc::new(RefCell::new(ItemListPane {
             entity: Rc::clone(entity),
             kind,
@@ -83,34 +83,34 @@ impl ItemListPane {
     }
 
     pub fn new_entity(
-        entity: &RcRfc<EntityState>,
+        entity: &Rc<RefCell<EntityState>>,
         cur_filter: &Rc<Cell<Filter>>,
-    ) -> RcRfc<ItemListPane> {
+    ) -> Rc<RefCell<ItemListPane>> {
         ItemListPane::new(entity, Kind::Entity, cur_filter)
     }
 
     pub fn new_prop(
-        entity: &RcRfc<EntityState>,
+        entity: &Rc<RefCell<EntityState>>,
         prop_index: usize,
         cur_filter: &Rc<Cell<Filter>>,
-    ) -> RcRfc<ItemListPane> {
+    ) -> Rc<RefCell<ItemListPane>> {
         ItemListPane::new(entity, Kind::Prop(prop_index), cur_filter)
     }
 
     pub fn new_merchant(
-        entity: &RcRfc<EntityState>,
+        entity: &Rc<RefCell<EntityState>>,
         merchant_id: String,
         cur_filter: &Rc<Cell<Filter>>,
-    ) -> RcRfc<ItemListPane> {
+    ) -> Rc<RefCell<ItemListPane>> {
         ItemListPane::new(entity, Kind::Merchant(merchant_id), cur_filter)
     }
 
-    fn set_filter(&mut self, filter: Filter, widget: &RcRfc<Widget>) {
+    fn set_filter(&mut self, filter: Filter, widget: &Rc<RefCell<Widget>>) {
         self.cur_filter.set(filter);
         widget.borrow_mut().invalidate_children();
     }
 
-    fn create_content_merchant(&self, merchant_id: &str) -> RcRfc<Widget> {
+    fn create_content_merchant(&self, merchant_id: &str) -> Rc<RefCell<Widget>> {
         let area_state = GameState::area_state();
         let area_state = area_state.borrow();
         let merchant = area_state.get_merchant(merchant_id);
@@ -139,7 +139,7 @@ impl ItemListPane {
         list_content
     }
 
-    fn create_content_prop(&self, prop_index: usize) -> RcRfc<Widget> {
+    fn create_content_prop(&self, prop_index: usize) -> Rc<RefCell<Widget>> {
         let combat_active = GameState::is_combat_active();
 
         let area_state = GameState::area_state();
@@ -174,7 +174,7 @@ impl ItemListPane {
         list_content
     }
 
-    fn create_content_inventory(&self) -> RcRfc<Widget> {
+    fn create_content_inventory(&self) -> Rc<RefCell<Widget>> {
         let combat_active = GameState::is_combat_active();
 
         let actor = &self.entity.borrow().actor;
@@ -231,7 +231,7 @@ impl ItemListPane {
 impl WidgetKind for ItemListPane {
     widget_kind!(NAME);
 
-    fn on_add(&mut self, _widget: &RcRfc<Widget>) -> Vec<RcRfc<Widget>> {
+    fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let mut children = Vec::new();
 
         let content = match &self.kind {

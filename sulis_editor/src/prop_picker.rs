@@ -19,7 +19,7 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 use sulis_core::io::{DrawList, GraphicsRenderer};
-use sulis_core::ui::{animation_state, Callback, Color, Widget, WidgetKind, RcRfc};
+use sulis_core::ui::{animation_state, Callback, Color, Widget, WidgetKind};
 use sulis_core::util::Point;
 use sulis_core::widgets::{Button, ScrollDirection, ScrollPane};
 use sulis_module::{Module, Prop};
@@ -35,7 +35,7 @@ pub struct PropPicker {
 }
 
 impl PropPicker {
-    pub fn new() -> RcRfc<PropPicker> {
+    pub fn new() -> Rc<RefCell<PropPicker>> {
         Rc::new(RefCell::new(PropPicker {
             cur_prop: None,
             removal_props: Vec::new(),
@@ -135,7 +135,7 @@ impl WidgetKind for PropPicker {
         self
     }
 
-    fn on_add(&mut self, _widget: &RcRfc<Widget>) -> Vec<RcRfc<Widget>> {
+    fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let mut all_props = Module::all_props();
         all_props.sort_by(|a, b| a.id.cmp(&b.id));
 

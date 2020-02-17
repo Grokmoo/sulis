@@ -14,15 +14,16 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::cell::Ref;
+use std::cell::{Ref, RefCell};
 use std::collections::HashMap;
 use std::io::{Error, ErrorKind};
+use std::rc::Rc;
 
 use crate::config::{Config, DisplayMode};
 use crate::io::keyboard_event::Key;
 use crate::io::*;
 use crate::resource::ResourceSet;
-use crate::ui::{Cursor, Widget, RcRfc};
+use crate::ui::{Cursor, Widget};
 use crate::util::{self, Point};
 
 use glium::backend::Facade;
@@ -490,7 +491,7 @@ impl IO for GliumDisplay {
         configs
     }
 
-    fn process_input(&mut self, root: RcRfc<Widget>) {
+    fn process_input(&mut self, root: Rc<RefCell<Widget>>) {
         let (ui_x, ui_y) = Config::ui_size();
         let mut mouse_move: Option<(f32, f32)> = None;
         let display_size = match self.display.gl_window().window().get_inner_size() {

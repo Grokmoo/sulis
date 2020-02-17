@@ -19,7 +19,7 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 use sulis_core::io::{event, InputAction};
-use sulis_core::ui::{theme, Widget, WidgetKind, RcRfc};
+use sulis_core::ui::{theme, Widget, WidgetKind};
 use sulis_core::widgets::TextArea;
 use sulis_module::{conversation::Response, Conversation, OnTrigger};
 use sulis_state::{
@@ -33,20 +33,20 @@ use crate::{AreaView, RootView};
 pub const NAME: &str = "dialog_window";
 
 pub struct DialogWindow {
-    pc: RcRfc<EntityState>,
-    entity: RcRfc<EntityState>,
+    pc: Rc<RefCell<EntityState>>,
+    entity: Rc<RefCell<EntityState>>,
     convo: Rc<Conversation>,
     cur_node: String,
 
-    node: RcRfc<TextArea>,
+    node: Rc<RefCell<TextArea>>,
 }
 
 impl DialogWindow {
     pub fn new(
-        pc: &RcRfc<EntityState>,
-        entity: &RcRfc<EntityState>,
+        pc: &Rc<RefCell<EntityState>>,
+        entity: &Rc<RefCell<EntityState>>,
         convo: Rc<Conversation>,
-    ) -> RcRfc<DialogWindow> {
+    ) -> Rc<RefCell<DialogWindow>> {
         let cur_node = get_initial_node(&convo, pc, entity);
 
         Rc::new(RefCell::new(DialogWindow {
@@ -62,7 +62,7 @@ impl DialogWindow {
 impl WidgetKind for DialogWindow {
     widget_kind!(NAME);
 
-    fn on_key_press(&mut self, widget: &RcRfc<Widget>, key: InputAction) -> bool {
+    fn on_key_press(&mut self, widget: &Rc<RefCell<Widget>>, key: InputAction) -> bool {
         let (root, view) = Widget::parent_mut::<RootView>(widget);
 
         use sulis_core::io::InputAction::*;
@@ -75,11 +75,11 @@ impl WidgetKind for DialogWindow {
         true
     }
 
-    fn on_remove(&mut self, _widget: &RcRfc<Widget>) {
+    fn on_remove(&mut self, _widget: &Rc<RefCell<Widget>>) {
         self.entity.borrow_mut().actor.listeners.remove(NAME);
     }
 
-    fn on_add(&mut self, widget: &RcRfc<Widget>) -> Vec<RcRfc<Widget>> {
+    fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         self.entity
             .borrow_mut()
             .actor
@@ -143,7 +143,7 @@ struct ResponseButton {
     text: String,
     to: Option<String>,
     on_select: Vec<OnTrigger>,
-    pc: RcRfc<EntityState>,
+    pc: Rc<RefCell<EntityState>>,
     convo: Rc<Conversation>,
 }
 
@@ -151,8 +151,8 @@ impl ResponseButton {
     fn new(
         convo: &Rc<Conversation>,
         response: &Response,
-        pc: &RcRfc<EntityState>,
-    ) -> RcRfc<ResponseButton> {
+        pc: &Rc<RefCell<EntityState>>,
+    ) -> Rc<RefCell<ResponseButton>> {
         Rc::new(RefCell::new(ResponseButton {
             text: response.text.to_string(),
             to: response.to.clone(),
@@ -162,7 +162,7 @@ impl ResponseButton {
         }))
     }
 
-    fn check_switch_speaker(&self, node: &str, area: &RcRfc<AreaView>) {
+    fn check_switch_speaker(&self, node: &str, area: &Rc<RefCell<AreaView>>) {
         let speaker = match self.convo.switch_speaker(node) {
             None => return,
             Some(ref speaker) => speaker,
@@ -190,7 +190,7 @@ impl ResponseButton {
 impl WidgetKind for ResponseButton {
     widget_kind!("response_button");
 
-    fn on_add(&mut self, _widget: &RcRfc<Widget>) -> Vec<RcRfc<Widget>> {
+    fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let text_area = TextArea::empty();
         let text_area_widget = Widget::with_defaults(text_area.clone());
 
@@ -210,7 +210,7 @@ impl WidgetKind for ResponseButton {
         widget.do_children_layout();
     }
 
-    fn on_mouse_release(&mut self, widget: &RcRfc<Widget>, kind: event::ClickKind) -> bool {
+    fn on_mouse_release(&mut self, widget: &Rc<RefCell<Widget>>, kind: event::ClickKind) -> bool {
         self.super_on_mouse_release(widget, kind);
 
         let (parent, window) = Widget::parent_mut::<DialogWindow>(widget);
@@ -238,9 +238,9 @@ impl WidgetKind for ResponseButton {
 
 pub fn show_convo(
     convo: Rc<Conversation>,
-    pc: &RcRfc<EntityState>,
-    target: &RcRfc<EntityState>,
-    widget: &RcRfc<Widget>,
+    pc: &Rc<RefCell<EntityState>>,
+    target: &Rc<RefCell<EntityState>>,
+    widget: &Rc<RefCell<Widget>>,
 ) {
     let initial_node = get_initial_node(&convo, &pc, &target);
     if convo.responses(&initial_node).is_empty() {
@@ -270,8 +270,8 @@ pub fn show_convo(
 
 pub fn get_initial_node(
     convo: &Rc<Conversation>,
-    pc: &RcRfc<EntityState>,
-    entity: &RcRfc<EntityState>,
+    pc: &Rc<RefCell<EntityState>>,
+    entity: &Rc<RefCell<EntityState>>,
 ) -> String {
     let mut cur_node = "";
     for (node, on_trigger) in convo.initial_nodes() {
@@ -287,8 +287,8 @@ pub fn get_initial_node(
 
 pub fn is_viewable(
     response: &Response,
-    pc: &RcRfc<EntityState>,
-    target: &RcRfc<EntityState>,
+    pc: &Rc<RefCell<EntityState>>,
+    target: &Rc<RefCell<EntityState>>,
 ) -> bool {
     is_match(&response.to_view, pc, target)
 }

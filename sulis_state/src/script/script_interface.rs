@@ -15,12 +15,13 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std;
+use std::cell::RefCell;
 use std::rc::Rc;
 
 use rlua::{self, UserData, UserDataMethods};
 
 use crate::script::*;
-use crate::{animation::Anim, AreaState, EntityState, GameState, Location, RcRfc};
+use crate::{animation::Anim, AreaState, EntityState, GameState, Location};
 use sulis_core::config::Config;
 use sulis_module::on_trigger::{self, QuestEntryState};
 use sulis_module::{Faction, ItemState, Module, OnTrigger, Time};
@@ -1008,7 +1009,7 @@ impl UserData for ScriptInterface {
     }
 }
 
-fn get_area(id: Option<String>) -> Result<RcRfc<AreaState>> {
+fn get_area(id: Option<String>) -> Result<Rc<RefCell<AreaState>>> {
     match id {
         None => Ok(GameState::area_state()),
         Some(id) => GameState::get_area_state(&id).ok_or(rlua::Error::FromLuaConversionError {
@@ -1038,7 +1039,7 @@ fn entities_with_ids(ids: Vec<String>) -> Vec<ScriptEntity> {
     result
 }
 
-pub fn entity_with_id(id: String) -> Option<RcRfc<EntityState>> {
+pub fn entity_with_id(id: String) -> Option<Rc<RefCell<EntityState>>> {
     let mgr = GameState::turn_manager();
     for entity in mgr.borrow().entity_iter() {
         {

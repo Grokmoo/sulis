@@ -25,7 +25,7 @@ use crate::{
 };
 use sulis_core::config::Config;
 use sulis_core::io::{keyboard_event::Key, InputAction};
-use sulis_core::ui::{Callback, Cursor, Widget, WidgetKind, RcRfc};
+use sulis_core::ui::{Callback, Cursor, Widget, WidgetKind};
 use sulis_core::util;
 use sulis_core::widgets::{Button, ConfirmationWindow, Label};
 use sulis_module::{area::OnRest, Module};
@@ -49,20 +49,20 @@ const NAME: &str = "game";
 
 pub struct RootView {
     pub(crate) next_step: Option<NextGameStep>,
-    status: RcRfc<Widget>,
+    status: Rc<RefCell<Widget>>,
     status_added: Option<Instant>,
-    area_view: RcRfc<AreaView>,
-    area_view_widget: RcRfc<Widget>,
-    console: RcRfc<ConsoleWindow>,
-    console_widget: RcRfc<Widget>,
+    area_view: Rc<RefCell<AreaView>>,
+    area_view_widget: Rc<RefCell<Widget>>,
+    console: Rc<RefCell<ConsoleWindow>>,
+    console_widget: Rc<RefCell<Widget>>,
 
-    quick_item_bar: Option<RcRfc<Widget>>,
-    abilities_bar: Option<RcRfc<Widget>>,
+    quick_item_bar: Option<Rc<RefCell<Widget>>>,
+    abilities_bar: Option<Rc<RefCell<Widget>>>,
     area: String,
 }
 
 impl RootView {
-    pub fn area_view(&self) -> (RcRfc<AreaView>, RcRfc<Widget>) {
+    pub fn area_view(&self) -> (Rc<RefCell<AreaView>>, Rc<RefCell<Widget>>) {
         (
             Rc::clone(&self.area_view),
             Rc::clone(&self.area_view_widget),
@@ -82,7 +82,7 @@ impl RootView {
         self.status_added = Some(Instant::now());
     }
 
-    pub fn new() -> RcRfc<RootView> {
+    pub fn new() -> Rc<RefCell<RootView>> {
         let area_view = AreaView::new();
         let area_view_widget = Widget::with_defaults(area_view.clone());
 
@@ -104,7 +104,7 @@ impl RootView {
     }
 
     /// Gets the merchant window if it is currently opened
-    pub fn get_merchant_window(&self, widget: &RcRfc<Widget>) -> Option<RcRfc<Widget>> {
+    pub fn get_merchant_window(&self, widget: &Rc<RefCell<Widget>>) -> Option<Rc<RefCell<Widget>>> {
         match Widget::get_child_with_name(widget, merchant_window::NAME) {
             None => None,
             Some(ref window) => Some(Rc::clone(window)),
@@ -112,7 +112,7 @@ impl RootView {
     }
 
     /// Gets the prop window if it is currently opened
-    pub fn get_prop_window(&self, widget: &RcRfc<Widget>) -> Option<RcRfc<Widget>> {
+    pub fn get_prop_window(&self, widget: &Rc<RefCell<Widget>>) -> Option<Rc<RefCell<Widget>>> {
         match Widget::get_child_with_name(widget, prop_window::NAME) {
             None => None,
             Some(ref window) => Some(Rc::clone(window)),
@@ -121,7 +121,7 @@ impl RootView {
 
     pub fn set_merchant_window(
         &mut self,
-        widget: &RcRfc<Widget>,
+        widget: &Rc<RefCell<Widget>>,
         desired_state: bool,
         merchant_id: &str,
     ) {
@@ -137,7 +137,7 @@ impl RootView {
 
     pub fn set_prop_window(
         &mut self,
-        widget: &RcRfc<Widget>,
+        widget: &Rc<RefCell<Widget>>,
         desired_state: bool,
         prop_index: usize,
     ) {
@@ -151,7 +151,7 @@ impl RootView {
         self.set_inventory_window(widget, desired_state);
     }
 
-    pub fn set_inventory_window(&mut self, widget: &RcRfc<Widget>, desired_state: bool) {
+    pub fn set_inventory_window(&mut self, widget: &Rc<RefCell<Widget>>, desired_state: bool) {
         self.set_window(widget, self::inventory_window::NAME, desired_state, &|| {
             match GameState::selected().first() {
                 None => None,
@@ -160,7 +160,7 @@ impl RootView {
         });
     }
 
-    pub fn set_character_window(&mut self, widget: &RcRfc<Widget>, desired_state: bool) {
+    pub fn set_character_window(&mut self, widget: &Rc<RefCell<Widget>>, desired_state: bool) {
         self.set_window(widget, self::character_window::NAME, desired_state, &|| {
             match GameState::selected().first() {
                 None => None,
@@ -169,7 +169,7 @@ impl RootView {
         });
     }
 
-    pub fn set_console_window(&mut self, _widget: &RcRfc<Widget>, desired_state: bool) {
+    pub fn set_console_window(&mut self, _widget: &Rc<RefCell<Widget>>, desired_state: bool) {
         self.console_widget
             .borrow_mut()
             .state
@@ -179,13 +179,13 @@ impl RootView {
         }
     }
 
-    pub fn set_quest_window(&mut self, widget: &RcRfc<Widget>, desired_state: bool) {
+    pub fn set_quest_window(&mut self, widget: &Rc<RefCell<Widget>>, desired_state: bool) {
         self.set_window(widget, self::quest_window::NAME, desired_state, &|| {
             Some(QuestWindow::new())
         });
     }
 
-    pub fn set_formation_window(&mut self, widget: &RcRfc<Widget>, desired_state: bool) {
+    pub fn set_formation_window(&mut self, widget: &Rc<RefCell<Widget>>, desired_state: bool) {
         self.set_window(widget, self::formation_window::NAME, desired_state, &|| {
             Some(FormationWindow::new())
         });
@@ -193,7 +193,7 @@ impl RootView {
 
     pub fn set_map_window(
         &mut self,
-        widget: &RcRfc<Widget>,
+        widget: &Rc<RefCell<Widget>>,
         desired_state: bool,
         transition_enabled: bool,
     ) {
@@ -204,10 +204,10 @@ impl RootView {
 
     fn set_window(
         &mut self,
-        widget: &RcRfc<Widget>,
+        widget: &Rc<RefCell<Widget>>,
         name: &str,
         desired_state: bool,
-        cb: &dyn Fn() -> Option<RcRfc<dyn WidgetKind>>,
+        cb: &dyn Fn() -> Option<Rc<RefCell<dyn WidgetKind>>>,
     ) {
         match Widget::get_child_with_name(widget, name) {
             None => {
@@ -229,7 +229,7 @@ impl RootView {
     }
 
     // returns true if there was at least one open window, false otherwise
-    fn close_all_windows(&mut self, widget: &RcRfc<Widget>) -> bool {
+    fn close_all_windows(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
         let mut found = false;
         for name in &WINDOW_NAMES {
             match Widget::get_child_with_name(widget, name) {
@@ -244,37 +244,37 @@ impl RootView {
         found
     }
 
-    pub fn toggle_formation_window(&mut self, widget: &RcRfc<Widget>) {
+    pub fn toggle_formation_window(&mut self, widget: &Rc<RefCell<Widget>>) {
         let desired_state = !Widget::has_child_with_name(widget, self::formation_window::NAME);
         self.set_formation_window(widget, desired_state);
     }
 
-    pub fn toggle_console_window(&mut self, widget: &RcRfc<Widget>) {
+    pub fn toggle_console_window(&mut self, widget: &Rc<RefCell<Widget>>) {
         let desired_state = !self.console_widget.borrow().state.is_visible();
         self.set_console_window(widget, desired_state);
     }
 
-    pub fn toggle_inventory_window(&mut self, widget: &RcRfc<Widget>) {
+    pub fn toggle_inventory_window(&mut self, widget: &Rc<RefCell<Widget>>) {
         let desired_state = !Widget::has_child_with_name(widget, self::inventory_window::NAME);
         self.set_inventory_window(widget, desired_state);
     }
 
-    pub fn toggle_character_window(&mut self, widget: &RcRfc<Widget>) {
+    pub fn toggle_character_window(&mut self, widget: &Rc<RefCell<Widget>>) {
         let desired_state = !Widget::has_child_with_name(widget, self::character_window::NAME);
         self.set_character_window(widget, desired_state);
     }
 
-    pub fn toggle_quest_window(&mut self, widget: &RcRfc<Widget>) {
+    pub fn toggle_quest_window(&mut self, widget: &Rc<RefCell<Widget>>) {
         let desired_state = !Widget::has_child_with_name(widget, self::quest_window::NAME);
         self.set_quest_window(widget, desired_state);
     }
 
-    pub fn toggle_map_window(&mut self, widget: &RcRfc<Widget>) {
+    pub fn toggle_map_window(&mut self, widget: &Rc<RefCell<Widget>>) {
         let desired_state = !Widget::has_child_with_name(widget, self::world_map_window::NAME);
         self.set_map_window(widget, desired_state, false);
     }
 
-    pub fn show_menu(&mut self, widget: &RcRfc<Widget>) {
+    pub fn show_menu(&mut self, widget: &Rc<RefCell<Widget>>) {
         let exit_cb = Callback::new(Rc::new(|widget, _| {
             let (_, root_view) = Widget::parent_mut::<RootView>(widget);
             root_view.next_step = Some(NextGameStep::Exit);
@@ -290,7 +290,7 @@ impl RootView {
         Widget::add_child_to(&widget, menu);
     }
 
-    pub fn show_exit(&mut self, widget: &RcRfc<Widget>) {
+    pub fn show_exit(&mut self, widget: &Rc<RefCell<Widget>>) {
         let exit_cb = Callback::new(Rc::new(|widget, _| {
             let (_, view) = Widget::parent_mut::<RootView>(widget);
             view.next_step = Some(NextGameStep::Exit);
@@ -354,7 +354,7 @@ impl RootView {
 impl WidgetKind for RootView {
     widget_kind!(NAME);
 
-    fn update(&mut self, widget: &RcRfc<Widget>, millis: u32) {
+    fn update(&mut self, widget: &Rc<RefCell<Widget>>, millis: u32) {
         let area_state = GameState::area_state();
         let root = Widget::get_root(widget);
         let area = area_state.borrow().area.area.id.clone();
@@ -421,7 +421,7 @@ impl WidgetKind for RootView {
         }
     }
 
-    fn on_key_press(&mut self, widget: &RcRfc<Widget>, key: InputAction) -> bool {
+    fn on_key_press(&mut self, widget: &Rc<RefCell<Widget>>, key: InputAction) -> bool {
         trace!("Key press: {:?} in root view.", key);
         use sulis_core::io::InputAction::*;
         match key {
@@ -467,7 +467,7 @@ impl WidgetKind for RootView {
         true
     }
 
-    fn on_add(&mut self, widget: &RcRfc<Widget>) -> Vec<RcRfc<Widget>> {
+    fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         info!("Adding to root widget.");
 
         let keys = Config::get_keybindings();
@@ -707,7 +707,7 @@ fn create_button(
     action: InputAction,
     id: &str,
     cb: Rc<CB>,
-) -> RcRfc<Widget> {
+) -> Rc<RefCell<Widget>> {
     let button = Widget::with_theme(Button::empty(), id);
     {
         let mut button = button.borrow_mut();
@@ -720,7 +720,7 @@ fn create_button(
     button
 }
 
-fn is_defeated(party: &[RcRfc<EntityState>]) -> bool {
+fn is_defeated(party: &[Rc<RefCell<EntityState>>]) -> bool {
     if party.is_empty() {
         return true;
     }

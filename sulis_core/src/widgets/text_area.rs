@@ -21,7 +21,7 @@ use std::rc::Rc;
 use crate::config::Config;
 use crate::io::{event::ClickKind, GraphicsRenderer};
 use crate::ui::theme::SizeRelative;
-use crate::ui::{Widget, WidgetKind, RcRfc};
+use crate::ui::{Widget, WidgetKind};
 use crate::util::{Point, Size};
 use crate::widget_kind;
 use crate::widgets::MarkupRenderer;
@@ -32,14 +32,14 @@ pub struct TextArea {
 }
 
 impl TextArea {
-    pub fn empty() -> RcRfc<TextArea> {
+    pub fn empty() -> Rc<RefCell<TextArea>> {
         Rc::new(RefCell::new(TextArea {
             text: None,
             limit_to_screen_edge: true,
         }))
     }
 
-    pub fn new(text: &str) -> RcRfc<TextArea> {
+    pub fn new(text: &str) -> Rc<RefCell<TextArea>> {
         Rc::new(RefCell::new(TextArea {
             text: Some(text.to_string()),
             limit_to_screen_edge: true,
@@ -58,19 +58,19 @@ impl TextArea {
 impl WidgetKind for TextArea {
     widget_kind!["text_area"];
 
-    fn on_mouse_press(&mut self, widget: &RcRfc<Widget>, kind: ClickKind) -> bool {
+    fn on_mouse_press(&mut self, widget: &Rc<RefCell<Widget>>, kind: ClickKind) -> bool {
         self.super_on_mouse_press(widget, kind);
         false
     }
 
-    fn on_mouse_release(&mut self, widget: &RcRfc<Widget>, kind: ClickKind) -> bool {
+    fn on_mouse_release(&mut self, widget: &Rc<RefCell<Widget>>, kind: ClickKind) -> bool {
         self.super_on_mouse_release(widget, kind);
         false
     }
 
     fn on_mouse_drag(
         &mut self,
-        _widget: &RcRfc<Widget>,
+        _widget: &Rc<RefCell<Widget>>,
         _kind: ClickKind,
         _delta_x: f32,
         _delta_y: f32,
@@ -80,19 +80,19 @@ impl WidgetKind for TextArea {
 
     fn on_mouse_move(
         &mut self,
-        _widget: &RcRfc<Widget>,
+        _widget: &Rc<RefCell<Widget>>,
         _delta_x: f32,
         _delta_y: f32,
     ) -> bool {
         true
     }
 
-    fn on_mouse_enter(&mut self, widget: &RcRfc<Widget>) -> bool {
+    fn on_mouse_enter(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
         self.super_on_mouse_exit(widget);
         false
     }
 
-    fn on_mouse_exit(&mut self, widget: &RcRfc<Widget>) -> bool {
+    fn on_mouse_exit(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
         self.super_on_mouse_exit(widget);
         false
     }

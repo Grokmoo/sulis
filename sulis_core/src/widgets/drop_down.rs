@@ -20,7 +20,7 @@ use std::fmt::Display;
 use std::rc::Rc;
 use std::slice::Iter;
 
-use crate::ui::{Callback, Widget, WidgetKind, RcRfc};
+use crate::ui::{Callback, Widget, WidgetKind};
 use crate::widgets::{list_box::Entry, Button, ListBox};
 
 const NAME: &str = "drop_down";
@@ -31,7 +31,7 @@ pub struct DropDown<T: Display + Clone + 'static> {
 }
 
 impl<T: Display + Clone + 'static> DropDown<T> {
-    pub fn new(entries: Vec<Entry<T>>, list_theme: &str) -> RcRfc<DropDown<T>> {
+    pub fn new(entries: Vec<Entry<T>>, list_theme: &str) -> Rc<RefCell<DropDown<T>>> {
         Rc::new(RefCell::new(DropDown {
             entries,
             list_theme: list_theme.to_string(),
@@ -60,7 +60,7 @@ impl<T: Display + Clone + 'static> WidgetKind for DropDown<T> {
         self
     }
 
-    fn on_add(&mut self, _widget: &RcRfc<Widget>) -> Vec<RcRfc<Widget>> {
+    fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let button = Widget::with_defaults(Button::empty());
         let entries_clone = self.entries.clone();
         let list_theme = self.list_theme.to_string();

@@ -14,13 +14,14 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::cell::RefCell;
 use std::rc::Rc;
 
 use crate::{action_kind, AreaMouseover};
 use sulis_core::image::Image;
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::resource::{ResourceSet, Sprite};
-use sulis_core::ui::{animation_state, Cursor, LineRenderer, Theme, Widget, RcRfc};
+use sulis_core::ui::{animation_state, Cursor, LineRenderer, Theme, Widget};
 use sulis_module::Module;
 use sulis_state::{area_feedback_text::Params, AreaState, EntityState, GameState};
 
@@ -38,8 +39,8 @@ pub struct AreaOverlayHandler {
     selection_box_start: Option<(f32, f32)>,
     selection_box_image: Option<Rc<dyn Image>>,
 
-    area_mouseover: Option<RcRfc<AreaMouseover>>,
-    area_mouseover_widget: Option<RcRfc<Widget>>,
+    area_mouseover: Option<Rc<RefCell<AreaMouseover>>>,
+    area_mouseover_widget: Option<Rc<RefCell<Widget>>>,
 
     path: Vec<(f32, f32)>,
     path_point_image: Option<Rc<dyn Image>>,
@@ -97,7 +98,7 @@ impl AreaOverlayHandler {
         widget: &Widget,
         scale: (f32, f32),
         scroll: (f32, f32),
-    ) -> Vec<RcRfc<EntityState>> {
+    ) -> Vec<Rc<RefCell<EntityState>>> {
         let mut party = Vec::new();
 
         let (x, y, x_end, y_end) = match self.get_selection_box_coords() {
@@ -125,7 +126,7 @@ impl AreaOverlayHandler {
         party
     }
 
-    fn check_mouseover(&self, x: i32, y: i32) -> Option<RcRfc<AreaMouseover>> {
+    fn check_mouseover(&self, x: i32, y: i32) -> Option<Rc<RefCell<AreaMouseover>>> {
         let area_state = GameState::area_state();
         let targeter = area_state.borrow_mut().targeter();
 
@@ -173,7 +174,7 @@ impl AreaOverlayHandler {
         x: i32,
         y: i32,
         area_state: &AreaState,
-    ) -> Option<RcRfc<AreaMouseover>> {
+    ) -> Option<Rc<RefCell<AreaMouseover>>> {
         if let Some(index) = area_state.props().index_at(x, y) {
             {
                 let prop = area_state.props().get(index);
@@ -218,7 +219,7 @@ impl AreaOverlayHandler {
 
     pub fn update_cursor_and_hover(
         &mut self,
-        widget: &RcRfc<Widget>,
+        widget: &Rc<RefCell<Widget>>,
         area_x: f32,
         area_y: f32,
     ) {
@@ -262,8 +263,8 @@ impl AreaOverlayHandler {
 
     fn set_new_mouseover(
         &mut self,
-        parent: &RcRfc<Widget>,
-        mouseover: RcRfc<AreaMouseover>,
+        parent: &Rc<RefCell<Widget>>,
+        mouseover: Rc<RefCell<AreaMouseover>>,
     ) {
         self.area_mouseover = Some(Rc::clone(&mouseover));
         let widget = Widget::with_defaults(mouseover);
@@ -432,7 +433,7 @@ impl AreaOverlayHandler {
 
     pub fn handle_left_click(
         &mut self,
-        widget: &RcRfc<Widget>,
+        widget: &Rc<RefCell<Widget>>,
         scale: (f32, f32),
         scroll: (f32, f32),
     ) -> bool {

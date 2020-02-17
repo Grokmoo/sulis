@@ -18,7 +18,7 @@ use std::any::Any;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use sulis_core::ui::{Callback, Widget, WidgetKind, RcRfc};
+use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_core::widgets::{Button, Label, ScrollDirection, ScrollPane, TextArea};
 use sulis_module::{on_trigger::QuestEntryState, Module, Quest};
 use sulis_state::{ChangeListener, GameState};
@@ -31,7 +31,7 @@ pub struct QuestWindow {
 }
 
 impl QuestWindow {
-    pub fn new() -> RcRfc<QuestWindow> {
+    pub fn new() -> Rc<RefCell<QuestWindow>> {
         Rc::new(RefCell::new(QuestWindow {
             active_quest: None,
             show_completed: false,
@@ -42,7 +42,7 @@ impl QuestWindow {
 impl WidgetKind for QuestWindow {
     widget_kind!(NAME);
 
-    fn on_add(&mut self, widget: &RcRfc<Widget>) -> Vec<RcRfc<Widget>> {
+    fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         GameState::add_quest_state_change_listener(ChangeListener::invalidate(NAME, widget));
 
         let quests = GameState::quest_state();

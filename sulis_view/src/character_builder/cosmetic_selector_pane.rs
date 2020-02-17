@@ -22,7 +22,7 @@ use std::rc::Rc;
 use sulis_core::image::{Image, LayeredImage};
 use sulis_core::io::GraphicsRenderer;
 use sulis_core::resource::ResourceSet;
-use sulis_core::ui::{Callback, Color, Widget, WidgetKind, RcRfc};
+use sulis_core::ui::{Callback, Color, Widget, WidgetKind};
 use sulis_core::util::Point;
 use sulis_core::widgets::{Button, InputField, Label, ScrollDirection, ScrollPane};
 use sulis_module::actor::Sex;
@@ -34,7 +34,7 @@ use crate::CharacterBuilder;
 pub const NAME: &str = "cosmetic_selector_pane";
 
 pub struct CosmeticSelectorPane {
-    preview: RcRfc<Widget>,
+    preview: Rc<RefCell<Widget>>,
 
     race: Option<Rc<Race>>,
     items: Vec<(Slot, ItemState)>,
@@ -51,7 +51,7 @@ pub struct CosmeticSelectorPane {
 }
 
 impl CosmeticSelectorPane {
-    pub fn new() -> RcRfc<CosmeticSelectorPane> {
+    pub fn new() -> Rc<RefCell<CosmeticSelectorPane>> {
         let preview = Widget::with_theme(Label::empty(), "preview");
         Rc::new(RefCell::new(CosmeticSelectorPane {
             sex: Sex::Male,
@@ -134,7 +134,7 @@ impl CosmeticSelectorPane {
         images
     }
 
-    fn set_finish_enabled(&self, widget: &RcRfc<Widget>) {
+    fn set_finish_enabled(&self, widget: &Rc<RefCell<Widget>>) {
         let (_, builder) = Widget::parent_mut::<CharacterBuilder>(&widget);
         builder
             .next
@@ -145,7 +145,7 @@ impl CosmeticSelectorPane {
 }
 
 impl BuilderPane for CosmeticSelectorPane {
-    fn on_selected(&mut self, builder: &mut CharacterBuilder, widget: RcRfc<Widget>) {
+    fn on_selected(&mut self, builder: &mut CharacterBuilder, widget: Rc<RefCell<Widget>>) {
         self.race = builder.race.clone();
         if let Some(ref race) = self.race {
             if !race.hair_selections.is_empty() {
@@ -182,7 +182,7 @@ impl BuilderPane for CosmeticSelectorPane {
         widget.borrow_mut().invalidate_children();
     }
 
-    fn next(&mut self, builder: &mut CharacterBuilder, widget: RcRfc<Widget>) {
+    fn next(&mut self, builder: &mut CharacterBuilder, widget: Rc<RefCell<Widget>>) {
         builder.sex = Some(self.sex);
         builder.name = self.name.to_string();
         builder.images = self.build_images();
@@ -196,7 +196,7 @@ impl BuilderPane for CosmeticSelectorPane {
         builder.next(&widget);
     }
 
-    fn prev(&mut self, builder: &mut CharacterBuilder, widget: RcRfc<Widget>) {
+    fn prev(&mut self, builder: &mut CharacterBuilder, widget: Rc<RefCell<Widget>>) {
         self.portrait = None;
         self.hue = Some(0.0);
         builder.prev(&widget);
@@ -239,7 +239,7 @@ impl WidgetKind for CosmeticSelectorPane {
         preview.draw(renderer, scale_x, scale_y, x, y, millis);
     }
 
-    fn on_add(&mut self, _widget: &RcRfc<Widget>) -> Vec<RcRfc<Widget>> {
+    fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let race = match &self.race {
             None => return vec![],
             Some(race) => Rc::clone(race),
@@ -594,7 +594,7 @@ fn hue_to_color(hue: f32) -> Color {
 
 fn portrait_selector_button_callback(
     portrait: &Rc<dyn Image>,
-    pane_widget: &RcRfc<Widget>,
+    pane_widget: &Rc<RefCell<Widget>>,
 ) -> Callback {
     let pane_widget_ref = Rc::clone(pane_widget);
     let image = Rc::clone(portrait);

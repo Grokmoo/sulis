@@ -14,13 +14,14 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::cell::RefCell;
 use std::cmp::Ordering;
 use std::rc::Rc;
 
 use sulis_core::image::Image;
 use sulis_core::io::DrawList;
 use sulis_core::resource::ResourceSet;
-use sulis_core::ui::{animation_state, RcRfc};
+use sulis_core::ui::animation_state;
 use sulis_core::util::Point;
 
 use crate::{is_within, EntityState, GameState};
@@ -52,7 +53,7 @@ impl RangeIndicatorHandler {
         self.indicators.first()
     }
 
-    pub fn add_attack(&mut self, parent: &RcRfc<EntityState>) {
+    pub fn add_attack(&mut self, parent: &Rc<RefCell<EntityState>>) {
         let indicator = RangeIndicator::attack(parent);
         self.add(Some(indicator));
     }
@@ -130,14 +131,14 @@ impl Ord for Kind {
 #[derive(Clone)]
 pub struct RangeIndicator {
     kind: Kind,
-    parent: RcRfc<EntityState>,
+    parent: Rc<RefCell<EntityState>>,
     neighbors: Vec<u8>,
     half_width: i32,
 }
 
 impl RangeIndicator {
     /// Creates an ability range indicator.  will panic if ability is not active.
-    pub fn ability(parent: &RcRfc<EntityState>, ability: &Rc<Ability>) -> RangeIndicator {
+    pub fn ability(parent: &Rc<RefCell<EntityState>>, ability: &Rc<Ability>) -> RangeIndicator {
         let active = ability.active.as_ref().unwrap();
 
         let mut radius = match active.range {
@@ -177,16 +178,16 @@ impl RangeIndicator {
         RangeIndicator::new(Kind::Ability(ability), radius, parent)
     }
 
-    pub fn targeter(radius: f32, parent: &RcRfc<EntityState>) -> RangeIndicator {
+    pub fn targeter(radius: f32, parent: &Rc<RefCell<EntityState>>) -> RangeIndicator {
         RangeIndicator::new(Kind::Targeter, radius, parent)
     }
 
-    pub fn attack(parent: &RcRfc<EntityState>) -> RangeIndicator {
+    pub fn attack(parent: &Rc<RefCell<EntityState>>) -> RangeIndicator {
         let radius = parent.borrow().actor.stats.attack_distance();
         RangeIndicator::new(Kind::Attack, radius, parent)
     }
 
-    fn new(kind: Kind, radius: f32, parent: &RcRfc<EntityState>) -> RangeIndicator {
+    fn new(kind: Kind, radius: f32, parent: &Rc<RefCell<EntityState>>) -> RangeIndicator {
         let parent = Rc::clone(parent);
 
         let half_width = radius.ceil() as i32 + 5;

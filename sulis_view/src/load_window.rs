@@ -18,7 +18,7 @@ use std::any::Any;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use sulis_core::ui::{Callback, Widget, WidgetKind, RcRfc};
+use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_core::widgets::{
     Button, ConfirmationWindow, Label, ScrollDirection, ScrollPane, TextArea,
 };
@@ -30,16 +30,16 @@ use crate::{main_menu::MainMenu, LoadingScreen, RootView};
 const NAME: &str = "load_window";
 
 pub struct LoadWindow {
-    accept: RcRfc<Widget>,
-    delete: RcRfc<Widget>,
-    pub(crate) cancel: RcRfc<Widget>,
+    accept: Rc<RefCell<Widget>>,
+    delete: Rc<RefCell<Widget>>,
+    pub(crate) cancel: Rc<RefCell<Widget>>,
     entries: Vec<SaveFileMetaData>,
     selected_entry: Option<usize>,
     main_menu_mode: bool,
 }
 
 impl LoadWindow {
-    pub fn new(main_menu_mode: bool) -> RcRfc<LoadWindow> {
+    pub fn new(main_menu_mode: bool) -> Rc<RefCell<LoadWindow>> {
         let accept = Widget::with_theme(Button::empty(), "accept");
         let cancel = Widget::with_theme(Button::empty(), "cancel");
         let delete = Widget::with_theme(Button::empty(), "delete");
@@ -62,7 +62,7 @@ impl LoadWindow {
         }))
     }
 
-    pub fn load(&self, root: &RcRfc<Widget>) {
+    pub fn load(&self, root: &Rc<RefCell<Widget>>) {
         let index = match self.selected_entry {
             None => return,
             Some(index) => index,
@@ -79,7 +79,7 @@ impl LoadWindow {
         }
     }
 
-    pub fn set_load_step(&self, save_state: SaveState, root: &RcRfc<Widget>) {
+    pub fn set_load_step(&self, save_state: SaveState, root: &Rc<RefCell<Widget>>) {
         // TODO remove the bool flag passed in the constructor
         if self.main_menu_mode {
             let main_menu = Widget::kind_mut::<MainMenu>(root);
@@ -133,7 +133,7 @@ impl LoadWindow {
 impl WidgetKind for LoadWindow {
     widget_kind!(NAME);
 
-    fn on_add(&mut self, widget: &RcRfc<Widget>) -> Vec<RcRfc<Widget>> {
+    fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let title = Widget::with_theme(Label::empty(), "title");
 
         self.cancel

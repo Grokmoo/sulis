@@ -24,7 +24,7 @@ use rlua::{self, FromLuaMulti, ToLua, ToLuaMulti};
 use crate::script::{
     Result, ScriptAbility, ScriptEntity, ScriptEntitySet, ScriptItem, ScriptItemKind, ScriptState,
 };
-use crate::{ai, EntityState, RcRfc};
+use crate::{ai, EntityState};
 use sulis_core::util::Point;
 use sulis_module::{ai::AITemplate, Ability, Item, Module};
 
@@ -156,7 +156,7 @@ where
     }
 }
 
-pub fn ai_script(parent: &RcRfc<EntityState>, func: &str) -> Result<ai::State> {
+pub fn ai_script(parent: &Rc<RefCell<EntityState>>, func: &str) -> Result<ai::State> {
     let script_data = get_script_data_from_entity(parent)?;
     let parent = ScriptEntity::from(parent);
     exec_func(
@@ -167,7 +167,7 @@ pub fn ai_script(parent: &RcRfc<EntityState>, func: &str) -> Result<ai::State> {
 }
 
 pub fn entity_script<T>(
-    parent: &RcRfc<EntityState>,
+    parent: &Rc<RefCell<EntityState>>,
     targets: ScriptEntitySet,
     arg: Option<T>,
     func: &str,
@@ -181,7 +181,7 @@ where
 }
 
 pub fn item_on_activate(
-    parent: &RcRfc<EntityState>,
+    parent: &Rc<RefCell<EntityState>>,
     func: String,
     kind: ScriptItemKind,
 ) -> Result<()> {
@@ -196,13 +196,13 @@ pub fn item_on_activate(
 }
 
 pub fn item_on_target_select(
-    parent: &RcRfc<EntityState>,
+    parent: &Rc<RefCell<EntityState>>,
     kind: ScriptItemKind,
-    targets: Vec<Option<RcRfc<EntityState>>>,
+    targets: Vec<Option<Rc<RefCell<EntityState>>>>,
     selected_point: Point,
     affected_points: Vec<Point>,
     func: &str,
-    custom_target: Option<RcRfc<EntityState>>,
+    custom_target: Option<Rc<RefCell<EntityState>>>,
 ) -> Result<()> {
     let mut targets = ScriptEntitySet::new(parent, &targets);
     targets.selected_point = Some((selected_point.x, selected_point.y));
@@ -219,7 +219,7 @@ pub fn item_on_target_select(
 /// this is not assumed, but the specified index is still set on the item that is passed into
 /// the script state.
 pub fn item_script<T>(
-    parent: &RcRfc<EntityState>,
+    parent: &Rc<RefCell<EntityState>>,
     kind: ScriptItemKind,
     targets: ScriptEntitySet,
     arg: Option<T>,
@@ -262,13 +262,13 @@ pub fn ability_on_deactivate(parent: usize, ability: &Rc<Ability>) -> Result<()>
 }
 
 pub fn ability_on_target_select(
-    parent: &RcRfc<EntityState>,
+    parent: &Rc<RefCell<EntityState>>,
     ability: &Rc<Ability>,
-    targets: Vec<Option<RcRfc<EntityState>>>,
+    targets: Vec<Option<Rc<RefCell<EntityState>>>>,
     selected_point: Point,
     affected_points: Vec<Point>,
     func: &str,
-    custom_target: Option<RcRfc<EntityState>>,
+    custom_target: Option<Rc<RefCell<EntityState>>>,
 ) -> Result<()> {
     let mut targets = ScriptEntitySet::new(parent, &targets);
     targets.selected_point = Some((selected_point.x, selected_point.y));
@@ -281,7 +281,7 @@ pub fn ability_on_target_select(
 }
 
 pub fn ability_script<T>(
-    parent: &RcRfc<EntityState>,
+    parent: &Rc<RefCell<EntityState>>,
     ability: &Rc<Ability>,
     targets: ScriptEntitySet,
     arg: Option<T>,
@@ -303,7 +303,7 @@ where
     exec_func(script_id, func, args)
 }
 
-fn get_script_data_from_entity(entity: &RcRfc<EntityState>) -> Result<Rc<AITemplate>> {
+fn get_script_data_from_entity(entity: &Rc<RefCell<EntityState>>) -> Result<Rc<AITemplate>> {
     let entity = entity.borrow();
     let id = entity.unique_id();
     match &entity.actor.actor.ai {

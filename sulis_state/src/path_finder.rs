@@ -14,7 +14,10 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use crate::{animation, animation::Anim, script::ScriptCallback, AreaState, EntityState, RcRfc};
+use std::cell::RefCell;
+use std::rc::Rc;
+
+use crate::{animation, animation::Anim, script::ScriptCallback, AreaState, EntityState};
 use sulis_core::{
     config::Config,
     util::{self, Point},
@@ -80,7 +83,7 @@ impl<'a, 'b> LocationChecker for StateLocationChecker<'a, 'b> {
 pub fn move_towards_point(
     finder: &mut PathFinder,
     area: &AreaState,
-    entity: &RcRfc<EntityState>,
+    entity: &Rc<RefCell<EntityState>>,
     entities_to_ignore: Vec<usize>,
     dest: Destination,
     cb: Option<Box<dyn ScriptCallback>>,

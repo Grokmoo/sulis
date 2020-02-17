@@ -21,7 +21,7 @@ use std::rc::Rc;
 use crate::image::Image;
 use crate::io::{event::ClickKind, DrawList, GraphicsRenderer};
 use crate::resource::ResourceSet;
-use crate::ui::{theme, LineRenderer, Widget, WidgetKind, RcRfc};
+use crate::ui::{theme, LineRenderer, Widget, WidgetKind};
 use crate::util::Point;
 use crate::widget_kind;
 use crate::widgets::{Label, TextArea};
@@ -31,12 +31,12 @@ const NAME: &str = "progress_bar";
 pub struct ProgressBar {
     fraction: f32,
     bar: Option<Rc<dyn Image>>,
-    label: RcRfc<Label>,
+    label: Rc<RefCell<Label>>,
     tooltip: String,
 }
 
 impl ProgressBar {
-    pub fn new(fraction: f32) -> RcRfc<ProgressBar> {
+    pub fn new(fraction: f32) -> Rc<RefCell<ProgressBar>> {
         Rc::new(RefCell::new(ProgressBar {
             bar: None,
             fraction: limit(fraction),
@@ -63,19 +63,19 @@ fn limit(fraction: f32) -> f32 {
 impl WidgetKind for ProgressBar {
     widget_kind![NAME];
 
-    fn on_mouse_press(&mut self, widget: &RcRfc<Widget>, kind: ClickKind) -> bool {
+    fn on_mouse_press(&mut self, widget: &Rc<RefCell<Widget>>, kind: ClickKind) -> bool {
         self.super_on_mouse_press(widget, kind);
         false
     }
 
-    fn on_mouse_release(&mut self, widget: &RcRfc<Widget>, kind: ClickKind) -> bool {
+    fn on_mouse_release(&mut self, widget: &Rc<RefCell<Widget>>, kind: ClickKind) -> bool {
         self.super_on_mouse_release(widget, kind);
         false
     }
 
     fn on_mouse_drag(
         &mut self,
-        _widget: &RcRfc<Widget>,
+        _widget: &Rc<RefCell<Widget>>,
         _kind: ClickKind,
         _delta_x: f32,
         _delta_y: f32,
@@ -83,18 +83,18 @@ impl WidgetKind for ProgressBar {
         false
     }
 
-    fn on_mouse_enter(&mut self, widget: &RcRfc<Widget>) -> bool {
+    fn on_mouse_enter(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
         self.super_on_mouse_exit(widget);
         false
     }
 
-    fn on_mouse_exit(&mut self, widget: &RcRfc<Widget>) -> bool {
+    fn on_mouse_exit(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
         self.super_on_mouse_exit(widget);
         false
     }
 
     // TODO refactor tooltip code into a common case somewhere
-    fn on_mouse_move(&mut self, widget: &RcRfc<Widget>, _dx: f32, _dy: f32) -> bool {
+    fn on_mouse_move(&mut self, widget: &Rc<RefCell<Widget>>, _dx: f32, _dy: f32) -> bool {
         if self.tooltip.is_empty() {
             return false;
         }

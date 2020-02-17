@@ -18,7 +18,7 @@ use std::any::Any;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use sulis_core::ui::{Callback, Widget, WidgetKind, RcRfc};
+use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_core::widgets::{Button, TextArea};
 use sulis_module::Cutscene;
 use sulis_state::GameState;
@@ -31,7 +31,7 @@ pub struct CutsceneWindow {
 }
 
 impl CutsceneWindow {
-    pub fn new(cutscene: Rc<Cutscene>) -> RcRfc<CutsceneWindow> {
+    pub fn new(cutscene: Rc<Cutscene>) -> Rc<RefCell<CutsceneWindow>> {
         Rc::new(RefCell::new(CutsceneWindow {
             cutscene,
             frame_index: 0,
@@ -49,7 +49,7 @@ pub fn add_on_end_cbs(cutscene: &Rc<Cutscene>) {
 impl WidgetKind for CutsceneWindow {
     widget_kind!(NAME);
 
-    fn on_add(&mut self, widget: &RcRfc<Widget>) -> Vec<RcRfc<Widget>> {
+    fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let frame = self.cutscene.frames.get(self.frame_index);
         let frame = match frame {
             None => {

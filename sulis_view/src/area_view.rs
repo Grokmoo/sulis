@@ -28,7 +28,7 @@ use sulis_core::io::event::ClickKind;
 use sulis_core::io::*;
 use sulis_core::resource::{ResourceSet, Sprite};
 use sulis_core::ui::{animation_state, compute_area_scaling};
-use sulis_core::ui::{color, Color, Cursor, Scrollable, Widget, WidgetKind, RcRfc};
+use sulis_core::ui::{color, Color, Cursor, Scrollable, Widget, WidgetKind};
 use sulis_core::util::{self, Point};
 use sulis_core::widgets::Label;
 use sulis_module::{
@@ -48,12 +48,12 @@ pub struct AreaView {
     layers: Vec<String>,
     entity_texture_cache: EntityTextureCache,
 
-    targeter_label: RcRfc<Widget>,
+    targeter_label: Rc<RefCell<Widget>>,
     targeter_tile: Option<Rc<dyn Image>>,
     range_indicator_image_set: Option<RangeIndicatorImageSet>,
 
     scroll: Scrollable,
-    active_entity: Option<RcRfc<EntityState>>,
+    active_entity: Option<Rc<RefCell<EntityState>>>,
     feedback_text_params: area_feedback_text::Params,
 
     scroll_target: Option<(f32, f32)>,
@@ -71,7 +71,7 @@ const BASE_LAYER_ID: &str = "__base_layer__";
 const AERIAL_LAYER_ID: &str = "__aerial_layer__";
 
 impl AreaView {
-    pub fn new() -> RcRfc<AreaView> {
+    pub fn new() -> Rc<RefCell<AreaView>> {
         Rc::new(RefCell::new(AreaView {
             targeter_label: Widget::with_theme(Label::empty(), "targeter_label"),
             scale: (1.0, 1.0),
@@ -100,14 +100,14 @@ impl AreaView {
         self.overlay_handler.clear_area_mouseover();
     }
 
-    pub fn update_cursor_and_hover(&mut self, widget: &RcRfc<Widget>) {
+    pub fn update_cursor_and_hover(&mut self, widget: &Rc<RefCell<Widget>>) {
         let (x, y) = self.get_cursor_pos(widget);
         self.overlay_handler.update_cursor_and_hover(widget, x, y);
     }
 
     pub fn center_scroll_on(
         &mut self,
-        entity: &RcRfc<EntityState>,
+        entity: &Rc<RefCell<EntityState>>,
         area_width: i32,
         area_height: i32,
         widget: &Widget,
@@ -150,7 +150,7 @@ impl AreaView {
         self.scroll_target = Some((x, y));
     }
 
-    fn get_cursor_pos(&self, widget: &RcRfc<Widget>) -> (f32, f32) {
+    fn get_cursor_pos(&self, widget: &Rc<RefCell<Widget>>) -> (f32, f32) {
         let pos = widget.borrow().state.inner_position();
         let (x, y) = self.get_cursor_pos_scaled(pos.x, pos.y);
         ((x + self.scroll.x()), (y + self.scroll.y()))
@@ -405,7 +405,7 @@ impl AreaView {
 
     fn draw_selection(
         &mut self,
-        selected: &RcRfc<EntityState>,
+        selected: &Rc<RefCell<EntityState>>,
         renderer: &mut dyn GraphicsRenderer,
         scale_x: f32,
         scale_y: f32,
@@ -443,7 +443,7 @@ impl AreaView {
         self.scroll.change(delta_x, delta_y)
     }
 
-    pub fn set_active_entity(&mut self, entity: Option<RcRfc<EntityState>>) {
+    pub fn set_active_entity(&mut self, entity: Option<Rc<RefCell<EntityState>>>) {
         self.active_entity = entity;
     }
 
@@ -508,7 +508,7 @@ impl WidgetKind for AreaView {
     widget_kind!(NAME);
 
     #[allow(clippy::float_cmp)]
-    fn update(&mut self, _widget: &RcRfc<Widget>, millis: u32) {
+    fn update(&mut self, _widget: &Rc<RefCell<Widget>>, millis: u32) {
         let (dest_x, dest_y) = match self.scroll_target {
             None => return,
             Some((x, y)) => (x, y),
@@ -622,7 +622,7 @@ impl WidgetKind for AreaView {
         }
     }
 
-    fn on_add(&mut self, _widget: &RcRfc<Widget>) -> Vec<RcRfc<Widget>> {
+    fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         info!("Adding area to widget tree");
         self.overlay_handler = AreaOverlayHandler::default();
 
@@ -639,7 +639,7 @@ impl WidgetKind for AreaView {
         vec![Rc::clone(&self.targeter_label), fade]
     }
 
-    fn on_key_press(&mut self, widget: &RcRfc<Widget>, key: InputAction) -> bool {
+    fn on_key_press(&mut self, widget: &Rc<RefCell<Widget>>, key: InputAction) -> bool {
         use sulis_core::io::InputAction::*;
         let delta = match key {
             ZoomIn => 0.1,
@@ -895,7 +895,7 @@ impl WidgetKind for AreaView {
         }
     }
 
-    fn on_mouse_release(&mut self, widget: &RcRfc<Widget>, kind: ClickKind) -> bool {
+    fn on_mouse_release(&mut self, widget: &Rc<RefCell<Widget>>, kind: ClickKind) -> bool {
         self.super_on_mouse_release(widget, kind);
         let (x, y) = self.get_cursor_pos(widget);
         if x < 0.0 || y < 0.0 {
@@ -938,7 +938,7 @@ impl WidgetKind for AreaView {
 
     fn on_mouse_drag(
         &mut self,
-        widget: &RcRfc<Widget>,
+        widget: &Rc<RefCell<Widget>>,
         kind: ClickKind,
         delta_x: f32,
         delta_y: f32,
@@ -971,13 +971,13 @@ impl WidgetKind for AreaView {
         true
     }
 
-    fn on_mouse_enter(&mut self, widget: &RcRfc<Widget>) -> bool {
+    fn on_mouse_enter(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
         self.set_active_entity(None);
         self.super_on_mouse_enter(widget);
         true
     }
 
-    fn on_mouse_exit(&mut self, widget: &RcRfc<Widget>) -> bool {
+    fn on_mouse_exit(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
         self.super_on_mouse_exit(widget);
         self.overlay_handler.on_mouse_exit();
         true

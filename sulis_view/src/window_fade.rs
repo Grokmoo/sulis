@@ -21,7 +21,7 @@ use std::rc::Rc;
 use sulis_core::image::Image;
 use sulis_core::io::{event::ClickKind, DrawList, GraphicsRenderer};
 use sulis_core::resource::ResourceSet;
-use sulis_core::ui::{animation_state, Widget, WidgetKind, RcRfc};
+use sulis_core::ui::{animation_state, Widget, WidgetKind};
 use sulis_core::util::Point;
 
 pub enum Mode {
@@ -40,7 +40,7 @@ pub struct WindowFade {
 }
 
 impl WindowFade {
-    pub fn new(mode: Mode) -> RcRfc<WindowFade> {
+    pub fn new(mode: Mode) -> Rc<RefCell<WindowFade>> {
         let frac = match mode {
             Mode::In => 1.0,
             Mode::OutIn => 0.0,
@@ -60,7 +60,7 @@ impl WindowFade {
 impl WidgetKind for WindowFade {
     widget_kind!["window_fade"];
 
-    fn update(&mut self, widget: &RcRfc<Widget>, millis: u32) {
+    fn update(&mut self, widget: &Rc<RefCell<Widget>>, millis: u32) {
         if self.elapsed_millis == 0 {
             // don't count the first frame in case we are loading
             self.elapsed_millis = 1;
@@ -126,19 +126,19 @@ impl WidgetKind for WindowFade {
         }
     }
 
-    fn on_mouse_press(&mut self, widget: &RcRfc<Widget>, kind: ClickKind) -> bool {
+    fn on_mouse_press(&mut self, widget: &Rc<RefCell<Widget>>, kind: ClickKind) -> bool {
         self.super_on_mouse_press(widget, kind);
         false
     }
 
-    fn on_mouse_release(&mut self, widget: &RcRfc<Widget>, kind: ClickKind) -> bool {
+    fn on_mouse_release(&mut self, widget: &Rc<RefCell<Widget>>, kind: ClickKind) -> bool {
         self.super_on_mouse_release(widget, kind);
         false
     }
 
     fn on_mouse_drag(
         &mut self,
-        _widget: &RcRfc<Widget>,
+        _widget: &Rc<RefCell<Widget>>,
         _kind: ClickKind,
         _delta_x: f32,
         _delta_y: f32,
@@ -146,12 +146,12 @@ impl WidgetKind for WindowFade {
         false
     }
 
-    fn on_mouse_enter(&mut self, widget: &RcRfc<Widget>) -> bool {
+    fn on_mouse_enter(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
         self.super_on_mouse_exit(widget);
         false
     }
 
-    fn on_mouse_exit(&mut self, widget: &RcRfc<Widget>) -> bool {
+    fn on_mouse_exit(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
         self.super_on_mouse_exit(widget);
         false
     }

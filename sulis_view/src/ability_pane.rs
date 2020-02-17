@@ -18,7 +18,7 @@ use std::any::Any;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use sulis_core::ui::{Widget, WidgetKind, WidgetState, RcRfc};
+use sulis_core::ui::{Widget, WidgetKind, WidgetState};
 use sulis_core::widgets::TextArea;
 use sulis_module::{ability, Ability, Module};
 
@@ -28,18 +28,18 @@ pub const NAME: &str = "ability_pane";
 
 pub struct AbilityPane {
     ability: Option<Rc<Ability>>,
-    pub details: RcRfc<Widget>,
+    pub details: Rc<RefCell<Widget>>,
 }
 
 impl AbilityPane {
-    pub fn empty() -> RcRfc<AbilityPane> {
+    pub fn empty() -> Rc<RefCell<AbilityPane>> {
         Rc::new(RefCell::new(AbilityPane {
             ability: None,
             details: Widget::with_theme(TextArea::empty(), "details"),
         }))
     }
 
-    pub fn new(ability: Rc<Ability>) -> RcRfc<AbilityPane> {
+    pub fn new(ability: Rc<Ability>) -> Rc<RefCell<AbilityPane>> {
         Rc::new(RefCell::new(AbilityPane {
             ability: Some(ability),
             details: Widget::with_theme(TextArea::empty(), "details"),
@@ -66,7 +66,7 @@ impl WidgetKind for AbilityPane {
         self
     }
 
-    fn on_add(&mut self, _widget: &RcRfc<Widget>) -> Vec<RcRfc<Widget>> {
+    fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let ability = match self.ability {
             None => return Vec::new(),
             Some(ref ability) => ability,

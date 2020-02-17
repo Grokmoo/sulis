@@ -22,7 +22,7 @@ use std::path::Path;
 use std::rc::Rc;
 
 use sulis_core::config::Config;
-use sulis_core::ui::{Callback, Widget, WidgetKind, RcRfc};
+use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_core::widgets::{list_box, Button, ListBox, ScrollDirection, ScrollPane};
 
 use crate::AreaEditor;
@@ -30,11 +30,11 @@ use crate::AreaEditor;
 pub const NAME: &str = "load_window";
 
 pub struct LoadWindow {
-    area_editor: RcRfc<AreaEditor>,
+    area_editor: Rc<RefCell<AreaEditor>>,
 }
 
 impl LoadWindow {
-    pub fn new(area_editor: RcRfc<AreaEditor>) -> RcRfc<LoadWindow> {
+    pub fn new(area_editor: Rc<RefCell<AreaEditor>>) -> Rc<RefCell<LoadWindow>> {
         Rc::new(RefCell::new(LoadWindow { area_editor }))
     }
 }
@@ -52,7 +52,7 @@ impl WidgetKind for LoadWindow {
         self
     }
 
-    fn on_add(&mut self, _widget: &RcRfc<Widget>) -> Vec<RcRfc<Widget>> {
+    fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let close = Widget::with_theme(Button::empty(), "close");
         close
             .borrow_mut()

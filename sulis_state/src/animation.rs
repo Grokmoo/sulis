@@ -14,7 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::cell::Cell;
+use std::cell::{Cell, RefCell};
 use std::cmp;
 use std::collections::HashMap;
 use std::rc::Rc;
@@ -42,7 +42,7 @@ use self::move_animation::MoveAnimModel;
 use self::particle_generator::Param;
 use self::particle_generator::{GeneratorModel, GeneratorState};
 use self::ranged_attack_animation::RangedAttackAnimModel;
-use crate::{ChangeListener, Effect, EntityState, ScriptCallback, RcRfc};
+use crate::{ChangeListener, Effect, EntityState, ScriptCallback};
 use sulis_core::{
     image::Image,
     io::GraphicsRenderer,
@@ -187,13 +187,13 @@ impl AnimState {
             || AnimState::has_any_blocking_vec(&self.above_anims)
     }
 
-    pub fn has_blocking_anims(&self, entity: &RcRfc<EntityState>) -> bool {
+    pub fn has_blocking_anims(&self, entity: &Rc<RefCell<EntityState>>) -> bool {
         AnimState::has_blocking_vec(&self.no_draw_anims, entity)
             || AnimState::has_blocking_vec(&self.below_anims, entity)
             || AnimState::has_blocking_vec(&self.above_anims, entity)
     }
 
-    pub fn clear_blocking_anims(&mut self, entity: &RcRfc<EntityState>) {
+    pub fn clear_blocking_anims(&mut self, entity: &Rc<RefCell<EntityState>>) {
         AnimState::clear_blocking_vec(&mut self.no_draw_anims, entity);
         AnimState::clear_blocking_vec(&mut self.below_anims, entity);
         AnimState::clear_blocking_vec(&mut self.above_anims, entity);
@@ -216,7 +216,7 @@ impl AnimState {
         false
     }
 
-    fn has_blocking_vec(vec: &[Anim], entity: &RcRfc<EntityState>) -> bool {
+    fn has_blocking_vec(vec: &[Anim], entity: &Rc<RefCell<EntityState>>) -> bool {
         for anim in vec.iter() {
             if !anim.is_blocking() {
                 continue;
@@ -230,7 +230,7 @@ impl AnimState {
         false
     }
 
-    fn clear_blocking_vec(vec: &mut Vec<Anim>, entity: &RcRfc<EntityState>) {
+    fn clear_blocking_vec(vec: &mut Vec<Anim>, entity: &Rc<RefCell<EntityState>>) {
         for anim in vec.iter_mut() {
             if !anim.is_blocking() {
                 continue;
@@ -285,7 +285,7 @@ pub struct Anim {
     marked_for_removal: Rc<Cell<bool>>,
     completion_callbacks: Vec<Box<dyn ScriptCallback>>,
     update_callbacks: Vec<(u32, Box<dyn ScriptCallback>)>, // sorted by the first field, time in secs
-    pub(in crate::animation) owner: RcRfc<EntityState>,
+    pub(in crate::animation) owner: Rc<RefCell<EntityState>>,
     pub(in crate::animation) removal_effect: Option<usize>, // used only for save/load purposes
 }
 
@@ -326,8 +326,8 @@ pub(in crate::animation) enum AnimKind {
     /// A particle effect from a script - can also be used for simple
     /// single image animations
     ParticleGenerator {
-        model: Box<GeneratorModel>,
-        state: Box<GeneratorState>,
+        model: GeneratorModel,
+        state: GeneratorState,
     },
 
     /// Animation triggered when an entity is killed
@@ -338,7 +338,7 @@ pub(in crate::animation) enum AnimKind {
 }
 
 impl Anim {
-    pub fn new_non_blocking_wait(owner: &RcRfc<EntityState>, duration_millis: u32) -> Anim {
+    pub fn new_non_blocking_wait(owner: &Rc<RefCell<EntityState>>, duration_millis: u32) -> Anim {
         Anim::new(
             owner,
             ExtInt::Int(duration_millis),
@@ -346,12 +346,12 @@ impl Anim {
         )
     }
 
-    pub fn new_wait(owner: &RcRfc<EntityState>, duration_millis: u32) -> Anim {
+    pub fn new_wait(owner: &Rc<RefCell<EntityState>>, duration_millis: u32) -> Anim {
         Anim::new(owner, ExtInt::Int(duration_millis), AnimKind::Wait)
     }
 
     pub fn new_entity_image_layer(
-        owner: &RcRfc<EntityState>,
+        owner: &Rc<RefCell<EntityState>>,
         duration_millis: ExtInt,
         images: HashMap<ImageLayer, Rc<dyn Image>>,
     ) -> Anim {
@@ -363,7 +363,7 @@ impl Anim {
     }
 
     pub fn new_entity_color(
-        owner: &RcRfc<EntityState>,
+        owner: &Rc<RefCell<EntityState>>,
         duration_millis: ExtInt,
         color: [Param; 4],
         color_sec: [Param; 4],
@@ -376,7 +376,7 @@ impl Anim {
     }
 
     pub fn new_entity_scale(
-        owner: &RcRfc<EntityState>,
+        owner: &Rc<RefCell<EntityState>>,
         duration_millis: ExtInt,
         scale: Param,
     ) -> Anim {
@@ -384,7 +384,7 @@ impl Anim {
     }
 
     pub fn new_entity_subpos(
-        owner: &RcRfc<EntityState>,
+        owner: &Rc<RefCell<EntityState>>,
         duration_millis: ExtInt,
         x: Param,
         y: Param,
@@ -393,7 +393,7 @@ impl Anim {
     }
 
     pub(in crate::animation) fn new_melee_attack(
-        attacker: &RcRfc<EntityState>,
+        attacker: &Rc<RefCell<EntityState>>,
         duration_millis: u32,
         model: MeleeAttackAnimModel,
     ) -> Anim {
@@ -405,7 +405,7 @@ impl Anim {
     }
 
     pub(in crate::animation) fn new_ranged_attack(
-        attacker: &RcRfc<EntityState>,
+        attacker: &Rc<RefCell<EntityState>>,
         duration_millis: u32,
         model: RangedAttackAnimModel,
     ) -> Anim {
@@ -417,7 +417,7 @@ impl Anim {
     }
 
     pub(in crate::animation) fn new_move(
-        mover: &RcRfc<EntityState>,
+        mover: &Rc<RefCell<EntityState>>,
         duration_millis: u32,
         model: MoveAnimModel,
     ) -> Anim {
@@ -429,7 +429,7 @@ impl Anim {
     }
 
     pub(in crate::animation) fn new_pgen(
-        owner: &RcRfc<EntityState>,
+        owner: &Rc<RefCell<EntityState>>,
         duration_millis: ExtInt,
         model: GeneratorModel,
         state: GeneratorState,
@@ -437,14 +437,11 @@ impl Anim {
         Anim::new(
             owner,
             duration_millis,
-            AnimKind::ParticleGenerator {
-                model: Box::new(model),
-                state: Box::new(state),
-            },
+            AnimKind::ParticleGenerator { model, state },
         )
     }
 
-    pub fn new_entity_recover(owner: &RcRfc<EntityState>) -> Anim {
+    pub fn new_entity_recover(owner: &Rc<RefCell<EntityState>>) -> Anim {
         let duration_millis = ExtInt::Int(800);
         let fixed = Param::fixed(1.0);
         let vel = Param::with_speed(1.0, -1.0);
@@ -457,7 +454,7 @@ impl Anim {
         )
     }
 
-    pub fn new_entity_death(owner: &RcRfc<EntityState>) -> Anim {
+    pub fn new_entity_death(owner: &Rc<RefCell<EntityState>>) -> Anim {
         let time = 800;
         let time_f32 = time as f32 / 1000.0;
         let duration_millis = ExtInt::Int(time);
@@ -477,7 +474,7 @@ impl Anim {
         )
     }
 
-    fn new(owner: &RcRfc<EntityState>, duration_millis: ExtInt, kind: AnimKind) -> Anim {
+    fn new(owner: &Rc<RefCell<EntityState>>, duration_millis: ExtInt, kind: AnimKind) -> Anim {
         Anim {
             kind,
             elapsed: 0,
@@ -676,7 +673,7 @@ impl Anim {
         self.marked_for_removal.set(true);
     }
 
-    pub fn owner(&self) -> &RcRfc<EntityState> {
+    pub fn owner(&self) -> &Rc<RefCell<EntityState>> {
         &self.owner
     }
 

@@ -21,7 +21,7 @@ use std::rc::Rc;
 use sulis_core::config::Config;
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::resource::{ResourceSet, Sprite};
-use sulis_core::ui::{Color, Widget, WidgetKind, RcRfc};
+use sulis_core::ui::{Color, Widget, WidgetKind};
 
 use crate::{AreaModel, EditorMode};
 
@@ -32,7 +32,7 @@ pub struct PassPicker {
 }
 
 impl PassPicker {
-    pub fn new() -> RcRfc<PassPicker> {
+    pub fn new() -> Rc<RefCell<PassPicker>> {
         let cursor_sprite = ResourceSet::panic_or_sprite(&Config::editor_config().cursor);
 
         Rc::new(RefCell::new(PassPicker { cursor_sprite }))
@@ -96,7 +96,7 @@ impl WidgetKind for PassPicker {
         self
     }
 
-    fn on_add(&mut self, _widget: &RcRfc<Widget>) -> Vec<RcRfc<Widget>> {
+    fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         Vec::new()
     }
 }

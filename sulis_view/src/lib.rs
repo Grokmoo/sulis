@@ -134,16 +134,16 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 use sulis_core::io::MainLoopUpdater;
-use sulis_core::ui::{Widget, WidgetKind, RcRfc};
+use sulis_core::ui::{Widget, WidgetKind};
 use sulis_core::widgets::{Button, ConfirmationWindow, Label};
 use sulis_state::{ChangeListener, GameState};
 
 pub struct GameMainLoopUpdater {
-    view: RcRfc<RootView>,
+    view: Rc<RefCell<RootView>>,
 }
 
 impl GameMainLoopUpdater {
-    pub fn new(view: &RcRfc<RootView>) -> GameMainLoopUpdater {
+    pub fn new(view: &Rc<RefCell<RootView>>) -> GameMainLoopUpdater {
         GameMainLoopUpdater {
             view: Rc::clone(view),
         }
@@ -151,7 +151,7 @@ impl GameMainLoopUpdater {
 }
 
 impl MainLoopUpdater for GameMainLoopUpdater {
-    fn update(&self, root: &RcRfc<Widget>, millis: u32) {
+    fn update(&self, root: &Rc<RefCell<Widget>>, millis: u32) {
         let ui_cb = GameState::update(millis);
 
         if let Some(cb) = ui_cb {
@@ -167,7 +167,7 @@ impl MainLoopUpdater for GameMainLoopUpdater {
 pub struct PortraitPane {}
 
 impl PortraitPane {
-    pub fn new() -> RcRfc<PortraitPane> {
+    pub fn new() -> Rc<RefCell<PortraitPane>> {
         Rc::new(RefCell::new(PortraitPane {}))
     }
 }
@@ -175,7 +175,7 @@ impl PortraitPane {
 impl WidgetKind for PortraitPane {
     widget_kind!("portrait_pane");
 
-    fn on_add(&mut self, widget: &RcRfc<Widget>) -> Vec<RcRfc<Widget>> {
+    fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         GameState::add_party_listener(ChangeListener::invalidate("portrait_pane", &widget));
 
         let mut children = Vec::new();
@@ -207,7 +207,7 @@ pub struct UIBlocker {
 }
 
 impl UIBlocker {
-    pub fn new(remaining_millis: u32) -> RcRfc<UIBlocker> {
+    pub fn new(remaining_millis: u32) -> Rc<RefCell<UIBlocker>> {
         Rc::new(RefCell::new(UIBlocker { remaining_millis }))
     }
 }
@@ -215,7 +215,7 @@ impl UIBlocker {
 impl WidgetKind for UIBlocker {
     widget_kind!("ui_blocker");
 
-    fn update(&mut self, widget: &RcRfc<Widget>, millis: u32) {
+    fn update(&mut self, widget: &Rc<RefCell<Widget>>, millis: u32) {
         if millis > self.remaining_millis {
             widget.borrow_mut().mark_for_removal();
         } else {

@@ -14,12 +14,12 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::cell::Cell;
+use std::cell::{Cell, RefCell};
 use std::collections::{vec_deque::Iter, HashMap, HashSet, VecDeque};
 use std::rc::Rc;
 
 use crate::script::{CallbackData, FuncKind, TriggeredCallback};
-use crate::{AreaState, ChangeListener, ChangeListenerList, Effect, EntityState, GameState, RcRfc};
+use crate::{AreaState, ChangeListener, ChangeListenerList, Effect, EntityState, GameState};
 use sulis_core::util::{gen_rand, Point};
 use sulis_module::{Faction, Module, Time, ROUND_TIME_MILLIS};
 
@@ -52,7 +52,7 @@ pub struct EncounterRef {
 }
 
 pub struct TurnManager {
-    entities: Vec<Option<RcRfc<EntityState>>>,
+    entities: Vec<Option<Rc<RefCell<EntityState>>>>,
     pub(crate) effects: Vec<Option<Effect>>,
     surfaces: Vec<usize>,
     auras: HashMap<usize, Vec<usize>>,
@@ -242,14 +242,14 @@ impl TurnManager {
         value
     }
 
-    pub fn entity_checked(&self, index: usize) -> Option<RcRfc<EntityState>> {
+    pub fn entity_checked(&self, index: usize) -> Option<Rc<RefCell<EntityState>>> {
         if index >= self.entities.len() {
             return None;
         }
         self.entities[index].clone()
     }
 
-    pub fn entity(&self, index: usize) -> RcRfc<EntityState> {
+    pub fn entity(&self, index: usize) -> Rc<RefCell<EntityState>> {
         Rc::clone(self.entities[index].as_ref().unwrap())
     }
 
@@ -425,7 +425,7 @@ impl TurnManager {
         debug!("'{}' now has the active turn", current.actor.actor.name);
     }
 
-    pub fn current(&self) -> Option<RcRfc<EntityState>> {
+    pub fn current(&self) -> Option<Rc<RefCell<EntityState>>> {
         if !self.combat_active {
             return None;
         }
@@ -505,7 +505,7 @@ impl TurnManager {
 
     pub fn check_ai_activation(
         &mut self,
-        mover: &RcRfc<EntityState>,
+        mover: &Rc<RefCell<EntityState>>,
         area_state: &mut AreaState,
     ) {
         if mover.borrow().actor.stats.hidden {
@@ -826,12 +826,12 @@ impl TurnManager {
         }
     }
 
-    pub fn readd_entity(&mut self, entity: &RcRfc<EntityState>) {
+    pub fn readd_entity(&mut self, entity: &Rc<RefCell<EntityState>>) {
         let index = entity.borrow().index();
         self.order.push_back(Entry::Entity(index));
     }
 
-    pub fn add_entity(&mut self, entity: &RcRfc<EntityState>, is_dead: bool) -> usize {
+    pub fn add_entity(&mut self, entity: &Rc<RefCell<EntityState>>, is_dead: bool) -> usize {
         {
             let entity = entity.borrow();
             let uid = entity.unique_id();
@@ -899,7 +899,7 @@ impl TurnManager {
     pub fn add_surface(
         &mut self,
         effect: Effect,
-        area_state: &RcRfc<AreaState>,
+        area_state: &Rc<RefCell<AreaState>>,
         points: Vec<Point>,
         cbs: Vec<CallbackData>,
         removal_markers: Vec<Rc<Cell<bool>>>,
@@ -926,7 +926,7 @@ impl TurnManager {
     pub fn add_effect(
         &mut self,
         effect: Effect,
-        entity: &RcRfc<EntityState>,
+        entity: &Rc<RefCell<EntityState>>,
         cbs: Vec<CallbackData>,
         removal_markers: Vec<Rc<Cell<bool>>>,
     ) -> usize {
@@ -997,7 +997,7 @@ impl TurnManager {
         cbs
     }
 
-    fn check_encounter_cleared(&self, entity: &RcRfc<EntityState>) -> Option<usize> {
+    fn check_encounter_cleared(&self, entity: &Rc<RefCell<EntityState>>) -> Option<usize> {
         let ai_group = match entity.borrow().ai_group() {
             None => return None,
             Some(index) => index,
@@ -1088,8 +1088,8 @@ pub struct ActiveEntityIterator<'a> {
 }
 
 impl<'a> Iterator for ActiveEntityIterator<'a> {
-    type Item = &'a RcRfc<EntityState>;
-    fn next(&mut self) -> Option<&'a RcRfc<EntityState>> {
+    type Item = &'a Rc<RefCell<EntityState>>;
+    fn next(&mut self) -> Option<&'a Rc<RefCell<EntityState>>> {
         if !self.mgr.is_combat_active() {
             return None;
         }
@@ -1117,8 +1117,8 @@ pub struct EntityIterator<'a> {
 }
 
 impl<'a> Iterator for EntityIterator<'a> {
-    type Item = RcRfc<EntityState>;
-    fn next(&mut self) -> Option<RcRfc<EntityState>> {
+    type Item = Rc<RefCell<EntityState>>;
+    fn next(&mut self) -> Option<Rc<RefCell<EntityState>>> {
         loop {
             let next = self.mgr.entities.get(self.index);
 

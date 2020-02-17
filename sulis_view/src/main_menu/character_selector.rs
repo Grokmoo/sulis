@@ -31,12 +31,12 @@ use crate::{main_menu::MainMenu, CharacterBuilder, LoadingScreen};
 pub struct CharacterSelector {
     selected: Option<Rc<Actor>>,
     first_add: bool,
-    main_menu: RcRfc<Widget>,
+    main_menu: Rc<RefCell<Widget>>,
     to_select: Option<String>,
 }
 
 impl CharacterSelector {
-    pub fn new(main_menu: RcRfc<Widget>) -> RcRfc<CharacterSelector> {
+    pub fn new(main_menu: Rc<RefCell<Widget>>) -> Rc<RefCell<CharacterSelector>> {
         Rc::new(RefCell::new(CharacterSelector {
             selected: None,
             first_add: true,
@@ -50,7 +50,7 @@ impl CharacterSelector {
     }
 
     #[must_use]
-    fn set_play_enabled(&self, play: &mut WidgetState) -> RcRfc<Widget> {
+    fn set_play_enabled(&self, play: &mut WidgetState) -> Rc<RefCell<Widget>> {
         let max_level = Module::campaign().max_starting_level;
 
         let invalid_level = Widget::with_theme(TextArea::empty(), "invalid_level_box");
@@ -81,7 +81,7 @@ impl CharacterSelector {
 impl WidgetKind for CharacterSelector {
     widget_kind!("character_selector");
 
-    fn on_add(&mut self, widget: &RcRfc<Widget>) -> Vec<RcRfc<Widget>> {
+    fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         debug!("Adding to main menu widget");
 
         let title = Widget::with_theme(Label::empty(), "title");

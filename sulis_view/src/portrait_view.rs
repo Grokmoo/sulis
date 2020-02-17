@@ -19,7 +19,7 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 use sulis_core::io::event;
-use sulis_core::ui::{Callback, Widget, WidgetKind, RcRfc};
+use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_core::widgets::{Button, Label, ProgressBar};
 use sulis_state::{ChangeListener, EntityState, GameState};
 
@@ -28,11 +28,11 @@ use crate::CharacterBuilder;
 pub const NAME: &str = "portrait_view";
 
 pub struct PortraitView {
-    entity: RcRfc<EntityState>,
+    entity: Rc<RefCell<EntityState>>,
 }
 
 impl PortraitView {
-    pub fn new(entity: RcRfc<EntityState>) -> RcRfc<PortraitView> {
+    pub fn new(entity: Rc<RefCell<EntityState>>) -> Rc<RefCell<PortraitView>> {
         Rc::new(RefCell::new(PortraitView { entity }))
     }
 }
@@ -40,7 +40,7 @@ impl PortraitView {
 impl WidgetKind for PortraitView {
     widget_kind!(NAME);
 
-    fn on_add(&mut self, widget: &RcRfc<Widget>) -> Vec<RcRfc<Widget>> {
+    fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let mut entity = self.entity.borrow_mut();
         entity
             .actor
@@ -143,7 +143,7 @@ impl WidgetKind for PortraitView {
         vec![portrait, hp_bar, class_stat_bar, level_up, icons]
     }
 
-    fn on_mouse_enter(&mut self, widget: &RcRfc<Widget>) -> bool {
+    fn on_mouse_enter(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
         self.super_on_mouse_enter(widget);
 
         let area_state = GameState::area_state();
@@ -159,7 +159,7 @@ impl WidgetKind for PortraitView {
         true
     }
 
-    fn on_mouse_release(&mut self, widget: &RcRfc<Widget>, kind: event::ClickKind) -> bool {
+    fn on_mouse_release(&mut self, widget: &Rc<RefCell<Widget>>, kind: event::ClickKind) -> bool {
         self.super_on_mouse_release(widget, kind);
 
         let area_state = GameState::area_state();

@@ -33,11 +33,11 @@ use crate::script::{script_cache, script_callback, Script, ScriptCallback, Scrip
 use crate::{
     path_finder, transition_handler, AreaState, ChangeListener, ChangeListenerList, Effect,
     EntityState, Formation, ItemList, Location, PartyStash, QuestStateSet, SaveState, TurnManager,
-    UICallback, WorldMapState, AI, RcRfc,
+    UICallback, WorldMapState, AI,
 };
 
 thread_local! {
-    static TURN_MANAGER: RcRfc<TurnManager> = Rc::new(RefCell::new(TurnManager::default()));
+    static TURN_MANAGER: Rc<RefCell<TurnManager>> = Rc::new(RefCell::new(TurnManager::default()));
     static STATE: RefCell<Option<GameState>> = RefCell::new(None);
     static AI: RefCell<AI> = RefCell::new(AI::new());
     static CLEAR_ANIMS: Cell<bool> = Cell::new(false);
@@ -47,20 +47,20 @@ thread_local! {
 }
 
 pub struct GameState {
-    areas: HashMap<String, RcRfc<AreaState>>,
-    area_state: RcRfc<AreaState>,
+    areas: HashMap<String, Rc<RefCell<AreaState>>>,
+    area_state: Rc<RefCell<AreaState>>,
     world_map: WorldMapState,
     quests: QuestStateSet,
-    selected: Vec<RcRfc<EntityState>>,
+    selected: Vec<Rc<RefCell<EntityState>>>,
     user_zoom: f32,
-    party: Vec<RcRfc<EntityState>>,
-    party_formation: RcRfc<Formation>,
+    party: Vec<Rc<RefCell<EntityState>>>,
+    party_formation: Rc<RefCell<Formation>>,
     party_coins: i32,
-    party_stash: RcRfc<PartyStash>,
+    party_stash: Rc<RefCell<PartyStash>>,
 
     // listener returns the first selected party member
-    party_listeners: ChangeListenerList<Option<RcRfc<EntityState>>>,
-    party_death_listeners: ChangeListenerList<Vec<RcRfc<EntityState>>>,
+    party_listeners: ChangeListenerList<Option<Rc<RefCell<EntityState>>>>,
+    party_death_listeners: ChangeListenerList<Vec<Rc<RefCell<EntityState>>>>,
     path_finder: PathFinder,
     ui_callbacks: Vec<UICallback>,
 }
@@ -399,7 +399,7 @@ impl GameState {
 
         let path_finder = PathFinder::new(width, height);
 
-        let mut areas: HashMap<String, RcRfc<AreaState>> = HashMap::new();
+        let mut areas: HashMap<String, Rc<RefCell<AreaState>>> = HashMap::new();
         areas.insert(campaign.starting_area.to_string(), Rc::clone(&area_state));
 
         let mut selected = Vec::new();
@@ -519,11 +519,11 @@ impl GameState {
         STATE.with(|state| state.borrow().as_ref().unwrap().user_zoom)
     }
 
-    pub fn turn_manager() -> RcRfc<TurnManager> {
+    pub fn turn_manager() -> Rc<RefCell<TurnManager>> {
         TURN_MANAGER.with(|m| Rc::clone(&m))
     }
 
-    pub fn set_selected_party_member(entity: RcRfc<EntityState>) {
+    pub fn set_selected_party_member(entity: Rc<RefCell<EntityState>>) {
         GameState::select_party_members(vec![entity]);
     }
 
@@ -531,7 +531,7 @@ impl GameState {
         GameState::select_party_members(Vec::new());
     }
 
-    pub fn select_party_members(mut members: Vec<RcRfc<EntityState>>) {
+    pub fn select_party_members(mut members: Vec<Rc<RefCell<EntityState>>>) {
         for member in members.iter() {
             if !member.borrow().is_party_member() {
                 warn!(
@@ -566,7 +566,7 @@ impl GameState {
         })
     }
 
-    pub fn create_damage_animation(entity: &RcRfc<EntityState>) {
+    pub fn create_damage_animation(entity: &Rc<RefCell<EntityState>>) {
         let time = 200;
         let time_f32 = time as f32 / 1000.0;
         let duration = ExtInt::Int(time);
@@ -586,11 +586,11 @@ impl GameState {
         GameState::add_animation(anim);
     }
 
-    pub fn selected() -> Vec<RcRfc<EntityState>> {
+    pub fn selected() -> Vec<Rc<RefCell<EntityState>>> {
         STATE.with(|s| s.borrow().as_ref().unwrap().selected.clone())
     }
 
-    pub fn remove_party_member(entity: RcRfc<EntityState>) {
+    pub fn remove_party_member(entity: Rc<RefCell<EntityState>>) {
         info!("Remove party member {}", entity.borrow().actor.actor.id);
         STATE.with(|state| {
             let mut state = state.borrow_mut();
@@ -736,7 +736,7 @@ impl GameState {
         false
     }
 
-    pub fn add_party_member(entity: RcRfc<EntityState>, show_portrait: bool) {
+    pub fn add_party_member(entity: Rc<RefCell<EntityState>>, show_portrait: bool) {
         info!("Add party member {}", entity.borrow().actor.actor.id);
         let mgr = GameState::turn_manager();
         if !mgr.borrow().is_combat_active() {
@@ -765,7 +765,7 @@ impl GameState {
         area_state.borrow_mut().update_view_visibility();
     }
 
-    pub fn add_party_death_listener(listener: ChangeListener<Vec<RcRfc<EntityState>>>) {
+    pub fn add_party_death_listener(listener: ChangeListener<Vec<Rc<RefCell<EntityState>>>>) {
         STATE.with(|state| {
             let mut state = state.borrow_mut();
             let state = state.as_mut().unwrap();
@@ -773,7 +773,7 @@ impl GameState {
         })
     }
 
-    pub fn add_party_listener(listener: ChangeListener<Option<RcRfc<EntityState>>>) {
+    pub fn add_party_listener(listener: ChangeListener<Option<Rc<RefCell<EntityState>>>>) {
         STATE.with(|state| {
             let mut state = state.borrow_mut();
             let state = state.as_mut().unwrap();
@@ -782,7 +782,7 @@ impl GameState {
         })
     }
 
-    pub fn player() -> RcRfc<EntityState> {
+    pub fn player() -> Rc<RefCell<EntityState>> {
         STATE.with(|state| {
             let mut state = state.borrow_mut();
             let state = state.as_mut().unwrap();
@@ -791,7 +791,7 @@ impl GameState {
         })
     }
 
-    pub fn party() -> Vec<RcRfc<EntityState>> {
+    pub fn party() -> Vec<Rc<RefCell<EntityState>>> {
         STATE.with(|state| {
             let mut state = state.borrow_mut();
             let state = state.as_mut().unwrap();
@@ -821,7 +821,7 @@ impl GameState {
     }
 
     #[must_use]
-    pub(crate) fn set_current_area(area: &RcRfc<AreaState>) -> bool {
+    pub(crate) fn set_current_area(area: &Rc<RefCell<AreaState>>) -> bool {
         STATE.with(|state| {
             let mut state = state.borrow_mut();
             let state = state.as_mut().unwrap();
@@ -839,7 +839,7 @@ impl GameState {
         })
     }
 
-    fn setup_area_state(area_id: &str) -> Result<RcRfc<AreaState>, Error> {
+    fn setup_area_state(area_id: &str) -> Result<Rc<RefCell<AreaState>>, Error> {
         debug!("Setting up area state from {}", &area_id);
 
         let area = Module::area(&area_id);
@@ -860,8 +860,8 @@ impl GameState {
 
     pub fn add_ui_callback(
         cb: Vec<OnTrigger>,
-        parent: &RcRfc<EntityState>,
-        target: &RcRfc<EntityState>,
+        parent: &Rc<RefCell<EntityState>>,
+        target: &Rc<RefCell<EntityState>>,
     ) {
         STATE.with(|s| {
             let mut state = s.borrow_mut();
@@ -879,8 +879,8 @@ impl GameState {
     pub fn add_ui_callbacks_of_kind(
         callbacks: &[Trigger],
         kind: TriggerKind,
-        parent: &RcRfc<EntityState>,
-        target: &RcRfc<EntityState>,
+        parent: &Rc<RefCell<EntityState>>,
+        target: &Rc<RefCell<EntityState>>,
     ) {
         STATE.with(|s| {
             let mut state = s.borrow_mut();
@@ -927,14 +927,14 @@ impl GameState {
         })
     }
 
-    pub fn get_area_state(id: &str) -> Option<RcRfc<AreaState>> {
+    pub fn get_area_state(id: &str) -> Option<Rc<RefCell<AreaState>>> {
         STATE.with(|s| match s.borrow().as_ref().unwrap().areas.get(id) {
             None => None,
             Some(area_state) => Some(Rc::clone(&area_state)),
         })
     }
 
-    pub fn area_state() -> RcRfc<AreaState> {
+    pub fn area_state() -> Rc<RefCell<AreaState>> {
         STATE.with(|s| Rc::clone(&s.borrow().as_ref().unwrap().area_state))
     }
 
@@ -1030,11 +1030,11 @@ impl GameState {
         ANIMATIONS.with(|a| a.borrow().has_any_blocking_anims())
     }
 
-    pub fn has_blocking_animations(entity: &RcRfc<EntityState>) -> bool {
+    pub fn has_blocking_animations(entity: &Rc<RefCell<EntityState>>) -> bool {
         ANIMATIONS.with(|a| a.borrow().has_blocking_anims(entity))
     }
 
-    pub fn remove_blocking_animations(entity: &RcRfc<EntityState>) {
+    pub fn remove_blocking_animations(entity: &Rc<RefCell<EntityState>>) {
         ANIMATIONS.with(|a| a.borrow_mut().clear_blocking_anims(entity));
     }
 
@@ -1071,7 +1071,7 @@ impl GameState {
         false
     }
 
-    pub fn is_current(entity: &RcRfc<EntityState>) -> bool {
+    pub fn is_current(entity: &Rc<RefCell<EntityState>>) -> bool {
         let mgr = GameState::turn_manager();
         if let Some(current) = mgr.borrow().current() {
             return Rc::ptr_eq(&current, entity);
@@ -1118,7 +1118,7 @@ impl GameState {
     }
 
     pub fn move_towards_dest(
-        entity: &RcRfc<EntityState>,
+        entity: &Rc<RefCell<EntityState>>,
         entities_to_ignore: Vec<usize>,
         dest: Destination,
         cb: Option<Box<dyn ScriptCallback>>,
@@ -1187,7 +1187,7 @@ impl GameState {
         })
     }
 
-    pub fn party_stash() -> RcRfc<PartyStash> {
+    pub fn party_stash() -> Rc<RefCell<PartyStash>> {
         STATE.with(|s| Rc::clone(&s.borrow().as_ref().unwrap().party_stash))
     }
 
@@ -1199,7 +1199,7 @@ impl GameState {
         STATE.with(|s| s.borrow_mut().as_mut().unwrap().party_coins += amount);
     }
 
-    pub fn party_formation() -> RcRfc<Formation> {
+    pub fn party_formation() -> Rc<RefCell<Formation>> {
         STATE.with(|s| {
             let state = s.borrow();
             let state = state.as_ref().unwrap();

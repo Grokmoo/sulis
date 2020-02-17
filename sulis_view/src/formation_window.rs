@@ -18,7 +18,7 @@ use std::any::Any;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use sulis_core::ui::{Callback, Cursor, Widget, WidgetKind, RcRfc};
+use sulis_core::ui::{Callback, Cursor, Widget, WidgetKind};
 use sulis_core::util::Size;
 use sulis_core::widgets::{Button, Label};
 use sulis_state::{ChangeListener, GameState};
@@ -26,7 +26,7 @@ use sulis_state::{ChangeListener, GameState};
 pub const NAME: &str = "formation_window";
 
 struct Entry {
-    child: RcRfc<Widget>,
+    child: Rc<RefCell<Widget>>,
     position: (f32, f32),
 }
 
@@ -42,7 +42,7 @@ pub struct FormationWindow {
 }
 
 impl FormationWindow {
-    pub fn new() -> RcRfc<FormationWindow> {
+    pub fn new() -> Rc<RefCell<FormationWindow>> {
         Rc::new(RefCell::new(FormationWindow {
             entries: Vec::new(),
             grid_half_width: 10.0,
@@ -114,7 +114,7 @@ impl WidgetKind for FormationWindow {
         widget.do_children_layout();
     }
 
-    fn on_mouse_move(&mut self, widget: &RcRfc<Widget>, _dx: f32, _dy: f32) -> bool {
+    fn on_mouse_move(&mut self, widget: &Rc<RefCell<Widget>>, _dx: f32, _dy: f32) -> bool {
         let index = match self.active_entry {
             None => return true,
             Some(index) => index,
@@ -178,7 +178,7 @@ impl WidgetKind for FormationWindow {
         true
     }
 
-    fn on_add(&mut self, widget: &RcRfc<Widget>) -> Vec<RcRfc<Widget>> {
+    fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let widget_ref = Rc::clone(widget);
         GameState::add_party_listener(ChangeListener::new(
             NAME,

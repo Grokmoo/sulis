@@ -21,7 +21,7 @@ use std::rc::Rc;
 use sulis_core::config::Config;
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::resource::{ResourceSet, Sprite};
-use sulis_core::ui::{Color, Widget, WidgetKind, RcRfc};
+use sulis_core::ui::{Color, Widget, WidgetKind};
 
 use crate::{AreaModel, EditorMode};
 
@@ -32,7 +32,7 @@ pub struct VisPicker {
 }
 
 impl VisPicker {
-    pub fn new() -> RcRfc<VisPicker> {
+    pub fn new() -> Rc<RefCell<VisPicker>> {
         let cursor_sprite = ResourceSet::panic_or_sprite(&Config::editor_config().cursor);
 
         Rc::new(RefCell::new(VisPicker { cursor_sprite }))
@@ -96,7 +96,7 @@ impl WidgetKind for VisPicker {
         self
     }
 
-    fn on_add(&mut self, _widget: &RcRfc<Widget>) -> Vec<RcRfc<Widget>> {
+    fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         Vec::new()
     }
 }

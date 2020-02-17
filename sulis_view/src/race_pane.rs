@@ -18,7 +18,7 @@ use std::any::Any;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use sulis_core::ui::{Widget, WidgetKind, RcRfc};
+use sulis_core::ui::{Widget, WidgetKind};
 use sulis_core::widgets::TextArea;
 use sulis_module::Race;
 
@@ -31,11 +31,11 @@ pub struct RacePane {
 }
 
 impl RacePane {
-    pub fn empty() -> RcRfc<RacePane> {
+    pub fn empty() -> Rc<RefCell<RacePane>> {
         Rc::new(RefCell::new(RacePane { race: None }))
     }
 
-    pub fn new(race: Rc<Race>) -> RcRfc<RacePane> {
+    pub fn new(race: Rc<Race>) -> Rc<RefCell<RacePane>> {
         Rc::new(RefCell::new(RacePane { race: Some(race) }))
     }
 
@@ -59,7 +59,7 @@ impl WidgetKind for RacePane {
         self
     }
 
-    fn on_add(&mut self, _widget: &RcRfc<Widget>) -> Vec<RcRfc<Widget>> {
+    fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let race = match self.race {
             None => return Vec::new(),
             Some(ref race) => race,

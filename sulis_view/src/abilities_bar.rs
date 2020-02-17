@@ -22,7 +22,7 @@ use std::collections::HashSet;
 use std::rc::Rc;
 
 use sulis_core::io::{event, keyboard_event::Key, InputAction};
-use sulis_core::ui::{animation_state, Callback, Widget, WidgetKind, WidgetState, RcRfc};
+use sulis_core::ui::{animation_state, Callback, Widget, WidgetKind, WidgetState};
 use sulis_core::util::{ExtInt, Size};
 use sulis_core::widgets::{Button, Label, ScrollDirection, ScrollPane, TextArea};
 use sulis_module::{
@@ -37,18 +37,18 @@ use sulis_state::{
 pub const NAME: &str = "abilities_bar";
 
 pub struct AbilitiesBar {
-    entity: RcRfc<EntityState>,
-    group_panes: Vec<RcRfc<Widget>>,
-    collapsed_panes: Vec<RcRfc<Widget>>,
+    entity: Rc<RefCell<EntityState>>,
+    group_panes: Vec<Rc<RefCell<Widget>>>,
+    collapsed_panes: Vec<Rc<RefCell<Widget>>>,
     max_collapsed: u32,
     keys: Vec<Option<Key>>,
 }
 
 impl AbilitiesBar {
     pub fn new(
-        entity: RcRfc<EntityState>,
+        entity: Rc<RefCell<EntityState>>,
         keys: &HashMap<InputAction, Key>,
-    ) -> RcRfc<AbilitiesBar> {
+    ) -> Rc<RefCell<AbilitiesBar>> {
         use InputAction::*;
         let keys = vec![
             keys.get(&ActivateAbility1).cloned(),
@@ -127,7 +127,7 @@ impl WidgetKind for AbilitiesBar {
         widget.do_children_layout();
     }
 
-    fn on_add(&mut self, widget: &RcRfc<Widget>) -> Vec<RcRfc<Widget>> {
+    fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         {
             let mut entity = self.entity.borrow_mut();
             entity
@@ -219,16 +219,16 @@ impl WidgetKind for AbilitiesBar {
 }
 
 struct CollapsedGroupPane {
-    entity: RcRfc<EntityState>,
+    entity: Rc<RefCell<EntityState>>,
     group: String,
-    description: RcRfc<Widget>,
+    description: Rc<RefCell<Widget>>,
 }
 
 impl CollapsedGroupPane {
     fn new(
         group: AbilityGroup,
-        entity: &RcRfc<EntityState>,
-    ) -> RcRfc<CollapsedGroupPane> {
+        entity: &Rc<RefCell<EntityState>>,
+    ) -> Rc<RefCell<CollapsedGroupPane>> {
         Rc::new(RefCell::new(CollapsedGroupPane {
             group: group.name(),
             entity: Rc::clone(entity),
@@ -264,7 +264,7 @@ impl WidgetKind for CollapsedGroupPane {
         widget.do_base_layout();
     }
 
-    fn on_add(&mut self, _widget: &RcRfc<Widget>) -> Vec<RcRfc<Widget>> {
+    fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         self.description.borrow_mut().state.clear_text_args();
 
         let total_uses = self
@@ -313,10 +313,10 @@ impl WidgetKind for CollapsedGroupPane {
     }
 }
 struct GroupPane {
-    entity: RcRfc<EntityState>,
+    entity: Rc<RefCell<EntityState>>,
     abilities: Vec<(OwnedAbility, Option<Key>)>,
     group: String,
-    description: RcRfc<Widget>,
+    description: Rc<RefCell<Widget>>,
     skip_first_position: bool,
     vertical_count: u32,
     min_horizontal_count: u32,
@@ -328,11 +328,11 @@ struct GroupPane {
 impl GroupPane {
     fn new(
         group: AbilityGroup,
-        entity: &RcRfc<EntityState>,
+        entity: &Rc<RefCell<EntityState>>,
         abilities: &[OwnedAbility],
         collapse_enabled: bool,
         remaining_keys: &mut Vec<Option<Key>>,
-    ) -> RcRfc<GroupPane> {
+    ) -> Rc<RefCell<GroupPane>> {
         let mut abilities_to_add = Vec::new();
         for ability in abilities.iter() {
             let active = match ability.ability.active {
@@ -409,7 +409,7 @@ impl WidgetKind for GroupPane {
         widget.do_base_layout();
     }
 
-    fn on_remove(&mut self, _widget: &RcRfc<Widget>) {
+    fn on_remove(&mut self, _widget: &Rc<RefCell<Widget>>) {
         for (ability, _) in self.abilities.iter() {
             if let Some(ref mut state) = self
                 .entity
@@ -422,7 +422,7 @@ impl WidgetKind for GroupPane {
         }
     }
 
-    fn on_add(&mut self, widget: &RcRfc<Widget>) -> Vec<RcRfc<Widget>> {
+    fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         for (ability, _) in self.abilities.iter() {
             if let Some(ref mut state) = self
                 .entity
@@ -505,7 +505,7 @@ impl WidgetKind for GroupPane {
 
 fn create_range_indicator(
     ability: &Rc<Ability>,
-    entity: &RcRfc<EntityState>,
+    entity: &Rc<RefCell<EntityState>>,
 ) -> Option<RangeIndicator> {
     let active = match &ability.active {
         None => return None,
@@ -520,7 +520,7 @@ fn create_range_indicator(
 }
 
 struct AbilityButton {
-    entity: RcRfc<EntityState>,
+    entity: Rc<RefCell<EntityState>>,
     ability: Rc<Ability>,
     newly_added: bool,
     range_indicator: Option<RangeIndicator>,
@@ -530,9 +530,9 @@ struct AbilityButton {
 impl AbilityButton {
     fn new(
         ability: &Rc<Ability>,
-        entity: &RcRfc<EntityState>,
+        entity: &Rc<RefCell<EntityState>>,
         key: Option<Key>,
-    ) -> RcRfc<AbilityButton> {
+    ) -> Rc<RefCell<AbilityButton>> {
         let mut newly_added = false;
         if let Some(state) = entity.borrow_mut().actor.ability_state(&ability.id) {
             newly_added = state.newly_added_ability;
@@ -601,7 +601,7 @@ impl WidgetKind for AbilityButton {
         }
     }
 
-    fn on_add(&mut self, _widget: &RcRfc<Widget>) -> Vec<RcRfc<Widget>> {
+    fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let duration_label = Widget::with_theme(Label::empty(), "duration_label");
         duration_label.borrow_mut().state.set_enabled(false);
         let icon = Widget::empty("icon");
@@ -621,7 +621,7 @@ impl WidgetKind for AbilityButton {
         vec![icon, duration_label, key_label]
     }
 
-    fn on_mouse_enter(&mut self, widget: &RcRfc<Widget>) -> bool {
+    fn on_mouse_enter(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
         let can_activate = self.entity.borrow().actor.can_activate(&self.ability.id);
         if can_activate {
             let area = GameState::area_state();
@@ -633,7 +633,7 @@ impl WidgetKind for AbilityButton {
         true
     }
 
-    fn on_mouse_exit(&mut self, widget: &RcRfc<Widget>) -> bool {
+    fn on_mouse_exit(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
         let area = GameState::area_state();
         area.borrow_mut()
             .range_indicators()
@@ -642,7 +642,7 @@ impl WidgetKind for AbilityButton {
         true
     }
 
-    fn on_mouse_move(&mut self, widget: &RcRfc<Widget>, _dx: f32, _dy: f32) -> bool {
+    fn on_mouse_move(&mut self, widget: &Rc<RefCell<Widget>>, _dx: f32, _dy: f32) -> bool {
         let disabled_reason = self.entity.borrow().actor.can_toggle(&self.ability.id);
         let hover = Widget::with_theme(TextArea::empty(), "ability_hover");
         let class = self.entity.borrow_mut().actor.actor.base_class();
@@ -668,14 +668,14 @@ impl WidgetKind for AbilityButton {
         true
     }
 
-    fn on_mouse_release(&mut self, widget: &RcRfc<Widget>, kind: event::ClickKind) -> bool {
+    fn on_mouse_release(&mut self, widget: &Rc<RefCell<Widget>>, kind: event::ClickKind) -> bool {
         self.super_on_mouse_release(widget, kind);
 
         activate_ability(&self.entity, &self.ability)
     }
 }
 
-fn activate_ability(entity: &RcRfc<EntityState>, ability: &Rc<Ability>) -> bool {
+fn activate_ability(entity: &Rc<RefCell<EntityState>>, ability: &Rc<Ability>) -> bool {
     let can_activate = entity.borrow().actor.can_activate(&ability.id);
     if can_activate {
         let index = entity.borrow().index();

@@ -23,7 +23,7 @@ use sulis_core::config::Config;
 use sulis_core::image::{layered_image::Layer, Image, LayeredImage};
 use sulis_core::io::GraphicsRenderer;
 use sulis_core::resource::write_to_file;
-use sulis_core::ui::{Callback, Widget, WidgetKind, RcRfc};
+use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_core::util::Point;
 use sulis_core::widgets::{list_box, Button, InputField, Label, MutuallyExclusiveListBox};
 use sulis_module::{
@@ -40,15 +40,15 @@ pub struct ActorCreatorWindow {
     selected_sex: Sex,
     selected_class: Rc<Class>,
 
-    view_pane: RcRfc<Widget>,
+    view_pane: Rc<RefCell<Widget>>,
     preview: Option<Rc<LayeredImage>>,
 
-    id_field: RcRfc<InputField>,
-    name_field: RcRfc<InputField>,
+    id_field: Rc<RefCell<InputField>>,
+    name_field: Rc<RefCell<InputField>>,
 }
 
 impl ActorCreatorWindow {
-    pub fn new() -> RcRfc<ActorCreatorWindow> {
+    pub fn new() -> Rc<RefCell<ActorCreatorWindow>> {
         Rc::new(RefCell::new(ActorCreatorWindow {
             selected_race: None,
             selected_class: Module::all_classes().remove(0),
@@ -139,7 +139,7 @@ impl ActorCreatorWindow {
         self.preview = Some(Rc::new(LayeredImage::new(images, Some(self.selected_hue))));
     }
 
-    fn populate_hue_pane(&mut self, pane: &RcRfc<Widget>) {
+    fn populate_hue_pane(&mut self, pane: &Rc<RefCell<Widget>>) {
         let prev = Widget::with_theme(Button::empty(), "prev_button");
         prev.borrow_mut()
             .state
@@ -174,7 +174,7 @@ impl ActorCreatorWindow {
         Widget::add_children_to(pane, vec![prev, next]);
     }
 
-    fn populate_images_pane(&mut self, race: Rc<Race>, pane: &RcRfc<Widget>) {
+    fn populate_images_pane(&mut self, race: Rc<Race>, pane: &Rc<RefCell<Widget>>) {
         for (layer, images) in race.editor_creator_images() {
             if images.is_empty() {
                 continue;
@@ -270,7 +270,7 @@ impl WidgetKind for ActorCreatorWindow {
         preview.draw(renderer, scale_x, scale_y, x, y, millis);
     }
 
-    fn on_add(&mut self, widget: &RcRfc<Widget>) -> Vec<RcRfc<Widget>> {
+    fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let close = Widget::with_theme(Button::empty(), "close");
         close
             .borrow_mut()

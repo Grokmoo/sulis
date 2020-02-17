@@ -23,7 +23,7 @@ use std::rc::Rc;
 use sulis_core::config::DisplayMode;
 use sulis_core::config::{self, Config, RawClick};
 use sulis_core::io::{event::ClickKind, keyboard_event::Key, DisplayConfiguration, InputAction};
-use sulis_core::ui::{Callback, Widget, WidgetKind, RcRfc};
+use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_core::widgets::{Button, Label, ScrollDirection, ScrollPane, TextArea};
 
 use crate::main_menu::MainMenu;
@@ -51,7 +51,7 @@ pub struct Options {
 }
 
 impl Options {
-    pub fn new(display_confs: Vec<DisplayConfiguration>) -> RcRfc<Options> {
+    pub fn new(display_confs: Vec<DisplayConfiguration>) -> Rc<RefCell<Options>> {
         let config = Config::get_clone();
         let mut cur_keybindings: Vec<_> = config
             .input
@@ -137,7 +137,7 @@ impl Options {
         Config::set(config);
     }
 
-    fn add_display_widgets(&mut self) -> Vec<RcRfc<Widget>> {
+    fn add_display_widgets(&mut self) -> Vec<Rc<RefCell<Widget>>> {
         let mode_title = Widget::with_theme(Label::empty(), "mode_title");
 
         let mode_content = Widget::empty("mode_content");
@@ -369,7 +369,7 @@ impl Options {
         ]
     }
 
-    fn add_input_widgets(&mut self) -> Vec<RcRfc<Widget>> {
+    fn add_input_widgets(&mut self) -> Vec<Rc<RefCell<Widget>>> {
         let scroll_speed_title = Widget::with_theme(Label::empty(), "scroll_speed_title");
 
         let scroll_speed_content = Widget::empty("scroll_speed_content");
@@ -523,7 +523,7 @@ const SCROLL_SPEEDS: [f32; 7] = [0.75, 1.0, 1.5, 2.25, 3.5, 5.0, 7.0];
 impl WidgetKind for Options {
     widget_kind!("options_window");
 
-    fn on_add(&mut self, _widget: &RcRfc<Widget>) -> Vec<RcRfc<Widget>> {
+    fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let title = Widget::with_theme(Label::empty(), "title");
 
         let apply = Widget::with_theme(Button::empty(), "apply");
@@ -601,11 +601,11 @@ impl WidgetKind for Options {
 
 pub struct MousePopup {
     action: ClickKind,
-    options_widget: RcRfc<Widget>,
+    options_widget: Rc<RefCell<Widget>>,
 }
 
 impl MousePopup {
-    pub fn new(action: ClickKind, options_widget: RcRfc<Widget>) -> RcRfc<MousePopup> {
+    pub fn new(action: ClickKind, options_widget: Rc<RefCell<Widget>>) -> Rc<RefCell<MousePopup>> {
         Rc::new(RefCell::new(MousePopup {
             action,
             options_widget,
@@ -616,7 +616,7 @@ impl MousePopup {
 impl WidgetKind for MousePopup {
     widget_kind!("mouse_popup");
 
-    fn on_mouse_press(&mut self, widget: &RcRfc<Widget>, kind: ClickKind) -> bool {
+    fn on_mouse_press(&mut self, widget: &Rc<RefCell<Widget>>, kind: ClickKind) -> bool {
         self.super_on_mouse_press(widget, kind);
 
         let options = Widget::kind_mut::<Options>(&self.options_widget);
@@ -642,12 +642,12 @@ impl WidgetKind for MousePopup {
         true
     }
 
-    fn on_raw_key(&mut self, widget: &RcRfc<Widget>, _: Key) -> bool {
+    fn on_raw_key(&mut self, widget: &Rc<RefCell<Widget>>, _: Key) -> bool {
         widget.borrow_mut().mark_for_removal();
         true
     }
 
-    fn on_add(&mut self, widget: &RcRfc<Widget>) -> Vec<RcRfc<Widget>> {
+    fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         widget.borrow_mut().state.set_modal(true);
 
         let title = Widget::with_theme(Label::empty(), "title");
@@ -662,14 +662,14 @@ impl WidgetKind for MousePopup {
 
 pub struct KeybindingPopup {
     action: InputAction,
-    options_widget: RcRfc<Widget>,
+    options_widget: Rc<RefCell<Widget>>,
 }
 
 impl KeybindingPopup {
     pub fn new(
         action: InputAction,
-        options_widget: RcRfc<Widget>,
-    ) -> RcRfc<KeybindingPopup> {
+        options_widget: Rc<RefCell<Widget>>,
+    ) -> Rc<RefCell<KeybindingPopup>> {
         Rc::new(RefCell::new(KeybindingPopup {
             action,
             options_widget,
@@ -680,13 +680,13 @@ impl KeybindingPopup {
 impl WidgetKind for KeybindingPopup {
     widget_kind!("keybinding_popup");
 
-    fn on_mouse_press(&mut self, widget: &RcRfc<Widget>, kind: ClickKind) -> bool {
+    fn on_mouse_press(&mut self, widget: &Rc<RefCell<Widget>>, kind: ClickKind) -> bool {
         self.super_on_mouse_press(widget, kind);
         widget.borrow_mut().mark_for_removal();
         true
     }
 
-    fn on_raw_key(&mut self, widget: &RcRfc<Widget>, key: Key) -> bool {
+    fn on_raw_key(&mut self, widget: &Rc<RefCell<Widget>>, key: Key) -> bool {
         let options = Widget::kind_mut::<Options>(&self.options_widget);
         let mut matched_index = 0;
         for (index, (_, v)) in options.cur_keybindings.iter().enumerate() {
@@ -702,7 +702,7 @@ impl WidgetKind for KeybindingPopup {
         false
     }
 
-    fn on_add(&mut self, widget: &RcRfc<Widget>) -> Vec<RcRfc<Widget>> {
+    fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         widget.borrow_mut().state.set_modal(true);
 
         let title = Widget::with_theme(Label::empty(), "title");

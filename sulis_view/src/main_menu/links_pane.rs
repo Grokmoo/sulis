@@ -20,13 +20,13 @@ use std::rc::Rc;
 
 use open;
 
-use sulis_core::ui::{Callback, Widget, WidgetKind, RcRfc};
+use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_core::widgets::{Button, Label};
 
 pub struct LinksPane {}
 
 impl LinksPane {
-    pub fn new() -> RcRfc<LinksPane> {
+    pub fn new() -> Rc<RefCell<LinksPane>> {
         Rc::new(RefCell::new(LinksPane {}))
     }
 }
@@ -34,7 +34,7 @@ impl LinksPane {
 impl WidgetKind for LinksPane {
     widget_kind!("links_pane");
 
-    fn on_add(&mut self, _widget: &RcRfc<Widget>) -> Vec<RcRfc<Widget>> {
+    fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let title = Widget::with_theme(Label::empty(), "title");
 
         let credits = Widget::with_theme(Button::empty(), "credits");

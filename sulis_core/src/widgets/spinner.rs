@@ -18,22 +18,22 @@ use std::any::Any;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use crate::ui::{Callback, Widget, WidgetKind, RcRfc};
+use crate::ui::{Callback, Widget, WidgetKind};
 use crate::widgets::{Button, Label};
 
 const NAME: &str = "spinner";
 
 pub struct Spinner {
-    label: RcRfc<Widget>,
-    down: RcRfc<Widget>,
-    up: RcRfc<Widget>,
+    label: Rc<RefCell<Widget>>,
+    down: Rc<RefCell<Widget>>,
+    up: Rc<RefCell<Widget>>,
     value: i32,
     min: i32,
     max: i32,
 }
 
 impl Spinner {
-    pub fn new(value: i32, min: i32, max: i32) -> RcRfc<Spinner> {
+    pub fn new(value: i32, min: i32, max: i32) -> Rc<RefCell<Spinner>> {
         Rc::new(RefCell::new(Spinner {
             label: Widget::with_defaults(Label::empty()),
             down: Widget::with_theme(Button::empty(), "down"),
@@ -86,7 +86,7 @@ impl WidgetKind for Spinner {
         widget.do_base_layout();
     }
 
-    fn on_add(&mut self, _widget: &RcRfc<Widget>) -> Vec<RcRfc<Widget>> {
+    fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         self.down
             .borrow_mut()
             .state

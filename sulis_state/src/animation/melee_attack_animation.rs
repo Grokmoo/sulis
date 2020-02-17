@@ -14,14 +14,15 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::cell::RefCell;
 use std::rc::Rc;
 
-use crate::{animation::Anim, AreaFeedbackText, EntityState, GameState, RcRfc};
+use crate::{animation::Anim, AreaFeedbackText, EntityState, GameState};
 use crate::{script::ScriptEntitySet, ScriptCallback};
 use sulis_module::{DamageKind, HitFlags, HitKind};
 
 pub(in crate::animation) fn update(
-    attacker: &RcRfc<EntityState>,
+    attacker: &Rc<RefCell<EntityState>>,
     model: &mut MeleeAttackAnimModel,
     frac: f32,
 ) {
@@ -87,7 +88,7 @@ pub(in crate::animation) fn update(
     }
 }
 
-pub(in crate::animation) fn cleanup(owner: &RcRfc<EntityState>) {
+pub(in crate::animation) fn cleanup(owner: &Rc<RefCell<EntityState>>) {
     owner.borrow_mut().sub_pos = (0.0, 0.0);
 
     if !GameState::is_combat_active() {
@@ -102,7 +103,7 @@ type Entity = RcRfc<EntityState>;
 type AttackResult = Vec<(HitKind, HitFlags, Vec<(DamageKind, u32)>)>;
 
 pub(in crate::animation) struct MeleeAttackAnimModel {
-    defender: RcRfc<EntityState>,
+    defender: Rc<RefCell<EntityState>>,
     callbacks: Vec<Box<dyn ScriptCallback>>,
     vector: (f32, f32),
     pub(in crate::animation) has_attacked: bool,
@@ -110,8 +111,8 @@ pub(in crate::animation) struct MeleeAttackAnimModel {
 }
 
 pub fn new(
-    attacker: &RcRfc<EntityState>,
-    defender: &RcRfc<EntityState>,
+    attacker: &Rc<RefCell<EntityState>>,
+    defender: &Rc<RefCell<EntityState>>,
     duration_millis: u32,
     callbacks: Vec<Box<dyn ScriptCallback>>,
     attack_func: Box<dyn Fn(&Entity, &Entity) -> AttackResult>,

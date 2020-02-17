@@ -21,7 +21,7 @@ use std::rc::Rc;
 use sulis_core::image::Image;
 use sulis_core::io::{event, DrawList, GraphicsRenderer};
 use sulis_core::resource::ResourceSet;
-use sulis_core::ui::{Color, Widget, WidgetKind, RcRfc};
+use sulis_core::ui::{Color, Widget, WidgetKind};
 use sulis_core::util::Point;
 
 pub struct ColorButton {
@@ -30,7 +30,7 @@ pub struct ColorButton {
 }
 
 impl ColorButton {
-    pub fn new(color: Color) -> RcRfc<ColorButton> {
+    pub fn new(color: Color) -> Rc<RefCell<ColorButton>> {
         Rc::new(RefCell::new(ColorButton { color, icon: None }))
     }
 }
@@ -84,7 +84,7 @@ impl WidgetKind for ColorButton {
         renderer.draw(draw_list);
     }
 
-    fn on_mouse_release(&mut self, widget: &RcRfc<Widget>, kind: event::ClickKind) -> bool {
+    fn on_mouse_release(&mut self, widget: &Rc<RefCell<Widget>>, kind: event::ClickKind) -> bool {
         self.super_on_mouse_release(widget, kind);
         Widget::fire_callback(widget, self);
         true

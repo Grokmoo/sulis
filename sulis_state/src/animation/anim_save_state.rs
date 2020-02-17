@@ -14,7 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::cell::Cell;
+use std::cell::{Cell, RefCell};
 use std::collections::HashMap;
 use std::rc::Rc;
 
@@ -22,7 +22,7 @@ use crate::animation::{
     particle_generator::{GeneratorModel, GeneratorState, Param, Particle},
     Anim, AnimKind,
 };
-use crate::{EntityState, RcRfc};
+use crate::EntityState;
 use sulis_core::resource::ResourceSet;
 use sulis_core::util::ExtInt;
 use sulis_module::ImageLayer;
@@ -90,7 +90,7 @@ impl AnimSaveState {
 
     pub fn load(
         self,
-        entities: &HashMap<usize, RcRfc<EntityState>>,
+        entities: &HashMap<usize, Rc<RefCell<EntityState>>>,
         effects: &HashMap<usize, usize>,
         marked: &mut HashMap<usize, Vec<Rc<Cell<bool>>>>,
     ) -> Option<Anim> {

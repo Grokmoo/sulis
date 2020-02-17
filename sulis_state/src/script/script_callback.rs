@@ -14,6 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::cell::RefCell;
 use std::collections::HashMap;
 use std::io::Error;
 use std::rc::Rc;
@@ -25,7 +26,7 @@ use crate::script::{
     script_entity, ScriptActiveSurface, ScriptAppliedEffect, ScriptEntity, ScriptEntitySet,
     ScriptItemKind, ScriptMenuSelection,
 };
-use crate::{EntityState, GameState, Script, RcRfc};
+use crate::{EntityState, GameState, Script};
 use sulis_core::util::invalid_data_error;
 use sulis_module::{on_trigger::Kind, Ability, DamageKind, HitKind, Module};
 
@@ -321,7 +322,7 @@ impl CallbackData {
 
     pub fn update_entity_refs_on_load(
         &mut self,
-        entities: &HashMap<usize, RcRfc<EntityState>>,
+        entities: &HashMap<usize, Rc<RefCell<EntityState>>>,
     ) -> result::Result<(), Error> {
         match entities.get(&self.parent) {
             None => {

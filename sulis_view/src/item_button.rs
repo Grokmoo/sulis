@@ -24,7 +24,7 @@ use crate::bonus_text_arg_handler::{
 use crate::item_callback_handler::sell_item_cb;
 use crate::{ItemActionMenu, MerchantWindow, RootView};
 use sulis_core::io::{event, keyboard_event::Key};
-use sulis_core::ui::{Callback, Widget, WidgetKind, RcRfc};
+use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_core::widgets::{Label, TextArea};
 use sulis_module::{
     ability,
@@ -47,11 +47,11 @@ enum Kind {
         item_index: usize,
     },
     Equipped {
-        player: RcRfc<EntityState>,
+        player: Rc<RefCell<EntityState>>,
         slot: Slot,
     },
     Quick {
-        player: RcRfc<EntityState>,
+        player: Rc<RefCell<EntityState>>,
         quick: QuickSlot,
     },
 }
@@ -70,7 +70,7 @@ pub struct ItemButton {
     actions: Vec<ButtonAction>,
     keyboard_shortcut: Option<Key>,
 
-    item_window: Option<RcRfc<Widget>>,
+    item_window: Option<Rc<RefCell<Widget>>>,
 }
 
 const ITEM_BUTTON_NAME: &str = "item_button";
@@ -80,25 +80,25 @@ impl ItemButton {
         item: &ItemState,
         quantity: u32,
         item_index: usize,
-    ) -> RcRfc<ItemButton> {
+    ) -> Rc<RefCell<ItemButton>> {
         ItemButton::new(item, quantity, Kind::Inventory { item_index })
     }
 
     pub fn equipped(
-        player: &RcRfc<EntityState>,
+        player: &Rc<RefCell<EntityState>>,
         item: &ItemState,
         slot: Slot,
-    ) -> RcRfc<ItemButton> {
+    ) -> Rc<RefCell<ItemButton>> {
         let player = Rc::clone(player);
         ItemButton::new(item, 1, Kind::Equipped { player, slot })
     }
 
     pub fn quick(
-        player: &RcRfc<EntityState>,
+        player: &Rc<RefCell<EntityState>>,
         quantity: u32,
         item: &ItemState,
         quick: QuickSlot,
-    ) -> RcRfc<ItemButton> {
+    ) -> Rc<RefCell<ItemButton>> {
         let player = Rc::clone(player);
         ItemButton::new(item, quantity, Kind::Quick { player, quick })
     }
@@ -108,7 +108,7 @@ impl ItemButton {
         quantity: u32,
         item_index: usize,
         prop_index: usize,
-    ) -> RcRfc<ItemButton> {
+    ) -> Rc<RefCell<ItemButton>> {
         ItemButton::new(
             item,
             quantity,
@@ -124,7 +124,7 @@ impl ItemButton {
         quantity: u32,
         item_index: usize,
         merchant_id: &str,
-    ) -> RcRfc<ItemButton> {
+    ) -> Rc<RefCell<ItemButton>> {
         ItemButton::new(
             item,
             quantity,
@@ -135,7 +135,7 @@ impl ItemButton {
         )
     }
 
-    fn new(item: &ItemState, quantity: u32, kind: Kind) -> RcRfc<ItemButton> {
+    fn new(item: &ItemState, quantity: u32, kind: Kind) -> Rc<RefCell<ItemButton>> {
         let icon = item.icon().id();
         let adjective_icons = item.item.adjective_icons();
 
@@ -154,7 +154,7 @@ impl ItemButton {
         self.keyboard_shortcut = key;
     }
 
-    pub fn fire_left_click_action(&mut self, widget: &RcRfc<Widget>) {
+    pub fn fire_left_click_action(&mut self, widget: &Rc<RefCell<Widget>>) {
         let sell_action = self.check_sell_action(widget);
         let cb = sell_action
             .iter()
@@ -248,7 +248,7 @@ impl ItemButton {
         }
     }
 
-    fn check_sell_action(&self, widget: &RcRfc<Widget>) -> Option<ButtonAction> {
+    fn check_sell_action(&self, widget: &Rc<RefCell<Widget>>) -> Option<ButtonAction> {
         let item_index = match self.kind {
             Kind::Inventory { item_index, .. } => item_index,
             _ => return None,
@@ -274,7 +274,7 @@ impl ItemButton {
 
     fn add_price_text_arg(
         &self,
-        root: &RcRfc<Widget>,
+        root: &Rc<RefCell<Widget>>,
         item_window: &mut Widget,
         item_state: &ItemState,
     ) {
@@ -313,11 +313,11 @@ impl ItemButton {
 impl WidgetKind for ItemButton {
     widget_kind!(ITEM_BUTTON_NAME);
 
-    fn on_remove(&mut self, _widget: &RcRfc<Widget>) {
+    fn on_remove(&mut self, _widget: &Rc<RefCell<Widget>>) {
         self.remove_item_window();
     }
 
-    fn on_add(&mut self, _widget: &RcRfc<Widget>) -> Vec<RcRfc<Widget>> {
+    fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let qty_label = Widget::with_theme(Label::empty(), "quantity_label");
         if self.quantity > 1 {
             qty_label
@@ -346,7 +346,7 @@ impl WidgetKind for ItemButton {
         vec![icon, adj, qty_label, key_label]
     }
 
-    fn on_mouse_enter(&mut self, widget: &RcRfc<Widget>) -> bool {
+    fn on_mouse_enter(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
         self.super_on_mouse_enter(widget);
 
         if self.item_window.is_some() {
@@ -461,14 +461,14 @@ impl WidgetKind for ItemButton {
         true
     }
 
-    fn on_mouse_exit(&mut self, widget: &RcRfc<Widget>) -> bool {
+    fn on_mouse_exit(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
         self.super_on_mouse_exit(widget);
 
         self.remove_item_window();
         true
     }
 
-    fn on_mouse_release(&mut self, widget: &RcRfc<Widget>, kind: event::ClickKind) -> bool {
+    fn on_mouse_release(&mut self, widget: &Rc<RefCell<Widget>>, kind: event::ClickKind) -> bool {
         self.super_on_mouse_release(widget, kind);
         self.remove_item_window();
 

@@ -66,11 +66,10 @@ pub use self::widget_state::WidgetState;
 
 use std::cell::RefCell;
 use std::rc::Rc;
-pub type RcRfc<T> = Rc<RefCell<T>>;
 
 use crate::util::{Point, Size};
 
-pub fn create_ui_tree(kind: RcRfc<dyn WidgetKind>) -> RcRfc<Widget> {
+pub fn create_ui_tree(kind: Rc<RefCell<dyn WidgetKind>>) -> Rc<RefCell<Widget>> {
     debug!("Creating UI tree.");
     let root = Widget::with_defaults(kind);
     Widget::setup_root(&root);

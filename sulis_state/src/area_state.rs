@@ -66,9 +66,9 @@ pub struct AreaState {
     pc_vis: Vec<bool>,
 
     feedback_text: Vec<AreaFeedbackText>,
-    scroll_to_callback: Option<RcRfc<EntityState>>,
+    scroll_to_callback: Option<Rc<RefCell<EntityState>>>,
 
-    targeter: Option<RcRfc<AreaTargeter>>,
+    targeter: Option<Rc<RefCell<AreaTargeter>>>,
     range_indicators: RangeIndicatorHandler,
 }
 
@@ -326,7 +326,7 @@ impl AreaState {
         self.range_indicators.current()
     }
 
-    pub fn targeter(&mut self) -> Option<RcRfc<AreaTargeter>> {
+    pub fn targeter(&mut self) -> Option<Rc<RefCell<AreaTargeter>>> {
         match self.targeter {
             None => None,
             Some(ref targeter) => Some(Rc::clone(targeter)),
@@ -341,11 +341,11 @@ impl AreaState {
         self.targeter = Some(Rc::new(RefCell::new(targeter)));
     }
 
-    pub fn push_scroll_to_callback(&mut self, entity: RcRfc<EntityState>) {
+    pub fn push_scroll_to_callback(&mut self, entity: Rc<RefCell<EntityState>>) {
         self.scroll_to_callback = Some(entity);
     }
 
-    pub fn pop_scroll_to_callback(&mut self) -> Option<RcRfc<EntityState>> {
+    pub fn pop_scroll_to_callback(&mut self) -> Option<Rc<RefCell<EntityState>>> {
         self.scroll_to_callback.take()
     }
 
@@ -384,7 +384,7 @@ impl AreaState {
         }
     }
 
-    pub fn fire_on_encounter_activated(&mut self, index: usize, target: &RcRfc<EntityState>) {
+    pub fn fire_on_encounter_activated(&mut self, index: usize, target: &Rc<RefCell<EntityState>>) {
         info!("OnEncounterActivated for {}", index);
 
         let player = GameState::player();
@@ -409,7 +409,7 @@ impl AreaState {
         }
     }
 
-    pub fn fire_on_encounter_cleared(&mut self, index: usize, target: &RcRfc<EntityState>) {
+    pub fn fire_on_encounter_cleared(&mut self, index: usize, target: &Rc<RefCell<EntityState>>) {
         info!("OnEncounterCleared for {}", index);
 
         let player = GameState::player();
@@ -578,7 +578,7 @@ impl AreaState {
             .all(|p| self.point_entities_passable(entities_to_ignore, p.x, p.y))
     }
 
-    pub fn get_entity_at(&self, x: i32, y: i32) -> Option<RcRfc<EntityState>> {
+    pub fn get_entity_at(&self, x: i32, y: i32) -> Option<Rc<RefCell<EntityState>>> {
         if !self.area.area.coords_valid(x, y) {
             return None;
         }
@@ -627,7 +627,7 @@ impl AreaState {
 
     pub fn compute_pc_visibility(
         &mut self,
-        entity: &RcRfc<EntityState>,
+        entity: &Rc<RefCell<EntityState>>,
         delta_x: i32,
         delta_y: i32,
     ) {
@@ -688,7 +688,7 @@ impl AreaState {
         true
     }
 
-    fn check_trigger_grid(&mut self, entity: &RcRfc<EntityState>) {
+    fn check_trigger_grid(&mut self, entity: &Rc<RefCell<EntityState>>) {
         let index = {
             let entity = entity.borrow();
             let grid_index = entity.location.x + entity.location.y * self.area.width;
@@ -838,7 +838,7 @@ impl AreaState {
 
     pub(crate) fn load_entity(
         &mut self,
-        entity: &RcRfc<EntityState>,
+        entity: &Rc<RefCell<EntityState>>,
         location: Location,
         is_dead: bool,
     ) -> Result<usize, Error> {
@@ -854,7 +854,7 @@ impl AreaState {
 
     pub(crate) fn add_entity(
         &mut self,
-        entity: &RcRfc<EntityState>,
+        entity: &Rc<RefCell<EntityState>>,
         location: Location,
     ) -> Result<usize, Error> {
         let result = self.load_entity(entity, location, false);
@@ -864,7 +864,7 @@ impl AreaState {
 
     fn compute_threatened(
         &self,
-        mover: &RcRfc<EntityState>,
+        mover: &Rc<RefCell<EntityState>>,
         mgr: &TurnManager,
         removal: bool,
     ) {
@@ -896,7 +896,7 @@ impl AreaState {
 
     pub(crate) fn transition_entity_to(
         &mut self,
-        entity: &RcRfc<EntityState>,
+        entity: &Rc<RefCell<EntityState>>,
         index: usize,
         location: Location,
     ) -> Result<usize, Error> {
@@ -942,7 +942,7 @@ impl AreaState {
 
     pub fn move_entity(
         &mut self,
-        entity: &RcRfc<EntityState>,
+        entity: &Rc<RefCell<EntityState>>,
         x: i32,
         y: i32,
         squares: u32,
@@ -962,7 +962,7 @@ impl AreaState {
 
     pub(crate) fn update_entity_position(
         &mut self,
-        entity: &RcRfc<EntityState>,
+        entity: &Rc<RefCell<EntityState>>,
         old_x: i32,
         old_y: i32,
         mgr: &mut TurnManager,
@@ -1085,7 +1085,7 @@ impl AreaState {
     #[must_use]
     pub fn remove_entity(
         &mut self,
-        entity: &RcRfc<EntityState>,
+        entity: &Rc<RefCell<EntityState>>,
         mgr: &TurnManager,
     ) -> HashSet<usize> {
         let (index, surfaces) = {

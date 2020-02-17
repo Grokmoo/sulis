@@ -18,7 +18,7 @@ use std::any::Any;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use sulis_core::ui::{Callback, Widget, WidgetKind, RcRfc};
+use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_core::widgets::{Button, Label};
 use sulis_module::{Module, Race};
 
@@ -32,7 +32,7 @@ pub struct RaceSelectorPane {
 }
 
 impl RaceSelectorPane {
-    pub fn new() -> RcRfc<RaceSelectorPane> {
+    pub fn new() -> Rc<RefCell<RaceSelectorPane>> {
         Rc::new(RefCell::new(RaceSelectorPane {
             selected_race: None,
         }))
@@ -40,7 +40,7 @@ impl RaceSelectorPane {
 }
 
 impl BuilderPane for RaceSelectorPane {
-    fn on_selected(&mut self, builder: &mut CharacterBuilder, _widget: RcRfc<Widget>) {
+    fn on_selected(&mut self, builder: &mut CharacterBuilder, _widget: Rc<RefCell<Widget>>) {
         builder.race = None;
         builder.prev.borrow_mut().state.set_enabled(false);
         builder
@@ -50,7 +50,7 @@ impl BuilderPane for RaceSelectorPane {
             .set_enabled(self.selected_race.is_some());
     }
 
-    fn next(&mut self, builder: &mut CharacterBuilder, widget: RcRfc<Widget>) {
+    fn next(&mut self, builder: &mut CharacterBuilder, widget: Rc<RefCell<Widget>>) {
         let race = match self.selected_race {
             None => return,
             Some(ref race) => race,
@@ -60,7 +60,7 @@ impl BuilderPane for RaceSelectorPane {
         builder.next(&widget);
     }
 
-    fn prev(&mut self, _builder: &mut CharacterBuilder, _widget: RcRfc<Widget>) {}
+    fn prev(&mut self, _builder: &mut CharacterBuilder, _widget: Rc<RefCell<Widget>>) {}
 }
 
 impl WidgetKind for RaceSelectorPane {
@@ -74,7 +74,7 @@ impl WidgetKind for RaceSelectorPane {
         self
     }
 
-    fn on_add(&mut self, _widget: &RcRfc<Widget>) -> Vec<RcRfc<Widget>> {
+    fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let title = Widget::with_theme(Label::empty(), "title");
 
         let races_pane = Widget::empty("races_pane");

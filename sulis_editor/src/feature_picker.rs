@@ -19,7 +19,7 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 use sulis_core::io::{DrawList, GraphicsRenderer};
-use sulis_core::ui::{Callback, Widget, WidgetKind, RcRfc};
+use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_core::util::Point;
 use sulis_core::widgets::{Button, ScrollDirection, ScrollPane};
 use sulis_module::{area::tile::Feature, Module};
@@ -55,7 +55,7 @@ pub struct FeaturePicker {
 }
 
 impl FeaturePicker {
-    pub fn new() -> RcRfc<FeaturePicker> {
+    pub fn new() -> Rc<RefCell<FeaturePicker>> {
         Rc::new(RefCell::new(FeaturePicker {
             cur_feature: None,
             cursor_pos: None,
@@ -143,7 +143,7 @@ impl WidgetKind for FeaturePicker {
         self
     }
 
-    fn on_add(&mut self, _widget: &RcRfc<Widget>) -> Vec<RcRfc<Widget>> {
+    fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let mut all_features = Module::all_features();
         all_features.sort_by(|a, b| a.id.cmp(&b.id));
 

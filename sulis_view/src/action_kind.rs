@@ -19,7 +19,7 @@ use std::cmp;
 use std::rc::Rc;
 
 use crate::RootView;
-use sulis_core::ui::{animation_state, Widget, RcRfc};
+use sulis_core::ui::{animation_state, Widget};
 use sulis_core::util::Point;
 use sulis_module::{
     area::{Destination, ToKind},
@@ -177,7 +177,7 @@ pub trait ActionKind {
     /// Fires the action for this ActionKind using the specified parent
     /// widget if needed.  Returns true if the method opens a window / modal
     /// that should clear the mouse state in the callee, false otherwise
-    fn fire_action(&mut self, widget: &RcRfc<Widget>) -> bool;
+    fn fire_action(&mut self, widget: &Rc<RefCell<Widget>>) -> bool;
 
     /// Returns the amount of AP that this action will cost the parent to perform
     fn ap(&self) -> i32 {
@@ -186,7 +186,7 @@ pub trait ActionKind {
 }
 
 struct SelectAction {
-    target: RcRfc<EntityState>,
+    target: Rc<RefCell<EntityState>>,
 }
 
 impl SelectAction {
@@ -223,7 +223,7 @@ impl ActionKind for SelectAction {
         ActionHoverInfo::new(&self.target.borrow().size, point)
     }
 
-    fn fire_action(&mut self, _widget: &RcRfc<Widget>) -> bool {
+    fn fire_action(&mut self, _widget: &Rc<RefCell<Widget>>) -> bool {
         trace!("Firing select action.");
         GameState::set_selected_party_member(Rc::clone(&self.target));
         false
@@ -231,8 +231,8 @@ impl ActionKind for SelectAction {
 }
 
 struct DialogAction {
-    target: RcRfc<EntityState>,
-    pc: RcRfc<EntityState>,
+    target: Rc<RefCell<EntityState>>,
+    pc: Rc<RefCell<EntityState>>,
 }
 
 impl DialogAction {
@@ -290,7 +290,7 @@ impl ActionKind for DialogAction {
         ActionHoverInfo::new(&self.target.borrow().size, point)
     }
 
-    fn fire_action(&mut self, _widget: &RcRfc<Widget>) -> bool {
+    fn fire_action(&mut self, _widget: &Rc<RefCell<Widget>>) -> bool {
         trace!("Firing dialog action.");
 
         let convo = match self.target.borrow().actor.actor.conversation {
@@ -352,7 +352,7 @@ impl ActionKind for DoorPropAction {
         ActionHoverInfo::new(&prop.prop.size, point)
     }
 
-    fn fire_action(&mut self, _widget: &RcRfc<Widget>) -> bool {
+    fn fire_action(&mut self, _widget: &Rc<RefCell<Widget>>) -> bool {
         let area_state = GameState::area_state();
         let mut area_state = area_state.borrow_mut();
         area_state.toggle_prop_active(self.index);
@@ -408,7 +408,7 @@ impl ActionKind for LootPropAction {
         ActionHoverInfo::new(&prop.prop.size, point)
     }
 
-    fn fire_action(&mut self, widget: &RcRfc<Widget>) -> bool {
+    fn fire_action(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
         let is_active = {
             let area_state = GameState::area_state();
             let mut area_state = area_state.borrow_mut();
@@ -483,7 +483,7 @@ impl ActionKind for TransitionAction {
         ActionHoverInfo::new(&transition.size, transition.from)
     }
 
-    fn fire_action(&mut self, widget: &RcRfc<Widget>) -> bool {
+    fn fire_action(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
         trace!("Firing transition callback.");
         let time = Time {
             day: 0,
@@ -520,12 +520,12 @@ impl ActionKind for TransitionAction {
 }
 
 struct AttackAction {
-    pc: RcRfc<EntityState>,
-    target: RcRfc<EntityState>,
+    pc: Rc<RefCell<EntityState>>,
+    target: Rc<RefCell<EntityState>>,
     ap: i32,
 }
 
-fn get_attack_target(area_state: &AreaState, x: i32, y: i32) -> Option<RcRfc<EntityState>> {
+fn get_attack_target(area_state: &AreaState, x: i32, y: i32) -> Option<Rc<RefCell<EntityState>>> {
     match area_state.get_entity_at(x, y) {
         None => None,
         Some(ref entity) => {
@@ -602,7 +602,7 @@ impl ActionKind for AttackAction {
         ActionHoverInfo::with_ap(&self.target.borrow(), point, total_ap, self.ap)
     }
 
-    fn fire_action(&mut self, _widget: &RcRfc<Widget>) -> bool {
+    fn fire_action(&mut self, _widget: &Rc<RefCell<Widget>>) -> bool {
         trace!("Firing attack action.");
         if !can_attack(&*self.pc.borrow(), &*self.target.borrow()) {
             return false;
@@ -618,8 +618,8 @@ impl ActionKind for AttackAction {
 }
 
 struct ActionCallback {
-    action: RcRfc<Box<dyn ActionKind>>,
-    widget: RcRfc<Widget>,
+    action: Rc<RefCell<Box<dyn ActionKind>>>,
+    widget: Rc<RefCell<Widget>>,
 }
 
 impl ScriptCallback for ActionCallback {
@@ -636,7 +636,7 @@ struct MoveThenAction {
 
 impl MoveThenAction {
     fn create_if_valid(
-        pc: &RcRfc<EntityState>,
+        pc: &Rc<RefCell<EntityState>>,
         pos: Point,
         size: &Rc<ObjectSize>,
         dist: f32,
@@ -673,7 +673,7 @@ impl ActionKind for MoveThenAction {
         self.cursor_state
     }
 
-    fn fire_action(&mut self, widget: &RcRfc<Widget>) -> bool {
+    fn fire_action(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
         let action = match self.cb_action.take() {
             None => return false,
             Some(action) => Rc::new(RefCell::new(action)),
@@ -703,7 +703,7 @@ impl ActionKind for MoveThenAction {
     }
 }
 struct MoveAction {
-    selected: Vec<RcRfc<EntityState>>,
+    selected: Vec<Rc<RefCell<EntityState>>>,
     dest: Destination,
     cb: Option<Box<dyn ScriptCallback>>,
 
@@ -831,7 +831,7 @@ impl ActionKind for MoveAction {
         animation_state::Kind::MouseMove
     }
 
-    fn fire_action(&mut self, widget: &RcRfc<Widget>) -> bool {
+    fn fire_action(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
         trace!("Firing move action");
         let (root, view) = Widget::parent_mut::<RootView>(widget);
         view.set_prop_window(&root, false, 0);
@@ -866,7 +866,7 @@ impl ActionKind for InvalidAction {
         animation_state::Kind::MouseInvalid
     }
 
-    fn fire_action(&mut self, _widget: &RcRfc<Widget>) -> bool {
+    fn fire_action(&mut self, _widget: &Rc<RefCell<Widget>>) -> bool {
         false
     }
 

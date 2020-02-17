@@ -14,17 +14,17 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::cell::Cell;
+use std::cell::{Cell, RefCell};
 use std::cmp;
 use std::rc::Rc;
 
-use crate::{animation::Anim, EntityState, GameState, RcRfc};
+use crate::{animation::Anim, EntityState, GameState};
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::ui::animation_state;
 use sulis_core::util::Point;
 use sulis_module::ObjectSize;
 
-fn check_immediate_cancel(mover: &RcRfc<EntityState>, model: &mut MoveAnimModel) -> bool {
+fn check_immediate_cancel(mover: &Rc<RefCell<EntityState>>, model: &mut MoveAnimModel) -> bool {
     let cur_area_id = mover.borrow().location.area_id.to_string();
     if (model.area_id != cur_area_id) || model.path.is_empty() {
         return true;
@@ -47,7 +47,7 @@ fn check_immediate_cancel(mover: &RcRfc<EntityState>, model: &mut MoveAnimModel)
 }
 
 pub(in crate::animation) fn update(
-    mover: &RcRfc<EntityState>,
+    mover: &Rc<RefCell<EntityState>>,
     marked_for_removal: &Rc<Cell<bool>>,
     model: &mut MoveAnimModel,
     millis: u32,
@@ -131,11 +131,11 @@ pub(in crate::animation) fn draw(
     renderer.draw(draw_list);
 }
 
-pub(in crate::animation) fn cleanup(owner: &RcRfc<EntityState>) {
+pub(in crate::animation) fn cleanup(owner: &Rc<RefCell<EntityState>>) {
     owner.borrow_mut().sub_pos = (0.0, 0.0);
 }
 
-pub fn new(mover: &RcRfc<EntityState>, path: Vec<Point>, frame_time_millis: u32) -> Anim {
+pub fn new(mover: &Rc<RefCell<EntityState>>, path: Vec<Point>, frame_time_millis: u32) -> Anim {
     let mut smoothed_path = Vec::new();
     let mut prev2 = path[0];
     let mut prev = path[0];

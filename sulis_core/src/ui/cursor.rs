@@ -22,7 +22,7 @@ use crate::image::Image;
 use crate::io::event::ClickKind;
 use crate::io::{event, Event, GraphicsRenderer};
 use crate::resource::ResourceSet;
-use crate::ui::{animation_state, AnimationState, Widget, RcRfc};
+use crate::ui::{animation_state, AnimationState, Widget};
 
 pub struct Cursor {
     pub x: i32,
@@ -105,7 +105,7 @@ impl Cursor {
         });
     }
 
-    pub fn move_by(root: &RcRfc<Widget>, x: f32, y: f32) {
+    pub fn move_by(root: &Rc<RefCell<Widget>>, x: f32, y: f32) {
         if !Cursor::move_by_internal(x, y) {
             return;
         }
@@ -131,12 +131,12 @@ impl Cursor {
         }
     }
 
-    pub fn move_to(root: &RcRfc<Widget>, x: f32, y: f32) {
+    pub fn move_to(root: &Rc<RefCell<Widget>>, x: f32, y: f32) {
         let (cur_x, cur_y) = Cursor::get_position_f32();
         Cursor::move_by(root, x - cur_x, y - cur_y);
     }
 
-    pub fn press(root: &RcRfc<Widget>, kind: event::ClickKind) {
+    pub fn press(root: &Rc<RefCell<Widget>>, kind: event::ClickKind) {
         Cursor::set_button_down(Some(kind));
         let (x, y) = Cursor::get_position();
 
@@ -145,7 +145,7 @@ impl Cursor {
         Widget::dispatch_event(&root, event);
     }
 
-    pub fn release(root: &RcRfc<Widget>, kind: event::ClickKind) {
+    pub fn release(root: &Rc<RefCell<Widget>>, kind: event::ClickKind) {
         Cursor::set_button_down(None);
         let (x, y) = Cursor::get_position();
 

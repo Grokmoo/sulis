@@ -21,7 +21,7 @@ use std::rc::Rc;
 use crate::image::Image;
 use crate::io::{GraphicsRenderer, InputAction};
 use crate::resource::ResourceSet;
-use crate::ui::{Callback, LineRenderer, Widget, WidgetKind, RcRfc};
+use crate::ui::{Callback, LineRenderer, Widget, WidgetKind};
 use crate::util::Point;
 use crate::widgets::Label;
 
@@ -31,7 +31,7 @@ type KeyPressCallback = Rc<dyn Fn(&Rc<RefCell<Widget>>, &mut InputField, InputAc
 
 pub struct InputField {
     pub text: String,
-    label: RcRfc<Label>,
+    label: Rc<RefCell<Label>>,
     carat: Option<Rc<dyn Image>>,
     carat_width: f32,
     carat_height: f32,
@@ -42,7 +42,7 @@ pub struct InputField {
 }
 
 impl InputField {
-    pub fn new(text: &str) -> RcRfc<InputField> {
+    pub fn new(text: &str) -> Rc<RefCell<InputField>> {
         Rc::new(RefCell::new(InputField {
             text: text.to_string(),
             label: Label::new(text),
@@ -72,13 +72,13 @@ impl InputField {
         self.text.clone()
     }
 
-    pub fn set_text(&mut self, text: &str, widget: &RcRfc<Widget>) {
+    pub fn set_text(&mut self, text: &str, widget: &Rc<RefCell<Widget>>) {
         self.text = text.to_string();
         self.label.borrow_mut().text = Some(self.text.clone());
         widget.borrow_mut().invalidate_layout();
     }
 
-    pub fn clear(&mut self, widget: &RcRfc<Widget>) {
+    pub fn clear(&mut self, widget: &Rc<RefCell<Widget>>) {
         self.text.clear();
         self.label.borrow_mut().text = Some(self.text.clone());
         widget.borrow_mut().invalidate_layout();
@@ -120,7 +120,7 @@ impl WidgetKind for InputField {
         self.carat_offset = theme.get_custom_or_default("carat_offset", 0.0);
     }
 
-    fn on_char_typed(&mut self, widget: &RcRfc<Widget>, c: char) -> bool {
+    fn on_char_typed(&mut self, widget: &Rc<RefCell<Widget>>, c: char) -> bool {
         if self.ignore_next {
             self.ignore_next = false;
             return true;
@@ -155,7 +155,7 @@ impl WidgetKind for InputField {
         true
     }
 
-    fn on_key_press(&mut self, widget: &RcRfc<Widget>, key: InputAction) -> bool {
+    fn on_key_press(&mut self, widget: &Rc<RefCell<Widget>>, key: InputAction) -> bool {
         let cb = self.key_press_callback.clone();
         if let Some(ref cb) = cb {
             (cb)(widget, self, key);

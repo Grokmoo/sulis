@@ -22,21 +22,21 @@ use std::rc::Rc;
 use crate::config::Config;
 use crate::io::{event, Event, GraphicsRenderer};
 use crate::resource::ResourceSet;
-use crate::ui::{theme, Cursor, EmptyWidget, Theme, WidgetKind, WidgetState, RcRfc};
+use crate::ui::{theme, Cursor, EmptyWidget, Theme, WidgetKind, WidgetState};
 use crate::util::{Point, Size};
 use crate::widgets::Label;
 
 pub struct Widget {
     pub state: WidgetState,
-    pub kind: RcRfc<dyn WidgetKind>,
-    pub children: Vec<RcRfc<Widget>>,
+    pub kind: Rc<RefCell<dyn WidgetKind>>,
+    pub children: Vec<Rc<RefCell<Widget>>>,
     pub theme: Rc<Theme>,
     theme_id: String,
     pub theme_subname: String,
 
-    modal_child: Option<RcRfc<Widget>>,
-    pub(crate) keyboard_focus_child: Option<RcRfc<Widget>>,
-    parent: Option<RcRfc<Widget>>,
+    modal_child: Option<Rc<RefCell<Widget>>>,
+    pub(crate) keyboard_focus_child: Option<Rc<RefCell<Widget>>>,
+    parent: Option<Rc<RefCell<Widget>>>,
 
     marked_for_removal: bool,
     marked_for_layout: bool,
@@ -177,7 +177,7 @@ impl Widget {
 }
 
 impl Widget {
-    fn new(kind: RcRfc<dyn WidgetKind>, theme: &str) -> RcRfc<Widget> {
+    fn new(kind: Rc<RefCell<dyn WidgetKind>>, theme: &str) -> Rc<RefCell<Widget>> {
         let widget = Widget {
             state: WidgetState::new(),
             kind: Rc::clone(&kind),
@@ -200,22 +200,22 @@ impl Widget {
         widget
     }
 
-    pub fn with_defaults(widget: RcRfc<dyn WidgetKind>) -> RcRfc<Widget> {
+    pub fn with_defaults(widget: Rc<RefCell<dyn WidgetKind>>) -> Rc<RefCell<Widget>> {
         let name = widget.borrow().get_name().to_string();
         Widget::new(widget, &name)
     }
 
-    pub fn with_theme(widget: RcRfc<dyn WidgetKind>, theme: &str) -> RcRfc<Widget> {
+    pub fn with_theme(widget: Rc<RefCell<dyn WidgetKind>>, theme: &str) -> Rc<RefCell<Widget>> {
         Widget::new(widget, theme)
     }
 
-    pub fn empty(theme: &str) -> RcRfc<Widget> {
+    pub fn empty(theme: &str) -> Rc<RefCell<Widget>> {
         Widget::new(EmptyWidget::new(), theme)
     }
 
     pub fn parent_mut<'a, T: WidgetKind + 'static>(
-        widget: &'a RcRfc<Widget>,
-    ) -> (RcRfc<Widget>, &'a mut T) {
+        widget: &'a Rc<RefCell<Widget>>,
+    ) -> (Rc<RefCell<Widget>>, &'a mut T) {
         let mut current = Rc::clone(widget);
         loop {
             let kind = Rc::clone(&current.borrow().kind);
@@ -232,8 +232,8 @@ impl Widget {
     }
 
     pub fn parent<'a, T: WidgetKind + 'static>(
-        widget: &'a RcRfc<Widget>,
-    ) -> (RcRfc<Widget>, &'a T) {
+        widget: &'a Rc<RefCell<Widget>>,
+    ) -> (Rc<RefCell<Widget>>, &'a T) {
         let mut current = Rc::clone(widget);
         loop {
             let kind = Rc::clone(&current.borrow().kind);
@@ -249,14 +249,14 @@ impl Widget {
         }
     }
 
-    pub fn get_root(widget: &RcRfc<Widget>) -> RcRfc<Widget> {
+    pub fn get_root(widget: &Rc<RefCell<Widget>>) -> Rc<RefCell<Widget>> {
         match &widget.borrow().parent {
             None => Rc::clone(widget),
             Some(parent) => Widget::get_root(parent),
         }
     }
 
-    pub fn kind<T: WidgetKind + 'static>(widget: &RcRfc<Widget>) -> &T {
+    pub fn kind<T: WidgetKind + 'static>(widget: &Rc<RefCell<Widget>>) -> &T {
         let kind = Rc::clone(&widget.borrow().kind);
         let kind = kind.borrow();
         let result = match kind.as_any().downcast_ref::<T>() {
@@ -267,7 +267,7 @@ impl Widget {
     }
 
     #[allow(clippy::mut_from_ref)]
-    pub fn kind_mut<T: WidgetKind + 'static>(widget: &RcRfc<Widget>) -> &mut T {
+    pub fn kind_mut<T: WidgetKind + 'static>(widget: &Rc<RefCell<Widget>>) -> &mut T {
         let kind = Rc::clone(&widget.borrow().kind);
         let mut kind = kind.borrow_mut();
         let result = match kind.as_any_mut().downcast_mut::<T>() {
@@ -290,11 +290,11 @@ impl Widget {
         }
     }
 
-    pub fn direct_parent(widget: &RcRfc<Widget>) -> RcRfc<Widget> {
+    pub fn direct_parent(widget: &Rc<RefCell<Widget>>) -> Rc<RefCell<Widget>> {
         Rc::clone(widget.borrow().parent.as_ref().unwrap())
     }
 
-    fn add_child_to_internal(parent: &RcRfc<Widget>, child: &RcRfc<Widget>) {
+    fn add_child_to_internal(parent: &Rc<RefCell<Widget>>, child: &Rc<RefCell<Widget>>) {
         {
             let child_ref = child.borrow();
             trace!(
@@ -313,17 +313,17 @@ impl Widget {
         parent.borrow_mut().marked_for_layout = true;
     }
 
-    pub fn add_child_to(parent: &RcRfc<Widget>, child: RcRfc<Widget>) {
+    pub fn add_child_to(parent: &Rc<RefCell<Widget>>, child: Rc<RefCell<Widget>>) {
         Widget::add_child_to_internal(parent, &child);
         parent.borrow_mut().children.push(child);
     }
 
-    pub fn add_child_to_front(parent: &RcRfc<Widget>, child: RcRfc<Widget>) {
+    pub fn add_child_to_front(parent: &Rc<RefCell<Widget>>, child: Rc<RefCell<Widget>>) {
         Widget::add_child_to_internal(parent, &child);
         parent.borrow_mut().children.insert(0, child);
     }
 
-    pub fn add_children_to(parent: &RcRfc<Widget>, children: Vec<RcRfc<Widget>>) {
+    pub fn add_children_to(parent: &Rc<RefCell<Widget>>, children: Vec<Rc<RefCell<Widget>>>) {
         for child in children.into_iter() {
             Widget::add_child_to(parent, child);
         }
@@ -333,7 +333,7 @@ impl Widget {
     /// exists.  note that this uses try_borrow and will not check a widget kind
     /// that is already borrowed (typically by the caller).
     /// returns true if the child exists, false otherwise
-    pub fn has_child_with_name(widget: &RcRfc<Widget>, name: &str) -> bool {
+    pub fn has_child_with_name(widget: &Rc<RefCell<Widget>>, name: &str) -> bool {
         for child in widget.borrow().children.iter() {
             let child_ref = match child.try_borrow() {
                 Err(_) => continue,
@@ -356,9 +356,9 @@ impl Widget {
     /// exists.  note that this uses try_borrow and will not check a widget kind
     /// that is already borrowed (typically by the caller)
     pub fn get_child_with_name(
-        widget: &RcRfc<Widget>,
+        widget: &Rc<RefCell<Widget>>,
         name: &str,
-    ) -> Option<RcRfc<Widget>> {
+    ) -> Option<Rc<RefCell<Widget>>> {
         for child in widget.borrow().children.iter() {
             let child_ref = match child.try_borrow() {
                 Err(_) => continue,
@@ -379,7 +379,7 @@ impl Widget {
 
     /// Attempts to grab keyboard focus.  this will fail if
     /// the widget has not been added to the tree yet
-    pub fn grab_keyboard_focus(widget: &RcRfc<Widget>) -> bool {
+    pub fn grab_keyboard_focus(widget: &Rc<RefCell<Widget>>) -> bool {
         let root = Widget::get_root(widget);
         if Rc::ptr_eq(&root, widget) {
             return false;
@@ -391,13 +391,13 @@ impl Widget {
         true
     }
 
-    pub fn clear_keyboard_focus(widget: &RcRfc<Widget>) {
+    pub fn clear_keyboard_focus(widget: &Rc<RefCell<Widget>>) {
         let root = Widget::get_root(widget);
         Widget::remove_old_keyboard_focus(&root);
         trace!("Cleared keyboard focus");
     }
 
-    fn remove_old_keyboard_focus(root: &RcRfc<Widget>) {
+    fn remove_old_keyboard_focus(root: &Rc<RefCell<Widget>>) {
         let mut root = root.borrow_mut();
 
         if root.keyboard_focus_child.is_none() {
@@ -411,7 +411,7 @@ impl Widget {
         root.keyboard_focus_child = None;
     }
 
-    pub fn fire_callback(widget: &RcRfc<Widget>, kind: &mut dyn WidgetKind) {
+    pub fn fire_callback(widget: &Rc<RefCell<Widget>>, kind: &mut dyn WidgetKind) {
         let cb = match widget.borrow().state.callback {
             None => return,
             Some(ref cb) => cb.clone(),
@@ -420,7 +420,7 @@ impl Widget {
         (cb).call(widget, kind);
     }
 
-    pub fn remove_mouse_over(root: &RcRfc<Widget>) {
+    pub fn remove_mouse_over(root: &Rc<RefCell<Widget>>) {
         for child in root.borrow().children.iter() {
             if !child.borrow().state.is_mouse_over {
                 continue;
@@ -430,8 +430,8 @@ impl Widget {
     }
 
     pub fn set_mouse_over_widget(
-        widget: &RcRfc<Widget>,
-        mouse_over: RcRfc<Widget>,
+        widget: &Rc<RefCell<Widget>>,
+        mouse_over: Rc<RefCell<Widget>>,
         x: i32,
         y: i32,
     ) {
@@ -445,8 +445,8 @@ impl Widget {
     }
 
     pub fn set_mouse_over(
-        widget: &RcRfc<Widget>,
-        mouse_over: RcRfc<dyn WidgetKind>,
+        widget: &Rc<RefCell<Widget>>,
+        mouse_over: Rc<RefCell<dyn WidgetKind>>,
         x: i32,
         y: i32,
     ) {
@@ -454,7 +454,7 @@ impl Widget {
         Widget::set_mouse_over_widget(widget, mouse_over, x, y);
     }
 
-    pub fn update(root: &RcRfc<Widget>, millis: u32) -> Result<(), Error> {
+    pub fn update(root: &Rc<RefCell<Widget>>, millis: u32) -> Result<(), Error> {
         Widget::update_kind_recursive(&root, millis);
 
         let mut find_new_modal = false;
@@ -479,7 +479,7 @@ impl Widget {
         Ok(())
     }
 
-    fn update_kind_recursive(widget: &RcRfc<Widget>, millis: u32) {
+    fn update_kind_recursive(widget: &Rc<RefCell<Widget>>, millis: u32) {
         let kind = Rc::clone(&widget.borrow().kind);
         kind.borrow_mut().update(&widget, millis);
 
@@ -490,7 +490,7 @@ impl Widget {
         }
     }
 
-    pub fn check_readd(parent: &RcRfc<Widget>) {
+    pub fn check_readd(parent: &Rc<RefCell<Widget>>) {
         let readd = parent.borrow().marked_for_readd;
         if readd {
             parent.borrow_mut().modal_child = None;
@@ -518,7 +518,7 @@ impl Widget {
         }
     }
 
-    fn recursive_on_remove(widget: &RcRfc<Widget>) {
+    fn recursive_on_remove(widget: &Rc<RefCell<Widget>>) {
         let len = widget.borrow().children.len();
         for i in 0..len {
             let child = Rc::clone(&widget.borrow().children[i]);
@@ -529,7 +529,7 @@ impl Widget {
         kind.borrow_mut().on_remove(&widget);
     }
 
-    fn find_new_modal_child(parent: &RcRfc<Widget>) -> Option<RcRfc<Widget>> {
+    fn find_new_modal_child(parent: &Rc<RefCell<Widget>>) -> Option<Rc<RefCell<Widget>>> {
         let len = parent.borrow().children.len();
         for i in (0..len).rev() {
             let child = Rc::clone(&parent.borrow().children[i]);
@@ -545,7 +545,7 @@ impl Widget {
         None
     }
 
-    pub fn check_children_removal(parent: &RcRfc<Widget>) {
+    pub fn check_children_removal(parent: &Rc<RefCell<Widget>>) {
         let len = parent.borrow().children.len();
         for i in (0..len).rev() {
             let child = Rc::clone(&parent.borrow().children[i]);
@@ -565,7 +565,7 @@ impl Widget {
         }
     }
 
-    pub(in crate::ui) fn setup_root(root: &RcRfc<Widget>) {
+    pub(in crate::ui) fn setup_root(root: &Rc<RefCell<Widget>>) {
         let (ui_x, ui_y) = Config::ui_size();
         let mut root = root.borrow_mut();
         root.state.set_size(Size::new(ui_x, ui_y));
@@ -573,7 +573,7 @@ impl Widget {
         root.theme = ResourceSet::theme(&root.theme_id);
     }
 
-    pub fn check_children(parent: &RcRfc<Widget>) -> Result<(), Error> {
+    pub fn check_children(parent: &Rc<RefCell<Widget>>) -> Result<(), Error> {
         // set up theme
         if parent.borrow().theme_id.is_empty() {
             let parent_parent = Widget::direct_parent(parent);
@@ -629,7 +629,7 @@ impl Widget {
     }
 
     // moves children to theme created containers as appropriate
-    fn reorder_and_set_theme_id_recursive(parent: &RcRfc<Widget>) {
+    fn reorder_and_set_theme_id_recursive(parent: &Rc<RefCell<Widget>>) {
         // TODO this isn't actually recursive and only handles one layer of containers
         let parent_theme = ResourceSet::theme(&parent.borrow().theme_id);
 
@@ -683,7 +683,7 @@ impl Widget {
         }
     }
 
-    pub fn dispatch_event(widget: &RcRfc<Widget>, event: Event) -> bool {
+    pub fn dispatch_event(widget: &Rc<RefCell<Widget>>, event: Event) -> bool {
         if widget.borrow().state.is_mouse_over {
             return false;
         }

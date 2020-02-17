@@ -21,7 +21,7 @@ use std::rc::Rc;
 use crate::io::event::ClickKind;
 use crate::io::GraphicsRenderer;
 use crate::ui::theme::{self, HorizontalAlignment, VerticalAlignment};
-use crate::ui::{LineRenderer, Widget, WidgetKind, RcRfc};
+use crate::ui::{LineRenderer, Widget, WidgetKind};
 use crate::util::Point;
 use crate::widget_kind;
 use crate::widgets::TextArea;
@@ -34,7 +34,7 @@ pub struct Label {
 }
 
 impl Label {
-    pub fn empty() -> RcRfc<Label> {
+    pub fn empty() -> Rc<RefCell<Label>> {
         Rc::new(RefCell::new(Label {
             text: None,
             text_draw_end_x: 0.0,
@@ -43,7 +43,7 @@ impl Label {
         }))
     }
 
-    pub fn new(text: &str) -> RcRfc<Label> {
+    pub fn new(text: &str) -> Rc<RefCell<Label>> {
         Rc::new(RefCell::new(Label {
             text: Some(text.to_string()),
             text_draw_end_x: 0.0,
@@ -79,19 +79,19 @@ impl Label {
 impl WidgetKind for Label {
     widget_kind!["label"];
 
-    fn on_mouse_press(&mut self, widget: &RcRfc<Widget>, kind: ClickKind) -> bool {
+    fn on_mouse_press(&mut self, widget: &Rc<RefCell<Widget>>, kind: ClickKind) -> bool {
         self.super_on_mouse_press(widget, kind);
         false
     }
 
-    fn on_mouse_release(&mut self, widget: &RcRfc<Widget>, kind: ClickKind) -> bool {
+    fn on_mouse_release(&mut self, widget: &Rc<RefCell<Widget>>, kind: ClickKind) -> bool {
         self.super_on_mouse_release(widget, kind);
         false
     }
 
     fn on_mouse_drag(
         &mut self,
-        _widget: &RcRfc<Widget>,
+        _widget: &Rc<RefCell<Widget>>,
         _kind: ClickKind,
         _delta_x: f32,
         _delta_y: f32,
@@ -100,7 +100,7 @@ impl WidgetKind for Label {
     }
 
     // TODO refactor tooltip code into a common case somewhere
-    fn on_mouse_move(&mut self, widget: &RcRfc<Widget>, _dx: f32, _dy: f32) -> bool {
+    fn on_mouse_move(&mut self, widget: &Rc<RefCell<Widget>>, _dx: f32, _dy: f32) -> bool {
         if self.tooltip.is_empty() {
             return false;
         }

@@ -14,12 +14,13 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::cell::RefCell;
 use std::f32::consts::PI;
 use std::rc::Rc;
 
 use sulis_core::image::Image;
 use sulis_core::io::{DrawList, GraphicsRenderer};
-use sulis_core::ui::{animation_state, color, Cursor, LineRenderer, RcRfc};
+use sulis_core::ui::{animation_state, color, Cursor, LineRenderer};
 use sulis_core::util::Point;
 use sulis_module::{Ability, Module, ObjectSize};
 
@@ -59,7 +60,7 @@ pub enum Shape {
     },
 }
 
-fn contains(target: &RcRfc<EntityState>, list: &[RcRfc<EntityState>]) -> bool {
+fn contains(target: &Rc<RefCell<EntityState>>, list: &[Rc<RefCell<EntityState>>]) -> bool {
     for entity in list.iter() {
         if Rc::ptr_eq(target, entity) {
             return true;
@@ -297,9 +298,9 @@ impl Shape {
     pub fn get_effected_entities(
         &self,
         points: &[Point],
-        target: Option<&RcRfc<EntityState>>,
-        effectable: &[RcRfc<EntityState>],
-    ) -> Vec<RcRfc<EntityState>> {
+        target: Option<&Rc<RefCell<EntityState>>>,
+        effectable: &[Rc<RefCell<EntityState>>],
+    ) -> Vec<Rc<RefCell<EntityState>>> {
         match self {
             Shape::Single => match target {
                 None => Vec::new(),
@@ -318,8 +319,8 @@ impl Shape {
     fn get_effected(
         &self,
         points: &[Point],
-        effectable: &[RcRfc<EntityState>],
-    ) -> Vec<RcRfc<EntityState>> {
+        effectable: &[Rc<RefCell<EntityState>>],
+    ) -> Vec<Rc<RefCell<EntityState>>> {
         let mut effected = Vec::new();
 
         let area_state = GameState::area_state();
@@ -733,11 +734,11 @@ enum ScriptSource {
 
 pub struct AreaTargeter {
     on_target_select_func: String,
-    on_target_select_custom_target: Option<RcRfc<EntityState>>,
+    on_target_select_custom_target: Option<Rc<RefCell<EntityState>>>,
     script_source: ScriptSource,
-    parent: RcRfc<EntityState>,
-    selectable: Vec<RcRfc<EntityState>>,
-    effectable: Vec<RcRfc<EntityState>>,
+    parent: Rc<RefCell<EntityState>>,
+    selectable: Vec<Rc<RefCell<EntityState>>>,
+    effectable: Vec<Rc<RefCell<EntityState>>>,
     max_effectable: Option<usize>,
     shape: Shape,
     show_mouseover: bool,
@@ -750,11 +751,11 @@ pub struct AreaTargeter {
     invis_blocks_affected_points: bool,
 
     free_select_valid: bool,
-    cur_target: Option<RcRfc<EntityState>>,
+    cur_target: Option<Rc<RefCell<EntityState>>>,
     cursor_pos: Point,
     cursor_offset: Point,
     cur_points: Vec<Point>,
-    cur_effected: Vec<RcRfc<EntityState>>,
+    cur_effected: Vec<Rc<RefCell<EntityState>>>,
 
     cancel: bool,
 }
@@ -762,7 +763,7 @@ pub struct AreaTargeter {
 fn create_entity_state_vec(
     mgr: &TurnManager,
     input: &[Option<usize>],
-) -> Vec<RcRfc<EntityState>> {
+) -> Vec<Rc<RefCell<EntityState>>> {
     let mut out = Vec::new();
     for index in input.iter() {
         let index = match index {
@@ -869,7 +870,7 @@ impl AreaTargeter {
 
     fn draw_target(
         &self,
-        target: &RcRfc<EntityState>,
+        target: &Rc<RefCell<EntityState>>,
         x_offset: f32,
         y_offset: f32,
     ) -> DrawList {
@@ -975,7 +976,7 @@ impl AreaTargeter {
         true
     }
 
-    pub fn parent(&self) -> &RcRfc<EntityState> {
+    pub fn parent(&self) -> &Rc<RefCell<EntityState>> {
         &self.parent
     }
 
@@ -1102,7 +1103,7 @@ impl AreaTargeter {
         &mut self,
         cursor_x: i32,
         cursor_y: i32,
-    ) -> Option<&RcRfc<EntityState>> {
+    ) -> Option<&Rc<RefCell<EntityState>>> {
         self.cursor_pos = Point::new(cursor_x, cursor_y);
         self.cursor_offset = self.shape.get_cursor_offset();
         self.cur_target = None;
@@ -1154,11 +1155,11 @@ impl AreaTargeter {
         self.free_select.is_some()
     }
 
-    pub fn selectable(&self) -> &[RcRfc<EntityState>] {
+    pub fn selectable(&self) -> &[Rc<RefCell<EntityState>>] {
         &self.selectable
     }
 
-    pub fn cur_affected(&self) -> &Vec<RcRfc<EntityState>> {
+    pub fn cur_affected(&self) -> &Vec<Rc<RefCell<EntityState>>> {
         &self.cur_effected
     }
 

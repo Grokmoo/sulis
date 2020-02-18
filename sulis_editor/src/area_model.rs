@@ -23,7 +23,7 @@ use sulis_core::config::{Config, EditorConfig};
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::resource::{read_single_resource, write_to_file, ResourceSet, Sprite};
 use sulis_core::ui::{animation_state, LineRenderer};
-use sulis_core::util::{Point, Size};
+use sulis_core::util::{Point, Size, Scale, Offset, Rect};
 use sulis_module::area::*;
 use sulis_module::generator::{is_removal, TilesModel};
 use sulis_module::{Actor, Encounter, Module, Prop};
@@ -355,42 +355,42 @@ impl AreaModel {
     pub fn draw(
         &self,
         renderer: &mut dyn GraphicsRenderer,
-        x: f32,
-        y: f32,
-        scale_x: f32,
-        scale_y: f32,
+        offset: Offset,
+        scale: Scale,
         millis: u32,
     ) {
         for &(_, ref tiles) in self.tiles.iter() {
             let mut draw_list = DrawList::empty_sprite();
             for &(pos, ref tile) in tiles {
                 let sprite = &tile.image_display;
+                let rect = Rect {
+                    x: offset.x + pos.x as f32,
+                    y: offset.y + pos.y as f32,
+                    w: tile.width as f32,
+                    h: tile.height as f32,
+                };
                 draw_list.append(&mut DrawList::from_sprite_f32(
                     sprite,
-                    x + pos.x as f32,
-                    y + pos.y as f32,
-                    tile.width as f32,
-                    tile.height as f32,
+                    rect,
                 ));
             }
             if !draw_list.is_empty() {
-                draw_list.set_scale(scale_x, scale_y);
+                draw_list.set_scale(scale);
                 renderer.draw(draw_list);
             }
         }
 
         for prop_data in self.props.iter() {
-            let x = prop_data.location.x as f32 + x;
-            let y = prop_data.location.y as f32 + y;
+            let x = prop_data.location.x as f32 + offset.x;
+            let y = prop_data.location.y as f32 + offset.y;
             let mut draw_list = DrawList::empty_sprite();
             prop_data.prop.append_to_draw_list(
                 &mut draw_list,
                 &animation_state::NORMAL,
-                x,
-                y,
+                Offset { x, y },
                 millis,
             );
-            draw_list.set_scale(scale_x, scale_y);
+            draw_list.set_scale(scale);
             renderer.draw(draw_list);
         }
 
@@ -399,10 +399,11 @@ impl AreaModel {
             let h = actor.race.size.height as f32 / 2.0;
             actor.draw(
                 renderer,
-                scale_x,
-                scale_y,
-                pos.x as f32 + x - w,
-                pos.y as f32 + y - h,
+                Offset {
+                    x: pos.x as f32 + offset.x - w,
+                    y: pos.y as f32 + offset.y - h,
+                },
+                scale,
                 millis,
             );
         }
@@ -418,12 +419,18 @@ impl AreaModel {
         };
 
         for transition in self.transitions.iter() {
-            let x = transition.from.x as f32 + x;
-            let y = transition.from.y as f32 + y;
-            let w = transition.size.width as f32;
-            let h = transition.size.height as f32;
-            let mut draw_list = DrawList::from_sprite_f32(encounter_sprite, x, y, w, h);
-            draw_list.set_scale(scale_x, scale_y);
+            let offset = Offset {
+                x: transition.from.x as f32 + offset.x,
+                y: transition.from.y as f32 + offset.y,
+            };
+            let rect = Rect {
+                x: offset.x,
+                y: offset.y,
+                w: transition.size.width as f32,
+                h: transition.size.height as f32,
+            };
+            let mut draw_list = DrawList::from_sprite_f32(encounter_sprite, rect);
+            draw_list.set_scale(scale);
             renderer.draw(draw_list);
 
             let text = match transition.to {
@@ -433,23 +440,29 @@ impl AreaModel {
                 ToKind::FindLink { ref id, .. } => format!("to {}", id),
             };
 
-            let (mut draw_list, _) = font_renderer.get_draw_list(&text, x, y, 1.0);
-            draw_list.set_scale(scale_x, scale_y);
+            let (mut draw_list, _) = font_renderer.get_draw_list(&text, offset, 1.0);
+            draw_list.set_scale(scale);
             renderer.draw(draw_list);
         }
 
         for encounter_data in self.encounters.iter() {
-            let x = encounter_data.location.x as f32 + x;
-            let y = encounter_data.location.y as f32 + y;
-            let w = encounter_data.size.width as f32;
-            let h = encounter_data.size.height as f32;
-            let mut draw_list = DrawList::from_sprite_f32(encounter_sprite, x, y, w, h);
-            draw_list.set_scale(scale_x, scale_y);
+            let offset = Offset {
+                x: encounter_data.location.x as f32 + offset.x,
+                y: encounter_data.location.y as f32 + offset.y,
+            };
+            let rect = Rect {
+                x: offset.x,
+                y: offset.y,
+                w: encounter_data.size.width as f32,
+                h: encounter_data.size.height as f32,
+            };
+            let mut draw_list = DrawList::from_sprite_f32(encounter_sprite, rect);
+            draw_list.set_scale(scale);
             renderer.draw(draw_list);
 
             let text = &encounter_data.encounter.id;
-            let (mut draw_list, _) = font_renderer.get_draw_list(text, x, y, 1.0);
-            draw_list.set_scale(scale_x, scale_y);
+            let (mut draw_list, _) = font_renderer.get_draw_list(text, offset, 1.0);
+            draw_list.set_scale(scale);
             renderer.draw(draw_list);
         }
 
@@ -459,16 +472,22 @@ impl AreaModel {
                 _ => continue,
             };
 
-            let x = loc.x as f32 + x;
-            let y = loc.y as f32 + y;
-            let w = size.width as f32;
-            let h = size.height as f32;
-            let mut draw_list = DrawList::from_sprite_f32(encounter_sprite, x, y, w, h);
-            draw_list.set_scale(scale_x, scale_y);
+            let offset = Offset {
+                x: loc.x as f32 + offset.x,
+                y: loc.y as f32 + offset.y,
+            };
+            let rect = Rect {
+                x: offset.x,
+                y: offset.y,
+                w: size.width as f32,
+                h: size.height as f32,
+            };
+            let mut draw_list = DrawList::from_sprite_f32(encounter_sprite, rect);
+            draw_list.set_scale(scale);
             renderer.draw(draw_list);
 
-            let (mut draw_list, _) = font_renderer.get_draw_list("Trigger", x, y, 1.0);
-            draw_list.set_scale(scale_x, scale_y);
+            let (mut draw_list, _) = font_renderer.get_draw_list("Trigger", offset, 1.0);
+            draw_list.set_scale(scale);
             renderer.draw(draw_list);
         }
     }
@@ -520,8 +539,8 @@ impl AreaModel {
         let dest_elev = self.tiles.raw_elevation();
         if elev.len() != area_builder.height * area_builder.width {
             warn!("Invalid elevation array in {}", path);
-            for i in 0..(MAX_AREA_SIZE * MAX_AREA_SIZE) as usize {
-                dest_elev[i] = 0;
+            for elev in dest_elev.iter_mut() {
+                *elev = 0;
             }
         } else {
             for y in 0..area_builder.height {

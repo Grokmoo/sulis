@@ -23,6 +23,7 @@ use crate::io::event::ClickKind;
 use crate::io::{event, Event, GraphicsRenderer};
 use crate::resource::ResourceSet;
 use crate::ui::{animation_state, AnimationState, Widget};
+use crate::util::Rect;
 
 pub struct Cursor {
     pub x: i32,
@@ -71,15 +72,13 @@ impl Cursor {
 
             let w = image.get_width_f32();
             let h = image.get_height_f32();
-            image.draw(
-                renderer,
-                &cursor.state,
-                cursor.xf - w / 2.0,
-                cursor.yf - h / 2.0,
+            let rect = Rect {
+                x: cursor.xf - w / 2.0,
+                y: cursor.yf - h / 2.0,
                 w,
                 h,
-                millis,
-            );
+            };
+            image.draw(renderer, &cursor.state, rect, millis);
         });
     }
 

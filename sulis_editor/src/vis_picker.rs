@@ -22,6 +22,7 @@ use sulis_core::config::Config;
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::resource::{ResourceSet, Sprite};
 use sulis_core::ui::{Color, Widget, WidgetKind};
+use sulis_core::util::{Offset, Scale, Rect};
 
 use crate::{AreaModel, EditorMode};
 
@@ -44,29 +45,28 @@ impl EditorMode for VisPicker {
         &mut self,
         renderer: &mut dyn GraphicsRenderer,
         model: &AreaModel,
-        x_offset: f32,
-        y_offset: f32,
-        scale_x: f32,
-        scale_y: f32,
+        offset: Offset,
+        scale: Scale,
         _millis: u32,
     ) {
         let mut draw_list = DrawList::empty_sprite();
         for (p, tile) in model.tiles().all() {
-            let x_base = x_offset + p.x as f32;
-            let y_base = y_offset + p.y as f32;
+            let x_base = offset.x + p.x as f32;
+            let y_base = offset.y + p.y as f32;
             for p in tile.invis.iter() {
-                let x = p.x as f32 + x_base;
-                let y = p.y as f32 + y_base;
+                let rect = Rect {
+                    x: p.x as f32 + x_base,
+                    y: p.y as f32 + y_base,
+                    w: 1.0,
+                    h: 1.0,
+                };
                 draw_list.append(&mut DrawList::from_sprite_f32(
                     &self.cursor_sprite,
-                    x,
-                    y,
-                    1.0,
-                    1.0,
+                    rect,
                 ));
             }
         }
-        draw_list.set_scale(scale_x, scale_y);
+        draw_list.set_scale(scale);
         draw_list.set_color(Color::from_string("F008"));
 
         renderer.draw(draw_list);

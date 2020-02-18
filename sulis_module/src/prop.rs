@@ -21,7 +21,7 @@ use sulis_core::image::Image;
 use sulis_core::io::DrawList;
 use sulis_core::resource::ResourceSet;
 use sulis_core::ui::AnimationState;
-use sulis_core::util::{unable_to_create_error, Point};
+use sulis_core::util::{unable_to_create_error, Point, Rect, Offset};
 
 use crate::area::tile::verify_point;
 use crate::{LootList, Module, ObjectSize};
@@ -169,15 +169,18 @@ impl Prop {
         &self,
         draw_list: &mut DrawList,
         state: &AnimationState,
-        x: f32,
-        y: f32,
+        offset: Offset,
         millis: u32,
     ) {
-        let w = self.size.width as f32;
-        let h = self.size.height as f32;
+        let rect = Rect {
+          x: offset.x,
+          y: offset.y,
+          w: self.size.width as f32,
+          h: self.size.height as f32,
+        };
 
         self.image
-            .append_to_draw_list(draw_list, state, x, y, w, h, millis);
+            .append_to_draw_list(draw_list, state, rect, millis);
     }
 }
 

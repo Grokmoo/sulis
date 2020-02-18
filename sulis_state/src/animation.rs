@@ -46,7 +46,7 @@ use crate::{ChangeListener, Effect, EntityState, ScriptCallback};
 use sulis_core::{
     image::Image,
     io::GraphicsRenderer,
-    util::{self, ExtInt},
+    util::{self, ExtInt, Offset, Scale},
 };
 use sulis_module::ImageLayer;
 
@@ -154,30 +154,26 @@ impl AnimState {
     pub fn draw_below_entities(
         &self,
         renderer: &mut dyn GraphicsRenderer,
-        offset_x: f32,
-        offset_y: f32,
-        scale_x: f32,
-        scale_y: f32,
+        offset: Offset,
+        scale: Scale,
         millis: u32,
     ) {
         // TODO need to only draw animations that are in the current area
         for anim in self.below_anims.iter() {
-            anim.draw(renderer, offset_x, offset_y, scale_x, scale_y, millis);
+            anim.draw(renderer, offset, scale, millis);
         }
     }
 
     pub fn draw_above_entities(
         &self,
         renderer: &mut dyn GraphicsRenderer,
-        offset_x: f32,
-        offset_y: f32,
-        scale_x: f32,
-        scale_y: f32,
+        offset: Offset,
+        scale: Scale,
         millis: u32,
     ) {
         // TODO only draw anims in the current area
         for anim in self.above_anims.iter() {
-            anim.draw(renderer, offset_x, offset_y, scale_x, scale_y, millis);
+            anim.draw(renderer, offset, scale, millis);
         }
     }
 
@@ -610,16 +606,14 @@ impl Anim {
     pub fn draw(
         &self,
         renderer: &mut dyn GraphicsRenderer,
-        offset_x: f32,
-        offset_y: f32,
-        scale_x: f32,
-        scale_y: f32,
+        offset: Offset,
+        scale: Scale,
         millis: u32,
     ) {
         use self::AnimKind::*;
         match self.kind {
             RangedAttack { ref model } => ranged_attack_animation::draw(
-                model, renderer, offset_x, offset_y, scale_x, scale_y, millis,
+                model, renderer, offset, scale, millis,
             ),
             ParticleGenerator {
                 ref state,
@@ -629,14 +623,12 @@ impl Anim {
                 model,
                 &self.owner,
                 renderer,
-                offset_x,
-                offset_y,
-                scale_x,
-                scale_y,
+                offset,
+                scale,
                 millis,
             ),
             Move { ref model } => move_animation::draw(
-                model, renderer, offset_x, offset_y, scale_x, scale_y, millis,
+                model, renderer, offset, scale, millis,
             ),
             _ => (),
         }

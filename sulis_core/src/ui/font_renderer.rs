@@ -17,14 +17,14 @@
 use crate::io::{DrawList, GraphicsRenderer, Vertex};
 use crate::resource::Font;
 use crate::ui::WidgetState;
+use crate::util::Offset;
 use std::rc::Rc;
 
 pub trait FontRenderer {
     fn render(
         &self,
         renderer: &mut dyn GraphicsRenderer,
-        pos_x: f32,
-        pos_y: f32,
+        offset: Offset,
         widget_state: &WidgetState,
     );
 
@@ -42,11 +42,11 @@ impl LineRenderer {
         }
     }
 
-    pub fn get_draw_list(&self, text: &str, pos_x: f32, pos_y: f32, scale: f32) -> (DrawList, f32) {
+    pub fn get_draw_list(&self, text: &str, offset: Offset, scale: f32) -> (DrawList, f32) {
         let mut quads: Vec<Vertex> = Vec::new();
-        let mut x = pos_x;
+        let mut x = offset.x;
         for c in text.chars() {
-            x = self.font.get_quad(&mut quads, c, x, pos_y, scale);
+            x = self.font.get_quad(&mut quads, c, x, offset.y, scale);
         }
         (DrawList::from_font(&self.font.id, quads), x)
     }
@@ -56,17 +56,16 @@ impl FontRenderer for LineRenderer {
     fn render(
         &self,
         renderer: &mut dyn GraphicsRenderer,
-        pos_x: f32,
-        pos_y: f32,
+        offset: Offset,
         widget_state: &WidgetState,
     ) {
         let text = &widget_state.text;
         let defaults = &widget_state.text_params;
 
         let mut quads: Vec<Vertex> = Vec::new();
-        let mut x = pos_x;
+        let mut x = offset.x;
         for c in text.chars() {
-            x = self.font.get_quad(&mut quads, c, x, pos_y, defaults.scale);
+            x = self.font.get_quad(&mut quads, c, x, offset.y, defaults.scale);
         }
 
         let mut draw_list = DrawList::from_font(&self.font.id, quads);

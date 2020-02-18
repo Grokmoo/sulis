@@ -22,7 +22,7 @@ use crate::io::event::ClickKind;
 use crate::io::GraphicsRenderer;
 use crate::ui::theme::{self, HorizontalAlignment, VerticalAlignment};
 use crate::ui::{LineRenderer, Widget, WidgetKind};
-use crate::util::Point;
+use crate::util::{Offset, Point};
 use crate::widget_kind;
 use crate::widgets::TextArea;
 
@@ -150,7 +150,8 @@ impl WidgetKind for Label {
         let scale = widget.state.text_params.scale;
         let width = font.get_width(&widget.state.text) as f32 * scale / font.line_height as f32;
         let (x, y) = Label::get_draw_params(width, scale, widget);
-        font_rend.render(renderer, x, y, &widget.state);
+        let offset = Offset { x, y };
+        font_rend.render(renderer, offset, &widget.state);
 
         self.text_draw_end_x = x + width;
         self.text_draw_end_y = y;

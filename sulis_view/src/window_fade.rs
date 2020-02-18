@@ -22,7 +22,7 @@ use sulis_core::image::Image;
 use sulis_core::io::{event::ClickKind, DrawList, GraphicsRenderer};
 use sulis_core::resource::ResourceSet;
 use sulis_core::ui::{animation_state, Widget, WidgetKind};
-use sulis_core::util::Point;
+use sulis_core::util::{Rect, Point};
 
 pub enum Mode {
     In,
@@ -114,12 +114,14 @@ impl WidgetKind for WindowFade {
         millis: u32,
     ) {
         if let Some(ref fill) = self.fill {
-            let x = widget.state.inner_left() as f32;
-            let y = widget.state.inner_top() as f32;
-            let w = widget.state.inner_width() as f32;
-            let h = widget.state.inner_height() as f32;
+            let rect = Rect {
+                x: widget.state.inner_left() as f32,
+                y: widget.state.inner_top() as f32,
+                w: widget.state.inner_width() as f32,
+                h: widget.state.inner_height() as f32,
+            };
             let mut draw_list = DrawList::empty_sprite();
-            fill.append_to_draw_list(&mut draw_list, &animation_state::NORMAL, x, y, w, h, millis);
+            fill.append_to_draw_list(&mut draw_list, &animation_state::NORMAL, rect, millis);
 
             draw_list.set_alpha(self.frac);
             renderer.draw(draw_list);

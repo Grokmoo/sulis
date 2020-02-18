@@ -21,7 +21,7 @@ use std::rc::Rc;
 use crate::{animation::Anim, EntityState, GameState};
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::ui::animation_state;
-use sulis_core::util::Point;
+use sulis_core::util::{Offset, Point, Scale, Rect};
 use sulis_module::ObjectSize;
 
 fn check_immediate_cancel(mover: &Rc<RefCell<EntityState>>, model: &mut MoveAnimModel) -> bool {
@@ -100,34 +100,31 @@ pub(in crate::animation) fn update(
 pub(in crate::animation) fn draw(
     model: &MoveAnimModel,
     renderer: &mut dyn GraphicsRenderer,
-    offset_x: f32,
-    offset_y: f32,
-    scale_x: f32,
-    scale_y: f32,
+    offset: Offset,
+    scale: Scale,
     millis: u32,
 ) {
     if model.path.is_empty() {
         return;
     }
 
-    let w = model.owner_size.width as f32;
-    let h = model.owner_size.height as f32;
-
     let last = &model.path[model.path.len() - 1];
-    let x = offset_x + last.x as f32;
-    let y = offset_y + last.y as f32;
+
+    let rect = Rect {
+        x: offset.x + last.x as f32,
+        y: offset.y + last.y as f32,
+        w: model.owner_size.width as f32,
+        h: model.owner_size.height as f32,
+    };
 
     let mut draw_list = DrawList::empty_sprite();
     model.owner_size.selection_image.append_to_draw_list(
         &mut draw_list,
         &animation_state::NORMAL,
-        x,
-        y,
-        w,
-        h,
+        rect,
         millis,
     );
-    draw_list.set_scale(scale_x, scale_y);
+    draw_list.set_scale(scale);
     renderer.draw(draw_list);
 }
 

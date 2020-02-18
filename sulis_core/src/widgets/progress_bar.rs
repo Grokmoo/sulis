@@ -22,7 +22,7 @@ use crate::image::Image;
 use crate::io::{event::ClickKind, DrawList, GraphicsRenderer};
 use crate::resource::ResourceSet;
 use crate::ui::{theme, LineRenderer, Widget, WidgetKind};
-use crate::util::Point;
+use crate::util::{Point, Rect};
 use crate::widget_kind;
 use crate::widgets::{Label, TextArea};
 
@@ -140,19 +140,18 @@ impl WidgetKind for ProgressBar {
     ) {
         if self.fraction > 0.0 {
             if let Some(ref bar) = self.bar {
-                let x = widget.state.inner_left() as f32;
-                let y = widget.state.inner_top() as f32;
-                let w = widget.state.inner_width() as f32 * self.fraction;
-                let h = widget.state.inner_height() as f32;
+                let rect = Rect {
+                    x: widget.state.inner_left() as f32,
+                    y: widget.state.inner_top() as f32,
+                    w: widget.state.inner_width() as f32 * self.fraction,
+                    h: widget.state.inner_height() as f32,
+                };
 
                 let mut draw_list = DrawList::empty_sprite();
                 bar.append_to_draw_list(
                     &mut draw_list,
                     &widget.state.animation_state,
-                    x,
-                    y,
-                    w,
-                    h,
+                    rect,
                     millis,
                 );
 

@@ -22,7 +22,7 @@ use sulis_core::config::Config;
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::resource::{ResourceSet, Sprite};
 use sulis_core::ui::{Callback, Color, Widget, WidgetKind};
-use sulis_core::util::Point;
+use sulis_core::util::{Scale, Offset, Point, Rect};
 use sulis_core::widgets::{Button, Label, ScrollDirection, ScrollPane, Spinner};
 use sulis_module::{area::tile::WallRules, area::MAX_AREA_SIZE, Module};
 
@@ -81,10 +81,8 @@ impl EditorMode for WallPicker {
         &mut self,
         renderer: &mut dyn GraphicsRenderer,
         _model: &AreaModel,
-        x_offset: f32,
-        y_offset: f32,
-        scale_x: f32,
-        scale_y: f32,
+        offset: Offset,
+        scale: Scale,
         _millis: u32,
     ) {
         let gw = self.grid_width as f32;
@@ -94,18 +92,19 @@ impl EditorMode for WallPicker {
         if let Some(pos) = self.cursor_pos {
             for y in 0..self.brush_size {
                 for x in 0..self.brush_size {
-                    let x = gw * x as f32 + pos.x as f32 + x_offset;
-                    let y = gh * y as f32 + pos.y as f32 + y_offset;
+                    let rect = Rect {
+                        x: gw * x as f32 + pos.x as f32 + offset.x,
+                        y: gh * y as f32 + pos.y as f32 + offset.y,
+                        w: gw,
+                        h: gh,
+                    };
                     draw_list.append(&mut DrawList::from_sprite_f32(
                         &self.cursor_sprite,
-                        x,
-                        y,
-                        gw,
-                        gh,
+                        rect,
                     ));
                 }
             }
-            draw_list.set_scale(scale_x, scale_y);
+            draw_list.set_scale(scale);
             draw_list.set_color(Color::from_string("0F08"));
             renderer.draw(draw_list);
         }

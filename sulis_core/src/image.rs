@@ -36,17 +36,14 @@ use std::fmt::Debug;
 
 use crate::io::{DrawList, GraphicsRenderer};
 use crate::ui::AnimationState;
-use crate::util::{size, Size};
+use crate::util::{size, Rect, Size};
 
 pub trait Image: Debug {
     fn draw(
         &self,
         renderer: &mut dyn GraphicsRenderer,
         state: &AnimationState,
-        x: f32,
-        y: f32,
-        w: f32,
-        h: f32,
+        rect: Rect,
         millis: u32,
     );
 
@@ -54,10 +51,7 @@ pub trait Image: Debug {
         &self,
         draw_list: &mut DrawList,
         state: &AnimationState,
-        x: f32,
-        y: f32,
-        w: f32,
-        h: f32,
+        rect: Rect,
         millis: u32,
     );
 
@@ -78,10 +72,7 @@ impl Image for EmptyImage {
         &self,
         _renderer: &mut dyn GraphicsRenderer,
         _state: &AnimationState,
-        _x: f32,
-        _y: f32,
-        _w: f32,
-        _h: f32,
+        _rect: Rect,
         _millis: u32,
     ) {
     }
@@ -90,10 +81,7 @@ impl Image for EmptyImage {
         &self,
         _draw_list: &mut DrawList,
         _state: &AnimationState,
-        _x: f32,
-        _y: f32,
-        _w: f32,
-        _h: f32,
+        _rect: Rect,
         _millis: u32,
     ) {
     }

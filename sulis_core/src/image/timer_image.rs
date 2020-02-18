@@ -21,7 +21,7 @@ use std::rc::Rc;
 use crate::image::Image;
 use crate::io::{DrawList, GraphicsRenderer};
 use crate::ui::AnimationState;
-use crate::util::{invalid_data_error, Size};
+use crate::util::{invalid_data_error, Rect, Size};
 
 #[derive(Debug)]
 pub struct TimerImage {
@@ -94,28 +94,22 @@ impl Image for TimerImage {
         &self,
         renderer: &mut dyn GraphicsRenderer,
         state: &AnimationState,
-        x: f32,
-        y: f32,
-        w: f32,
-        h: f32,
+        rect: Rect,
         millis: u32,
     ) {
         self.get_cur_frame(millis)
-            .draw(renderer, state, x, y, w, h, millis);
+            .draw(renderer, state, rect, millis);
     }
 
     fn append_to_draw_list(
         &self,
         draw_list: &mut DrawList,
         state: &AnimationState,
-        x: f32,
-        y: f32,
-        w: f32,
-        h: f32,
+        rect: Rect,
         millis: u32,
     ) {
         self.get_cur_frame(millis)
-            .append_to_draw_list(draw_list, state, x, y, w, h, millis);
+            .append_to_draw_list(draw_list, state, rect, millis);
     }
 
     fn get_width_f32(&self) -> f32 {

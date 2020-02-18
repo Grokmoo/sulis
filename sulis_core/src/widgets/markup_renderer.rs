@@ -112,6 +112,7 @@ use std::rc::Rc;
 use crate::io::{DrawList, GraphicsRenderer};
 use crate::resource::{Font, ResourceSet};
 use crate::ui::{FontRenderer, WidgetState};
+use crate::util::{Offset, Rect};
 
 pub struct MarkupRenderer {
     font: Rc<Font>,
@@ -218,8 +219,7 @@ impl MarkupRenderer {
                         let (x1, y1) = self.draw_current(
                             &mut word_buf,
                             &cur_markup,
-                            x,
-                            y,
+                            Offset { x, y },
                             pos_x,
                             max_x,
                             word_width,
@@ -264,8 +264,7 @@ impl MarkupRenderer {
                         let (x1, y1) = self.draw_current(
                             &mut word_buf,
                             &cur_markup,
-                            x,
-                            y,
+                            Offset { x, y },
                             pos_x,
                             max_x,
                             word_width,
@@ -285,8 +284,7 @@ impl MarkupRenderer {
                             let (x1, y1) = self.draw_current(
                                 &mut word_buf,
                                 &cur_markup,
-                                x,
-                                y,
+                                Offset { x, y },
                                 pos_x,
                                 max_x,
                                 word_width,
@@ -308,7 +306,8 @@ impl MarkupRenderer {
             }
         }
 
-        self.draw_current(&mut word_buf, &cur_markup, x, y, pos_x, max_x, word_width);
+        let offset = Offset { x, y };
+        self.draw_current(&mut word_buf, &cur_markup, offset, pos_x, max_x, word_width);
 
         if self.bottom_y < widget_state.inner_top() as f32 {
             self.bottom_y = widget_state.inner_top() as f32;
@@ -323,12 +322,13 @@ impl MarkupRenderer {
         &mut self,
         word_buf: &mut String,
         markup: &Markup,
-        mut x: f32,
-        mut y: f32,
+        offset: Offset,
         start_x: f32,
         max_x: f32,
         word_width: u32,
     ) -> (f32, f32) {
+        let mut x = offset.x;
+        let mut y = offset.y;
         let factor = markup.font.base as f32 / markup.font.line_height as f32;
 
         if markup.ignore {
@@ -385,8 +385,14 @@ impl MarkupRenderer {
         };
 
         let x_over_y = sprite.size.width as f32 / sprite.size.height as f32;
-        let mut draw_list =
-            DrawList::from_sprite_f32(&sprite, x, y, markup.scale * x_over_y, markup.scale);
+        let rect = Rect {
+            x,
+            y,
+            w: markup.scale * x_over_y,
+            h: markup.scale,
+        };
+
+        let mut draw_list = DrawList::from_sprite_f32(&sprite, rect);
         draw_list.set_color(markup.color);
         self.append_to_draw_lists(draw_list);
     }
@@ -409,8 +415,7 @@ impl FontRenderer for MarkupRenderer {
     fn render(
         &self,
         renderer: &mut dyn GraphicsRenderer,
-        _pos_x: f32,
-        _pos_y: f32,
+        _offset: Offset,
         _widget_state: &WidgetState,
     ) {
         for draw_list in self.draw_lists.iter() {

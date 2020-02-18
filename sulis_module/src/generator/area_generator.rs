@@ -312,12 +312,15 @@ impl AreaGenerator {
             let (offset_x, offset_y) = model.from_region_coords(p_room.x, p_room.y);
             let (tot_gw, tot_gh) = (model.total_grid_size.x, model.total_grid_size.y);
             let (gw, gh) = (model.model.grid_width, model.model.grid_height);
+            let params = WallParams {
+                offset: Point::new(offset_x, offset_y),
+                step: Point::new(gw as i32, gh as i32),
+                max: Point::new(tot_gw, tot_gh),
+            };
             self.carve_wall(
                 model,
                 neighbors,
-                Point::new(offset_x, offset_y),
-                Point::new(gw as i32, gh as i32),
-                Point::new(tot_gw, tot_gh),
+                params,
                 elev,
                 wall_kind,
             );
@@ -328,12 +331,13 @@ impl AreaGenerator {
         &self,
         model: &mut GenModel,
         neighbors: [Option<TileKind>; 5],
-        offset: Point,
-        step: Point,
-        max: Point,
+        params: WallParams,
         elev: u8,
         wall_kind: Option<usize>,
     ) {
+        let offset = params.offset;
+        let max = params.max;
+        let step = params.step;
         let edge_choice = match neighbors[0] {
             Some(TileKind::Corridor(region)) => {
                 if model.rand.gen(1, 101) < self.room_params.corridor_edge_overfill_chance {
@@ -419,6 +423,12 @@ impl AreaGenerator {
             }
         }
     }
+}
+
+struct WallParams {
+    offset: Point,
+    step: Point,
+    max: Point,
 }
 
 fn is_rough_edge(

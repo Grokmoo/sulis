@@ -20,7 +20,7 @@ use std::rc::Rc;
 
 use sulis_core::io::GraphicsRenderer;
 use sulis_core::ui::{Callback, Widget, WidgetKind};
-use sulis_core::util::Point;
+use sulis_core::util::{Offset, Scale, Point};
 use sulis_core::widgets::{Button, ScrollDirection, ScrollPane};
 use sulis_module::{Actor, Module};
 
@@ -49,10 +49,8 @@ impl EditorMode for ActorPicker {
         &mut self,
         renderer: &mut dyn GraphicsRenderer,
         _model: &AreaModel,
-        x: f32,
-        y: f32,
-        scale_x: f32,
-        scale_y: f32,
+        offset: Offset,
+        scale: Scale,
         millis: u32,
     ) {
         for &(pos, ref actor) in self.removal_actors.iter() {
@@ -60,10 +58,11 @@ impl EditorMode for ActorPicker {
             let h = actor.race.size.height as f32 / 2.0;
             actor.draw(
                 renderer,
-                scale_x,
-                scale_y,
-                x + pos.x as f32 - w,
-                y + pos.y as f32 - h,
+                Offset {
+                    x: offset.x + pos.x as f32 - w,
+                    y: offset.y + pos.y as f32 - h,
+                },
+                scale,
                 millis,
             );
         }
@@ -82,10 +81,11 @@ impl EditorMode for ActorPicker {
         let h = actor.race.size.height as f32 / 2.0;
         actor.draw(
             renderer,
-            scale_x,
-            scale_y,
-            x + pos.x as f32 - w,
-            y + pos.y as f32 - h,
+            Offset {
+                x: offset.x + pos.x as f32 - w,
+                y: offset.y + pos.y as f32 - h,
+            },
+            scale,
             millis,
         );
     }

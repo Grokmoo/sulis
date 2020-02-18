@@ -19,7 +19,7 @@ use std::rc::Rc;
 use crate::image::Image;
 use crate::io::{DrawList, GraphicsRenderer};
 use crate::ui::{animation_state, AnimationState, Color};
-use crate::util::Size;
+use crate::util::{Offset, Rect, Scale, Size};
 
 #[derive(Debug)]
 pub struct Layer {
@@ -66,34 +66,26 @@ impl LayeredImage {
     }
 
     #[inline]
-    fn draw_layer(
-        &self,
-        layer: &Layer,
-        offset_x: f32,
-        offset_y: f32,
-        scale_x: f32,
-        scale_y: f32,
-        millis: u32,
-    ) -> DrawList {
+    fn draw_layer(&self, layer: &Layer, offset: Offset, scale: Scale, millis: u32) -> DrawList {
         let mut draw_list = DrawList::empty_sprite();
-        let w = layer.image.get_width_f32();
-        let h = layer.image.get_height_f32();
-        layer.image.append_to_draw_list(
-            &mut draw_list,
-            &animation_state::NORMAL,
-            layer.x + offset_x,
-            layer.y + offset_y,
-            w,
-            h,
-            millis,
-        );
+
+        let draw = Rect {
+            x: layer.x + offset.x,
+            y: layer.y + offset.y,
+            w: layer.image.get_width_f32(),
+            h: layer.image.get_height_f32(),
+        };
+
+        layer
+            .image
+            .append_to_draw_list(&mut draw_list, &animation_state::NORMAL, draw, millis);
         if let Some(color) = &layer.color {
             draw_list.set_color(*color);
         }
         if let Some(hue) = self.hue {
             draw_list.set_swap_hue(hue);
         }
-        draw_list.set_scale(scale_x, scale_y);
+        draw_list.set_scale(scale);
 
         draw_list
     }
@@ -102,13 +94,11 @@ impl LayeredImage {
         &self,
         renderer: &mut dyn GraphicsRenderer,
         texture_id: &str,
-        scale_x: f32,
-        scale_y: f32,
-        x: f32,
-        y: f32,
+        offset: Offset,
+        scale: Scale,
     ) {
         for layer in self.layers.iter() {
-            let draw_list = self.draw_layer(layer, x, y, scale_x, scale_y, 0);
+            let draw_list = self.draw_layer(layer, offset, scale, 0);
             renderer.draw_to_texture(texture_id, draw_list);
         }
     }
@@ -116,14 +106,12 @@ impl LayeredImage {
     pub fn draw(
         &self,
         renderer: &mut dyn GraphicsRenderer,
-        scale_x: f32,
-        scale_y: f32,
-        x: f32,
-        y: f32,
+        offset: Offset,
+        scale: Scale,
         millis: u32,
     ) {
         for layer in self.layers.iter() {
-            let draw_list = self.draw_layer(layer, x, y, scale_x, scale_y, millis);
+            let draw_list = self.draw_layer(layer, offset, scale, millis);
             renderer.draw(draw_list);
         }
     }
@@ -134,10 +122,7 @@ impl Image for LayeredImage {
         &self,
         _draw_list: &mut DrawList,
         _state: &AnimationState,
-        _x: f32,
-        _y: f32,
-        _w: f32,
-        _h: f32,
+        _rect: Rect,
         _millis: u32,
     ) {
         panic!("LayeredImage must be drawn directly");
@@ -147,10 +132,7 @@ impl Image for LayeredImage {
         &self,
         _renderer: &mut dyn GraphicsRenderer,
         _state: &AnimationState,
-        _x: f32,
-        _y: f32,
-        _w: f32,
-        _h: f32,
+        _rect: Rect,
         _millis: u32,
     ) {
         panic!("LayeredImage must be drawn directly");

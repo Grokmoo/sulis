@@ -21,7 +21,7 @@ use std::rc::Rc;
 use crate::image::Image;
 use crate::io::{DrawList, GraphicsRenderer};
 use crate::ui::AnimationState;
-use crate::util::{invalid_data_error, Size};
+use crate::util::{invalid_data_error, Rect, Size};
 
 #[derive(Debug)]
 pub struct AnimatedImage {
@@ -92,28 +92,21 @@ impl Image for AnimatedImage {
         &self,
         renderer: &mut dyn GraphicsRenderer,
         state: &AnimationState,
-        x: f32,
-        y: f32,
-        w: f32,
-        h: f32,
+        rect: Rect,
         millis: u32,
     ) {
-        AnimationState::find_match_in_vec(state, &self.images)
-            .draw(renderer, state, x, y, w, h, millis);
+        AnimationState::find_match_in_vec(state, &self.images).draw(renderer, state, rect, millis);
     }
 
     fn append_to_draw_list(
         &self,
         draw_list: &mut DrawList,
         state: &AnimationState,
-        x: f32,
-        y: f32,
-        w: f32,
-        h: f32,
+        rect: Rect,
         millis: u32,
     ) {
         AnimationState::find_match_in_vec(state, &self.images)
-            .append_to_draw_list(draw_list, state, x, y, w, h, millis);
+            .append_to_draw_list(draw_list, state, rect, millis);
     }
 
     fn get_width_f32(&self) -> f32 {

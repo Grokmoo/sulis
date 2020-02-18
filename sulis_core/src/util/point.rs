@@ -20,6 +20,28 @@ use std::ops;
 
 use crate::ui::Border;
 
+#[derive(Deserialize, Debug, Copy, Clone, Default)]
+#[serde(deny_unknown_fields)]
+pub struct Offset {
+    pub x: f32,
+    pub y: f32,
+}
+#[derive(Deserialize, Debug, Copy, Clone, Default)]
+#[serde(deny_unknown_fields)]
+pub struct Scale {
+    pub x: f32,
+    pub y: f32,
+}
+
+#[derive(Deserialize, Debug, Copy, Clone, Default)]
+#[serde(deny_unknown_fields)]
+pub struct Rect {
+    pub x: f32,
+    pub y: f32,
+    pub w: f32,
+    pub h: f32,
+}
+
 #[derive(Copy, Clone, Default, Deserialize, Serialize, Eq, Hash, PartialEq, Ord)]
 #[serde(deny_unknown_fields)]
 pub struct Point {

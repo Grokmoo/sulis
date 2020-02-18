@@ -23,7 +23,7 @@ use crate::config::Config;
 use crate::io::{event, Event, GraphicsRenderer};
 use crate::resource::ResourceSet;
 use crate::ui::{theme, Cursor, EmptyWidget, Theme, WidgetKind, WidgetState};
-use crate::util::{Point, Size};
+use crate::util::{Point, Rect, Size};
 use crate::widgets::Label;
 
 pub struct Widget {
@@ -60,15 +60,13 @@ impl Widget {
         if let Some(ref image) = self.state.background {
             let (x, y) = self.state.position().as_tuple();
             let (w, h) = self.state.size().as_tuple();
-            image.draw(
-                renderer,
-                &self.state.animation_state,
-                x as f32,
-                y as f32,
-                w as f32,
-                h as f32,
-                millis,
-            );
+            let rect = Rect {
+                x: x as f32,
+                y: y as f32,
+                w: w as f32,
+                h: h as f32,
+            };
+            image.draw(renderer, &self.state.animation_state, rect, millis);
         }
 
         self.kind
@@ -81,11 +79,14 @@ impl Widget {
             child.draw(renderer, pixel_size, millis);
 
             if let Some(ref image) = child.state.foreground {
-                let x = child.state.inner_left() as f32;
-                let y = child.state.inner_top() as f32;
-                let w = child.state.inner_width() as f32;
-                let h = child.state.inner_height() as f32;
-                image.draw(renderer, &child.state.animation_state, x, y, w, h, millis);
+                let rect = Rect {
+                    x: child.state.inner_left() as f32,
+                    y: child.state.inner_top() as f32,
+                    w: child.state.inner_width() as f32,
+                    h: child.state.inner_height() as f32,
+                };
+
+                image.draw(renderer, &child.state.animation_state, rect, millis);
             }
         }
 

@@ -26,7 +26,7 @@ use crate::{
 };
 use sulis_core::image::{Image, LayeredImage};
 use sulis_core::io::GraphicsRenderer;
-use sulis_core::util::{invalid_data_error, ExtInt};
+use sulis_core::util::{invalid_data_error, ExtInt, Scale, Offset};
 use sulis_module::{Ability, Actor, ActorBuilder, Faction, ImageLayer, Module};
 use sulis_module::{BonusList, ItemKind, ItemState, QuickSlot, Slot, StatList};
 
@@ -531,26 +531,22 @@ impl ActorState {
     pub fn draw(
         &self,
         renderer: &mut dyn GraphicsRenderer,
-        scale_x: f32,
-        scale_y: f32,
-        x: f32,
-        y: f32,
+        offset: Offset,
+        scale: Scale,
         millis: u32,
     ) {
-        self.image.draw(renderer, scale_x, scale_y, x, y, millis);
+        self.image.draw(renderer, offset, scale, millis);
     }
 
     pub fn draw_to_texture(
         &self,
         renderer: &mut dyn GraphicsRenderer,
         texture_id: &str,
-        scale_x: f32,
-        scale_y: f32,
-        x: f32,
-        y: f32,
+        offset: Offset,
+        scale: Scale,
     ) {
         self.image
-            .draw_to_texture(renderer, texture_id, scale_x, scale_y, x, y);
+            .draw_to_texture(renderer, texture_id, offset, scale);
     }
 
     pub fn has_ap_to_attack(&self) -> bool {

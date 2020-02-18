@@ -21,7 +21,7 @@ use std::rc::Rc;
 
 use sulis_core::config::Config;
 use sulis_core::io::GraphicsRenderer;
-use sulis_core::util::{invalid_data_error, ExtInt, Point};
+use sulis_core::util::{invalid_data_error, ExtInt, Point, Offset, Scale};
 use sulis_module::on_trigger::QuestEntryState;
 use sulis_module::{
     area::{Destination, PathFinder, Trigger, TriggerKind},
@@ -1000,29 +1000,25 @@ impl GameState {
 
     pub fn draw_above_entities(
         renderer: &mut dyn GraphicsRenderer,
-        offset_x: f32,
-        offset_y: f32,
-        scale_x: f32,
-        scale_y: f32,
+        offset: Offset,
+        scale: Scale,
         millis: u32,
     ) {
         ANIMATIONS.with(|a| {
             a.borrow()
-                .draw_above_entities(renderer, offset_x, offset_y, scale_x, scale_y, millis)
+                .draw_above_entities(renderer, offset, scale, millis)
         });
     }
 
     pub fn draw_below_entities(
         renderer: &mut dyn GraphicsRenderer,
-        offset_x: f32,
-        offset_y: f32,
-        scale_x: f32,
-        scale_y: f32,
+        offset: Offset,
+        scale: Scale,
         millis: u32,
     ) {
         ANIMATIONS.with(|a| {
             a.borrow()
-                .draw_below_entities(renderer, offset_x, offset_y, scale_x, scale_y, millis)
+                .draw_below_entities(renderer, offset, scale, millis)
         });
     }
 

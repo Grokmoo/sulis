@@ -22,7 +22,7 @@ use sulis_core::image::Image;
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::resource::{Font, ResourceSet};
 use sulis_core::ui::{animation_state, Color, LineRenderer};
-use sulis_core::util::{self, Point};
+use sulis_core::util::{self, Point, Offset, Scale, Rect};
 use sulis_module::{DamageKind, HitFlags, HitKind};
 
 use crate::{AreaState, EntityState};
@@ -252,10 +252,8 @@ impl AreaFeedbackText {
         &mut self,
         renderer: &mut dyn GraphicsRenderer,
         params: &Params,
-        offset_x: f32,
-        offset_y: f32,
-        scale_x: f32,
-        scale_y: f32,
+        offset: Offset,
+        scale: Scale,
         millis: u32,
     ) {
         // creating the line renderer here is not ideal but is a low cost operation
@@ -265,11 +263,11 @@ impl AreaFeedbackText {
                 params.font.get_width(&self.total_text) as f32 / params.font.line_height as f32;
         }
 
-        let mut pos_x = offset_x + self.pos_x - params.scale * self.text_width / 2.0;
+        let mut pos_x = offset.x + self.pos_x - params.scale * self.text_width / 2.0;
         if pos_x < 0.0 {
             pos_x = 0.0;
         }
-        let pos_y = offset_y + self.pos_y - self.hover_y;
+        let pos_y = offset.y + self.pos_y - self.hover_y;
 
         for entry in &self.entries {
             let mut color = match entry.color_kind {
@@ -298,26 +296,25 @@ impl AreaFeedbackText {
                     IconKind::Graze => &params.graze_icon,
                 };
 
+                let rect = Rect { x: pos_x, y: pos_y + params.scale * 0.15, w, h };
                 let mut draw_list = DrawList::empty_sprite();
                 image.append_to_draw_list(
                     &mut draw_list,
                     state,
-                    pos_x,
-                    pos_y + params.scale * 0.15,
-                    w,
-                    h,
+                    rect,
                     millis,
                 );
-                draw_list.set_scale(scale_x, scale_y);
+                draw_list.set_scale(scale);
                 draw_list.set_color(color);
                 renderer.draw(draw_list);
 
                 pos_x += 1.5 * params.scale / params.font.line_height as f32
                     * params.font.get_char_width('w') as f32;
             } else {
+                let offset = Offset { x: pos_x, y: pos_y };
                 let (mut draw_list, next_x) =
-                    font_renderer.get_draw_list(&entry.text, pos_x, pos_y, params.scale);
-                draw_list.set_scale(scale_x, scale_y);
+                    font_renderer.get_draw_list(&entry.text, offset, params.scale);
+                draw_list.set_scale(scale);
                 draw_list.set_color(color);
                 renderer.draw(draw_list);
                 pos_x = next_x;

@@ -20,7 +20,7 @@ use std::rc::Rc;
 
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::ui::{animation_state, Callback, Color, Widget, WidgetKind};
-use sulis_core::util::Point;
+use sulis_core::util::{Scale, Offset, Point};
 use sulis_core::widgets::{Button, ScrollDirection, ScrollPane};
 use sulis_module::{Module, Prop};
 
@@ -49,19 +49,19 @@ impl EditorMode for PropPicker {
         &mut self,
         renderer: &mut dyn GraphicsRenderer,
         _model: &AreaModel,
-        x: f32,
-        y: f32,
-        scale_x: f32,
-        scale_y: f32,
+        offset: Offset,
+        scale: Scale,
         millis: u32,
     ) {
         for &(pos, ref prop) in self.removal_props.iter() {
-            let x = x + pos.x as f32;
-            let y = y + pos.y as f32;
+            let offset = Offset {
+                x: offset.x + pos.x as f32,
+                y: offset.y + pos.y as f32,
+            };
             let mut draw_list = DrawList::empty_sprite();
-            prop.append_to_draw_list(&mut draw_list, &animation_state::NORMAL, x, y, millis);
+            prop.append_to_draw_list(&mut draw_list, &animation_state::NORMAL, offset, millis);
             draw_list.set_color(Color::from_string("FFF8"));
-            draw_list.set_scale(scale_x, scale_y);
+            draw_list.set_scale(scale);
             renderer.draw(draw_list);
         }
 
@@ -76,11 +76,13 @@ impl EditorMode for PropPicker {
         };
 
         let mut draw_list = DrawList::empty_sprite();
-        let x = x + pos.x as f32;
-        let y = y + pos.y as f32;
-        prop.append_to_draw_list(&mut draw_list, &animation_state::NORMAL, x, y, millis);
+            let offset = Offset {
+                x: offset.x + pos.x as f32,
+                y: offset.y + pos.y as f32,
+            };
+        prop.append_to_draw_list(&mut draw_list, &animation_state::NORMAL, offset, millis);
         draw_list.set_color(Color::from_string("FFF8"));
-        draw_list.set_scale(scale_x, scale_y);
+        draw_list.set_scale(scale);
         renderer.draw(draw_list);
     }
 

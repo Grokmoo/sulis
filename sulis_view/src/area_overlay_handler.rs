@@ -22,6 +22,7 @@ use sulis_core::image::Image;
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::resource::{ResourceSet, Sprite};
 use sulis_core::ui::{animation_state, Cursor, LineRenderer, Theme, Widget};
+use sulis_core::util::{Offset, Rect, Scale};
 use sulis_module::Module;
 use sulis_state::{area_feedback_text::Params, AreaState, EntityState, GameState};
 
@@ -316,8 +317,7 @@ impl AreaOverlayHandler {
 
     pub fn get_path_draw_list(
         &self,
-        x_offset: f32,
-        y_offset: f32,
+        offset: Offset,
         millis: u32,
     ) -> Option<DrawList> {
         if !GameState::is_combat_active() {
@@ -336,15 +336,16 @@ impl AreaOverlayHandler {
         let mut draw_list = DrawList::empty_sprite();
 
         for p in &self.path[0..self.path.len() - 1] {
-            let x = p.0 - x_offset;
-            let y = p.1 - y_offset;
+            let rect = Rect {
+                x: p.0 - offset.x,
+                y: p.1 - offset.y,
+                w: 1.0,
+                h: 1.0,
+            };
             image.append_to_draw_list(
                 &mut draw_list,
                 &animation_state::NORMAL,
-                x,
-                y,
-                1.0,
-                1.0,
+                rect,
                 millis,
             );
         }
@@ -353,15 +354,16 @@ impl AreaOverlayHandler {
             None => (),
             Some(ref image) => {
                 let last = self.path.last().unwrap();
-                let x = last.0 - x_offset;
-                let y = last.1 - y_offset;
+                let rect = Rect {
+                    x: last.0 - offset.x,
+                    y: last.1 - offset.y,
+                    w: 1.0,
+                    h: 1.0,
+                };
                 image.append_to_draw_list(
                     &mut draw_list,
                     &animation_state::NORMAL,
-                    x,
-                    y,
-                    1.0,
-                    1.0,
+                    rect,
                     millis,
                 );
             }
@@ -374,8 +376,8 @@ impl AreaOverlayHandler {
         &self,
         renderer: &mut dyn GraphicsRenderer,
         params: &Params,
-        offset: (f32, f32),
-        scale: (f32, f32),
+        offset: Offset,
+        scale: Scale,
         millis: u32,
     ) {
         if let Some(ref image) = self.selection_box_image {
@@ -387,14 +389,13 @@ impl AreaOverlayHandler {
                     return;
                 }
 
+                let rect = Rect { x, y, w, h };
+
                 let mut draw_list = DrawList::empty_sprite();
                 image.append_to_draw_list(
                     &mut draw_list,
                     &animation_state::NORMAL,
-                    x,
-                    y,
-                    w,
-                    h,
+                    rect,
                     millis,
                 );
                 renderer.draw(draw_list);
@@ -410,14 +411,15 @@ impl AreaOverlayHandler {
             let (x, y) = match &self.hover_sprite {
                 None => (0.0, 0.0),
                 Some(hover) => (
-                    hover.x as f32 + offset.0,
-                    hover.y as f32 + hover.h as f32 + offset.1,
+                    hover.x as f32 + offset.x,
+                    hover.y as f32 + hover.h as f32 + offset.y,
                 ),
             };
 
-            let (mut draw_list, _) = font_rend.get_draw_list(&text, x, y, params.ap_scale);
+            let offset = Offset { x, y };
+            let (mut draw_list, _) = font_rend.get_draw_list(&text, offset, params.ap_scale);
             draw_list.set_color(params.ap_color);
-            draw_list.set_scale(scale.0, scale.1);
+            draw_list.set_scale(scale);
             renderer.draw(draw_list);
         }
     }

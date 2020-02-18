@@ -34,7 +34,7 @@ use crate::extern_image::{ImageBuffer, Rgba};
 use crate::config::{Config, IOAdapter};
 use crate::resource::Sprite;
 use crate::ui::{Color, Widget};
-use crate::util::{Point, Size};
+use crate::util::{Point, Rect, Scale, Size};
 
 #[derive(Debug, Clone)]
 pub struct DisplayConfiguration {
@@ -176,18 +176,11 @@ impl DrawList {
     }
 
     #[inline]
-    pub fn from_texture_id(
-        id: &str,
-        tex_coords: &[f32; 8],
-        x: f32,
-        y: f32,
-        w: f32,
-        h: f32,
-    ) -> DrawList {
-        let x_min = x;
-        let y_max = Config::ui_height() as f32 - y;
-        let x_max = x_min + w;
-        let y_min = y_max - h;
+    pub fn from_texture_id(id: &str, tex_coords: &[f32; 8], rect: Rect) -> DrawList {
+        let x_min = rect.x;
+        let y_max = Config::ui_height() as f32 - rect.y;
+        let x_max = x_min + rect.w;
+        let y_min = y_max - rect.h;
         let tc = tex_coords;
 
         let centroid = Some([(x_min + x_max) / 2.0, (y_min + y_max) / 2.0]);
@@ -228,18 +221,18 @@ impl DrawList {
     }
 
     #[inline]
-    pub fn from_sprite_f32(sprite: &Rc<Sprite>, x: f32, y: f32, w: f32, h: f32) -> DrawList {
-        DrawList::from_texture_id(&sprite.sheet_id, &sprite.tex_coords, x, y, w, h)
+    pub fn from_sprite_f32(sprite: &Rc<Sprite>, rect: Rect) -> DrawList {
+        DrawList::from_texture_id(&sprite.sheet_id, &sprite.tex_coords, rect)
     }
 
     #[inline]
-    pub fn from_sprite(sprite: &Rc<Sprite>, x: i32, y: i32, w: i32, h: i32) -> DrawList {
-        DrawList::from_sprite_f32(sprite, x as f32, y as f32, w as f32, h as f32)
+    pub fn from_sprite(sprite: &Rc<Sprite>, rect: Rect) -> DrawList {
+        DrawList::from_sprite_f32(sprite, rect)
     }
 
     #[inline]
-    pub fn set_scale(&mut self, scale_x: f32, scale_y: f32) {
-        self.scale = [scale_x, scale_y];
+    pub fn set_scale(&mut self, scale: Scale) {
+        self.scale = [scale.x, scale.y];
     }
 
     #[inline]

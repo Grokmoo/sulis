@@ -24,7 +24,7 @@ use sulis_core::image::{layered_image::Layer, Image, LayeredImage};
 use sulis_core::io::GraphicsRenderer;
 use sulis_core::resource::write_to_file;
 use sulis_core::ui::{Callback, Widget, WidgetKind};
-use sulis_core::util::Point;
+use sulis_core::util::{Scale, Offset, Point};
 use sulis_core::widgets::{list_box, Button, InputField, Label, MutuallyExclusiveListBox};
 use sulis_module::{
     ActorBuilder, AttributeList, Class, Faction, ImageLayer, InventoryBuilder, Module, Race, Sex,
@@ -267,7 +267,10 @@ impl WidgetKind for ActorCreatorWindow {
         let x = (child.inner_left() as f32) / scale_x;
         let y = (child.inner_top() as f32) / scale_y;
 
-        preview.draw(renderer, scale_x, scale_y, x, y, millis);
+        let offset = Offset { x, y };
+        let scale = Scale { x: scale_x, y: scale_y };
+
+        preview.draw(renderer, offset, scale, millis);
     }
 
     fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
@@ -310,8 +313,10 @@ impl WidgetKind for ActorCreatorWindow {
             entries.push(list_box::Entry::new(race, None));
         }
 
+        type ListBoxCb = list_box::Entry<Rc<Race>>;
+
         let window_ref = Rc::clone(&widget);
-        let cb: Rc<dyn Fn(Option<&list_box::Entry<Rc<Race>>>)> = Rc::new(move |active_entry| {
+        let cb: Rc<dyn Fn(Option<&ListBoxCb>)> = Rc::new(move |active_entry| {
             let window = Widget::kind_mut::<ActorCreatorWindow>(&window_ref);
             match active_entry {
                 None => window.selected_race = None,

@@ -23,7 +23,7 @@ use sulis_core::image::{Image, LayeredImage};
 use sulis_core::io::GraphicsRenderer;
 use sulis_core::resource::ResourceSet;
 use sulis_core::ui::{Callback, Color, Widget, WidgetKind};
-use sulis_core::util::Point;
+use sulis_core::util::{Point, Scale, Offset};
 use sulis_core::widgets::{Button, InputField, Label, ScrollDirection, ScrollPane};
 use sulis_module::actor::Sex;
 use sulis_module::{ImageLayer, ImageLayerSet, ItemState, Race, Slot};
@@ -232,11 +232,16 @@ impl WidgetKind for CosmeticSelectorPane {
         };
 
         let child = self.preview.borrow();
-        let scale_x = 0.8 * child.state.inner_width() as f32 / preview.get_width_f32();
-        let scale_y = 0.8 * child.state.inner_height() as f32 / preview.get_height_f32();
-        let x = (child.state.inner_left() as f32) / scale_x + race.ticker_offset.0;
-        let y = (child.state.inner_top() as f32) / scale_y + race.ticker_offset.1;
-        preview.draw(renderer, scale_x, scale_y, x, y, millis);
+        let scale = Scale {
+            x: 0.8 * child.state.inner_width() as f32 / preview.get_width_f32(),
+            y: 0.8 * child.state.inner_height() as f32 / preview.get_height_f32(),
+        };
+        let offset = Offset {
+            x: (child.state.inner_left() as f32) / scale.x + race.ticker_offset.0,
+            y: (child.state.inner_top() as f32) / scale.y + race.ticker_offset.1,
+        };
+
+        preview.draw(renderer, offset, scale, millis);
     }
 
     fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {

@@ -21,7 +21,7 @@ use crate::image::Image;
 use crate::io::{DrawList, GraphicsRenderer};
 use crate::resource::{ResourceSet, Sprite};
 use crate::ui::AnimationState;
-use crate::util::Size;
+use crate::util::{Rect, Size};
 
 #[derive(Debug)]
 pub struct SimpleImage {
@@ -50,32 +50,20 @@ impl Image for SimpleImage {
         &self,
         renderer: &mut dyn GraphicsRenderer,
         _state: &AnimationState,
-        x: f32,
-        y: f32,
-        w: f32,
-        h: f32,
+        rect: Rect,
         _millis: u32,
     ) {
-        renderer.draw(DrawList::from_sprite_f32(&self.image_display, x, y, w, h));
+        renderer.draw(DrawList::from_sprite_f32(&self.image_display, rect));
     }
 
     fn append_to_draw_list(
         &self,
         draw_list: &mut DrawList,
         _state: &AnimationState,
-        x: f32,
-        y: f32,
-        w: f32,
-        h: f32,
+        rect: Rect,
         _millis: u32,
     ) {
-        draw_list.append(&mut DrawList::from_sprite_f32(
-            &self.image_display,
-            x,
-            y,
-            w,
-            h,
-        ));
+        draw_list.append(&mut DrawList::from_sprite_f32(&self.image_display, rect));
     }
 
     fn get_width_f32(&self) -> f32 {

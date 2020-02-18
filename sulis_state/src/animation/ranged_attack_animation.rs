@@ -22,6 +22,7 @@ use crate::{script::ScriptEntitySet, EntityState, GameState, ScriptCallback};
 use sulis_core::image::Image;
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::ui::animation_state;
+use sulis_core::util::{Offset, Scale, Rect};
 
 pub(in crate::animation) fn update(
     attacker: &Rc<RefCell<EntityState>>,
@@ -102,24 +103,26 @@ pub(in crate::animation) fn cleanup(owner: &Rc<RefCell<EntityState>>) {
 pub(in crate::animation) fn draw(
     model: &RangedAttackAnimModel,
     renderer: &mut dyn GraphicsRenderer,
-    offset_x: f32,
-    offset_y: f32,
-    scale_x: f32,
-    scale_y: f32,
+    offset: Offset,
+    scale: Scale,
     millis: u32,
 ) {
     if let Some(ref projectile) = model.projectile {
+        let rect = Rect {
+            x: model.cur_pos.0 + offset.x,
+            y: model.cur_pos.1 + offset.y,
+            w: projectile.get_width_f32(),
+            h: projectile.get_height_f32(),
+        };
+
         let mut draw_list = DrawList::empty_sprite();
         projectile.append_to_draw_list(
             &mut draw_list,
             &animation_state::NORMAL,
-            model.cur_pos.0 + offset_x,
-            model.cur_pos.1 + offset_y,
-            projectile.get_width_f32(),
-            projectile.get_height_f32(),
+            rect,
             millis,
         );
-        draw_list.set_scale(scale_x, scale_y);
+        draw_list.set_scale(scale);
         draw_list.rotate(model.angle);
         renderer.draw(draw_list);
     }

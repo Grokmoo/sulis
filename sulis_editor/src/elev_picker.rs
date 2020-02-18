@@ -22,7 +22,7 @@ use sulis_core::config::Config;
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::resource::{ResourceSet, Sprite};
 use sulis_core::ui::{Callback, Color, Widget, WidgetKind};
-use sulis_core::util::Point;
+use sulis_core::util::{Offset, Scale, Point, Rect};
 use sulis_core::widgets::{Label, Spinner};
 use sulis_module::area::MAX_AREA_SIZE;
 
@@ -70,10 +70,8 @@ impl EditorMode for ElevPicker {
         &mut self,
         renderer: &mut dyn GraphicsRenderer,
         model: &AreaModel,
-        x_offset: f32,
-        y_offset: f32,
-        scale_x: f32,
-        scale_y: f32,
+        offset: Offset,
+        scale: Scale,
         _millis: u32,
     ) {
         let mut draw_list = DrawList::empty_sprite();
@@ -84,12 +82,13 @@ impl EditorMode for ElevPicker {
                     continue;
                 }
                 let sprite = &self.elev_tiles[elev];
-                let x = x as f32 + x_offset;
-                let y = y as f32 + y_offset;
-                draw_list.append(&mut DrawList::from_sprite_f32(&sprite, x, y, 1.0, 1.0));
+                let x = x as f32 + offset.x;
+                let y = y as f32 + offset.y;
+                let rect = Rect { x, y, w: 1.0, h: 1.0 };
+                draw_list.append(&mut DrawList::from_sprite_f32(&sprite, rect));
             }
         }
-        draw_list.set_scale(scale_x, scale_y);
+        draw_list.set_scale(scale);
 
         renderer.draw(draw_list);
 
@@ -97,18 +96,19 @@ impl EditorMode for ElevPicker {
         if let Some(pos) = self.cursor_pos {
             for y in 0..self.brush_size {
                 for x in 0..self.brush_size {
-                    let x = x as f32 + pos.x as f32 + x_offset;
-                    let y = y as f32 + pos.y as f32 + y_offset;
+                    let rect = Rect {
+                        x: x as f32 + pos.x as f32 + offset.x,
+                           y: y as f32 + pos.y as f32 + offset.y,
+                              w: 1.0,
+                              h: 1.0,
+                    };
                     draw_list.append(&mut DrawList::from_sprite_f32(
                         &self.cursor_sprite,
-                        x,
-                        y,
-                        1.0,
-                        1.0,
+                        rect,
                     ));
                 }
             }
-            draw_list.set_scale(scale_x, scale_y);
+            draw_list.set_scale(scale);
             draw_list.set_color(Color::from_string("0F08"));
             renderer.draw(draw_list);
         }

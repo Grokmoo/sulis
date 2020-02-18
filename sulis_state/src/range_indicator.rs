@@ -22,7 +22,7 @@ use sulis_core::image::Image;
 use sulis_core::io::DrawList;
 use sulis_core::resource::ResourceSet;
 use sulis_core::ui::animation_state;
-use sulis_core::util::Point;
+use sulis_core::util::{Offset, Point, Rect};
 
 use crate::{is_within, EntityState, GameState};
 use sulis_module::{ability::Range, Ability};
@@ -239,12 +239,11 @@ impl RangeIndicator {
     pub fn get_draw_list(
         &self,
         image_set: &RangeIndicatorImageSet,
-        x_offset: f32,
-        y_offset: f32,
+        offset: Offset,
         millis: u32,
     ) -> DrawList {
-        let x_offset = x_offset - self.parent.borrow().location.x as f32;
-        let y_offset = y_offset - self.parent.borrow().location.y as f32;
+        let x_offset = offset.x - self.parent.borrow().location.x as f32;
+        let y_offset = offset.y - self.parent.borrow().location.y as f32;
         let mut draw_list = DrawList::empty_sprite();
 
         let half_width_f32 = self.half_width as f32;
@@ -253,14 +252,17 @@ impl RangeIndicator {
             for x in 0..width {
                 let n = self.neighbors[x + y * width];
 
+                let rect = Rect {
+                    x: x as f32 - x_offset - half_width_f32,
+                    y: y as f32 - y_offset - half_width_f32,
+                    w: 1.0,
+                    h: 1.0,
+                };
                 if let Some(ref image) = image_set.images[n as usize] {
                     image.append_to_draw_list(
                         &mut draw_list,
                         &animation_state::NORMAL,
-                        x as f32 - x_offset - half_width_f32,
-                        y as f32 - y_offset - half_width_f32,
-                        1.0,
-                        1.0,
+                        rect,
                         millis,
                     );
                 }

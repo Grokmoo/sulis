@@ -22,7 +22,7 @@ use crate::image::{Image, SimpleImage};
 use crate::io::{DrawList, GraphicsRenderer};
 use crate::resource::ResourceSet;
 use crate::ui::AnimationState;
-use crate::util::{invalid_data_error, Size};
+use crate::util::{invalid_data_error, Rect, Size};
 
 const GRID_DIM: i32 = 3;
 const GRID_LEN: i32 = GRID_DIM * GRID_DIM;
@@ -157,79 +157,75 @@ impl Image for ComposedImage {
         &self,
         draw_list: &mut DrawList,
         state: &AnimationState,
-        x: f32,
-        y: f32,
-        w: f32,
-        h: f32,
+        rect: Rect,
         millis: u32,
     ) {
-        let fill_width = w - (self.size.width - self.middle_size.width) as f32;
-        let fill_height = h - (self.size.height - self.middle_size.height) as f32;
+        let fill_width = rect.w - (self.size.width - self.middle_size.width) as f32;
+        let fill_height = rect.h - (self.size.height - self.middle_size.height) as f32;
 
         let image = &self.images[0];
-        let mut draw_x = x;
-        let mut draw_y = y;
-        let mut draw_w = image.get_width_f32();
-        let mut draw_h = image.get_height_f32();
-        image.append_to_draw_list(draw_list, state, draw_x, draw_y, draw_w, draw_h, millis);
+        let mut draw = Rect {
+            x: rect.x,
+            y: rect.y,
+            w: image.get_width_f32(),
+            h: image.get_height_f32(),
+        };
+        image.append_to_draw_list(draw_list, state, draw, millis);
 
-        draw_x += image.get_width_f32();
+        draw.x += image.get_width_f32();
         let image = &self.images[1];
-        draw_w = fill_width;
-        image.append_to_draw_list(draw_list, state, draw_x, draw_y, draw_w, draw_h, millis);
+        draw.w = fill_width;
+        image.append_to_draw_list(draw_list, state, draw, millis);
 
-        draw_x += fill_width;
+        draw.x += fill_width;
         let image = &self.images[2];
-        draw_w = image.get_width_f32();
-        image.append_to_draw_list(draw_list, state, draw_x, draw_y, draw_w, draw_h, millis);
+        draw.w = image.get_width_f32();
+        image.append_to_draw_list(draw_list, state, draw, millis);
 
-        draw_x = x;
-        draw_y += image.get_height_f32();
+        draw.x = rect.x;
+        draw.y += image.get_height_f32();
         let image = &self.images[3];
-        draw_w = image.get_width_f32();
-        draw_h = fill_height;
-        image.append_to_draw_list(draw_list, state, draw_x, draw_y, draw_w, draw_h, millis);
+        draw.w = image.get_width_f32();
+        draw.h = fill_height;
+        image.append_to_draw_list(draw_list, state, draw, millis);
 
-        draw_x += image.get_width_f32();
+        draw.x += image.get_width_f32();
         let image = &self.images[4];
-        draw_w = fill_width;
-        image.append_to_draw_list(draw_list, state, draw_x, draw_y, draw_w, draw_h, millis);
+        draw.w = fill_width;
+        image.append_to_draw_list(draw_list, state, draw, millis);
 
-        draw_x += fill_width;
+        draw.x += fill_width;
         let image = &self.images[5];
-        draw_w = image.get_width_f32();
-        image.append_to_draw_list(draw_list, state, draw_x, draw_y, draw_w, draw_h, millis);
+        draw.w = image.get_width_f32();
+        image.append_to_draw_list(draw_list, state, draw, millis);
 
-        draw_x = x;
-        draw_y += fill_height;
+        draw.x = rect.x;
+        draw.y += fill_height;
         let image = &self.images[6];
-        draw_w = image.get_width_f32();
-        draw_h = image.get_height_f32();
-        image.append_to_draw_list(draw_list, state, draw_x, draw_y, draw_w, draw_h, millis);
+        draw.w = image.get_width_f32();
+        draw.h = image.get_height_f32();
+        image.append_to_draw_list(draw_list, state, draw, millis);
 
-        draw_x += image.get_width_f32();
+        draw.x += image.get_width_f32();
         let image = &self.images[7];
-        draw_w = fill_width;
-        image.append_to_draw_list(draw_list, state, draw_x, draw_y, draw_w, draw_h, millis);
+        draw.w = fill_width;
+        image.append_to_draw_list(draw_list, state, draw, millis);
 
-        draw_x += fill_width;
+        draw.x += fill_width;
         let image = &self.images[8];
-        draw_w = image.get_width_f32();
-        image.append_to_draw_list(draw_list, state, draw_x, draw_y, draw_w, draw_h, millis);
+        draw.w = image.get_width_f32();
+        image.append_to_draw_list(draw_list, state, draw, millis);
     }
 
     fn draw(
         &self,
         renderer: &mut dyn GraphicsRenderer,
         state: &AnimationState,
-        x: f32,
-        y: f32,
-        w: f32,
-        h: f32,
+        rect: Rect,
         millis: u32,
     ) {
         let mut draw_list = DrawList::empty_sprite();
-        self.append_to_draw_list(&mut draw_list, state, x, y, w, h, millis);
+        self.append_to_draw_list(&mut draw_list, state, rect, millis);
         renderer.draw(draw_list);
     }
 

@@ -22,7 +22,7 @@ use crate::config::Config;
 use crate::io::{event::ClickKind, GraphicsRenderer};
 use crate::ui::theme::SizeRelative;
 use crate::ui::{Widget, WidgetKind};
-use crate::util::{Point, Size};
+use crate::util::{Point, Size, Offset};
 use crate::widget_kind;
 use crate::widgets::MarkupRenderer;
 
@@ -167,7 +167,8 @@ impl WidgetKind for TextArea {
         // let start_time = time::Instant::now();
         let x = widget.state.inner_left() as f32;
         let y = widget.state.inner_top() as f32;
-        font_rend.render(renderer, x, y, &widget.state);
+        let offset = Offset { x, y };
+        font_rend.render(renderer, offset, &widget.state);
         // info!("Text Area render time: {}", util::format_elapsed_secs(start_time.elapsed()));
     }
 }

@@ -20,7 +20,7 @@ use std::rc::Rc;
 
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::ui::{Callback, Color, Widget, WidgetKind};
-use sulis_core::util::Point;
+use sulis_core::util::{Scale, Offset, Rect, Point};
 use sulis_core::widgets::{Button, ScrollDirection, ScrollPane};
 use sulis_module::area::Tile;
 use sulis_module::Module;
@@ -52,28 +52,27 @@ impl EditorMode for TilePicker {
         &mut self,
         renderer: &mut dyn GraphicsRenderer,
         _model: &AreaModel,
-        x: f32,
-        y: f32,
-        scale_x: f32,
-        scale_y: f32,
+        offset: Offset,
+        scale: Scale,
         _millis: u32,
     ) {
         if !self.removal_tiles.is_empty() {
             let mut draw_list = DrawList::empty_sprite();
             for &(pos, ref tile) in self.removal_tiles.iter() {
-                let x = x + pos.x as f32;
-                let y = y + pos.y as f32;
+                let rect = Rect {
+                    x: offset.x + pos.x as f32,
+                    y: offset.y + pos.y as f32,
+                    w: tile.width as f32,
+                    h: tile.height as f32,
+                };
                 draw_list.append(&mut DrawList::from_sprite_f32(
                     &tile.image_display,
-                    x,
-                    y,
-                    tile.width as f32,
-                    tile.height as f32,
+                    rect,
                 ));
             }
 
             draw_list.set_color(Color::from_string("F008"));
-            draw_list.set_scale(scale_x, scale_y);
+            draw_list.set_scale(scale);
             renderer.draw(draw_list);
         }
 
@@ -87,17 +86,18 @@ impl EditorMode for TilePicker {
             Some(pos) => pos,
         };
 
-        let x = x + pos.x as f32;
-        let y = y + pos.y as f32;
+        let rect = Rect {
+            x: offset.x + pos.x as f32,
+            y: offset.y + pos.y as f32,
+            w: tile.width as f32,
+            h: tile.height as f32,
+        };
         let mut draw_list = DrawList::from_sprite_f32(
             &tile.image_display,
-            x,
-            y,
-            tile.width as f32,
-            tile.height as f32,
+            rect,
         );
         draw_list.set_color(Color::from_string("FFF8"));
-        draw_list.set_scale(scale_x, scale_y);
+        draw_list.set_scale(scale);
         renderer.draw(draw_list);
     }
 

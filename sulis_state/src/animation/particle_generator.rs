@@ -24,7 +24,7 @@ use sulis_core::config::Config;
 use sulis_core::image::Image;
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::ui::{animation_state, Color};
-use sulis_core::util::{approx_eq, gen_rand, ExtInt};
+use sulis_core::util::{approx_eq, gen_rand, ExtInt, Offset, Scale, Rect};
 
 #[allow(clippy::trivially_copy_pass_by_ref)]
 fn is_zero(val: &f32) -> bool {
@@ -373,41 +373,38 @@ pub(in crate::animation) fn draw(
     model: &GeneratorModel,
     owner: &Rc<RefCell<EntityState>>,
     renderer: &mut dyn GraphicsRenderer,
-    offset_x: f32,
-    offset_y: f32,
-    scale_x: f32,
-    scale_y: f32,
+    offset: Offset,
+    scale: Scale,
     _millis: u32,
 ) {
     let (offset_x, offset_y) = if model.moves_with_parent {
         let parent = owner.borrow();
         let x = parent.location.x as f32 + parent.size.width as f32 / 2.0 + parent.sub_pos.0;
         let y = parent.location.y as f32 + parent.size.height as f32 / 2.0 + parent.sub_pos.1;
-        (x + offset_x, y + offset_y)
+        (x + offset.x, y + offset.y)
     } else {
-        (offset_x, offset_y)
+        (offset.x, offset.y)
     };
 
     let mut draw_list = DrawList::empty_sprite();
     for particle in state.particles.iter() {
-        let x = particle.position.0.value + offset_x;
-        let y = particle.position.1.value + offset_y;
-        let w = particle.width;
-        let h = particle.height;
+        let rect = Rect {
+            x: particle.position.0.value + offset_x,
+            y: particle.position.1.value + offset_y,
+            w: particle.width,
+            h: particle.height,
+        };
         let millis = (particle.current_duration * 1000.0) as u32;
         state.image.append_to_draw_list(
             &mut draw_list,
             &animation_state::NORMAL,
-            x,
-            y,
-            w,
-            h,
+            rect,
             millis,
         );
     }
 
     if !draw_list.is_empty() {
-        draw_list.set_scale(scale_x, scale_y);
+        draw_list.set_scale(scale);
         draw_list.set_color(Color::new(
             model.red.value,
             model.green.value,

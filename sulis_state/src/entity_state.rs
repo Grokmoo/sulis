@@ -29,11 +29,11 @@ use crate::script::{self, CallbackData, ScriptEntitySet};
 use crate::{
     entity_attack_handler::weapon_attack, is_within_attack_dist, ActorState, AreaState,
     ChangeListenerList, EntityTextureCache, EntityTextureSlot, GameState, Location, ScriptCallback,
-    TurnManager,
+    TurnManager, entity_texture_cache::Slot,
 };
 use sulis_core::io::GraphicsRenderer;
 use sulis_core::ui::{color, Color};
-use sulis_core::util::invalid_data_error;
+use sulis_core::util::{Scale, Offset, invalid_data_error};
 use sulis_module::area::MAX_AREA_SIZE;
 use sulis_module::{
     actor::Faction, ai, Actor, DamageKind, HitKind, Module, ObjectSize, ObjectSizeIterator,
@@ -542,23 +542,22 @@ impl EntityState {
     pub fn draw_no_pos(
         &self,
         renderer: &mut dyn GraphicsRenderer,
-        scale_x: f32,
-        scale_y: f32,
-        x: f32,
-        y: f32,
+        offset: Offset,
+        scale: Scale,
         alpha: f32,
     ) {
         let a = self.color.a * alpha;
         let color = Color::new(self.color.r, self.color.g, self.color.b, a);
         if let Some(ref slot) = self.texture_cache_slot {
+            let slot_loc = Slot {
+                x: offset.x,
+                y: offset.y,
+            };
             slot.draw(
                 renderer,
-                x,
-                y,
-                0.0,
-                0.0,
-                scale_x,
-                scale_y,
+                slot_loc,
+                Offset::default(),
+                scale,
                 color,
                 self.color_sec,
             );
@@ -576,8 +575,7 @@ pub trait AreaDrawable {
     fn draw(
         &self,
         renderer: &mut dyn GraphicsRenderer,
-        scale_x: f32,
-        scale_y: f32,
+        scale: Scale,
         x: f32,
         y: f32,
         millis: u32,
@@ -609,8 +607,7 @@ impl AreaDrawable for EntityState {
     fn draw(
         &self,
         renderer: &mut dyn GraphicsRenderer,
-        scale_x: f32,
-        scale_y: f32,
+        scale: Scale,
         x: f32,
         y: f32,
         _millis: u32,
@@ -636,15 +633,14 @@ impl AreaDrawable for EntityState {
             self.color.b * color.b,
             self.color.a * color.a,
         );
+        let offset = Offset { x: offset_x, y: offset_y };
+        let slot_loc = Slot { x, y };
         if let Some(ref slot) = self.texture_cache_slot {
             slot.draw(
                 renderer,
-                x,
-                y,
-                offset_x,
-                offset_y,
-                scale_x,
-                scale_y,
+                slot_loc,
+                offset,
+                scale,
                 color,
                 self.color_sec,
             );

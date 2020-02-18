@@ -20,7 +20,7 @@ use std::rc::Rc;
 
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::ui::{animation_state, AnimationState, Color};
-use sulis_core::util::{self, invalid_data_error};
+use sulis_core::util::{self, invalid_data_error, Scale, Offset};
 use sulis_module::area::PropData;
 use sulis_module::{prop, ItemState, LootList, Module, ObjectSizeIterator, Prop};
 
@@ -398,9 +398,9 @@ impl PropState {
         self.animation_state.contains(animation_state::Kind::Active)
     }
 
-    pub fn append_to_draw_list(&self, draw_list: &mut DrawList, x: f32, y: f32, millis: u32) {
+    pub fn append_to_draw_list(&self, draw_list: &mut DrawList, offset: Offset, millis: u32) {
         self.prop
-            .append_to_draw_list(draw_list, &self.animation_state, x, y, millis);
+            .append_to_draw_list(draw_list, &self.animation_state, offset, millis);
     }
 }
 
@@ -415,20 +415,21 @@ impl AreaDrawable for PropState {
     fn draw(
         &self,
         renderer: &mut dyn GraphicsRenderer,
-        scale_x: f32,
-        scale_y: f32,
+        scale: Scale,
         x: f32,
         y: f32,
         millis: u32,
         color: Color,
     ) {
-        let x = x + self.location.x as f32;
-        let y = y + self.location.y as f32;
+        let pos = Offset {
+            x: x + self.location.x as f32,
+            y: y + self.location.y as f32,
+        };
 
         let mut draw_list = DrawList::empty_sprite();
-        draw_list.set_scale(scale_x, scale_y);
+        draw_list.set_scale(scale);
         draw_list.set_color(color);
-        self.append_to_draw_list(&mut draw_list, x, y, millis + self.millis_offset);
+        self.append_to_draw_list(&mut draw_list, pos, millis + self.millis_offset);
         renderer.draw(draw_list);
     }
 

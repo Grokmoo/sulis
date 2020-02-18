@@ -21,15 +21,17 @@ use std::rc::Rc;
 use sulis_core::io::event::ClickKind;
 use sulis_core::io::{GraphicsRenderer, InputAction};
 use sulis_core::ui::{compute_area_scaling, Cursor, Scrollable, Widget, WidgetKind};
-use sulis_core::util::Point;
+use sulis_core::util::{Scale, Offset, Point};
 use sulis_module::area::MAX_AREA_SIZE;
 
 use crate::{AreaModel, EditorMode};
 
 const NAME: &str = "area_editor";
 
+type EditorModeRef = Rc<RefCell<dyn EditorMode>>;
+
 pub struct AreaEditor {
-    cur_editor: Option<Rc<RefCell<dyn EditorMode>>>,
+    cur_editor: Option<EditorModeRef>,
     pub(crate) model: AreaModel,
 
     scroll: Scrollable,
@@ -55,7 +57,7 @@ impl AreaEditor {
         self.cur_editor = None;
     }
 
-    pub fn set_editor(&mut self, editor: Rc<RefCell<dyn EditorMode>>) {
+    pub fn set_editor(&mut self, editor: EditorModeRef) {
         self.cur_editor = Some(editor);
     }
 
@@ -77,7 +79,7 @@ impl AreaEditor {
     fn get_event_data(
         &self,
         widget: &Rc<RefCell<Widget>>,
-    ) -> Option<(Rc<RefCell<dyn EditorMode>>, i32, i32)> {
+    ) -> Option<(EditorModeRef, i32, i32)> {
         let editor = match self.cur_editor {
             None => return None,
             Some(ref editor) => editor,
@@ -110,7 +112,7 @@ impl WidgetKind for AreaEditor {
         millis: u32,
     ) {
         self.scale = compute_area_scaling(pixel_size);
-        let (scale_x, scale_y) = self.scale;
+        let scale = Scale { x: self.scale.0, y: self.scale.1 };
 
         let p = widget.state.position();
         // TODO fix this hack
@@ -118,10 +120,11 @@ impl WidgetKind for AreaEditor {
 
         self.model.draw(
             renderer,
-            p.x as f32 - self.scroll.x(),
-            p.y as f32 - self.scroll.y(),
-            scale_x,
-            scale_y,
+            Offset {
+                x: p.x as f32 - self.scroll.x(),
+                y: p.y as f32 - self.scroll.y(),
+            },
+            scale,
             millis,
         );
 
@@ -130,10 +133,11 @@ impl WidgetKind for AreaEditor {
             editor.draw_mode(
                 renderer,
                 &self.model,
-                p.x as f32 - self.scroll.x(),
-                p.y as f32 - self.scroll.y(),
-                scale_x,
-                scale_y,
+                Offset {
+                    x: p.x as f32 - self.scroll.x(),
+                    y: p.y as f32 - self.scroll.y(),
+                },
+                scale,
                 millis,
             );
         }

@@ -22,7 +22,7 @@ use sulis_core::config::Config;
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::resource::{ResourceSet, Sprite};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
-use sulis_core::util::Point;
+use sulis_core::util::{Scale, Offset, Rect, Point};
 use sulis_core::widgets::{Button, Label, ScrollDirection, ScrollPane, Spinner};
 use sulis_module::{Encounter, Module};
 
@@ -66,10 +66,8 @@ impl EditorMode for EncounterPicker {
         &mut self,
         renderer: &mut dyn GraphicsRenderer,
         _model: &AreaModel,
-        x: f32,
-        y: f32,
-        scale_x: f32,
-        scale_y: f32,
+        offset: Offset,
+        scale: Scale,
         _millis: u32,
     ) {
         match self.cur_encounter {
@@ -83,12 +81,14 @@ impl EditorMode for EncounterPicker {
         };
 
         if let Some(ref sprite) = self.encounter_sprite {
-            let x = x + pos.x as f32;
-            let y = y + pos.y as f32;
-            let w = self.cur_width as f32;
-            let h = self.cur_height as f32;
-            let mut draw_list = DrawList::from_sprite_f32(sprite, x, y, w, h);
-            draw_list.set_scale(scale_x, scale_y);
+            let rect = Rect {
+                x: offset.x + pos.x as f32,
+                y: offset.y + pos.y as f32,
+                w: self.cur_width as f32,
+                h: self.cur_height as f32,
+            };
+            let mut draw_list = DrawList::from_sprite_f32(sprite, rect);
+            draw_list.set_scale(scale);
             renderer.draw(draw_list);
         }
     }

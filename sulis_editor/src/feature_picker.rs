@@ -20,7 +20,7 @@ use std::rc::Rc;
 
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
-use sulis_core::util::Point;
+use sulis_core::util::{Scale, Offset, Rect, Point};
 use sulis_core::widgets::{Button, ScrollDirection, ScrollPane};
 use sulis_module::{area::tile::Feature, Module};
 
@@ -31,20 +31,21 @@ const NAME: &str = "feature_picker";
 fn draw(
     feature: &Rc<Feature>,
     renderer: &mut dyn GraphicsRenderer,
-    x: f32,
-    y: f32,
-    s_x: f32,
-    s_y: f32,
+    offset: Offset,
+    scale: Scale,
 ) {
     for (tile, p) in &feature.preview {
+        let rect = Rect {
+            x: offset.x + p.x as f32,
+            y: offset.y + p.y as f32,
+            w: tile.width as f32,
+            h: tile.height as f32,
+        };
         let mut draw_list = DrawList::from_sprite_f32(
             &tile.image_display,
-            x + p.x as f32,
-            y + p.y as f32,
-            tile.width as f32,
-            tile.height as f32,
+            rect,
         );
-        draw_list.set_scale(s_x, s_y);
+        draw_list.set_scale(scale);
         renderer.draw(draw_list);
     }
 }
@@ -68,10 +69,8 @@ impl EditorMode for FeaturePicker {
         &mut self,
         renderer: &mut dyn GraphicsRenderer,
         _model: &AreaModel,
-        x: f32,
-        y: f32,
-        scale_x: f32,
-        scale_y: f32,
+        offset: Offset,
+        scale: Scale,
         _millis: u32,
     ) {
         let feature = match self.cur_feature {
@@ -87,10 +86,11 @@ impl EditorMode for FeaturePicker {
         draw(
             feature,
             renderer,
-            x + pos.x as f32,
-            y + pos.y as f32,
-            scale_x,
-            scale_y,
+            Offset {
+                x: offset.x + pos.x as f32,
+                y: offset.y + pos.y as f32,
+            },
+            scale,
         );
     }
 

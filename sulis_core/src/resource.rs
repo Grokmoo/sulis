@@ -138,7 +138,12 @@ impl ResourceSet {
             set.images.insert(empty.id(), empty);
 
             for (id, image) in builder_set.simple_builders {
-                insert_if_ok_boxed("image", id, SimpleImage::generate(image, &set), &mut set.images);
+                insert_if_ok_boxed(
+                    "image",
+                    id,
+                    SimpleImage::generate(image, &set),
+                    &mut set.images,
+                );
             }
 
             for (id, image) in builder_set.composed_builders {
@@ -169,7 +174,12 @@ impl ResourceSet {
             }
 
             for (id, image) in builder_set.window_builders {
-                insert_if_ok_boxed("image", id, WindowImage::generate(image, &set), &mut set.images);
+                insert_if_ok_boxed(
+                    "image",
+                    id,
+                    WindowImage::generate(image, &set),
+                    &mut set.images,
+                );
             }
 
             Ok(())

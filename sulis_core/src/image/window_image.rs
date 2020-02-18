@@ -22,7 +22,7 @@ use crate::image::Image;
 use crate::io::{DrawList, GraphicsRenderer};
 use crate::resource::{ResourceSet, Sprite};
 use crate::ui::AnimationState;
-use crate::util::Size;
+use crate::util::{Rect, Size};
 
 /// An animated image with a moving window that covers part of the
 /// image and changes over time.
@@ -52,7 +52,7 @@ impl WindowImage {
         }))
     }
 
-    fn get_draw_list(&self, x: f32, y: f32, w: f32, h: f32, millis: u32) -> DrawList {
+    fn get_draw_list(&self, rect: Rect, millis: u32) -> DrawList {
         let time = millis as f32 / 1000.0;
 
         let rel_x = self.initial.x + self.delta.x * time;
@@ -72,12 +72,17 @@ impl WindowImage {
         let y_max = abs_y + abs_h * rel_h;
 
         let tc = [x_min, y_max, x_min, y_min, x_max, y_max, x_max, y_min];
-        let mut list =
-            DrawList::from_texture_id(&self.image.sheet_id, &tc, x, y, w * rel_w, h * rel_h);
+        let draw = Rect {
+            x: rect.x,
+            y: rect.y,
+            w: rect.w * rel_w,
+            h: rect.h * rel_h,
+        };
+        let mut list = DrawList::from_texture_id(&self.image.sheet_id, &tc, draw);
 
-        let y_max = Config::ui_height() as f32 - y;
-        let y_min = y_max - h;
-        list.centroid = Some([x + w / 2.0, (y_max + y_min) / 2.0]);
+        let y_max = Config::ui_height() as f32 - rect.y;
+        let y_min = y_max - rect.h;
+        list.centroid = Some([rect.x + rect.w / 2.0, (y_max + y_min) / 2.0]);
         list
     }
 }
@@ -87,26 +92,20 @@ impl Image for WindowImage {
         &self,
         renderer: &mut dyn GraphicsRenderer,
         _state: &AnimationState,
-        x: f32,
-        y: f32,
-        w: f32,
-        h: f32,
+        rect: Rect,
         millis: u32,
     ) {
-        renderer.draw(self.get_draw_list(x, y, w, h, millis));
+        renderer.draw(self.get_draw_list(rect, millis));
     }
 
     fn append_to_draw_list(
         &self,
         draw_list: &mut DrawList,
         _state: &AnimationState,
-        x: f32,
-        y: f32,
-        w: f32,
-        h: f32,
+        rect: Rect,
         millis: u32,
     ) {
-        draw_list.append(&mut self.get_draw_list(x, y, w, h, millis));
+        draw_list.append(&mut self.get_draw_list(rect, millis));
     }
 
     fn get_width_f32(&self) -> f32 {
@@ -134,13 +133,4 @@ pub struct WindowImageBuilder {
     size: Size,
     initial: Rect,
     delta: Rect,
-}
-
-#[derive(Deserialize, Debug)]
-#[serde(deny_unknown_fields)]
-pub struct Rect {
-    x: f32,
-    y: f32,
-    w: f32,
-    h: f32,
 }

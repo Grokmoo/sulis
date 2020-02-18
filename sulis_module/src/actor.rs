@@ -24,7 +24,7 @@ use sulis_core::image::{Image, LayeredImage};
 use sulis_core::io::GraphicsRenderer;
 use sulis_core::resource::ResourceSet;
 use sulis_core::ui::Color;
-use sulis_core::util::unable_to_create_error;
+use sulis_core::util::{Scale, Offset, unable_to_create_error};
 
 use crate::{
     AITemplate, Ability, Class, Conversation, ImageLayer, ImageLayerSet, InventoryBuilder,
@@ -441,13 +441,11 @@ impl Actor {
     pub fn draw(
         &self,
         renderer: &mut dyn GraphicsRenderer,
-        scale_x: f32,
-        scale_y: f32,
-        x: f32,
-        y: f32,
+        offset: Offset,
+        scale: Scale,
         millis: u32,
     ) {
-        self.image.draw(renderer, scale_x, scale_y, x, y, millis);
+        self.image.draw(renderer, offset, scale, millis);
     }
 }
 

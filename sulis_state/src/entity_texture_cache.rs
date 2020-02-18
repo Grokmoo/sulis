@@ -20,9 +20,16 @@ use crate::{EntityState, GameState};
 use sulis_core::config::Config;
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::ui::Color;
+use sulis_core::util::{Offset, Scale, Rect};
 
 const BORDER_SIZE: i32 = 2;
 const BORDER_SIZE_F: f32 = BORDER_SIZE as f32;
+
+#[derive(Clone, Copy, Debug)]
+pub struct Slot {
+    pub x: f32,
+    pub y: f32,
+}
 
 #[derive(Clone)]
 pub struct EntityTextureSlot {
@@ -47,39 +54,39 @@ impl EntityTextureSlot {
             (self.y + self.h) * scale,
         );
 
-        let min_x = self.x as f32 + BORDER_SIZE_F;
-        let min_y = self.y as f32 + 2.0 * BORDER_SIZE_F;
         let (ui_x, ui_y) = Config::ui_size();
-        let scale_x = ui_x as f32 / self.slots_dim as f32;
-        let scale_y = ui_y as f32 / self.slots_dim as f32;
+
+        let offset = Offset { x: self.x as f32 + BORDER_SIZE_F, y: self.y as f32 + 2.0 * BORDER_SIZE_F };
+        let scale = Scale { x: ui_x as f32 / self.slots_dim as f32, y: ui_y as f32 / self.slots_dim as f32 };
 
         entity
             .actor
-            .draw_to_texture(renderer, &self.texture_id, scale_x, scale_y, min_x, min_y);
+            .draw_to_texture(renderer, &self.texture_id, offset, scale);
     }
 
     pub fn draw(
         &self,
         renderer: &mut dyn GraphicsRenderer,
-        x: f32,
-        y: f32,
-        offset_x: f32,
-        offset_y: f32,
-        scale_x: f32,
-        scale_y: f32,
+        slot: Slot,
+        offset: Offset,
+        scale: Scale,
         color: Color,
         color_sec: Color,
     ) {
+        let rect = Rect {
+            x: slot.x - BORDER_SIZE_F - offset.x,
+            y: slot.y - 2.0 * BORDER_SIZE_F - offset.y,
+            w: self.w as f32 + offset.x * 2.0,
+            h: self.h as f32 + offset.y * 2.0,
+        };
+
         let mut list = DrawList::from_texture_id(
             &self.texture_id,
             &self.tex_coords,
-            x - BORDER_SIZE_F - offset_x,
-            y - 2.0 * BORDER_SIZE_F - offset_y,
-            self.w as f32 + offset_x * 2.0,
-            self.h as f32 + offset_y * 2.0,
+            rect,
         );
 
-        list.set_scale(scale_x, scale_y);
+        list.set_scale(scale);
         list.set_color(color);
         list.set_color_sec(color_sec);
         renderer.draw(list);
@@ -140,19 +147,23 @@ impl EntityTextureCache {
 
         let slot_index = self.find_slot(width, height);
         let slot = &self.entity_slots[slot_index];
-        let x = slot.x as f32 + BORDER_SIZE_F;
-        let y = slot.y as f32 + 2.0 * BORDER_SIZE_F;
+        let offset = Offset {
+            x: slot.x as f32 + BORDER_SIZE_F,
+            y: slot.y as f32 + 2.0 * BORDER_SIZE_F,
+        };
 
         info!(
             "Drawing entity '{}' to slot {} at {},{}",
-            entity.actor.actor.id, slot_index, x, y
+            entity.actor.actor.id, slot_index, offset.x, offset.y,
         );
         let (ui_x, ui_y) = Config::ui_size();
-        let scale_x = ui_x as f32 / self.slots_dim as f32;
-        let scale_y = ui_y as f32 / self.slots_dim as f32;
+        let scale = Scale {
+            x: ui_x as f32 / self.slots_dim as f32,
+            y: ui_y as f32 / self.slots_dim as f32,
+        };
         entity
             .actor
-            .draw_to_texture(renderer, &self.texture_id, scale_x, scale_y, x, y);
+            .draw_to_texture(renderer, &self.texture_id, offset, scale);
 
         slot.clone()
     }

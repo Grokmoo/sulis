@@ -21,7 +21,7 @@ use std::rc::Rc;
 use sulis_core::image::Image;
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::ui::{animation_state, color, Cursor, LineRenderer};
-use sulis_core::util::Point;
+use sulis_core::util::{Offset, Point, Scale, Rect};
 use sulis_module::{Ability, Module, ObjectSize};
 
 use crate::script::{targeter, ScriptItemKind, TargeterData};
@@ -138,6 +138,13 @@ fn get_cursor_offset_from_size(size: &str) -> Point {
     Point::new(size.width / 2, size.height / 2)
 }
 
+#[derive(Copy, Clone, Debug)]
+struct LosParams {
+    impass_blocks: bool,
+    invis_blocks: bool,
+    src_elev: u8,
+}
+
 impl Shape {
     pub fn get_cursor_offset(&self) -> Point {
         use Shape::*;
@@ -201,9 +208,7 @@ impl Shape {
                 *length,
                 size,
                 &area_state,
-                src_elev,
-                impass_blocks,
-                invis_blocks,
+                LosParams { impass_blocks, invis_blocks, src_elev }
             ),
             Shape::LineSegment {
                 ref size,
@@ -214,9 +219,7 @@ impl Shape {
                 pos,
                 size,
                 &area_state,
-                src_elev,
-                impass_blocks,
-                invis_blocks,
+                LosParams { impass_blocks, invis_blocks, src_elev }
             ),
             Shape::ObjectSize { ref size } => self.get_points_object_size(pos, size, &area_state),
             Shape::Cone {
@@ -232,7 +235,6 @@ impl Shape {
                 *min_radius,
                 *radius,
                 *angle,
-                &area_state,
             ),
         };
 
@@ -270,6 +272,8 @@ impl Shape {
             });
         }
 
+        let los_params = LosParams { impass_blocks, invis_blocks, src_elev };
+
         if impass_blocks || invis_blocks {
             let start = Point::new(origin_x as i32, origin_y as i32);
             let size = "1by1"; // TODO don't hardcode this
@@ -281,9 +285,7 @@ impl Shape {
                             *p,
                             size,
                             &area_state,
-                            src_elev,
-                            impass_blocks,
-                            invis_blocks,
+                            los_params,
                         );
                         !concat
                     });
@@ -351,9 +353,7 @@ impl Shape {
         end: Point,
         size: &str,
         area_state: &AreaState,
-        src_elev: u8,
-        impass_blocks: bool,
-        invis_blocks: bool,
+        los_params: LosParams,
     ) -> Vec<Point> {
         trace!(
             "Computing line seg points from {},{} to {},{}",
@@ -368,9 +368,7 @@ impl Shape {
             end,
             size,
             area_state,
-            src_elev,
-            impass_blocks,
-            invis_blocks,
+            los_params,
         );
 
         if concat {
@@ -387,9 +385,7 @@ impl Shape {
         len: i32,
         size: &str,
         area_state: &AreaState,
-        src_elev: u8,
-        impass_blocks: bool,
-        invis_blocks: bool,
+        los_params: LosParams,
     ) -> Vec<Point> {
         if start.x == pos.x && start.y == pos.y {
             return Vec::new();
@@ -431,9 +427,7 @@ impl Shape {
             Point::new(end_x as i32, end_y as i32),
             size,
             area_state,
-            src_elev,
-            impass_blocks,
-            invis_blocks,
+            los_params,
         );
 
         points
@@ -446,9 +440,7 @@ impl Shape {
         end: Point,
         size: &str,
         area_state: &AreaState,
-        src_elev: u8,
-        impass_blocks: bool,
-        invis_blocks: bool,
+        los_params: LosParams,
     ) -> (Vec<Point>, bool) {
         let size = match Module::object_size(size) {
             None => {
@@ -465,9 +457,7 @@ impl Shape {
                     &area_state,
                     &size,
                     &mut p,
-                    impass_blocks,
-                    invis_blocks,
-                    src_elev,
+                    los_params,
                 );
                 (p, concated)
             } else {
@@ -476,9 +466,7 @@ impl Shape {
                     &area_state,
                     &size,
                     &mut p,
-                    impass_blocks,
-                    invis_blocks,
-                    src_elev,
+                    los_params,
                 );
                 (p, concated)
             }
@@ -489,9 +477,7 @@ impl Shape {
                     &area_state,
                     &size,
                     &mut p,
-                    impass_blocks,
-                    invis_blocks,
-                    src_elev,
+                    los_params,
                 );
                 (p, concated)
             } else {
@@ -500,9 +486,7 @@ impl Shape {
                     &area_state,
                     &size,
                     &mut p,
-                    impass_blocks,
-                    invis_blocks,
-                    src_elev,
+                    los_params,
                 );
                 (p, concated)
             }
@@ -522,16 +506,13 @@ impl Shape {
         &self,
         area: &AreaState,
         size: &ObjectSize,
-        x: i32,
-        y: i32,
-        impass_blocks: bool,
-        invis_blocks: bool,
-        src_elev: u8,
+        p: Point,
+        los_params: LosParams,
     ) -> bool {
-        let p_index = (x + y * area.area.width) as usize;
+        let p_index = (p.x + p.y * area.area.width) as usize;
 
-        if impass_blocks {
-            if !area.is_terrain_passable(&size.id, x, y) {
+        if los_params.impass_blocks {
+            if !area.is_terrain_passable(&size.id, p.x, p.y) {
                 return true;
             }
 
@@ -540,12 +521,12 @@ impl Shape {
             }
         }
 
-        if invis_blocks {
+        if los_params.invis_blocks {
             if !area.props().vis_grid(p_index) {
                 return true;
             }
 
-            if area.area.layer_set.elevation_index(p_index) > src_elev {
+            if area.area.layer_set.elevation_index(p_index) > los_params.src_elev {
                 return true;
             }
 
@@ -562,9 +543,7 @@ impl Shape {
         area: &AreaState,
         size: &ObjectSize,
         points: &mut Vec<Point>,
-        impass_blocks: bool,
-        invis_blocks: bool,
-        src_elev: u8,
+        los_params: LosParams,
     ) -> bool {
         let mut index = 0;
         loop {
@@ -575,11 +554,8 @@ impl Shape {
             if self.check_concat_break(
                 area,
                 size,
-                points[index].x,
-                points[index].y,
-                impass_blocks,
-                invis_blocks,
-                src_elev,
+                points[index],
+                los_params,
             ) {
                 break;
             }
@@ -601,20 +577,15 @@ impl Shape {
         area: &AreaState,
         size: &ObjectSize,
         points: &mut Vec<Point>,
-        impass_blocks: bool,
-        invis_blocks: bool,
-        src_elev: u8,
+        los_params: LosParams,
     ) -> bool {
         let mut index = points.len() - 1;
         loop {
             if self.check_concat_break(
                 area,
                 size,
-                points[index].x,
-                points[index].y,
-                impass_blocks,
-                invis_blocks,
-                src_elev,
+                points[index],
+                los_params,
             ) {
                 break;
             }
@@ -642,7 +613,6 @@ impl Shape {
         min_radius: f32,
         radius: f32,
         angular_size: f32,
-        _area_state: &AreaState,
     ) -> Vec<Point> {
         let pos = Point::new(origin_x.trunc() as i32, origin_y.trunc() as i32);
         let origin = (origin_x, origin_y);
@@ -871,16 +841,19 @@ impl AreaTargeter {
     fn draw_target(
         &self,
         target: &Rc<RefCell<EntityState>>,
-        x_offset: f32,
-        y_offset: f32,
+        offset: Offset,
     ) -> DrawList {
         let target = target.borrow();
+        let rect = Rect {
+            x: target.location.x as f32 - offset.x,
+            y: target.location.y as f32 - offset.y,
+            w: target.size.width as f32,
+            h: target.size.height as f32,
+        };
+
         DrawList::from_sprite_f32(
             &target.size.cursor_sprite,
-            target.location.x as f32 - x_offset,
-            target.location.y as f32 - y_offset,
-            target.size.width as f32,
-            target.size.height as f32,
+            rect
         )
     }
 
@@ -995,10 +968,8 @@ impl AreaTargeter {
         &mut self,
         renderer: &mut dyn GraphicsRenderer,
         tile: &Rc<dyn Image>,
-        x_offset: f32,
-        y_offset: f32,
-        scale_x: f32,
-        scale_y: f32,
+        offset: Offset,
+        scale: Scale,
         millis: u32,
         params: &Params,
     ) {
@@ -1009,37 +980,38 @@ impl AreaTargeter {
         let mut draw_list = DrawList::empty_sprite();
 
         for target in self.selectable.iter() {
-            draw_list.append(&mut self.draw_target(target, x_offset, y_offset));
+            draw_list.append(&mut self.draw_target(target, offset));
         }
 
         if !draw_list.is_empty() {
-            draw_list.set_scale(scale_x, scale_y);
+            draw_list.set_scale(scale);
             renderer.draw(draw_list);
         }
 
         let mut draw_list = DrawList::empty_sprite();
         for target in self.cur_effected.iter() {
-            draw_list.append(&mut self.draw_target(target, x_offset, y_offset));
+            draw_list.append(&mut self.draw_target(target, offset));
         }
-        draw_list.set_scale(scale_x, scale_y);
+        draw_list.set_scale(scale);
         draw_list.set_color(color::RED);
         renderer.draw(draw_list);
 
         let mut draw_list = DrawList::empty_sprite();
         for p in self.cur_points.iter() {
-            let x = p.x as f32 - x_offset;
-            let y = p.y as f32 - y_offset;
+            let rect = Rect {
+                x: p.x as f32 - offset.x,
+                y: p.y as f32 - offset.y,
+                w: 1.0,
+                h: 1.0
+            };
             tile.append_to_draw_list(
                 &mut draw_list,
                 &animation_state::NORMAL,
-                x,
-                y,
-                1.0,
-                1.0,
+                rect,
                 millis,
             );
         }
-        draw_list.set_scale(scale_x, scale_y);
+        draw_list.set_scale(scale);
         renderer.draw(draw_list);
 
         if let ScriptSource::Ability(ability) = &self.script_source {
@@ -1047,8 +1019,8 @@ impl AreaTargeter {
                 self.draw_ap_usage(
                     renderer,
                     params,
-                    (scale_x, scale_y),
-                    (x_offset, y_offset),
+                    offset,
+                    scale,
                     active.ap as i32,
                 );
             }
@@ -1059,8 +1031,8 @@ impl AreaTargeter {
         &self,
         renderer: &mut dyn GraphicsRenderer,
         params: &Params,
-        scale: (f32, f32),
-        offset: (f32, f32),
+        offset: Offset,
+        scale: Scale,
         ap: i32,
     ) {
         if !GameState::is_combat_active() {
@@ -1091,11 +1063,12 @@ impl AreaTargeter {
 
         let font_rend = LineRenderer::new(&params.font);
         let text = format!("{} AP", Module::rules().format_ap(ap));
-        let x = x - offset.0;
-        let y = y - offset.1;
-        let (mut draw_list, _) = font_rend.get_draw_list(&text, x, y, params.ap_scale);
+        let x = x - offset.x;
+        let y = y - offset.y;
+        let offset = Offset { x, y };
+        let (mut draw_list, _) = font_rend.get_draw_list(&text, offset, params.ap_scale);
         draw_list.set_color(params.ap_color);
-        draw_list.set_scale(scale.0, scale.1);
+        draw_list.set_scale(scale);
         renderer.draw(draw_list);
     }
 

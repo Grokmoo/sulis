@@ -22,7 +22,7 @@ use crate::image::Image;
 use crate::io::{GraphicsRenderer, InputAction};
 use crate::resource::ResourceSet;
 use crate::ui::{Callback, LineRenderer, Widget, WidgetKind};
-use crate::util::Point;
+use crate::util::{Point, Rect};
 use crate::widgets::Label;
 
 const NAME: &str = "input_field";
@@ -180,12 +180,14 @@ impl WidgetKind for InputField {
         }
 
         if let Some(ref carat) = self.carat {
-            let x = self.label.borrow().text_draw_end_x + self.carat_offset;
-            let y = widget.state.inner_top() as f32
-                + (widget.state.inner_height() as f32 - self.carat_height) / 2.0;
-            let w = self.carat_width;
-            let h = self.carat_height;
-            carat.draw(renderer, &widget.state.animation_state, x, y, w, h, millis);
+            let rect = Rect {
+                x: self.label.borrow().text_draw_end_x + self.carat_offset,
+                y: widget.state.inner_top() as f32
+                    + (widget.state.inner_height() as f32 - self.carat_height) / 2.0,
+                w: self.carat_width,
+                h: self.carat_height,
+            };
+            carat.draw(renderer, &widget.state.animation_state, rect, millis);
         }
     }
 }

@@ -15,7 +15,7 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 mod point;
-pub use self::point::Point;
+pub use self::point::{Offset, Point, Rect, Scale};
 
 pub mod size;
 pub use self::size::Size;

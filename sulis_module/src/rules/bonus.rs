@@ -172,22 +172,21 @@ impl BonusList {
     }
 }
 
-macro_rules! apply_kind_mod_i32 {
-    ($kind:ident ( $val:ident ) : $penalty:ident, $bonus:ident) => {
-        if $val > 0 {
-            $kind(($val as f32 * $bonus).round() as i32)
+macro_rules! get_mod {
+    ($val:expr, $tp:ty, $penalty:ident, $bonus:ident) => {
+        if $val >= 0 as $tp {
+            ($val as f32 * $bonus).round() as $tp
         } else {
-            $kind(($val as f32 * $penalty).round() as i32)
+            ($val as f32 * $penalty).round() as $tp
         }
     };
-}
-
-macro_rules! apply_kind_mod_f32 {
-    ($kind:ident ( $val:ident ) : $penalty:ident, $bonus:ident) => {
-        if $val > 0.0 {
-            $kind($val * $bonus)
-        } else {
-            $kind($val * $penalty)
+    ($variant:ident ( $val:ident ): $($tail:tt)*) => {
+        $variant(get_mod!($val, $($tail)*))
+    };
+    ($variant:ident {$kind:ident, $amount:ident}: $($tail:tt)*) => {
+        $variant {
+            $kind,
+            $amount: get_mod!($amount, $($tail)*)
         }
     };
 }
@@ -198,85 +197,42 @@ fn apply_modifiers(bonus: &mut Bonus, neg: f32, pos: f32) {
     let new_kind = match bonus.kind {
         // all of these could easily merged into one macro, but then it
         // would need a separate match and we would lose the exhaustiveness check
-        ActionPoints(val) => apply_kind_mod_i32!(ActionPoints(val): neg, pos),
-        Armor(val) => apply_kind_mod_i32!(Armor(val): neg, pos),
-        Reach(val) => apply_kind_mod_f32!(Reach(val): neg, pos),
-        Range(val) => apply_kind_mod_f32!(Range(val): neg, pos),
-        Initiative(val) => apply_kind_mod_i32!(Initiative(val): neg, pos),
-        HitPoints(val) => apply_kind_mod_i32!(HitPoints(val): neg, pos),
-        MeleeAccuracy(val) => apply_kind_mod_i32!(MeleeAccuracy(val): neg, pos),
-        RangedAccuracy(val) => apply_kind_mod_i32!(RangedAccuracy(val): neg, pos),
-        SpellAccuracy(val) => apply_kind_mod_i32!(SpellAccuracy(val): neg, pos),
-        Defense(val) => apply_kind_mod_i32!(Defense(val): neg, pos),
-        Fortitude(val) => apply_kind_mod_i32!(Fortitude(val): neg, pos),
-        Reflex(val) => apply_kind_mod_i32!(Reflex(val): neg, pos),
-        Will(val) => apply_kind_mod_i32!(Will(val): neg, pos),
-        Concealment(val) => apply_kind_mod_i32!(Concealment(val): neg, pos),
-        ConcealmentIgnore(val) => apply_kind_mod_i32!(ConcealmentIgnore(val): neg, pos),
-        CritChance(val) => apply_kind_mod_i32!(CritChance(val): neg, pos),
-        HitThreshold(val) => apply_kind_mod_i32!(HitThreshold(val): neg, pos),
-        GrazeThreshold(val) => apply_kind_mod_i32!(GrazeThreshold(val): neg, pos),
-        CritMultiplier(val) => apply_kind_mod_f32!(CritMultiplier(val): neg, pos),
-        HitMultiplier(val) => apply_kind_mod_f32!(HitMultiplier(val): neg, pos),
-        GrazeMultiplier(val) => apply_kind_mod_f32!(GrazeMultiplier(val): neg, pos),
-        MovementRate(val) => apply_kind_mod_f32!(MovementRate(val): neg, pos),
-        AttackCost(val) => apply_kind_mod_i32!(AttackCost(val): neg, pos),
-        FlankingAngle(val) => apply_kind_mod_i32!(FlankingAngle(val): neg, pos),
-        CasterLevel(val) => apply_kind_mod_i32!(CasterLevel(val): neg, pos),
-        AbilityActionPointCost(val) => apply_kind_mod_i32!(AbilityActionPointCost(val): neg, pos),
+        ActionPoints(val) => get_mod!(ActionPoints(val): i32, neg, pos),
+        Armor(val) => get_mod!(Armor(val): i32, neg, pos),
+        Reach(val) => get_mod!(Reach(val): f32, neg, pos),
+        Range(val) => get_mod!(Range(val): f32, neg, pos),
+        Initiative(val) => get_mod!(Initiative(val): i32, neg, pos),
+        HitPoints(val) => get_mod!(HitPoints(val): i32, neg, pos),
+        MeleeAccuracy(val) => get_mod!(MeleeAccuracy(val): i32, neg, pos),
+        RangedAccuracy(val) => get_mod!(RangedAccuracy(val): i32, neg, pos),
+        SpellAccuracy(val) => get_mod!(SpellAccuracy(val): i32, neg, pos),
+        Defense(val) => get_mod!(Defense(val): i32, neg, pos),
+        Fortitude(val) => get_mod!(Fortitude(val): i32, neg, pos),
+        Reflex(val) => get_mod!(Reflex(val): i32, neg, pos),
+        Will(val) => get_mod!(Will(val): i32, neg, pos),
+        Concealment(val) => get_mod!(Concealment(val): i32, neg, pos),
+        ConcealmentIgnore(val) => get_mod!(ConcealmentIgnore(val): i32, neg, pos),
+        CritChance(val) => get_mod!(CritChance(val): i32, neg, pos),
+        HitThreshold(val) => get_mod!(HitThreshold(val): i32, neg, pos),
+        GrazeThreshold(val) => get_mod!(GrazeThreshold(val): i32, neg, pos),
+        CritMultiplier(val) => get_mod!(CritMultiplier(val): f32, neg, pos),
+        HitMultiplier(val) => get_mod!(HitMultiplier(val): f32, neg, pos),
+        GrazeMultiplier(val) => get_mod!(GrazeMultiplier(val): f32, neg, pos),
+        MovementRate(val) => get_mod!(MovementRate(val): f32, neg, pos),
+        AttackCost(val) => get_mod!(AttackCost(val): i32, neg, pos),
+        FlankingAngle(val) => get_mod!(FlankingAngle(val): i32, neg, pos),
+        CasterLevel(val) => get_mod!(CasterLevel(val): i32, neg, pos),
+        AbilityActionPointCost(val) => get_mod!(AbilityActionPointCost(val): i32, neg, pos),
         Damage(damage) => Damage(damage.mult_f32(pos)),
         ClassStat { ref id, amount } => {
-            if amount > 0 {
-                ClassStat {
-                    id: id.clone(),
-                    amount: (amount as f32 * pos).round() as i32,
-                }
-            } else {
-                ClassStat {
-                    id: id.clone(),
-                    amount: (amount as f32 * neg).round() as i32,
-                }
+            ClassStat {
+                id: id.clone(),
+                amount: get_mod!(amount, i32, pos, neg),
             }
         }
-        ArmorKind { kind, amount } => {
-            if amount > 0 {
-                ArmorKind {
-                    kind,
-                    amount: (amount as f32 * pos).round() as i32,
-                }
-            } else {
-                ArmorKind {
-                    kind,
-                    amount: (amount as f32 * neg).round() as i32,
-                }
-            }
-        }
-        Resistance { kind, amount } => {
-            if amount > 0 {
-                Resistance {
-                    kind,
-                    amount: (amount as f32 * pos).round() as i32,
-                }
-            } else {
-                Resistance {
-                    kind,
-                    amount: (amount as f32 * neg).round() as i32,
-                }
-            }
-        }
-        Attribute { attribute, amount } => {
-            if amount > 0 {
-                Attribute {
-                    attribute,
-                    amount: (amount as f32 * pos).round() as i8,
-                }
-            } else {
-                Attribute {
-                    attribute,
-                    amount: (amount as f32 * neg).round() as i8,
-                }
-            }
-        }
+        ArmorKind { kind, amount } => get_mod!(ArmorKind {kind, amount}: i32, neg, pos),
+        Resistance { kind, amount } => get_mod!(Resistance {kind, amount}: i32, neg, pos),
+        Attribute { attribute, amount } => get_mod!(Attribute {attribute, amount}: i8, neg, pos),
         ArmorProficiency(_)
         | WeaponProficiency(_)
         | MoveDisabled
@@ -294,18 +250,52 @@ fn apply_modifiers(bonus: &mut Bonus, neg: f32, pos: f32) {
     bonus.kind = new_kind;
 }
 
-macro_rules! merge_int_bonus {
-    ($kind:ident, $val:ident, $sec:ident, $when:ident) => {
-        if let $kind(other) = $sec.kind {
-            return Some(Bonus {
-                $when,
-                kind: $kind($val + other),
-            });
+macro_rules! merge_dup {
+    ($when:ident, $variant:ident {$attr:ident, $amount:ident}: $amt:ident) => {
+        Some(Bonus {$when, kind: $variant {$attr, $amount: $amount + $amt}})
+    };
+    ($when:ident, $variant:ident($amount:ident): $other:ident) => {
+        Some(Bonus {$when, kind: $variant($amount + $other)})
+    };
+    ($variant:ident: $sec:ident, $when:ident) => {
+        match $sec.kind {
+            $variant => Some(Bonus {$when, kind: $variant}),
+            _ => None
+        }
+    };
+    ($variant:ident($amount:ident): $sec:ident, $when:ident) => {
+        match $sec.kind {
+            $variant(other) => merge_dup!($when, $variant($amount): other),
+            _ => None
+        }
+    };
+    ($variant:ident($kind:ident): $sec:ident, $test:ident, $when:ident) => {
+        match $sec.kind {
+            $variant($test) if $kind == $test => {
+                Some(Bonus {$when, kind: $variant($kind)})
+            },
+            _ => None
+        }
+    };
+    ($variant:ident {$attr:ident, $amount:ident}: $sec:ident, $when:ident) => {
+        match $sec.kind {
+            $variant {$attr: test, $amount: amt} if $attr == test => {
+                merge_dup!($when, $variant{$attr, $amount}: amt)
+            },
+            _ => None
+        }
+    };
+    ($variant:ident {$ref: ident $var:ident, $amount:ident}: $sec:ident, $when:ident) => {
+        match $sec.kind {
+            $variant {$var: $ref other, $amount: amt} if $var == other => {
+                let $var = $var.clone();
+                merge_dup!($when, $variant{$var, $amount}: amt)
+            },
+            _ => None
         }
     };
 }
 
-#[allow(clippy::cognitive_complexity)]
 pub fn merge_if_dup(first: &Bonus, sec: &Bonus) -> Option<Bonus> {
     if first.when != sec.when {
         return None;
@@ -314,238 +304,68 @@ pub fn merge_if_dup(first: &Bonus, sec: &Bonus) -> Option<Bonus> {
     let when = first.when;
     use self::BonusKind::*;
     match first.kind {
-        Attribute { attribute, amount } => {
-            if let Attribute {
-                attribute: attr,
-                amount: amt,
-            } = sec.kind
-            {
-                if attr != attribute {
-                    return None;
-                }
-                return Some(Bonus {
-                    when,
-                    kind: Attribute {
-                        attribute,
-                        amount: amount + amt,
-                    },
-                });
-            }
-        }
-        ArmorKind { kind, amount } => {
-            if let ArmorKind {
-                kind: other_kind,
-                amount: other,
-            } = sec.kind
-            {
-                if other_kind != kind {
-                    return None;
-                }
-                return Some(Bonus {
-                    when,
-                    kind: ArmorKind {
-                        kind,
-                        amount: amount + other,
-                    },
-                });
-            }
-        }
-        Resistance { kind, amount } => {
-            if let Resistance {
-                kind: other_kind,
-                amount: other,
-            } = sec.kind
-            {
-                if other_kind != kind {
-                    return None;
-                }
-                return Some(Bonus {
-                    when,
-                    kind: Resistance {
-                        kind,
-                        amount: amount + other,
-                    },
-                });
-            }
-        }
+        Attribute { attribute, amount } => merge_dup!(Attribute {attribute, amount}: sec, when),
+        ArmorKind { kind, amount } => merge_dup!(ArmorKind {kind, amount}: sec, when),
+        Resistance { kind, amount } => merge_dup!(Resistance {kind, amount}: sec, when),
         Damage(mut damage) => {
-            if let Damage(other) = sec.kind {
-                if damage.kind != other.kind {
-                    return None;
-                }
-                damage.add(other);
-                return Some(Bonus {
-                    when,
-                    kind: Damage(damage),
-                });
+            match sec.kind {
+                Damage(other) if damage.kind == other.kind => {
+                    damage.add(other);
+                    Some(Bonus {
+                        when,
+                        kind: Damage(damage),
+                    })
+                },
+                _ => None,
             }
         }
-        ArmorProficiency(kind) => {
-            if let ArmorProficiency(other) = sec.kind {
-                if kind != other {
-                    return None;
-                }
-                return Some(Bonus {
-                    when,
-                    kind: ArmorProficiency(kind),
-                });
-            }
-        }
-        WeaponProficiency(kind) => {
-            if let WeaponProficiency(other) = sec.kind {
-                if kind != other {
-                    return None;
-                }
-                return Some(Bonus {
-                    when,
-                    kind: WeaponProficiency(kind),
-                });
-            }
-        }
-        MoveDisabled => {
-            if let MoveDisabled = sec.kind {
-                return Some(Bonus {
-                    when,
-                    kind: MoveDisabled,
-                });
-            }
-        }
-        AbilitiesDisabled => {
-            if let AbilitiesDisabled = sec.kind {
-                return Some(Bonus {
-                    when,
-                    kind: AbilitiesDisabled,
-                });
-            }
-        }
-        AttackDisabled => {
-            if let AttackDisabled = sec.kind {
-                return Some(Bonus {
-                    when,
-                    kind: AttackDisabled,
-                });
-            }
-        }
-        Hidden => {
-            if let Hidden = sec.kind {
-                return Some(Bonus { when, kind: Hidden });
-            }
-        }
-        FlankedImmunity => {
-            if let FlankedImmunity = sec.kind {
-                return Some(Bonus {
-                    when,
-                    kind: FlankedImmunity,
-                });
-            }
-        }
-        SneakAttackImmunity => {
-            if let SneakAttackImmunity = sec.kind {
-                return Some(Bonus {
-                    when,
-                    kind: SneakAttackImmunity,
-                });
-            }
-        }
-        CritImmunity => {
-            if let CritImmunity = sec.kind {
-                return Some(Bonus {
-                    when,
-                    kind: CritImmunity,
-                });
-            }
-        }
-        FreeAbilityGroupUse => {
-            if let FreeAbilityGroupUse = sec.kind {
-                return Some(Bonus {
-                    when,
-                    kind: FreeAbilityGroupUse,
-                });
-            }
-        }
-        GroupUsesPerEncounter { ref group, amount } => {
-            if let GroupUsesPerEncounter {
-                group: ref other_grp,
-                amount: amt,
-            } = sec.kind
-            {
-                if group != other_grp {
-                    return None;
-                }
-                let group = group.clone();
-                let amount = amount + amt;
-                return Some(Bonus {
-                    when,
-                    kind: GroupUsesPerEncounter { group, amount },
-                });
-            }
-        }
-        GroupUsesPerDay { ref group, amount } => {
-            if let GroupUsesPerDay {
-                group: ref other_grp,
-                amount: amt,
-            } = sec.kind
-            {
-                if group != other_grp {
-                    return None;
-                }
-                let group = group.clone();
-                let amount = amount + amt;
-                return Some(Bonus {
-                    when,
-                    kind: GroupUsesPerDay { group, amount },
-                });
-            }
-        }
-        ClassStat { ref id, amount } => {
-            if let ClassStat {
-                id: ref other_id,
-                amount: amt,
-            } = sec.kind
-            {
-                if id != other_id {
-                    return None;
-                }
-                let id = id.clone();
-                let amount = amount + amt;
-                return Some(Bonus {
-                    when,
-                    kind: ClassStat { id, amount },
-                });
-            }
-        }
-        // all of these statements could be easily merged into one macro,
-        // but then it would need to be its own match statement and you would
-        // lose the exhaustiveness check
-        AbilityActionPointCost(val) => merge_int_bonus!(AbilityActionPointCost, val, sec, when),
-        ActionPoints(val) => merge_int_bonus!(ActionPoints, val, sec, when),
-        Armor(val) => merge_int_bonus!(Armor, val, sec, when),
-        Range(val) => merge_int_bonus!(Range, val, sec, when),
-        Reach(val) => merge_int_bonus!(Reach, val, sec, when),
-        Initiative(val) => merge_int_bonus!(Initiative, val, sec, when),
-        HitPoints(val) => merge_int_bonus!(HitPoints, val, sec, when),
-        MeleeAccuracy(val) => merge_int_bonus!(MeleeAccuracy, val, sec, when),
-        RangedAccuracy(val) => merge_int_bonus!(RangedAccuracy, val, sec, when),
-        SpellAccuracy(val) => merge_int_bonus!(SpellAccuracy, val, sec, when),
-        Defense(val) => merge_int_bonus!(Defense, val, sec, when),
-        Fortitude(val) => merge_int_bonus!(Fortitude, val, sec, when),
-        Reflex(val) => merge_int_bonus!(Reflex, val, sec, when),
-        Will(val) => merge_int_bonus!(Will, val, sec, when),
-        Concealment(val) => merge_int_bonus!(Concealment, val, sec, when),
-        ConcealmentIgnore(val) => merge_int_bonus!(ConcealmentIgnore, val, sec, when),
-        CritChance(val) => merge_int_bonus!(CritChance, val, sec, when),
-        HitThreshold(val) => merge_int_bonus!(HitThreshold, val, sec, when),
-        GrazeThreshold(val) => merge_int_bonus!(GrazeThreshold, val, sec, when),
-        CritMultiplier(val) => merge_int_bonus!(CritMultiplier, val, sec, when),
-        HitMultiplier(val) => merge_int_bonus!(HitMultiplier, val, sec, when),
-        GrazeMultiplier(val) => merge_int_bonus!(GrazeMultiplier, val, sec, when),
-        MovementRate(val) => merge_int_bonus!(MovementRate, val, sec, when),
-        AttackCost(val) => merge_int_bonus!(AttackCost, val, sec, when),
-        FlankingAngle(val) => merge_int_bonus!(FlankingAngle, val, sec, when),
-        CasterLevel(val) => merge_int_bonus!(CasterLevel, val, sec, when),
-    }
+        ArmorProficiency(kind) => merge_dup!(ArmorProficiency(kind): sec, test_name, when),
+        WeaponProficiency(kind) => merge_dup!(WeaponProficiency(kind): sec, test_name, when),
 
-    None
+        MoveDisabled => merge_dup!(MoveDisabled: sec, when),
+        AbilitiesDisabled => merge_dup!(AbilitiesDisabled: sec, when),
+        AttackDisabled => merge_dup!(AttackDisabled: sec, when),
+        Hidden => merge_dup!(Hidden: sec, when),
+        FlankedImmunity => merge_dup!(FlankedImmunity: sec, when),
+        SneakAttackImmunity => merge_dup!(SneakAttackImmunity: sec, when),
+        CritImmunity => merge_dup!(CritImmunity: sec, when),
+        FreeAbilityGroupUse => merge_dup!(FreeAbilityGroupUse: sec, when),
+
+        GroupUsesPerEncounter {ref group, amount } => {
+            merge_dup!(GroupUsesPerEncounter{ref group, amount}: sec, when)
+        },
+        GroupUsesPerDay {ref group, amount } => {
+            merge_dup!(GroupUsesPerDay{ref group, amount}: sec, when)
+        },
+        ClassStat { ref id, amount } => merge_dup!(ClassStat{ref id, amount}: sec, when),
+
+        AbilityActionPointCost(val) => merge_dup!(AbilityActionPointCost(val): sec, when),
+        ActionPoints(val) => merge_dup!(ActionPoints(val): sec, when),
+        Armor(val) => merge_dup!(Armor(val): sec, when),
+        Range(val) => merge_dup!(Range(val): sec, when),
+        Reach(val) => merge_dup!(Reach(val): sec, when),
+        Initiative(val) => merge_dup!(Initiative(val): sec, when),
+        HitPoints(val) => merge_dup!(HitPoints(val): sec, when),
+        MeleeAccuracy(val) => merge_dup!(MeleeAccuracy(val): sec, when),
+        RangedAccuracy(val) => merge_dup!(RangedAccuracy(val): sec, when),
+        SpellAccuracy(val) => merge_dup!(SpellAccuracy(val): sec, when),
+        Defense(val) => merge_dup!(Defense(val): sec, when),
+        Fortitude(val) => merge_dup!(Fortitude(val): sec, when),
+        Reflex(val) => merge_dup!(Reflex(val): sec, when),
+        Will(val) => merge_dup!(Will(val): sec, when),
+        Concealment(val) => merge_dup!(Concealment(val): sec, when),
+        ConcealmentIgnore(val) => merge_dup!(ConcealmentIgnore(val): sec, when),
+        CritChance(val) => merge_dup!(CritChance(val): sec, when),
+        HitThreshold(val) => merge_dup!(HitThreshold(val): sec, when),
+        GrazeThreshold(val) => merge_dup!(GrazeThreshold(val): sec, when),
+        CritMultiplier(val) => merge_dup!(CritMultiplier(val): sec, when),
+        HitMultiplier(val) => merge_dup!(HitMultiplier(val): sec, when),
+        GrazeMultiplier(val) => merge_dup!(GrazeMultiplier(val): sec, when),
+        MovementRate(val) => merge_dup!(MovementRate(val): sec, when),
+        AttackCost(val) => merge_dup!(AttackCost(val): sec, when),
+        FlankingAngle(val) => merge_dup!(FlankingAngle(val): sec, when),
+        CasterLevel(val) => merge_dup!(CasterLevel(val): sec, when),
+    }
 }
 
 #[derive(Deserialize, Debug, Clone)]
@@ -562,26 +382,6 @@ pub struct AttackBonuses {
     pub crit_multiplier: f32,
     pub hit_multiplier: f32,
     pub graze_multiplier: f32,
-}
-
-macro_rules! mod_field {
-    ($field:expr, $pos:ident, $neg:ident) => {
-        if $field > 0 {
-            $field = ($field as f32 * $pos).round() as i32;
-        } else {
-            $field = ($field as f32 * $neg).round() as i32;
-        }
-    };
-}
-
-macro_rules! mod_field_f32 {
-    ($field:expr, $pos:ident, $neg:ident) => {
-        if $field > 0.0 {
-            $field *= $pos;
-        } else {
-            $field = $field as f32 * $neg;
-        }
-    };
 }
 
 impl AttackBonuses {
@@ -610,15 +410,15 @@ impl AttackBonuses {
             damage.mult_f32_mut(pos);
         }
 
-        mod_field!(self.melee_accuracy, pos, neg);
-        mod_field!(self.ranged_accuracy, pos, neg);
-        mod_field!(self.spell_accuracy, pos, neg);
-        mod_field!(self.crit_chance, pos, neg);
-        mod_field!(self.hit_threshold, pos, neg);
-        mod_field!(self.graze_threshold, pos, neg);
-        mod_field_f32!(self.crit_multiplier, pos, neg);
-        mod_field_f32!(self.hit_multiplier, pos, neg);
-        mod_field_f32!(self.graze_multiplier, pos, neg);
+        self.melee_accuracy = get_mod!(self.melee_accuracy, i32, neg, pos);
+        self.ranged_accuracy = get_mod!(self.ranged_accuracy, i32, neg, pos);
+        self.spell_accuracy = get_mod!(self.spell_accuracy, i32, neg, pos);
+        self.crit_chance = get_mod!(self.crit_chance, i32, neg, pos);
+        self.hit_threshold = get_mod!(self.hit_threshold, i32, neg, pos);
+        self.graze_threshold = get_mod!(self.graze_threshold, i32, neg, pos);
+        self.crit_multiplier = get_mod!(self.crit_multiplier, f32, neg, pos);
+        self.hit_multiplier = get_mod!(self.hit_multiplier, f32, neg, pos);
+        self.graze_multiplier = get_mod!(self.graze_multiplier, f32, neg, pos);
     }
 }
 

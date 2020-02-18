@@ -31,8 +31,7 @@ pub struct AnimatedImage {
 }
 
 impl AnimatedImage {
-    #[allow(clippy::new_ret_no_self)]
-    pub fn new(
+    pub fn generate(
         builder: AnimatedImageBuilder,
         images: &HashMap<String, Rc<dyn Image>>,
     ) -> Result<Rc<dyn Image>, Error> {

@@ -69,7 +69,7 @@ fn get_images_from_inline(
             image_display,
             size,
         };
-        let image = SimpleImage::new(builder, resources)?;
+        let image = SimpleImage::generate(builder, resources)?;
         resources.images.insert(id, Rc::clone(&image));
         images.push(image);
     }
@@ -78,8 +78,7 @@ fn get_images_from_inline(
 }
 
 impl ComposedImage {
-    #[allow(clippy::new_ret_no_self)]
-    pub fn new(
+    pub fn generate(
         builder: ComposedImageBuilder,
         resources: &mut ResourceSet,
     ) -> Result<Rc<dyn Image>, Error> {

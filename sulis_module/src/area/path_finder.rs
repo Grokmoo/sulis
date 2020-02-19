@@ -141,8 +141,6 @@ impl PathFinder {
     /// efficient manner.  Returns `None` if no path exists to reach the destination.
     /// Will return a vec of length zero if the dest is already reached by the
     /// requester.
-    /// If reconstruct is set to false, does not produce a path.  Instead, only
-    /// checks if a path exists, returning Some if it does, None if not
     pub fn find<T: LocationChecker>(
         &mut self,
         checker: &T,

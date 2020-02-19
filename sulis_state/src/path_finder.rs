@@ -14,6 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::collections::HashSet;
 use std::cell::RefCell;
 use std::rc::Rc;
 
@@ -23,6 +24,8 @@ use sulis_core::{
     util::{self, Point},
 };
 use sulis_module::area::{Destination, LocationChecker, PathFinder, PathFinderGrid};
+use sulis_module::Faction;
+use crate::GameState;
 
 pub struct StateLocationChecker<'a, 'b> {
     width: i32,
@@ -30,20 +33,22 @@ pub struct StateLocationChecker<'a, 'b> {
     prop_grid: &'a [bool],
     entity_grid: &'a [Vec<usize>],
     requester: &'b EntityState,
-    entities_to_ignore: Vec<usize>,
+    entities_to_ignore: HashSet<usize>,
+    non_endpoints: HashSet<usize>,
 }
 
 impl<'a, 'b> StateLocationChecker<'a, 'b> {
     pub fn new(
         area_state: &'a AreaState,
         requester: &'b EntityState,
-        mut entities_to_ignore: Vec<usize>,
+        mut entities_to_ignore: HashSet<usize>,
+        non_endpoints: HashSet<usize>,
     ) -> StateLocationChecker<'a, 'b> {
         let width = area_state.area.width;
         let grid = &area_state.area.path_grid(&requester.size());
         let prop_grid = area_state.props().entire_pass_grid();
         let entity_grid = &area_state.entity_grid;
-        entities_to_ignore.push(requester.index());
+        entities_to_ignore.insert(requester.index());
 
         StateLocationChecker {
             width,
@@ -52,6 +57,7 @@ impl<'a, 'b> StateLocationChecker<'a, 'b> {
             entity_grid,
             requester,
             entities_to_ignore,
+            non_endpoints,
         }
     }
 }
@@ -70,13 +76,18 @@ impl<'a, 'b> LocationChecker for StateLocationChecker<'a, 'b> {
             }
 
             for i in self.entity_grid[index].iter() {
-                if !self.entities_to_ignore.contains(i) {
+                if !self.entities_to_ignore.contains(i) && !self.non_endpoints.contains(i) {
                     return false;
                 }
             }
 
             true
         })
+    }
+    fn is_invalid_endpoint(&self, x: i32, y:i32) -> bool {
+
+        let index = (x + y * self.width) as usize;
+        self.non_endpoints.contains(&index)
     }
 }
 
@@ -137,7 +148,17 @@ fn find_path(
     dest: Destination,
     check_ap: bool,
 ) -> Option<Vec<Point>> {
-    let checker = StateLocationChecker::new(area_state, entity, entities_to_ignore);
+
+    let entities_to_ignore: HashSet<usize> = entities_to_ignore.iter().cloned().collect();
+    let mut non_endpoints = HashSet::new();
+
+    if entity.actor.faction() != Faction::Hostile {
+        for member in GameState::party().iter() {
+            non_endpoints.insert(member.borrow().index());
+        }
+    }
+
+    let checker = StateLocationChecker::new(area_state, entity, entities_to_ignore, non_endpoints);
 
     debug!(
         "Attempting move '{}' to {:?}",

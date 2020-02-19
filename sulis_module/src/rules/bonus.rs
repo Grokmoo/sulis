@@ -194,7 +194,6 @@ macro_rules! get_mod {
     };
 }
 
-#[allow(clippy::cognitive_complexity)]
 fn apply_modifiers(bonus: &mut Bonus, neg: f32, pos: f32) {
     use self::BonusKind::*;
     let new_kind = match bonus.kind {

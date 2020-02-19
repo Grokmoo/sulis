@@ -173,8 +173,11 @@ impl BonusList {
 }
 
 macro_rules! get_mod {
+    ($val:expr, f32, $penalty:ident, $bonus:ident) => {
+        $val * if $val >= 0.0 {$bonus} else {$penalty}
+    };
     ($val:expr, $tp:ty, $penalty:ident, $bonus:ident) => {
-        if $val >= 0 as $tp {
+        if $val >= 0 {
             ($val as f32 * $bonus).round() as $tp
         } else {
             ($val as f32 * $penalty).round() as $tp

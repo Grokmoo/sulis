@@ -287,9 +287,9 @@ macro_rules! merge_dup {
             _ => None
         }
     };
-    ($variant:ident {$ref: ident $var:ident, $amount:ident}: $sec:ident, $when:ident) => {
+    ($variant:ident {ref $var:ident, $amount:ident}: $sec:ident, $when:ident) => {
         match $sec.kind {
-            $variant {$var: $ref other, $amount: amt} if $var == other => {
+            $variant {$var: ref other, $amount: amt} if $var == other => {
                 let $var = $var.clone();
                 merge_dup!($when, $variant{$var, $amount}: amt)
             },

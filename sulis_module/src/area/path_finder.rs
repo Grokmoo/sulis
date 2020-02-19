@@ -84,6 +84,9 @@ impl PartialEq for OpenEntry {
 
 pub trait LocationChecker {
     fn passable(&self, x: i32, y: i32) -> bool;
+    fn is_invalid_endpoint(&self, _x: i32, _y: i32) -> bool {
+        false
+    }
 }
 
 pub struct PathFinder {
@@ -216,7 +219,7 @@ impl PathFinder {
                     util::format_elapsed_secs(loop_start_time.elapsed())
                 );
 
-                let path = self.reconstruct_path(current);
+                let path = self.reconstruct_path(checker, current);
                 if path.len() == 1 && path[0].x == start_x && path[0].y == start_y {
                     debug!("Found path with no moves.");
                     return None;
@@ -292,14 +295,16 @@ impl PathFinder {
     }
 
     #[inline]
-    fn reconstruct_path(&self, current: i32) -> Vec<Point> {
+    fn reconstruct_path<T: LocationChecker>(&mut self, checker: &T, mut current: i32) -> Vec<Point> {
         trace!("Reconstructing path");
 
         // let reconstruct_time = time::Instant::now();
         let mut path: Vec<Point> = Vec::new();
 
+        while checker.is_invalid_endpoint(current % self.width, current / self.width) && !self.open.is_empty() {
+            current = self.pop_lowest_f_score_in_open_set();
+        }
         path.push(self.get_point(current));
-        let mut current = current;
         loop {
             //trace!("Current {}", current);
             current = match self.came_from.get(&current) {

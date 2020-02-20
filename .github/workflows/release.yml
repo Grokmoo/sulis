@@ -75,6 +75,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.get_release_url.outputs.upload_url }}
-          asset_path: ./sulis-${{ steps.get_version.outputs.VERSION }}-linux64.zip
-          asset_name: sulis-${{ steps.get_version.outputs.VERSION }}-linux64.zip
+          asset_path: ./sulis-${{ steps.get_version.outputs.VERSION }}-${{ matrix.name }}.zip
+          asset_name: sulis-${{ steps.get_version.outputs.VERSION }}-${{ matrix.name }}.zip
           asset_content_type: application/zip

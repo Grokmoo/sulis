@@ -14,7 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::collections::HashSet;
+use std::collections::HashMap;
 use std::cell::RefCell;
 use std::rc::Rc;
 
@@ -24,8 +24,6 @@ use sulis_core::{
     util::{self, Point},
 };
 use sulis_module::area::{Destination, LocationChecker, PathFinder, PathFinderGrid};
-use sulis_module::Faction;
-use crate::GameState;
 
 pub struct StateLocationChecker<'a, 'b> {
     width: i32,
@@ -33,22 +31,19 @@ pub struct StateLocationChecker<'a, 'b> {
     prop_grid: &'a [bool],
     entity_grid: &'a [Vec<usize>],
     requester: &'b EntityState,
-    entities_to_ignore: HashSet<usize>,
-    non_endpoints: HashSet<usize>,
+    entities_to_ignore: &'b HashMap<usize, bool>,
 }
 
 impl<'a, 'b> StateLocationChecker<'a, 'b> {
     pub fn new(
         area_state: &'a AreaState,
         requester: &'b EntityState,
-        mut entities_to_ignore: HashSet<usize>,
-        non_endpoints: HashSet<usize>,
+        entities_to_ignore: &'b HashMap<usize, bool>,
     ) -> StateLocationChecker<'a, 'b> {
         let width = area_state.area.width;
         let grid = &area_state.area.path_grid(&requester.size());
         let prop_grid = area_state.props().entire_pass_grid();
         let entity_grid = &area_state.entity_grid;
-        entities_to_ignore.insert(requester.index());
 
         StateLocationChecker {
             width,
@@ -57,7 +52,6 @@ impl<'a, 'b> StateLocationChecker<'a, 'b> {
             entity_grid,
             requester,
             entities_to_ignore,
-            non_endpoints,
         }
     }
 }
@@ -76,7 +70,7 @@ impl<'a, 'b> LocationChecker for StateLocationChecker<'a, 'b> {
             }
 
             for i in self.entity_grid[index].iter() {
-                if !self.entities_to_ignore.contains(i) && !self.non_endpoints.contains(i) {
+                if !self.entities_to_ignore.contains_key(i) {
                     return false;
                 }
             }
@@ -87,7 +81,7 @@ impl<'a, 'b> LocationChecker for StateLocationChecker<'a, 'b> {
     fn is_invalid_endpoint(&self, x: i32, y:i32) -> bool {
 
         let index = (x + y * self.width) as usize;
-        self.non_endpoints.contains(&index)
+        self.entities_to_ignore.get(&index) == Some(&true)
     }
 }
 
@@ -95,7 +89,7 @@ pub fn move_towards_point(
     finder: &mut PathFinder,
     area: &AreaState,
     entity: &Rc<RefCell<EntityState>>,
-    entities_to_ignore: Vec<usize>,
+    entities_to_ignore: &HashMap<usize, bool>,
     dest: Destination,
     cb: Option<Box<dyn ScriptCallback>>,
 ) -> Option<Anim> {
@@ -124,7 +118,7 @@ pub fn can_move_towards_point(
     finder: &mut PathFinder,
     area: &AreaState,
     entity: &EntityState,
-    entities_to_ignore: Vec<usize>,
+    entities_to_ignore: &HashMap<usize, bool>,
     dest: Destination,
 ) -> Option<Vec<Point>> {
     find_path(finder, area, entity, entities_to_ignore, dest, true)
@@ -134,7 +128,7 @@ pub fn can_move_ignore_ap(
     finder: &mut PathFinder,
     area: &AreaState,
     entity: &EntityState,
-    entities_to_ignore: Vec<usize>,
+    entities_to_ignore: &HashMap<usize, bool>,
     dest: Destination,
 ) -> Option<Vec<Point>> {
     find_path(finder, area, entity, entities_to_ignore, dest, false)
@@ -144,21 +138,11 @@ fn find_path(
     path_finder: &mut PathFinder,
     area_state: &AreaState,
     entity: &EntityState,
-    entities_to_ignore: Vec<usize>,
+    entities_to_ignore: &HashMap<usize, bool>,
     dest: Destination,
     check_ap: bool,
 ) -> Option<Vec<Point>> {
-
-    let entities_to_ignore: HashSet<usize> = entities_to_ignore.iter().cloned().collect();
-    let mut non_endpoints = HashSet::new();
-
-    if entity.actor.faction() != Faction::Hostile {
-        for member in GameState::party().iter() {
-            non_endpoints.insert(member.borrow().index());
-        }
-    }
-
-    let checker = StateLocationChecker::new(area_state, entity, entities_to_ignore, non_endpoints);
+    let checker = StateLocationChecker::new(area_state, entity, entities_to_ignore);
 
     debug!(
         "Attempting move '{}' to {:?}",

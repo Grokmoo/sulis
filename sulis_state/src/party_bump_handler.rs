@@ -139,8 +139,9 @@ fn check_bump_position(
     }
 
     let dest = GameState::get_point_dest(entity, p.x as f32, p.y as f32);
+    let party = party.to_vec().into_iter().map(|p|(p, true)).collect();
 
-    let result = GameState::can_move_ignore_ap(entity, area, party.to_vec(), dest);
+    let result = GameState::can_move_ignore_ap(entity, area, &party, dest);
 
     match result {
         None => false,

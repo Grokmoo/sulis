@@ -22,7 +22,7 @@ use sulis_core::image::Image;
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::resource::{Font, ResourceSet};
 use sulis_core::ui::{animation_state, Color, LineRenderer};
-use sulis_core::util::{self, Point, Offset, Scale, Rect};
+use sulis_core::util::{self, Offset, Point, Rect, Scale};
 use sulis_module::{DamageKind, HitFlags, HitKind};
 
 use crate::{AreaState, EntityState};
@@ -296,14 +296,14 @@ impl AreaFeedbackText {
                     IconKind::Graze => &params.graze_icon,
                 };
 
-                let rect = Rect { x: pos_x, y: pos_y + params.scale * 0.15, w, h };
+                let rect = Rect {
+                    x: pos_x,
+                    y: pos_y + params.scale * 0.15,
+                    w,
+                    h,
+                };
                 let mut draw_list = DrawList::empty_sprite();
-                image.append_to_draw_list(
-                    &mut draw_list,
-                    state,
-                    rect,
-                    millis,
-                );
+                image.append_to_draw_list(&mut draw_list, state, rect, millis);
                 draw_list.set_scale(scale);
                 draw_list.set_color(color);
                 renderer.draw(draw_list);

@@ -317,13 +317,7 @@ impl AreaGenerator {
                 step: Point::new(gw as i32, gh as i32),
                 max: Point::new(tot_gw, tot_gh),
             };
-            self.carve_wall(
-                model,
-                neighbors,
-                params,
-                elev,
-                wall_kind,
-            );
+            self.carve_wall(model, neighbors, params, elev, wall_kind);
         }
     }
 

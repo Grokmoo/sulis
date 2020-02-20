@@ -315,11 +315,7 @@ impl AreaOverlayHandler {
         self.hover_sprite.as_ref()
     }
 
-    pub fn get_path_draw_list(
-        &self,
-        offset: Offset,
-        millis: u32,
-    ) -> Option<DrawList> {
+    pub fn get_path_draw_list(&self, offset: Offset, millis: u32) -> Option<DrawList> {
         if !GameState::is_combat_active() {
             return None;
         }
@@ -342,12 +338,7 @@ impl AreaOverlayHandler {
                 w: 1.0,
                 h: 1.0,
             };
-            image.append_to_draw_list(
-                &mut draw_list,
-                &animation_state::NORMAL,
-                rect,
-                millis,
-            );
+            image.append_to_draw_list(&mut draw_list, &animation_state::NORMAL, rect, millis);
         }
 
         match self.path_point_end_image {
@@ -360,12 +351,7 @@ impl AreaOverlayHandler {
                     w: 1.0,
                     h: 1.0,
                 };
-                image.append_to_draw_list(
-                    &mut draw_list,
-                    &animation_state::NORMAL,
-                    rect,
-                    millis,
-                );
+                image.append_to_draw_list(&mut draw_list, &animation_state::NORMAL, rect, millis);
             }
         }
 
@@ -392,12 +378,7 @@ impl AreaOverlayHandler {
                 let rect = Rect { x, y, w, h };
 
                 let mut draw_list = DrawList::empty_sprite();
-                image.append_to_draw_list(
-                    &mut draw_list,
-                    &animation_state::NORMAL,
-                    rect,
-                    millis,
-                );
+                image.append_to_draw_list(&mut draw_list, &animation_state::NORMAL, rect, millis);
                 renderer.draw(draw_list);
             }
         }

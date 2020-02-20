@@ -22,7 +22,7 @@ use crate::{script::ScriptEntitySet, EntityState, GameState, ScriptCallback};
 use sulis_core::image::Image;
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::ui::animation_state;
-use sulis_core::util::{Offset, Scale, Rect};
+use sulis_core::util::{Offset, Rect, Scale};
 
 pub(in crate::animation) fn update(
     attacker: &Rc<RefCell<EntityState>>,
@@ -116,12 +116,7 @@ pub(in crate::animation) fn draw(
         };
 
         let mut draw_list = DrawList::empty_sprite();
-        projectile.append_to_draw_list(
-            &mut draw_list,
-            &animation_state::NORMAL,
-            rect,
-            millis,
-        );
+        projectile.append_to_draw_list(&mut draw_list, &animation_state::NORMAL, rect, millis);
         draw_list.set_scale(scale);
         draw_list.rotate(model.angle);
         renderer.draw(draw_list);

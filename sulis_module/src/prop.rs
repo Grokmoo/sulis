@@ -21,7 +21,7 @@ use sulis_core::image::Image;
 use sulis_core::io::DrawList;
 use sulis_core::resource::ResourceSet;
 use sulis_core::ui::AnimationState;
-use sulis_core::util::{unable_to_create_error, Point, Rect, Offset};
+use sulis_core::util::{unable_to_create_error, Offset, Point, Rect};
 
 use crate::area::tile::verify_point;
 use crate::{LootList, Module, ObjectSize};
@@ -173,10 +173,10 @@ impl Prop {
         millis: u32,
     ) {
         let rect = Rect {
-          x: offset.x,
-          y: offset.y,
-          w: self.size.width as f32,
-          h: self.size.height as f32,
+            x: offset.x,
+            y: offset.y,
+            w: self.size.width as f32,
+            h: self.size.height as f32,
         };
 
         self.image

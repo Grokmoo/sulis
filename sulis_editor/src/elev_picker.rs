@@ -22,7 +22,7 @@ use sulis_core::config::Config;
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::resource::{ResourceSet, Sprite};
 use sulis_core::ui::{Callback, Color, Widget, WidgetKind};
-use sulis_core::util::{Offset, Scale, Point, Rect};
+use sulis_core::util::{Offset, Point, Rect, Scale};
 use sulis_core::widgets::{Label, Spinner};
 use sulis_module::area::MAX_AREA_SIZE;
 
@@ -84,7 +84,12 @@ impl EditorMode for ElevPicker {
                 let sprite = &self.elev_tiles[elev];
                 let x = x as f32 + offset.x;
                 let y = y as f32 + offset.y;
-                let rect = Rect { x, y, w: 1.0, h: 1.0 };
+                let rect = Rect {
+                    x,
+                    y,
+                    w: 1.0,
+                    h: 1.0,
+                };
                 draw_list.append(&mut DrawList::from_sprite_f32(&sprite, rect));
             }
         }
@@ -98,14 +103,11 @@ impl EditorMode for ElevPicker {
                 for x in 0..self.brush_size {
                     let rect = Rect {
                         x: x as f32 + pos.x as f32 + offset.x,
-                           y: y as f32 + pos.y as f32 + offset.y,
-                              w: 1.0,
-                              h: 1.0,
+                        y: y as f32 + pos.y as f32 + offset.y,
+                        w: 1.0,
+                        h: 1.0,
                     };
-                    draw_list.append(&mut DrawList::from_sprite_f32(
-                        &self.cursor_sprite,
-                        rect,
-                    ));
+                    draw_list.append(&mut DrawList::from_sprite_f32(&self.cursor_sprite, rect));
                 }
             }
             draw_list.set_scale(scale);

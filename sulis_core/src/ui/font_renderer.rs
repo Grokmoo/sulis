@@ -65,7 +65,9 @@ impl FontRenderer for LineRenderer {
         let mut quads: Vec<Vertex> = Vec::new();
         let mut x = offset.x;
         for c in text.chars() {
-            x = self.font.get_quad(&mut quads, c, x, offset.y, defaults.scale);
+            x = self
+                .font
+                .get_quad(&mut quads, c, x, offset.y, defaults.scale);
         }
 
         let mut draw_list = DrawList::from_font(&self.font.id, quads);

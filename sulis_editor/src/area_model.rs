@@ -23,7 +23,7 @@ use sulis_core::config::{Config, EditorConfig};
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::resource::{read_single_resource, write_to_file, ResourceSet, Sprite};
 use sulis_core::ui::{animation_state, LineRenderer};
-use sulis_core::util::{Point, Size, Scale, Offset, Rect};
+use sulis_core::util::{Offset, Point, Rect, Scale, Size};
 use sulis_module::area::*;
 use sulis_module::generator::{is_removal, TilesModel};
 use sulis_module::{Actor, Encounter, Module, Prop};
@@ -369,10 +369,7 @@ impl AreaModel {
                     w: tile.width as f32,
                     h: tile.height as f32,
                 };
-                draw_list.append(&mut DrawList::from_sprite_f32(
-                    sprite,
-                    rect,
-                ));
+                draw_list.append(&mut DrawList::from_sprite_f32(sprite, rect));
             }
             if !draw_list.is_empty() {
                 draw_list.set_scale(scale);

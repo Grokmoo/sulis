@@ -21,7 +21,7 @@ use std::rc::Rc;
 use crate::{animation::Anim, EntityState, GameState};
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::ui::animation_state;
-use sulis_core::util::{Offset, Point, Scale, Rect};
+use sulis_core::util::{Offset, Point, Rect, Scale};
 use sulis_module::ObjectSize;
 
 fn check_immediate_cancel(mover: &Rc<RefCell<EntityState>>, model: &mut MoveAnimModel) -> bool {

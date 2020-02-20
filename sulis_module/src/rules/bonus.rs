@@ -194,6 +194,7 @@ macro_rules! get_mod {
     };
 }
 
+#[allow(clippy::cognitive_complexity)]
 fn apply_modifiers(bonus: &mut Bonus, neg: f32, pos: f32) {
     use self::BonusKind::*;
     let new_kind = match bonus.kind {
@@ -226,15 +227,13 @@ fn apply_modifiers(bonus: &mut Bonus, neg: f32, pos: f32) {
         CasterLevel(val) => get_mod!(CasterLevel(val): i32, neg, pos),
         AbilityActionPointCost(val) => get_mod!(AbilityActionPointCost(val): i32, neg, pos),
         Damage(damage) => Damage(damage.mult_f32(pos)),
-        ClassStat { ref id, amount } => {
-            ClassStat {
-                id: id.clone(),
-                amount: get_mod!(amount, i32, pos, neg),
-            }
-        }
-        ArmorKind { kind, amount } => get_mod!(ArmorKind {kind, amount}: i32, neg, pos),
-        Resistance { kind, amount } => get_mod!(Resistance {kind, amount}: i32, neg, pos),
-        Attribute { attribute, amount } => get_mod!(Attribute {attribute, amount}: i8, neg, pos),
+        ClassStat { ref id, amount } => ClassStat {
+            id: id.clone(),
+            amount: get_mod!(amount, i32, pos, neg),
+        },
+        ArmorKind { kind, amount } => get_mod!(ArmorKind { kind, amount }: i32, neg, pos),
+        Resistance { kind, amount } => get_mod!(Resistance { kind, amount }: i32, neg, pos),
+        Attribute { attribute, amount } => get_mod!(Attribute { attribute, amount }: i8, neg, pos),
         ArmorProficiency(_)
         | WeaponProficiency(_)
         | MoveDisabled
@@ -254,50 +253,68 @@ fn apply_modifiers(bonus: &mut Bonus, neg: f32, pos: f32) {
 
 macro_rules! merge_dup {
     ($when:ident, $variant:ident {$attr:ident, $amount:ident}: $amt:ident) => {
-        Some(Bonus {$when, kind: $variant {$attr, $amount: $amount + $amt}})
+        Some(Bonus {
+            $when,
+            kind: $variant {
+                $attr,
+                $amount: $amount + $amt,
+            },
+        })
     };
     ($when:ident, $variant:ident($amount:ident): $other:ident) => {
-        Some(Bonus {$when, kind: $variant($amount + $other)})
+        Some(Bonus {
+            $when,
+            kind: $variant($amount + $other),
+        })
     };
     ($variant:ident: $sec:ident, $when:ident) => {
         match $sec.kind {
-            $variant => Some(Bonus {$when, kind: $variant}),
-            _ => None
+            $variant => Some(Bonus {
+                $when,
+                kind: $variant,
+            }),
+            _ => None,
         }
     };
     ($variant:ident($amount:ident): $sec:ident, $when:ident) => {
         match $sec.kind {
             $variant(other) => merge_dup!($when, $variant($amount): other),
-            _ => None
+            _ => None,
         }
     };
     ($variant:ident($kind:ident): $sec:ident, $test:ident, $when:ident) => {
         match $sec.kind {
-            $variant($test) if $kind == $test => {
-                Some(Bonus {$when, kind: $variant($kind)})
-            },
-            _ => None
+            $variant($test) if $kind == $test => Some(Bonus {
+                $when,
+                kind: $variant($kind),
+            }),
+            _ => None,
         }
     };
     ($variant:ident {$attr:ident, $amount:ident}: $sec:ident, $when:ident) => {
         match $sec.kind {
-            $variant {$attr: test, $amount: amt} if $attr == test => {
-                merge_dup!($when, $variant{$attr, $amount}: amt)
-            },
-            _ => None
+            $variant {
+                $attr: test,
+                $amount: amt,
+            } if $attr == test => merge_dup!($when, $variant { $attr, $amount }: amt),
+            _ => None,
         }
     };
     ($variant:ident {ref $var:ident, $amount:ident}: $sec:ident, $when:ident) => {
         match $sec.kind {
-            $variant {$var: ref other, $amount: amt} if $var == other => {
+            $variant {
+                $var: ref other,
+                $amount: amt,
+            } if $var == other => {
                 let $var = $var.clone();
-                merge_dup!($when, $variant{$var, $amount}: amt)
-            },
-            _ => None
+                merge_dup!($when, $variant { $var, $amount }: amt)
+            }
+            _ => None,
         }
     };
 }
 
+#[allow(clippy::cognitive_complexity)]
 pub fn merge_if_dup(first: &Bonus, sec: &Bonus) -> Option<Bonus> {
     if first.when != sec.when {
         return None;
@@ -306,21 +323,19 @@ pub fn merge_if_dup(first: &Bonus, sec: &Bonus) -> Option<Bonus> {
     let when = first.when;
     use self::BonusKind::*;
     match first.kind {
-        Attribute { attribute, amount } => merge_dup!(Attribute {attribute, amount}: sec, when),
-        ArmorKind { kind, amount } => merge_dup!(ArmorKind {kind, amount}: sec, when),
-        Resistance { kind, amount } => merge_dup!(Resistance {kind, amount}: sec, when),
-        Damage(mut damage) => {
-            match sec.kind {
-                Damage(other) if damage.kind == other.kind => {
-                    damage.add(other);
-                    Some(Bonus {
-                        when,
-                        kind: Damage(damage),
-                    })
-                },
-                _ => None,
+        Attribute { attribute, amount } => merge_dup!(Attribute { attribute, amount }: sec, when),
+        ArmorKind { kind, amount } => merge_dup!(ArmorKind { kind, amount }: sec, when),
+        Resistance { kind, amount } => merge_dup!(Resistance { kind, amount }: sec, when),
+        Damage(mut damage) => match sec.kind {
+            Damage(other) if damage.kind == other.kind => {
+                damage.add(other);
+                Some(Bonus {
+                    when,
+                    kind: Damage(damage),
+                })
             }
-        }
+            _ => None,
+        },
         ArmorProficiency(kind) => merge_dup!(ArmorProficiency(kind): sec, test_name, when),
         WeaponProficiency(kind) => merge_dup!(WeaponProficiency(kind): sec, test_name, when),
 
@@ -333,12 +348,12 @@ pub fn merge_if_dup(first: &Bonus, sec: &Bonus) -> Option<Bonus> {
         CritImmunity => merge_dup!(CritImmunity: sec, when),
         FreeAbilityGroupUse => merge_dup!(FreeAbilityGroupUse: sec, when),
 
-        GroupUsesPerEncounter {ref group, amount } => {
+        GroupUsesPerEncounter { ref group, amount } => {
             merge_dup!(GroupUsesPerEncounter{ref group, amount}: sec, when)
-        },
-        GroupUsesPerDay {ref group, amount } => {
+        }
+        GroupUsesPerDay { ref group, amount } => {
             merge_dup!(GroupUsesPerDay{ref group, amount}: sec, when)
-        },
+        }
         ClassStat { ref id, amount } => merge_dup!(ClassStat{ref id, amount}: sec, when),
 
         AbilityActionPointCost(val) => merge_dup!(AbilityActionPointCost(val): sec, when),

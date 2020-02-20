@@ -1,0 +1,21 @@
+on: [push, pull_request]
+name: Clippy
+jobs:
+  clippy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+           toolchain: stable
+           components: rustfmt, clippy
+           override: true
+      - uses: actions-rs/cargo@v1
+        with:
+          command: clippy
+          args: -- -D warnings
+      # Rustfmt - not enabled at this time
+      # - uses: actions-rs/cargo@v1
+      #   with:
+      #     command: fmt
+      #     args: --all -- --check

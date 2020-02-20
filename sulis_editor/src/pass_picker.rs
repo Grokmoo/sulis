@@ -22,7 +22,7 @@ use sulis_core::config::Config;
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::resource::{ResourceSet, Sprite};
 use sulis_core::ui::{Color, Widget, WidgetKind};
-use sulis_core::util::{Scale, Offset, Rect};
+use sulis_core::util::{Offset, Rect, Scale};
 
 use crate::{AreaModel, EditorMode};
 
@@ -60,10 +60,7 @@ impl EditorMode for PassPicker {
                     w: 1.0,
                     h: 1.0,
                 };
-                draw_list.append(&mut DrawList::from_sprite_f32(
-                    &self.cursor_sprite,
-                    rect,
-                ));
+                draw_list.append(&mut DrawList::from_sprite_f32(&self.cursor_sprite, rect));
             }
         }
         draw_list.set_scale(scale);

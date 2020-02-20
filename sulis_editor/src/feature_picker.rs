@@ -20,7 +20,7 @@ use std::rc::Rc;
 
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
-use sulis_core::util::{Scale, Offset, Rect, Point};
+use sulis_core::util::{Offset, Point, Rect, Scale};
 use sulis_core::widgets::{Button, ScrollDirection, ScrollPane};
 use sulis_module::{area::tile::Feature, Module};
 
@@ -28,12 +28,7 @@ use crate::{AreaModel, EditorMode};
 
 const NAME: &str = "feature_picker";
 
-fn draw(
-    feature: &Rc<Feature>,
-    renderer: &mut dyn GraphicsRenderer,
-    offset: Offset,
-    scale: Scale,
-) {
+fn draw(feature: &Rc<Feature>, renderer: &mut dyn GraphicsRenderer, offset: Offset, scale: Scale) {
     for (tile, p) in &feature.preview {
         let rect = Rect {
             x: offset.x + p.x as f32,
@@ -41,10 +36,7 @@ fn draw(
             w: tile.width as f32,
             h: tile.height as f32,
         };
-        let mut draw_list = DrawList::from_sprite_f32(
-            &tile.image_display,
-            rect,
-        );
+        let mut draw_list = DrawList::from_sprite_f32(&tile.image_display, rect);
         draw_list.set_scale(scale);
         renderer.draw(draw_list);
     }

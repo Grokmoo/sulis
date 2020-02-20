@@ -21,7 +21,7 @@ use std::rc::Rc;
 use sulis_core::io::event::ClickKind;
 use sulis_core::io::GraphicsRenderer;
 use sulis_core::ui::{Widget, WidgetKind};
-use sulis_core::util::{Offset, Scale, Point};
+use sulis_core::util::{Offset, Point, Scale};
 use sulis_state::{ChangeListener, EntityState, GameState};
 
 pub const NAME: &str = "initiative_ticker";
@@ -120,7 +120,10 @@ impl WidgetKind for TickerLabel {
         let cx = x + (inner_width - size) / 2.0 - 2.0 + entity.actor.actor.race.ticker_offset.0;
         let cy = y + (inner_height - size) / 2.0 - 2.0 + entity.actor.actor.race.ticker_offset.1;
 
-        let offset = Offset { x: cx / size, y: cy / size };
+        let offset = Offset {
+            x: cx / size,
+            y: cy / size,
+        };
         let scale = Scale { x: size, y: size };
 
         self.entity

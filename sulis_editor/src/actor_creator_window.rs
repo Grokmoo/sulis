@@ -24,7 +24,7 @@ use sulis_core::image::{layered_image::Layer, Image, LayeredImage};
 use sulis_core::io::GraphicsRenderer;
 use sulis_core::resource::write_to_file;
 use sulis_core::ui::{Callback, Widget, WidgetKind};
-use sulis_core::util::{Scale, Offset, Point};
+use sulis_core::util::{Offset, Point, Scale};
 use sulis_core::widgets::{list_box, Button, InputField, Label, MutuallyExclusiveListBox};
 use sulis_module::{
     ActorBuilder, AttributeList, Class, Faction, ImageLayer, InventoryBuilder, Module, Race, Sex,
@@ -268,7 +268,10 @@ impl WidgetKind for ActorCreatorWindow {
         let y = (child.inner_top() as f32) / scale_y;
 
         let offset = Offset { x, y };
-        let scale = Scale { x: scale_x, y: scale_y };
+        let scale = Scale {
+            x: scale_x,
+            y: scale_y,
+        };
 
         preview.draw(renderer, offset, scale, millis);
     }

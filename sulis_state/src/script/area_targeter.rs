@@ -21,7 +21,7 @@ use std::rc::Rc;
 use sulis_core::image::Image;
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::ui::{animation_state, color, Cursor, LineRenderer};
-use sulis_core::util::{Offset, Point, Scale, Rect};
+use sulis_core::util::{Offset, Point, Rect, Scale};
 use sulis_module::{Ability, Module, ObjectSize};
 
 use crate::script::{targeter, ScriptItemKind, TargeterData};
@@ -208,7 +208,11 @@ impl Shape {
                 *length,
                 size,
                 &area_state,
-                LosParams { impass_blocks, invis_blocks, src_elev }
+                LosParams {
+                    impass_blocks,
+                    invis_blocks,
+                    src_elev,
+                },
             ),
             Shape::LineSegment {
                 ref size,
@@ -219,7 +223,11 @@ impl Shape {
                 pos,
                 size,
                 &area_state,
-                LosParams { impass_blocks, invis_blocks, src_elev }
+                LosParams {
+                    impass_blocks,
+                    invis_blocks,
+                    src_elev,
+                },
             ),
             Shape::ObjectSize { ref size } => self.get_points_object_size(pos, size, &area_state),
             Shape::Cone {
@@ -228,14 +236,7 @@ impl Shape {
                 min_radius,
                 radius,
                 angle,
-            } => self.get_points_cone(
-                *origin_x,
-                *origin_y,
-                pos,
-                *min_radius,
-                *radius,
-                *angle,
-            ),
+            } => self.get_points_cone(*origin_x, *origin_y, pos, *min_radius, *radius, *angle),
         };
 
         if !allow_impass {
@@ -272,7 +273,11 @@ impl Shape {
             });
         }
 
-        let los_params = LosParams { impass_blocks, invis_blocks, src_elev };
+        let los_params = LosParams {
+            impass_blocks,
+            invis_blocks,
+            src_elev,
+        };
 
         if impass_blocks || invis_blocks {
             let start = Point::new(origin_x as i32, origin_y as i32);
@@ -280,13 +285,8 @@ impl Shape {
             match &self {
                 Shape::ObjectSize { .. } | Shape::Cone { .. } | Shape::Circle { .. } => {
                     points.retain(|p| {
-                        let (_, concat) = self.get_points_line_internal(
-                            start,
-                            *p,
-                            size,
-                            &area_state,
-                            los_params,
-                        );
+                        let (_, concat) =
+                            self.get_points_line_internal(start, *p, size, &area_state, los_params);
                         !concat
                     });
                 }
@@ -363,13 +363,8 @@ impl Shape {
             end.y
         );
 
-        let (points, concat) = self.get_points_line_internal(
-            start,
-            end,
-            size,
-            area_state,
-            los_params,
-        );
+        let (points, concat) =
+            self.get_points_line_internal(start, end, size, area_state, los_params);
 
         if concat {
             return Vec::new();
@@ -453,41 +448,21 @@ impl Shape {
         let (points, concat) = if (end.y - start.y).abs() < (end.x - start.x).abs() {
             if start.x > end.x {
                 let mut p = cast_low(end, start);
-                let concated = self.concat_from_end(
-                    &area_state,
-                    &size,
-                    &mut p,
-                    los_params,
-                );
+                let concated = self.concat_from_end(&area_state, &size, &mut p, los_params);
                 (p, concated)
             } else {
                 let mut p = cast_low(start, end);
-                let concated = self.concat_from_start(
-                    &area_state,
-                    &size,
-                    &mut p,
-                    los_params,
-                );
+                let concated = self.concat_from_start(&area_state, &size, &mut p, los_params);
                 (p, concated)
             }
         } else {
             if start.y > end.y {
                 let mut p = cast_high(end, start);
-                let concated = self.concat_from_end(
-                    &area_state,
-                    &size,
-                    &mut p,
-                    los_params,
-                );
+                let concated = self.concat_from_end(&area_state, &size, &mut p, los_params);
                 (p, concated)
             } else {
                 let mut p = cast_high(start, end);
-                let concated = self.concat_from_start(
-                    &area_state,
-                    &size,
-                    &mut p,
-                    los_params,
-                );
+                let concated = self.concat_from_start(&area_state, &size, &mut p, los_params);
                 (p, concated)
             }
         };
@@ -551,12 +526,7 @@ impl Shape {
                 return false;
             }
 
-            if self.check_concat_break(
-                area,
-                size,
-                points[index],
-                los_params,
-            ) {
+            if self.check_concat_break(area, size, points[index], los_params) {
                 break;
             }
 
@@ -581,12 +551,7 @@ impl Shape {
     ) -> bool {
         let mut index = points.len() - 1;
         loop {
-            if self.check_concat_break(
-                area,
-                size,
-                points[index],
-                los_params,
-            ) {
+            if self.check_concat_break(area, size, points[index], los_params) {
                 break;
             }
 
@@ -838,11 +803,7 @@ impl AreaTargeter {
         self.range_indicator.take()
     }
 
-    fn draw_target(
-        &self,
-        target: &Rc<RefCell<EntityState>>,
-        offset: Offset,
-    ) -> DrawList {
+    fn draw_target(&self, target: &Rc<RefCell<EntityState>>, offset: Offset) -> DrawList {
         let target = target.borrow();
         let rect = Rect {
             x: target.location.x as f32 - offset.x,
@@ -851,10 +812,7 @@ impl AreaTargeter {
             h: target.size.height as f32,
         };
 
-        DrawList::from_sprite_f32(
-            &target.size.cursor_sprite,
-            rect
-        )
+        DrawList::from_sprite_f32(&target.size.cursor_sprite, rect)
     }
 
     fn calculate_points(&mut self) {
@@ -1002,27 +960,16 @@ impl AreaTargeter {
                 x: p.x as f32 - offset.x,
                 y: p.y as f32 - offset.y,
                 w: 1.0,
-                h: 1.0
+                h: 1.0,
             };
-            tile.append_to_draw_list(
-                &mut draw_list,
-                &animation_state::NORMAL,
-                rect,
-                millis,
-            );
+            tile.append_to_draw_list(&mut draw_list, &animation_state::NORMAL, rect, millis);
         }
         draw_list.set_scale(scale);
         renderer.draw(draw_list);
 
         if let ScriptSource::Ability(ability) = &self.script_source {
             if let Some(active) = &ability.active {
-                self.draw_ap_usage(
-                    renderer,
-                    params,
-                    offset,
-                    scale,
-                    active.ap as i32,
-                );
+                self.draw_ap_usage(renderer, params, offset, scale, active.ap as i32);
             }
         }
     }

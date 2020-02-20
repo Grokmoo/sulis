@@ -21,7 +21,7 @@ use std::rc::Rc;
 use sulis_core::io::event::ClickKind;
 use sulis_core::io::{GraphicsRenderer, InputAction};
 use sulis_core::ui::{compute_area_scaling, Cursor, Scrollable, Widget, WidgetKind};
-use sulis_core::util::{Scale, Offset, Point};
+use sulis_core::util::{Offset, Point, Scale};
 use sulis_module::area::MAX_AREA_SIZE;
 
 use crate::{AreaModel, EditorMode};
@@ -76,10 +76,7 @@ impl AreaEditor {
         )
     }
 
-    fn get_event_data(
-        &self,
-        widget: &Rc<RefCell<Widget>>,
-    ) -> Option<(EditorModeRef, i32, i32)> {
+    fn get_event_data(&self, widget: &Rc<RefCell<Widget>>) -> Option<(EditorModeRef, i32, i32)> {
         let editor = match self.cur_editor {
             None => return None,
             Some(ref editor) => editor,
@@ -112,7 +109,10 @@ impl WidgetKind for AreaEditor {
         millis: u32,
     ) {
         self.scale = compute_area_scaling(pixel_size);
-        let scale = Scale { x: self.scale.0, y: self.scale.1 };
+        let scale = Scale {
+            x: self.scale.0,
+            y: self.scale.1,
+        };
 
         let p = widget.state.position();
         // TODO fix this hack

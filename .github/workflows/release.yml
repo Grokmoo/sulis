@@ -1,0 +1,45 @@
+on:
+  push:
+    tags:
+      - '*'
+
+name: Create Release Builds
+
+jobs:
+  build:
+    name: Create Release Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          components: cross
+          override: true
+      - name: Linux Build
+        run: |
+          cross build --release --target x86_64-unknown-linux-gnu
+          mkdir sulis/
+          cp target/x86_64-unknown-linux-gnu/release/main sulis/sulis
+          git archive HEAD --prefix=sulis/ --format=zip -o sulis-${{ github.ref }}-linux64.zip
+          zip -u sulis-${{ github.ref }}-linux64.zip sulis/sulis
+      - name: Create Release
+        id: create_release
+        uses: actions/create_release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: ${{ github.ref }}
+          draft: false
+          prerelease: false
+      - name: Upload Asset
+        id: upload_asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./sulis-${{ github.ref }}-linux64.zip
+          asset_name: sulis-${{ github.ref }}-linux64.zip
+          asset_content_type: application/zip

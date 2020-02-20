@@ -14,6 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::collections::HashMap;
 use std::cell::RefCell;
 use std::f32;
 use std::rc::Rc;
@@ -75,11 +76,11 @@ impl Formation {
     pub fn move_group(
         &self,
         entities_to_move: &[Rc<RefCell<EntityState>>],
-        entities_to_ignore: Vec<usize>,
+        entities_to_ignore: HashMap<usize, bool>,
         dest: Destination,
     ) {
         if entities_to_move.len() == 1 {
-            GameState::move_towards_dest(&entities_to_move[0], entities_to_ignore, dest, None);
+            GameState::move_towards_dest(&entities_to_move[0], &entities_to_ignore, dest, None);
             return;
         }
 
@@ -121,7 +122,7 @@ impl Formation {
                 };
                 if GameState::can_move_towards_dest(
                     &to_move.borrow(),
-                    entities_to_ignore.clone(),
+                    &entities_to_ignore,
                     dest,
                 )
                 .is_none()
@@ -129,7 +130,7 @@ impl Formation {
                     continue;
                 }
 
-                GameState::move_towards_dest(to_move, entities_to_ignore.clone(), dest, None);
+                GameState::move_towards_dest(to_move, &entities_to_ignore, dest, None);
                 break;
             }
         }

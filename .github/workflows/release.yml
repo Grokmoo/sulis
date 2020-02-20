@@ -14,10 +14,10 @@ jobs:
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
-          components: cross
           override: true
       - name: Linux Build
         run: |
+          cargo install cross
           cross build --release --target x86_64-unknown-linux-gnu
           mkdir sulis/
           cp target/x86_64-unknown-linux-gnu/release/main sulis/sulis

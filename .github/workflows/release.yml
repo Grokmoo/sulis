@@ -59,10 +59,10 @@ jobs:
           cp target/${{ matrix.target }}/release/main${{ matrix.extension }} sulis/sulis${{ matrix.extension }}
           git archive HEAD --prefix=sulis/ --format=zip -o sulis-${{ steps.get_version.outputs.VERSION }}-${{ matrix.name }}.zip
           zip -u sulis-${{ steps.get_version.outputs.VERSION }}-${{ matrix.name }}.zip sulis/sulis${{ matrix.extension }}
-       - name: Load Release URL
-         uses: actions/download-artifact@v1
-         with:
-           name: release_url
+      - name: Load Release URL
+        uses: actions/download-artifact@v1
+        with:
+          name: release_url
       - name: Get Release URL
         id: get_release_url
         run: |

@@ -20,7 +20,7 @@ use std::rc::Rc;
 
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::ui::{animation_state, Callback, Color, Widget, WidgetKind};
-use sulis_core::util::{Scale, Offset, Point};
+use sulis_core::util::{Offset, Point, Scale};
 use sulis_core::widgets::{Button, ScrollDirection, ScrollPane};
 use sulis_module::{Module, Prop};
 
@@ -76,10 +76,10 @@ impl EditorMode for PropPicker {
         };
 
         let mut draw_list = DrawList::empty_sprite();
-            let offset = Offset {
-                x: offset.x + pos.x as f32,
-                y: offset.y + pos.y as f32,
-            };
+        let offset = Offset {
+            x: offset.x + pos.x as f32,
+            y: offset.y + pos.y as f32,
+        };
         prop.append_to_draw_list(&mut draw_list, &animation_state::NORMAL, offset, millis);
         draw_list.set_color(Color::from_string("FFF8"));
         draw_list.set_scale(scale);

@@ -20,7 +20,7 @@ use std::rc::Rc;
 
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::ui::{animation_state, AnimationState, Color};
-use sulis_core::util::{self, invalid_data_error, Scale, Offset};
+use sulis_core::util::{self, invalid_data_error, Offset, Scale};
 use sulis_module::area::PropData;
 use sulis_module::{prop, ItemState, LootList, Module, ObjectSizeIterator, Prop};
 

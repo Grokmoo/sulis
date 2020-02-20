@@ -22,7 +22,7 @@ use sulis_core::image::Image;
 use sulis_core::io::{event::ClickKind, DrawList, GraphicsRenderer};
 use sulis_core::resource::ResourceSet;
 use sulis_core::ui::{animation_state, Widget, WidgetKind};
-use sulis_core::util::{Rect, Point};
+use sulis_core::util::{Point, Rect};
 
 pub enum Mode {
     In,

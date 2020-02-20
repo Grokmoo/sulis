@@ -26,7 +26,7 @@ use crate::{
 };
 use sulis_core::image::{Image, LayeredImage};
 use sulis_core::io::GraphicsRenderer;
-use sulis_core::util::{invalid_data_error, ExtInt, Scale, Offset};
+use sulis_core::util::{invalid_data_error, ExtInt, Offset, Scale};
 use sulis_module::{Ability, Actor, ActorBuilder, Faction, ImageLayer, Module};
 use sulis_module::{BonusList, ItemKind, ItemState, QuickSlot, Slot, StatList};
 

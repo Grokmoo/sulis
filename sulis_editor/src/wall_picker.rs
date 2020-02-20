@@ -22,7 +22,7 @@ use sulis_core::config::Config;
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::resource::{ResourceSet, Sprite};
 use sulis_core::ui::{Callback, Color, Widget, WidgetKind};
-use sulis_core::util::{Scale, Offset, Point, Rect};
+use sulis_core::util::{Offset, Point, Rect, Scale};
 use sulis_core::widgets::{Button, Label, ScrollDirection, ScrollPane, Spinner};
 use sulis_module::{area::tile::WallRules, area::MAX_AREA_SIZE, Module};
 
@@ -98,10 +98,7 @@ impl EditorMode for WallPicker {
                         w: gw,
                         h: gh,
                     };
-                    draw_list.append(&mut DrawList::from_sprite_f32(
-                        &self.cursor_sprite,
-                        rect,
-                    ));
+                    draw_list.append(&mut DrawList::from_sprite_f32(&self.cursor_sprite, rect));
                 }
             }
             draw_list.set_scale(scale);

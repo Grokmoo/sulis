@@ -21,7 +21,7 @@ use std::rc::Rc;
 
 use sulis_core::config::Config;
 use sulis_core::io::GraphicsRenderer;
-use sulis_core::util::{invalid_data_error, ExtInt, Point, Offset, Scale};
+use sulis_core::util::{invalid_data_error, ExtInt, Offset, Point, Scale};
 use sulis_module::on_trigger::QuestEntryState;
 use sulis_module::{
     area::{Destination, PathFinder, Trigger, TriggerKind},

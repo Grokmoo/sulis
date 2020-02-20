@@ -24,7 +24,7 @@ use sulis_core::image::{Image, LayeredImage};
 use sulis_core::io::GraphicsRenderer;
 use sulis_core::resource::ResourceSet;
 use sulis_core::ui::Color;
-use sulis_core::util::{Scale, Offset, unable_to_create_error};
+use sulis_core::util::{unable_to_create_error, Offset, Scale};
 
 use crate::{
     AITemplate, Ability, Class, Conversation, ImageLayer, ImageLayerSet, InventoryBuilder,

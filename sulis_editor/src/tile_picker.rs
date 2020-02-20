@@ -20,7 +20,7 @@ use std::rc::Rc;
 
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::ui::{Callback, Color, Widget, WidgetKind};
-use sulis_core::util::{Scale, Offset, Rect, Point};
+use sulis_core::util::{Offset, Point, Rect, Scale};
 use sulis_core::widgets::{Button, ScrollDirection, ScrollPane};
 use sulis_module::area::Tile;
 use sulis_module::Module;
@@ -65,10 +65,7 @@ impl EditorMode for TilePicker {
                     w: tile.width as f32,
                     h: tile.height as f32,
                 };
-                draw_list.append(&mut DrawList::from_sprite_f32(
-                    &tile.image_display,
-                    rect,
-                ));
+                draw_list.append(&mut DrawList::from_sprite_f32(&tile.image_display, rect));
             }
 
             draw_list.set_color(Color::from_string("F008"));
@@ -92,10 +89,7 @@ impl EditorMode for TilePicker {
             w: tile.width as f32,
             h: tile.height as f32,
         };
-        let mut draw_list = DrawList::from_sprite_f32(
-            &tile.image_display,
-            rect,
-        );
+        let mut draw_list = DrawList::from_sprite_f32(&tile.image_display, rect);
         draw_list.set_color(Color::from_string("FFF8"));
         draw_list.set_scale(scale);
         renderer.draw(draw_list);

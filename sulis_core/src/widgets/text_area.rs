@@ -22,7 +22,7 @@ use crate::config::Config;
 use crate::io::{event::ClickKind, GraphicsRenderer};
 use crate::ui::theme::SizeRelative;
 use crate::ui::{Widget, WidgetKind};
-use crate::util::{Point, Size, Offset};
+use crate::util::{Offset, Point, Size};
 use crate::widget_kind;
 use crate::widgets::MarkupRenderer;
 

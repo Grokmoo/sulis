@@ -27,13 +27,13 @@ use crate::animation::{self, Anim};
 use crate::save_state::EntitySaveState;
 use crate::script::{self, CallbackData, ScriptEntitySet};
 use crate::{
-    entity_attack_handler::weapon_attack, is_within_attack_dist, ActorState, AreaState,
-    ChangeListenerList, EntityTextureCache, EntityTextureSlot, GameState, Location, ScriptCallback,
-    TurnManager, entity_texture_cache::Slot,
+    entity_attack_handler::weapon_attack, entity_texture_cache::Slot, is_within_attack_dist,
+    ActorState, AreaState, ChangeListenerList, EntityTextureCache, EntityTextureSlot, GameState,
+    Location, ScriptCallback, TurnManager,
 };
 use sulis_core::io::GraphicsRenderer;
 use sulis_core::ui::{color, Color};
-use sulis_core::util::{Scale, Offset, invalid_data_error};
+use sulis_core::util::{invalid_data_error, Offset, Scale};
 use sulis_module::area::MAX_AREA_SIZE;
 use sulis_module::{
     actor::Faction, ai, Actor, DamageKind, HitKind, Module, ObjectSize, ObjectSizeIterator,
@@ -633,17 +633,13 @@ impl AreaDrawable for EntityState {
             self.color.b * color.b,
             self.color.a * color.a,
         );
-        let offset = Offset { x: offset_x, y: offset_y };
+        let offset = Offset {
+            x: offset_x,
+            y: offset_y,
+        };
         let slot_loc = Slot { x, y };
         if let Some(ref slot) = self.texture_cache_slot {
-            slot.draw(
-                renderer,
-                slot_loc,
-                offset,
-                scale,
-                color,
-                self.color_sec,
-            );
+            slot.draw(renderer, slot_loc, offset, scale, color, self.color_sec);
         }
     }
 

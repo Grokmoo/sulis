@@ -29,7 +29,7 @@ use sulis_core::io::*;
 use sulis_core::resource::{ResourceSet, Sprite};
 use sulis_core::ui::{animation_state, compute_area_scaling};
 use sulis_core::ui::{color, Color, Cursor, Scrollable, Widget, WidgetKind};
-use sulis_core::util::{self, Point, Offset, Scale, Rect};
+use sulis_core::util::{self, Offset, Point, Rect, Scale};
 use sulis_core::widgets::Label;
 use sulis_module::{
     area::{Layer, Tile},
@@ -197,11 +197,13 @@ impl AreaView {
 
         let mut draw_list = DrawList::empty_sprite();
         for (x, y, tile) in tiles {
-            let rect = Rect { x: x as f32, y: y as f32, w: tile.width as f32, h: tile.height as f32 };
-            draw_list.append(&mut DrawList::from_sprite(
-                &tile.image_display,
-                rect
-            ));
+            let rect = Rect {
+                x: x as f32,
+                y: y as f32,
+                w: tile.width as f32,
+                h: tile.height as f32,
+            };
+            draw_list.append(&mut DrawList::from_sprite(&tile.image_display, rect));
         }
 
         if !draw_list.is_empty() {
@@ -245,14 +247,13 @@ impl AreaView {
                 max_x * scale,
                 max_y * scale,
             );
-            let range = Range { min_x, max_x, min_y, max_y };
-            self.draw_vis_to_texture(
-                renderer,
-                vis_sprite,
-                explored_sprite,
-                area_state,
-                range,
-            );
+            let range = Range {
+                min_x,
+                max_x,
+                min_y,
+                max_y,
+            };
+            self.draw_vis_to_texture(renderer, vis_sprite, explored_sprite, area_state, range);
             trace!(
                 "Visibility render to texture time: {}",
                 util::format_elapsed_secs(start_time.elapsed())
@@ -281,16 +282,18 @@ impl AreaView {
                     // cur_line.push(' ');
                 }
 
-                let rect = Rect { x: tile_x as f32, y: tile_y as f32, w: 1.0, h: 1.0 };
+                let rect = Rect {
+                    x: tile_x as f32,
+                    y: tile_y as f32,
+                    w: 1.0,
+                    h: 1.0,
+                };
                 draw_list.append(&mut DrawList::from_sprite(vis_sprite, rect));
 
                 if area_state.is_pc_explored(tile_x, tile_y) {
                     continue;
                 }
-                draw_list.append(&mut DrawList::from_sprite(
-                    explored_sprite,
-                    rect,
-                ));
+                draw_list.append(&mut DrawList::from_sprite(explored_sprite, rect));
             }
             // info!("{}|", cur_line);
         }
@@ -310,12 +313,10 @@ impl AreaView {
         let mut draw_list = draw_list;
         draw_list.texture_mag_filter = TextureMagFilter::Linear;
         draw_list.texture_min_filter = TextureMinFilter::Linear;
-        draw_list.set_scale(
-            Scale {
-                x: TILE_SIZE as f32 / TILE_CACHE_TEXTURE_SIZE as f32 * ui_x as f32,
-                y: TILE_SIZE as f32 / TILE_CACHE_TEXTURE_SIZE as f32 * ui_y as f32,
-            }
-        );
+        draw_list.set_scale(Scale {
+            x: TILE_SIZE as f32 / TILE_CACHE_TEXTURE_SIZE as f32 * ui_x as f32,
+            y: TILE_SIZE as f32 / TILE_CACHE_TEXTURE_SIZE as f32 * ui_y as f32,
+        });
         renderer.draw_to_texture(texture_id, draw_list);
     }
 
@@ -341,11 +342,7 @@ impl AreaView {
             w: (TILE_CACHE_TEXTURE_SIZE / TILE_SIZE) as f32,
             h: (TILE_CACHE_TEXTURE_SIZE / TILE_SIZE) as f32,
         };
-        let mut draw_list = DrawList::from_texture_id(
-            &id,
-            &TEX_COORDS,
-            rect,
-        );
+        let mut draw_list = DrawList::from_texture_id(&id, &TEX_COORDS, rect);
         draw_list.set_scale(scale);
         draw_list.set_color(color);
         renderer.draw(draw_list);
@@ -705,7 +702,12 @@ impl WidgetKind for AreaView {
                 let (max_x, max_y) =
                     AreaView::get_texture_cache_max(state.area.width, state.area.height);
                 trace!("Full area visibility draw from 0,0 to {},{}", max_x, max_y);
-                let range = Range { min_x: 0, max_x, min_y: 0, max_y };
+                let range = Range {
+                    min_x: 0,
+                    max_x,
+                    min_y: 0,
+                    max_y,
+                };
                 self.draw_vis_to_texture(
                     renderer,
                     &state.area.area.visibility_tile,
@@ -735,14 +737,11 @@ impl WidgetKind for AreaView {
         let time = mgr.borrow().current_time();
         let area_color = rules.get_area_color(state.area.area.location_kind, time);
 
-        let scale = Scale { x: scale_x, y: scale_y };
-        self.draw_layer(
-            renderer,
-            scale,
-            widget,
-            BASE_LAYER_ID,
-            area_color,
-        );
+        let scale = Scale {
+            x: scale_x,
+            y: scale_y,
+        };
+        self.draw_layer(renderer, scale, widget, BASE_LAYER_ID, area_color);
         GameState::draw_below_entities(
             renderer,
             Offset {
@@ -758,18 +757,17 @@ impl WidgetKind for AreaView {
             Some(ref set) => set,
         };
 
-        let offset = Offset { x: self.scroll.x(), y: self.scroll.y() };
+        let offset = Offset {
+            x: self.scroll.x(),
+            y: self.scroll.y(),
+        };
         if let Some(ref indicator) = state.range_indicator() {
-            let mut draw_list =
-                indicator.get_draw_list(image_set, offset, millis);
+            let mut draw_list = indicator.get_draw_list(image_set, offset, millis);
             draw_list.set_scale(scale);
             renderer.draw(draw_list);
         }
 
-        if let Some(mut draw_list) =
-            self.overlay_handler
-                .get_path_draw_list(offset, millis)
-        {
+        if let Some(mut draw_list) = self.overlay_handler.get_path_draw_list(offset, millis) {
             draw_list.set_scale(scale);
             renderer.draw(draw_list);
         }
@@ -812,23 +810,13 @@ impl WidgetKind for AreaView {
             }
         }
 
-        self.draw_entities_props(
-            renderer, scale, area_color, widget, &state, millis,
-        );
-        let offset = Offset { x: p.x as f32 - self.scroll.x(), y: p.y as f32 - self.scroll.y() };
-        GameState::draw_above_entities(
-            renderer,
-            offset,
-            scale,
-            millis,
-        );
-        self.draw_layer(
-            renderer,
-            scale,
-            widget,
-            AERIAL_LAYER_ID,
-            area_color,
-        );
+        self.draw_entities_props(renderer, scale, area_color, widget, &state, millis);
+        let offset = Offset {
+            x: p.x as f32 - self.scroll.x(),
+            y: p.y as f32 - self.scroll.y(),
+        };
+        GameState::draw_above_entities(renderer, offset, scale, millis);
+        self.draw_layer(renderer, scale, widget, AERIAL_LAYER_ID, area_color);
 
         if let Some(ref hover) = self.overlay_handler.hover_sprite() {
             let rect = Rect {
@@ -838,9 +826,7 @@ impl WidgetKind for AreaView {
                 h: hover.h as f32,
             };
 
-            let mut draw_list = DrawList::from_sprite_f32(
-                &hover.sprite, rect
-            );
+            let mut draw_list = DrawList::from_sprite_f32(&hover.sprite, rect);
             if !hover.left_click_action_valid {
                 draw_list.set_color(color::RED);
             }
@@ -854,7 +840,10 @@ impl WidgetKind for AreaView {
         };
 
         if let Some(ref targeter) = state.targeter() {
-            let offset = Offset { x: self.scroll.x(), y: self.scroll.y() };
+            let offset = Offset {
+                x: self.scroll.x(),
+                y: self.scroll.y(),
+            };
             targeter.borrow_mut().draw(
                 renderer,
                 &targeter_tile,
@@ -869,27 +858,18 @@ impl WidgetKind for AreaView {
         self.draw_entities_props(renderer, scale, color, widget, &state, millis);
 
         if Config::debug().limit_line_of_sight {
-            self.draw_layer(
-                renderer,
-                scale,
-                widget,
-                VISIBILITY_TEX_ID,
-                color::WHITE,
-            );
+            self.draw_layer(renderer, scale, widget, VISIBILITY_TEX_ID, color::WHITE);
         }
 
-        let offset = Offset {x: p.x as f32 - self.scroll.x(), y: p.y as f32 - self.scroll.y() };
+        let offset = Offset {
+            x: p.x as f32 - self.scroll.x(),
+            y: p.y as f32 - self.scroll.y(),
+        };
         self.overlay_handler
             .draw_top(renderer, &self.feedback_text_params, offset, scale, millis);
 
         for feedback_text in state.feedback_text_iter_mut() {
-            feedback_text.draw(
-                renderer,
-                &self.feedback_text_params,
-                offset,
-                scale,
-                millis,
-            );
+            feedback_text.draw(renderer, &self.feedback_text_params, offset, scale, millis);
         }
     }
 

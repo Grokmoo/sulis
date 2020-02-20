@@ -24,7 +24,7 @@ use sulis_core::config::Config;
 use sulis_core::image::Image;
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::ui::{animation_state, Color};
-use sulis_core::util::{approx_eq, gen_rand, ExtInt, Offset, Scale, Rect};
+use sulis_core::util::{approx_eq, gen_rand, ExtInt, Offset, Rect, Scale};
 
 #[allow(clippy::trivially_copy_pass_by_ref)]
 fn is_zero(val: &f32) -> bool {
@@ -395,12 +395,9 @@ pub(in crate::animation) fn draw(
             h: particle.height,
         };
         let millis = (particle.current_duration * 1000.0) as u32;
-        state.image.append_to_draw_list(
-            &mut draw_list,
-            &animation_state::NORMAL,
-            rect,
-            millis,
-        );
+        state
+            .image
+            .append_to_draw_list(&mut draw_list, &animation_state::NORMAL, rect, millis);
     }
 
     if !draw_list.is_empty() {

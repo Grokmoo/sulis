@@ -612,24 +612,16 @@ impl Anim {
     ) {
         use self::AnimKind::*;
         match self.kind {
-            RangedAttack { ref model } => ranged_attack_animation::draw(
-                model, renderer, offset, scale, millis,
-            ),
+            RangedAttack { ref model } => {
+                ranged_attack_animation::draw(model, renderer, offset, scale, millis)
+            }
             ParticleGenerator {
                 ref state,
                 ref model,
-            } => particle_generator::draw(
-                state,
-                model,
-                &self.owner,
-                renderer,
-                offset,
-                scale,
-                millis,
-            ),
-            Move { ref model } => move_animation::draw(
-                model, renderer, offset, scale, millis,
-            ),
+            } => {
+                particle_generator::draw(state, model, &self.owner, renderer, offset, scale, millis)
+            }
+            Move { ref model } => move_animation::draw(model, renderer, offset, scale, millis),
             _ => (),
         }
     }

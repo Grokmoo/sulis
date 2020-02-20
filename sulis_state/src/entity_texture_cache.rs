@@ -20,7 +20,7 @@ use crate::{EntityState, GameState};
 use sulis_core::config::Config;
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::ui::Color;
-use sulis_core::util::{Offset, Scale, Rect};
+use sulis_core::util::{Offset, Rect, Scale};
 
 const BORDER_SIZE: i32 = 2;
 const BORDER_SIZE_F: f32 = BORDER_SIZE as f32;
@@ -56,8 +56,14 @@ impl EntityTextureSlot {
 
         let (ui_x, ui_y) = Config::ui_size();
 
-        let offset = Offset { x: self.x as f32 + BORDER_SIZE_F, y: self.y as f32 + 2.0 * BORDER_SIZE_F };
-        let scale = Scale { x: ui_x as f32 / self.slots_dim as f32, y: ui_y as f32 / self.slots_dim as f32 };
+        let offset = Offset {
+            x: self.x as f32 + BORDER_SIZE_F,
+            y: self.y as f32 + 2.0 * BORDER_SIZE_F,
+        };
+        let scale = Scale {
+            x: ui_x as f32 / self.slots_dim as f32,
+            y: ui_y as f32 / self.slots_dim as f32,
+        };
 
         entity
             .actor
@@ -80,11 +86,7 @@ impl EntityTextureSlot {
             h: self.h as f32 + offset.y * 2.0,
         };
 
-        let mut list = DrawList::from_texture_id(
-            &self.texture_id,
-            &self.tex_coords,
-            rect,
-        );
+        let mut list = DrawList::from_texture_id(&self.texture_id, &self.tex_coords, rect);
 
         list.set_scale(scale);
         list.set_color(color);

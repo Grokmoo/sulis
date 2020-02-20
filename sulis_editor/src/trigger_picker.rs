@@ -22,7 +22,7 @@ use sulis_core::config::Config;
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::resource::{ResourceSet, Sprite};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
-use sulis_core::util::{Scale, Offset, Rect, Point};
+use sulis_core::util::{Offset, Point, Rect, Scale};
 use sulis_core::widgets::{Label, Spinner};
 
 use crate::{AreaModel, EditorMode};

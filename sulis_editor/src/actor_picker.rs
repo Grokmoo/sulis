@@ -20,7 +20,7 @@ use std::rc::Rc;
 
 use sulis_core::io::GraphicsRenderer;
 use sulis_core::ui::{Callback, Widget, WidgetKind};
-use sulis_core::util::{Offset, Scale, Point};
+use sulis_core::util::{Offset, Point, Scale};
 use sulis_core::widgets::{Button, ScrollDirection, ScrollPane};
 use sulis_module::{Actor, Module};
 

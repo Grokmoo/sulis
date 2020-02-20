@@ -22,7 +22,7 @@ use sulis_core::image::Image;
 use sulis_core::io::{event, DrawList, GraphicsRenderer};
 use sulis_core::resource::ResourceSet;
 use sulis_core::ui::{Color, Widget, WidgetKind};
-use sulis_core::util::{Rect, Point};
+use sulis_core::util::{Point, Rect};
 
 pub struct ColorButton {
     color: Color,
@@ -70,14 +70,14 @@ impl WidgetKind for ColorButton {
 
         let (x, y) = widget.state.inner_position().as_tuple();
         let (w, h) = widget.state.inner_size().as_tuple();
-        let rect = Rect { x: x as f32, y: y as f32, w: w as f32, h: h as f32 };
+        let rect = Rect {
+            x: x as f32,
+            y: y as f32,
+            w: w as f32,
+            h: h as f32,
+        };
         let mut draw_list = DrawList::empty_sprite();
-        icon.append_to_draw_list(
-            &mut draw_list,
-            &widget.state.animation_state,
-            rect,
-            millis,
-        );
+        icon.append_to_draw_list(&mut draw_list, &widget.state.animation_state, rect, millis);
         draw_list.set_color(self.color);
         renderer.draw(draw_list);
     }

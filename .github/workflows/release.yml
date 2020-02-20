@@ -21,7 +21,7 @@ jobs:
       - name: Linux Build
         run: |
           cargo install cross
-          cross build --target x86_64-unknown-linux-gnu
+          cross build --release --target x86_64-unknown-linux-gnu
           mkdir sulis/
           cp target/x86_64-unknown-linux-gnu/release/main sulis/sulis
           git archive HEAD --prefix=sulis/ --format=zip -o sulis-${{ steps.get_version.outputs.VERSION }}-linux64.zip

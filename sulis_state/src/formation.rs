@@ -14,7 +14,6 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::collections::HashMap;
 use std::cell::RefCell;
 use std::f32;
 use std::rc::Rc;
@@ -76,7 +75,7 @@ impl Formation {
     pub fn move_group(
         &self,
         entities_to_move: &[Rc<RefCell<EntityState>>],
-        entities_to_ignore: HashMap<usize, bool>,
+        entities_to_ignore: Vec<usize>,
         dest: Destination,
     ) {
         if entities_to_move.len() == 1 {

@@ -14,7 +14,6 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::collections::HashMap;
 use std::cell::RefCell;
 use std::cmp;
 use std::rc::Rc;
@@ -712,12 +711,15 @@ struct MoveAction {
     path: Vec<(f32, f32)>,
 }
 
-fn entities_to_ignore() -> HashMap<usize, bool> {
-    let in_combat = GameState::is_combat_active();
-    GameState::party()
-        .iter()
-        .map(|e| (e.borrow().index(), in_combat))
-        .collect()
+fn entities_to_ignore() -> Vec<usize> {
+    if GameState::is_combat_active() {
+        Vec::new()
+    } else {
+        GameState::party()
+            .iter()
+            .map(|e| e.borrow().index())
+            .collect()
+    }
 }
 
 impl MoveAction {

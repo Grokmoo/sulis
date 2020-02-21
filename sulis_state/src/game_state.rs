@@ -1119,7 +1119,7 @@ impl GameState {
 
     pub fn move_towards_dest(
         entity: &Rc<RefCell<EntityState>>,
-        entities_to_ignore: &HashMap<usize, bool>,
+        entities_to_ignore: &Vec<usize>,
         dest: Destination,
         cb: Option<Box<dyn ScriptCallback>>,
     ) -> bool {
@@ -1150,7 +1150,7 @@ impl GameState {
 
     pub fn can_move_towards_dest(
         entity: &EntityState,
-        entities_to_ignore: &HashMap<usize, bool>,
+        entities_to_ignore: &Vec<usize>,
         dest: Destination,
     ) -> Option<Vec<Point>> {
         STATE.with(|s| {
@@ -1171,7 +1171,7 @@ impl GameState {
     pub fn can_move_ignore_ap(
         entity: &EntityState,
         area: &AreaState,
-        entities_to_ignore: &HashMap<usize, bool>,
+        entities_to_ignore: &Vec<usize>,
         dest: Destination,
     ) -> Option<Vec<Point>> {
         STATE.with(|s| {

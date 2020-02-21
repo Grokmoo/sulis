@@ -14,7 +14,6 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::collections::HashMap;
 use std::cell::RefCell;
 use std::rc::Rc;
 
@@ -31,14 +30,14 @@ pub struct StateLocationChecker<'a, 'b> {
     prop_grid: &'a [bool],
     entity_grid: &'a [Vec<usize>],
     requester: &'b EntityState,
-    entities_to_ignore: &'b HashMap<usize, bool>,
+    entities_to_ignore: &'b Vec<usize>,
 }
 
 impl<'a, 'b> StateLocationChecker<'a, 'b> {
     pub fn new(
         area_state: &'a AreaState,
         requester: &'b EntityState,
-        entities_to_ignore: &'b HashMap<usize, bool>,
+        entities_to_ignore: &'b Vec<usize>,
     ) -> StateLocationChecker<'a, 'b> {
         let width = area_state.area.width;
         let grid = &area_state.area.path_grid(&requester.size());
@@ -57,31 +56,25 @@ impl<'a, 'b> StateLocationChecker<'a, 'b> {
 }
 
 impl<'a, 'b> LocationChecker for StateLocationChecker<'a, 'b> {
-    fn passable(&self, x: i32, y: i32) -> bool {
+    fn passable(&self, x: i32, y: i32) -> Option<bool> {
         if !self.grid.is_passable(x, y) {
-            return false;
+            return Some(false);
         }
 
-        self.requester.points(x, y).all(|p| {
+        for p in self.requester.points(x, y) {
             let index = (p.x + p.y * self.width) as usize;
 
             if !self.prop_grid[index] {
-                return false;
+                return Some(false);
             }
 
             for i in self.entity_grid[index].iter() {
-                if !self.entities_to_ignore.contains_key(i) {
-                    return false;
+                if !self.entities_to_ignore.contains(i) {
+                    return Some(true);
                 }
             }
-
-            true
-        })
-    }
-    fn is_invalid_endpoint(&self, x: i32, y:i32) -> bool {
-
-        let index = (x + y * self.width) as usize;
-        self.entities_to_ignore.get(&index) == Some(&true)
+        }
+        None
     }
 }
 
@@ -89,7 +82,7 @@ pub fn move_towards_point(
     finder: &mut PathFinder,
     area: &AreaState,
     entity: &Rc<RefCell<EntityState>>,
-    entities_to_ignore: &HashMap<usize, bool>,
+    entities_to_ignore: &Vec<usize>,
     dest: Destination,
     cb: Option<Box<dyn ScriptCallback>>,
 ) -> Option<Anim> {
@@ -118,7 +111,7 @@ pub fn can_move_towards_point(
     finder: &mut PathFinder,
     area: &AreaState,
     entity: &EntityState,
-    entities_to_ignore: &HashMap<usize, bool>,
+    entities_to_ignore: &Vec<usize>,
     dest: Destination,
 ) -> Option<Vec<Point>> {
     find_path(finder, area, entity, entities_to_ignore, dest, true)
@@ -128,7 +121,7 @@ pub fn can_move_ignore_ap(
     finder: &mut PathFinder,
     area: &AreaState,
     entity: &EntityState,
-    entities_to_ignore: &HashMap<usize, bool>,
+    entities_to_ignore: &Vec<usize>,
     dest: Destination,
 ) -> Option<Vec<Point>> {
     find_path(finder, area, entity, entities_to_ignore, dest, false)
@@ -138,7 +131,7 @@ fn find_path(
     path_finder: &mut PathFinder,
     area_state: &AreaState,
     entity: &EntityState,
-    entities_to_ignore: &HashMap<usize, bool>,
+    entities_to_ignore: &Vec<usize>,
     dest: Destination,
     check_ap: bool,
 ) -> Option<Vec<Point>> {

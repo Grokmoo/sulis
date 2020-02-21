@@ -83,10 +83,7 @@ impl PartialEq for OpenEntry {
 }
 
 pub trait LocationChecker {
-    fn passable(&self, x: i32, y: i32) -> bool;
-    fn is_invalid_endpoint(&self, _x: i32, _y: i32) -> bool {
-        false
-    }
+    fn passable(&self, x: i32, y: i32) -> Option<bool>;
 }
 
 pub struct PathFinder {
@@ -209,17 +206,23 @@ impl PathFinder {
         // info!("Spent {} secs in path find init", util::format_elapsed_secs(start_time.elapsed()));
 
         let loop_start_time = time::Instant::now();
+        let mut step_back: Option<i32> = None;
 
         let mut iterations = 0;
         while iterations < self.max_iterations && !self.open.is_empty() {
-            let current = self.pop_lowest_f_score_in_open_set();
+            let mut current = self.pop_lowest_f_score_in_open_set();
             if self.is_goal(current, dest_dist_squared) {
                 trace!(
                     "Path loop time: {}",
                     util::format_elapsed_secs(loop_start_time.elapsed())
                 );
+                if let Some(step) = step_back {
+                    for _ in step..iterations {
+                        current = self.pop_lowest_f_score_in_open_set();
+                    }
+                }
 
-                let path = self.reconstruct_path(checker, current);
+                let path = self.reconstruct_path(current);
                 if path.len() == 1 && path[0].x == start_x && path[0].y == start_y {
                     debug!("Found path with no moves.");
                     return None;
@@ -240,6 +243,7 @@ impl PathFinder {
             }
 
             self.closed.insert(current);
+            let mut in_comfort_zone = false;
 
             let neighbors = self.get_neighbors(current);
             for neighbor in neighbors.iter() {
@@ -257,10 +261,14 @@ impl PathFinder {
                 let neighbor_x = neighbor % self.width;
                 let neighbor_y = neighbor / self.width;
 
-                if !checker.passable(neighbor_x, neighbor_y) {
-                    self.closed.insert(neighbor);
-                    //trace!("Not passable");
-                    continue;
+                match checker.passable(neighbor_x, neighbor_y) {
+                    Some(false) => {
+                        self.closed.insert(neighbor);
+                        //trace!("Not passable");
+                        continue;
+                    },
+                    Some(true) => in_comfort_zone = true,
+                    None => {}
                 }
 
                 let tentative_g_score =
@@ -277,8 +285,11 @@ impl PathFinder {
                 self.f_score[neighbor as usize] = tentative_g_score + self.dist_squared(neighbor);
                 self.push_to_open_set(neighbor, self.f_score[neighbor as usize]);
             }
-
             iterations += 1;
+            if !in_comfort_zone { // far enough from friendly unit for endpoint
+                step_back = Some(iterations);
+            }
+
         }
 
         debug!(
@@ -295,15 +306,12 @@ impl PathFinder {
     }
 
     #[inline]
-    fn reconstruct_path<T: LocationChecker>(&mut self, checker: &T, mut current: i32) -> Vec<Point> {
+    fn reconstruct_path(&self, mut current: i32) -> Vec<Point> {
         trace!("Reconstructing path");
 
         // let reconstruct_time = time::Instant::now();
         let mut path: Vec<Point> = Vec::new();
 
-        while checker.is_invalid_endpoint(current % self.width, current / self.width) && !self.open.is_empty() {
-            current = self.pop_lowest_f_score_in_open_set();
-        }
         path.push(self.get_point(current));
         loop {
             //trace!("Current {}", current);

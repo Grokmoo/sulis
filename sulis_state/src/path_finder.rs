@@ -61,7 +61,7 @@ impl<'a, 'b> LocationChecker for StateLocationChecker<'a, 'b> {
             return false;
         }
 
-       self.requester.points(x, y).all(|p| {
+        self.requester.points(x, y).all(|p| {
             let index = (p.x + p.y * self.width) as usize;
 
             if !self.prop_grid[index] {

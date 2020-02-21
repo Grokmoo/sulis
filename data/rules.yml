@@ -85,6 +85,7 @@ hints:
   - "Each character gains four action points per round, which can be modified by various effects.  Some action points can be saved up until the next round if unused."
   - "You can run away from combat, if you are able to put enough distance between your party and enemies."
   - "Buttons on the bottom panel each have a keyboard hotkey, customizable in the Options Menu under Input."
+  - "All keyboard keys can be remapped in the Options Menu under Input."
 
 area_colors:
   Outdoors: [

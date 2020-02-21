@@ -2,7 +2,7 @@
 # The main game configuration file.  User preferences are set here.
 
 # If the user has an old revision, their config is automatically recreated from the sample.
-revision: 10
+revision: 11
 
 display:
     # Display Adapter - Glium is the only choice for now
@@ -74,7 +74,7 @@ input:
         KeyF: ToggleFormation
         KeyM: ToggleMap
         KeyJ: ToggleJournal
-        KeyT: Rest
+        KeyR: Rest
         KeySpace: EndTurn
         KeyDown: ScrollDown
         KeyUp: ScrollUp
@@ -90,10 +90,10 @@ input:
         KeyF2: SelectPartyMember2
         KeyF3: SelectPartyMember3
         KeyF4: SelectPartyMember4
-        KeyQ: QuickItem1
-        KeyW: QuickItem2
-        KeyE: QuickItem3
-        KeyR: QuickItem4
+        KeyT: QuickItem1
+        KeyY: QuickItem2
+        KeyG: QuickItem3
+        KeyH: QuickItem4
         Key1: ActivateAbility1
         Key2: ActivateAbility2
         Key3: ActivateAbility3

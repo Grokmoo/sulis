@@ -83,7 +83,7 @@ impl PartialEq for OpenEntry {
 }
 
 pub trait LocationChecker {
-    fn passable(&self, x: i32, y: i32) -> Option<bool>;
+    fn passable(&self, x: i32, y: i32, in_comfort_zone: &mut bool) -> bool;
 }
 
 pub struct PathFinder {
@@ -261,14 +261,10 @@ impl PathFinder {
                 let neighbor_x = neighbor % self.width;
                 let neighbor_y = neighbor / self.width;
 
-                match checker.passable(neighbor_x, neighbor_y) {
-                    Some(false) => {
-                        self.closed.insert(neighbor);
-                        //trace!("Not passable");
-                        continue;
-                    },
-                    Some(true) => in_comfort_zone = true,
-                    None => {}
+                if checker.passable(neighbor_x, neighbor_y, &mut in_comfort_zone) {
+                    self.closed.insert(neighbor);
+                    //trace!("Not passable");
+                    continue;
                 }
 
                 let tentative_g_score =

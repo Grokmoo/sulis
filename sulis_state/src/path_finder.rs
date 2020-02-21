@@ -30,14 +30,14 @@ pub struct StateLocationChecker<'a, 'b> {
     prop_grid: &'a [bool],
     entity_grid: &'a [Vec<usize>],
     requester: &'b EntityState,
-    entities_to_ignore: &'b Vec<usize>,
+    entities_to_ignore: &'b [usize],
 }
 
 impl<'a, 'b> StateLocationChecker<'a, 'b> {
     pub fn new(
         area_state: &'a AreaState,
         requester: &'b EntityState,
-        entities_to_ignore: &'b Vec<usize>,
+        entities_to_ignore: &'b [usize],
     ) -> StateLocationChecker<'a, 'b> {
         let width = area_state.area.width;
         let grid = &area_state.area.path_grid(&requester.size());
@@ -82,7 +82,7 @@ pub fn move_towards_point(
     finder: &mut PathFinder,
     area: &AreaState,
     entity: &Rc<RefCell<EntityState>>,
-    entities_to_ignore: &Vec<usize>,
+    entities_to_ignore: &[usize],
     dest: Destination,
     cb: Option<Box<dyn ScriptCallback>>,
 ) -> Option<Anim> {
@@ -111,7 +111,7 @@ pub fn can_move_towards_point(
     finder: &mut PathFinder,
     area: &AreaState,
     entity: &EntityState,
-    entities_to_ignore: &Vec<usize>,
+    entities_to_ignore: &[usize],
     dest: Destination,
 ) -> Option<Vec<Point>> {
     find_path(finder, area, entity, entities_to_ignore, dest, true)
@@ -121,7 +121,7 @@ pub fn can_move_ignore_ap(
     finder: &mut PathFinder,
     area: &AreaState,
     entity: &EntityState,
-    entities_to_ignore: &Vec<usize>,
+    entities_to_ignore: &[usize],
     dest: Destination,
 ) -> Option<Vec<Point>> {
     find_path(finder, area, entity, entities_to_ignore, dest, false)
@@ -131,7 +131,7 @@ fn find_path(
     path_finder: &mut PathFinder,
     area_state: &AreaState,
     entity: &EntityState,
-    entities_to_ignore: &Vec<usize>,
+    entities_to_ignore: &[usize],
     dest: Destination,
     check_ap: bool,
 ) -> Option<Vec<Point>> {

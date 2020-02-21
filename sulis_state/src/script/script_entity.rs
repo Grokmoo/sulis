@@ -1032,7 +1032,7 @@ impl UserData for ScriptEntity {
 
                 Ok(GameState::move_towards_dest(
                     &parent,
-                    &HashMap::new(),
+                    &Vec::new(),
                     dest,
                     None,
                 ))
@@ -1048,7 +1048,7 @@ impl UserData for ScriptEntity {
                 dest.dist = dist.unwrap_or(MOVE_TO_THRESHOLD);
                 Ok(GameState::move_towards_dest(
                     &parent,
-                    &HashMap::new(),
+                    &Vec::new(),
                     dest,
                     None,
                 ))

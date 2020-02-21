@@ -822,7 +822,7 @@ impl MoveAction {
         let formation = GameState::party_formation();
         formation
             .borrow()
-            .move_group(&self.selected, entities_to_ignore(), self.dest);
+            .move_group(&self.selected, &entities_to_ignore(), self.dest);
     }
 }
 

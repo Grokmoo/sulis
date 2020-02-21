@@ -206,7 +206,7 @@ impl PathFinder {
         // info!("Spent {} secs in path find init", util::format_elapsed_secs(start_time.elapsed()));
 
         let loop_start_time = time::Instant::now();
-        let mut step_back: Option<i32> = None;
+        let mut step_back = 0;
 
         let mut iterations = 0;
         while iterations < self.max_iterations && !self.open.is_empty() {
@@ -216,8 +216,8 @@ impl PathFinder {
                     "Path loop time: {}",
                     util::format_elapsed_secs(loop_start_time.elapsed())
                 );
-                if let Some(step) = step_back {
-                    for _ in step..iterations {
+                if step_back > 0 && step_back != iterations {
+                    for _ in step_back..=iterations {
                         current = self.pop_lowest_f_score_in_open_set();
                     }
                 }
@@ -243,7 +243,7 @@ impl PathFinder {
             }
 
             self.closed.insert(current);
-            let mut in_comfort_zone = false;
+            let mut in_comfort_zone = false; // not too near a friendly unit
 
             let neighbors = self.get_neighbors(current);
             for neighbor in neighbors.iter() {
@@ -286,8 +286,8 @@ impl PathFinder {
                 self.push_to_open_set(neighbor, self.f_score[neighbor as usize]);
             }
             iterations += 1;
-            if !in_comfort_zone { // far enough from friendly unit for endpoint
-                step_back = Some(iterations);
+            if !in_comfort_zone {
+                step_back = iterations;
             }
 
         }

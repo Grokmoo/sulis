@@ -261,7 +261,7 @@ impl PathFinder {
                 let neighbor_x = neighbor % self.width;
                 let neighbor_y = neighbor / self.width;
 
-                if checker.passable(neighbor_x, neighbor_y, &mut in_comfort_zone) {
+                if !checker.passable(neighbor_x, neighbor_y, &mut in_comfort_zone) {
                     self.closed.insert(neighbor);
                     //trace!("Not passable");
                     continue;

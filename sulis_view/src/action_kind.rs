@@ -712,18 +712,10 @@ struct MoveAction {
 }
 
 fn entities_to_ignore() -> Vec<usize> {
-    if GameState::is_combat_active() {
-        if let Some(pc) = GameState::selected().first() {
-            vec![pc.borrow().index()]
-        } else {
-            vec![]
-        }
-    } else {
-        GameState::party()
-            .iter()
-            .map(|e| e.borrow().index())
-            .collect()
-    }
+    GameState::party()
+        .iter()
+        .map(|e| e.borrow().index())
+        .collect()
 }
 
 impl MoveAction {

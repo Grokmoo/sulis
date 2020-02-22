@@ -198,7 +198,7 @@ impl AreaGenerator {
             let mut open_spot: Option<Point> = None;
             for y in min_y..max_y {
                 for x in min_x..max_x {
-                    if location_checker.passable(x, y) != Some(false) {
+                    if location_checker.passable(x, y, &mut false) {
                         open_spot = Some(Point::new(x, y));
                         break;
                     }

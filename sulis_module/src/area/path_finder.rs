@@ -83,7 +83,8 @@ impl PartialEq for OpenEntry {
 }
 
 pub trait LocationChecker {
-    fn passable(&self, x: i32, y: i32, in_private_space: &mut bool) -> bool;
+    fn passable(&self, x: i32, y: i32) -> bool;
+    fn in_friend_space(&self, _op: Option<&Point>) -> bool {false}
 }
 
 pub struct PathFinder {
@@ -207,25 +208,26 @@ impl PathFinder {
 
         let loop_start_time = time::Instant::now();
 
-        let mut last_private_space = 0;
         let mut iterations = 0;
         while iterations < self.max_iterations && !self.open.is_empty() {
-            let mut current = self.pop_lowest_f_score_in_open_set();
+            let current = self.pop_lowest_f_score_in_open_set();
             if self.is_goal(current, dest_dist_squared) {
                 trace!(
                     "Path loop time: {}",
                     util::format_elapsed_secs(loop_start_time.elapsed())
                 );
-                if last_private_space > 0 && last_private_space != iterations {
-                    for _ in last_private_space..=iterations {
-                        current = self.pop_lowest_f_score_in_open_set();
-                    }
-                }
 
-                let path = self.reconstruct_path(current);
-                if path.len() == 1 && path[0].x == start_x && path[0].y == start_y {
-                    debug!("Found path with no moves.");
-                    return None;
+                let mut path = self.reconstruct_path(current);
+
+                loop {
+                    if path.len() == 1 && path[0].x == start_x && path[0].y == start_y {
+                        debug!("Found path with no moves.");
+                        return None;
+                    }
+                    if !checker.in_friend_space(path.last()) {
+                        break;
+                    }
+                    path.pop();
                 }
 
                 if let Some(max_path_len) = dest.max_path_len {
@@ -244,9 +246,6 @@ impl PathFinder {
 
             self.closed.insert(current);
 
-            // not too near a friendly unit
-            let mut in_private_space = last_private_space < iterations - 2;
-
             let neighbors = self.get_neighbors(current);
             for neighbor in neighbors.iter() {
                 let neighbor = *neighbor;
@@ -263,7 +262,7 @@ impl PathFinder {
                 let neighbor_x = neighbor % self.width;
                 let neighbor_y = neighbor / self.width;
 
-                if !checker.passable(neighbor_x, neighbor_y, &mut in_private_space) {
+                if !checker.passable(neighbor_x, neighbor_y) {
                     self.closed.insert(neighbor);
                     //trace!("Not passable");
                     continue;
@@ -284,10 +283,6 @@ impl PathFinder {
                 self.push_to_open_set(neighbor, self.f_score[neighbor as usize]);
             }
             iterations += 1;
-            if in_private_space {
-                last_private_space = iterations;
-            }
-
         }
 
         debug!(

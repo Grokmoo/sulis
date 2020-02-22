@@ -1022,6 +1022,7 @@ impl UserData for ScriptEntity {
             |_, entity, (dest, dist, max_len): (ScriptEntity, Option<f32>, Option<u32>)| {
                 let parent = entity.try_unwrap()?;
                 let target = dest.try_unwrap()?;
+                let index = parent.borrow().index();
 
                 let mut dest = GameState::get_target_dest(&*parent.borrow(), &*target.borrow());
                 if let Some(dist) = dist {
@@ -1032,7 +1033,7 @@ impl UserData for ScriptEntity {
 
                 Ok(GameState::move_towards_dest(
                     &parent,
-                    Vec::new(),
+                    &[index],
                     dest,
                     None,
                 ))
@@ -1043,12 +1044,13 @@ impl UserData for ScriptEntity {
             "move_towards_point",
             |_, entity, (x, y, dist): (f32, f32, Option<f32>)| {
                 let parent = entity.try_unwrap()?;
+                let index = parent.borrow().index();
 
                 let mut dest = GameState::get_point_dest(&*parent.borrow(), x, y);
                 dest.dist = dist.unwrap_or(MOVE_TO_THRESHOLD);
                 Ok(GameState::move_towards_dest(
                     &parent,
-                    Vec::new(),
+                    &[index],
                     dest,
                     None,
                 ))

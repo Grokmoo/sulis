@@ -56,25 +56,26 @@ impl<'a, 'b> StateLocationChecker<'a, 'b> {
 }
 
 impl<'a, 'b> LocationChecker for StateLocationChecker<'a, 'b> {
-    fn passable(&self, x: i32, y: i32) -> Option<bool> {
+    fn passable(&self, x: i32, y: i32, in_private: &mut bool) -> bool {
         if !self.grid.is_passable(x, y) {
-            return Some(false);
+            return false;
         }
 
         for p in self.requester.points(x, y) {
             let index = (p.x + p.y * self.width) as usize;
 
             if !self.prop_grid[index] {
-                return Some(false);
+                return false;
             }
 
             for i in self.entity_grid[index].iter() {
                 if !self.entities_to_ignore.contains(i) {
-                    return Some(true);
+                    return false;
                 }
+                *in_private = false;
             }
         }
-        None
+        true
     }
 }
 

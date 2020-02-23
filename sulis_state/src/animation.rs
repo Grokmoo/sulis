@@ -505,10 +505,10 @@ impl Anim {
             self.update_callbacks.remove(0);
         }
 
-        let keep = (self.duration_millis.less_than(elapsed) && self.ok_to_remove())
+        let remove = (self.duration_millis.less_than(elapsed) && self.ok_to_remove())
             || self.marked_for_removal.get();
 
-        !keep
+        !remove
     }
 
     fn get_completion_callbacks(

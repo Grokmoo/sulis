@@ -84,7 +84,7 @@ impl PartialEq for OpenEntry {
 
 pub trait LocationChecker {
     fn passable(&self, x: i32, y: i32) -> bool;
-    fn in_friend_space(&self, _op: Option<&Point>) -> bool {false}
+    fn in_friend_space(&self, _current: i32) -> bool {false}
 }
 
 pub struct PathFinder {
@@ -211,7 +211,7 @@ impl PathFinder {
         let mut iterations = 0;
         while iterations < self.max_iterations && !self.open.is_empty() {
             let current = self.pop_lowest_f_score_in_open_set();
-            if self.is_goal(current, dest_dist_squared) {
+            if self.is_goal(checker, current, dest_dist_squared) {
                 trace!(
                     "Path loop time: {}",
                     util::format_elapsed_secs(loop_start_time.elapsed())

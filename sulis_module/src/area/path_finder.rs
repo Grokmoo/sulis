@@ -287,17 +287,8 @@ impl PathFinder {
     }
 
     #[inline]
-    fn is_goal<T: LocationChecker>(&self, checker: &T, mut current: i32, dest_dist_squared: i32) -> bool {
-        while self.dist_squared(current) <= dest_dist_squared {
-            if !checker.in_friend_space(current) {
-                return true;
-            }
-            current = match self.came_from.get(&current) {
-                None => break,
-                Some(point) => *point,
-            };
-        }
-        false
+    fn is_goal<T: LocationChecker>(&self, checker: &T, current: i32, dest_dist_squared: i32) -> bool {
+        self.dist_squared(current) <= dest_dist_squared && !checker.in_friend_space(current)
     }
 
     #[inline]

@@ -28,12 +28,20 @@ use crate::script::AreaTargeter;
 use crate::*;
 use sulis_core::config::Config;
 use sulis_core::util::{self, gen_rand, invalid_data_error, Point, Size};
-use sulis_module::area::{Transition, TriggerKind};
+use sulis_module::area::{Transition, TriggerKind, Trigger};
 use sulis_module::{Actor, Area, LootList, Module, ObjectSize, Time};
 
 pub struct TriggerState {
     pub(crate) fired: bool,
     pub(crate) enabled: bool,
+}
+
+impl TriggerState {
+    pub fn can_fire(&self, trigger: &Trigger) -> bool {
+        if !self.enabled { return false; }
+
+        trigger.fire_more_than_once || !self.fired
+    }
 }
 
 #[derive(Clone, Copy)]
@@ -397,7 +405,7 @@ impl AreaState {
                 continue;
             }
 
-            if self.triggers[*trigger_index].fired {
+            if !self.triggers[*trigger_index].can_fire(&trigger) {
                 continue;
             }
             self.triggers[*trigger_index].fired = true;
@@ -698,7 +706,7 @@ impl AreaState {
             }
         };
 
-        if !self.triggers[index].enabled || self.triggers[index].fired {
+        if !self.triggers[index].can_fire(&self.area.area.triggers[index]) {
             return;
         }
 

@@ -60,6 +60,7 @@ pub struct Trigger {
     pub kind: TriggerKind,
     pub on_activate: Vec<OnTrigger>,
     pub initially_enabled: bool,
+    pub fire_more_than_once: bool,
 }
 
 #[derive(Debug, Clone)]
@@ -187,6 +188,7 @@ impl Area {
                 kind: tbuilder.kind.clone(),
                 on_activate: tbuilder.on_activate.clone(),
                 initially_enabled: tbuilder.initially_enabled,
+                fire_more_than_once: tbuilder.fire_more_than_once,
             });
         }
 
@@ -617,6 +619,9 @@ pub struct TriggerBuilder {
     pub kind: TriggerKind,
     pub on_activate: Vec<OnTrigger>,
     pub initially_enabled: bool,
+
+    #[serde(default)]
+    pub fire_more_than_once: bool,
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone)]

@@ -146,6 +146,7 @@ pub enum OnTrigger {
     SayLine(String),
     GameOverWindow(String),
     ScrollView(i32, i32),
+    ScreenShake,
     LoadModule(ModuleLoadData),
     ShowConfirm(DialogData),
     ShowMenu(MenuData),

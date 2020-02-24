@@ -2,7 +2,7 @@
 # The main game configuration file.  User preferences are set here.
 
 # If the user has an old revision, their config is automatically recreated from the sample.
-revision: 11
+revision: 12
 
 display:
     # Display Adapter - Glium is the only choice for now
@@ -54,6 +54,9 @@ resources:
     mods_directory: mods
 
 input:
+    # whether the screen will shake on a critical hit
+    crit_screen_shake: true
+
     # whether moving the mouse to the screen edge will scroll the view
     edge_scrolling: true
 

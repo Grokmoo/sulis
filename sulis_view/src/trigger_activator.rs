@@ -240,6 +240,7 @@ pub fn activate(
             FireScript(ref script) => fire_script(&script.id, &script.func, pc, target),
             GameOverWindow(ref text) => game_over_window(widget, text.to_string()),
             ScrollView(x, y) => scroll_view(widget, *x, *y),
+            ScreenShake => screen_shake(widget),
             LoadModule(ref module_data) => load_module(widget, module_data),
             ShowConfirm(ref data) => show_confirm(widget, data),
             ShowMenu(ref data) => show_menu(widget, data),
@@ -424,6 +425,17 @@ pub fn scroll_view(widget: &Rc<RefCell<Widget>>, x: i32, y: i32) {
         height,
         &area_view_widget.borrow(),
     );
+}
+
+pub fn screen_shake(widget: &Rc<RefCell<Widget>>) {
+    let root = Widget::get_root(widget);
+
+    let (area_view, _) = {
+        let view = Widget::kind_mut::<RootView>(&root);
+        view.area_view()
+    };
+
+    area_view.borrow_mut().screen_shake();
 }
 
 fn game_over_window(widget: &Rc<RefCell<Widget>>, text: String) {

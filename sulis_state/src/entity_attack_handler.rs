@@ -18,7 +18,8 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 use crate::{center, is_threat, ActorState, EntityState, GameState};
-use sulis_module::{AccuracyKind, Attack, AttackKind, DamageKind, HitFlags, HitKind, Module};
+use sulis_module::{AccuracyKind, Attack, AttackKind, DamageKind, HitFlags, HitKind, Module,
+    OnTrigger};
 
 fn is_sneak_attack(parent: &EntityState, target: &EntityState) -> bool {
     parent.actor.stats.hidden && !target.actor.stats.sneak_attack_immunity
@@ -95,6 +96,7 @@ pub fn weapon_attack(
     let is_flanking = is_flanking(&parent.borrow(), &target.borrow());
     let is_sneak_attack = is_sneak_attack(&parent.borrow(), &target.borrow());
 
+    let mut had_crit = false;
     let mut result = Vec::new();
     for attack in attacks {
         let mut attack = if is_flanking {
@@ -105,7 +107,16 @@ pub fn weapon_attack(
 
         let (hit_kind, hit_flags, damage) =
             attack_internal(parent, target, &mut attack, is_flanking, is_sneak_attack);
+
+        if hit_kind == HitKind::Crit {
+            had_crit = true;
+        }
+
         result.push((hit_kind, hit_flags, damage));
+    }
+
+    if had_crit {
+        GameState::add_ui_callback(vec![OnTrigger::ScreenShake], &parent, &target);
     }
 
     ActorState::check_death(parent, target);

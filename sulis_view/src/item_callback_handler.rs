@@ -19,7 +19,7 @@ use std::rc::Rc;
 
 use sulis_core::ui::{Callback, Widget};
 use sulis_module::{ItemState, QuickSlot, Slot};
-use sulis_state::{script::ScriptItemKind, EntityState, GameState, Script};
+use sulis_state::{script::{ScriptCallback, ScriptItemKind}, EntityState, GameState, Script};
 
 use crate::{MerchantWindow, PropWindow, RootView};
 
@@ -92,11 +92,22 @@ pub fn equip_item_cb(entity: &Rc<RefCell<EntityState>>, index: usize) -> Callbac
             Some(item) => item,
         };
 
+        let slot = item.item.equippable.as_ref().map_or(Slot::Neck, |e| e.slot);
+
         // equip with no preferred slot
         let to_add = entity.borrow_mut().actor.equip(item, None);
 
         for item in to_add {
             stash.borrow_mut().add_item(1, item);
+        }
+
+        match slot {
+            Slot::HeldMain | Slot::HeldOff => {
+                let mgr = GameState::turn_manager();
+                let cbs = entity.borrow().callbacks(&mgr.borrow());
+                cbs.iter().for_each(|cb| cb.on_held_changed());
+            },
+            _ => (),
         }
     }))
 }
@@ -219,6 +230,15 @@ pub fn unequip_and_drop_item_cb(entity: &Rc<RefCell<EntityState>>, slot: Slot) -
         if let Some(item) = item {
             drop_item(widget, &entity, item);
         }
+
+        match slot {
+            Slot::HeldMain | Slot::HeldOff => {
+                let mgr = GameState::turn_manager();
+                let cbs = entity.borrow().callbacks(&mgr.borrow());
+                cbs.iter().for_each(|cb| cb.on_held_changed());
+            },
+            _ => (),
+        }
     }))
 }
 
@@ -229,6 +249,15 @@ pub fn unequip_item_cb(entity: &Rc<RefCell<EntityState>>, slot: Slot) -> Callbac
         if let Some(item) = item {
             let stash = GameState::party_stash();
             stash.borrow_mut().add_item(1, item);
+        }
+
+        match slot {
+            Slot::HeldMain | Slot::HeldOff => {
+                let mgr = GameState::turn_manager();
+                let cbs = entity.borrow().callbacks(&mgr.borrow());
+                cbs.iter().for_each(|cb| cb.on_held_changed());
+            },
+            _ => (),
         }
     }))
 }

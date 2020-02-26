@@ -5,7 +5,7 @@ description: |
   You enter hidden mode if you are not already hidden, and become completely undetectable to all but the most powerful magical means for the duration.
 active:
   script: "unspottable"
-  group: Modes
+  group: Rogue
   ap: 2000
   duration:
     Rounds: 2

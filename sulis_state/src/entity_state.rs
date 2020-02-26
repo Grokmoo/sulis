@@ -404,7 +404,7 @@ impl EntityState {
 
         let mgr = GameState::turn_manager();
         let cbs = entity.borrow().callbacks(&mgr.borrow());
-        cbs.iter().for_each(|cb| cb.on_swap_weapons());
+        cbs.iter().for_each(|cb| cb.on_held_changed());
     }
 
     /// Returns true if this entity has enough AP to move at least 1 square,

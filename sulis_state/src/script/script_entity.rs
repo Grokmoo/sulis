@@ -399,6 +399,9 @@ use sulis_module::{
 /// Returns true if this entity has at least one currently active mode ability, false
 /// otherwise.
 ///
+/// # `get_active_mode() -> Bool`
+/// Returns the first active mode for this entity, if one exists.
+///
 /// # `stats() -> Table`
 /// Creates and returns a stats table for this entity.  This includes all stats shown on the
 /// character sheet.
@@ -1481,12 +1484,25 @@ impl UserData for ScriptEntity {
         methods.add_method("has_active_mode", |_, entity, ()| {
             let entity = entity.try_unwrap()?;
             let entity = entity.borrow();
-            for (_, ref state) in entity.actor.ability_states.iter() {
+            for (_, state) in entity.actor.ability_states.iter() {
                 if state.is_active_mode() {
                     return Ok(true);
                 }
             }
             Ok(false)
+        });
+
+        methods.add_method("get_active_mode", |_, entity, ()| {
+            let entity = entity.try_unwrap()?;
+            let entity = entity.borrow();
+            for (id, state) in entity.actor.ability_states.iter() {
+                if state.is_active_mode() {
+                    let ability = Module::ability(id).unwrap();
+                    return Ok(Some(ScriptAbility::from(&ability)));
+                }
+            }
+
+            Ok(None)
         });
 
         methods.add_method("stats", &create_stats_table);

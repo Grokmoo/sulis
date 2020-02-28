@@ -176,6 +176,12 @@ impl PathFinder {
         self.parent_h_over2 = dest.parent_h / 2.0;
         let dest_dist_squared = (dest.dist * dest.dist) as i32;
         let start = start_x + start_y * self.width;
+        let initial_dist_squared = self.dist_squared(start);
+
+        if initial_dist_squared <= dest_dist_squared {
+            debug!("Mover is already inside the destination");
+            return None;
+        }
 
         // the set of discovered nodes that are not evaluated yet
         self.open.clear();
@@ -222,6 +228,10 @@ impl PathFinder {
                     debug!("Found path with no moves.");
                     return None;
                 }
+
+                let final_dist_squared = self.dist_squared(path[0].x + path[0].y * self.width);
+                trace!("Initial dist vs final dist: {} vs {}",
+                    initial_dist_squared, final_dist_squared);
 
                 if let Some(max_path_len) = dest.max_path_len {
                     if path.len() > max_path_len as usize {

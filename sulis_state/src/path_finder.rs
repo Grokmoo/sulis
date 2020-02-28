@@ -76,13 +76,23 @@ impl<'a, 'b> LocationChecker for StateLocationChecker<'a, 'b> {
             true
         })
     }
+
     fn in_friend_space(&self, current: i32) -> bool {
-        for i in self.entity_grid[current as usize].iter() {
-            if self.entities_to_ignore.contains(i) {
-                return true;
+        let x = current % self.width;
+        let y = current / self.width;
+
+        self.requester.points(x, y).any(|p| {
+            let index = (p.x + p.y * self.width) as usize;
+
+            for i in self.entity_grid[index].iter() {
+                if *i == self.requester.index() { continue; }
+
+                if self.entities_to_ignore.contains(i) {
+                    return true;
+                }
             }
-        }
-        false
+            false
+        })
     }
 }
 

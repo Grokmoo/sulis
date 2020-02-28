@@ -586,8 +586,13 @@ impl AreaState {
             .all(|p| self.point_entities_passable(entities_to_ignore, p.x, p.y))
     }
 
-    pub fn is_entity_on_passable(&self, requester: &EntityState) -> bool {
-        self.is_passable(&requester, &[requester.index()], requester.location.x, requester.location.y)
+    pub fn is_passable_for_entity(&self, requester: &EntityState, x: i32, y: i32) -> bool {
+        self.is_passable(
+            &requester,
+            &[requester.index()],
+            x,
+            y,
+        )
     }
 
     pub fn get_entity_at(&self, x: i32, y: i32) -> Option<Rc<RefCell<EntityState>>> {

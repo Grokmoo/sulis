@@ -94,6 +94,14 @@ impl<'a, 'b> LocationChecker for StateLocationChecker<'a, 'b> {
             false
         })
     }
+
+    fn get_cost(&self, _from: i32, to: i32) -> i32 {
+        if self.entity_grid[to as usize].is_empty() {
+            10
+        } else {
+            11
+        }
+    }
 }
 
 pub fn move_towards_point(
@@ -154,6 +162,12 @@ fn find_path(
     check_ap: bool,
 ) -> Option<Vec<Point>> {
     let checker = StateLocationChecker::new(area_state, entity, entities_to_ignore);
+
+    if entity.is_party_member() {
+        path_finder.set_max_iterations(2_000);
+    } else {
+        path_finder.set_max_iterations(500);
+    }
 
     debug!(
         "Attempting move '{}' to {:?}",

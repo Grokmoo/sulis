@@ -52,7 +52,7 @@ pub fn get_action(x_f32: f32, y_f32: f32) -> Box<dyn ActionKind> {
         return action;
     }
 
-    if let Some(action) = MoveAction::create_if_valid(x as f32, y as f32, 0.0, 0.0, None) {
+    if let Some(action) = MoveAction::create_if_valid(x, y, 0, 0, None) {
         return action;
     }
 
@@ -643,12 +643,8 @@ impl MoveThenAction {
         cb_action: Box<dyn ActionKind>,
         mut cursor_state: animation_state::Kind,
     ) -> Option<Box<dyn ActionKind>> {
-        let x = pos.x as f32;
-        let y = pos.y as f32;
-        let w = size.width as f32;
-        let h = size.height as f32;
-
-        let move_action = match MoveAction::new_if_valid(x, y, w, h, Some(dist)) {
+        let move_action = match MoveAction::new_if_valid(
+            pos.x, pos.y, size.width, size.height, Some(dist)) {
             None => return None,
             Some(move_action) => move_action,
         };
@@ -719,7 +715,7 @@ fn entities_to_ignore() -> Vec<usize> {
 }
 
 impl MoveAction {
-    fn new_if_valid(x: f32, y: f32, w: f32, h: f32, dist: Option<f32>) -> Option<MoveAction> {
+    fn new_if_valid(x: i32, y: i32, w: i32, h: i32, dist: Option<f32>) -> Option<MoveAction> {
         let area_state = GameState::area_state();
         let area_state = area_state.borrow();
 
@@ -731,7 +727,7 @@ impl MoveAction {
 
         let dist = dist.unwrap_or(MOVE_TO_THRESHOLD);
 
-        if let Some(target) = get_attack_target(&area_state, x as i32, y as i32) {
+        if let Some(target) = get_attack_target(&area_state, x, y) {
             if can_attack(&*pc.borrow(), &*target.borrow()) {
                 // if we can already reach the target with our weapon, don't
                 // move further towards them
@@ -742,10 +738,10 @@ impl MoveAction {
         let parent_w = pc.borrow().size.width as f32;
         let parent_h = pc.borrow().size.height as f32;
         let dest = Destination {
-            x,
-            y,
-            w,
-            h,
+            x: x as f32,
+            y: y as f32,
+            w: w as f32,
+            h: h as f32,
             parent_w,
             parent_h,
             dist,
@@ -797,10 +793,10 @@ impl MoveAction {
     }
 
     fn create_if_valid(
-        x: f32,
-        y: f32,
-        w: f32,
-        h: f32,
+        x: i32,
+        y: i32,
+        w: i32,
+        h: i32,
         dist: Option<f32>,
     ) -> Option<Box<dyn ActionKind>> {
         match MoveAction::new_if_valid(x, y, w, h, dist) {

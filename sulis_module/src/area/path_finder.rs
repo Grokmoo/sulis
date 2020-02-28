@@ -84,7 +84,8 @@ impl PartialEq for OpenEntry {
 
 pub trait LocationChecker {
     fn passable(&self, x: i32, y: i32) -> bool;
-    fn in_friend_space(&self, _current: i32) -> bool {false}
+    fn in_friend_space(&self, _current: i32) -> bool { false }
+    fn get_cost(&self, _from: i32, _to: i32) -> i32 { 1 }
 }
 
 pub struct PathFinder {
@@ -272,7 +273,7 @@ impl PathFinder {
                 }
 
                 let tentative_g_score =
-                    self.g_score[current as usize] + self.get_cost(current, neighbor);
+                    self.g_score[current as usize] + checker.get_cost(current, neighbor);
                 if tentative_g_score >= self.g_score[neighbor as usize] {
                     self.push_to_open_set(neighbor, self.f_score[neighbor as usize]);
                     //trace!("G score indicates this neighbor is not preferable.");
@@ -327,11 +328,6 @@ impl PathFinder {
     #[inline]
     fn get_point(&self, index: i32) -> Point {
         Point::new(index % self.width, index / self.width)
-    }
-
-    #[inline]
-    fn get_cost(&self, _from: i32, _to: i32) -> i32 {
-        1
     }
 
     #[inline]

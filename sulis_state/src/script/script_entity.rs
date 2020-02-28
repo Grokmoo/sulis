@@ -30,7 +30,7 @@ use sulis_core::resource::ResourceSet;
 use sulis_core::util::ExtInt;
 use sulis_module::{
     ability::AIData, Actor, Attack, AttackKind, Attribute, DamageKind, Faction, HitFlags, HitKind,
-    ImageLayer, InventoryBuilder, MOVE_TO_THRESHOLD,
+    ImageLayer, InventoryBuilder, MOVE_TO_THRESHOLD, area::Destination,
 };
 
 /// Represents a single entity for Lua scripts.  Also can represent an invalid,
@@ -398,6 +398,9 @@ use sulis_module::{
 /// # `has_active_mode() -> Bool`
 /// Returns true if this entity has at least one currently active mode ability, false
 /// otherwise.
+///
+/// # `get_active_mode() -> Bool`
+/// Returns the first active mode for this entity, if one exists.
 ///
 /// # `stats() -> Table`
 /// Creates and returns a stats table for this entity.  This includes all stats shown on the
@@ -1022,7 +1025,6 @@ impl UserData for ScriptEntity {
             |_, entity, (dest, dist, max_len): (ScriptEntity, Option<f32>, Option<u32>)| {
                 let parent = entity.try_unwrap()?;
                 let target = dest.try_unwrap()?;
-                let index = parent.borrow().index();
 
                 let mut dest = GameState::get_target_dest(&*parent.borrow(), &*target.borrow());
                 if let Some(dist) = dist {
@@ -1031,12 +1033,7 @@ impl UserData for ScriptEntity {
 
                 dest.max_path_len = max_len;
 
-                Ok(GameState::move_towards_dest(
-                    &parent,
-                    &[index],
-                    dest,
-                    None,
-                ))
+                move_towards_dest(parent, dest)
             },
         );
 
@@ -1044,16 +1041,11 @@ impl UserData for ScriptEntity {
             "move_towards_point",
             |_, entity, (x, y, dist): (f32, f32, Option<f32>)| {
                 let parent = entity.try_unwrap()?;
-                let index = parent.borrow().index();
 
                 let mut dest = GameState::get_point_dest(&*parent.borrow(), x, y);
                 dest.dist = dist.unwrap_or(MOVE_TO_THRESHOLD);
-                Ok(GameState::move_towards_dest(
-                    &parent,
-                    &[index],
-                    dest,
-                    None,
-                ))
+
+                move_towards_dest(parent, dest)
             },
         );
 
@@ -1483,12 +1475,25 @@ impl UserData for ScriptEntity {
         methods.add_method("has_active_mode", |_, entity, ()| {
             let entity = entity.try_unwrap()?;
             let entity = entity.borrow();
-            for (_, ref state) in entity.actor.ability_states.iter() {
+            for (_, state) in entity.actor.ability_states.iter() {
                 if state.is_active_mode() {
                     return Ok(true);
                 }
             }
             Ok(false)
+        });
+
+        methods.add_method("get_active_mode", |_, entity, ()| {
+            let entity = entity.try_unwrap()?;
+            let entity = entity.borrow();
+            for (id, state) in entity.actor.ability_states.iter() {
+                if state.is_active_mode() {
+                    let ability = Module::ability(id).unwrap();
+                    return Ok(Some(ScriptAbility::from(&ability)));
+                }
+            }
+
+            Ok(None)
         });
 
         methods.add_method("stats", &create_stats_table);
@@ -1617,6 +1622,27 @@ impl UserData for ScriptEntity {
             Ok(entity.actor.p_stats().is_threatened_by(target))
         });
     }
+}
+
+fn move_towards_dest(parent: Rc<RefCell<EntityState>>, dest: Destination) -> Result<bool> {
+    let mgr = GameState::turn_manager();
+    let area = GameState::get_area_state(&parent.borrow().location.area_id).unwrap();
+    let mut to_ignore = Vec::new();
+    for e in area.borrow().entity_iter() {
+        let other = mgr.borrow().entity(*e);
+        if parent.borrow().ai_group() != other.borrow().ai_group() { continue; }
+
+        if parent.borrow().is_friendly(&other.borrow()) {
+            to_ignore.push(*e);
+        }
+    }
+
+    Ok(GameState::move_towards_dest(
+            &parent,
+            &to_ignore,
+            dest,
+            None,
+    ))
 }
 
 pub fn unwrap_point(point: HashMap<String, i32>) -> Result<(i32, i32)> {

@@ -168,6 +168,10 @@ impl Config {
     pub fn edge_scrolling() -> bool {
         CONFIG.with(|c| c.borrow().input.edge_scrolling)
     }
+
+    pub fn crit_screen_shake() -> bool {
+        CONFIG.with(|c| c.borrow().input.crit_screen_shake)
+    }
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone)]
@@ -279,6 +283,7 @@ pub struct InputConfig {
     pub scroll_speed: f32,
     pub keybindings: HashMap<Key, InputAction>,
     pub click_actions: HashMap<RawClick, ClickKind>,
+    pub crit_screen_shake: bool,
 }
 
 #[derive(Debug, Deserialize, Serialize, Copy, Clone, Eq, PartialEq, Hash, PartialOrd, Ord)]

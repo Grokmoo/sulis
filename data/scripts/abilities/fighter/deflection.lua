@@ -1,12 +1,7 @@
 function on_activate(parent, ability)
-  if not parent:inventory():has_equipped_shield() then
-    game:say_line("You must have a shield equipped.", parent)
-    return
-  end
-  
-  if parent:has_active_mode() then
-    game:say_line("Only one mode may be active at a time.", parent)
-    return
+  local cur_mode = parent:get_active_mode()
+  if cur_mode ~= nil then
+    cur_mode:deactivate(parent)
   end
 
   local stats = parent:stats()
@@ -15,7 +10,7 @@ function on_activate(parent, ability)
   local effect = parent:create_effect(ability:name())
   effect:deactivate_with(ability)
   local cb = ability:create_callback(parent)
-  cb:set_on_swap_weapons_fn("on_swap_weapons")
+  cb:set_on_held_changed_fn("on_held_changed")
   cb:set_after_defense_fn("after_defense")
   effect:add_callback(cb)
 
@@ -33,7 +28,7 @@ function on_deactivate(parent, ability)
   ability:deactivate(parent)
 end
 
-function on_swap_weapons(parent, ability)
+function on_held_changed(parent, ability)
   if not parent:inventory():has_equipped_shield() then
     game:say_line("Deflection Deactivated", parent)
     ability:deactivate(parent)

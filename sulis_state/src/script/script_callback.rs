@@ -130,8 +130,11 @@ pub fn fire_on_moved(cbs: Vec<Rc<CallbackData>>) {
 #[derive(Serialize, Deserialize, Clone, Copy, PartialOrd, Ord, Hash, PartialEq, Eq, Debug)]
 #[serde(deny_unknown_fields)]
 pub enum FuncKind {
-    /// Called when an entity swaps their weapon set
+    /// Save compatibility only.  TODO remove this after a while
     OnSwapWeapons,
+
+    /// Called when an entity swaps their weapon set
+    OnHeldChanged,
 
     /// Called when a new effect is applied to a parent
     OnEffectApplied,
@@ -198,7 +201,7 @@ pub enum FuncKind {
 /// A trait representing a callback that will fire a script when called.  In lua scripts,
 /// `CallbackData` is constructed to use this trait.
 pub trait ScriptCallback {
-    fn on_swap_weapons(&self) {}
+    fn on_held_changed(&self) {}
 
     fn on_effect_applied(&self, _effect: ScriptAppliedEffect) {}
 
@@ -270,7 +273,7 @@ pub trait ScriptCallback {
 /// Adds the list of affected points to the affected_points this callback will provide its
 /// targets.  The points is a list of tables of the form `{x: x_coord, y: y_coord}`
 ///
-/// # `set_on_swap_weapons_fn(func: String)`
+/// # `set_on_held_changed(func: String)`
 /// # `set_on_effect_applied_fn(func: String)`
 /// # `set_on_menu_select_fn(func: String)`
 /// # `set_on_removed_fn(func: String)`
@@ -549,8 +552,8 @@ impl CallbackData {
 }
 
 impl ScriptCallback for CallbackData {
-    fn on_swap_weapons(&self) {
-        self.exec_standard_script(self.get_or_create_targets(), FuncKind::OnSwapWeapons);
+    fn on_held_changed(&self) {
+        self.exec_standard_script(self.get_or_create_targets(), FuncKind::OnHeldChanged);
     }
 
     fn on_effect_applied(&self, effect: ScriptAppliedEffect) {
@@ -768,8 +771,8 @@ impl UserData for CallbackData {
             },
         );
 
-        methods.add_method_mut("set_on_swap_weapons_fn", |_, cb, func: String| {
-            cb.add_func(FuncKind::OnSwapWeapons, func);
+        methods.add_method_mut("set_on_held_changed_fn", |_, cb, func: String| {
+            cb.add_func(FuncKind::OnHeldChanged, func);
             Ok(())
         });
         methods.add_method_mut("set_on_effect_applied_fn", |_, cb, func: String| {

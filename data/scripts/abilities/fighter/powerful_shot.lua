@@ -1,7 +1,7 @@
 function on_activate(parent, ability)
-  if parent:has_active_mode() then
-    game:say_line("Only one mode may be active at a time.", parent)
-    return
+  local cur_mode = parent:get_active_mode()
+  if cur_mode ~= nil then
+    cur_mode:deactivate(parent)
   end
 
   local effect = parent:create_effect(ability:name())
@@ -19,7 +19,7 @@ function on_activate(parent, ability)
   end
   
   local cb = ability:create_callback(parent)
-  cb:set_on_swap_weapons_fn("on_swap_weapons")
+  cb:set_on_held_changed_fn("on_held_changed")
   effect:add_callback(cb)
   
   local gen = parent:create_anim("crossed_arrow")
@@ -36,7 +36,7 @@ function on_deactivate(parent, ability)
   ability:deactivate(parent)
 end
 
-function on_swap_weapons(parent, ability)
+function on_held_changed(parent, ability)
   if not parent:stats().attack_is_ranged then
     game:say_line("Powerful Shot Deactivated", parent)
     ability:deactivate(parent)

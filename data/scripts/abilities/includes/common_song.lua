@@ -1,11 +1,6 @@
 -- This file is included by the bard songs.
 
 function on_activate(parent, ability)
-  if parent:has_active_mode() then
-    game:say_line("Only one song may be active at a time.", parent)
-    return
-  end
-
   local targets = get_targets(parent)
   local radius = ability:range() + parent:ability_level_from_id("louder_music") * 2
   
@@ -44,6 +39,12 @@ function reactivate(parent, ability, targets)
 end
 
 function on_target_select(parent, ability, targets)
+  local cur_mode = parent:get_active_mode()
+  if cur_mode ~= nil then
+    -- this will deactivate the song itself but not any associated melodies or rhythms
+    cur_mode:deactivate(parent)
+  end
+
   create_song(parent, ability, targets)
   ability:activate(parent)
 end

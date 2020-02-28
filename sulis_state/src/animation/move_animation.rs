@@ -128,8 +128,31 @@ pub(in crate::animation) fn draw(
     renderer.draw(draw_list);
 }
 
-pub(in crate::animation) fn cleanup(owner: &Rc<RefCell<EntityState>>) {
-    owner.borrow_mut().sub_pos = (0.0, 0.0);
+pub(in crate::animation) fn cleanup(mover: &Rc<RefCell<EntityState>>, model: &mut MoveAnimModel) {
+    mover.borrow_mut().sub_pos = (0.0, 0.0);
+    let area = GameState::get_area_state(&mover.borrow().location.area_id).unwrap();
+
+    let mut first = true;
+    let mut target = None;
+    let mut index = model.last_frame_index as usize;
+    loop {
+        let p = model.path[index];
+        if area.borrow().is_passable_for_entity(&mover.borrow(), p.x, p.y) {
+            if !first {
+                target = Some(p);
+            }
+            break;
+        }
+
+        if index == 0 { break; }
+
+        index -= 1;
+        first = false;
+    }
+
+    if let Some(p) = target {
+        area.borrow_mut().move_entity(mover, p.x, p.y, 0);
+    }
 }
 
 pub fn new(mover: &Rc<RefCell<EntityState>>, path: Vec<Point>, frame_time_millis: u32) -> Anim {

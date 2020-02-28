@@ -84,6 +84,8 @@ impl PartialEq for OpenEntry {
 
 pub trait LocationChecker {
     fn passable(&self, x: i32, y: i32) -> bool;
+    fn in_friend_space(&self, _current: i32) -> bool { false }
+    fn get_cost(&self, _from: i32, _to: i32) -> i32 { 1 }
 }
 
 pub struct PathFinder {
@@ -141,8 +143,6 @@ impl PathFinder {
     /// efficient manner.  Returns `None` if no path exists to reach the destination.
     /// Will return a vec of length zero if the dest is already reached by the
     /// requester.
-    /// If reconstruct is set to false, does not produce a path.  Instead, only
-    /// checks if a path exists, returning Some if it does, None if not
     pub fn find<T: LocationChecker>(
         &mut self,
         checker: &T,
@@ -177,6 +177,12 @@ impl PathFinder {
         self.parent_h_over2 = dest.parent_h / 2.0;
         let dest_dist_squared = (dest.dist * dest.dist) as i32;
         let start = start_x + start_y * self.width;
+        let initial_dist_squared = self.dist_squared(start);
+
+        if initial_dist_squared <= dest_dist_squared {
+            debug!("Mover is already inside the destination");
+            return None;
+        }
 
         // the set of discovered nodes that are not evaluated yet
         self.open.clear();
@@ -212,7 +218,7 @@ impl PathFinder {
         let mut iterations = 0;
         while iterations < self.max_iterations && !self.open.is_empty() {
             let current = self.pop_lowest_f_score_in_open_set();
-            if self.is_goal(current, dest_dist_squared) {
+            if self.is_goal(checker, current, dest_dist_squared) {
                 trace!(
                     "Path loop time: {}",
                     util::format_elapsed_secs(loop_start_time.elapsed())
@@ -223,6 +229,10 @@ impl PathFinder {
                     debug!("Found path with no moves.");
                     return None;
                 }
+
+                let final_dist_squared = self.dist_squared(path[0].x + path[0].y * self.width);
+                trace!("Initial dist vs final dist: {} vs {}",
+                    initial_dist_squared, final_dist_squared);
 
                 if let Some(max_path_len) = dest.max_path_len {
                     if path.len() > max_path_len as usize {
@@ -263,7 +273,7 @@ impl PathFinder {
                 }
 
                 let tentative_g_score =
-                    self.g_score[current as usize] + self.get_cost(current, neighbor);
+                    self.g_score[current as usize] + checker.get_cost(current, neighbor);
                 if tentative_g_score >= self.g_score[neighbor as usize] {
                     self.push_to_open_set(neighbor, self.f_score[neighbor as usize]);
                     //trace!("G score indicates this neighbor is not preferable.");
@@ -276,7 +286,6 @@ impl PathFinder {
                 self.f_score[neighbor as usize] = tentative_g_score + self.dist_squared(neighbor);
                 self.push_to_open_set(neighbor, self.f_score[neighbor as usize]);
             }
-
             iterations += 1;
         }
 
@@ -289,19 +298,18 @@ impl PathFinder {
     }
 
     #[inline]
-    fn is_goal(&self, current: i32, dest_dist_squared: i32) -> bool {
-        self.dist_squared(current) <= dest_dist_squared
+    fn is_goal<T: LocationChecker>(&self, checker: &T, current: i32, dest_dist_squared: i32) -> bool {
+        self.dist_squared(current) <= dest_dist_squared && !checker.in_friend_space(current)
     }
 
     #[inline]
-    fn reconstruct_path(&self, current: i32) -> Vec<Point> {
+    fn reconstruct_path(&self, mut current: i32) -> Vec<Point> {
         trace!("Reconstructing path");
 
         // let reconstruct_time = time::Instant::now();
         let mut path: Vec<Point> = Vec::new();
 
         path.push(self.get_point(current));
-        let mut current = current;
         loop {
             //trace!("Current {}", current);
             current = match self.came_from.get(&current) {
@@ -320,11 +328,6 @@ impl PathFinder {
     #[inline]
     fn get_point(&self, index: i32) -> Point {
         Point::new(index % self.width, index / self.width)
-    }
-
-    #[inline]
-    fn get_cost(&self, _from: i32, _to: i32) -> i32 {
-        1
     }
 
     #[inline]

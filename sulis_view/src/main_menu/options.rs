@@ -31,6 +31,7 @@ use crate::main_menu::MainMenu;
 enum Tab {
     Display,
     Input,
+    Gameplay,
 }
 
 pub struct Options {
@@ -48,6 +49,8 @@ pub struct Options {
     cur_edge_scrolling: bool,
     cur_keybindings: Vec<(Key, InputAction)>,
     cur_click_actions: Vec<(RawClick, ClickKind)>,
+
+    cur_crit_screen_shake: bool,
 }
 
 impl Options {
@@ -90,6 +93,8 @@ impl Options {
             cur_ui_scale: (config.display.width, config.display.height),
             cur_keybindings,
             cur_click_actions,
+
+            cur_crit_screen_shake: config.input.crit_screen_shake,
         }))
     }
 
@@ -131,6 +136,8 @@ impl Options {
         for (k, v) in self.cur_keybindings.iter() {
             config.input.keybindings.insert(*k, *v);
         }
+
+        config.input.crit_screen_shake = self.cur_crit_screen_shake;
 
         // don't save config to disk at this point.  it is only saved
         // when accepted in the save_or_revert_options_window popup
@@ -369,6 +376,38 @@ impl Options {
         ]
     }
 
+    fn add_gameplay_widgets(&mut self) -> Vec<Rc<RefCell<Widget>>> {
+        let screen_shake_on = Widget::with_theme(Button::empty(), "on");
+        screen_shake_on
+            .borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(|widget, _| {
+                let (parent, options) = Widget::parent_mut::<Options>(widget);
+                options.cur_crit_screen_shake = true;
+                parent.borrow_mut().invalidate_children();
+            })));
+        let screen_shake_off = Widget::with_theme(Button::empty(), "off");
+        screen_shake_off
+            .borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(|widget, _| {
+                let (parent, options) = Widget::parent_mut::<Options>(widget);
+                options.cur_crit_screen_shake = false;
+                parent.borrow_mut().invalidate_children();
+            })));
+        if self.cur_crit_screen_shake {
+            screen_shake_on.borrow_mut().state.set_active(true);
+        } else {
+            screen_shake_off.borrow_mut().state.set_active(true);
+        }
+
+        let screen_shake_content = Widget::empty("screen_shake_content");
+        Widget::add_child_to(&screen_shake_content, screen_shake_on);
+        Widget::add_child_to(&screen_shake_content, screen_shake_off);
+
+        vec![screen_shake_content]
+    }
+
     fn add_input_widgets(&mut self) -> Vec<Rc<RefCell<Widget>>> {
         let scroll_speed_title = Widget::with_theme(Label::empty(), "scroll_speed_title");
 
@@ -580,6 +619,13 @@ impl WidgetKind for Options {
                 parent.borrow_mut().invalidate_children();
             })));
 
+        let gameplay = Widget::with_theme(Button::empty(), "gameplay");
+        gameplay.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
+            let (parent, options) = Widget::parent_mut::<Options>(widget);
+            options.cur_tab = Tab::Gameplay;
+            parent.borrow_mut().invalidate_children();
+        })));
+
         let content = Widget::empty("content");
 
         let widgets = match self.cur_tab {
@@ -590,12 +636,16 @@ impl WidgetKind for Options {
             Tab::Input => {
                 input.borrow_mut().state.set_active(true);
                 self.add_input_widgets()
-            }
+            },
+            Tab::Gameplay => {
+                gameplay.borrow_mut().state.set_active(true);
+                self.add_gameplay_widgets()
+            },
         };
 
         Widget::add_children_to(&content, widgets);
 
-        vec![title, apply, cancel, reset, content, display, input]
+        vec![title, apply, cancel, reset, content, display, input, gameplay]
     }
 }
 

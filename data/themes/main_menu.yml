@@ -411,7 +411,7 @@ themes:
         relative:
           x: Center
         size: [40, 10]
-        position: [0, 0]
+        position: [1, 0]
       display:
         from: tab_button
         text: "Display"
@@ -423,6 +423,13 @@ themes:
         from: tab_button
         text: "Input"
         position: [-40, 3]
+        size: [19, 7]
+        relative:
+          x: Center
+      gameplay:
+        from: tab_button
+        text: "Gameplay"
+        position: [-20, 3]
         size: [19, 7]
         relative:
           x: Center
@@ -520,6 +527,38 @@ themes:
                   height: Max
                 custom:
                   tooltip: "Traditional fullscreen mode.  Borderless is almost always the better choice."
+          screen_shake_content:
+            from: options_window.content_sub_content
+            relative:
+              x: Center
+            size: [50, 8]
+            children:
+              label:
+                from: label
+                kind: Label
+                text: "Crit Screen Shake"
+                text_params:
+                  scale: 6
+                relative:
+                  x: Zero
+                size: [32, 6]
+              on:
+                from: button
+                text: "On"
+                relative:
+                  x: Max
+                size: [8, 6]
+                custom:
+                  tooltip: "Enable Critical Hit Screen Shake."
+              off:
+                from: button
+                text: "Off"
+                relative:
+                  x: Max
+                size: [8, 6]
+                position: [-9, 0]
+                custom:
+                  tooltip: "Disable Critical Hit Screen Shake."
           monitor_title:
             from: options_window.content_title
             text: "Monitor"

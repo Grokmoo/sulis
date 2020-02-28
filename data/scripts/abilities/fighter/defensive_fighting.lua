@@ -1,12 +1,7 @@
 function on_activate(parent, ability)
-  if not parent:inventory():has_equipped_shield() then
-    game:say_line("You must have a shield equipped.", parent)
-    return
-  end
-  
-  if parent:has_active_mode() then
-    game:say_line("Only one mode may be active at a time.", parent)
-    return
+  local cur_mode = parent:get_active_mode()
+  if cur_mode ~= nil then
+    cur_mode:deactivate(parent)
   end
 
   local stats = parent:stats()
@@ -22,7 +17,7 @@ function on_activate(parent, ability)
   effect:add_num_bonus("melee_accuracy", -10)
 
   local cb = ability:create_callback(parent)
-  cb:set_on_swap_weapons_fn("on_swap_weapons")
+  cb:set_on_held_changed_fn("on_held_changed")
 
   if parent:ability_level(ability) > 1 then
     cb:set_after_defense_fn("after_defense")
@@ -44,7 +39,7 @@ function on_deactivate(parent, ability)
   ability:deactivate(parent)
 end
 
-function on_swap_weapons(parent, ability)
+function on_held_changed(parent, ability)
   if not parent:inventory():has_equipped_shield() then
     game:say_line("Defensive Fighting Deactivated", parent)
     ability:deactivate(parent)

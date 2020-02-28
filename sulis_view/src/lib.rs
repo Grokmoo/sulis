@@ -118,6 +118,9 @@ pub use self::race_pane::RacePane;
 mod root_view;
 pub use self::root_view::RootView;
 
+mod screen_shake;
+pub use self::screen_shake::ScreenShake;
+
 mod script_menu;
 pub use self::script_menu::ScriptMenu;
 

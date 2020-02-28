@@ -38,7 +38,7 @@ use sulis_module::{
 use sulis_state::{area_feedback_text, area_state::PCVisRedraw, RangeIndicatorImageSet};
 use sulis_state::{AreaDrawable, AreaState, EntityState, EntityTextureCache, GameState};
 
-use crate::{action_kind, window_fade, AreaOverlayHandler, WindowFade};
+use crate::{action_kind, window_fade, AreaOverlayHandler, ScreenShake, WindowFade};
 
 struct Range {
     min_x: i32,
@@ -64,6 +64,7 @@ pub struct AreaView {
     feedback_text_params: area_feedback_text::Params,
 
     scroll_target: Option<(f32, f32)>,
+    screen_shake: Option<ScreenShake>,
 
     overlay_handler: AreaOverlayHandler,
 }
@@ -95,6 +96,7 @@ impl AreaView {
             active_entity: None,
             feedback_text_params: area_feedback_text::Params::default(),
             scroll_target: None,
+            screen_shake: None,
             overlay_handler: AreaOverlayHandler::default(),
         }))
     }
@@ -142,6 +144,12 @@ impl AreaView {
         let y = y - widget.state.inner_height() as f32 / scale_y / 2.0;
 
         (x, y)
+    }
+
+    pub fn screen_shake(&mut self) {
+        if !Config::crit_screen_shake() { return; }
+
+        self.screen_shake = Some(ScreenShake::new());
     }
 
     pub fn delayed_scroll_to_point(
@@ -505,6 +513,19 @@ impl WidgetKind for AreaView {
 
     #[allow(clippy::float_cmp)]
     fn update(&mut self, _widget: &Rc<RefCell<Widget>>, millis: u32) {
+        if let Some(shake) = self.screen_shake.as_mut() {
+            let result = shake.shake(millis);
+
+            if let Some(scroll) = result.scroll {
+                let factor = GameState::user_zoom();
+                self.scroll.change(scroll.x / factor, scroll.y / factor);
+            }
+
+            if result.done {
+                self.screen_shake = None;
+            }
+        }
+
         let (dest_x, dest_y) = match self.scroll_target {
             None => return,
             Some((x, y)) => (x, y),

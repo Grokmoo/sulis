@@ -505,10 +505,10 @@ impl Anim {
             self.update_callbacks.remove(0);
         }
 
-        let keep = (self.duration_millis.less_than(elapsed) && self.ok_to_remove())
+        let remove = (self.duration_millis.less_than(elapsed) && self.ok_to_remove())
             || self.marked_for_removal.get();
 
-        !keep
+        !remove
     }
 
     fn get_completion_callbacks(
@@ -594,7 +594,7 @@ impl Anim {
             EntityScale { .. } => entity_scale_animation::cleanup(&self.owner),
             MeleeAttack { .. } => melee_attack_animation::cleanup(&self.owner),
             RangedAttack { .. } => ranged_attack_animation::cleanup(&self.owner),
-            Move { .. } => move_animation::cleanup(&self.owner),
+            Move { ref mut model } => move_animation::cleanup(&self.owner, model),
             EntityDeath { .. } => {
                 entity_color_animation::cleanup(&self.owner);
                 self.owner.borrow_mut().marked_for_removal = true;

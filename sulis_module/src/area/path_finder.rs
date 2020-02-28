@@ -84,6 +84,7 @@ impl PartialEq for OpenEntry {
 
 pub trait LocationChecker {
     fn passable(&self, x: i32, y: i32) -> bool;
+    fn in_friend_space(&self, _current: i32) -> bool {false}
 }
 
 pub struct PathFinder {
@@ -141,8 +142,6 @@ impl PathFinder {
     /// efficient manner.  Returns `None` if no path exists to reach the destination.
     /// Will return a vec of length zero if the dest is already reached by the
     /// requester.
-    /// If reconstruct is set to false, does not produce a path.  Instead, only
-    /// checks if a path exists, returning Some if it does, None if not
     pub fn find<T: LocationChecker>(
         &mut self,
         checker: &T,
@@ -212,7 +211,7 @@ impl PathFinder {
         let mut iterations = 0;
         while iterations < self.max_iterations && !self.open.is_empty() {
             let current = self.pop_lowest_f_score_in_open_set();
-            if self.is_goal(current, dest_dist_squared) {
+            if self.is_goal(checker, current, dest_dist_squared) {
                 trace!(
                     "Path loop time: {}",
                     util::format_elapsed_secs(loop_start_time.elapsed())
@@ -276,7 +275,6 @@ impl PathFinder {
                 self.f_score[neighbor as usize] = tentative_g_score + self.dist_squared(neighbor);
                 self.push_to_open_set(neighbor, self.f_score[neighbor as usize]);
             }
-
             iterations += 1;
         }
 
@@ -289,19 +287,18 @@ impl PathFinder {
     }
 
     #[inline]
-    fn is_goal(&self, current: i32, dest_dist_squared: i32) -> bool {
-        self.dist_squared(current) <= dest_dist_squared
+    fn is_goal<T: LocationChecker>(&self, checker: &T, current: i32, dest_dist_squared: i32) -> bool {
+        self.dist_squared(current) <= dest_dist_squared && !checker.in_friend_space(current)
     }
 
     #[inline]
-    fn reconstruct_path(&self, current: i32) -> Vec<Point> {
+    fn reconstruct_path(&self, mut current: i32) -> Vec<Point> {
         trace!("Reconstructing path");
 
         // let reconstruct_time = time::Instant::now();
         let mut path: Vec<Point> = Vec::new();
 
         path.push(self.get_point(current));
-        let mut current = current;
         loop {
             //trace!("Current {}", current);
             current = match self.came_from.get(&current) {

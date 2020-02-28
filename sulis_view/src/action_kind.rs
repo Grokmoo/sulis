@@ -712,14 +712,10 @@ struct MoveAction {
 }
 
 fn entities_to_ignore() -> Vec<usize> {
-    if GameState::is_combat_active() {
-        Vec::new()
-    } else {
-        GameState::party()
-            .iter()
-            .map(|e| e.borrow().index())
-            .collect()
-    }
+    GameState::party()
+        .iter()
+        .map(|e| e.borrow().index())
+        .collect()
 }
 
 impl MoveAction {
@@ -756,7 +752,7 @@ impl MoveAction {
             max_path_len: None,
         };
 
-        let path = match GameState::can_move_towards_dest(&pc.borrow(), entities_to_ignore(), dest)
+        let path = match GameState::can_move_towards_dest(&pc.borrow(), &entities_to_ignore(), dest)
         {
             None => return None,
             Some(path) => path,
@@ -815,14 +811,14 @@ impl MoveAction {
 
     fn move_one(&mut self) {
         let cb = self.cb.take();
-        GameState::move_towards_dest(&self.selected[0], entities_to_ignore(), self.dest, cb);
+        GameState::move_towards_dest(&self.selected[0], &entities_to_ignore(), self.dest, cb);
     }
 
     fn move_all(&mut self) {
         let formation = GameState::party_formation();
         formation
             .borrow()
-            .move_group(&self.selected, entities_to_ignore(), self.dest);
+            .move_group(&self.selected, &entities_to_ignore(), self.dest);
     }
 }
 

@@ -19,7 +19,7 @@ active:
     group: Multiple
     range: Visible
   short_description: |
-    Blind and deal minor damage in a large area.
+    Randomly throw targets in a path, dealing heavy damage.
 prereqs:
   abilities: [ hail_storm ]
   total_level: 11

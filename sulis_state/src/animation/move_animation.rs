@@ -18,10 +18,10 @@ use std::cell::{Cell, RefCell};
 use std::cmp;
 use std::rc::Rc;
 
-use crate::{animation::Anim, EntityState, GameState};
+use crate::{animation::Anim, EntityState, GameState, animation::particle_generator::Param};
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::ui::animation_state;
-use sulis_core::util::{Offset, Point, Rect, Scale};
+use sulis_core::util::{Offset, Point, Rect, Scale, ExtInt};
 use sulis_module::ObjectSize;
 
 fn check_immediate_cancel(mover: &Rc<RefCell<EntityState>>, model: &mut MoveAnimModel) -> bool {
@@ -129,7 +129,8 @@ pub(in crate::animation) fn draw(
 }
 
 pub(in crate::animation) fn cleanup(mover: &Rc<RefCell<EntityState>>, model: &mut MoveAnimModel) {
-    mover.borrow_mut().sub_pos = (0.0, 0.0);
+    let old_pos = mover.borrow().location.to_point();
+
     let area = GameState::get_area_state(&mover.borrow().location.area_id).unwrap();
 
     let mut first = true;
@@ -153,6 +154,24 @@ pub(in crate::animation) fn cleanup(mover: &Rc<RefCell<EntityState>>, model: &mu
     if let Some(p) = target {
         area.borrow_mut().move_entity(mover, p.x, p.y, 0);
     }
+
+    let new_pos = mover.borrow().location.to_point();
+    let dx = (new_pos.x - old_pos.x) as f32 + mover.borrow().sub_pos.0;
+    let dy = (new_pos.y - old_pos.y) as f32 + mover.borrow().sub_pos.1;
+
+    trace!("Canceling subpos with {:?}", mover.borrow().sub_pos);
+    if new_pos != old_pos {
+        let base_time = model.frame_time_millis * 5;
+        let frac = 1000.0 / base_time as f32;
+        let x = Param::with_speed(-dx, dx * frac);
+        let y = Param::with_speed(-dy, dy * frac);
+        let anim = Anim::new_entity_subpos(&mover, ExtInt::Int(base_time), x, y);
+        GameState::add_animation(anim);
+
+        mover.borrow_mut().sub_pos = (-dx, -dy);
+    } else {
+        mover.borrow_mut().sub_pos = (0.0, 0.0);
+    }
 }
 
 pub fn new(mover: &Rc<RefCell<EntityState>>, path: Vec<Point>, frame_time_millis: u32) -> Anim {
@@ -169,8 +188,8 @@ pub fn new(mover: &Rc<RefCell<EntityState>>, path: Vec<Point>, frame_time_millis
             next2 = path[i as usize + 2];
         }
         if i < path.len() as i32 - 1 {
+            // next2 is already set to the final point
             next = path[i as usize + 1];
-        // next2 is already set to the final point
         } else {
             // next and next2 are already set to the final point
         }

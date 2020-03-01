@@ -18,6 +18,7 @@ active:
     kind: Summon
     group: Multiple
     range: Short
+    target: EmptyGround
     on_activate_fn: ai_on_activate
   short_description: |
     Summon a loyal animal to fight for you.

@@ -81,6 +81,10 @@ type Result<T> = std::result::Result<T, rlua::Error>;
 /// with the specified AI range `range`.  Valid range types are `Personal`, `Touch`, `Attack`,
 /// `Short`, `Visible`
 ///
+/// # `only_target(target: String) -> ScriptAbilitySet`
+/// Creates a new ScriptAbilitySet from this one, but only including abilities with the specified
+/// AI target `target`.  Valid target types are `Entity`, `EmptyGround`, `AnyGround`.
+///
 /// # `sort_by_priority()`
 /// Sorts this set in place, according to the AI priority of the abilities in the
 /// set.  Lower priorities are sorted first.
@@ -216,6 +220,22 @@ impl UserData for ScriptAbilitySet {
             })
         });
 
+        methods.add_method("only_target", |_, set, target: String| {
+            let target = ability::AITarget::unwrap_from_str(&target);
+            let abilities = set.abilities.iter().
+                filter_map(|ability| {
+                    if ability.ai_data.target == target {
+                        Some(ability.clone())
+                    } else {
+                        None
+                    }
+                }).collect();
+            Ok(ScriptAbilitySet {
+                parent: set.parent,
+                abilities,
+            })
+        });
+
         methods.add_method_mut("sort_by_priority", |_, set, ()| {
             set.abilities.sort_by_key(|a| a.ai_data.priority());
             Ok(())
@@ -270,7 +290,7 @@ impl UserData for ScriptAbilitySet {
 ///
 /// # `ai_data() -> Table`
 /// Creates a Lua table including the AI data of this ability.  This includes
-/// the `priority`, an integer, the `kind`, `group, and `range`, all Strings.  See
+/// the `priority`, an integer, the `kind`, `group, `range`, and `target`, all Strings.  See
 /// `ScriptAbilitySet::only_group`, `ScriptAbilitySet::only_range`,
 /// `ScriptAbilitySet::only_kind`.
 #[derive(Clone)]
@@ -405,6 +425,7 @@ impl UserData for ScriptAbility {
             ai_data.set("kind", ability.ai_data.kind())?;
             ai_data.set("group", ability.ai_data.group())?;
             ai_data.set("range", ability.ai_data.range())?;
+            ai_data.set("target", ability.ai_data.target())?;
 
             if let Some(on_activate_fn) = &ability.ai_data.on_activate_fn {
                 ai_data.set("on_activate_fn", on_activate_fn.to_string())?;

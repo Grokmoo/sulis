@@ -265,6 +265,9 @@ pub struct ActiveBuilder {
 #[serde(deny_unknown_fields)]
 pub struct AIData {
     pub priority: u32,
+
+    #[serde(default = "default_target")]
+    pub target: AITarget,
     pub kind: AIKind,
     pub group: AIGroup,
     pub range: AIRange,
@@ -272,6 +275,10 @@ pub struct AIData {
 }
 
 impl AIData {
+    pub fn target(&self) -> String {
+        format!("{:?}", self.target)
+    }
+
     pub fn priority(&self) -> u32 {
         self.priority
     }
@@ -286,6 +293,30 @@ impl AIData {
 
     pub fn range(&self) -> String {
         format!("{:?}", self.range)
+    }
+}
+
+fn default_target() -> AITarget { AITarget::Entity }
+
+#[derive(Deserialize, Debug, Clone, Copy, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
+pub enum AITarget {
+    Entity,
+    EmptyGround,
+    AnyGround,
+}
+
+impl AITarget {
+    pub fn unwrap_from_str(s: &str) -> AITarget {
+        match s {
+            "Entity" => AITarget::Entity,
+            "EmptyGround" => AITarget::EmptyGround,
+            "AnyGround" => AITarget::AnyGround,
+            _ => {
+                warn!("Invalid AI target string '{}'", s);
+                AITarget::Entity
+            }
+        }
     }
 }
 

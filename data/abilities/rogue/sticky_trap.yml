@@ -13,9 +13,10 @@ active:
   range: Touch
   ai:
     priority: 10
-    kind: Special
+    kind: Buff
     group: Single
     range: Touch
+    target: EmptyGround
   short_description: |
     Set a trap that will hold enemies in place
 prereqs:

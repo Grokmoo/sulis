@@ -19,6 +19,7 @@ active:
     kind: Damage
     group: Multiple
     range: Visible
+    target: AnyGround
   short_description: |
     Deal large fire damage to a group of opponents.
 prereqs:

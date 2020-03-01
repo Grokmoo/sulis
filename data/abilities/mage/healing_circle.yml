@@ -18,6 +18,7 @@ active:
     kind: Heal
     group: Multiple
     range: Short
+    target: AnyGround
   short_description: |
     Continually heal all allies in an area.
 prereqs:

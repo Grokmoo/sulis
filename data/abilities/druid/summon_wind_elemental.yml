@@ -18,6 +18,7 @@ active:
     kind: Summon
     group: Multiple
     range: Short
+    target: EmptyGround
   short_description: |
     Summon a powerful air spirit to fight for you.
 prereqs:

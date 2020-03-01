@@ -17,6 +17,7 @@ active:
     kind: Special
     group: Single
     range: Short
+    target: EmptyGround
   short_description: |
     Move yourself or an ally instantly to a nearby location.
 prereqs:

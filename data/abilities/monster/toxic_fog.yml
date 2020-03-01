@@ -15,5 +15,6 @@ active:
     kind: Debuff
     group: Multiple
     range: Short
+    target: AnyGround
   short_description: |
     Create toxic fog in an area.

@@ -262,8 +262,9 @@ impl LootList {
                     }
                     Some(item) => item,
                 };
+                let identified = !adjectives.contains(&"unidentified".to_string());
                 let variant = self.gen_variant(entry);
-                items.push((quantity, ItemState::new(item, variant)));
+                items.push((quantity, ItemState::new(item, variant, identified)));
             }
         }
 
@@ -370,7 +371,8 @@ impl LootList {
                     Some(item) => item,
                 };
                 let variant = self.gen_variant(entry);
-                return Some((quantity, ItemState::new(item, variant)));
+                let identified = !adjectives.contains(&"unidentified".to_string());
+                return Some((quantity, ItemState::new(item, variant, identified)));
             }
         }
 

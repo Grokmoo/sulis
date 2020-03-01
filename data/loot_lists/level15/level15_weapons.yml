@@ -12,6 +12,7 @@ weighted_entries:
       exceptional: 5
       masterwork: 5
     adjective2:
+      unidentified3: 6
       none: 7
       weapon_accuracy15: 1
       acid15: 1
@@ -25,6 +26,7 @@ weighted_entries:
   club:
     weight: 8
     adjective2:
+      unidentified3: 6
       none: 7
       weapon_accuracy15: 1
       acid15: 1
@@ -41,6 +43,7 @@ weighted_entries:
       exceptional: 5
       masterwork: 5
     adjective2:
+      unidentified3: 6
       none: 7
       ranged_accuracy15: 1
       acid15: 1
@@ -57,6 +60,7 @@ weighted_entries:
       exceptional: 5
       masterwork: 5
     adjective2:
+      unidentified3: 6
       none: 7
       weapon_accuracy15: 1
       acid15: 1
@@ -73,6 +77,7 @@ weighted_entries:
       exceptional: 5
       masterwork: 5
     adjective2:
+      unidentified3: 6
       none: 7
       weapon_accuracy15: 1
       acid15: 1
@@ -89,6 +94,7 @@ weighted_entries:
       exceptional: 5
       masterwork: 5
     adjective2:
+      unidentified3: 6
       none: 7
       weapon_accuracy15: 1
       acid15: 1
@@ -105,6 +111,7 @@ weighted_entries:
       exceptional: 5
       masterwork: 5
     adjective2:
+      unidentified3: 6
       none: 7
       weapon_accuracy15: 1
       acid15: 1
@@ -121,6 +128,7 @@ weighted_entries:
       exceptional: 5
       masterwork: 5
     adjective2:
+      unidentified3: 6
       none: 7
       weapon_accuracy15: 1
       acid15: 1
@@ -137,6 +145,7 @@ weighted_entries:
       exceptional: 5
       masterwork: 5
     adjective2:
+      unidentified3: 6
       none: 7
       weapon_accuracy15: 1
       acid15: 1
@@ -153,6 +162,7 @@ weighted_entries:
       exceptional: 5
       masterwork: 5
     adjective2:
+      unidentified3: 6
       none: 7
       ranged_accuracy15: 1
       acid15: 1
@@ -169,6 +179,7 @@ weighted_entries:
       exceptional: 5
       masterwork: 5
     adjective2:
+      unidentified3: 6
       none: 7
       weapon_accuracy15: 1
       acid15: 1
@@ -185,6 +196,7 @@ weighted_entries:
       exceptional: 5
       masterwork: 5
     adjective2:
+      unidentified3: 6
       none: 7
       weapon_accuracy15: 1
       acid15: 1
@@ -201,6 +213,7 @@ weighted_entries:
       exceptional: 5
       masterwork: 5
     adjective2:
+      unidentified3: 6
       none: 7
       weapon_accuracy15: 1
       acid15: 1
@@ -217,6 +230,7 @@ weighted_entries:
       exceptional: 5
       masterwork: 5
     adjective2:
+      unidentified3: 6
       none: 7
       weapon_accuracy15: 1
       acid15: 1
@@ -233,6 +247,7 @@ weighted_entries:
       exceptional: 5
       masterwork: 5
     adjective2:
+      unidentified3: 6
       none: 7
       weapon_accuracy15: 1
       acid15: 1
@@ -249,6 +264,7 @@ weighted_entries:
       exceptional: 5
       masterwork: 5
     adjective2:
+      unidentified3: 6
       none: 7
       weapon_accuracy15: 1
       acid15: 1
@@ -265,6 +281,7 @@ weighted_entries:
       exceptional: 5
       masterwork: 5
     adjective2:
+      unidentified3: 6
       none: 7
       ranged_accuracy15: 1
       acid15: 1
@@ -281,6 +298,7 @@ weighted_entries:
       exceptional: 5
       masterwork: 5
     adjective2:
+      unidentified3: 6
       none: 7
       weapon_accuracy15: 1
       acid15: 1
@@ -297,6 +315,7 @@ weighted_entries:
       exceptional: 5
       masterwork: 5
     adjective2:
+      unidentified3: 6
       none: 7
       weapon_accuracy15: 1
       acid15: 1
@@ -313,6 +332,7 @@ weighted_entries:
       exceptional: 5
       masterwork: 5
     adjective2:
+      unidentified3: 6
       none: 7
       weapon_accuracy15: 1
       acid15: 1
@@ -329,6 +349,7 @@ weighted_entries:
       exceptional: 5
       masterwork: 5
     adjective2:
+      unidentified3: 6
       none: 7
       weapon_accuracy15: 1
       acid15: 1
@@ -345,6 +366,7 @@ weighted_entries:
       exceptional: 5
       masterwork: 5
     adjective2:
+      unidentified3: 6
       none: 7
       weapon_accuracy15: 1
       acid15: 1
@@ -361,6 +383,7 @@ weighted_entries:
       exceptional: 5
       masterwork: 5
     adjective2:
+      unidentified3: 6
       none: 7
       weapon_accuracy15: 1
       acid15: 1
@@ -377,6 +400,7 @@ weighted_entries:
       exceptional: 5
       masterwork: 5
     adjective2:
+      unidentified3: 6
       none: 7
       weapon_accuracy15: 1
       acid15: 1
@@ -393,6 +417,7 @@ weighted_entries:
       exceptional: 5
       masterwork: 5
     adjective2:
+      unidentified3: 6
       none: 7
       weapon_accuracy15: 1
       acid15: 1

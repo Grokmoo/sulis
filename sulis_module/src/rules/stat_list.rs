@@ -384,6 +384,7 @@ impl StatList {
             }
             GroupUsesPerDay { group, amount } => self.add_single_group_uses_per_day(group, *amount),
             ClassStat { id, amount } => self.add_single_class_stat_i32(id, *amount),
+            Unidentified(_amount) => {},
         }
     }
 

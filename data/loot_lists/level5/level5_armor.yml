@@ -13,6 +13,7 @@ weighted_entries:
       none: 5
       fine: 5
     adjective2:
+      unidentified1: 2
       none: 5
       will5: 2
       intellect1: 2
@@ -28,6 +29,7 @@ weighted_entries:
       none: 5
       fine: 5
     adjective2:
+      unidentified1: 2
       none: 4
       concealment5: 2
       wisdom1: 2
@@ -40,6 +42,7 @@ weighted_entries:
       none: 5
       fine: 5
     adjective2:
+      unidentified1: 2
       none: 4
       reflex5: 2
       dexterity1: 2
@@ -52,6 +55,7 @@ weighted_entries:
       none: 5
       fine: 5
     adjective2:
+      unidentified1: 2
       none: 4
       movement5: 2
       flanking5: 2
@@ -64,6 +68,7 @@ weighted_entries:
       none: 5
       fine: 5
     adjective2:
+      unidentified1: 2
       none: 4
       movement5: 2
       flanking5: 2
@@ -76,6 +81,7 @@ weighted_entries:
       none: 5
       fine: 5
     adjective2:
+      unidentified1: 2
       none: 4
       movement5: 2
       flanking5: 2
@@ -88,6 +94,7 @@ weighted_entries:
       none: 5
       fine: 5
     adjective2:
+      unidentified1: 2
       none: 3
       reflex5: 2
       dexterity1: 2
@@ -99,6 +106,7 @@ weighted_entries:
       none: 5
       fine: 5
     adjective2:
+      unidentified1: 2
       none: 3
       reflex5: 2
       dexterity1: 2
@@ -110,6 +118,7 @@ weighted_entries:
       none: 5
       fine: 5
     adjective2:
+      unidentified1: 2
       none: 3
       reflex5: 2
       dexterity1: 2
@@ -121,6 +130,7 @@ weighted_entries:
       none: 5
       fine: 5
     adjective2:
+      unidentified1: 2
       none: 3
       perception1: 2
       accuracy5: 2
@@ -132,6 +142,7 @@ weighted_entries:
       none: 5
       fine: 5
     adjective2:
+      unidentified1: 2
       none: 3
       perception1: 2
       accuracy5: 2
@@ -143,6 +154,7 @@ weighted_entries:
       none: 5
       fine: 5
     adjective2:
+      unidentified1: 2
       none: 3
       perception1: 2
       accuracy5: 2
@@ -154,6 +166,7 @@ weighted_entries:
       none: 5
       fine: 5
     adjective2:
+      unidentified1: 2
       none: 3
       movement5: 2
       endurance1: 2
@@ -165,6 +178,7 @@ weighted_entries:
       none: 5
       fine: 5
     adjective2:
+      unidentified1: 2
       none: 3
       movement5: 2
       endurance1: 2
@@ -176,6 +190,7 @@ weighted_entries:
       none: 5
       fine: 5
     adjective2:
+      unidentified1: 2
       none: 3
       movement5: 2
       endurance1: 2
@@ -187,6 +202,7 @@ weighted_entries:
       none: 5
       fine: 5
     adjective2:
+      unidentified1: 2
       none: 5
       fortitude5: 2
       strength1: 2
@@ -200,6 +216,7 @@ weighted_entries:
       none: 5
       fine: 5
     adjective2:
+      unidentified1: 2
       none: 5
       fortitude5: 2
       strength1: 2
@@ -213,6 +230,7 @@ weighted_entries:
       none: 5
       fine: 5
     adjective2:
+      unidentified1: 2
       none: 5
       fortitude5: 2
       strength1: 2
@@ -226,6 +244,7 @@ weighted_entries:
       none: 5
       fine: 5
     adjective2:
+      unidentified1: 2
       none: 5
       defense5: 2
       reflex5: 2
@@ -243,6 +262,7 @@ weighted_entries:
       none: 5
       fine: 5
     adjective2:
+      unidentified1: 2
       none: 5
       defense5: 2
       reflex5: 2
@@ -260,6 +280,7 @@ weighted_entries:
       none: 5
       fine: 5
     adjective2:
+      unidentified1: 2
       none: 5
       defense5: 2
       reflex5: 2
@@ -277,6 +298,7 @@ weighted_entries:
       none: 5
       fine: 5
     adjective2:
+      unidentified1: 2
       none: 5
       defense5: 2
       reflex5: 2

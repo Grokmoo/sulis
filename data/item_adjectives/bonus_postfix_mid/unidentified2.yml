@@ -1,0 +1,15 @@
+id: unidentified2
+name: Unidentified
+name_postfix: " unidentified"
+item_status_icon: gui/status_unidentified
+value_modifier: 0.2
+value_add: 0
+bonus_modifier: 1.0
+penalty_modifier: 1.0
+attack_damage_modifier: 1.0
+attack_bonus_modifier: 1.0
+attack_penalty_modifier: 1.0
+bonuses:
+  - kind:
+      unidentified: 0.6
+attack_bonuses: {}

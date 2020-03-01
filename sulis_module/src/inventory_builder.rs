@@ -142,7 +142,7 @@ impl InventoryBuilder {
                     None
                 }
                 Some(item) => {
-                    let state = ItemState::new(item, entry.item.variant);
+                    let state = ItemState::new(item, entry.item.variant, true);
                     Some((qty, state))
                 }
             }
@@ -169,8 +169,9 @@ impl InventoryBuilder {
             if !equippable_to(&item, &item_save.id, slot) {
                 return None;
             }
+            let identified = !item_save.adjectives.contains(&"unidentified".to_string());
 
-            Some((slot, ItemState::new(item, item_save.variant)))
+            Some((slot, ItemState::new(item, item_save.variant, identified)))
         })
     }
 
@@ -207,8 +208,9 @@ impl InventoryBuilder {
                     item.usable.as_ref()?;
                 }
             }
+            let identified = !item_save.adjectives.contains(&"unidentified".to_string());
 
-            Some((slot, ItemState::new(item, item_save.variant)))
+            Some((slot, ItemState::new(item, item_save.variant, identified)))
         })
     }
 }

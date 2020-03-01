@@ -150,6 +150,7 @@ fn add_bonus(
             *damage_index += 1;
         }
         Reach(amount) => add(state, "bonus_reach", amount),
+        Unidentified(amount) => add(state, "unidentified", amount),
         Range(amount) => add(state, "bonus_range", amount),
         Initiative(amount) => add(state, "initiative", amount),
         HitPoints(amount) => add(state, "hit_points", amount),

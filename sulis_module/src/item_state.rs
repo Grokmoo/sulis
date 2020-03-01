@@ -35,6 +35,9 @@ impl PartialEq for ItemState {
 
 impl ItemState {
     pub fn new(item: Rc<Item>, variant: Option<usize>, identified: bool) -> ItemState {
+        if !identified {
+             warn!("Item {} is created as not identified", item.id);
+        }
         match variant {
             None => ItemState {
                 item,

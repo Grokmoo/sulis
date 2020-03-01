@@ -143,6 +143,7 @@ impl AreaModel {
             kind: TriggerKind::OnPlayerEnter { location, size },
             on_activate: Vec::new(),
             initially_enabled: true,
+            fire_more_than_once: false,
         });
     }
 

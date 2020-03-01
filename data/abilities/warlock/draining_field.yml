@@ -21,6 +21,7 @@ active:
     kind: Damage
     group: Multiple
     range: Short
+    target: AnyGround
   short_description: |
     Continually deal raw damage to all targets in an area.
 prereqs:

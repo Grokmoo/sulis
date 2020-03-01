@@ -18,6 +18,7 @@ active:
     kind: Damage
     group: Multiple
     range: Visible
+    target: AnyGround
   short_description: |
     Deal piercing damage to a group of enemies.
 prereqs:

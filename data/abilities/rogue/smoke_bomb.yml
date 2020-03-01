@@ -14,8 +14,9 @@ active:
     Radius: 10.0
   ai:
     priority: 100
-    kind: Special
+    kind: Buff
     group: Multiple
     range: Short
+    target: AnyGround
   short_description: |
     Create concealing smoke in an area.

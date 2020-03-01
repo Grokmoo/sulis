@@ -1,4 +1,4 @@
-MIN_MULTIPLE_SCORE= 2
+MIN_MULTIPLE_SCORE = 1.5
 MOVE_THRESHOLD = 0.1
 HEALING_FRAC = 0.5
 WAIT_TIME = 10
@@ -48,6 +48,12 @@ function ai_action(parent, params)
 
     hostiles = hostiles:to_table()
 
+    -- setup precomputed weights for all targets
+    local weights = {}
+    weights[parent:id()] = compute_weight(parent, parent)
+    precompute_weights(parent, hostiles, weights)
+    precompute_weights(parent, friendlies, weights)
+
     local failed_use_count = 0
 
     if not parent:has_flag("ai_force_attack") then
@@ -61,7 +67,8 @@ function ai_action(parent, params)
 
     -- only check items and abilities at most 10 times
     for i = 1,10 do
-        local result = find_and_use_item(parent, items, hostiles, friendlies, failed_use_count)
+        local result = find_and_use_item(parent, items, hostiles, friendlies,
+            failed_use_count, weights)
         if result.done then
             game:log("  Item used or moved")
             return parent:state_wait(WAIT_TIME)
@@ -72,7 +79,7 @@ function ai_action(parent, params)
         end
 
         local result = find_and_use_ability(parent, params, abilities, hostiles,
-            friendlies, failed_use_count)
+            friendlies, failed_use_count, weights)
         if result.done then
             game:log("  Ability used or moved")
             return parent:state_wait(WAIT_TIME)
@@ -101,7 +108,7 @@ function ai_action(parent, params)
         return end_turn(parent)
     end
 
-    local targets = sort_attack_targets(parent, hostiles)
+    local targets = sort_attack_targets(parent, hostiles, weights)
     if targets == nil then
         game:log("  No valid attack target.  End")
         return end_turn(parent)
@@ -193,7 +200,7 @@ function check_move_for_attack(parent, target, attempt)
 
         game:log("    Attempt move towards target")
         local target_dist = parent:stats().attack_distance
-        if not parent:move_towards_entity(target, target_dist + increase, MAX_MOVE_LEN) then
+        if not check_move_towards(parent, target, target_dist + increase).done then
             game:log("    Unable to move.")
 
             return { attack=false }
@@ -214,7 +221,7 @@ function check_move_for_attack(parent, target, attempt)
         game:log("At dist " .. tostring(dist) .. " target dist is " .. tostring(target_dist))
         if dist > target_dist then
             game:log("    Attempt move towards target")
-            if not parent:move_towards_entity(target, target_dist, MAX_MOVE_LEN) then
+            if not check_move_towards(parent, target, target_dist).done then
                 game:log("    Unable to move.")
                 return { attack=false }
             end
@@ -224,7 +231,7 @@ function check_move_for_attack(parent, target, attempt)
 
         if not parent:has_visibility(target) then
             game:log("    No visibility.  Move towards")
-            if not parent:move_towards_entity(target, dist - 2, MAX_MOVE_LEN) then
+            if not check_move_towards(parent, target, dist - 2).done then
                 game:log("    Unable to move.")
                 return { attack=false }
             end
@@ -277,7 +284,7 @@ function check_swap_weapons_to_melee(parent, hostiles)
     return { done=false }
 end
 
-function find_and_use_item(parent, items, hostiles, friendlies, failed_use_count)
+function find_and_use_item(parent, items, hostiles, friendlies, failed_use_count, weights)
     for i = 1, #items do
         local item = items[i]
 
@@ -290,7 +297,8 @@ function find_and_use_item(parent, items, hostiles, friendlies, failed_use_count
         if result.target then
             game:log("      Use item")
             parent:use_item(item)
-            local result = handle_targeter(parent, result.target, item:ai_data(), hostiles, friendlies)
+            local result = handle_targeter(parent, result.target, item:ai_data(),
+                hostiles, friendlies, weights)
 
             if result.done then
                 return { done=true }
@@ -301,7 +309,9 @@ function find_and_use_item(parent, items, hostiles, friendlies, failed_use_count
     return { done=false }
 end
 
-function find_and_use_ability(parent, params, abilities, hostiles, friendlies, failed_use_count)
+function find_and_use_ability(parent, params, abilities, hostiles, friendlies,
+    failed_use_count, weights)
+
     local abilities_table = abilities:to_table()
     for i = 1, #abilities_table do
         local ability = abilities_table[i]
@@ -324,7 +334,8 @@ function find_and_use_ability(parent, params, abilities, hostiles, friendlies, f
         if result.target then
             game:log("      Use ability")
             parent:use_ability(ability)
-            local result = handle_targeter(parent, result.target, ai_data, hostiles, friendlies)
+            local result = handle_targeter(parent, result.target, ai_data,
+                hostiles, friendlies, weights)
 
             if result.done then
                 return { done=true }
@@ -336,7 +347,7 @@ function find_and_use_ability(parent, params, abilities, hostiles, friendlies, f
 end
 
 -- find the best target for the given targeter
-function handle_targeter(parent, closest_target, ai_data, hostiles, friendlies)
+function handle_targeter(parent, closest_target, ai_data, hostiles, friendlies, weights)
     if not game:has_targeter() then
         return { done=false, do_next=true }
     end
@@ -358,14 +369,10 @@ function handle_targeter(parent, closest_target, ai_data, hostiles, friendlies)
 
     -- get set of possible targeter targets
     local to_check = nil
-    if game:is_targeter_free_select() then
-        if relationship_modifier == -1 then
-            to_check = hostiles
-        else
-            to_check = friendlies
-        end
+    if relationship_modifier == -1 then
+        to_check = get_targeter_to_check(parent, ai_data, hostiles)
     else
-        to_check = game:get_targeter_selectable():to_table()
+        to_check = get_targeter_to_check(parent, ai_data, friendlies)
     end
 
     if to_check == nil then
@@ -383,11 +390,11 @@ function handle_targeter(parent, closest_target, ai_data, hostiles, friendlies)
     for i = 1,#to_check do
         local cur_score = 0
         local try_target = to_check[i]
-        if game:check_targeter_position(try_target:x(), try_target:y()) then
+        if game:check_targeter_position(try_target.x, try_target.y) then
             local potential_targets = game:get_targeter_affected():to_table()
             for j = 1,#potential_targets do
                 local target = potential_targets[j]
-                local weight = compute_weight(parent, target)
+                local weight = weights[target:id()]
                 cur_score = cur_score + weight * relationship_modifier
             end
         end
@@ -414,11 +421,60 @@ function handle_targeter(parent, closest_target, ai_data, hostiles, friendlies)
         return { done=false, do_next=true }
     end
 
-    game:log("      Found best target " .. best_target:id())
+    if best_target.id then
+        game:log("      Found best target " .. best_target.id)
+    else
+        game:log("      Found best target on ground")
+    end
 
     -- fire targeter on best scored target.  if none with score greater than 0 was found,
     -- will just return
-    return activate_targeter({ x=best_target:x(), y=best_target:y() })
+    return activate_targeter(best_target)
+end
+
+function get_targeter_to_check(parent, ai_data, targets)
+    if not game:is_targeter_free_select() then
+        game:log("        Non free-select.  Checking all valid targets")
+        return map_targets(game:get_targeter_selectable():to_table())
+    end
+
+    if ai_data.target == "Entity" then
+        game:log("        Checking all valid targets")
+        return map_targets(targets)
+    elseif ai_data.target == "AnyGround" then
+        return build_ground_targets(targets)
+    elseif ai_data.target == "EmptyGround" then
+        return build_ground_targets(targets)
+    end
+end
+
+function build_ground_targets(targets)
+    local result = {}
+
+    for i = 1, #targets do
+        local base_x = targets[i]:x()
+        local base_y = targets[i]:y()
+        for y = -4, 4, 2 do
+            for x = -4, 4, 2 do
+                table.insert(result, { x=base_x+x, y=base_y+y })
+            end
+        end
+    end
+    game:log("        Checking ground targets near valid targets")
+    return result
+end
+
+-- transform table of ScriptEntity targets into x,y,id
+function map_targets(targets)
+    local out = {}
+
+    for i = 1,#targets do
+        local target = targets[i]
+        local mapped = { x=target:x(), y=target:y(), id=target:id() }
+        table.insert(out, mapped)
+    end
+
+    return out
 end
 
 function find_targeter_position_nearby(target)
@@ -580,7 +636,7 @@ function find_closest_target(parent, targets)
     return closest_target
 end
 
-function sort_attack_targets(parent, hostiles)
+function sort_attack_targets(parent, hostiles, weights)
     if hostiles == nil then return nil end
 
     local ranked = {}
@@ -589,7 +645,7 @@ function sort_attack_targets(parent, hostiles)
     game:log("  Sorting " .. tostring(#hostiles) .. " potential attack targets")
     for i = 1, #hostiles do
         local target = hostiles[i]
-        local score = compute_weight(parent, target)
+        local score = weights[target:id()]
         game:debug("        Got score of " .. tostring(score) .. " for " .. target:id())
         ranked[score] = target
         table.insert(scores, score)
@@ -604,6 +660,14 @@ function sort_attack_targets(parent, hostiles)
     end
 
     return out
+end
+
+function precompute_weights(parent, targets, weights)
+    for i = 1, #targets do
+        local target = targets[i]
+        local weight = compute_weight(parent, target)
+        weights[target:id()] = weight
+    end
 end
 
 function compute_weight(parent, target)

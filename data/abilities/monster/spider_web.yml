@@ -18,5 +18,6 @@ active:
     kind: Debuff
     group: Multiple
     range: Short
+    target: AnyGround
   short_description: |
     Create sticky webs in an area.

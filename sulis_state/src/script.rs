@@ -311,9 +311,9 @@ impl Script {
 }
 
 const MEM_LIMIT: usize = 10_485_760;
-const INSTRUCTION_LIMIT: u32 = 10_000;
-const INSTRUCTIONS_PER_CHECK: u32 = 10;
-const MILLIS_LIMIT: f64 = 100.0;
+const INSTRUCTION_LIMIT: u32 = 50_000;
+const INSTRUCTIONS_PER_CHECK: u32 = 50;
+const MILLIS_LIMIT: f64 = 50.0;
 
 pub struct InstructionState {
     count: u32,

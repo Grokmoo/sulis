@@ -16,9 +16,10 @@ active:
     Radius: 12.0
   ai:
     priority: 10
-    kind: Special
+    kind: Damage
     group: Multiple
     range: Short
+    target: EmptyGround
   short_description: |
     Charge through multiple opponents, attack each in turn.
 prereqs:

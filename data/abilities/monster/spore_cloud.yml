@@ -17,5 +17,6 @@ active:
     kind: Debuff
     group: Multiple
     range: Short
+    target: AnyGround
   short_description: |
     Lower a group of opponent's mental capacities.

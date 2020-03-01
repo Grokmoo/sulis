@@ -21,6 +21,7 @@ active:
     kind: Damage
     group: Multiple
     range: Visible
+    target: AnyGround
   short_description: |
     Targets in a line suffer massive damage.
 prereqs:

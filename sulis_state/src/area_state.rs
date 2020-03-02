@@ -334,7 +334,7 @@ impl AreaState {
         self.range_indicators.current()
     }
 
-    pub fn targeter(&mut self) -> Option<Rc<RefCell<AreaTargeter>>> {
+    pub fn targeter(&self) -> Option<Rc<RefCell<AreaTargeter>>> {
         match self.targeter {
             None => None,
             Some(ref targeter) => Some(Rc::clone(targeter)),

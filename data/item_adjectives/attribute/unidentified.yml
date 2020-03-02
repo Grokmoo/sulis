@@ -1,4 +1,4 @@
-id: unidentified2
+id: unidentified
 name: Unidentified
 name_postfix: " unidentified"
 item_status_icon: gui/status_unidentified
@@ -9,7 +9,5 @@ penalty_modifier: 1.0
 attack_damage_modifier: 1.0
 attack_bonus_modifier: 1.0
 attack_penalty_modifier: 1.0
-bonuses:
-  - kind:
-      unidentified: 0.6
+bonuses: []
 attack_bonuses: {}

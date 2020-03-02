@@ -13,7 +13,7 @@ weighted_entries:
       exceptional: 5
       fine: 5
     adjective2:
-      unidentified2: 4
+      unidentified: 4
       none: 5
       will10: 2
       intellect2: 2
@@ -29,7 +29,7 @@ weighted_entries:
       exceptional: 5
       fine: 5
     adjective2:
-      unidentified2: 4
+      unidentified: 4
       none: 4
       concealment10: 2
       wisdom2: 2
@@ -42,7 +42,7 @@ weighted_entries:
       exceptional: 5
       fine: 5
     adjective2:
-      unidentified2: 4
+      unidentified: 4
       none: 4
       reflex10: 2
       dexterity2: 2
@@ -55,7 +55,7 @@ weighted_entries:
       exceptional: 5
       fine: 5
     adjective2:
-      unidentified2: 4
+      unidentified: 4
       none: 4
       movement10: 2
       flanking10: 2
@@ -68,7 +68,7 @@ weighted_entries:
       exceptional: 5
       fine: 5
     adjective2:
-      unidentified2: 4
+      unidentified: 4
       none: 4
       movement10: 2
       flanking10: 2
@@ -81,7 +81,7 @@ weighted_entries:
       exceptional: 5
       fine: 5
     adjective2:
-      unidentified2: 4
+      unidentified: 4
       none: 4
       movement10: 2
       flanking10: 2
@@ -94,7 +94,7 @@ weighted_entries:
       exceptional: 5
       fine: 5
     adjective2:
-      unidentified2: 4
+      unidentified: 4
       none: 3
       reflex10: 2
       dexterity2: 2
@@ -106,7 +106,7 @@ weighted_entries:
       exceptional: 5
       fine: 5
     adjective2:
-      unidentified2: 4
+      unidentified: 4
       none: 3
       reflex10: 2
       dexterity2: 2
@@ -118,7 +118,7 @@ weighted_entries:
       exceptional: 5
       fine: 5
     adjective2:
-      unidentified2: 4
+      unidentified: 4
       none: 3
       reflex10: 2
       dexterity2: 2
@@ -130,7 +130,7 @@ weighted_entries:
       exceptional: 5
       fine: 5
     adjective2:
-      unidentified2: 4
+      unidentified: 4
       none: 3
       perception2: 2
       accuracy10: 2
@@ -142,7 +142,7 @@ weighted_entries:
       exceptional: 5
       fine: 5
     adjective2:
-      unidentified2: 4
+      unidentified: 4
       none: 3
       perception2: 2
       accuracy10: 2
@@ -154,7 +154,7 @@ weighted_entries:
       exceptional: 5
       fine: 5
     adjective2:
-      unidentified2: 4
+      unidentified: 4
       none: 3
       perception2: 2
       accuracy10: 2
@@ -166,7 +166,7 @@ weighted_entries:
       exceptional: 5
       fine: 5
     adjective2:
-      unidentified2: 4
+      unidentified: 4
       none: 3
       movement10: 2
       endurance2: 2
@@ -178,7 +178,7 @@ weighted_entries:
       exceptional: 5
       fine: 5
     adjective2:
-      unidentified2: 4
+      unidentified: 4
       none: 3
       movement10: 2
       endurance2: 2
@@ -190,7 +190,7 @@ weighted_entries:
       exceptional: 5
       fine: 5
     adjective2:
-      unidentified2: 4
+      unidentified: 4
       none: 3
       movement10: 2
       endurance2: 2
@@ -202,7 +202,7 @@ weighted_entries:
       exceptional: 5
       fine: 5
     adjective2:
-      unidentified2: 4
+      unidentified: 4
       none: 5
       fortitude10: 2
       strength2: 2
@@ -216,7 +216,7 @@ weighted_entries:
       exceptional: 5
       fine: 5
     adjective2:
-      unidentified2: 4
+      unidentified: 4
       none: 5
       fortitude10: 2
       strength2: 2
@@ -230,7 +230,7 @@ weighted_entries:
       exceptional: 5
       fine: 5
     adjective2:
-      unidentified2: 4
+      unidentified: 4
       none: 5
       fortitude10: 2
       strength2: 2
@@ -244,7 +244,7 @@ weighted_entries:
       exceptional: 5
       fine: 5
     adjective2:
-      unidentified2: 4
+      unidentified: 4
       none: 5
       defense10: 2
       reflex10: 2
@@ -262,7 +262,7 @@ weighted_entries:
       exceptional: 5
       fine: 5
     adjective2:
-      unidentified2: 4
+      unidentified: 4
       none: 5
       defense10: 2
       reflex10: 2
@@ -280,7 +280,7 @@ weighted_entries:
       exceptional: 5
       fine: 5
     adjective2:
-      unidentified2: 4
+      unidentified: 4
       none: 5
       defense10: 2
       reflex10: 2
@@ -298,7 +298,7 @@ weighted_entries:
       exceptional: 5
       fine: 5
     adjective2:
-      unidentified2: 4
+      unidentified: 4
       none: 5
       defense10: 2
       reflex10: 2

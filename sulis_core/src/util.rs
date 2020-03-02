@@ -35,7 +35,8 @@ use std::{thread, time};
 
 use backtrace::Backtrace;
 use flexi_logger::{opt_format, Duplicate, Logger};
-use rand::{self, distributions::uniform::SampleUniform, seq::SliceRandom, Rng};
+use rand::prelude::*;
+use rand::{self, distributions::{WeightedIndex,uniform::SampleUniform}, seq::SliceRandom, Rng};
 use rand_pcg::Pcg64Mcg;
 use serde_yaml;
 
@@ -107,6 +108,16 @@ pub fn shuffle<T>(values: &mut [T]) {
 
 pub fn gen_rand<T: SampleUniform + Sized>(min: T, max: T) -> T {
     rand::thread_rng().gen_range(min, max)
+}
+
+pub fn gen_rand_weight<'a, T, V>(items: &'a Vec<(T, V)>) -> &'a T
+where
+    V: Sized + Clone + Default + PartialOrd + Copy,
+    V: for<'b> std::ops::AddAssign<&'b V>,
+    V: SampleUniform,
+{
+    let dist = WeightedIndex::new(items.iter().map(|item| item.1)).unwrap();
+    &items[dist.sample(&mut rand::thread_rng())].0
 }
 
 fn active_resources_file_path() -> PathBuf {

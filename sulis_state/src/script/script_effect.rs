@@ -165,7 +165,6 @@ fn check_for_bonus(effect: &ScriptAppliedEffect, kind: String) -> bool {
         "ap" => ActionPoints(0),
         "reach" => Reach(0.0),
         "range" => Range(0.0),
-        "unidentified" => Unidentified(0.0),
         "initiative" => Initiative(0),
         "hit_points" => HitPoints(0),
         "melee_accuracy" => MeleeAccuracy(0),

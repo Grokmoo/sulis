@@ -17,7 +17,7 @@
 use std::collections::HashMap;
 use std::io::Error;
 
-use sulis_core::util::{gen_rand, unable_to_create_error};
+use sulis_core::util::{gen_rand, gen_rand_weight, unable_to_create_error};
 
 use crate::{ItemState, Module};
 
@@ -29,13 +29,8 @@ struct Entry {
     weight: u32,
     quantity: [u32; 2],
 
-    adjective1_total_weight: u32,
     adjective1: Vec<(String, u32)>,
-
-    adjective2_total_weight: u32,
     adjective2: Vec<(String, u32)>,
-
-    variant_total_weight: u32,
     variant: Vec<(usize, u32)>,
 }
 
@@ -126,11 +121,8 @@ impl LootList {
             weight: entry_in.weight,
             quantity: [min_qty, max_qty],
             adjective1: Vec::new(),
-            adjective1_total_weight: 0,
             adjective2: Vec::new(),
-            adjective2_total_weight: 0,
             variant: Vec::new(),
-            variant_total_weight: 0,
         })
     }
 
@@ -151,9 +143,7 @@ impl LootList {
         };
 
         let mut adjective1 = Vec::new();
-        let mut adjective1_total_weight = 0;
         for (id, weight) in entry_in.adjective1 {
-            adjective1_total_weight += weight;
             if id == "none" {
                 continue;
             }
@@ -165,9 +155,7 @@ impl LootList {
         }
 
         let mut adjective2 = Vec::new();
-        let mut adjective2_total_weight = 0;
         for (id, weight) in entry_in.adjective2 {
-            adjective2_total_weight += weight;
             if id == "none" {
                 continue;
             }
@@ -179,9 +167,7 @@ impl LootList {
         }
 
         let mut variant = Vec::new();
-        let mut variant_total_weight = 0;
         for (id, weight) in entry_in.variant {
-            variant_total_weight += weight;
             if id == "none" {
                 continue;
             }
@@ -200,11 +186,8 @@ impl LootList {
             weight: entry_in.weight,
             quantity: [min_qty, max_qty],
             adjective1,
-            adjective1_total_weight,
             adjective2,
-            adjective2_total_weight,
             variant,
-            variant_total_weight,
         })
     }
 
@@ -302,47 +285,32 @@ impl LootList {
 
     fn gen_adjectives(&self, entry: &Entry) -> Vec<String> {
         let mut result = Vec::new();
-        if entry.adjective1_total_weight > 0 {
-            let roll = gen_rand(0, entry.adjective1_total_weight);
 
-            let mut cur_weight = 0;
-            for (id, weight) in entry.adjective1.iter() {
-                cur_weight += weight;
-                if roll < cur_weight {
-                    result.push(id.clone());
-                    break;
+        if entry.adjective1.len() > 0 {
+            let pick = gen_rand_weight(&entry.adjective1);
+            result.push(pick.clone());
+        }
+
+        if entry.adjective2.len() > 0 {
+            let mut remain = 1;
+            while remain > 0 {
+                let pick = gen_rand_weight(&entry.adjective2);
+                result.push(pick.clone());
+                match pick.as_str() {
+                    "unidentified" => {},
+                    "multiple" => remain += 1,
+                    _ => remain -= 1,
                 }
             }
         }
-
-        if entry.adjective2_total_weight > 0 {
-            let roll = gen_rand(0, entry.adjective2_total_weight);
-
-            let mut cur_weight = 0;
-            for (id, weight) in entry.adjective2.iter() {
-                cur_weight += weight;
-                if roll < cur_weight {
-                    result.push(id.clone());
-                    break;
-                }
-            }
-        }
-
         result
     }
 
     fn gen_variant(&self, entry: &Entry) -> Option<usize> {
-        if entry.variant_total_weight > 0 {
-            let roll = gen_rand(0, entry.variant_total_weight);
-            let mut cur_weight = 0;
-            for (id, weight) in entry.variant.iter() {
-                cur_weight += weight;
-                if roll < cur_weight {
-                    return Some(*id);
-                }
-            }
+        if entry.variant.len() > 0 {
+            let pick = gen_rand_weight(&entry.variant);
+            return Some(*pick);
         }
-
         None
     }
 

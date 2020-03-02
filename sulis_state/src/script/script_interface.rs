@@ -388,7 +388,7 @@ impl UserData for ScriptInterface {
 
         methods.add_method("has_targeter", |_, _, ()| {
             let area_state = GameState::area_state();
-            let mut area_state = area_state.borrow_mut();
+            let area_state = area_state.borrow();
             Ok(area_state.targeter().is_some())
         });
 

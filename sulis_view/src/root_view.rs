@@ -302,10 +302,21 @@ impl RootView {
     }
 
     pub fn end_turn(&self) {
+        self.cancel_targeter();
+
         if GameState::is_pc_current() {
             let mgr = GameState::turn_manager();
             let cbs = mgr.borrow_mut().next();
             script_callback::fire_round_elapsed(cbs);
+        }
+    }
+
+    fn cancel_targeter(&self) {
+        let area = GameState::area_state();
+        let area = area.borrow();
+
+        if let Some(targeter) = area.targeter() {
+            targeter.borrow_mut().on_cancel();
         }
     }
 

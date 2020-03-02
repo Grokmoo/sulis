@@ -472,7 +472,7 @@ impl ScriptState {
 
 fn get_targeter() -> Result<Rc<RefCell<AreaTargeter>>> {
     let area_state = GameState::area_state();
-    let mut area_state = area_state.borrow_mut();
+    let area_state = area_state.borrow();
     match area_state.targeter() {
         None => {
             warn!("Error getting targeter");

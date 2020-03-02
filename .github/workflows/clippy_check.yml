@@ -10,12 +10,8 @@ jobs:
            toolchain: stable
            components: rustfmt, clippy
            override: true
-      - uses: actions-rs/cargo@v1
-        with:
-          command: clippy
-          args: -- -D warnings
-      # Rustfmt - not enabled at this time
-      # - uses: actions-rs/cargo@v1
-      #   with:
-      #     command: fmt
-      #     args: --all -- --check
+      - name: Clippy
+        run: |
+          cargo clippy -- -D warnings
+          cd sulis_editor
+          cargo clippy -- -D warnings

@@ -196,10 +196,12 @@ impl ActorCreatorWindow {
                 .add_callback(Callback::new(Rc::new(move |widget, _| {
                     let (_, window) = Widget::parent_mut::<ActorCreatorWindow>(widget);
 
-                    let index = (window.selected_images.get(&layer).unwrap().0 - 1) % len;
-                    window
-                        .selected_images
-                        .insert(layer, (index, Rc::clone(&images_ref[index])));
+                    if len > 0 {
+                        let index = (window.selected_images.get(&layer).unwrap().0 + len - 1) % len;
+                        window
+                            .selected_images
+                            .insert(layer, (index, Rc::clone(&images_ref[index])));
+                    }
                     window.build_preview();
                 })));
 
@@ -211,10 +213,12 @@ impl ActorCreatorWindow {
                 .add_callback(Callback::new(Rc::new(move |widget, _| {
                     let (_, window) = Widget::parent_mut::<ActorCreatorWindow>(widget);
 
-                    let index = (window.selected_images.get(&layer).unwrap().0 + 1) % len;
-                    window
-                        .selected_images
-                        .insert(layer, (index, Rc::clone(&images_ref[index])));
+                    if len > 0 {
+                        let index = (window.selected_images.get(&layer).unwrap().0 + 1) % len;
+                        window
+                            .selected_images
+                            .insert(layer, (index, Rc::clone(&images_ref[index])));
+                    }
                     window.build_preview();
                 })));
 

@@ -7,14 +7,15 @@ edition = "2018"
 [dependencies]
 dirs = "2.0"
 backtrace = "0.3"
-flexi_logger = "0.14"
+flexi_logger = "0.15"
 image = "0.22"
 glium = "0.25"
 lazy_static = "1.4"
-log = "0.4"
+log = { version = "0.4", features = [ "serde" ] }
 rand = "0.7"
 rand_pcg = { version = "0.2", features = [ "serde1" ] }
 serde = "1.0"
 serde_derive = "1.0"
 serde_yaml = "0.8"
 serde_json = "1.0"
+rlua = "0.17"

@@ -297,7 +297,7 @@ function find_and_use_item(parent, items, hostiles, friendlies, failed_use_count
         if result.target then
             game:log("      Use item")
             parent:use_item(item)
-            local result = handle_targeter(parent, result.target, item:ai_data(),
+            local result = handle_targeter(parent, result.target, item, item:ai_data(),
                 hostiles, friendlies, weights)
 
             if result.done then
@@ -334,7 +334,7 @@ function find_and_use_ability(parent, params, abilities, hostiles, friendlies,
         if result.target then
             game:log("      Use ability")
             parent:use_ability(ability)
-            local result = handle_targeter(parent, result.target, ai_data,
+            local result = handle_targeter(parent, result.target, ability, ai_data,
                 hostiles, friendlies, weights)
 
             if result.done then
@@ -347,7 +347,7 @@ function find_and_use_ability(parent, params, abilities, hostiles, friendlies,
 end
 
 -- find the best target for the given targeter
-function handle_targeter(parent, closest_target, ai_data, hostiles, friendlies, weights)
+function handle_targeter(parent, closest_target, src, ai_data, hostiles, friendlies, weights)
     if not game:has_targeter() then
         return { done=false, do_next=true }
     end
@@ -384,6 +384,8 @@ function handle_targeter(parent, closest_target, ai_data, hostiles, friendlies, 
     game:log("      Got " .. tostring(#to_check) .. " targets ")
     game:log("      and relationship modifier " .. tostring(relationship_modifier))
 
+    local target_find_bench = game:start_bench(parent:name() .. " find target for " .. src:name())
+
     -- find the best scored target
     local best_score = 0
     local best_target = nil
@@ -406,6 +408,8 @@ function handle_targeter(parent, closest_target, ai_data, hostiles, friendlies, 
     end
 
     game:log("      Best score was " .. tostring(best_score))
+
+    game:end_bench(target_find_bench)
 
     if ai_data.group == "Multiple" then
         if best_score < MIN_MULTIPLE_SCORE then

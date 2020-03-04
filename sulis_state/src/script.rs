@@ -106,7 +106,7 @@ use std::time;
 use rlua::{self, FromLuaMulti, Function, Lua, ToLuaMulti};
 
 use crate::{ai, EntityState, GameState};
-use sulis_core::util::Point;
+use sulis_core::{config::Config, util::Point};
 use sulis_module::{Ability, DamageKind, HitKind, Module, QuickSlot};
 
 pub type Result<T> = std::result::Result<T, rlua::Error>;
@@ -397,8 +397,8 @@ impl ScriptState {
         };
         let total = get_elapsed_millis(time);
         let mem = (self.lua.used_memory() as f32) / 1024.0;
-        info!(
-            "Executed Lua '{}:{}': {:.3} millis, {:.3} KB, ~{} Instructions",
+        log!(Config::bench_log_level(),
+            "BENCHMARK Lua '{}:{}': {:.3} millis, {:.3} KB, ~{} Instructions",
             self.id, func, total, mem, count
         );
     }

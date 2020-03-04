@@ -22,7 +22,7 @@ use rlua::{self, UserData, UserDataMethods};
 
 use crate::script::*;
 use crate::{animation::Anim, AreaState, EntityState, GameState, Location};
-use sulis_core::config::Config;
+use sulis_core::{config::Config};
 use sulis_module::on_trigger::{self, QuestEntryState};
 use sulis_module::{Faction, ItemState, Module, OnTrigger, Time};
 
@@ -340,6 +340,13 @@ use sulis_module::{Faction, ItemState, Module, OnTrigger, Time};
 /// the player is forced to load to continue.  The player is moved to the exact coordinates,
 /// whereas other party members are moved to nearby coordinates.
 ///
+/// # `start_bench(tag: String (Optional)) -> Handle`
+/// Starts a benchmark run.  Returns a `handle` that can be used to finish the run.
+/// The benchmark may optionally be labeled with a `tag`.
+///
+/// # `end_bench(handle: Handle)`
+/// Ends a benchmark run.  The `handle` should be the one returned from `start_bench`.
+///
 pub struct ScriptInterface {}
 
 impl UserData for ScriptInterface {
@@ -396,7 +403,9 @@ impl UserData for ScriptInterface {
             let targeter = get_targeter()?;
             let mut targeter = targeter.borrow_mut();
             targeter.on_mouse_move(x, y);
-            Ok(targeter.is_valid_to_activate())
+
+            let result = targeter.is_valid_to_activate();
+            Ok(result)
         });
 
         methods.add_method("get_targeter_affected", |_, _, ()| {
@@ -1006,6 +1015,17 @@ impl UserData for ScriptInterface {
                 Ok(())
             },
         );
+
+        methods.add_method("start_bench", |_, _, tag: Option<String>| {
+            let handle = sulis_core::benchmark::start_bench(tag);
+
+            Ok(handle)
+        });
+
+        methods.add_method("end_bench", |_, _, handle: sulis_core::benchmark::Handle| {
+            sulis_core::benchmark::end_bench(handle);
+            Ok(())
+        });
     }
 }
 

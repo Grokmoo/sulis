@@ -4,6 +4,8 @@ jobs:
   clippy:
     runs-on: ubuntu-latest
     steps:
+      - name: Install ALSA dev
+        run: sudo apt-get install libasound2-dev
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
         with:

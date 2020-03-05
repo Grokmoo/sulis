@@ -20,6 +20,9 @@ pub use self::resource_builder_set::{
     write_json_to_file, write_to_file,
 };
 
+mod sound_set;
+pub use self::sound_set::{SoundSetBuilder, SoundSet};
+
 mod spritesheet;
 pub use self::spritesheet::Sprite;
 pub use self::spritesheet::Spritesheet;
@@ -45,6 +48,7 @@ use serde::{de, Deserialize, Deserializer};
 use serde_yaml;
 
 use crate::config::Config;
+use crate::io::SoundSource;
 use crate::image::{
     AnimatedImage, ComposedImage, EmptyImage, Image, SimpleImage, TimerImage, WindowImage,
 };
@@ -62,6 +66,7 @@ pub struct ResourceSet {
     pub(crate) images: HashMap<String, Rc<dyn Image>>,
     pub(crate) spritesheets: HashMap<String, Rc<Spritesheet>>,
     pub(crate) fonts: HashMap<String, Rc<Font>>,
+    pub(crate) sound_sets: HashMap<String, Rc<SoundSet>>,
 }
 
 impl ResourceSet {
@@ -108,11 +113,16 @@ impl ResourceSet {
 
         RESOURCE_SET.with(|resource_set| {
             let mut set = resource_set.borrow_mut();
+            set.sound_sets.clear();
             set.images.clear();
             set.spritesheets.clear();
             set.fonts.clear();
 
             set.themes = builder_set.theme_builder.create_theme_set()?;
+
+            for (id, sounds) in builder_set.sound_set_builders {
+                insert_if_ok_boxed("sound_set", id, SoundSet::new(sounds), &mut set.sound_sets);
+            }
 
             for (id, sheet) in builder_set.spritesheet_builders {
                 insert_if_ok_boxed(
@@ -247,6 +257,39 @@ impl ResourceSet {
 
     pub fn image(id: &str) -> Option<Rc<dyn Image>> {
         RESOURCE_SET.with(|r| get_resource(id, &r.borrow().images))
+    }
+
+    pub fn sound(id: &str) -> Result<SoundSource, Error> {
+        RESOURCE_SET.with(|r| r.borrow().sound_internal(id))
+    }
+
+    fn sound_internal(&self, id: &str) -> Result<SoundSource, Error> {
+        let split_index = match id.find('/') {
+            None => return invalid_data_error("Sound must be {SET_ID}/{SOUND_ID}"),
+            Some(idx) => idx,
+        };
+
+        let (set_id, sound_id) = id.split_at(split_index);
+        if sound_id.is_empty() {
+            return invalid_data_error("Sound must be {SET_ID}/{SOUND_ID}");
+        }
+
+        let sound_id = &sound_id[1..];
+
+        let set = match self.sound_sets.get(set_id) {
+            None => {
+                return invalid_data_error(&format!("Unable to locate sound set '{}'", set_id));
+            }, Some(set) => set,
+        };
+
+        let sound = match set.get(sound_id) {
+            None => {
+                return invalid_data_error(&format!("Unable to locate sound '{}' in set '{}'",
+                        sound_id, set_id));
+            }, Some(sound) => sound.clone(),
+        };
+
+        Ok(sound)
     }
 
     /// Parses the `id` string to get a sprite from a spritesheet.  The string

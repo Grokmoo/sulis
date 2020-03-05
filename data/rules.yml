@@ -70,10 +70,12 @@ hour_names: [ Midnight, Late Night, Late Night,    Early Morning,  Early Morning
                         Afternoon,  Afternoon,     Late Afternoon, Late Afternoon,     Evening,     Evening,
                         Dusk,       Dusk,          Night,          Night,              Midnight ]
 
+main_menu_music: music/main_background
+
 hints:
   - "The mouse wheel will zoom your view in or out."
   - "Right click on items to see all available actions.  You can remap mouse buttons in the Options Menu under Input."
-  - "The only items available to you in combat are those already equipped, your other weapon set, and anything in your quick slots, so be prepared."
+  - "The only items available to you in combat are those already equipped, your secondary weapon set, and anything in your quick slots, so be prepared."
   - "Press and hold the middle mouse button and drag the mouse to move the camera.  You can remap mouse buttons in the Options Menu under Input."
   - "Some enemies are either resistant or vulnerable to particular damage types.  Try out different weapons and abilities!"
   - "Ability Groups on the Quickbar can be expanded or collapsed by clicking on the title of the Group."
@@ -81,11 +83,12 @@ hints:
   - "Flanking occurs when a target is in between two attackers, both wielding melee weapons.  Being flanked is very dangerous, especially by a Rogue!"
   - "Armor reduces damage taken from all attacks, while Defense makes you harder to hit."
   - "You can equip two melee weapons at once to dual wield, as long as the weapons are not too large."
-  - "All attacks result in either a Miss, a Graze, a Hit, or a Crit.  Grazes will do less damage than a normal hit."
-  - "Each character gains four action points per round, which can be modified by various effects.  Some action points can be saved up until the next round if unused."
+  - "All attacks result in either a Miss, a Graze, a Hit, or a Crit.  Grazes will do less damage than a normal Hit."
+  - "Each character gains four action points per round, which can be modified by various effects.  Some action points will be carried over to the next round if unused."
   - "You can run away from combat, if you are able to put enough distance between your party and enemies."
   - "Buttons on the bottom panel each have a keyboard hotkey, customizable in the Options Menu under Input."
   - "All keyboard keys can be remapped in the Options Menu under Input."
+  - "Check the settings in the Audio menu under Options if you do not hear any sound."
 
 area_colors:
   Outdoors: [

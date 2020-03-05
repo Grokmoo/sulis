@@ -40,6 +40,7 @@ Please check the [Issue Tracker](https://github.com/Grokmoo/sulis/issues) for kn
 ## Built With
 * [Serde](https://serde.rs/)
 * [Glium](https://github.com/glium/glium)
+* [Rodio](https://github.com/RustAudio/rodio)
 * [Image](https://github.com/PistonDevelopers/image)
 * [rLua](https://github.com/chucklefish/rlua)
 * [Flexi Logger](https://github.com/emabee/flexi_logger)

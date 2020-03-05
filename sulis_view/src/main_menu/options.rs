@@ -22,7 +22,8 @@ use std::rc::Rc;
 
 use sulis_core::config::DisplayMode;
 use sulis_core::config::{self, Config, RawClick};
-use sulis_core::io::{event::ClickKind, keyboard_event::Key, DisplayConfiguration, InputAction};
+use sulis_core::io::{event::ClickKind, keyboard_event::Key, DisplayConfiguration, InputAction,
+    AudioDeviceInfo};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_core::widgets::{Button, Label, ScrollDirection, ScrollPane, TextArea};
 
@@ -32,6 +33,7 @@ enum Tab {
     Display,
     Input,
     Gameplay,
+    Audio
 }
 
 pub struct Options {
@@ -51,10 +53,20 @@ pub struct Options {
     cur_click_actions: Vec<(RawClick, ClickKind)>,
 
     cur_crit_screen_shake: bool,
+
+    audio_devices: Vec<AudioDeviceInfo>,
+    cur_audio_device: Option<usize>,
+    master_volume: f32,
+    music_volume: f32,
+    effects_volume: f32,
+    ambient_volume: f32,
 }
 
 impl Options {
-    pub fn new(display_confs: Vec<DisplayConfiguration>) -> Rc<RefCell<Options>> {
+    pub fn new(
+        display_confs: Vec<DisplayConfiguration>,
+        audio_devices: Vec<AudioDeviceInfo>,
+    ) -> Rc<RefCell<Options>> {
         let config = Config::get_clone();
         let mut cur_keybindings: Vec<_> = config
             .input
@@ -78,6 +90,14 @@ impl Options {
             config.display.monitor
         };
 
+        let cur_audio_device = if audio_devices.is_empty() {
+            None
+        } else if config.audio.device < audio_devices.len() {
+            Some(config.audio.device)
+        } else {
+            Some(0)
+        };
+
         Rc::new(RefCell::new(Options {
             display_confs,
 
@@ -95,6 +115,13 @@ impl Options {
             cur_click_actions,
 
             cur_crit_screen_shake: config.input.crit_screen_shake,
+
+            audio_devices,
+            cur_audio_device,
+            master_volume: config.audio.master_volume,
+            music_volume: config.audio.music_volume,
+            effects_volume: config.audio.effects_volume,
+            ambient_volume: config.audio.ambient_volume,
         }))
     }
 
@@ -138,6 +165,12 @@ impl Options {
         }
 
         config.input.crit_screen_shake = self.cur_crit_screen_shake;
+
+        config.audio.device = self.cur_audio_device.unwrap_or(0);
+        config.audio.master_volume = self.master_volume;
+        config.audio.music_volume = self.music_volume;
+        config.audio.effects_volume = self.effects_volume;
+        config.audio.ambient_volume = self.ambient_volume;
 
         // don't save config to disk at this point.  it is only saved
         // when accepted in the save_or_revert_options_window popup
@@ -299,6 +332,133 @@ impl Options {
         Widget::add_child_to(&ui_scale_content, normal);
         Widget::add_child_to(&ui_scale_content, small);
 
+        vec![
+            mode_title,
+            mode_content,
+            monitor_title,
+            monitor_content,
+            resolution_title,
+            resolution_pane,
+            ui_scale_title,
+            ui_scale_content,
+        ]
+    }
+
+    fn add_audio_widgets(&mut self) -> Vec<Rc<RefCell<Widget>>> {
+        let device_content = Widget::empty("device_content");
+
+        let device_title = Widget::with_theme(Label::empty(), "device_title");
+
+        let device_label = Widget::with_theme(Label::empty(), "device_label");
+        let name = match self.cur_audio_device {
+            None => "No Audio Device Detected",
+            Some(idx) => &self.audio_devices[idx].name,
+        };
+        device_label.borrow_mut().state.add_text_arg("device", name);
+        let next_device = Widget::with_theme(Button::empty(), "next_device");
+        next_device
+            .borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(|widget, _| {
+                let (parent, options) = Widget::parent_mut::<Options>(widget);
+
+                let cur_value = options.cur_audio_device.unwrap_or(0);
+
+                if cur_value == options.audio_devices.len() - 1 {
+                    options.cur_audio_device = Some(0);
+                } else {
+                    options.cur_audio_device = Some(cur_value + 1);
+                }
+
+                parent.borrow_mut().invalidate_children();
+            })));
+        if self.audio_devices.len() < 2 {
+            next_device.borrow_mut().state.set_enabled(false);
+        }
+        Widget::add_child_to(&device_content, device_label);
+        Widget::add_child_to(&device_content, next_device);
+
+        vec![
+            device_content,
+            device_title,
+            self.add_volume_widget("master", self.master_volume, |o, vol| o.master_volume = vol),
+            self.add_volume_widget("music", self.music_volume, |o, vol| o.music_volume = vol),
+            self.add_volume_widget("effects", self.effects_volume, |o, vol| o.effects_volume = vol),
+            self.add_volume_widget("ambient", self.ambient_volume, |o, vol| o.ambient_volume = vol),
+        ]
+    }
+
+    fn add_volume_widget(
+        &self,
+        id: &str,
+        cur: f32,
+        setter: fn(&mut Options, f32),
+    ) -> Rc<RefCell<Widget>> {
+        let content = Widget::empty(&format!("{}_volume_content", id));
+
+        let title = Widget::with_theme(Label::empty(), "title");
+        Widget::add_child_to(&content, title);
+
+        let buttons = Widget::empty("buttons");
+        let mut found = false;
+        for vol in VOLUME_LEVELS.iter() {
+            let vol = *vol;
+            let button = Widget::with_theme(Button::empty(), "volume_button");
+            button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
+                let (parent, options) = Widget::parent_mut::<Options>(widget);
+                setter(options, vol);
+                parent.borrow_mut().invalidate_children();
+            })));
+            if (vol - cur).abs() < std::f32::EPSILON {
+                button.borrow_mut().state.set_active(true);
+                found = true;
+            }
+
+            Widget::add_child_to(&buttons, button);
+        }
+        Widget::add_child_to(&content, buttons);
+
+        let soft_label = Widget::with_theme(Label::empty(), "soft");
+        Widget::add_child_to(&content, soft_label);
+        let loud_label = Widget::with_theme(Label::empty(), "loud");
+        Widget::add_child_to(&content, loud_label);
+
+        if !found {
+            info!("Volume set to nonstandard value: {}", cur);
+        }
+
+        content
+    }
+
+    fn add_gameplay_widgets(&mut self) -> Vec<Rc<RefCell<Widget>>> {
+        let screen_shake_on = Widget::with_theme(Button::empty(), "on");
+        screen_shake_on
+            .borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(|widget, _| {
+                let (parent, options) = Widget::parent_mut::<Options>(widget);
+                options.cur_crit_screen_shake = true;
+                parent.borrow_mut().invalidate_children();
+            })));
+        let screen_shake_off = Widget::with_theme(Button::empty(), "off");
+        screen_shake_off
+            .borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(|widget, _| {
+                let (parent, options) = Widget::parent_mut::<Options>(widget);
+                options.cur_crit_screen_shake = false;
+                parent.borrow_mut().invalidate_children();
+            })));
+        if self.cur_crit_screen_shake {
+            screen_shake_on.borrow_mut().state.set_active(true);
+        } else {
+            screen_shake_off.borrow_mut().state.set_active(true);
+        }
+
+        let screen_shake_content = Widget::empty("screen_shake_content");
+        Widget::add_child_to(&screen_shake_content, screen_shake_on);
+        Widget::add_child_to(&screen_shake_content, screen_shake_off);
+
         let zoom_content = Widget::empty("default_zoom_content");
         let mut zoom_found = false;
         for zoom in DEFAULT_ZOOMS.iter() {
@@ -360,52 +520,13 @@ impl Options {
         let fast_label = Widget::with_theme(Label::empty(), "anim_speed_fast");
 
         vec![
-            mode_title,
-            mode_content,
-            monitor_title,
-            monitor_content,
-            resolution_title,
-            resolution_pane,
-            ui_scale_title,
-            ui_scale_content,
+            screen_shake_content,
             slow_label,
             fast_label,
             anim_speed_title,
             anim_speed_content,
             zoom_content,
         ]
-    }
-
-    fn add_gameplay_widgets(&mut self) -> Vec<Rc<RefCell<Widget>>> {
-        let screen_shake_on = Widget::with_theme(Button::empty(), "on");
-        screen_shake_on
-            .borrow_mut()
-            .state
-            .add_callback(Callback::new(Rc::new(|widget, _| {
-                let (parent, options) = Widget::parent_mut::<Options>(widget);
-                options.cur_crit_screen_shake = true;
-                parent.borrow_mut().invalidate_children();
-            })));
-        let screen_shake_off = Widget::with_theme(Button::empty(), "off");
-        screen_shake_off
-            .borrow_mut()
-            .state
-            .add_callback(Callback::new(Rc::new(|widget, _| {
-                let (parent, options) = Widget::parent_mut::<Options>(widget);
-                options.cur_crit_screen_shake = false;
-                parent.borrow_mut().invalidate_children();
-            })));
-        if self.cur_crit_screen_shake {
-            screen_shake_on.borrow_mut().state.set_active(true);
-        } else {
-            screen_shake_off.borrow_mut().state.set_active(true);
-        }
-
-        let screen_shake_content = Widget::empty("screen_shake_content");
-        Widget::add_child_to(&screen_shake_content, screen_shake_on);
-        Widget::add_child_to(&screen_shake_content, screen_shake_off);
-
-        vec![screen_shake_content]
     }
 
     fn add_input_widgets(&mut self) -> Vec<Rc<RefCell<Widget>>> {
@@ -553,6 +674,8 @@ impl Options {
     }
 }
 
+const VOLUME_LEVELS: [f32; 11] = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0];
+
 const UI_SCALE_NORMAL: (i32, i32) = (320, 180);
 const UI_SCALE_SMALL: (i32, i32) = (368, 207);
 const ANIM_SPEEDS: [u32; 5] = [75, 50, 35, 25, 15];
@@ -626,6 +749,13 @@ impl WidgetKind for Options {
             parent.borrow_mut().invalidate_children();
         })));
 
+        let audio = Widget::with_theme(Button::empty(), "audio");
+        audio.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
+            let (parent, options) = Widget::parent_mut::<Options>(widget);
+            options.cur_tab = Tab::Audio;
+            parent.borrow_mut().invalidate_children();
+        })));
+
         let content = Widget::empty("content");
 
         let widgets = match self.cur_tab {
@@ -641,11 +771,15 @@ impl WidgetKind for Options {
                 gameplay.borrow_mut().state.set_active(true);
                 self.add_gameplay_widgets()
             },
+            Tab::Audio => {
+                audio.borrow_mut().state.set_active(true);
+                self.add_audio_widgets()
+            }
         };
 
         Widget::add_children_to(&content, widgets);
 
-        vec![title, apply, cancel, reset, content, display, input, gameplay]
+        vec![title, apply, cancel, reset, content, display, input, gameplay, audio]
     }
 }
 

@@ -116,9 +116,17 @@ pub struct Rules {
     pub area_colors: HashMap<LocationKind, Vec<Color>>,
 
     pub hints: Vec<String>,
+
+    pub main_menu_music: Option<String>,
 }
 
 impl Rules {
+    pub fn play_main_menu_music(&self) {
+        if let Some(music) = self.main_menu_music.as_ref() {
+            sulis_core::io::Audio::play_music(music);
+        }
+    }
+
     pub fn random_hint(&self) -> String {
         match self.hints.len() {
             0 => "",

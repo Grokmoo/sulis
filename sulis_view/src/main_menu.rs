@@ -37,7 +37,7 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 use sulis_core::config::Config;
-use sulis_core::io::{DisplayConfiguration, InputAction, MainLoopUpdater};
+use sulis_core::io::{DisplayConfiguration, InputAction, MainLoopUpdater, AudioDeviceInfo};
 use sulis_core::ui::*;
 use sulis_core::util;
 use sulis_core::widgets::{Button, ConfirmationWindow, TextArea};
@@ -82,12 +82,16 @@ pub struct MainMenu {
     content: Rc<RefCell<Widget>>,
     pub(crate) char_builder_to_add: Option<Rc<RefCell<CharacterBuilder>>>,
     pub(crate) display_configurations: Vec<DisplayConfiguration>,
+    pub(crate) audio_devices: Vec<AudioDeviceInfo>,
 
     tip_text: Option<String>,
 }
 
 impl MainMenu {
-    pub fn new(display_configurations: Vec<DisplayConfiguration>) -> Rc<RefCell<MainMenu>> {
+    pub fn new(
+        display_configurations: Vec<DisplayConfiguration>,
+        audio_devices: Vec<AudioDeviceInfo>,
+    ) -> Rc<RefCell<MainMenu>> {
         let tip_text = if Module::is_initialized() {
             Some(Module::rules().random_hint())
         } else {
@@ -100,6 +104,7 @@ impl MainMenu {
             content: Widget::empty("content"),
             char_builder_to_add: None,
             display_configurations,
+            audio_devices,
             tip_text,
         }))
     }
@@ -143,6 +148,18 @@ impl WidgetKind for MainMenu {
         }
 
         true
+    }
+
+    fn layout(&mut self, widget: &mut Widget) {
+        let theme = &widget.theme;
+        if let Some(music_id) = theme.custom.get("default_music") {
+            if !Module::is_initialized() {
+                sulis_core::io::Audio::play_music(music_id);
+            } else {
+                Module::rules().play_main_menu_music();
+            }
+        }
+        widget.do_base_layout();
     }
 
     fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
@@ -236,8 +253,9 @@ impl WidgetKind for MainMenu {
                 let (parent, window) = Widget::parent_mut::<MainMenu>(widget);
                 window.mode = Mode::Options;
                 let configs = window.display_configurations.clone();
+                let audio = window.audio_devices.clone();
 
-                window.content = Widget::with_defaults(Options::new(configs));
+                window.content = Widget::with_defaults(Options::new(configs, audio));
 
                 parent.borrow_mut().invalidate_children();
             })));

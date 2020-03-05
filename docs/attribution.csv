@@ -137,3 +137,5 @@ data/spritesheets/particles.png,wind animation,"896, 0 to 2048,256",para,CC0 - P
 data/spritesheets/particles.png,whirlwind,"896,256 to 1664,448",n4,CC0 - Public Domain,http://creativecommons.org/publicdomain/zero/1.0/,Whirlwind for Effects,https://opengameart.org/content/whirlwind-for-effects,desaturated
 data/spritesheets/backgrounds/bg1.jpg,,,Jared Stephen,CC0 - Public Domain,http://creativecommons.org/publicdomain/zero/1.0/,,"https://commons.wikimedia.org/wiki/File:Linden,_paysage.jpg",Oilified
 data/spritesheets/backgrounds/bg2.jpg,,,Havang(nl),CC0 - Public Domain,http://creativecommons.org/publicdomain/zero/1.0/,"Linden, paysage",,
+data/sounds/TremLoadingloopl.ogg,Loading screen music loop,,Brandon Morris,CC0 - Public Domain,http://creativecommons.org/publicdomain/zero/1.0/,Loading Screen Loop,https://opengameart.org/content/loading-screen-loop,Encoded to ogg
+data/sounds/Harp.ogg,Background music loop,,Vwolfdog,CC-BY 3.0,https://creativecommons.org/licenses/by/3.0/,Soft Mysterious Harp Loop,https://opengameart.org/content/soft-mysterious-harp-loop,

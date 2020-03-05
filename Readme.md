@@ -16,6 +16,8 @@ Resources for developers and modders are available on a [page on the website](ht
 ### Prerequisites
 You'll need recent versions of Rust and Cargo installed.  The game will compile on the latest stable version.  [Get Rust](https://www.rust-lang.org/)
 
+On Linux, you will need the ALSA development files installed for audio support.  On Debian / Ubuntu, `apt-get install libasound2-dev`.  On Red Hat / Fedora, `yum install alsa-lib-devel`
+
 ### Installation
 
 1. Clone the git repository.
@@ -29,6 +31,8 @@ You'll need recent versions of Rust and Cargo installed.  The game will compile 
 Note that Running with release mode is recommended.  The compilation process takes several minutes, but load time and performance in game are massively improved over a standard debug build.
 
 ## Troubleshooting
+
+If you encounter build errors on Linux, please see the recently changed Prerequisites above.
 
 Please check the [Issue Tracker](https://github.com/Grokmoo/sulis/issues) for known bugs.  You can [create an issue](https://github.com/Grokmoo/sulis/issues/new).  Please leave as much information as you can, including logs from your sulis user folder /log directory
 

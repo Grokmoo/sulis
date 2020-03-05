@@ -44,6 +44,7 @@ pub struct ResourceBuilderSet {
     pub animated_builders: HashMap<String, AnimatedImageBuilder>,
     pub spritesheet_builders: HashMap<String, SpritesheetBuilder>,
     pub font_builders: HashMap<String, FontBuilder>,
+    pub sound_set_builders: HashMap<String, SoundSetBuilder>,
 }
 
 impl ResourceBuilderSet {
@@ -73,6 +74,7 @@ impl ResourceBuilderSet {
             window_builders: read_builders(resources, WindowImage)?,
             animated_builders: read_builders(resources, AnimatedImage)?,
             spritesheet_builders: read_builders_insert_dirs(resources, Spritesheet)?,
+            sound_set_builders: read_builders_insert_dirs(resources, SoundSet)?,
         })
     }
 }

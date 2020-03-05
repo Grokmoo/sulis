@@ -26,8 +26,6 @@ extern crate serde_derive;
 extern crate glium;
 pub extern crate image as extern_image;
 
-extern crate rlua;
-
 pub mod config;
 pub mod image;
 pub mod io;

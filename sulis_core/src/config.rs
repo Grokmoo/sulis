@@ -45,6 +45,7 @@ lazy_static! {
 pub struct Config {
     pub revision: u32,
     pub display: DisplayConfig,
+    pub audio: AudioConfig,
     pub resources: ResourcesConfig,
     pub input: InputConfig,
     pub logging: LoggingConfig,
@@ -129,6 +130,10 @@ impl Config {
 
     pub fn debug() -> DebugConfig {
         CONFIG.with(|c| c.borrow().debug.clone())
+    }
+
+    pub fn audio_config() -> AudioConfig {
+        CONFIG.with(|c| c.borrow().audio.clone())
     }
 
     pub fn editor_config() -> EditorConfig {
@@ -247,6 +252,16 @@ pub struct LoggingConfig {
     pub bench_log_level: Level,
     pub use_timestamps: bool,
     pub append: bool,
+}
+
+#[derive(Debug, Deserialize, Serialize, Clone)]
+#[serde(deny_unknown_fields)]
+pub struct AudioConfig {
+    pub device: usize,
+    pub master_volume: f32,
+    pub music_volume: f32,
+    pub effects_volume: f32,
+    pub ambient_volume: f32,
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone)]

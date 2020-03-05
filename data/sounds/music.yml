@@ -1,0 +1,9 @@
+id: music
+sounds:
+  loading_loop:
+    file: TremLoadingloopl.ogg
+    loops: true
+  main_background:
+    file: Harp.ogg
+    loops: true
+    volume: 1.5

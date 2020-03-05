@@ -2,7 +2,7 @@
 # The main game configuration file.  User preferences are set here.
 
 # If the user has an old revision, their config is automatically recreated from the sample.
-revision: 13
+revision: 15
 
 display:
     # Display Adapter - Glium is the only choice for now
@@ -42,6 +42,22 @@ display:
 
     # The default mouse pointer
     default_cursor: mouse
+
+audio:
+  # which audio device to output on, starting from 0
+  device: 1
+  
+  # volume level which controls overall level
+  master_volume: 1.0
+  
+  # volume level for music
+  music_volume: 0.7
+  
+  # volume level for sound effects
+  effects_volume: 0.8
+  
+  # volume level for background ambient noises
+  ambient_volume: 0.5
 
 resources:
     # all resources are subdirectories under this

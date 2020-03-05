@@ -2,6 +2,8 @@
 id: main_menu
 themes:
   main_menu:
+    custom:
+      default_music: "music/main_background"
     children:
       kit_selector_ability_hover:
         from: game.kit_selector_ability_hover
@@ -407,7 +409,7 @@ themes:
         from: label
         text_params:
           scale: 10.0
-        text: "Options"
+        text: ""
         relative:
           x: Center
         size: [40, 10]
@@ -430,6 +432,13 @@ themes:
         from: tab_button
         text: "Gameplay"
         position: [-20, 3]
+        size: [19, 7]
+        relative:
+          x: Center
+      audio:
+        from: tab_button
+        text: "Audio"
+        position: [0, 3]
         size: [19, 7]
         relative:
           x: Center
@@ -478,6 +487,45 @@ themes:
         border: [1, 1, 1, 1]
         relative:
           x: Center
+      volume_content:
+        size: [0, 13]
+        relative:
+          x: Center
+          width: ChildMax
+        children:
+          title:
+            from: options_window.content_title
+            position: [0, 0]
+            relative:
+              x: Center
+          soft:
+            from: label
+            text: "Off"
+            position: [0, 1]
+            size: [8, 5]
+          loud:
+            from: label
+            text: "Max"
+            position: [0, 1]
+            size: [8, 5]
+            relative:
+              x: Max
+          buttons:
+            background: bg_base
+            border: [1, 1, 1, 1]
+            position: [0, 5]
+            size: [0, -5]
+            relative:
+              width: ChildSum
+              height: Max
+            layout: BoxHorizontal
+            layout_spacing: { top: 0, bottom: 0, left: 0, right: 1 }
+            children:
+              volume_button:
+                from: button
+                relative:
+                  height: Max
+                size: [8, 0]
       content:
         background: bg_base
         border: { top: 2, bottom: 2, left: 5, right: 5 }
@@ -487,6 +535,162 @@ themes:
           height: Max
         position: [0, 10]
         children:
+          device_title:
+            from: options_window.content_title
+            text: "Output Device"
+            position: [0, 0]
+            relative:
+              x: Center
+          device_content:
+            from: options_window.content_sub_content
+            relative:
+              x: Center
+            size: [80, 8]
+            position: [0, 5]
+            children:
+              device_label:
+                from: label
+                text_params:
+                  horizontal_alignment: Left
+                text: "#device#"
+                size: [-12, 0]
+                relative:
+                  width: Max
+                  height: Max
+              next_device:
+                from: button
+                text: "Next"
+                relative:
+                  x: Max
+                  height: Max
+                size: [10, 0]
+                custom:
+                  tooltip: "Specify which audio device to use."
+          master_volume_content:
+            from: options_window.volume_content
+            position: [0, 15]
+            children:
+              title:
+                text: "Master Volume"
+          music_volume_content:
+            from: options_window.volume_content
+            position: [0, 30]
+            children:
+              title:
+                text: "Music Volume"
+          effects_volume_content:
+            from: options_window.volume_content
+            position: [0, 45]
+            children:
+              title:
+                text: "Effects Volume"
+          ambient_volume_content:
+            from: options_window.volume_content
+            position: [0, 60]
+            children:
+              title:
+                text: "Ambient Volume"
+          screen_shake_content:
+            from: options_window.content_sub_content
+            relative:
+              x: Center
+            size: [50, 8]
+            position: [0, 2]
+            children:
+              label:
+                from: label
+                kind: Label
+                text: "Crit Screen Shake"
+                text_params:
+                  scale: 6
+                relative:
+                  x: Zero
+                size: [32, 6]
+              on:
+                from: button
+                text: "On"
+                relative:
+                  x: Max
+                size: [8, 6]
+                custom:
+                  tooltip: "Enable Critical Hit Screen Shake."
+              off:
+                from: button
+                text: "Off"
+                relative:
+                  x: Max
+                size: [8, 6]
+                position: [-9, 0]
+                custom:
+                  tooltip: "Disable Critical Hit Screen Shake."
+          default_zoom_content:
+            relative:
+              x: Center
+            size: [50, 14]
+            position: [0, 10]
+            children:
+              buttons_box:
+                from: options_window.content_sub_content
+                kind: Container
+                layout: BoxHorizontal
+                layout_spacing: { top: 0, bottom: 0, left: 0, right: 2 }
+                relative:
+                  x: Center
+                size: [50, 8]
+                position: [0, 6]
+                children:
+                  default_zoom_button:
+                    from: button
+                    relative:
+                      height: Max
+                    size: [8, 0]
+                    custom:
+                      tooltip: "Set the default zoom level when playing."
+              default_zoom_title:
+                from: options_window.content_title
+                kind: Label
+                text: "Default Zoom"
+                position: [0, 0]
+                size: [0, 8]
+                relative:
+                  width: Max
+          anim_speed_title:
+            from: options_window.content_title
+            text: "Animation Speed"
+            position: [0, 25]
+            relative:
+              x: Center
+          anim_speed_slow:
+            from: label
+            text: Slow
+            position: [-20, 26]
+            size: [10, 5]
+            relative:
+              x: Center
+          anim_speed_fast:
+            from: label
+            text: Fast
+            position: [20, 26]
+            size: [10, 5]
+            relative:
+              x: Center
+          anim_speed_content:
+            from: options_window.content_sub_content
+            relative:
+              x: Center
+              width: ChildSum
+            size: [0, 8]
+            layout: BoxHorizontal
+            layout_spacing: { top: 0, bottom: 0, left: 0, right: 2 }
+            position: [0, 30]
+            children:
+              speed_button:
+                from: button
+                relative:
+                  height: Max
+                size: [8, 0]
+                custom:
+                  tooltip: "Set the speed of all in game animations.  Affects the speed of combat and character movement."
           mode_title:
             from: options_window.content_title
             text: "Display Mode"
@@ -527,38 +731,6 @@ themes:
                   height: Max
                 custom:
                   tooltip: "Traditional fullscreen mode.  Borderless is almost always the better choice."
-          screen_shake_content:
-            from: options_window.content_sub_content
-            relative:
-              x: Center
-            size: [50, 8]
-            children:
-              label:
-                from: label
-                kind: Label
-                text: "Crit Screen Shake"
-                text_params:
-                  scale: 6
-                relative:
-                  x: Zero
-                size: [32, 6]
-              on:
-                from: button
-                text: "On"
-                relative:
-                  x: Max
-                size: [8, 6]
-                custom:
-                  tooltip: "Enable Critical Hit Screen Shake."
-              off:
-                from: button
-                text: "Off"
-                relative:
-                  x: Max
-                size: [8, 6]
-                position: [-9, 0]
-                custom:
-                  tooltip: "Disable Critical Hit Screen Shake."
           monitor_title:
             from: options_window.content_title
             text: "Monitor"
@@ -625,7 +797,7 @@ themes:
           ui_scale_title:
             from: options_window.content_title
             text: "UI Scale"
-            position: [-30, 80]
+            position: [0, 80]
             relative:
               x: Center
           ui_scale_content:
@@ -633,7 +805,7 @@ themes:
             relative:
               x: Center
             size: [50, 8]
-            position: [-30, 85]
+            position: [0, 85]
             children:
               small:
                 from: button
@@ -652,74 +824,6 @@ themes:
                 size: [23, 0]
                 custom:
                   tooltip: "Standard size buttons, text, and other UI elements."
-          default_zoom_content:
-            relative:
-              x: Center
-            size: [50, 14]
-            position: [30, 79]
-            children:
-              buttons_box:
-                from: options_window.content_sub_content
-                kind: Container
-                layout: BoxHorizontal
-                layout_spacing: { top: 0, bottom: 0, left: 0, right: 2 }
-                relative:
-                  x: Center
-                size: [50, 8]
-                position: [0, 6]
-                children:
-                  default_zoom_button:
-                    from: button
-                    relative:
-                      height: Max
-                    size: [8, 0]
-                    custom:
-                      tooltip: "Set the default zoom level when playing."
-              default_zoom_title:
-                from: options_window.content_title
-                kind: Label
-                text: "Default Zoom"
-                position: [0, 0]
-                size: [0, 8]
-                relative:
-                  width: Max
-          anim_speed_title:
-            from: options_window.content_title
-            text: "Animation Speed"
-            position: [0, 95]
-            relative:
-              x: Center
-          anim_speed_slow:
-            from: label
-            text: Slow
-            position: [-20, 96]
-            size: [10, 5]
-            relative:
-              x: Center
-          anim_speed_fast:
-            from: label
-            text: Fast
-            position: [20, 96]
-            size: [10, 5]
-            relative:
-              x: Center
-          anim_speed_content:
-            from: options_window.content_sub_content
-            relative:
-              x: Center
-              width: ChildSum
-            size: [0, 8]
-            layout: BoxHorizontal
-            layout_spacing: { top: 0, bottom: 0, left: 0, right: 2 }
-            position: [0, 100]
-            children:
-              speed_button:
-                from: button
-                relative:
-                  height: Max
-                size: [8, 0]
-                custom:
-                  tooltip: "Set the speed of all in game animations.  Affects the speed of combat and character movement."
           scroll_speed_title:
             from: options_window.content_title
             text: "Scroll Speed"

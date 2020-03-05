@@ -42,6 +42,7 @@ pub enum YamlResourceKind {
     TimerImage,
     WindowImage,
     Spritesheet,
+    SoundSet,
 
     Ability,
     AbilityList,
@@ -91,6 +92,7 @@ impl YamlResourceKind {
             "images/timer" | "images\\timer" => TimerImage,
             "images/window" | "images\\window" => WindowImage,
             "spritesheets" => Spritesheet,
+            "sounds" => SoundSet,
 
             "abilities" => Ability,
             "ability_lists" => AbilityList,

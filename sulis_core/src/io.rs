@@ -14,6 +14,9 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+pub mod audio;
+pub use self::audio::{Audio, AudioDevice, AudioDeviceInfo, SoundSource, create_audio_device};
+
 pub mod event;
 pub use self::event::Event;
 
@@ -26,13 +29,13 @@ pub mod keyboard_event;
 pub use self::keyboard_event::KeyboardEvent;
 
 use std::cell::{Ref, RefCell};
-use std::io::Error;
+use std::io::{Error};
 use std::rc::Rc;
 
 use crate::extern_image::{ImageBuffer, Rgba};
 
 use crate::config::{Config, IOAdapter};
-use crate::resource::Sprite;
+use crate::resource::{Sprite};
 use crate::ui::{Color, Widget};
 use crate::util::{Point, Rect, Scale, Size};
 
@@ -325,11 +328,33 @@ pub struct Vertex {
 
 implement_vertex!(Vertex, position, tex_coords);
 
-pub fn create() -> Result<Box<dyn IO>, Error> {
-    match Config::display_adapter() {
+pub struct System {
+    io: Box<dyn IO>,
+    audio: Option<AudioDevice>,
+}
+
+impl System {
+    pub fn io(&mut self) -> &mut dyn IO {
+        self.io.as_mut()
+    }
+
+    pub fn audio(&mut self) -> Option<&mut AudioDevice> {
+        self.audio.as_mut()
+    }
+}
+
+pub fn create() -> Result<System, Error> {
+    let io = match Config::display_adapter() {
         IOAdapter::Auto => get_auto_adapter(),
         IOAdapter::Glium => get_glium_adapter(),
-    }
+    }?;
+
+    let audio = create_audio_device();
+
+    Ok(System {
+        io,
+        audio,
+    })
 }
 
 #[cfg(not(target_os = "windows"))]

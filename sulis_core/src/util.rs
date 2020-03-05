@@ -41,7 +41,7 @@ use rand_pcg::Pcg64Mcg;
 use serde_yaml;
 
 use crate::config::{self, Config};
-use crate::io::{MainLoopUpdater, IO};
+use crate::io::{Audio, MainLoopUpdater, System};
 use crate::resource::write_to_file;
 use crate::ui::Widget;
 
@@ -371,7 +371,7 @@ pub fn error_and_exit(error: &str) {
 }
 
 pub fn main_loop(
-    io: &mut dyn IO,
+    system: &mut System,
     root: Rc<RefCell<Widget>>,
     updater: Box<dyn MainLoopUpdater>,
 ) -> Result<(), Error> {
@@ -391,15 +391,17 @@ pub fn main_loop(
         last_start_time = time::Instant::now();
         let total_elapsed = get_elapsed_millis(main_loop_start_time.elapsed());
 
-        io.process_input(Rc::clone(&root));
+        system.io().process_input(Rc::clone(&root));
         updater.update(&root, last_elapsed);
+
+        Audio::update(system.audio(), last_elapsed);
 
         if let Err(e) = Widget::update(&root, last_elapsed) {
             error!("There was a fatal error updating the UI tree state.");
             return Err(e);
         }
 
-        io.render_output(root.borrow(), total_elapsed);
+        system.io().render_output(root.borrow(), total_elapsed);
 
         if updater.is_exit() {
             trace!("Exiting main loop.");

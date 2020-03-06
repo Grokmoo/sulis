@@ -14,6 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::collections::VecDeque;
 use std::cell::RefCell;
 use std::io::{BufReader, Error, ErrorKind};
 use std::fs::File;
@@ -69,7 +70,7 @@ impl Audio {
         AUDIO_QUEUE.with(|q| q.borrow_mut().push(entry));
     }
 
-    pub(crate) fn update(device: Option<&mut AudioDevice>, _elapsed_millis: u32) {
+    pub(crate) fn update(device: Option<&mut AudioDevice>, elapsed_millis: u32) {
         match device {
             None => AUDIO_QUEUE.with(|q| q.borrow_mut().clear()),
             Some(device) => {
@@ -77,6 +78,8 @@ impl Audio {
                 for entry in entries {
                     device.play(entry);
                 }
+
+                device.update(elapsed_millis);
             }
         }
     }
@@ -109,12 +112,103 @@ impl SoundSource {
     }
 }
 
+const FADE_TIME: i32 = 2000;
+
+enum SinkQueueEntry {
+    FadeIn(i32),
+    FadeOut(i32),
+    Stop,
+    Start(SoundSource),
+}
+
 struct AudioSink {
     sink: Sink,
+    cur_id: String,
+    queue: VecDeque<SinkQueueEntry>,
+    base_volume: f32,
 }
 
 impl AudioSink {
-    fn play(&self, source: SoundSource) {
+    fn new(device: &Device, base_volume: f32) -> AudioSink {
+        let sink = Sink::new(device);
+        sink.set_volume(base_volume);
+        AudioSink {
+            sink,
+            cur_id: String::new(),
+            queue: VecDeque::new(),
+            base_volume
+        }
+    }
+
+    fn update(&mut self, device: &Device, elapsed_millis: u32) {
+        let millis = elapsed_millis as i32;
+
+        loop {
+            let entry = match self.queue.pop_front() {
+                None => break,
+                Some(entry) => entry,
+            };
+
+            use SinkQueueEntry::*;
+            match entry {
+                FadeIn(time) => {
+                    let time = time - millis;
+                    if time < 0 {
+                        self.sink.set_volume(self.base_volume);
+                        continue;
+                    } else {
+                        self.sink.set_volume(
+                            self.base_volume * (1.0 - (time as f32 / FADE_TIME as f32))
+                        );
+                        self.queue.push_front(FadeIn(time));
+                        break;
+                    }
+                },
+                FadeOut(time) => {
+                    let time = time - millis;
+                    if time < 0 {
+                        self.sink.set_volume(0.0);
+                        continue;
+                    } else {
+                        self.sink.set_volume(
+                            self.base_volume * (time as f32 / FADE_TIME as f32)
+                        );
+                        self.queue.push_front(FadeOut(time));
+                        break;
+                    }
+                },
+                Stop => {
+                    self.cur_id.clear();
+                    self.sink.stop();
+                    self.sink = Sink::new(device);
+                },
+                Start(sound) => {
+                    self.play_immediate(sound);
+                }
+            }
+        }
+    }
+
+    fn stop_play(&mut self) {
+        self.queue.push_back(SinkQueueEntry::FadeOut(FADE_TIME));
+        self.queue.push_back(SinkQueueEntry::Stop);
+    }
+
+    fn switch_to_source(&mut self, source: SoundSource) {
+        if self.cur_id == source.id { return; }
+
+        if !self.cur_id.is_empty() {
+            self.queue.push_back(SinkQueueEntry::FadeOut(FADE_TIME));
+            self.queue.push_back(SinkQueueEntry::Stop);
+        }
+
+        self.queue.push_back(SinkQueueEntry::Start(source));
+        self.queue.push_back(SinkQueueEntry::FadeIn(FADE_TIME));
+    }
+
+    fn play_immediate(&mut self, source: SoundSource) {
+        self.cur_id = source.id;
+
         let sound = match source.volume {
             None => source.sound.amplify(1.0),
             Some(vol) => source.sound.amplify(vol),
@@ -126,16 +220,8 @@ impl AudioSink {
         }
     }
 
-    fn stop(&self) {
-        self.sink.stop();
-    }
-
     fn detach(self) {
         self.sink.detach();
-    }
-
-    fn set_volume(&self, volume: f32) {
-        self.sink.set_volume(volume);
     }
 }
 
@@ -144,7 +230,6 @@ pub struct AudioDevice {
     name: String,
     config: AudioConfig,
     music: AudioSink,
-    last_music_id: Option<String>,
 }
 
 impl AudioDevice {
@@ -158,18 +243,18 @@ impl AudioDevice {
         config.effects_volume *= config.master_volume;
         config.ambient_volume *= config.master_volume;
 
-        // this sink will never actually be used since each music play
-        // creates a new one
-        let sink = Sink::new(&device);
-        let music = AudioSink { sink };
+        let music = AudioSink::new(&device, config.music_volume);
 
         AudioDevice {
             device,
             name,
             config,
             music,
-            last_music_id: None,
         }
+    }
+
+    fn update(&mut self, elapsed_millis: u32) {
+        self.music.update(&self.device, elapsed_millis);
     }
 
     fn play(&mut self, entry: QueueEntry) {
@@ -181,30 +266,17 @@ impl AudioDevice {
     }
 
     fn stop_music(&mut self) {
-        self.last_music_id = None;
-        self.music.stop();
+        self.music.stop_play();
     }
 
     fn play_music(&mut self, sound: SoundSource) {
-        if self.last_music_id.as_ref() == Some(&sound.id) { return; }
-
-        self.last_music_id = Some(sound.id.to_string());
-        self.music.stop();
-        self.music = self.create_sink();
-        self.music.set_volume(self.config.music_volume);
-        self.music.play(sound);
+        self.music.switch_to_source(sound);
     }
 
     fn play_sfx(&mut self, sound: SoundSource) {
-        let sink = self.create_sink();
-        sink.set_volume(self.config.effects_volume);
-        sink.play(sound);
+        let mut sink = AudioSink::new(&self.device, self.config.effects_volume);
+        sink.play_immediate(sound);
         sink.detach();
-    }
-
-    fn create_sink(&self) -> AudioSink {
-        let sink = Sink::new(&self.device);
-        AudioSink { sink }
     }
 }
 

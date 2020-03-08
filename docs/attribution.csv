@@ -139,3 +139,5 @@ data/spritesheets/backgrounds/bg1.jpg,,,Jared Stephen,CC0 - Public Domain,http:/
 data/spritesheets/backgrounds/bg2.jpg,,,Havang(nl),CC0 - Public Domain,http://creativecommons.org/publicdomain/zero/1.0/,"Linden, paysage",,
 data/sounds/TremLoadingloopl.ogg,Loading screen music loop,,Brandon Morris,CC0 - Public Domain,http://creativecommons.org/publicdomain/zero/1.0/,Loading Screen Loop,https://opengameart.org/content/loading-screen-loop,Encoded to ogg
 data/sounds/Harp.ogg,Background music loop,,Vwolfdog,CC-BY 3.0,https://creativecommons.org/licenses/by/3.0/,Soft Mysterious Harp Loop,https://opengameart.org/content/soft-mysterious-harp-loop,
+data/sounds/ambient/amb_*.flac,Ambient Loops,,Blender Foundation,CC-BY 3.0,https://creativecommons.org/licenses/by/3.0/,"Ambient Mountain, River, Wind, and Forest and Waterfall",https://opengameart.org/content/ambient-mountain-river-wind-and-forest-and-waterfall,
+data/sounds/ambient/dungeon_ambient_1.ogg,Cave / Dungeon background,,JaggedStone,CC0 - Public Domain,http://creativecommons.org/publicdomain/zero/1.0/,Loopable Dungeon Ambience,https://opengameart.org/content/loopable-dungeon-ambience,

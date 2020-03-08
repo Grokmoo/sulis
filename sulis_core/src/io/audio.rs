@@ -29,9 +29,11 @@ thread_local! {
 }
 
 enum QueueKind {
+    Ambient,
+    StopAmbient,
     Music,
-    Sfx,
     StopMusic,
+    Sfx,
 }
 
 struct QueueEntry {
@@ -42,21 +44,56 @@ struct QueueEntry {
 pub struct Audio {}
 
 impl Audio {
+    pub fn stop_ambient() {
+        Audio::enqueue(None, QueueKind::StopAmbient);
+    }
+
+    pub fn change_ambient(sound: Option<SoundSource>) {
+        let kind = if sound.is_some() {
+            QueueKind::Ambient
+        } else {
+            QueueKind::StopAmbient
+        };
+        Audio::enqueue(sound, kind);
+    }
+
+    pub fn change_music(sound: Option<SoundSource>) {
+        let kind = if sound.is_some() {
+            QueueKind::Music
+        } else {
+            QueueKind::StopMusic
+        };
+        Audio::enqueue(sound, kind);
+    }
+
+    pub fn play_ambient(source_id: &str) {
+        Audio::enqueue_id(source_id, QueueKind::Ambient);
+    }
+
     pub fn stop_music() {
-        AUDIO_QUEUE.with(|q| q.borrow_mut().push(
-            QueueEntry { sound: None, kind: QueueKind::StopMusic }
-        ));
+        Audio::enqueue(None, QueueKind::StopMusic);
     }
 
     pub fn play_music(source_id: &str) {
-        Audio::enqueue(source_id, QueueKind::Music);
+        Audio::enqueue_id(source_id, QueueKind::Music);
     }
 
     pub fn play_sfx(source_id: &str) {
-        Audio::enqueue(source_id, QueueKind::Sfx);
+        Audio::enqueue_id(source_id, QueueKind::Sfx);
     }
 
-    fn enqueue(source_id: &str, kind: QueueKind) {
+    fn enqueue(sound: Option<SoundSource>, kind: QueueKind) {
+        AUDIO_QUEUE.with(|q| {
+            if let Some(entry) = q.borrow().last() {
+                if entry.sound == sound { return; }
+            }
+
+            q.borrow_mut().push(QueueEntry { sound, kind });
+
+        });
+    }
+
+    fn enqueue_id(source_id: &str, kind: QueueKind) {
         let sound = match ResourceSet::sound(source_id) {
             Err(e) => {
                 warn!("Unable to locate sound '{}': {}", source_id, e);
@@ -65,9 +102,7 @@ impl Audio {
             Ok(sound) => Some(sound),
         };
 
-        let entry = QueueEntry { sound, kind };
-
-        AUDIO_QUEUE.with(|q| q.borrow_mut().push(entry));
+        Audio::enqueue(sound, kind);
     }
 
     pub(crate) fn update(device: Option<&mut AudioDevice>, elapsed_millis: u32) {
@@ -93,6 +128,14 @@ pub struct SoundSource {
     volume: Option<f32>,
 }
 
+impl PartialEq for SoundSource {
+    fn eq(&self, other: &Self) -> bool {
+        self.id == other.id
+    }
+}
+
+impl Eq for SoundSource {}
+
 impl SoundSource {
     pub fn new(
         id: String,
@@ -112,7 +155,7 @@ impl SoundSource {
     }
 }
 
-const FADE_TIME: i32 = 2000;
+const FADE_TIME: i32 = 1000;
 
 enum SinkQueueEntry {
     FadeIn(i32),
@@ -230,6 +273,7 @@ pub struct AudioDevice {
     name: String,
     config: AudioConfig,
     music: AudioSink,
+    ambient: AudioSink,
 }
 
 impl AudioDevice {
@@ -244,24 +288,29 @@ impl AudioDevice {
         config.ambient_volume *= config.master_volume;
 
         let music = AudioSink::new(&device, config.music_volume);
+        let ambient = AudioSink::new(&device, config.ambient_volume);
 
         AudioDevice {
             device,
             name,
             config,
             music,
+            ambient,
         }
     }
 
     fn update(&mut self, elapsed_millis: u32) {
         self.music.update(&self.device, elapsed_millis);
+        self.ambient.update(&self.device, elapsed_millis);
     }
 
     fn play(&mut self, entry: QueueEntry) {
         match entry.kind {
             QueueKind::Music => self.play_music(entry.sound.unwrap()),
-            QueueKind::Sfx => self.play_sfx(entry.sound.unwrap()),
             QueueKind::StopMusic => self.stop_music(),
+            QueueKind::Sfx => self.play_sfx(entry.sound.unwrap()),
+            QueueKind::Ambient => self.play_ambient(entry.sound.unwrap()),
+            QueueKind::StopAmbient => self.stop_ambient(),
         }
     }
 
@@ -271,6 +320,14 @@ impl AudioDevice {
 
     fn play_music(&mut self, sound: SoundSource) {
         self.music.switch_to_source(sound);
+    }
+
+    fn stop_ambient(&mut self) {
+        self.ambient.stop_play();
+    }
+
+    fn play_ambient(&mut self, sound: SoundSource) {
+        self.ambient.switch_to_source(sound);
     }
 
     fn play_sfx(&mut self, sound: SoundSource) {

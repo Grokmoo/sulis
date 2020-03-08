@@ -40,6 +40,7 @@ use serde::{Deserialize, Deserializer, Serializer};
 use sulis_core::image::Image;
 use sulis_core::resource::{ResourceSet, Sprite};
 use sulis_core::util::{unable_to_create_error, Point, Size};
+use sulis_core::io::SoundSource;
 
 use crate::generator::{EncounterParams, EncounterParamsBuilder, PropParams, PropParamsBuilder};
 use crate::{Encounter, ItemListEntrySaveState, Module, ObjectSize, OnTrigger, Prop};
@@ -115,6 +116,7 @@ pub struct Area {
     pub vis_dist_squared: i32,
     pub vis_dist_up_one_squared: i32,
     pub world_map_location: Option<String>,
+    pub ambient_sound: Option<SoundSource>,
     pub on_rest: OnRest,
     pub location_kind: LocationKind,
     pub generator: Option<GeneratorParams>,
@@ -248,6 +250,11 @@ impl Area {
             Some(gen) => Some(GeneratorParams::new(gen)?),
         };
 
+        let ambient_sound = match &builder.ambient_sound {
+            None => None,
+            Some(id) => Some(ResourceSet::sound(id)?),
+        };
+
         Ok(Area {
             id: builder.id.to_string(),
             name: builder.name.to_string(),
@@ -265,6 +272,7 @@ impl Area {
             vis_dist_up_one_squared: builder.max_vis_up_one_distance
                 * builder.max_vis_up_one_distance,
             world_map_location: builder.world_map_location.clone(),
+            ambient_sound,
             on_rest: builder.on_rest.clone(),
             location_kind: builder.location_kind,
             generator,
@@ -296,6 +304,7 @@ pub struct AreaBuilder {
     pub max_vis_distance: i32,
     pub max_vis_up_one_distance: i32,
     pub world_map_location: Option<String>,
+    pub ambient_sound: Option<String>,
     pub on_rest: OnRest,
     pub location_kind: LocationKind,
 

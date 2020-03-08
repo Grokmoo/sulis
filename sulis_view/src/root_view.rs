@@ -661,6 +661,14 @@ impl WidgetKind for RootView {
                 }),
             ));
 
+            mgr.borrow_mut().time_listeners.add(ChangeListener::new(
+                "ambient",
+                Box::new(|time| {
+                    let area = GameState::area_state();
+                    area.borrow().update_ambient_audio(time);
+                }),
+            ));
+
             Widget::add_children_to(
                 &bot_pane,
                 vec![

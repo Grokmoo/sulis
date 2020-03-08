@@ -7,3 +7,31 @@ sounds:
     file: Harp.ogg
     loops: true
     volume: 1.5
+  ambient_forest:
+    file: ambient/amb_forest.flac
+    loops: true
+    volume: 1.0
+  ambient_mountains:
+    file: ambient/amb_mountains.flac
+    loops: true
+    volume: 0.2
+  ambient_river:
+    file: ambient/amb_river.flac
+    loops: true
+    volume: 0.3
+  ambient_stream:
+    file: ambient/amb_stream.flac
+    loops: true
+    volume: 0.3
+  ambient_waterfall:
+    file: ambient/amb_waterfall.flac
+    loops: true
+    volume: 0.3
+  ambient_wind:
+    file: ambient/amb_wind_1.flac
+    loops: true
+    volume: 0.3
+  ambient_cave:
+    file: ambient/dungeon_ambient_1.ogg
+    loops: true
+    volume: 0.7

@@ -158,6 +158,7 @@ impl WidgetKind for MainMenu {
             } else {
                 Module::rules().play_main_menu_music();
             }
+            sulis_core::io::Audio::stop_ambient();
         }
         widget.do_base_layout();
     }

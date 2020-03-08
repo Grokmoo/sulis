@@ -49,6 +49,8 @@ pub struct AreaModel {
     pub world_map_location: Option<String>,
     pub location_kind: LocationKind,
     pub on_rest: OnRest,
+
+    ambient_sound: Option<String>,
 }
 
 impl Default for AreaModel {
@@ -93,6 +95,7 @@ impl Default for AreaModel {
             world_map_location: None,
             max_vis_distance: 20,
             max_vis_up_one_distance: 6,
+            ambient_sound: None,
             location_kind: LocationKind::Outdoors,
             on_rest: OnRest::Disabled {
                 message: "<PLACEHOLDER>".to_string(),
@@ -511,6 +514,7 @@ impl AreaModel {
         self.world_map_location = area_builder.world_map_location.clone();
         self.on_rest = area_builder.on_rest.clone();
         self.location_kind = area_builder.location_kind;
+        self.ambient_sound = area_builder.ambient_sound;
 
         let width = area_builder.width as i32;
 
@@ -846,6 +850,7 @@ impl AreaModel {
             max_vis_distance: self.max_vis_distance,
             max_vis_up_one_distance: self.max_vis_up_one_distance,
             world_map_location: self.world_map_location.clone(),
+            ambient_sound: self.ambient_sound.clone(),
             on_rest: self.on_rest.clone(),
         };
 

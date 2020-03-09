@@ -286,20 +286,25 @@ impl LootList {
     fn gen_adjectives(&self, entry: &Entry) -> Vec<String> {
         let mut result = Vec::new();
 
-        if entry.adjective1.len() > 0 {
+        if !entry.adjective1.is_empty() {
             let pick = gen_rand_weight(&entry.adjective1);
             result.push(pick.clone());
         }
 
-        if entry.adjective2.len() > 0 {
+        if !entry.adjective2.is_empty() {
             let mut remain = 1;
             while remain > 0 {
                 let pick = gen_rand_weight(&entry.adjective2);
-                result.push(pick.clone());
                 match pick.as_str() {
-                    "unidentified" => {},
-                    "multiple" => remain += 1,
-                    _ => remain -= 1,
+                    "unidentified" => {
+                        if result.get(0) != Some(&"unidentified".to_string()) {
+                            result.insert(0, pick.clone());
+                        }
+                    },
+                    _ => {
+                        result.push(pick.clone());
+                        remain -= 1
+                    },
                 }
             }
         }
@@ -307,7 +312,7 @@ impl LootList {
     }
 
     fn gen_variant(&self, entry: &Entry) -> Option<usize> {
-        if entry.variant.len() > 0 {
+        if !entry.variant.is_empty() {
             let pick = gen_rand_weight(&entry.variant);
             return Some(*pick);
         }

@@ -13,7 +13,7 @@ weighted_entries:
       exceptional: 5
       masterwork: 5
     adjective2:
-      unidentified: 6
+      unidentified: 14
       none: 5
       will15: 2
       intellect3: 2
@@ -29,7 +29,7 @@ weighted_entries:
       exceptional: 5
       masterwork: 5
     adjective2:
-      unidentified: 6
+      unidentified: 14
       none: 4
       concealment15: 2
       wisdom3: 2
@@ -42,7 +42,7 @@ weighted_entries:
       exceptional: 5
       masterwork: 5
     adjective2:
-      unidentified: 6
+      unidentified: 14
       none: 4
       reflex15: 2
       dexterity3: 2
@@ -55,7 +55,7 @@ weighted_entries:
       exceptional: 5
       masterwork: 5
     adjective2:
-      unidentified: 6
+      unidentified: 14
       none: 4
       movement15: 2
       flanking15: 2
@@ -68,7 +68,7 @@ weighted_entries:
       exceptional: 5
       masterwork: 5
     adjective2:
-      unidentified: 6
+      unidentified: 14
       none: 4
       movement15: 2
       flanking15: 2
@@ -81,7 +81,7 @@ weighted_entries:
       exceptional: 5
       masterwork: 5
     adjective2:
-      unidentified: 6
+      unidentified: 14
       none: 4
       movement15: 2
       flanking15: 2
@@ -94,7 +94,7 @@ weighted_entries:
       exceptional: 5
       masterwork: 5
     adjective2:
-      unidentified: 6
+      unidentified: 14
       none: 3
       reflex15: 2
       dexterity3: 2
@@ -106,7 +106,7 @@ weighted_entries:
       exceptional: 5
       masterwork: 5
     adjective2:
-      unidentified: 6
+      unidentified: 14
       none: 3
       reflex15: 2
       dexterity3: 2
@@ -118,7 +118,7 @@ weighted_entries:
       exceptional: 5
       masterwork: 5
     adjective2:
-      unidentified: 6
+      unidentified: 14
       none: 3
       reflex15: 2
       dexterity3: 2
@@ -130,7 +130,7 @@ weighted_entries:
       exceptional: 5
       masterwork: 5
     adjective2:
-      unidentified: 6
+      unidentified: 14
       none: 3
       perception3: 2
       accuracy15: 2
@@ -142,7 +142,7 @@ weighted_entries:
       exceptional: 5
       masterwork: 5
     adjective2:
-      unidentified: 6
+      unidentified: 14
       none: 3
       perception3: 2
       accuracy15: 2
@@ -154,7 +154,7 @@ weighted_entries:
       exceptional: 5
       masterwork: 5
     adjective2:
-      unidentified: 6
+      unidentified: 14
       none: 3
       perception3: 2
       accuracy15: 2
@@ -166,7 +166,7 @@ weighted_entries:
       exceptional: 5
       masterwork: 5
     adjective2:
-      unidentified: 6
+      unidentified: 14
       none: 3
       movement15: 2
       endurance3: 2
@@ -178,7 +178,7 @@ weighted_entries:
       exceptional: 5
       masterwork: 5
     adjective2:
-      unidentified: 6
+      unidentified: 14
       none: 3
       movement15: 2
       endurance3: 2
@@ -190,7 +190,7 @@ weighted_entries:
       exceptional: 5
       masterwork: 5
     adjective2:
-      unidentified: 6
+      unidentified: 14
       none: 3
       movement15: 2
       endurance3: 2
@@ -202,7 +202,7 @@ weighted_entries:
       exceptional: 5
       masterwork: 5
     adjective2:
-      unidentified: 6
+      unidentified: 14
       none: 5
       fortitude15: 2
       strength3: 2
@@ -216,7 +216,7 @@ weighted_entries:
       exceptional: 5
       masterwork: 5
     adjective2:
-      unidentified: 6
+      unidentified: 14
       none: 5
       fortitude15: 2
       strength3: 2
@@ -230,7 +230,7 @@ weighted_entries:
       exceptional: 5
       masterwork: 5
     adjective2:
-      unidentified: 6
+      unidentified: 14
       none: 5
       fortitude15: 2
       strength3: 2
@@ -244,7 +244,7 @@ weighted_entries:
       exceptional: 5
       masterwork: 5
     adjective2:
-      unidentified: 6
+      unidentified: 14
       none: 5
       defense15: 2
       reflex15: 2
@@ -262,7 +262,7 @@ weighted_entries:
       exceptional: 5
       masterwork: 5
     adjective2:
-      unidentified: 6
+      unidentified: 14
       none: 5
       defense15: 2
       reflex15: 2
@@ -280,7 +280,7 @@ weighted_entries:
       exceptional: 5
       masterwork: 5
     adjective2:
-      unidentified: 6
+      unidentified: 14
       none: 5
       defense15: 2
       reflex15: 2
@@ -298,7 +298,7 @@ weighted_entries:
       exceptional: 5
       masterwork: 5
     adjective2:
-      unidentified: 6
+      unidentified: 14
       none: 5
       defense15: 2
       reflex15: 2

@@ -26,6 +26,7 @@ pub struct MerchantState {
     pub id: String,
     pub buy_frac: f32,
     pub sell_frac: f32,
+    pub identify_fraction: f32,
     pub listeners: ChangeListenerList<MerchantState>,
     items: ItemList,
 
@@ -54,6 +55,7 @@ impl MerchantState {
             loot_list_id: save.loot_list_id,
             buy_frac: save.buy_frac,
             sell_frac: save.sell_frac,
+            identify_fraction: 0.2,
             listeners: ChangeListenerList::default(),
             items,
             refresh_rate_millis: save.refresh_rate_millis,
@@ -83,6 +85,7 @@ impl MerchantState {
             loot_list_id: Some(loot_list.id.to_string()),
             buy_frac,
             sell_frac,
+            identify_fraction: 0.2,
             items,
             listeners: ChangeListenerList::default(),
             last_refresh_millis,
@@ -135,7 +138,12 @@ impl MerchantState {
     }
 
     pub fn get_sell_price(&self, item_state: &ItemState) -> i32 {
-        ((item_state.item.value as f32) * self.sell_frac).floor() as i32
+        let value = if item_state.identified {
+            item_state.item.value as f32
+        } else {
+            (1.0 - self.identify_fraction) * item_state.item.value.abs() as f32
+        };
+        (value * self.sell_frac).floor() as i32
     }
 
     pub fn add(&mut self, item_state: ItemState) {

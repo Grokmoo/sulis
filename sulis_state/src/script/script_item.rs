@@ -134,7 +134,7 @@ impl ScriptItem {
             parent: parent.borrow().index(),
             kind,
             id: item.item.id.to_string(),
-            name: item.item.name.to_string(),
+            name: item.get_name(),
             ap,
         })
     }

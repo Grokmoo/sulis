@@ -132,18 +132,7 @@ impl Item {
             &all_adjectives,
         );
 
-        let mut name = String::new();
-        for adj in all_adjectives.iter() {
-            if let Some(ref prefix) = adj.name_prefix {
-                name.push_str(prefix);
-            }
-        }
-        name.push_str(&item.name);
-        for adj in all_adjectives.iter() {
-            if let Some(ref postfix) = adj.name_postfix {
-                name.push_str(postfix);
-            }
-        }
+        let name = item.name.clone();
 
         Item {
             id: new_id,

@@ -121,7 +121,6 @@ impl UserData for ScriptMenuSelection {
 /// `crit_multiplier`, `movement_rate`, `attack_cost`, `ability_ap_cost`,
 /// `hidden`, `free_ability_group_use`, abilities_disabled`, `move_disabled`,
 /// `attack_disabled`, `flanked_immunity`, `sneak_attack_immunity`, `crit_immunity`
-/// `unidentified`
 ///
 /// # `mark_for_removal()`
 /// Marks this effect to be removed on the next update.  This is done asynchronously,

@@ -35,9 +35,6 @@ impl PartialEq for ItemState {
 
 impl ItemState {
     pub fn new(item: Rc<Item>, variant: Option<usize>, identified: bool) -> ItemState {
-        if !identified {
-             warn!("Item {} is created as not identified", item.id);
-        }
         match variant {
             None => ItemState {
                 item,
@@ -76,5 +73,27 @@ impl ItemState {
 
     pub fn icon(&self) -> Rc<dyn Image> {
         self.item.icon(self.variant)
+    }
+    pub fn get_name(&self) -> String {
+        let mut name;
+
+        if self.identified {
+            name = String::new();
+            for adj in self.item.added_adjectives.iter() {
+                if let Some(ref prefix) = adj.name_prefix {
+                    name.push_str(prefix);
+                }
+            }
+            name.push_str(&self.item.name);
+            for adj in self.item.added_adjectives.iter() {
+                if let Some(ref postfix) = adj.name_postfix {
+                    name.push_str(postfix);
+                }
+            }
+        } else {
+            name = "Unidentified ".to_string();
+            name.push_str(&self.item.name);
+        }
+        name
     }
 }

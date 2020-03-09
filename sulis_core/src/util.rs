@@ -110,7 +110,7 @@ pub fn gen_rand<T: SampleUniform + Sized>(min: T, max: T) -> T {
     rand::thread_rng().gen_range(min, max)
 }
 
-pub fn gen_rand_weight<'a, T, V>(items: &'a Vec<(T, V)>) -> &'a T
+pub fn gen_rand_weight<'a, T, V>(items: &'a [(T, V)]) -> &'a T
 where
     V: Sized + Clone + Default + PartialOrd + Copy,
     V: for<'b> std::ops::AddAssign<&'b V>,

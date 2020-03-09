@@ -4,18 +4,16 @@ jobs:
   clippy:
     runs-on: ubuntu-latest
     steps:
+      - name: Install ALSA dev
+        run: sudo apt-get install libasound2-dev
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
         with:
            toolchain: stable
            components: rustfmt, clippy
            override: true
-      - uses: actions-rs/cargo@v1
-        with:
-          command: clippy
-          args: -- -D warnings
-      # Rustfmt - not enabled at this time
-      # - uses: actions-rs/cargo@v1
-      #   with:
-      #     command: fmt
-      #     args: --all -- --check
+      - name: Clippy
+        run: |
+          cargo clippy -- -D warnings
+          cd sulis_editor
+          cargo clippy -- -D warnings

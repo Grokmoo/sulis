@@ -19,6 +19,7 @@ active:
     kind: Damage
     group: Multiple
     range: Short
+    target: AnyGround
   short_description: |
     Attack up to 3 enemies in a cone in front of you.
 prereqs:

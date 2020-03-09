@@ -23,6 +23,7 @@ use std::path::PathBuf;
 
 use lazy_static::lazy_static;
 use serde::{Deserialize, Deserializer};
+use log::{Level, LevelFilter};
 
 use crate::io::keyboard_event::Key;
 use crate::io::{event::ClickKind, InputAction, KeyboardEvent};
@@ -44,6 +45,7 @@ lazy_static! {
 pub struct Config {
     pub revision: u32,
     pub display: DisplayConfig,
+    pub audio: AudioConfig,
     pub resources: ResourcesConfig,
     pub input: InputConfig,
     pub logging: LoggingConfig,
@@ -130,6 +132,10 @@ impl Config {
         CONFIG.with(|c| c.borrow().debug.clone())
     }
 
+    pub fn audio_config() -> AudioConfig {
+        CONFIG.with(|c| c.borrow().audio.clone())
+    }
+
     pub fn editor_config() -> EditorConfig {
         CONFIG.with(|c| c.borrow().editor.clone())
     }
@@ -171,6 +177,10 @@ impl Config {
 
     pub fn crit_screen_shake() -> bool {
         CONFIG.with(|c| c.borrow().input.crit_screen_shake)
+    }
+
+    pub fn bench_log_level() -> Level {
+        CONFIG.with(|c| c.borrow().logging.bench_log_level)
     }
 }
 
@@ -237,10 +247,21 @@ pub struct EditorAreaConfig {
 #[derive(Debug, Deserialize, Serialize, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct LoggingConfig {
-    pub log_level: String,
-    pub stderr_log_level: String,
+    pub log_level: LevelFilter,
+    pub stderr_log_level: LevelFilter,
+    pub bench_log_level: Level,
     pub use_timestamps: bool,
     pub append: bool,
+}
+
+#[derive(Debug, Deserialize, Serialize, Clone)]
+#[serde(deny_unknown_fields)]
+pub struct AudioConfig {
+    pub device: usize,
+    pub master_volume: f32,
+    pub music_volume: f32,
+    pub effects_volume: f32,
+    pub ambient_volume: f32,
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone)]
@@ -446,16 +467,6 @@ impl Config {
                 format!("Config has old revision: {}", config.revision),
             ));
         }
-
-        match config.logging.log_level.as_ref() {
-            "error" | "warn" | "info" | "debug" | "trace" => (),
-            _ => {
-                return Err(Error::new(
-                    ErrorKind::InvalidData,
-                    "log_level must be one of error, warn, info, debug, or trace".to_string(),
-                ));
-            }
-        };
 
         Ok(config)
     }

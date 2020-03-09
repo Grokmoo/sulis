@@ -18,9 +18,10 @@ active:
     Radius: 12.0
   ai:
     priority: 30
-    kind: Debuff
+    kind: Summon
     group: Multiple
     range: Visible
+    target: EmptyGround
   short_description: |
     Create a terrifying phantasm that frightens enemies for several turns.
 prereqs:

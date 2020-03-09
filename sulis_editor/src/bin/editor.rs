@@ -58,8 +58,8 @@ fn main() {
     }
 
     info!("Setting up display adapter.");
-    let mut io = match sulis_core::io::create() {
-        Ok(io) => io,
+    let mut system = match sulis_core::io::create() {
+        Ok(system) => system,
         Err(e) => {
             error!("{}", e);
             util::error_and_exit("There was a fatal error initializing the display.");
@@ -69,7 +69,7 @@ fn main() {
 
     let root = ui::create_ui_tree(EditorView::new());
 
-    if let Err(e) = util::main_loop(io.as_mut(), root, Box::new(EditorMainLoopUpdater {})) {
+    if let Err(e) = util::main_loop(&mut system, root, Box::new(EditorMainLoopUpdater {})) {
         error!("{}", e);
         error!("Error in main loop.  Exiting...");
     }

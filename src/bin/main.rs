@@ -21,7 +21,7 @@ use std::rc::Rc;
 
 use log::{error, info};
 
-use sulis_core::io::IO;
+use sulis_core::io::{System};
 use sulis_core::resource::ResourceSet;
 use sulis_core::ui::{self, Cursor};
 use sulis_core::util::{self, ActiveResources};
@@ -29,7 +29,7 @@ use sulis_module::{Actor, Module};
 use sulis_state::{GameState, NextGameStep, SaveState};
 use sulis_view::{main_menu, RootView};
 
-fn init() -> Box<dyn IO> {
+fn init() -> System {
     // CONFIG will be lazily initialized here; if it fails it
     // prints an error and exits
     util::setup_logger();
@@ -41,12 +41,12 @@ fn init() -> Box<dyn IO> {
     create_io()
 }
 
-fn create_io() -> Box<dyn IO> {
+fn create_io() -> System {
     Cursor::update_max();
 
     info!("Setting up display adapter.");
     match sulis_core::io::create() {
-        Ok(io) => io,
+        Ok(system) => system,
         Err(e) => {
             error!("{}", e);
             util::error_and_exit("There was a fatal error initializing the display.");
@@ -81,12 +81,15 @@ fn load_resources() {
     }
 }
 
-fn main_menu(io: &mut dyn IO) -> NextGameStep {
-    let view = main_menu::MainMenu::new(io.get_display_configurations());
+fn main_menu(system: &mut System) -> NextGameStep {
+    let view = main_menu::MainMenu::new(
+        system.io().get_display_configurations(),
+        sulis_core::io::audio::get_audio_device_info(),
+    );
     let loop_updater = main_menu::LoopUpdater::new(&view);
     let root = ui::create_ui_tree(view.clone());
 
-    if let Err(e) = util::main_loop(io, root, Box::new(loop_updater)) {
+    if let Err(e) = util::main_loop(system, root, Box::new(loop_updater)) {
         error!("{}", e);
         util::error_and_exit("Error in module starter.");
     }
@@ -99,7 +102,7 @@ fn main_menu(io: &mut dyn IO) -> NextGameStep {
 }
 
 fn new_campaign(
-    io: &mut dyn IO,
+    system: &mut System,
     pc_actor: Rc<Actor>,
     party_actors: Vec<Rc<Actor>>,
     flags: HashMap<String, String>,
@@ -110,25 +113,25 @@ fn new_campaign(
         util::error_and_exit("There was a fatal error creating the game state.");
     };
 
-    run_campaign(io)
+    run_campaign(system)
 }
 
-fn load_campaign(io: &mut dyn IO, save_state: SaveState) -> NextGameStep {
+fn load_campaign(system: &mut System, save_state: SaveState) -> NextGameStep {
     info!("Loading game state.");
     if let Err(e) = GameState::load(save_state) {
         error!("{}", e);
         util::error_and_exit("There was a fatal error loading the game state.");
     };
 
-    run_campaign(io)
+    run_campaign(system)
 }
 
-fn run_campaign(io: &mut dyn IO) -> NextGameStep {
+fn run_campaign(system: &mut System) -> NextGameStep {
     let view = RootView::new();
     let loop_updater = sulis_view::GameMainLoopUpdater::new(&view);
     let root = ui::create_ui_tree(view.clone());
 
-    if let Err(e) = util::main_loop(io, root, Box::new(loop_updater)) {
+    if let Err(e) = util::main_loop(system, root, Box::new(loop_updater)) {
         error!("{}", e);
         error!("Error in main loop.  Exiting...");
     }
@@ -141,7 +144,7 @@ fn run_campaign(io: &mut dyn IO) -> NextGameStep {
 }
 
 fn main() {
-    let mut io = init();
+    let mut system = init();
 
     let mut next_step = NextGameStep::MainMenu;
     loop {
@@ -149,13 +152,13 @@ fn main() {
         next_step = match next_step {
             Exit => break,
             NewCampaign { pc_actor } => {
-                new_campaign(io.as_mut(), pc_actor, Vec::new(), HashMap::new())
+                new_campaign(&mut system, pc_actor, Vec::new(), HashMap::new())
             }
-            LoadCampaign { save_state } => load_campaign(io.as_mut(), *save_state),
-            MainMenu => main_menu(io.as_mut()),
+            LoadCampaign { save_state } => load_campaign(&mut system, *save_state),
+            MainMenu => main_menu(&mut system),
             MainMenuReloadResources => {
                 load_resources();
-                main_menu(io.as_mut())
+                main_menu(&mut system)
             }
             LoadModuleAndNewCampaign {
                 pc_actor,
@@ -167,11 +170,11 @@ fn main() {
                 active.campaign = Some(module_dir);
                 active.write();
                 load_resources();
-                new_campaign(io.as_mut(), pc_actor, party_actors, flags)
+                new_campaign(&mut system, pc_actor, party_actors, flags)
             }
             RecreateIO => {
-                io = create_io();
-                main_menu(io.as_mut())
+                system = create_io();
+                main_menu(&mut system)
             }
         };
     }

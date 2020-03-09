@@ -14,6 +14,7 @@ active:
     kind: Debuff
     group: Multiple
     range: Short
+    target: AnyGround
   duration:
     Instant
   cooldown: 3

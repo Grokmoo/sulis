@@ -21,6 +21,7 @@ active:
     kind: Damage
     group: Multiple
     range: Visible
+    target: AnyGround
   short_description: |
     Damage a group of opponents, the more the better.
 prereqs:

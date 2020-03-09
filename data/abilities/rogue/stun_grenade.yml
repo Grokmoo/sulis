@@ -17,6 +17,7 @@ active:
     kind: Debuff
     group: Multiple
     range: Visible
+    target: AnyGround
   short_description: |
     Stun enemies in an area
 prereqs:

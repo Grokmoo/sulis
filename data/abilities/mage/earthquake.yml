@@ -18,6 +18,7 @@ active:
     kind: Debuff
     group: Single
     range: Short
+    target: AnyGround
   short_description: |
     Stun and deal heavy damage to targets in a large area.
 prereqs:

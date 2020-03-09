@@ -18,7 +18,7 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 use crate::{AreaState, EntityState, GameState, Location, TurnManager};
-use sulis_core::util::Point;
+use sulis_core::{util::Point};
 use sulis_module::{
     area::{ToKind, TriggerKind},
     Area, ObjectSize, Time,
@@ -62,6 +62,8 @@ pub(crate) fn transition_to(area_id: Option<&str>, p: Option<Point>, offset: Poi
     if !new_area {
         area.borrow_mut().pc_vis_full_redraw();
     }
+
+    area.borrow().update_ambient_audio(&mgr.borrow().current_time());
 
     remove_party_from_surfaces(&mut mgr.borrow_mut(), &party);
 

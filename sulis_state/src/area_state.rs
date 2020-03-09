@@ -26,6 +26,7 @@ use std::time;
 use crate::save_state::AreaSaveState;
 use crate::script::AreaTargeter;
 use crate::*;
+use sulis_core::io::Audio;
 use sulis_core::config::Config;
 use sulis_core::util::{self, gen_rand, invalid_data_error, Point, Size};
 use sulis_module::area::{Transition, TriggerKind, Trigger};
@@ -326,6 +327,12 @@ impl AreaState {
         }
     }
 
+    pub fn update_ambient_audio(&self, _time: &Time) {
+        // TODO support time specific ambient sounds
+
+        Audio::change_ambient(self.area.area.ambient_sound.clone());
+    }
+
     pub fn range_indicators(&mut self) -> &mut RangeIndicatorHandler {
         &mut self.range_indicators
     }
@@ -334,7 +341,7 @@ impl AreaState {
         self.range_indicators.current()
     }
 
-    pub fn targeter(&mut self) -> Option<Rc<RefCell<AreaTargeter>>> {
+    pub fn targeter(&self) -> Option<Rc<RefCell<AreaTargeter>>> {
         match self.targeter {
             None => None,
             Some(ref targeter) => Some(Rc::clone(targeter)),

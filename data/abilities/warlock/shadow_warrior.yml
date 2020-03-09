@@ -20,6 +20,7 @@ active:
     kind: Summon
     group: Multiple
     range: Visible
+    target: EmptyGround
   short_description: |
     Illusory shadows distract your opponents.
 prereqs:

@@ -106,7 +106,7 @@ use std::time;
 use rlua::{self, FromLuaMulti, Function, Lua, ToLuaMulti};
 
 use crate::{ai, EntityState, GameState};
-use sulis_core::util::Point;
+use sulis_core::{config::Config, util::Point};
 use sulis_module::{Ability, DamageKind, HitKind, Module, QuickSlot};
 
 pub type Result<T> = std::result::Result<T, rlua::Error>;
@@ -311,9 +311,9 @@ impl Script {
 }
 
 const MEM_LIMIT: usize = 10_485_760;
-const INSTRUCTION_LIMIT: u32 = 10_000;
-const INSTRUCTIONS_PER_CHECK: u32 = 10;
-const MILLIS_LIMIT: f64 = 100.0;
+const INSTRUCTION_LIMIT: u32 = 50_000;
+const INSTRUCTIONS_PER_CHECK: u32 = 50;
+const MILLIS_LIMIT: f64 = 50.0;
 
 pub struct InstructionState {
     count: u32,
@@ -397,8 +397,8 @@ impl ScriptState {
         };
         let total = get_elapsed_millis(time);
         let mem = (self.lua.used_memory() as f32) / 1024.0;
-        info!(
-            "Executed Lua '{}:{}': {:.3} millis, {:.3} KB, ~{} Instructions",
+        log!(Config::bench_log_level(),
+            "BENCHMARK Lua '{}:{}': {:.3} millis, {:.3} KB, ~{} Instructions",
             self.id, func, total, mem, count
         );
     }
@@ -472,7 +472,7 @@ impl ScriptState {
 
 fn get_targeter() -> Result<Rc<RefCell<AreaTargeter>>> {
     let area_state = GameState::area_state();
-    let mut area_state = area_state.borrow_mut();
+    let area_state = area_state.borrow();
     match area_state.targeter() {
         None => {
             warn!("Error getting targeter");

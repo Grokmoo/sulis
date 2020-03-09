@@ -302,10 +302,21 @@ impl RootView {
     }
 
     pub fn end_turn(&self) {
+        self.cancel_targeter();
+
         if GameState::is_pc_current() {
             let mgr = GameState::turn_manager();
             let cbs = mgr.borrow_mut().next();
             script_callback::fire_round_elapsed(cbs);
+        }
+    }
+
+    fn cancel_targeter(&self) {
+        let area = GameState::area_state();
+        let area = area.borrow();
+
+        if let Some(targeter) = area.targeter() {
+            targeter.borrow_mut().on_cancel();
         }
     }
 
@@ -469,6 +480,8 @@ impl WidgetKind for RootView {
 
     fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         info!("Adding to root widget.");
+
+        sulis_core::io::Audio::stop_music();
 
         let keys = Config::get_keybindings();
         use InputAction::*;
@@ -645,6 +658,14 @@ impl WidgetKind for RootView {
                         .state
                         .add_text_arg("round", &time.round.to_string());
                     time_label_ref.borrow_mut().invalidate_layout();
+                }),
+            ));
+
+            mgr.borrow_mut().time_listeners.add(ChangeListener::new(
+                "ambient",
+                Box::new(|time| {
+                    let area = GameState::area_state();
+                    area.borrow().update_ambient_audio(time);
                 }),
             ));
 

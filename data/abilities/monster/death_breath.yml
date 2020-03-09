@@ -15,5 +15,6 @@ active:
     kind: Damage
     group: Multiple
     range: Short
+    target: AnyGround
   short_description: |
     Deal raw damage to all opponents in an arc

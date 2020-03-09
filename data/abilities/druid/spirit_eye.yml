@@ -17,6 +17,7 @@ active:
     kind: Summon 
     group: Multiple
     range: Short
+    target: EmptyGround
   short_description: |
     Summon an invisible magic scout.
 prereqs:

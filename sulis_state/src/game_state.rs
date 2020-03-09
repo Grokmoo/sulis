@@ -20,7 +20,7 @@ use std::io::{Error, ErrorKind};
 use std::rc::Rc;
 
 use sulis_core::config::Config;
-use sulis_core::io::GraphicsRenderer;
+use sulis_core::io::{GraphicsRenderer};
 use sulis_core::util::{invalid_data_error, ExtInt, Offset, Point, Scale};
 use sulis_module::on_trigger::QuestEntryState;
 use sulis_module::{
@@ -238,6 +238,7 @@ impl GameState {
             world_map.load();
 
             mgr.borrow_mut().finish_load();
+            area_state.borrow().update_ambient_audio(&mgr.borrow().current_time());
 
             Ok(GameState {
                 areas,
@@ -314,6 +315,9 @@ impl GameState {
             &pc,
             &pc,
         );
+
+        let mgr = GameState::turn_manager();
+        area_state.update_ambient_audio(&mgr.borrow().current_time());
 
         Ok(())
     }

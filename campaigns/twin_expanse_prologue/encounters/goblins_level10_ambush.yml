@@ -1,5 +1,6 @@
 id: goblins_level10_ambush
 auto_spawn: false
+music: music/theme_battle03
 min_gen_actors: 10
 max_gen_actors: 10
 entries:

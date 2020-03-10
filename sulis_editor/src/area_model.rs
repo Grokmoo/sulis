@@ -51,6 +51,8 @@ pub struct AreaModel {
     pub on_rest: OnRest,
 
     ambient_sound: Option<String>,
+    default_music: Option<String>,
+    default_combat_music: Option<String>,
 }
 
 impl Default for AreaModel {
@@ -96,6 +98,8 @@ impl Default for AreaModel {
             max_vis_distance: 20,
             max_vis_up_one_distance: 6,
             ambient_sound: None,
+            default_music: None,
+            default_combat_music: None,
             location_kind: LocationKind::Outdoors,
             on_rest: OnRest::Disabled {
                 message: "<PLACEHOLDER>".to_string(),
@@ -515,6 +519,8 @@ impl AreaModel {
         self.on_rest = area_builder.on_rest.clone();
         self.location_kind = area_builder.location_kind;
         self.ambient_sound = area_builder.ambient_sound;
+        self.default_music = area_builder.default_music;
+        self.default_combat_music = area_builder.default_combat_music;
 
         let width = area_builder.width as i32;
 
@@ -851,6 +857,8 @@ impl AreaModel {
             max_vis_up_one_distance: self.max_vis_up_one_distance,
             world_map_location: self.world_map_location.clone(),
             ambient_sound: self.ambient_sound.clone(),
+            default_music: self.default_music.clone(),
+            default_combat_music: self.default_combat_music.clone(),
             on_rest: self.on_rest.clone(),
         };
 

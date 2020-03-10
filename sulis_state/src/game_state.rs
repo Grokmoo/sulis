@@ -238,6 +238,7 @@ impl GameState {
 
             mgr.borrow_mut().finish_load();
             area_state.borrow().update_ambient_audio(&mgr.borrow().current_time());
+            area_state.borrow().update_music(false, None);
 
             Ok(GameState {
                 areas,
@@ -317,6 +318,7 @@ impl GameState {
 
         let mgr = GameState::turn_manager();
         area_state.update_ambient_audio(&mgr.borrow().current_time());
+        area_state.update_music(false, None);
 
         Ok(())
     }

@@ -14,6 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::time::Duration;
 use std::collections::VecDeque;
 use std::cell::RefCell;
 use std::io::{BufReader, Error, ErrorKind};
@@ -22,7 +23,7 @@ use std::fs::File;
 use rodio::{Sink, Device, DeviceTrait, Source, Decoder, source::Buffered};
 
 use crate::config::{AudioConfig, Config};
-use crate::resource::ResourceSet;
+use crate::resource::{sound_set::EntryBuilder, ResourceSet};
 
 thread_local! {
     static AUDIO_QUEUE: RefCell<Vec<QueueEntry>> = RefCell::new(Vec::new());
@@ -125,7 +126,8 @@ pub struct SoundSource {
     id: String,
     sound: Buffered<Decoder<BufReader<File>>>,
     loops: bool,
-    volume: Option<f32>,
+    volume: f32,
+    delay: Duration,
 }
 
 impl PartialEq for SoundSource {
@@ -140,8 +142,7 @@ impl SoundSource {
     pub fn new(
         id: String,
         file: File,
-        loops: bool,
-        volume: Option<f32>
+        entry: &EntryBuilder
     ) -> Result<SoundSource, Error> {
         let sound = match Decoder::new(BufReader::new(file)) {
             Ok(sound) => sound,
@@ -151,7 +152,13 @@ impl SoundSource {
             }
         };
 
-        Ok(SoundSource { id, sound: sound.buffered(), loops, volume })
+        Ok(SoundSource {
+            id,
+            sound: sound.buffered(),
+            loops: entry.loops,
+            volume: entry.volume,
+            delay: Duration::from_secs_f32(entry.delay),
+        })
     }
 }
 
@@ -252,10 +259,8 @@ impl AudioSink {
     fn play_immediate(&mut self, source: SoundSource) {
         self.cur_id = source.id;
 
-        let sound = match source.volume {
-            None => source.sound.amplify(1.0),
-            Some(vol) => source.sound.amplify(vol),
-        };
+        let sound = source.sound.amplify(source.volume).delay(source.delay);
+
         if source.loops {
             self.sink.append(sound.repeat_infinite());
         } else {

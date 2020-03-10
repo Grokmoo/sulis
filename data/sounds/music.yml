@@ -35,3 +35,41 @@ sounds:
     file: ambient/dungeon_ambient_1.ogg
     loops: true
     volume: 0.7
+  theme_grasslands01:
+    file: old_music/prelude.ogg
+    loops: true
+    volume: 0.3
+    delay: 5.0
+  theme_grasslands02:
+    file: old_music/legend_1.ogg
+    loops: true
+    volume: 0.3
+    delay: 5.0
+  theme_grasslands03:
+    file: old_music/medieval_theme_1.ogg
+    loops: true
+    volume: 0.3
+    delay: 5.0
+  theme_grasslands04:
+    file: old_music/theme_medieval.ogg
+    loops: true
+    volume: 0.3
+    delay: 5.0
+  theme_grasslands05:
+    file: old_music/kingdom_theme.ogg
+    loops: true
+    volume: 0.3
+    delay: 5.0
+  theme_battle01:
+    file: The_Old_Tower_Inn.ogg
+    loops: true
+    volume: 0.4
+    delay: 0.0
+  theme_battle02:
+    file: regular_battle.ogg
+    loops: true
+    volume: 0.5
+  theme_battle03:
+    file: POL-battle-march-short.ogg
+    loops: true
+    volume: 0.5

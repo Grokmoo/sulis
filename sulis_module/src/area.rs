@@ -117,6 +117,8 @@ pub struct Area {
     pub vis_dist_up_one_squared: i32,
     pub world_map_location: Option<String>,
     pub ambient_sound: Option<SoundSource>,
+    pub default_music: Option<SoundSource>,
+    pub default_combat_music: Option<SoundSource>,
     pub on_rest: OnRest,
     pub location_kind: LocationKind,
     pub generator: Option<GeneratorParams>,
@@ -255,6 +257,16 @@ impl Area {
             Some(id) => Some(ResourceSet::sound(id)?),
         };
 
+        let default_music = match &builder.default_music {
+            None => None,
+            Some(id) => Some(ResourceSet::sound(id)?),
+        };
+
+        let default_combat_music = match &builder.default_combat_music {
+            None => None,
+            Some(id) => Some(ResourceSet::sound(id)?),
+        };
+
         Ok(Area {
             id: builder.id.to_string(),
             name: builder.name.to_string(),
@@ -273,6 +285,8 @@ impl Area {
                 * builder.max_vis_up_one_distance,
             world_map_location: builder.world_map_location.clone(),
             ambient_sound,
+            default_music,
+            default_combat_music,
             on_rest: builder.on_rest.clone(),
             location_kind: builder.location_kind,
             generator,
@@ -305,6 +319,8 @@ pub struct AreaBuilder {
     pub max_vis_up_one_distance: i32,
     pub world_map_location: Option<String>,
     pub ambient_sound: Option<String>,
+    pub default_music: Option<String>,
+    pub default_combat_music: Option<String>,
     pub on_rest: OnRest,
     pub location_kind: LocationKind,
 

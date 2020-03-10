@@ -43,8 +43,7 @@ impl SoundSet {
                 };
 
                 let s_id = format!("{}/{}", builder.id, id);
-                if let Ok(sound_source) = SoundSource::new(s_id, file, entry_builder.loops,
-                    entry_builder.volume) {
+                if let Ok(sound_source) = SoundSource::new(s_id, file, entry_builder) {
 
                     source = Some(sound_source);
                     break;
@@ -82,10 +81,16 @@ pub struct SoundSetBuilder {
 #[derive(Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct EntryBuilder {
-    file: String,
+    pub file: String,
 
     #[serde(default)]
-    loops: bool,
+    pub loops: bool,
 
-    volume: Option<f32>,
+    #[serde(default = "float_1")]
+    pub volume: f32,
+
+    #[serde(default)]
+    pub delay: f32,
 }
+
+fn float_1() -> f32 { 1.0 }

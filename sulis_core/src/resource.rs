@@ -20,7 +20,7 @@ pub use self::resource_builder_set::{
     write_json_to_file, write_to_file,
 };
 
-mod sound_set;
+pub mod sound_set;
 pub use self::sound_set::{SoundSetBuilder, SoundSet};
 
 mod spritesheet;

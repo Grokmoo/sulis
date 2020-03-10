@@ -481,8 +481,6 @@ impl WidgetKind for RootView {
     fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         info!("Adding to root widget.");
 
-        sulis_core::io::Audio::stop_music();
-
         let keys = Config::get_keybindings();
         use InputAction::*;
 

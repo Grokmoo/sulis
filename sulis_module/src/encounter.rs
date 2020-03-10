@@ -19,6 +19,8 @@ use std::io::Error;
 use std::rc::Rc;
 
 use crate::{Actor, Module};
+use sulis_core::io::SoundSource;
+use sulis_core::resource::ResourceSet;
 use sulis_core::util::{gen_rand, unable_to_create_error};
 
 struct Entry {
@@ -31,6 +33,7 @@ struct Entry {
 
 pub struct Encounter {
     pub id: String,
+    pub music: Option<SoundSource>,
     pub auto_spawn: bool,
     min_gen_actors: u32,
     max_gen_actors: u32,
@@ -87,8 +90,14 @@ impl Encounter {
             });
         }
 
+        let music = match &builder.music {
+            None => None,
+            Some(id) => Some(ResourceSet::sound(id)?),
+        };
+
         Ok(Encounter {
             id: builder.id,
+            music,
             auto_spawn: builder.auto_spawn,
             min_gen_actors: builder.min_gen_actors,
             max_gen_actors: builder.max_gen_actors,
@@ -175,6 +184,7 @@ impl Encounter {
 #[serde(deny_unknown_fields)]
 pub struct EncounterBuilder {
     pub id: String,
+    pub music: Option<String>,
     pub auto_spawn: bool,
     min_gen_actors: u32,
     max_gen_actors: u32,

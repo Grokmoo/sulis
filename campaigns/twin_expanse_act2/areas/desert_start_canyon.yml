@@ -109,8 +109,8 @@ transitions:
     to:
       Area:
         id: desert_start
-        x: 0
-        y: 0
+        x: 27
+        y: 6
     hover_text: To Desert
     image_display: empty
   - from:

@@ -129,6 +129,9 @@ impl AreaOverlayHandler {
 
     fn check_mouseover(&self, x: i32, y: i32) -> Option<Rc<RefCell<AreaMouseover>>> {
         let area_state = GameState::area_state();
+
+        if !area_state.borrow().is_pc_explored(x, y) { return None; }
+
         let targeter = area_state.borrow_mut().targeter();
 
         if let Some(ref targeter) = targeter {

@@ -511,6 +511,7 @@ themes:
           path_point_end_image: path_point_end
           ap_hover_text_scale: "1.0"
           ap_hover_text_color: FF0
+          entity_see_through_alpha: "0.4"
         children:
           targeter_label:
             from: label

@@ -9,7 +9,7 @@ max_vis_distance: 20
 max_vis_up_one_distance: 6
 world_map_location: wellswood_forest
 ambient_sound: music/ambient_mountains
-default_music: music/theme_grasslands03
+default_music: music/theme_grasslands02
 on_rest:
   FireScript:
     id: campaign

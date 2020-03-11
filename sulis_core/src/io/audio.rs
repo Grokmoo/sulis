@@ -14,6 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::fmt;
 use std::time::Duration;
 use std::collections::VecDeque;
 use std::cell::RefCell;
@@ -29,6 +30,7 @@ thread_local! {
     static AUDIO_QUEUE: RefCell<Vec<QueueEntry>> = RefCell::new(Vec::new());
 }
 
+#[derive(PartialEq, Eq)]
 enum QueueKind {
     Ambient,
     StopAmbient,
@@ -37,6 +39,7 @@ enum QueueKind {
     Sfx,
 }
 
+#[derive(Eq, PartialEq)]
 struct QueueEntry {
     sound: Option<SoundSource>,
     kind: QueueKind,
@@ -85,12 +88,7 @@ impl Audio {
 
     fn enqueue(sound: Option<SoundSource>, kind: QueueKind) {
         AUDIO_QUEUE.with(|q| {
-            if let Some(entry) = q.borrow().last() {
-                if entry.sound == sound { return; }
-            }
-
             q.borrow_mut().push(QueueEntry { sound, kind });
-
         });
     }
 
@@ -171,6 +169,18 @@ enum SinkQueueEntry {
     Start(SoundSource),
 }
 
+impl fmt::Debug for SinkQueueEntry {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        use SinkQueueEntry::*;
+        match self {
+            FadeIn(time) => write!(f, "FadeIn {}", time),
+            FadeOut(time) => write!(f, "FadeOut {}", time),
+            Stop => write!(f, "Stop"),
+            Start(_) => write!(f, "Start"),
+        }
+    }
+}
+
 struct AudioSink {
     sink: Sink,
     cur_id: String,
@@ -231,6 +241,7 @@ impl AudioSink {
                     self.cur_id.clear();
                     self.sink.stop();
                     self.sink = Sink::new(device);
+                    self.sink.set_volume(self.base_volume);
                 },
                 Start(sound) => {
                     self.play_immediate(sound);
@@ -252,6 +263,7 @@ impl AudioSink {
             self.queue.push_back(SinkQueueEntry::Stop);
         }
 
+        self.cur_id = source.id.to_string();
         self.queue.push_back(SinkQueueEntry::Start(source));
         self.queue.push_back(SinkQueueEntry::FadeIn(FADE_TIME));
     }

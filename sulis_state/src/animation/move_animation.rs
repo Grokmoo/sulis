@@ -136,19 +136,24 @@ pub(in crate::animation) fn cleanup(mover: &Rc<RefCell<EntityState>>, model: &mu
     let mut first = true;
     let mut target = None;
     let mut index = model.last_frame_index as usize;
-    loop {
-        let p = model.path[index];
-        if area.borrow().is_passable_for_entity(&mover.borrow(), p.x, p.y) {
-            if !first {
-                target = Some(p);
+
+    let do_move_back = !mover.borrow().is_party_member() || GameState::is_combat_active();
+
+    if do_move_back {
+        loop {
+            let p = model.path[index];
+            if area.borrow().is_passable_for_entity(&mover.borrow(), p.x, p.y) {
+                if !first {
+                    target = Some(p);
+                }
+                break;
             }
-            break;
+
+            if index == 0 { break; }
+
+            index -= 1;
+            first = false;
         }
-
-        if index == 0 { break; }
-
-        index -= 1;
-        first = false;
     }
 
     if let Some(p) = target {

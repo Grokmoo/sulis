@@ -20,7 +20,7 @@ function after_rockslide_cutscene(parent)
   elseif base_class == "rogue" then
     members[3]:remove()
     table.remove(members, 3)
-  else -- mage or druid
+  else -- mage, druid, or warlock
     members[2]:remove()
     table.remove(members, 2)
   end

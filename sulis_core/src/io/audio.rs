@@ -366,11 +366,10 @@ pub struct AudioDeviceInfo {
 pub fn get_audio_device_info() -> Vec<AudioDeviceInfo> {
     let devices = get_audio_devices();
 
-    devices.into_iter().map(|device| AudioDeviceInfo { name: device.name }).collect()
+    devices.into_iter().map(|(name, _)| AudioDeviceInfo { name }).collect()
 }
 
-fn get_audio_devices() -> Vec<AudioDevice> {
-    let audio_config = Config::audio_config();
+fn get_audio_devices() -> Vec<(String, Device)> {
 
     let devices = match rodio::output_devices() {
         Err(e) => {
@@ -383,8 +382,7 @@ fn get_audio_devices() -> Vec<AudioDevice> {
     let mut output = Vec::new();
     for (index, device) in devices.enumerate() {
         let name = device_name(&device, index);
-        let config = audio_config.clone();
-        output.push(AudioDevice::new(device, name, config));
+        output.push((name, device));
     }
 
     output
@@ -399,13 +397,16 @@ pub fn create_audio_device() -> Option<AudioDevice> {
     }
 
     let audio_config = Config::audio_config();
+    let config = audio_config.clone();
+    warn!("Probing audio device with index {}", audio_config.device);
 
-    if audio_config.device < devices.len() {
-        return Some(devices.remove(audio_config.device));
-    }
+    let (name, device) = if audio_config.device < devices.len() {
+        devices.remove(audio_config.device)
+    } else {
+        warn!("Device not found, using default audio device 0");
+        devices.remove(0)
+    };
 
-    warn!("Configured audio device with index {} not found", audio_config.device);
-    warn!("Using default audio device");
-
-    Some(devices.remove(0))
+    warn!("Trying to set up {}, if this crashes change the device nr in the config.yml", name);
+    Some(AudioDevice::new(device, name, config))
 }

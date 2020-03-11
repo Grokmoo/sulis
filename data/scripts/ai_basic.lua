@@ -682,11 +682,11 @@ function compute_weight(parent, target)
 
     -- threatening hostiles are higher priority
     if parent:is_threatened_by(target) then
-        modifiers = modifiers + 0.25
+        modifiers = modifiers + 0.35
     end
 
     -- closer targets are higher priority
-    modifiers = modifiers + (20.0 - parent:dist_to_entity(target)) / 80.0
+    modifiers = modifiers + (20.0 - parent:dist_to_entity(target)) / 60.0
 
     -- weaker hostiles and stronger friendlies are higher priority
     if base == 1 then

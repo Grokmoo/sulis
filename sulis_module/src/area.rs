@@ -139,53 +139,64 @@ impl Area {
             props.push(prop_data);
         }
 
-        let mut transitions: Vec<Transition> = Vec::new();
-        for (index, t_builder) in builder.transitions.iter().enumerate() {
-            let image = match ResourceSet::image(&t_builder.image_display) {
-                None => {
-                    warn!(
-                        "Image '{}' not found for transition.",
-                        t_builder.image_display
-                    );
-                    continue;
-                }
-                Some(image) => image,
-            };
+        let transitions = Area::read_transitions(&builder.transitions, builder.width as i32,
+            builder.height as i32)?;
 
-            let size = match Module::size(&t_builder.size) {
-                None => {
-                    warn!("Size '{}' not found for transition.", t_builder.size);
-                    continue;
-                }
-                Some(ref size) => Rc::clone(size),
-            };
+        let (triggers, encounters) = Area::read_triggers_and_encounters(&builder)?;
 
-            let p = t_builder.from;
-            if !p.in_bounds(builder.width as i32, builder.height as i32) {
-                warn!("Transition {} falls outside area bounds", index);
-                continue;
-            }
-            p.add(size.width, size.height);
-            if !p.in_bounds(builder.width as i32, builder.height as i32) {
-                warn!("Transition {} falls outside area bounds", index);
-                continue;
-            }
+        let visibility_tile = ResourceSet::sprite(&builder.visibility_tile)?;
+        let explored_tile = ResourceSet::sprite(&builder.explored_tile)?;
 
-            debug!(
-                "Created transition to '{:?}' at {},{}",
-                t_builder.to, t_builder.from.x, t_builder.from.y
-            );
+        let generator = match builder.generator.take() {
+            None => None,
+            Some(gen) => Some(GeneratorParams::new(gen)?),
+        };
 
-            let transition = Transition {
-                from: t_builder.from,
-                to: t_builder.to.clone(),
-                hover_text: t_builder.hover_text.clone(),
-                size,
-                image_display: image,
-            };
-            transitions.push(transition);
-        }
+        let ambient_sound = match &builder.ambient_sound {
+            None => None,
+            Some(id) => Some(ResourceSet::sound(id)?),
+        };
 
+        let default_music = match &builder.default_music {
+            None => None,
+            Some(id) => Some(ResourceSet::sound(id)?),
+        };
+
+        let default_combat_music = match &builder.default_combat_music {
+            None => None,
+            Some(id) => Some(ResourceSet::sound(id)?),
+        };
+
+        Ok(Area {
+            id: builder.id.to_string(),
+            name: builder.name.to_string(),
+            width: builder.width as i32,
+            height: builder.height as i32,
+            actors: builder.actors.clone(),
+            encounters,
+            props,
+            visibility_tile,
+            explored_tile,
+            transitions,
+            triggers,
+            vis_dist: builder.max_vis_distance,
+            vis_dist_squared: builder.max_vis_distance * builder.max_vis_distance,
+            vis_dist_up_one_squared: builder.max_vis_up_one_distance
+                * builder.max_vis_up_one_distance,
+            world_map_location: builder.world_map_location.clone(),
+            ambient_sound,
+            default_music,
+            default_combat_music,
+            on_rest: builder.on_rest.clone(),
+            location_kind: builder.location_kind,
+            generator,
+            builder,
+        })
+    }
+
+    fn read_triggers_and_encounters(
+        builder: &AreaBuilder
+    ) -> Result<(Vec<Trigger>, Vec<EncounterData>), Error> {
         let mut triggers: Vec<Trigger> = Vec::new();
         for tbuilder in &builder.triggers {
             triggers.push(Trigger {
@@ -244,54 +255,62 @@ impl Area {
             }
         }
 
-        let visibility_tile = ResourceSet::sprite(&builder.visibility_tile)?;
-        let explored_tile = ResourceSet::sprite(&builder.explored_tile)?;
+        Ok((triggers, encounters))
+    }
 
-        let generator = match builder.generator.take() {
-            None => None,
-            Some(gen) => Some(GeneratorParams::new(gen)?),
-        };
+    fn read_transitions(
+        input: &[TransitionBuilder],
+        width: i32,
+        height: i32,
+    ) -> Result<Vec<Transition>, Error> {
+        let mut transitions: Vec<Transition> = Vec::new();
+        for (index, t_builder) in input.iter().enumerate() {
+            let image = match ResourceSet::image(&t_builder.image_display) {
+                None => {
+                    warn!(
+                        "Image '{}' not found for transition.",
+                        t_builder.image_display
+                    );
+                    continue;
+                }
+                Some(image) => image,
+            };
 
-        let ambient_sound = match &builder.ambient_sound {
-            None => None,
-            Some(id) => Some(ResourceSet::sound(id)?),
-        };
+            let size = match Module::size(&t_builder.size) {
+                None => {
+                    warn!("Size '{}' not found for transition.", t_builder.size);
+                    continue;
+                }
+                Some(ref size) => Rc::clone(size),
+            };
 
-        let default_music = match &builder.default_music {
-            None => None,
-            Some(id) => Some(ResourceSet::sound(id)?),
-        };
+            let p = t_builder.from;
+            if !p.in_bounds(width, height) {
+                warn!("Transition {} falls outside area bounds", index);
+                continue;
+            }
+            p.add(size.width, size.height);
+            if !p.in_bounds(width, height) {
+                warn!("Transition with size {} falls outside area bounds", index);
+                continue;
+            }
 
-        let default_combat_music = match &builder.default_combat_music {
-            None => None,
-            Some(id) => Some(ResourceSet::sound(id)?),
-        };
+            debug!(
+                "Created transition to '{:?}' at {},{}",
+                t_builder.to, t_builder.from.x, t_builder.from.y
+            );
 
-        Ok(Area {
-            id: builder.id.to_string(),
-            name: builder.name.to_string(),
-            width: builder.width as i32,
-            height: builder.height as i32,
-            actors: builder.actors.clone(),
-            encounters,
-            props,
-            visibility_tile,
-            explored_tile,
-            transitions,
-            triggers,
-            vis_dist: builder.max_vis_distance,
-            vis_dist_squared: builder.max_vis_distance * builder.max_vis_distance,
-            vis_dist_up_one_squared: builder.max_vis_up_one_distance
-                * builder.max_vis_up_one_distance,
-            world_map_location: builder.world_map_location.clone(),
-            ambient_sound,
-            default_music,
-            default_combat_music,
-            on_rest: builder.on_rest.clone(),
-            location_kind: builder.location_kind,
-            generator,
-            builder,
-        })
+            let transition = Transition {
+                from: t_builder.from,
+                to: t_builder.to.clone(),
+                hover_text: t_builder.hover_text.clone(),
+                size,
+                image_display: image,
+            };
+            transitions.push(transition);
+        }
+
+        Ok(transitions)
     }
 
     pub fn coords_valid(&self, x: i32, y: i32) -> bool {

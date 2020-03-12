@@ -189,15 +189,19 @@ struct AudioSink {
 }
 
 impl AudioSink {
-    fn new(device: &Device, base_volume: f32) -> AudioSink {
-        let sink = Sink::new(device);
-        sink.set_volume(base_volume);
-        AudioSink {
+    fn new(device: &Device, base_volume: f32) -> std::thread::Result<AudioSink> {
+        let sink = std::panic::catch_unwind(|| {
+            let sink = Sink::new(device);
+            sink.set_volume(base_volume);
+            sink
+        })?;
+
+        Ok(AudioSink {
             sink,
             cur_id: String::new(),
             queue: VecDeque::new(),
             base_volume
-        }
+        })
     }
 
     fn update(&mut self, device: &Device, elapsed_millis: u32) {
@@ -298,22 +302,22 @@ impl AudioDevice {
         &self.name
     }
 
-    fn new(device: Device, name: String, mut config: AudioConfig) -> AudioDevice {
+    fn new(device: Device, name: String, mut config: AudioConfig) -> std::thread::Result<AudioDevice> {
         // precompute output volumes
         config.music_volume *= config.master_volume;
         config.effects_volume *= config.master_volume;
         config.ambient_volume *= config.master_volume;
 
-        let music = AudioSink::new(&device, config.music_volume);
-        let ambient = AudioSink::new(&device, config.ambient_volume);
+        let music = AudioSink::new(&device, config.music_volume)?;
+        let ambient = AudioSink::new(&device, config.ambient_volume)?;
 
-        AudioDevice {
+        Ok(AudioDevice {
             device,
             name,
             config,
             music,
             ambient,
-        }
+        })
     }
 
     fn update(&mut self, elapsed_millis: u32) {
@@ -348,7 +352,10 @@ impl AudioDevice {
     }
 
     fn play_sfx(&mut self, sound: SoundSource) {
-        let mut sink = AudioSink::new(&self.device, self.config.effects_volume);
+        let mut sink = match AudioSink::new(&self.device, self.config.effects_volume) {
+            Err(_) => return,
+            Ok(sink) => sink,
+        };
         sink.play_immediate(sound);
         sink.detach();
     }
@@ -372,6 +379,8 @@ pub fn get_audio_device_info() -> Vec<AudioDeviceInfo> {
 fn get_audio_devices() -> Vec<AudioDevice> {
     let audio_config = Config::audio_config();
 
+    info!("Querying audio devices");
+
     let devices = match rodio::output_devices() {
         Err(e) => {
             warn!("Error querying audio devices: {}", e);
@@ -383,8 +392,39 @@ fn get_audio_devices() -> Vec<AudioDevice> {
     let mut output = Vec::new();
     for (index, device) in devices.enumerate() {
         let name = device_name(&device, index);
+
+        if name.contains("CARD=HDMI") {
+            // this video card output will crash rodio
+            continue;
+        }
+
+        let mut formats = match device.supported_output_formats() {
+            Err(e) => {
+                info!("Error getting supported formats for audio device {}: {}", name, e);
+                continue;
+            }, Ok(formats) => formats,
+        };
+
+        if formats.next().is_none() {
+            info!("Audio device {} did not have any supported output formats.", name);
+            continue;
+        }
+
+        if let Err(e) = device.default_output_format() {
+            info!("Error getting an output format for audio device: {}: {}", name, e);
+            continue;
+        }
+
         let config = audio_config.clone();
-        output.push(AudioDevice::new(device, name, config));
+        let device = match AudioDevice::new(device, name.to_string(), config) {
+            Err(_) => {
+                info!("Thread panic on audio device setup for {}", name);
+                continue;
+            }, Ok(device) => device,
+        };
+
+        info!("Found supported audio device: {}", name);
+        output.push(device);
     }
 
     output

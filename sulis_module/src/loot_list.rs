@@ -245,7 +245,7 @@ impl LootList {
                     }
                     Some(item) => item,
                 };
-                let identified = !adjectives.contains(&"unidentified".to_string());
+                let identified = !adjectives.contains(&Module::rules().unidentified_item_adjective);
                 let variant = self.gen_variant(entry);
                 items.push((quantity, ItemState::new(item, variant, identified)));
             }
@@ -297,7 +297,7 @@ impl LootList {
                 let pick = gen_rand_weight(&entry.adjective2);
                 match pick.as_str() {
                     "unidentified" => {
-                        if result.get(0) != Some(&"unidentified".to_string()) {
+                        if result.get(0) != Some(&Module::rules().unidentified_item_adjective) {
                             result.insert(0, pick.clone());
                         }
                     },
@@ -344,7 +344,7 @@ impl LootList {
                     Some(item) => item,
                 };
                 let variant = self.gen_variant(entry);
-                let identified = !adjectives.contains(&"unidentified".to_string());
+                let identified = !adjectives.contains(&Module::rules().unidentified_item_adjective);
                 return Some((quantity, ItemState::new(item, variant, identified)));
             }
         }

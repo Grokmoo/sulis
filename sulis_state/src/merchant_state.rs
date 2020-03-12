@@ -41,7 +41,7 @@ impl MerchantState {
         for item_save in save.items {
             let item = item_save.item;
             let variant = item.variant;
-            let identified = !item.adjectives.contains(&"unidentified".to_string());
+            let identified = !item.adjectives.contains(&Module::rules().unidentified_item_adjective);
             let item = match Module::create_get_item(&item.id, &item.adjectives) {
                 None => invalid_data_error(&format!("No item with ID '{}'", item.id)),
                 Some(item) => Ok(item),

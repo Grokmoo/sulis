@@ -75,25 +75,10 @@ impl ItemState {
         self.item.icon(self.variant)
     }
     pub fn get_name(&self) -> String {
-        let mut name;
-
         if self.identified {
-            name = String::new();
-            for adj in self.item.added_adjectives.iter() {
-                if let Some(ref prefix) = adj.name_prefix {
-                    name.push_str(prefix);
-                }
-            }
-            name.push_str(&self.item.name);
-            for adj in self.item.added_adjectives.iter() {
-                if let Some(ref postfix) = adj.name_postfix {
-                    name.push_str(postfix);
-                }
-            }
+            self.item.name.to_string()
         } else {
-            name = "Unidentified ".to_string();
-            name.push_str(&self.item.name);
+            self.item.unidentified_name.to_string()
         }
-        name
     }
 }

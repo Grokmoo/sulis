@@ -394,7 +394,7 @@ fn get_audio_devices() -> Vec<AudioDevice> {
         let name = device_name(&device, index);
 
         match name.split("CARD=").last()
-            .map(|d| d.split(",").next().unwrap_or(d))
+            .map(|d| d.split(',').next().unwrap_or(d))
             .unwrap_or(&name) {
 
             "HDMI" | "PCH" | "NVidia" => {

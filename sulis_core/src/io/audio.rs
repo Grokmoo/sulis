@@ -372,6 +372,8 @@ pub fn get_audio_device_info() -> Vec<AudioDeviceInfo> {
 fn get_audio_devices() -> Vec<AudioDevice> {
     let audio_config = Config::audio_config();
 
+    info!("Querying audio devices");
+
     let devices = match rodio::output_devices() {
         Err(e) => {
             warn!("Error querying audio devices: {}", e);
@@ -383,6 +385,31 @@ fn get_audio_devices() -> Vec<AudioDevice> {
     let mut output = Vec::new();
     for (index, device) in devices.enumerate() {
         let name = device_name(&device, index);
+
+        if name.contains("CARD=HDMI") {
+            // this video card output will crash rodio
+            continue;
+        }
+
+        let mut formats = match device.supported_output_formats() {
+            Err(e) => {
+                info!("Error getting supported formats for audio device {}: {}", name, e);
+                continue;
+            }, Ok(formats) => formats,
+        };
+
+        if formats.next().is_none() {
+            info!("Audio device {} did not have any supported output formats.", name);
+            continue;
+        }
+
+        if let Err(e) = device.default_output_format() {
+            info!("Error getting an output format for audio device: {}: {}", name, e);
+            continue;
+        }
+
+        info!("Found supported audio device: {}", name);
+
         let config = audio_config.clone();
         output.push(AudioDevice::new(device, name, config));
     }

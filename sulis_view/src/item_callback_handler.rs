@@ -194,8 +194,11 @@ pub fn identify_item_cb(entity: &Rc<RefCell<EntityState>>, index: usize) -> Call
             let stash = GameState::party_stash();
             if let Some(item_state) = stash.borrow_mut().identify(index) {
                 let price = merchant.get_sell_price(&item_state) as f32;
-                let charge = price * merchant.identify_fraction;
-                GameState::add_party_coins(-charge.ceil() as i32);
+                let charge = (price * merchant.identify_fraction.ceil()) as i32;
+                if GameState::party_coins() < charge {
+                    return;
+                }
+                GameState::add_party_coins(-charge);
             }
 
             let actor = &entity.borrow().actor;

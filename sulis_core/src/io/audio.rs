@@ -17,7 +17,7 @@
 use std::fmt;
 use std::time::Duration;
 use std::collections::VecDeque;
-use std::cell::RefCell;
+use std::cell::{Cell, RefCell};
 use std::io::{BufReader, Error, ErrorKind};
 use std::fs::File;
 
@@ -27,6 +27,7 @@ use crate::config::{AudioConfig, Config};
 use crate::resource::{sound_set::EntryBuilder, ResourceSet};
 
 thread_local! {
+    static AUDIO_PANIC: Cell<bool> = Cell::new(false);
     static AUDIO_QUEUE: RefCell<Vec<QueueEntry>> = RefCell::new(Vec::new());
 }
 
@@ -194,7 +195,16 @@ impl AudioSink {
             let sink = Sink::new(device);
             sink.set_volume(base_volume);
             sink
-        })?;
+        });
+
+        let sink = match sink {
+            Ok(sink) => sink,
+            Err(e) => {
+                warn!("Rodio panic attempted to setup audio device.  Audio disabled.");
+                AUDIO_PANIC.with(|a| a.set(true));
+                return Err(e);
+            }
+        };
 
         Ok(AudioSink {
             sink,
@@ -303,6 +313,12 @@ impl AudioDevice {
     }
 
     fn new(device: Device, name: String, mut config: AudioConfig) -> std::thread::Result<AudioDevice> {
+        let already_failed = AUDIO_PANIC.with(|a| a.get());
+        if already_failed {
+            warn!("Unable to create audio device for {} due to previous panic.", name);
+            return Err(Box::new("Audio is disabled due to previous panic."));
+        }
+
         // precompute output volumes
         config.music_volume *= config.master_volume;
         config.effects_volume *= config.master_volume;
@@ -424,7 +440,7 @@ fn get_audio_devices() -> Vec<AudioDevice> {
         let config = audio_config.clone();
         let device = match AudioDevice::new(device, name.to_string(), config) {
             Err(_) => {
-                info!("Thread panic on audio device setup for {}", name);
+                warn!("Unable to create audio device for {}", name);
                 continue;
             }, Ok(device) => device,
         };

@@ -472,7 +472,7 @@ pub fn setup_logger() {
     });
 
     panic::set_hook(Box::new(|p| {
-        error!("Thread main panic.  Exiting.");
+        error!("Thread main panic.");
         warn!("with payload: {:?}", p.payload());
         if let Some(loc) = p.location() {
             warn!("at {:?}", loc);

@@ -17,6 +17,7 @@
 use std::cell::RefCell;
 use std::rc::Rc;
 
+use sulis_core::io::Audio;
 use crate::{center, is_threat, ActorState, EntityState, GameState};
 use sulis_module::{AccuracyKind, Attack, AttackKind, DamageKind, HitFlags, HitKind, Module,
     OnTrigger};
@@ -110,6 +111,11 @@ pub fn weapon_attack(
 
         if hit_kind == HitKind::Crit {
             had_crit = true;
+        }
+
+        let sound = attack.sounds.sound(hit_kind);
+        if let Some(sound_id) = sound {
+            Audio::play_sfx(sound_id);
         }
 
         result.push((hit_kind, hit_flags, damage));

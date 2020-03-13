@@ -327,6 +327,23 @@ impl AreaState {
         }
     }
 
+    pub fn update_music(&self, in_combat: bool, groups: Option<&[usize]>) {
+        if !in_combat {
+            Audio::change_music(self.area.area.default_music.clone());
+            return;
+        }
+
+        let mut music = self.area.area.default_combat_music.as_ref();
+        for group in groups.unwrap_or_default().iter() {
+            let enc_data = &self.area.encounters[*group];
+
+            music = enc_data.encounter.music.as_ref().or(music);
+        }
+
+        music = music.or_else(|| self.area.area.default_music.as_ref());
+        Audio::change_music(music.cloned());
+    }
+
     pub fn update_ambient_audio(&self, _time: &Time) {
         // TODO support time specific ambient sounds
 

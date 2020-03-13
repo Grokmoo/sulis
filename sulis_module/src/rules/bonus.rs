@@ -16,7 +16,9 @@
 
 use std::mem;
 
-use crate::rules::{ArmorKind, Attribute, Damage, DamageKind, Slot, WeaponKind, WeaponStyle};
+use crate::rules::{
+    ArmorKind, Attribute, Damage, DamageKind, HitKind, Slot, WeaponKind, WeaponStyle
+};
 use sulis_core::util::ExtInt;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, PartialOrd)]
@@ -464,6 +466,9 @@ pub struct AttackBuilder {
 
     #[serde(default)]
     pub bonuses: AttackBonuses,
+
+    #[serde(default)]
+    pub sounds: HitSounds,
 }
 
 impl AttackBuilder {
@@ -479,6 +484,7 @@ impl AttackBuilder {
             damage: self.damage.mult_f32(multiplier),
             kind: self.kind.clone(),
             bonuses: self.bonuses.clone(),
+            sounds: self.sounds.clone(),
         }
     }
 
@@ -487,6 +493,34 @@ impl AttackBuilder {
             AttackKindBuilder::Melee { .. } => true,
             _ => false,
         }
+    }
+}
+
+#[derive(Deserialize, Debug, Clone)]
+#[serde(deny_unknown_fields)]
+pub struct HitSounds {
+    miss: Option<String>,
+    graze: Option<String>,
+    hit: Option<String>,
+    crit: Option<String>,
+}
+
+impl HitSounds {
+    pub fn sound(&self, kind: HitKind) -> Option<&str> {
+        use HitKind::*;
+        match kind {
+            Miss => self.miss.as_deref(),
+            Graze => self.graze.as_deref(),
+            Hit => self.hit.as_deref(),
+            Crit => self.crit.as_deref(),
+            Auto => self.hit.as_deref(),
+        }
+    }
+}
+
+impl Default for HitSounds {
+    fn default() -> Self {
+        HitSounds { miss: None, graze: None, hit: None, crit: None }
     }
 }
 

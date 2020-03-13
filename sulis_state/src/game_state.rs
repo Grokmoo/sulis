@@ -44,6 +44,7 @@ thread_local! {
     static MODAL_LOCKED: Cell<bool> = Cell::new(false);
     static ANIMATIONS: RefCell<AnimState> = RefCell::new(AnimState::new());
     static ANIMS_TO_ADD: RefCell<Vec<Anim>> = RefCell::new(Vec::new());
+    static COMBAT_INACTIVE_TIME: Cell<u32> = Cell::new(0);
 }
 
 pub struct GameState {
@@ -64,6 +65,8 @@ pub struct GameState {
     path_finder: PathFinder,
     ui_callbacks: Vec<UICallback>,
 }
+
+const MAX_COMBAT_INACTIVE_TIME: u32 = 5000;
 
 const MIN_ZOOM: f32 = 0.7;
 const MAX_ZOOM: f32 = 2.0;
@@ -239,6 +242,7 @@ impl GameState {
 
             mgr.borrow_mut().finish_load();
             area_state.borrow().update_ambient_audio(&mgr.borrow().current_time());
+            area_state.borrow().update_music(false, None);
 
             Ok(GameState {
                 areas,
@@ -318,6 +322,7 @@ impl GameState {
 
         let mgr = GameState::turn_manager();
         area_state.update_ambient_audio(&mgr.borrow().current_time());
+        area_state.update_music(false, None);
 
         Ok(())
     }
@@ -983,12 +988,39 @@ impl GameState {
         }
 
         let current = mgr.borrow().current();
-        if let Some(entity) = current {
+        if let Some(entity) = current.as_ref() {
             AI.with(|ai| {
                 let mut ai = ai.borrow_mut();
-                ai.update(entity);
+                ai.update(Rc::clone(entity));
             });
         }
+
+        // check if combat has been inactive (stuck) for a while.  if so, end the
+        // turn and continue.
+        // this should catch any possible turn order hang and move things forward.
+        let current_inactive = match current.as_ref() {
+            None => true,
+            Some(entity) => {
+                let actor = &entity.borrow().actor;
+                actor.is_dead() || actor.ap() == 0
+            }
+        };
+
+        let inactive_time = if current_inactive && mgr.borrow().is_combat_active() {
+            let prev_time = COMBAT_INACTIVE_TIME.with(|c| c.get());
+            let elapsed_time = prev_time + millis;
+
+            if elapsed_time > MAX_COMBAT_INACTIVE_TIME {
+                let cbs = mgr.borrow_mut().next();
+                script_callback::fire_round_elapsed(cbs);
+                0
+            } else {
+                elapsed_time
+            }
+        } else {
+            0
+        };
+        COMBAT_INACTIVE_TIME.with(|c| c.set(inactive_time));
 
         GameState::handle_disabled_party_members();
 

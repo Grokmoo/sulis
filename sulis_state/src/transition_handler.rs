@@ -64,6 +64,7 @@ pub(crate) fn transition_to(area_id: Option<&str>, p: Option<Point>, offset: Poi
     }
 
     area.borrow().update_ambient_audio(&mgr.borrow().current_time());
+    area.borrow().update_music(false, None);
 
     remove_party_from_surfaces(&mut mgr.borrow_mut(), &party);
 

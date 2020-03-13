@@ -14,20 +14,24 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::fmt;
+use std::time::Duration;
 use std::collections::VecDeque;
-use std::cell::RefCell;
+use std::cell::{Cell, RefCell};
 use std::io::{BufReader, Error, ErrorKind};
 use std::fs::File;
 
 use rodio::{Sink, Device, DeviceTrait, Source, Decoder, source::Buffered};
 
 use crate::config::{AudioConfig, Config};
-use crate::resource::ResourceSet;
+use crate::resource::{sound_set::EntryBuilder, ResourceSet};
 
 thread_local! {
+    static AUDIO_PANIC: Cell<bool> = Cell::new(false);
     static AUDIO_QUEUE: RefCell<Vec<QueueEntry>> = RefCell::new(Vec::new());
 }
 
+#[derive(PartialEq, Eq)]
 enum QueueKind {
     Ambient,
     StopAmbient,
@@ -36,6 +40,7 @@ enum QueueKind {
     Sfx,
 }
 
+#[derive(Eq, PartialEq)]
 struct QueueEntry {
     sound: Option<SoundSource>,
     kind: QueueKind,
@@ -84,12 +89,7 @@ impl Audio {
 
     fn enqueue(sound: Option<SoundSource>, kind: QueueKind) {
         AUDIO_QUEUE.with(|q| {
-            if let Some(entry) = q.borrow().last() {
-                if entry.sound == sound { return; }
-            }
-
             q.borrow_mut().push(QueueEntry { sound, kind });
-
         });
     }
 
@@ -125,7 +125,8 @@ pub struct SoundSource {
     id: String,
     sound: Buffered<Decoder<BufReader<File>>>,
     loops: bool,
-    volume: Option<f32>,
+    volume: f32,
+    delay: Duration,
 }
 
 impl PartialEq for SoundSource {
@@ -140,8 +141,7 @@ impl SoundSource {
     pub fn new(
         id: String,
         file: File,
-        loops: bool,
-        volume: Option<f32>
+        entry: &EntryBuilder
     ) -> Result<SoundSource, Error> {
         let sound = match Decoder::new(BufReader::new(file)) {
             Ok(sound) => sound,
@@ -151,7 +151,13 @@ impl SoundSource {
             }
         };
 
-        Ok(SoundSource { id, sound: sound.buffered(), loops, volume })
+        Ok(SoundSource {
+            id,
+            sound: sound.buffered(),
+            loops: entry.loops,
+            volume: entry.volume,
+            delay: Duration::from_secs_f32(entry.delay),
+        })
     }
 }
 
@@ -164,6 +170,18 @@ enum SinkQueueEntry {
     Start(SoundSource),
 }
 
+impl fmt::Debug for SinkQueueEntry {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        use SinkQueueEntry::*;
+        match self {
+            FadeIn(time) => write!(f, "FadeIn {}", time),
+            FadeOut(time) => write!(f, "FadeOut {}", time),
+            Stop => write!(f, "Stop"),
+            Start(_) => write!(f, "Start"),
+        }
+    }
+}
+
 struct AudioSink {
     sink: Sink,
     cur_id: String,
@@ -172,15 +190,28 @@ struct AudioSink {
 }
 
 impl AudioSink {
-    fn new(device: &Device, base_volume: f32) -> AudioSink {
-        let sink = Sink::new(device);
-        sink.set_volume(base_volume);
-        AudioSink {
+    fn new(device: &Device, base_volume: f32) -> std::thread::Result<AudioSink> {
+        let sink = std::panic::catch_unwind(|| {
+            let sink = Sink::new(device);
+            sink.set_volume(base_volume);
+            sink
+        });
+
+        let sink = match sink {
+            Ok(sink) => sink,
+            Err(e) => {
+                warn!("Rodio panic attempted to setup audio device.  Audio disabled.");
+                AUDIO_PANIC.with(|a| a.set(true));
+                return Err(e);
+            }
+        };
+
+        Ok(AudioSink {
             sink,
             cur_id: String::new(),
             queue: VecDeque::new(),
             base_volume
-        }
+        })
     }
 
     fn update(&mut self, device: &Device, elapsed_millis: u32) {
@@ -224,6 +255,7 @@ impl AudioSink {
                     self.cur_id.clear();
                     self.sink.stop();
                     self.sink = Sink::new(device);
+                    self.sink.set_volume(self.base_volume);
                 },
                 Start(sound) => {
                     self.play_immediate(sound);
@@ -245,6 +277,7 @@ impl AudioSink {
             self.queue.push_back(SinkQueueEntry::Stop);
         }
 
+        self.cur_id = source.id.to_string();
         self.queue.push_back(SinkQueueEntry::Start(source));
         self.queue.push_back(SinkQueueEntry::FadeIn(FADE_TIME));
     }
@@ -252,10 +285,8 @@ impl AudioSink {
     fn play_immediate(&mut self, source: SoundSource) {
         self.cur_id = source.id;
 
-        let sound = match source.volume {
-            None => source.sound.amplify(1.0),
-            Some(vol) => source.sound.amplify(vol),
-        };
+        let sound = source.sound.amplify(source.volume).delay(source.delay);
+
         if source.loops {
             self.sink.append(sound.repeat_infinite());
         } else {
@@ -281,22 +312,28 @@ impl AudioDevice {
         &self.name
     }
 
-    fn new(device: Device, name: String, mut config: AudioConfig) -> AudioDevice {
+    fn new(device: Device, name: String, mut config: AudioConfig) -> std::thread::Result<AudioDevice> {
+        let already_failed = AUDIO_PANIC.with(|a| a.get());
+        if already_failed {
+            warn!("Unable to create audio device for {} due to previous panic.", name);
+            return Err(Box::new("Audio is disabled due to previous panic."));
+        }
+
         // precompute output volumes
         config.music_volume *= config.master_volume;
         config.effects_volume *= config.master_volume;
         config.ambient_volume *= config.master_volume;
 
-        let music = AudioSink::new(&device, config.music_volume);
-        let ambient = AudioSink::new(&device, config.ambient_volume);
+        let music = AudioSink::new(&device, config.music_volume)?;
+        let ambient = AudioSink::new(&device, config.ambient_volume)?;
 
-        AudioDevice {
+        Ok(AudioDevice {
             device,
             name,
             config,
             music,
             ambient,
-        }
+        })
     }
 
     fn update(&mut self, elapsed_millis: u32) {
@@ -331,7 +368,10 @@ impl AudioDevice {
     }
 
     fn play_sfx(&mut self, sound: SoundSource) {
-        let mut sink = AudioSink::new(&self.device, self.config.effects_volume);
+        let mut sink = match AudioSink::new(&self.device, self.config.effects_volume) {
+            Err(_) => return,
+            Ok(sink) => sink,
+        };
         sink.play_immediate(sound);
         sink.detach();
     }
@@ -355,6 +395,8 @@ pub fn get_audio_device_info() -> Vec<AudioDeviceInfo> {
 fn get_audio_devices() -> Vec<AudioDevice> {
     let audio_config = Config::audio_config();
 
+    info!("Querying audio devices");
+
     let devices = match rodio::output_devices() {
         Err(e) => {
             warn!("Error querying audio devices: {}", e);
@@ -366,8 +408,45 @@ fn get_audio_devices() -> Vec<AudioDevice> {
     let mut output = Vec::new();
     for (index, device) in devices.enumerate() {
         let name = device_name(&device, index);
+
+        match name.split("CARD=").last()
+            .map(|d| d.split(',').next().unwrap_or(d))
+            .unwrap_or(&name) {
+
+            "HDMI" | "PCH" | "NVidia" => {
+                // outputs will crash rodio
+                continue;
+            },
+            _ => {}
+        }
+
+        let mut formats = match device.supported_output_formats() {
+            Err(e) => {
+                info!("Error getting supported formats for audio device {}: {}", name, e);
+                continue;
+            }, Ok(formats) => formats,
+        };
+
+        if formats.next().is_none() {
+            info!("Audio device {} did not have any supported output formats.", name);
+            continue;
+        }
+
+        if let Err(e) = device.default_output_format() {
+            info!("Error getting an output format for audio device: {}: {}", name, e);
+            continue;
+        }
+
         let config = audio_config.clone();
-        output.push(AudioDevice::new(device, name, config));
+        let device = match AudioDevice::new(device, name.to_string(), config) {
+            Err(_) => {
+                warn!("Unable to create audio device for {}", name);
+                continue;
+            }, Ok(device) => device,
+        };
+
+        info!("Found supported audio device: {}", name);
+        output.push(device);
     }
 
     output

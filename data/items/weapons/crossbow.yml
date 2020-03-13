@@ -25,6 +25,11 @@ equippable:
     kind: # Ranged
       range: 15.0
       projectile: creatures/projectile_crossbow
+    sounds:
+      miss: sfx/swish_2
+      graze: sfx/thwack-03
+      hit: sfx/hit_3
+      crit: sfx/hit_2
     bonuses: {}
 image:
   HeldMain:

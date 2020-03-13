@@ -45,7 +45,7 @@ display:
 
 audio:
   # which audio device to output on, starting from 0
-  device: 1
+  device: 0
   
   # volume level which controls overall level
   master_volume: 1.0

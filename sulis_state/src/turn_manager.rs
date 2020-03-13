@@ -580,8 +580,8 @@ impl TurnManager {
             }
         }
 
-        for group in groups_to_activate {
-            let enc_ref = self.ai_groups.get(&group).unwrap().clone();
+        for group in &groups_to_activate {
+            let enc_ref = self.ai_groups.get(group).unwrap().clone();
             if enc_ref.area_id == area_state.area.area.id {
                 area_state.fire_on_encounter_activated(enc_ref.encounter_index, &mover);
             } else {
@@ -593,6 +593,12 @@ impl TurnManager {
         }
 
         if !self.combat_active {
+            let enc_indices: Vec<usize> = groups_to_activate.iter().map(|i| {
+                let group = &self.ai_groups[i];
+                group.encounter_index
+            }).collect();
+            area_state.update_music(true, Some(&enc_indices));
+
             self.set_combat_active(true);
             loop {
                 if self.current_is_active_entity() {
@@ -713,6 +719,7 @@ impl TurnManager {
 
         let area = GameState::area_state();
         area.borrow_mut().range_indicators().clear();
+        area.borrow().update_music(false, None);
     }
 
     fn initiate_combat(&mut self) {

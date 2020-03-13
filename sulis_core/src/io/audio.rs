@@ -393,9 +393,15 @@ fn get_audio_devices() -> Vec<AudioDevice> {
     for (index, device) in devices.enumerate() {
         let name = device_name(&device, index);
 
-        if name.contains("CARD=HDMI") {
-            // this video card output will crash rodio
-            continue;
+        match name.split("CARD=").last()
+            .map(|d| d.split(',').next().unwrap_or(d))
+            .unwrap_or(&name) {
+
+            "HDMI" | "PCH" | "NVidia" => {
+                // outputs will crash rodio
+                continue;
+            },
+            _ => {}
         }
 
         let mut formats = match device.supported_output_formats() {

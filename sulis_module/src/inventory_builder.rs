@@ -133,6 +133,8 @@ impl InventoryBuilder {
         self.pc_starting_items.iter().filter_map(|entry| {
             let qty = entry.quantity;
             let item = &entry.item;
+            let unidentified_str = &Module::rules().unidentified_item_adjective;
+            let identified = !item.adjectives.contains(unidentified_str);
             match Module::create_get_item(&item.id, &item.adjectives) {
                 None => {
                     warn!(
@@ -142,7 +144,7 @@ impl InventoryBuilder {
                     None
                 }
                 Some(item) => {
-                    let state = ItemState::new(item, entry.item.variant, true);
+                    let state = ItemState::new(item, entry.item.variant, identified);
                     Some((qty, state))
                 }
             }

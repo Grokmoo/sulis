@@ -16,7 +16,7 @@
 
 use std::rc::Rc;
 
-use crate::rules::bonus::{AttackBuilder, AttackKindBuilder, BonusKind, BonusList};
+use crate::rules::bonus::{AttackBuilder, AttackKindBuilder, BonusKind, BonusList, HitSounds};
 use crate::rules::{AttackBonuses, Damage, DamageKind, DamageList, StatList, WeaponKind};
 use sulis_core::image::Image;
 use sulis_core::resource::ResourceSet;
@@ -49,6 +49,7 @@ pub struct Attack {
     pub damage: DamageList,
     pub kind: AttackKind,
     pub bonuses: AttackBonuses,
+    pub sounds: HitSounds,
 }
 
 impl Attack {
@@ -94,6 +95,7 @@ impl Attack {
             damage: damage_list,
             kind: attack_kind,
             bonuses,
+            sounds: HitSounds::default(),
         }
     }
 
@@ -115,6 +117,7 @@ impl Attack {
             kind,
             bonuses,
             damage,
+            sounds: other.sounds.clone(),
         }
     }
 
@@ -175,6 +178,7 @@ impl Attack {
             damage,
             kind,
             bonuses,
+            sounds: builder.sounds.clone(),
         }
     }
 
@@ -204,6 +208,7 @@ impl Attack {
             damage: self.damage.mult(multiplier),
             kind: self.kind.clone(),
             bonuses: self.bonuses.clone(),
+            sounds: self.sounds.clone(),
         }
     }
 

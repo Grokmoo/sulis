@@ -32,32 +32,22 @@ impl SoundSet {
         let mut sounds = HashMap::new();
 
         for (id, entry_builder) in &builder.sounds {
-            let mut source = None;
-            for dir in builder.source_dirs.iter().rev() {
-                let mut filepath = PathBuf::from(dir);
-                filepath.push(entry_builder.file.to_string());
+            let source = build_source(&builder.source_dirs, &builder.id, id, entry_builder)?;
+            sounds.insert(id.to_string(), source);
+        }
 
-                let file = match File::open(filepath) {
-                    Ok(file) => file,
-                    Err(_) => continue,
+        for (_group_id, group) in &builder.groups {
+            for entry_id in &group.entries {
+                let entry = EntryBuilder {
+                    file: format!("{}{}{}", group.prefix, entry_id, group.postfix),
+                    loops: group.loops,
+                    volume: group.volume,
+                    delay: group.delay,
                 };
 
-                let s_id = format!("{}/{}", builder.id, id);
-                if let Ok(sound_source) = SoundSource::new(s_id, file, entry_builder) {
-
-                    source = Some(sound_source);
-                    break;
-                }
+                let source = build_source(&builder.source_dirs, &builder.id, entry_id, &entry)?;
+                sounds.insert(entry_id.to_string(), source);
             }
-
-            let source = source.ok_or_else(|| {
-                warn!("Unable to read sound '{}' from any of '{:?}'",
-                    id, builder.source_dirs);
-                Error::new(ErrorKind::InvalidData,
-                    format!("Unable to create sound_set '{}'", builder.id))
-            })?;
-
-            sounds.insert(id.to_string(), source);
         }
 
         Ok(Rc::new(SoundSet { sounds, id: builder.id }))
@@ -70,12 +60,67 @@ impl SoundSet {
     }
 }
 
+fn build_source(
+    source_dirs: &[String],
+    builder_id: &str,
+    entry_id: &str,
+    entry_builder: &EntryBuilder
+) -> Result<SoundSource, Error> {
+    let mut source = None;
+    for dir in source_dirs.iter().rev() {
+        let mut filepath = PathBuf::from(dir);
+        filepath.push(entry_builder.file.to_string());
+
+        let file = match File::open(filepath) {
+            Ok(file) => file,
+            Err(_) => continue,
+        };
+
+        let s_id = format!("{}/{}", builder_id, entry_id);
+        if let Ok(sound_source) = SoundSource::new(s_id, file, &entry_builder) {
+            source = Some(sound_source);
+            break;
+        }
+    }
+
+    source.ok_or_else(|| {
+        warn!("Unable to read sound '{}' from any of '{:?}'",
+            entry_id, source_dirs);
+        Error::new(ErrorKind::InvalidData,
+            format!("Unable to create sound_set '{}'", builder_id))
+    })
+}
+
 #[derive(Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct SoundSetBuilder {
     pub id: String,
     pub source_dirs: Vec<String>,
+
+    #[serde(default)]
     pub sounds: HashMap<String, EntryBuilder>,
+
+    #[serde(default)]
+    groups: HashMap<String, Group>,
+}
+
+
+#[derive(Deserialize, Debug)]
+#[serde(deny_unknown_fields)]
+struct Group {
+    prefix: String,
+    postfix: String,
+
+    #[serde(default)]
+    loops: bool,
+
+    #[serde(default = "float_1")]
+    volume: f32,
+
+    #[serde(default)]
+    delay: f32,
+
+    entries: Vec<String>,
 }
 
 #[derive(Deserialize, Debug)]

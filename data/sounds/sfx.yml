@@ -1,0 +1,106 @@
+id: sfx
+sounds: {}
+groups:
+  jute-dh-rpgsounds:
+    prefix: sfx/jute-dh-rpgsounds/
+    postfix: ".ogg"
+    volume: 0.6
+    entries:
+      - campfire
+      - campfire_2
+      - click_1
+      - click_2
+      - door_ripped_1
+      - door_ripped_2
+      - doorwood_close
+      - doorwood_open
+      - fall
+      - fire
+      - fire_2
+      - gold
+      - hit_1
+      - hit_2
+      - hit_3
+      - skull_hit_1
+      - skull_hit_2
+      - skull_hit_3
+      - skull_hit_4
+      - splash
+      - sword_sheath_1
+      - sword_sheath_2
+  thwack:
+    prefix: sfx/thwack/
+    postfix: ".oga"
+    volume: 0.6
+    entries:
+      - thwack-01
+      - thwack-02
+      - thwack-03
+      - thwack-04
+      - thwack-05
+      - thwack-06
+      - thwack-07
+      - thwack-08
+      - thwack-09
+      - thwack-10
+  battle_sound_effects:
+    prefix: sfx/battle_sound_effects/
+    postfix: ".wav"
+    volume: 0.6
+    entries:
+      - Bow
+      - swish_2
+      - swish_3
+      - swish_4
+  sfx_100:
+    prefix: sfx/sfx_100/sfx100v2_
+    postfix: ".ogg"
+    volume: 0.6
+    entries:
+      - door_01
+      - door_02
+      - door_03
+      - door_04
+      - door_05
+      - footstep_01
+      - footstep_02
+      - footstep_wet_01
+      - footstep_wet_02
+      - footstep_wet_03
+      - footstep_wood_01
+      - footstep_wood_02
+      - footstep_wood_03
+      - footstep_wood_04
+      - glass_01
+      - glass_02
+      - glass_03
+      - glass_04
+      - glass_05
+      - glass_06
+      - hit_01
+      - hit_02
+      - hit_03
+      - items_01
+      - items_02
+      - lock_open_01
+      - metal_01
+      - metal_02
+      - metal_03
+      - metal_04
+      - metal_05
+      - metal_06
+      - metal_hit_01
+      - metal_hit_02
+      - stones_01
+      - stones_02
+      - stones_03
+      - switch_01
+      - switch_02
+      - thunder_01
+      - wood_01
+      - wood_02
+      - wood_03
+      - wood_04
+      - wood_hit_01
+      - wood_hit_02
+      - wood_hit_03

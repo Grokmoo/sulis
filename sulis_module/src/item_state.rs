@@ -75,10 +75,9 @@ impl ItemState {
         self.item.icon(self.variant)
     }
     pub fn get_name(&self) -> String {
-        if self.identified {
-            self.item.name.to_string()
-        } else {
-            self.item.unidentified_name.to_string()
+        match &self.item.unidentified_name {
+            Some(unidentified_name) if !self.identified => unidentified_name.to_string(),
+            _ => self.item.name.to_string()
         }
     }
 }

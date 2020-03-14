@@ -62,7 +62,7 @@ struct Variant {
 pub struct Item {
     pub id: String,
     pub name: String,
-    pub unidentified_name: String,
+    pub unidentified_name: Option<String>,
     pub kind: ItemKind,
     pub equippable: Option<Equippable>,
     pub prereqs: Option<PrereqList>,
@@ -133,18 +133,24 @@ impl Item {
             &all_adjectives,
         );
 
-        let mut unidentified_name = "Unidentified ".to_string();
+        let mut unidentified_name = None;
 
         let mut name = String::new();
         for adj in all_adjectives.iter() {
             if let Some(ref prefix) = adj.name_prefix {
+                if unidentified_name.is_none() &&
+                    "Exceptional Fine Masterwork Rusty Worn ".find(prefix).is_none() {
+                    unidentified_name = Some("Unidentified ".to_string() + &item.name);
+                }
                 name.push_str(prefix);
             }
         }
-        unidentified_name.push_str(&item.name);
         name.push_str(&item.name);
         for adj in all_adjectives.iter() {
             if let Some(ref postfix) = adj.name_postfix {
+                if unidentified_name.is_none() {
+                    unidentified_name = Some("Unidentified ".to_string() + &item.name);
+                }
                 name.push_str(postfix);
             }
         }
@@ -427,7 +433,7 @@ struct VariantBuilder {
 pub struct ItemBuilder {
     pub id: String,
     pub name: String,
-    pub unidentified_name: String,
+    pub unidentified_name: Option<String>,
     kind: Option<ItemKind>,
     pub icon: String,
     pub equippable: Option<Equippable>,

@@ -57,8 +57,8 @@ pub fn approx_eq(a: f32, b: f32) -> bool {
         return false;
     }
 
-    let a_int: i32 = unsafe { std::mem::transmute(a) };
-    let b_int: i32 = unsafe { std::mem::transmute(b) };
+    let a_int = a.to_bits() as i32;
+    let b_int = b.to_bits() as i32;
 
     i32::abs(a_int - b_int) <= MAX_ULPS
 }
@@ -472,7 +472,7 @@ pub fn setup_logger() {
     });
 
     panic::set_hook(Box::new(|p| {
-        error!("Thread main panic.  Exiting.");
+        error!("Thread main panic.");
         warn!("with payload: {:?}", p.payload());
         if let Some(loc) = p.location() {
             warn!("at {:?}", loc);

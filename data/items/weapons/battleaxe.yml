@@ -16,6 +16,11 @@ equippable:
       kind: Slashing
     kind: # Melee
       reach: 0.75
+    sounds:
+      miss: sfx/swish_2
+      graze: sfx/thwack-03
+      hit: sfx/hit_3
+      crit: sfx/hit_2
     bonuses:
       crit_multiplier: 1.0
 image:

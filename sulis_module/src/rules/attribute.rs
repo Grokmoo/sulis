@@ -65,7 +65,7 @@ impl AttributeList {
     }
 
     pub fn bonus(self, attr: Attribute, base_attr: i32) -> i32 {
-        (self.get(attr) as i32 - base_attr)
+        self.get(attr) as i32 - base_attr
     }
 
     pub fn get(self, attr: Attribute) -> u8 {

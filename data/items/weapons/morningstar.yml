@@ -19,6 +19,11 @@ equippable:
       reach: 0.75
     bonuses:
       crit_multiplier: -0.5
+    sounds:
+      miss: sfx/swish_2
+      graze: sfx/thwack-03
+      hit: sfx/hit_3
+      crit: sfx/hit_2
 image:
   HeldMain:
     creatures/morningstar

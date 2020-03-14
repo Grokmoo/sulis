@@ -35,6 +35,10 @@ sounds:
     file: ambient/dungeon_ambient_1.ogg
     loops: true
     volume: 0.7
+  ambient_swamp:
+    file: swamp.ogg
+    loops: true
+    volume: 0.6
   theme_grasslands01:
     file: old_music/prelude.ogg
     loops: true
@@ -59,6 +63,11 @@ sounds:
     file: old_music/kingdom_theme.ogg
     loops: true
     volume: 0.3
+    delay: 5.0
+  theme_desert01:
+    file: caravan.ogg
+    loops: true
+    volume: 0.6
     delay: 5.0
   theme_battle01:
     file: The_Old_Tower_Inn.ogg

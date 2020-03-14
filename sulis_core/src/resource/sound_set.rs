@@ -36,7 +36,7 @@ impl SoundSet {
             sounds.insert(id.to_string(), source);
         }
 
-        for (_group_id, group) in &builder.groups {
+        for group in builder.groups.values() {
             for entry_id in &group.entries {
                 let entry = EntryBuilder {
                     file: format!("{}{}{}", group.prefix, entry_id, group.postfix),

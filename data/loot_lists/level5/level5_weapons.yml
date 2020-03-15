@@ -8,12 +8,10 @@ generate:
 weighted_entries:
   battleaxe:
     weight: 5
-    adjective1:
-      none: 5
+    adjectives:
+    - none: 5
       fine: 5
-    adjective2:
-      unidentified: 10
-      none: 7
+    - none: 7
       weapon_accuracy5: 1
       acid5: 1
       cold5: 1
@@ -23,11 +21,12 @@ weighted_entries:
       damage5: 1
       reach1: 1
       concealment_ignore1: 1
+    - identified: 90
+      unidentified: 10
   club:
     weight: 8
-    adjective2:
-      unidentified: 10
-      none: 7
+    adjectives:
+    - none: 7
       weapon_accuracy5: 1
       acid5: 1
       cold5: 1
@@ -37,14 +36,14 @@ weighted_entries:
       damage5: 1
       reach1: 1
       concealment_ignore1: 1
+    - identified: 90
+      unidentified: 10
   crossbow:
     weight: 3
-    adjective1:
-      none: 5
+    adjectives:
+    - none: 5
       fine: 5
-    adjective2:
-      unidentified: 10
-      none: 7
+    - none: 7
       ranged_accuracy5: 1
       acid5: 1
       cold5: 1
@@ -54,14 +53,14 @@ weighted_entries:
       damage5: 1
       reach1: 1
       concealment_ignore1: 1
+    - identified: 90
+      unidentified: 10
   dagger:
     weight: 8
-    adjective1:
-      none: 5
+    adjectives:
+    - none: 5
       fine: 5
-    adjective2:
-      unidentified: 10
-      none: 7
+    - none: 7
       weapon_accuracy5: 1
       acid5: 1
       cold5: 1
@@ -71,14 +70,14 @@ weighted_entries:
       damage5: 1
       reach1: 1
       concealment_ignore1: 1
+    - identified: 90
+      unidentified: 10
   flail:
     weight: 3
-    adjective1:
-      none: 5
+    adjectives:
+    - none: 5
       fine: 5
-    adjective2:
-      unidentified: 10
-      none: 7
+    - none: 7
       weapon_accuracy5: 1
       acid5: 1
       cold5: 1
@@ -88,14 +87,14 @@ weighted_entries:
       damage5: 1
       reach1: 1
       concealment_ignore1: 1
+    - identified: 90
+      unidentified: 10
   greataxe:
     weight: 2
-    adjective1:
-      none: 5
+    adjectives:
+    - none: 5
       fine: 5
-    adjective2:
-      unidentified: 10
-      none: 7
+    - none: 7
       weapon_accuracy5: 1
       acid5: 1
       cold5: 1
@@ -105,14 +104,14 @@ weighted_entries:
       damage5: 1
       reach1: 1
       concealment_ignore1: 1
+    - identified: 90
+      unidentified: 10
   greathammer:
     weight: 2
-    adjective1:
-      none: 5
+    adjectives:
+    - none: 5
       fine: 5
-    adjective2:
-      unidentified: 10
-      none: 7
+    - none: 7
       weapon_accuracy5: 1
       acid5: 1
       cold5: 1
@@ -122,14 +121,14 @@ weighted_entries:
       damage5: 1
       reach1: 1
       concealment_ignore1: 1
+    - identified: 90
+      unidentified: 10
   greatsword:
     weight: 2
-    adjective1:
-      none: 5
+    adjectives:
+    - none: 5
       fine: 5
-    adjective2:
-      unidentified: 10
-      none: 7
+    - none: 7
       weapon_accuracy5: 1
       acid5: 1
       cold5: 1
@@ -139,14 +138,14 @@ weighted_entries:
       damage5: 1
       reach1: 1
       concealment_ignore1: 1
+    - identified: 90
+      unidentified: 10
   hatchet:
     weight: 8
-    adjective1:
-      none: 5
+    adjectives:
+    - none: 5
       fine: 5
-    adjective2:
-      unidentified: 10
-      none: 7
+    - none: 7
       weapon_accuracy5: 1
       acid5: 1
       cold5: 1
@@ -156,14 +155,14 @@ weighted_entries:
       damage5: 1
       reach1: 1
       concealment_ignore1: 1
+    - identified: 90
+      unidentified: 10
   longbow:
     weight: 2
-    adjective1:
-      none: 5
+    adjectives:
+    - none: 5
       fine: 5
-    adjective2:
-      unidentified: 10
-      none: 7
+    - none: 7
       ranged_accuracy5: 1
       acid5: 1
       cold5: 1
@@ -173,14 +172,14 @@ weighted_entries:
       damage5: 1
       reach1: 1
       concealment_ignore1: 1
+    - identified: 90
+      unidentified: 10
   longspear:
     weight: 3
-    adjective1:
-      none: 5
+    adjectives:
+    - none: 5
       fine: 5
-    adjective2:
-      unidentified: 10
-      none: 7
+    - none: 7
       weapon_accuracy5: 1
       acid5: 1
       cold5: 1
@@ -190,14 +189,14 @@ weighted_entries:
       damage5: 1
       reach1: 1
       concealment_ignore1: 1
+    - identified: 90
+      unidentified: 10
   longsword:
     weight: 3
-    adjective1:
-      none: 5
+    adjectives:
+    - none: 5
       fine: 5
-    adjective2:
-      unidentified: 10
-      none: 7
+    - none: 7
       weapon_accuracy5: 1
       acid5: 1
       cold5: 1
@@ -207,14 +206,14 @@ weighted_entries:
       damage5: 1
       reach1: 1
       concealment_ignore1: 1
+    - identified: 90
+      unidentified: 10
   mace:
     weight: 5
-    adjective1:
-      none: 5
+    adjectives:
+    - none: 5
       fine: 5
-    adjective2:
-      unidentified: 10
-      none: 7
+    - none: 7
       weapon_accuracy5: 1
       acid5: 1
       cold5: 1
@@ -224,14 +223,14 @@ weighted_entries:
       damage5: 1
       reach1: 1
       concealment_ignore1: 1
+    - identified: 90
+      unidentified: 10
   morningstar:
     weight: 3
-    adjective1:
-      none: 5
+    adjectives:
+    - none: 5
       fine: 5
-    adjective2:
-      unidentified: 10
-      none: 7
+    - none: 7
       weapon_accuracy5: 1
       acid5: 1
       cold5: 1
@@ -241,14 +240,14 @@ weighted_entries:
       damage5: 1
       reach1: 1
       concealment_ignore1: 1
+    - identified: 90
+      unidentified: 10
   quarterstaff:
     weight: 8
-    adjective1:
-      none: 5
+    adjectives:
+    - none: 5
       fine: 5
-    adjective2:
-      unidentified: 10
-      none: 7
+    - none: 7
       weapon_accuracy5: 1
       acid5: 1
       cold5: 1
@@ -258,14 +257,14 @@ weighted_entries:
       damage5: 1
       reach1: 1
       concealment_ignore1: 1
+    - identified: 90
+      unidentified: 10
   druid_staff:
     weight: 8
-    adjective1:
-      none: 5
+    adjectives:
+    - none: 5
       fine: 5
-    adjective2:
-      unidentified: 10
-      none: 7
+    - none: 7
       weapon_accuracy5: 1
       acid5: 1
       cold5: 1
@@ -275,14 +274,14 @@ weighted_entries:
       damage5: 1
       reach1: 1
       concealment_ignore1: 1
+    - identified: 90
+      unidentified: 10
   shortbow:
     weight: 5
-    adjective1:
-      none: 5
+    adjectives:
+    - none: 5
       fine: 5
-    adjective2:
-      unidentified: 10
-      none: 7
+    - none: 7
       ranged_accuracy5: 1
       acid5: 1
       cold5: 1
@@ -292,14 +291,14 @@ weighted_entries:
       damage5: 1
       reach1: 1
       concealment_ignore1: 1
+    - identified: 90
+      unidentified: 10
   shortspear:
     weight: 8
-    adjective1:
-      none: 5
+    adjectives:
+    - none: 5
       fine: 5
-    adjective2:
-      unidentified: 10
-      none: 7
+    - none: 7
       weapon_accuracy5: 1
       acid5: 1
       cold5: 1
@@ -309,14 +308,14 @@ weighted_entries:
       damage5: 1
       reach1: 1
       concealment_ignore1: 1
+    - identified: 90
+      unidentified: 10
   shortsword:
     weight: 5
-    adjective1:
-      none: 5
+    adjectives:
+    - none: 5
       fine: 5
-    adjective2:
-      unidentified: 10
-      none: 7
+    - none: 7
       weapon_accuracy5: 1
       acid5: 1
       cold5: 1
@@ -326,14 +325,14 @@ weighted_entries:
       damage5: 1
       reach1: 1
       concealment_ignore1: 1
+    - identified: 90
+      unidentified: 10
   warhammer:
     weight: 5
-    adjective1:
-      none: 5
+    adjectives:
+    - none: 5
       fine: 5
-    adjective2:
-      unidentified: 10
-      none: 7
+    - none: 7
       weapon_accuracy5: 1
       acid5: 1
       cold5: 1
@@ -343,14 +342,14 @@ weighted_entries:
       damage5: 1
       reach1: 1
       concealment_ignore1: 1
+    - identified: 90
+      unidentified: 10
   sickle:
     weight: 8
-    adjective1:
-      none: 5
+    adjectives:
+    - none: 5
       fine: 5
-    adjective2:
-      unidentified: 10
-      none: 7
+    - none: 7
       weapon_accuracy5: 1
       acid5: 1
       cold5: 1
@@ -360,14 +359,14 @@ weighted_entries:
       damage5: 1
       reach1: 1
       concealment_ignore1: 1
+    - identified: 90
+      unidentified: 10
   sabre:
     weight: 3
-    adjective1:
-      none: 5
+    adjectives:
+    - none: 5
       fine: 5
-    adjective2:
-      unidentified: 10
-      none: 7
+    - none: 7
       weapon_accuracy5: 1
       acid5: 1
       cold5: 1
@@ -377,14 +376,14 @@ weighted_entries:
       damage5: 1
       reach1: 1
       concealment_ignore1: 1
+    - identified: 90
+      unidentified: 10
   scimitar:
     weight: 2
-    adjective1:
-      none: 5
+    adjectives:
+    - none: 5
       fine: 5
-    adjective2:
-      unidentified: 10
-      none: 7
+    - none: 7
       weapon_accuracy5: 1
       acid5: 1
       cold5: 1
@@ -394,14 +393,14 @@ weighted_entries:
       damage5: 1
       reach1: 1
       concealment_ignore1: 1
+    - identified: 90
+      unidentified: 10
   halberd:
     weight: 2
-    adjective1:
-      none: 5
+    adjectives:
+    - none: 5
       fine: 5
-    adjective2:
-      unidentified: 10
-      none: 7
+    - none: 7
       weapon_accuracy5: 1
       acid5: 1
       cold5: 1
@@ -411,13 +410,14 @@ weighted_entries:
       damage5: 1
       reach1: 1
       concealment_ignore1: 1
+    - identified: 90
+      unidentified: 10
   glaive:
     weight: 2
-    adjective1:
-      none: 5
+    adjectives:
+    - none: 5
       fine: 5
-    adjective2:
-      unidentified: 10
+    - unidentified: 10
       none: 7
       weapon_accuracy5: 1
       acid5: 1

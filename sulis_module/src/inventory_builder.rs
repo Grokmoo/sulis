@@ -174,7 +174,8 @@ impl InventoryBuilder {
             if !equippable_to(&item, &item_save.id, slot) {
                 return None;
             }
-            let identified = !item_save.adjectives.contains(&Module::rules().unidentified_item_adjective);
+            let unidentified_str = &Module::rules().unidentified_item_adjective;
+            let identified = !item_save.adjectives.contains(unidentified_str);
 
             Some((slot, ItemState::new(item, item_save.variant, identified)))
         })
@@ -213,7 +214,8 @@ impl InventoryBuilder {
                     item.usable.as_ref()?;
                 }
             }
-            let identified = !item_save.adjectives.contains(&Module::rules().unidentified_item_adjective);
+            let unidentified_str = &Module::rules().unidentified_item_adjective;
+            let identified = !item_save.adjectives.contains(unidentified_str);
 
             Some((slot, ItemState::new(item, item_save.variant, identified)))
         })

@@ -418,9 +418,11 @@ impl WidgetKind for ItemButton {
             item_window
                 .state
                 .add_text_arg("name", &item_state.get_name());
+            let value_str = if item_state.identified {"value"} else {"identification value"};
             item_window
                 .state
-                .add_text_arg("value", &format_item_value(item_state.item.value));
+                .add_text_arg(value_str, &format_item_value(item_state.item.value));
+
             item_window
                 .state
                 .add_text_arg("weight", &format_item_weight(item_state.item.weight));

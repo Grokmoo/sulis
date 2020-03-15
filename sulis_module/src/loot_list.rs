@@ -29,8 +29,7 @@ struct Entry {
     weight: u32,
     quantity: [u32; 2],
 
-    adjective1: Vec<(String, u32)>,
-    adjective2: Vec<(String, u32)>,
+    adjectives: Vec<Vec<(String, u32)>>,
     variant: Vec<(usize, u32)>,
 }
 
@@ -100,8 +99,7 @@ impl LootList {
         id: String,
         entry_in: EntryBuilder,
     ) -> Result<Entry, Error> {
-        if !entry_in.adjective1.is_empty()
-            || !entry_in.adjective2.is_empty()
+        if !entry_in.adjectives.is_empty()
             || !entry_in.variant.is_empty()
         {
             warn!(
@@ -120,8 +118,7 @@ impl LootList {
             id,
             weight: entry_in.weight,
             quantity: [min_qty, max_qty],
-            adjective1: Vec::new(),
-            adjective2: Vec::new(),
+            adjectives: Vec::new(),
             variant: Vec::new(),
         })
     }
@@ -142,28 +139,18 @@ impl LootList {
             Some(qty) => (qty[0], qty[1]),
         };
 
-        let mut adjective1 = Vec::new();
-        for (id, weight) in entry_in.adjective1 {
-            if id == "none" {
-                continue;
-            }
-            if module.item_adjectives.get(&id).is_none() {
-                warn!("Unable to find item adjective '{}'", id);
-                return unable_to_create_error("loot_list", &builder_id);
-            }
-            adjective1.push((id, weight));
-        }
+        let mut adjectives = vec![];
 
-        let mut adjective2 = Vec::new();
-        for (id, weight) in entry_in.adjective2 {
-            if id == "none" {
-                continue;
+        for in_adj in entry_in.adjectives.iter() {
+            let mut adj = vec![];
+            for (id, weight) in in_adj.iter().filter(|x| x.0 != "none") {
+                if module.item_adjectives.get(id).is_none() {
+                    warn!("Unable to find item adjective '{}'", id);
+                    return unable_to_create_error("loot_list", &builder_id);
+                }
+                adj.push((id.to_string(), *weight));
             }
-            if module.item_adjectives.get(&id).is_none() {
-                warn!("Unable to find item adjective '{}'", id);
-                return unable_to_create_error("loot_list", &builder_id);
-            }
-            adjective2.push((id, weight));
+            adjectives.push(adj);
         }
 
         let mut variant = Vec::new();
@@ -185,8 +172,7 @@ impl LootList {
             id,
             weight: entry_in.weight,
             quantity: [min_qty, max_qty],
-            adjective1,
-            adjective2,
+            adjectives,
             variant,
         })
     }
@@ -285,29 +271,13 @@ impl LootList {
 
     fn gen_adjectives(&self, entry: &Entry) -> Vec<String> {
         let mut result = Vec::new();
-
-        if !entry.adjective1.is_empty() {
-            let pick = gen_rand_weight(&entry.adjective1);
-            result.push(pick.clone());
-        }
-
-        if !entry.adjective2.is_empty() {
-            let mut remain = 1;
-            while remain > 0 {
-                let pick = gen_rand_weight(&entry.adjective2);
-                match pick.as_str() {
-                    "unidentified" => {
-                        if result.get(0) != Some(&Module::rules().unidentified_item_adjective) {
-                            result.insert(0, pick.clone());
-                        }
-                    },
-                    _ => {
-                        result.push(pick.clone());
-                        remain -= 1
-                    },
-                }
+        for adj in entry.adjectives.iter() {
+            if !adj.is_empty() {
+                let pick = gen_rand_weight(&adj);
+                result.push(pick.clone());
             }
         }
+
         result
     }
 
@@ -377,9 +347,7 @@ struct EntryBuilder {
     weight: u32,
     quantity: Option<[u32; 2]>,
     #[serde(default)]
-    adjective1: HashMap<String, u32>,
-    #[serde(default)]
-    adjective2: HashMap<String, u32>,
+    adjectives: Vec<HashMap<String, u32>>,
 
     #[serde(default)]
     variant: HashMap<String, u32>,

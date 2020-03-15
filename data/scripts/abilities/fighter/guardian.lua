@@ -23,6 +23,8 @@ function on_activate(parent, ability)
 end
 
 function on_target_select(parent, ability, targets)
+  game:play_sfx("sfx/metal_02")
+
   local targets = targets:to_table()
   for i = 1, #targets do
     local effect = targets[i]:create_effect(ability:name(), ability:duration())

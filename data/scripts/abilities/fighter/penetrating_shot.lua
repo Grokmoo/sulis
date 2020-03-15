@@ -52,10 +52,21 @@ end
 function attack_target(parent, ability, targets)
   local target = targets:first()
 
+  if not target:is_valid() then return end
+
   local stats = parent:stats()
   
-  if target:is_valid() then
-    parent:special_attack(target, "Reflex", "Ranged", stats.damage_min_0, stats.damage_max_0, stats.armor_penetration_0, "Raw")
+  local hit = parent:special_attack(target, "Reflex", "Ranged",
+    stats.damage_min_0, stats.damage_max_0, stats.armor_penetration_0, "Raw")
+  
+  if hit:is_miss() then
+    game:play_sfx("sfx/swish_2")
+  elseif hit:is_graze() then
+    game:play_sfx("sfx/thwack-03")
+  elseif hit:is_hit() then
+    game:play_sfx("sfx/hit_3")
+  elseif hit:is_crit() then
+    game:play_sfx("sfx/hit_2")
   end
 end
 

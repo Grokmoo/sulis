@@ -22,11 +22,16 @@ end
 function create_stun_effect(parent, ability, targets, hit)
   local target = targets:first()
   
-  if hit:is_graze() then
+  if hit:is_miss() then
+    game:play_sfx("sfx/swish_2")
+  elseif hit:is_graze() then
+    game:play_sfx("sfx/thwack-07")
     target:change_overflow_ap(-2000)
   elseif hit:is_hit() then
     target:change_overflow_ap(-4000)
+	game:play_sfx("sfx/thwack-08")
   elseif hit:is_crit() then
+    game:play_sfx("sfx/thwack-09")
     target:change_overflow_ap(-6000)
   end
   

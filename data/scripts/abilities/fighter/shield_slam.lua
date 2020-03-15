@@ -31,7 +31,12 @@ function on_target_select(parent, ability, targets)
 end
 
 function create_stun_effect(parent, ability, targets, hit)
-  if hit:is_miss() then return end
+  if hit:is_miss() then
+    game:play_sfx("sfx/swish_2")
+    return
+  end
+
+  game:play_sfx("sfx/metal_hit_01")
 
   local target = targets:first()
   

@@ -48,7 +48,16 @@ function attack_target(parent, ability, targets)
   local stats = parent:stats()
   local min_dmg = 10 + stats.dexterity_bonus / 2 + stats.level
   local max_dmg = 20 + stats.dexterity_bonus / 2 + stats.level
-  parent:special_attack(target, "Reflex", "Ranged", min_dmg, max_dmg, 5, "Piercing")
+  local hit = parent:special_attack(target, "Reflex", "Ranged", min_dmg, max_dmg, 5, "Piercing")
+  if hit:is_miss() then
+    game:play_sfx("sfx/swish_2")
+  elseif hit:is_graze() then
+    game:play_sfx("sfx/thwack-03")
+  elseif hit:is_hit() then
+    game:play_sfx("sfx/hit_3")
+  elseif hit:is_crit() then
+    game:play_sfx("sfx/hit_2")
+  end
   
   local dur = 10 / (200 * game:anim_base_time())
   

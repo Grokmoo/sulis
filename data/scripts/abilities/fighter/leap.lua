@@ -43,4 +43,5 @@ end
 function move_parent(parent, ability, targets)
   local dest = targets:selected_point()
   parent:teleport_to(dest)
+  game:play_sfx("sfx/thwack-10")
 end

@@ -29,6 +29,7 @@ function on_activate(parent, ability)
   effect:add_anim(gen)
   effect:apply()
 
+  game:play_sfx("sfx/sword_sheath_2")
   ability:activate(parent)
 end
 

@@ -1,5 +1,8 @@
 id: sfx
-sounds: {}
+sounds:
+  spell2:
+    file: sfx/spell2.ogg
+    volume: 0.5
 groups:
   jute-dh-rpgsounds:
     prefix: sfx/jute-dh-rpgsounds/
@@ -45,13 +48,34 @@ groups:
       - thwack-10
   battle_sound_effects:
     prefix: sfx/battle_sound_effects/
-    postfix: ".wav"
+    postfix: ".ogg"
     volume: 0.6
     entries:
       - Bow
       - swish_2
       - swish_3
       - swish_4
+  spell:
+    prefix: sfx/spell/
+    postfix: ".ogg"
+    volume: 0.5
+    entries:
+      - blessing
+      - blessing2
+      - blessing3
+      - enchant
+      - enchant2
+      - explode
+      - explode2
+      - explode5
+      - forcepush
+      - freeze2
+      - heal
+      - insect
+      - pestilence
+      - spell
+      - teleport
+      - water
   sfx_100:
     prefix: sfx/sfx_100/sfx100v2_
     postfix: ".ogg"

@@ -29,6 +29,9 @@ use sulis_module::{Faction, ItemState, Module, OnTrigger, Time};
 /// The ScriptInterface, accessible in all Lua scripts as the global `game`.
 /// The following methods are available on this object (documentation WIP):
 ///
+/// # `play_sfx(id: String)`
+/// Plays the sound effect with the specified ID
+///
 /// # `current_round() -> Int`
 /// Returns the current round, or the total number of rounds of playtime that have elapsed.
 /// This number increases by 1 for every complete round of combat, or by 1 for every 5 seconds
@@ -351,6 +354,11 @@ pub struct ScriptInterface {}
 
 impl UserData for ScriptInterface {
     fn add_methods<'lua, M: UserDataMethods<'lua, Self>>(methods: &mut M) {
+        methods.add_method("play_sfx", |_, _, id: String| {
+            sulis_core::io::Audio::play_sfx(&id);
+            Ok(())
+        });
+
         methods.add_method("current_round", |_, _, ()| {
             let mgr = GameState::turn_manager();
             let round = mgr.borrow().current_round();

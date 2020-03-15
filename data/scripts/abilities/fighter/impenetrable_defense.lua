@@ -16,5 +16,6 @@ function on_activate(parent, ability)
   effect:add_anim(gen)
   effect:apply()
 
+  game:play_sfx("sfx/metal_02")
   ability:activate(parent)
 end

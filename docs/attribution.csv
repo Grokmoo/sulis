@@ -148,6 +148,8 @@ data/sounds/POL-battle-march-short.ogg,Music,,PlayOnLoop,CC-BY 3.0,https://creat
 data/sounds/swamp.ogg,Music,,LokiF,CC0 - Public Domain,http://creativecommons.org/publicdomain/zero/1.0/,Swamp Environment Audio,https://opengameart.org/content/swamp-environment-audio,
 data/sounds/caravan.ogg,,,yd,CC0 - Public Domain,http://creativecommons.org/publicdomain/zero/1.0/,Desert Theme,https://opengameart.org/content/desert-theme,
 data/sounds/sfx/sfx_100/*,Assorted Sound Effects,,rubberduck,CC0 - Public Domain,http://creativecommons.org/publicdomain/zero/1.0/,100 CC0 SFX #2,https://opengameart.org/content/100-cc0-sfx-2,
-data/sounds/sfx/battle_sound_effects/*,Assorted Sound Effects,,artisticdude,CC0 - Public Domain,http://creativecommons.org/publicdomain/zero/1.0/,Battle Sound Effects,https://opengameart.org/content/battle-sound-effects,
+data/sounds/sfx/battle_sound_effects/*,Assorted Sound Effects,,artisticdude,CC0 - Public Domain,http://creativecommons.org/publicdomain/zero/1.0/,Battle Sound Effects,https://opengameart.org/content/battle-sound-effects,Encoded to ogg
 data/sounds/sfx/thwack/*,Assorted Hits,,AntumDeluge,CC0 - Public Domain,http://creativecommons.org/publicdomain/zero/1.0/,Thwack Sounds,https://opengameart.org/content/thwack-sounds,
-data/sounds/sfx/jute-dh-rpgsounds,Misc Sounds,,Jute,GPL 3.0,http://www.gnu.org/licenses/gpl-3.0.html,"Items, door, fire, weapon hits",https://opengameart.org/content/items-door-fire-weapon-hits,Encoded to ogg
+data/sounds/sfx/jute-dh-rpgsounds/*,Misc Sounds,,Jute,GPL 3.0,http://www.gnu.org/licenses/gpl-3.0.html,"Items, door, fire, weapon hits",https://opengameart.org/content/items-door-fire-weapon-hits,Encoded to ogg
+data/sounds/sfx/spell/*,Spell Sounds,,p0ss,CC-BY-SA 3.0,https://creativecommons.org/licenses/by-sa/3.0/,Spell Sounds Starter Pack,https://opengameart.org/content/spell-sounds-starter-pack,Encoded to ogg
+data/sounds/sfx/spell2.ogg,Misc spell sound,,Bart Kelsey,CC-BY-SA 3.0,https://creativecommons.org/licenses/by-sa/3.0/,Spell 2,https://opengameart.org/content/spell-2,Encoded to ogg

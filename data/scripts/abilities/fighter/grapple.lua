@@ -33,6 +33,7 @@ function create_grapple_effect(parent, ability, targets, hit)
   local target = targets:first()
   
   if hit:is_miss() then
+    game:play_sfx("sfx/swish_2")
     return
   end
   
@@ -40,7 +41,9 @@ function create_grapple_effect(parent, ability, targets, hit)
   
   if hit:is_graze() then
     effect:add_move_disabled()
+	game:play_sfx("sfx/thwack-03")
   else
+    game:play_sfx("sfx/hit_3")
     effect:add_move_disabled()
     effect:add_attack_disabled()
   end

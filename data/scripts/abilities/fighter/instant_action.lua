@@ -10,4 +10,6 @@ function on_activate(parent, ability)
   gen:set_position(gen:param(-1.25), gen:param(-1.25))
   gen:set_particle_size_dist(gen:fixed_dist(2.5), gen:fixed_dist(2.5))
   gen:activate()
+  
+  game:play_sfx("sfx/spell2")
 end

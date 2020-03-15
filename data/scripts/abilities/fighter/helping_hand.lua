@@ -35,4 +35,6 @@ function on_target_select(parent, ability, targets)
   anim:set_particle_duration_dist(anim:fixed_dist(0.75))
   anim:set_color(anim:param(0.0), anim:param(0.5), anim:param(1.0, -1.0), anim:param(1.0, -1.0))
   anim:activate()
+  
+  game:play_sfx("sfx/blessing2")
 end

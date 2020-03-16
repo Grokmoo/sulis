@@ -100,7 +100,7 @@ impl LootList {
         id: String,
         entry_in: EntryBuilder,
     ) -> Result<Entry, Error> {
-        if !entry_in.adjectives.is_empty()
+        if !entry_in.adjectives.iter().all(|e| e.is_empty())
             || !entry_in.variant.is_empty()
         {
             warn!(

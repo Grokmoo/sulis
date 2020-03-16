@@ -944,8 +944,15 @@ impl UserData for ScriptInterface {
                            (String, Option<String>, Option<String>, Option<String>)| {
 
             let adjs = vec![adj1, adj2, adj3];
-            let adjectives: Vec<_> = adjs.into_iter().filter_map(|a| a).collect();
-            let identified = !adjectives.contains(&Module::rules().unidentified_item_adjective);
+            let mut identified = true;
+            let adjectives: Vec<_> = adjs.into_iter().filter_map(|a| {
+                if a.as_ref() == Some(&Module::rules().unidentified_item_adjective) {
+                    identified = false;
+                    None
+                } else {
+                    a
+                }
+            }).collect();
             let stash = GameState::party_stash();
             let item = match Module::create_get_item(&id, &adjectives) {
                 None => return Err(rlua::Error::FromLuaConversionError {
@@ -972,8 +979,15 @@ impl UserData for ScriptInterface {
         methods.add_method("add_party_item", |_, _, (item, adj1, adj2, adj3):
             (String, Option<String>, Option<String>, Option<String>)| {
             let adjs = vec![adj1, adj2, adj3];
-            let adjectives: Vec<_> = adjs.into_iter().filter_map(|a| a).collect();
-            let identified = !adjectives.contains(&Module::rules().unidentified_item_adjective);
+            let mut identified = true;
+            let adjectives: Vec<_> = adjs.into_iter().filter_map(|a| {
+                if a.as_ref() == Some(&Module::rules().unidentified_item_adjective) {
+                    identified = false;
+                    None
+                } else {
+                    a
+                }
+            }).collect();
 
             let stash = GameState::party_stash();
             let item = match Module::create_get_item(&item, &adjectives) {

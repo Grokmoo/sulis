@@ -71,7 +71,7 @@ impl PropState {
             let quantity = item_save.quantity;
             let item = &item_save.item;
             let variant = item.variant;
-            let identified = !item.adjectives.contains(&Module::rules().unidentified_item_adjective);
+            let identified = item.identified;
             let item = match Module::create_get_item(&item.id, &item.adjectives) {
                 None => {
                     warn!(

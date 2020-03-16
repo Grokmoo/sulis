@@ -40,6 +40,8 @@ impl ItemListEntrySaveState {
 #[serde(deny_unknown_fields)]
 pub struct ItemSaveState {
     pub id: String,
+    #[serde(default = "bool_true")]
+    pub identified: bool,
     #[serde(default)]
     pub adjectives: Vec<String>,
 
@@ -53,17 +55,19 @@ impl ItemSaveState {
             .item
             .added_adjectives
             .iter()
-            .filter(|adj| !item.identified || adj.id != "unidentified")
             .map(|adj| adj.id.clone())
             .collect();
 
         ItemSaveState {
             id: item.item.original_id.clone(),
+            identified: item.identified,
             adjectives,
             variant: item.variant,
         }
     }
 }
+
+fn bool_true() -> bool { true }
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
 #[serde(deny_unknown_fields, default)]
@@ -134,8 +138,7 @@ impl InventoryBuilder {
         self.pc_starting_items.iter().filter_map(|entry| {
             let qty = entry.quantity;
             let item = &entry.item;
-            let unidentified_str = &Module::rules().unidentified_item_adjective;
-            let identified = !item.adjectives.contains(unidentified_str);
+            let identified = item.identified;
             match Module::create_get_item(&item.id, &item.adjectives) {
                 None => {
                     warn!(
@@ -172,10 +175,8 @@ impl InventoryBuilder {
             if !equippable_to(&item, &item_save.id, slot) {
                 return None;
             }
-            let unidentified_str = &Module::rules().unidentified_item_adjective;
-            let identified = !item_save.adjectives.contains(unidentified_str);
 
-            Some((slot, ItemState::new(item, item_save.variant, identified)))
+            Some((slot, ItemState::new(item, item_save.variant, item_save.identified)))
         })
     }
 
@@ -212,10 +213,8 @@ impl InventoryBuilder {
                     item.usable.as_ref()?;
                 }
             }
-            let unidentified_str = &Module::rules().unidentified_item_adjective;
-            let identified = !item_save.adjectives.contains(unidentified_str);
 
-            Some((slot, ItemState::new(item, item_save.variant, identified)))
+            Some((slot, ItemState::new(item, item_save.variant, item_save.identified)))
         })
     }
 }

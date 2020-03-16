@@ -27,6 +27,7 @@ const MAX_DEPTH: u32 = 10;
 struct Entry {
     id: String,
     weight: u32,
+    identified: bool,
     quantity: [u32; 2],
 
     adjectives: Vec<Vec<(String, u32)>>,
@@ -117,6 +118,7 @@ impl LootList {
         Ok(Entry {
             id,
             weight: entry_in.weight,
+            identified: true,
             quantity: [min_qty, max_qty],
             adjectives: Vec::new(),
             variant: Vec::new(),
@@ -139,11 +141,20 @@ impl LootList {
             Some(qty) => (qty[0], qty[1]),
         };
 
+        let mut identified = true;
         let mut adjectives = vec![];
 
         for in_adj in entry_in.adjectives.iter() {
             let mut adj = vec![];
-            for (id, weight) in in_adj.iter().filter(|x| x.0 != "none") {
+            for (id, weight) in in_adj.iter() {
+                match id.as_str() {
+                    "none" | "identified" => continue,
+                    "unidentified" => {
+                        identified = false;
+                        continue;
+                    },
+                    _ => {},
+                }
                 if module.item_adjectives.get(id).is_none() {
                     warn!("Unable to find item adjective '{}'", id);
                     return unable_to_create_error("loot_list", &builder_id);
@@ -171,6 +182,7 @@ impl LootList {
         Ok(Entry {
             id,
             weight: entry_in.weight,
+            identified,
             quantity: [min_qty, max_qty],
             adjectives,
             variant,
@@ -231,9 +243,8 @@ impl LootList {
                     }
                     Some(item) => item,
                 };
-                let identified = !adjectives.contains(&Module::rules().unidentified_item_adjective);
                 let variant = self.gen_variant(entry);
-                items.push((quantity, ItemState::new(item, variant, identified)));
+                items.push((quantity, ItemState::new(item, variant, entry.identified)));
             }
         }
 
@@ -314,8 +325,7 @@ impl LootList {
                     Some(item) => item,
                 };
                 let variant = self.gen_variant(entry);
-                let identified = !adjectives.contains(&Module::rules().unidentified_item_adjective);
-                return Some((quantity, ItemState::new(item, variant, identified)));
+                return Some((quantity, ItemState::new(item, variant, entry.identified)));
             }
         }
 

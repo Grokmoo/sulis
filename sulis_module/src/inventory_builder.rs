@@ -49,15 +49,13 @@ pub struct ItemSaveState {
 
 impl ItemSaveState {
     pub fn new(item: &ItemState) -> ItemSaveState {
-        let mut adjectives: Vec<_> = item
+        let adjectives: Vec<_> = item
             .item
             .added_adjectives
             .iter()
+            .filter(|adj| !item.identified || adj.id != "unidentified")
             .map(|adj| adj.id.clone())
             .collect();
-        if !item.identified {
-            adjectives.push("unidentified".to_string());
-        }
 
         ItemSaveState {
             id: item.item.original_id.clone(),

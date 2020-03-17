@@ -233,7 +233,8 @@ impl AreaGenerator {
                 .find(&location_checker, start_x, start_y, dest)
                 .is_none()
             {
-                warn!("Unable to path between generated rooms {} and {}", i, i + 1);
+                return Err(Error::new(ErrorKind::InvalidInput,
+                    format!("Unable to path between generated rooms {} and {}", i, i + 1)));
             }
         }
 

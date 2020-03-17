@@ -63,6 +63,7 @@ pub fn approx_eq(a: f32, b: f32) -> bool {
     i32::abs(a_int - b_int) <= MAX_ULPS
 }
 
+#[derive(Clone)]
 pub struct ReproducibleRandom {
     seed: u128,
     gen: Pcg64Mcg,

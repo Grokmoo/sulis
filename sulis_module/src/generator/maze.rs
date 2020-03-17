@@ -163,7 +163,7 @@ impl Maze {
                     }
                 }
 
-                if regions.len() < 2 {
+                if regions.is_empty() {
                     continue;
                 }
 

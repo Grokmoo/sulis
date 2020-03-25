@@ -16,7 +16,9 @@ Resources for developers and modders are available on a [page on the website](ht
 ### Prerequisites
 You'll need recent versions of Rust and Cargo installed.  The game will compile on the latest stable version.  [Get Rust](https://www.rust-lang.org/)
 
-On Linux, you will need the ALSA development files installed for audio support.  On Debian / Ubuntu, `apt-get install libasound2-dev`.  On Red Hat / Fedora, `yum install alsa-lib-devel`
+On Linux, you will need the ALSA development files installed for audio support.  On Debian / Ubuntu, `apt-get install libasound2-dev`.  On Red Hat / Fedora, `yum install alsa-lib-devel`.
+
+On Windows Subsystem for Linux (WSL) running Ubuntu, run `sudo apt install build-essential libasound2-dev pkg-config`.
 
 ### Installation
 

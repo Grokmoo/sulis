@@ -35,11 +35,15 @@ function on_target_select(parent, ability, targets)
   
   surf:apply()
   ability:activate(parent)
+  
+  game:play_sfx("sfx/click_1")
 end
 
 function on_entered(parent, ability, targets)
   -- only fire on hostiles
   if targets:hostile():is_empty() then return end
+  
+  game:play_sfx("sfx/fire_impact_1")
   
   targets:surface():mark_for_removal()
   

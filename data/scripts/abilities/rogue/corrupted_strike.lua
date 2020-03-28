@@ -17,6 +17,7 @@ function on_target_select(parent, ability, targets)
   
   ability:activate(parent)
   parent:anim_weapon_attack(target, cb)
+  game:play_sfx("sfx/splash")
 end
 
 function after_attack(parent, ability, targets, hit)

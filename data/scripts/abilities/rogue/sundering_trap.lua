@@ -36,6 +36,8 @@ function on_target_select(parent, ability, targets)
   
   surf:apply()
   ability:activate(parent)
+  
+  game:play_sfx("sfx/click_1")
 end
 
 function on_entered(parent, ability, targets)
@@ -60,7 +62,10 @@ function on_entered(parent, ability, targets)
   local effect = target:create_effect(ability:name(), 2)
   effect:set_tag("sundered_armor")
   
-  if hit:is_miss() then return end
+  if hit:is_miss() then
+    game:play_sfx("sfx/swish_2")
+    return
+  end
 
   local stats = parent:stats()
   local amount = 8 + stats.level / 2
@@ -69,10 +74,16 @@ function on_entered(parent, ability, targets)
   end
 
   if hit:is_graze() then
+    game:play_sfx("sfx/thwack-07")
+	game:play_sfx("sfx/metal_hit_01")
     effect:add_num_bonus("armor", -amount / 1.5)
   elseif hit:is_hit() then
+    game:play_sfx("sfx/thwack-08")
+	game:play_sfx("sfx/metal_hit_01")
     effect:add_num_bonus("armor", -amount)
   elseif hit:is_crit() then
+    game:play_sfx("sfx/thwack-09")
+	game:play_sfx("sfx/metal_hit_01")
     effect:add_num_bonus("armor", -(amount * 1.5))
   end
   

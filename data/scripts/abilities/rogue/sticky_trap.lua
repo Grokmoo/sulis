@@ -36,6 +36,8 @@ function on_target_select(parent, ability, targets)
   
   surf:apply()
   ability:activate(parent)
+  
+  game:play_sfx("sfx/click_1")
 end
 
 function on_entered(parent, ability, targets)
@@ -50,6 +52,8 @@ function on_entered(parent, ability, targets)
   if parent:has_ability("mechanical_mastery") then
     duration = duration + 1
   end
+  
+  game:play_sfx("sfx/lava")
   
   if hit:is_miss() then
     return

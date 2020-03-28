@@ -3,6 +3,12 @@ sounds:
   spell2:
     file: sfx/spell2.ogg
     volume: 0.5
+  short_wind_sound:
+    file: sfx/short_wind_sound.ogg
+    volume: 0.8
+  lava:
+    file: sfx/lava.ogg
+    volume: 0.6
 groups:
   jute-dh-rpgsounds:
     prefix: sfx/jute-dh-rpgsounds/
@@ -128,3 +134,47 @@ groups:
       - wood_hit_01
       - wood_hit_02
       - wood_hit_03
+  qubodup_rustle:
+     prefix: sfx/qubodup-rustle/
+     postfix: ".ogg"
+     volume: 0.8
+     entries:
+       - rustle01
+       - rustle02
+       - rustle03
+       - rustle04
+       - rustle05
+       - rustle06
+       - rustle07
+       - rustle08
+       - rustle09
+       - rustle10
+       - rustle11
+       - rustle12
+  swishes:
+    prefix: sfx/swishes/
+    postfix: ".ogg"
+    volume: 0.6
+    entries:
+      - swish-1
+      - swish-2
+      - swish-3
+      - swish-4
+      - swish-5
+      - swish-6
+      - swish-7
+      - swish-8
+      - swish-9
+      - swish-10
+      - swish-11
+      - swish-12
+  magic_sfx_preview_pack:
+    prefix: sfx/Magic_SFX_Preview_Pack/
+    postfix: ".ogg"
+    volume: 0.6
+    entries:
+      - fire_impact_1
+      - healing_full
+      - ice_attack_2
+      - misc_02
+      - wind_effects_5

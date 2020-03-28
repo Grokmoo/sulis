@@ -55,4 +55,6 @@ function do_attack(parent, ability, targets)
   gen:set_particle_size_dist(gen:fixed_dist(2.5), gen:fixed_dist(2.5))
   gen:set_color(gen:param(1.0), gen:param(0.2), gen:param(0.2))
   gen:activate()
+  
+  game:play_sfx("sfx/metal_04")
 end

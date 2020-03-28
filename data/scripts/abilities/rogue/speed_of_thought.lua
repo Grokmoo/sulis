@@ -14,4 +14,6 @@ function on_activate(parent, ability)
   gen:set_particle_size_dist(gen:fixed_dist(1.0), gen:fixed_dist(1.0))
   effect:add_anim(gen)
   effect:apply()
+  
+  game:play_sfx("sfx/short_wind_sound")
 end

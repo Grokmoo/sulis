@@ -36,6 +36,8 @@ function activate_no_check(parent, ability)
                  anim:param(0.4))
   effect:add_color_anim(anim)
   effect:apply()
+  
+  game:play_sfx("sfx/rustle10")
 end
 
 function on_moved(parent, ability)
@@ -44,6 +46,7 @@ function on_moved(parent, ability)
 	ability:deactivate(parent)
 	game:cancel_blocking_anims()
 	game:run_script_delayed("hide", "check_ai_activation", 0.1)
+	game:play_sfx("sfx/rustle12")
   end
 end
 
@@ -52,6 +55,7 @@ function on_round_elapsed(parent, ability)
     game:say_line("Spotted!", parent)
 	ability:deactivate(parent)
 	game:run_script_delayed("hide", "check_ai_activation", 0.1)
+	game:play_sfx("sfx/rustle12")
   end
 end
 
@@ -66,6 +70,7 @@ function deactivate(parent, ability)
   
   game:say_line("Spotted!", parent)
   ability:deactivate(parent)
+  game:play_sfx("sfx/rustle12")
 end
 
 function after_attack(parent, ability)

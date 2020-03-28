@@ -38,9 +38,12 @@ function on_target_select(parent, ability, targets)
   gen:activate()
   
   ability:activate(parent)
+  game:play_sfx("sfx/swish-7")
 end
 
 function create_smoke(parent, ability, targets)
+  game:play_sfx("sfx/explode")
+
   local points = targets:affected_points()
   local surface = parent:create_surface(ability:name(), points, ability:duration())
   surface:add_num_bonus("concealment", 15 + parent:stats().level)

@@ -35,6 +35,8 @@ function on_target_select(parent, ability, targets)
   
   surf:apply()
   ability:activate(parent)
+  
+  game:play_sfx("sfx/click_1")
 end
 
 function on_entered(parent, ability, targets)
@@ -58,6 +60,16 @@ function on_entered(parent, ability, targets)
   local max_dmg = 28 + stats.level + stats.intellect_bonus / 2
   
   local hit = parent:special_attack(target, "Reflex", "Ranged", min_dmg, max_dmg, 0, "Piercing")
+  
+  if hit:is_miss() then
+    game:play_sfx("sfx/swish_2")
+  elseif hit:is_graze() then
+    game:play_sfx("sfx/thwack-07")
+  elseif hit:is_hit() then
+	game:play_sfx("sfx/thwack-08")
+  elseif hit:is_crit() then
+    game:play_sfx("sfx/thwack-09")
+  end
   
   if not target:is_dead() and parent:ability_level(ability) > 1 then
     local effect = target:create_effect(ability:name(), 2)

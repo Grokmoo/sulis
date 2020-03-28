@@ -17,6 +17,7 @@ function on_target_select(parent, ability, targets)
   
   ability:activate(parent)
   parent:anim_weapon_attack(target, cb)
+  game:play_sfx("sfx/sword_sheath_1")
 end
 
 function create_parent_effect(parent, ability, targets)

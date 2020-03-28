@@ -45,6 +45,8 @@ function on_target_select(parent, ability, targets)
   anim:set_completion_callback(cb)
   anim:activate()
   ability:activate(parent)
+  
+  game:play_sfx("sfx/rustle01")
 end
 
 function move_parent(parent, ability, targets)

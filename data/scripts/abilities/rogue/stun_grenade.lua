@@ -38,9 +38,12 @@ function on_target_select(parent, ability, targets)
   gen:activate()
   
   ability:activate(parent)
+  game:play_sfx("sfx/swish-7")
 end
 
 function create_explosion(parent, ability, targets)
+  game:play_sfx("sfx/door_ripped_2")
+
   local duration = 1.2
   
   local position = targets:selected_point()

@@ -28,6 +28,8 @@ function create_feint_effect(parent, ability, targets, hit)
   effect:set_tag("vulnerable")
   local stats = parent:stats()
   
+  game:play_sfx("sfx/swish-7")
+  
   if hit:is_graze() then
     effect:add_num_bonus("defense", -10 - stats.level)
   elseif hit:is_hit() then

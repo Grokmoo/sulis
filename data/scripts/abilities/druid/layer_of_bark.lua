@@ -22,4 +22,5 @@ function on_activate(parent, ability)
   effect:apply()
 
   ability:activate(parent)
+  game:play_sfx("sfx/rustle05")
 end

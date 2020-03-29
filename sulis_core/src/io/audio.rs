@@ -71,20 +71,20 @@ impl Audio {
         Audio::enqueue(sound, kind);
     }
 
-    pub fn play_ambient(source_id: &str) {
-        Audio::enqueue_id(source_id, QueueKind::Ambient);
+    pub fn play_ambient(source_id: &str, volume: f32) {
+        Audio::enqueue_id(source_id, QueueKind::Ambient, volume);
     }
 
     pub fn stop_music() {
         Audio::enqueue(None, QueueKind::StopMusic);
     }
 
-    pub fn play_music(source_id: &str) {
-        Audio::enqueue_id(source_id, QueueKind::Music);
+    pub fn play_music(source_id: &str, volume: f32) {
+        Audio::enqueue_id(source_id, QueueKind::Music, volume);
     }
 
-    pub fn play_sfx(source_id: &str) {
-        Audio::enqueue_id(source_id, QueueKind::Sfx);
+    pub fn play_sfx(source_id: &str, volume: f32) {
+        Audio::enqueue_id(source_id, QueueKind::Sfx, volume);
     }
 
     fn enqueue(sound: Option<SoundSource>, kind: QueueKind) {
@@ -93,13 +93,16 @@ impl Audio {
         });
     }
 
-    fn enqueue_id(source_id: &str, kind: QueueKind) {
+    fn enqueue_id(source_id: &str, kind: QueueKind, volume: f32) {
         let sound = match ResourceSet::sound(source_id) {
             Err(e) => {
                 warn!("Unable to locate sound '{}': {}", source_id, e);
                 return;
             },
-            Ok(sound) => Some(sound),
+            Ok(mut sound) => {
+                sound.mult_volume(volume);
+                Some(sound)
+            }
         };
 
         Audio::enqueue(sound, kind);
@@ -158,6 +161,10 @@ impl SoundSource {
             volume: entry.volume,
             delay: Duration::from_secs_f32(entry.delay),
         })
+    }
+
+    pub fn mult_volume(&mut self, volume: f32) {
+        self.volume *= volume;
     }
 }
 

@@ -19,6 +19,11 @@ inline_race:
       kind: Raw
     kind: #Melee
       reach: 1.0
+    sounds:
+      miss: sfx/swish_2
+      graze: sfx/thwack-03
+      hit: sfx/hit_3
+      crit: sfx/hit_2
   default_images:
     Background: creatures/eye
     Shadow: creatures/goblin_shadow

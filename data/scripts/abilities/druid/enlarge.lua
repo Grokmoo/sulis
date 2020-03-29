@@ -28,4 +28,5 @@ function on_target_select(parent, ability, targets)
   effect:add_scale_anim(gen)
   
   effect:apply()
+  game:play_sfx("sfx/explode2")
 end

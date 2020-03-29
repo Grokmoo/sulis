@@ -29,8 +29,9 @@ use sulis_module::{Faction, ItemState, Module, OnTrigger, Time};
 /// The ScriptInterface, accessible in all Lua scripts as the global `game`.
 /// The following methods are available on this object (documentation WIP):
 ///
-/// # `play_sfx(id: String)`
-/// Plays the sound effect with the specified ID
+/// # `play_sfx(id: String, volume: Float (Optional))`
+/// Plays the sound effect with the specified ID.  Optionally multiple the
+/// sound base volume by the specified volume
 ///
 /// # `current_round() -> Int`
 /// Returns the current round, or the total number of rounds of playtime that have elapsed.
@@ -354,8 +355,9 @@ pub struct ScriptInterface {}
 
 impl UserData for ScriptInterface {
     fn add_methods<'lua, M: UserDataMethods<'lua, Self>>(methods: &mut M) {
-        methods.add_method("play_sfx", |_, _, id: String| {
-            sulis_core::io::Audio::play_sfx(&id);
+        methods.add_method("play_sfx", |_, _, (id, vol): (String, Option<f32>)| {
+            let vol = vol.unwrap_or(1.0);
+            sulis_core::io::Audio::play_sfx(&id, vol);
             Ok(())
         });
 

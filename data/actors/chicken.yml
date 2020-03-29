@@ -26,6 +26,11 @@ inline_race:
       kind: Piercing
     kind: #Melee
       reach: 1.0
+    sounds:
+      miss: sfx/swish_2
+      graze: sfx/thwack-03
+      hit: sfx/hit_3
+      crit: sfx/hit_2
   default_images:
     Background: creatures/chicken0
     Shadow: creatures/goblin_shadow

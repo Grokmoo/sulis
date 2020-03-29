@@ -9,10 +9,9 @@ function on_activate(parent, ability)
 end
 
 function on_target_select(parent, ability, targets)
-  local stats = parent:stats()
   local target = targets:first()
   
-  target:heal_damage(10 + stats.caster_level / 3 + stats.wisdom_bonus / 3)
+  apply_heal(parent, ability, targets)
   
   local effect = target:create_effect(ability:name(), ability:duration())
   
@@ -41,4 +40,5 @@ function apply_heal(parent, ability, targets)
   local target = targets:first()
   
   target:heal_damage(10 + stats.caster_level / 3 + stats.wisdom_bonus / 3)
+  game:play_sfx("sfx/spell2")
 end

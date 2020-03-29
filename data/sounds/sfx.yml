@@ -64,24 +64,54 @@ groups:
   spell:
     prefix: sfx/spell/
     postfix: ".ogg"
-    volume: 0.5
+    volume: 0.7
     entries:
       - blessing
       - blessing2
       - blessing3
+      - confusion
+      - curse
+      - curse2
+      - curse3
+      - curse4
+      - curse5
+      - disenchant
       - enchant
       - enchant2
       - explode
+      - explode1
       - explode2
+      - explode3
+      - explode4
       - explode5
+      - flamethrower
+      - forcepulse
       - forcepush
+      - freeze
       - freeze2
       - heal
       - insect
+      - magicdrop
+      - magicerase
+      - magicfail
+      - magicfail2
+      - magicshield
+      - moving
       - pestilence
+      - sand
+      - shot
+      - shot2
       - spell
+      - spring
+      - steam
       - teleport
+      - transmission
+      - warp
+      - warp2
+      - warp3
       - water
+      - wind
+      - wind2
   sfx_100:
     prefix: sfx/sfx_100/sfx100v2_
     postfix: ".ogg"
@@ -178,3 +208,22 @@ groups:
       - ice_attack_2
       - misc_02
       - wind_effects_5
+  random_sfx:
+    prefix: sfx/RandomSFX/
+    postfix: ".ogg"
+    volume: 0.6
+    entries:
+      - atmos01
+      - atmos02
+      - atmos03
+      - atmos04
+      - atmos05
+      - atmos06
+      - echo01
+      - echo02
+      - echo03
+      - roar1
+      - roar2
+      - roar3
+      - roar4
+      - roar5

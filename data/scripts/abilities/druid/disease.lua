@@ -50,4 +50,5 @@ function on_target_select(parent, ability, targets)
   effect:add_anim(anim)
   
   effect:apply()
+  game:play_sfx("sfx/curse5", 1.5)
 end

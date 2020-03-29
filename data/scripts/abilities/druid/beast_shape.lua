@@ -65,6 +65,8 @@ function on_activate(parent, ability)
                      anim:param(1.0, -1,0),
                      anim:param(0.0))
   anim:activate()
+  
+  game:play_sfx("sfx/roar5")
 end
 
 function on_removed(parent, ability)

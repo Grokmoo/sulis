@@ -40,6 +40,7 @@ function menu_select(parent, ability, targets, selection)
   effect:apply()
   
   ability:activate(parent)
+  game:play_sfx("sfx/blessing3")
 end
 
 function on_damaged(parent, ability, targets, hit)
@@ -62,6 +63,7 @@ function on_damaged(parent, ability, targets, hit)
   local amount = 25 + stats.caster_level + stats.wisdom_bonus
   local heal = matching_damage * (1.0 + amount / 100.0)
   defender:heal_damage(heal)
+  game:play_sfx("sfx/blessing3")
 end
 
 function on_removed(parent)

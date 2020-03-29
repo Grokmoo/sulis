@@ -40,6 +40,7 @@ function on_target_select(parent, ability, targets)
   end
 
   ability:activate(parent)
+  game:play_sfx("sfx/blessing2")
 end
 
 function attack_target(parent, ability, target)

@@ -40,11 +40,14 @@ function on_target_select(parent, ability, targets)
   surface:apply()
   
   ability:activate(parent)
+  game:play_sfx("sfx/rustle01")
+  game:play_sfx("sfx/insect")
 end
 
 function on_moved(parent, ability, targets)
   local target = targets:first()
   target:take_damage(parent, 2, 4, "Piercing", 5)
+  game:play_sfx("sfx/metal_hit_02")
 end
 
 function on_round_elapsed(parent, ability, targets)
@@ -58,9 +61,11 @@ function on_round_elapsed(parent, ability, targets)
   for i = 1, #targets do
     if i == special_index then
 	  game:say_line("Swarmed!", targets[i])
+	  game:play_sfx("sfx/hit_03")
 	  targets[i]:take_damage(parent, 15, 22, "Piercing", 8)
 	else
 	  targets[i]:take_damage(parent, 2, 4, "Piercing", 5)
+	  game:play_sfx("sfx/metal_hit_02")
 	end
   end
   

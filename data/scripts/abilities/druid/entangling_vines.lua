@@ -35,6 +35,7 @@ function on_target_select(parent, ability, targets)
   surface:apply()
   
   ability:activate(parent)
+  game:play_sfx("sfx/rustle07")
 end
 
 function on_moved(parent, ability, targets)
@@ -55,6 +56,8 @@ function try_hold(parent, ability, target)
   local hit = parent:special_attack(target, "Reflex", "Spell")
   
   if hit:is_miss() then return end
+  
+  game:play_sfx("sfx/rustle09")
   
   local effect = target:create_effect(ability:name(), 1)
   effect:set_tag("tangle")

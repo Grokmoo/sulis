@@ -41,6 +41,7 @@ function on_target_select(parent, ability, targets)
   surface:add_anim(gen)
   surface:apply()
   ability:activate(parent)
+  game:play_sfx("sfx/ice_attack_2")
 end
 
 function on_moved(parent, ability, targets)
@@ -57,5 +58,6 @@ function do_attack(parent, ability, targets)
     local target = targets[i]
     target:take_damage(parent, 3, 6, "Cold", 4)
     target:take_damage(parent, 3, 6, "Piercing", 4)
+	game:play_sfx("sfx/thwack-10")
   end
 end

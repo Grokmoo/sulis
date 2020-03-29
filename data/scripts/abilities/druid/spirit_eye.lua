@@ -43,6 +43,7 @@ function on_target_select(parent, ability, targets)
                      anim:param(1.0, -1,0),
                      anim:param(0.0))
   anim:activate()
+  game:play_sfx("sfx/forcepulse", 1.3)
 end
 
 function on_removed(parent, ability)

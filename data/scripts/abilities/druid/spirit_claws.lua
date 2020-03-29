@@ -45,6 +45,8 @@ function on_activate(parent, ability)
   gen:set_particle_size_dist(gen:fixed_dist(3.0), gen:fixed_dist(3.0))
   effect:add_anim(gen)
   effect:apply()
+  
+  game:play_sfx("sfx/blessing2")
 end
 
 function on_removed(parent, ability)

@@ -36,4 +36,6 @@ function on_target_select(parent, ability, targets)
   anim:set_position(anim:param(-2.0), anim:param(-2.75))
   anim:set_particle_size_dist(anim:fixed_dist(4.0), anim:fixed_dist(4.0))
   anim:activate()
+  
+  game:play_sfx("sfx/heal")
 end

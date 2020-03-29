@@ -123,7 +123,7 @@ pub struct Rules {
 impl Rules {
     pub fn play_main_menu_music(&self) {
         if let Some(music) = self.main_menu_music.as_ref() {
-            sulis_core::io::Audio::play_music(music);
+            sulis_core::io::Audio::play_music(music, 1.0);
         }
     }
 

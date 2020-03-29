@@ -29,6 +29,7 @@ function on_activate(parent, ability)
   
   effect:apply()
   ability:activate(parent)
+  game:play_sfx("sfx/enchant2")
 end
 
 function setup_anim(gen)

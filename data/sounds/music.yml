@@ -1,4 +1,16 @@
 id: music
+groups:
+  random_sfx:
+    prefix: sfx/RandomSFX/ambient/
+    postfix: ".ogg"
+    volume: 0.6
+    entries:
+      - Crystal_Falls
+      - Falls
+      - Hollow_Wind
+      - Metal_Bubbles
+      - Muck_Bubbles
+      - Shallow_Bubbles
 sounds:
   loading_loop:
     file: TremLoadingloopl.ogg

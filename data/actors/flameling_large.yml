@@ -26,6 +26,11 @@ inline_race:
       kind: Fire
     kind: #Melee
       reach: 1.0
+    sounds:
+      miss: sfx/swish_2
+      graze: sfx/thwack-03
+      hit: sfx/hit_3
+      crit: sfx/hit_2
   default_images:
     Background: creatures/flameling_large
     Shadow: creatures/4x4_large_shadow

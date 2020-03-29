@@ -42,6 +42,9 @@ function on_target_select(parent, ability, targets)
                      anim:param(1.0, -1,0),
                      anim:param(0.0))
   anim:activate()
+  
+  game:play_sfx("sfx/rustle04")
+  game:play_sfx("sfx/roar3")
 end
 
 function on_removed(parent, ability)

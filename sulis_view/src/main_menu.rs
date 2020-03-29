@@ -154,7 +154,7 @@ impl WidgetKind for MainMenu {
         let theme = &widget.theme;
         if let Some(music_id) = theme.custom.get("default_music") {
             if !Module::is_initialized() {
-                sulis_core::io::Audio::play_music(music_id);
+                sulis_core::io::Audio::play_music(music_id, 1.0);
             } else {
                 Module::rules().play_main_menu_music();
             }

@@ -115,7 +115,7 @@ pub fn weapon_attack(
 
         let sound = attack.sounds.sound(hit_kind);
         if let Some(sound_id) = sound {
-            Audio::play_sfx(sound_id);
+            Audio::play_sfx(sound_id, 1.0);
         }
 
         result.push((hit_kind, hit_flags, damage));

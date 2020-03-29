@@ -23,6 +23,11 @@ base_attack:
     kind: Crushing
   kind: #Melee
     reach: 0.5
+  sounds:
+    miss: sfx/swish_2
+    graze: sfx/thwack-03
+    hit: sfx/hit_3
+    crit: sfx/hit_2
 default_images_by_sex:
   Male:
     Foreground: creatures/trollkin_fg

@@ -19,6 +19,7 @@ function on_target_select(parent, ability, targets)
                      anim:param(0.0),
                      anim:param(0.0))
   anim:activate()
+  game:play_sfx("sfx/curse5", 1.6)
   
   local stats = parent:stats()
   local min_dmg = 10 + stats.caster_level / 2 + stats.intellect_bonus / 4

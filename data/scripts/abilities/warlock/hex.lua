@@ -36,4 +36,6 @@ function on_target_select(parent, ability, targets)
   gen:set_color(gen:param(1.0), gen:param(0.0), gen:param(0.0))
   effect:add_anim(gen)
   effect:apply()
+  
+  game:play_sfx("sfx/curse")
 end

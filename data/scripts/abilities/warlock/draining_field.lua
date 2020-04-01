@@ -41,16 +41,12 @@ function on_target_select(parent, ability, targets)
   surface:apply()
   ability:activate(parent)
   
-  local stats = parent:stats()
-  local amount = 5 + stats.caster_level + stats.intellect_bonus / 2
-  
-  local targets = targets:friendly():to_table()
-  for i = 1, #targets do
-	targets[i]:take_damage(parent, amount, amount, "Raw")
-  end
+  apply_damage(parent, ability, targets)
 end
 
 function apply_damage(parent, ability, targets)
+  game:play_sfx("sfx/pestilence")
+
   local stats = parent:stats()
   local amount = 5 + stats.caster_level + stats.intellect_bonus / 2
 

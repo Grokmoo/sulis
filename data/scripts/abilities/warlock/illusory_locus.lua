@@ -30,6 +30,8 @@ function on_activate(parent, ability)
 
   effect:apply()
   ability:activate(parent)
+  
+  game:play_sfx("sfx/warp2")
 end
 
 function illusion_check(parent, ability, targets)

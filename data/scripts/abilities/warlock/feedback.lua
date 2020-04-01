@@ -14,6 +14,8 @@ end
 
 function on_target_select(parent, ability, targets)
   ability:activate(parent)
+  game:play_sfx("sfx/fire_impact_1")
+  game:play_sfx("sfx/curse2")
   
   local position = targets:selected_point()
   

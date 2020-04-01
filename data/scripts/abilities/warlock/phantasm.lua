@@ -10,6 +10,7 @@ end
 function on_target_select(parent, ability, targets)
   local pos = targets:selected_point()
   ability:activate(parent)
+  game:play_sfx("sfx/short_wind_sound")
   
   local summon = game:spawn_actor_at("phantasm", pos.x, pos.y, "Neutral")
   if not summon:is_valid() then return end

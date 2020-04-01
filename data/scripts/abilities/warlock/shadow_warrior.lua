@@ -13,6 +13,7 @@ end
 function on_target_select(parent, ability, targets)
   local pos = targets:selected_point()
   ability:activate(parent)
+  game:play_sfx("sfx/short_wind_sound")
   
   local stats = parent:stats()
   local amount = math.floor(1 + stats.caster_level / 5)
@@ -24,7 +25,7 @@ function on_target_select(parent, ability, targets)
 end
 
 function gen_summon(parent, ability, points)
-  local summon = try_find_position(points)
+  local summon = try_find_position(parent, points)
   if summon == nil then return end
   
   if parent:is_party_member() then
@@ -47,7 +48,7 @@ function gen_summon(parent, ability, points)
   effect:apply()
 end
 
-function try_find_position(points)
+function try_find_position(parent, points)
   -- try to find a place for the summon, at most 20 attempts
   for i=1,20 do
     -- generate random point

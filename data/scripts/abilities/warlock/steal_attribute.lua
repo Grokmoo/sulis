@@ -36,6 +36,7 @@ function on_target_select(parent, ability, targets)
   local target = targets:first()
   
   ability:activate(parent)
+  game:play_sfx("sfx/curse2")
   
   local attr = parent:get_flag("__steal_attribute_type")
   parent:clear_flag("__steal_attribute_type")

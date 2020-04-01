@@ -9,6 +9,9 @@ sounds:
   lava:
     file: sfx/lava.ogg
     volume: 0.6
+  ghostbreath:
+    file: sfx/ghostbreath.ogg
+    volume: 0.8
 groups:
   jute-dh-rpgsounds:
     prefix: sfx/jute-dh-rpgsounds/

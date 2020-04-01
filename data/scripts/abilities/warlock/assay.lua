@@ -12,6 +12,7 @@ function on_target_select(parent, ability, targets)
   local target = targets:first()
   
   ability:activate(parent)
+  game:play_sfx("sfx/disenchant")
   
   local stats = parent:stats()
   local amount = 10 + stats.caster_level / 2 + stats.intellect_bonus / 4

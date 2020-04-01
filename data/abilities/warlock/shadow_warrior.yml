@@ -7,6 +7,7 @@ active:
   script: "shadow_warrior"
   group: Warlock
   ap: 3000
+  combat_only: true
   class_stats:
     warlock:
       Power: 40

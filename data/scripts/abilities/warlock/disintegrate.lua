@@ -48,6 +48,7 @@ function on_target_select(parent, ability, targets)
   
   anim:activate()
   ability:activate(parent)
+  game:play_sfx("sfx/explode4")
 end
 
 function attack_target(parent, ability, targets)
@@ -58,4 +59,6 @@ function attack_target(parent, ability, targets)
   local max_dmg = 16 + stats.intellect_bonus / 2 + stats.caster_level
   parent:special_attack(target, "Will", "Spell", min_dmg, max_dmg, 5, "Piercing")
   parent:special_attack(target, "Will", "Spell", min_dmg, max_dmg, 5, "Shock")
+  
+  game:play_sfx("sfx/explode5")
 end

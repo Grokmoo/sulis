@@ -13,6 +13,9 @@ function on_target_select(parent, ability, targets)
   
   ability:activate(parent)
   
+  game:play_sfx("sfx/confusion")
+  game:play_sfx("sfx/spell")
+  
   local hit = parent:special_attack(target, "Will", "Spell")
   local duration = ability:duration()
   if hit:is_miss() then

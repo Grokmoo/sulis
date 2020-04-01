@@ -12,6 +12,7 @@ function on_target_select(parent, ability, targets)
   local target = targets:first()
   
   ability:activate(parent)
+  game:play_sfx("sfx/ghostbreath")
   
   local hit = parent:special_attack(target, "Will", "Spell")
   local duration = ability:duration()

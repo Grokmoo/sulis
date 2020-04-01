@@ -42,6 +42,7 @@ function on_target_select(parent, ability, targets)
   end
   
   gen:activate()
+  game:play_sfx("sfx/magicfail2", 2.0)
 end
 
 function apply_effect(parent, ability, targets)
@@ -72,4 +73,5 @@ function apply_effect(parent, ability, targets)
   gen:set_position(gen:param(-0.75), gen:param(-0.75))
   gen:set_particle_size_dist(gen:fixed_dist(1.5), gen:fixed_dist(1.5))
   gen:activate()
+  game:play_sfx("sfx/thwack-01")
 end

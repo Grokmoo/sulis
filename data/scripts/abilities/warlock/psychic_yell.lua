@@ -32,6 +32,8 @@ function on_target_select(parent, ability, targets)
   end
   
   gen:activate()
+  
+  game:play_sfx("sfx/wind_effects_5")
 end
 
 function apply_effect(parent, ability, targets)

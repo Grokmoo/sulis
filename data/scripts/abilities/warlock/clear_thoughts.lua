@@ -12,6 +12,7 @@ end
 
 function on_target_select(parent, ability, targets)
   ability:activate(parent)
+  game:play_sfx("sfx/enchant2")
   
   local position = targets:selected_point()
   

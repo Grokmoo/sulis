@@ -10,6 +10,7 @@ end
 
 function on_target_select(parent, ability, targets)
   ability:activate(parent)
+  game:play_sfx("sfx/confusion")
 
   local target = targets:first()
   

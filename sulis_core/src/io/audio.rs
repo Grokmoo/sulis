@@ -388,18 +388,13 @@ fn device_name(device: &Device, index: usize) -> String {
     device.name().unwrap_or_else(|_e| format!("Audio Device {}", index))
 }
 
-#[derive(Clone)]
 pub struct AudioDeviceInfo {
     pub name: String,
+    device: Device,
+    config: AudioConfig,
 }
 
-pub fn get_audio_device_info() -> Vec<AudioDeviceInfo> {
-    let devices = get_audio_devices();
-
-    devices.into_iter().map(|device| AudioDeviceInfo { name: device.name }).collect()
-}
-
-fn get_audio_devices() -> Vec<AudioDevice> {
+pub fn get_audio_devices() -> Vec<AudioDeviceInfo> {
     let audio_config = Config::audio_config();
 
     info!("Querying audio devices");
@@ -416,15 +411,9 @@ fn get_audio_devices() -> Vec<AudioDevice> {
     for (index, device) in devices.enumerate() {
         let name = device_name(&device, index);
 
-        match name.split("CARD=").last()
-            .map(|d| d.split(',').next().unwrap_or(d))
-            .unwrap_or(&name) {
-
-            "HDMI" | "PCH" | "NVidia" => {
-                // outputs will crash rodio
-                continue;
-            },
-            _ => {}
+        if name.contains("CARD=") {
+            // this device will most likely crash rodio
+            continue;
         }
 
         let mut formats = match device.supported_output_formats() {
@@ -445,18 +434,26 @@ fn get_audio_devices() -> Vec<AudioDevice> {
         }
 
         let config = audio_config.clone();
-        let device = match AudioDevice::new(device, name.to_string(), config) {
-            Err(_) => {
-                warn!("Unable to create audio device for {}", name);
-                continue;
-            }, Ok(device) => device,
+        let audio_device = AudioDeviceInfo {
+            device,
+            name: name.to_string(),
+            config
         };
 
         info!("Found supported audio device: {}", name);
-        output.push(device);
+        output.push(audio_device);
     }
 
     output
+}
+
+pub fn init_device(info: AudioDeviceInfo) -> Option<AudioDevice> {
+    match AudioDevice::new(info.device, info.name.to_string(), info.config) {
+        Err(_) => {
+            warn!("Unable to create audio device for {}", info.name);
+            None
+        }, Ok(device) => Some(device),
+    }
 }
 
 pub fn create_audio_device() -> Option<AudioDevice> {
@@ -470,11 +467,11 @@ pub fn create_audio_device() -> Option<AudioDevice> {
     let audio_config = Config::audio_config();
 
     if audio_config.device < devices.len() {
-        return Some(devices.remove(audio_config.device));
+        return init_device(devices.remove(audio_config.device));
     }
 
     warn!("Configured audio device with index {} not found", audio_config.device);
     warn!("Using default audio device");
 
-    Some(devices.remove(0))
+    init_device(devices.remove(0))
 }

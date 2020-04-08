@@ -254,7 +254,7 @@ impl WidgetKind for MainMenu {
                 let (parent, window) = Widget::parent_mut::<MainMenu>(widget);
                 window.mode = Mode::Options;
                 let configs = window.display_configurations.clone();
-                let audio = window.audio_devices.clone();
+                let audio = window.audio_devices.iter().map(|d| d.name.to_string()).collect();
 
                 window.content = Widget::with_defaults(Options::new(configs, audio));
 

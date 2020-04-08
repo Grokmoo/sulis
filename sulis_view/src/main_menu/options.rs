@@ -22,8 +22,7 @@ use std::rc::Rc;
 
 use sulis_core::config::DisplayMode;
 use sulis_core::config::{self, Config, RawClick};
-use sulis_core::io::{event::ClickKind, keyboard_event::Key, DisplayConfiguration, InputAction,
-    AudioDeviceInfo};
+use sulis_core::io::{event::ClickKind, keyboard_event::Key, DisplayConfiguration, InputAction};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_core::widgets::{Button, Label, ScrollDirection, ScrollPane, TextArea};
 
@@ -54,7 +53,7 @@ pub struct Options {
 
     cur_crit_screen_shake: bool,
 
-    audio_devices: Vec<AudioDeviceInfo>,
+    audio_devices: Vec<String>,
     cur_audio_device: Option<usize>,
     master_volume: f32,
     music_volume: f32,
@@ -65,7 +64,7 @@ pub struct Options {
 impl Options {
     pub fn new(
         display_confs: Vec<DisplayConfiguration>,
-        audio_devices: Vec<AudioDeviceInfo>,
+        audio_devices: Vec<String>,
     ) -> Rc<RefCell<Options>> {
         let config = Config::get_clone();
         let mut cur_keybindings: Vec<_> = config
@@ -352,7 +351,7 @@ impl Options {
         let device_label = Widget::with_theme(Label::empty(), "device_label");
         let name = match self.cur_audio_device {
             None => "No Audio Device Detected",
-            Some(idx) => &self.audio_devices[idx].name,
+            Some(idx) => &self.audio_devices[idx],
         };
         device_label.borrow_mut().state.add_text_arg("device", name);
         let next_device = Widget::with_theme(Button::empty(), "next_device");

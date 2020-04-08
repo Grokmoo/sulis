@@ -84,7 +84,7 @@ fn load_resources() {
 fn main_menu(system: &mut System) -> NextGameStep {
     let view = main_menu::MainMenu::new(
         system.io().get_display_configurations(),
-        sulis_core::io::audio::get_audio_device_info(),
+        sulis_core::io::audio::get_audio_devices(),
     );
     let loop_updater = main_menu::LoopUpdater::new(&view);
     let root = ui::create_ui_tree(view.clone());

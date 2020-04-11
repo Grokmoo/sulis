@@ -12,6 +12,18 @@ sounds:
   ghostbreath:
     file: sfx/ghostbreath.ogg
     volume: 0.8
+  song_bad:
+    file: sfx/Day_1_v2.ogg
+    volume: 0.2
+  song_good:
+    file: sfx/hjm-glass_bell_1.ogg
+    volume: 0.7
+  song_neutral:
+    file: sfx/churchbell.ogg
+    volume: 0.2
+  guitar:
+    file: sfx/guitar-1.ogg
+    volume: 0.4
 groups:
   jute-dh-rpgsounds:
     prefix: sfx/jute-dh-rpgsounds/
@@ -230,3 +242,28 @@ groups:
       - roar3
       - roar4
       - roar5
+  jingleSounds_Kenney:
+    prefix: sfx/jingleSounds_Kenney/jingles_
+    postfix: ".ogg"
+    volume: 0.6
+    entries:
+      - PIZZA01
+      - PIZZA02
+      - PIZZA03
+      - PIZZA06
+      - PIZZA07
+      - PIZZA10
+      - PIZZA11
+      - PIZZA12
+      - PIZZA14
+      - PIZZA15
+      - SAX01
+      - SAX02
+      - SAX03
+      - SAX06
+      - SAX07
+      - SAX10
+      - SAX11
+      - SAX12
+      - SAX14
+      - SAX15

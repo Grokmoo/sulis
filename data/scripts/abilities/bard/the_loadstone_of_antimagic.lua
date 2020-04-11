@@ -33,6 +33,9 @@ function on_target_select(parent, ability, targets)
   gen:set_alpha(gen:param(1.0, -1.0))
   gen:activate()
   
+  game:play_sfx("sfx/PIZZA15")
+  game:play_sfx("sfx/song_bad")
+  
   local targets = targets:to_table()
   for i = 1, #targets do
     apply_effect(parent, ability, targets[i])

@@ -8,6 +8,9 @@ end
 
 function set_anim_color(anim)
   anim:set_color(anim:param(0.35), anim:param(0.4), anim:param(0.1), anim:param(0.5))
+  
+  game:play_sfx("sfx/guitar")
+  game:play_sfx("sfx/song_good")
 end
 
 function on_entered(parent, ability, targets)

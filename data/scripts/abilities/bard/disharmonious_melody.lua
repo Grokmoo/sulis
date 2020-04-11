@@ -42,6 +42,9 @@ function on_activate(parent, ability)
   effect:add_num_bonus("ap", -1 * game:ap_display_factor())
   effect:apply()
   
+  game:play_sfx("sfx/PIZZA01")
+  game:play_sfx("sfx/PIZZA02")
+  
   ability:activate(parent)
 end
 

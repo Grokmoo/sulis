@@ -34,6 +34,7 @@ function on_target_select(parent, ability, targets)
   gen:activate()
   
   ability:activate(parent)
+  game:play_sfx("sfx/rustle09")
 end
 
 function attack_target(parent, ability, targets)
@@ -66,4 +67,6 @@ function attack_target(parent, ability, targets)
                      anim:param(0.0))
   effect:add_color_anim(anim)
   effect:apply()
+  
+  game:play_sfx("sfx/water")
 end

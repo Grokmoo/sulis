@@ -24,6 +24,9 @@ function on_activate(parent, ability)
   ability:activate(parent)
   
   parent:add_ability("lightning_leap")
+  
+  game:play_sfx("sfx/warp3")
+  game:play_sfx("sfx/ElectricityDamage01")
 end
 
 function on_removed(parent)

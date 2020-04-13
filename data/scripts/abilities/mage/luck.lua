@@ -62,4 +62,6 @@ function apply_effect(parent, ability, targets)
   anim:set_color(anim:param(0.0), anim:param(1.0), anim:param(1.0), anim:param(0.5))
   effect:add_anim(anim)
   effect:apply()
+  
+  game:play_sfx("sfx/misc_02")
 end

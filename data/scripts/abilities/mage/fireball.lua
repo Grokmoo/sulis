@@ -36,6 +36,7 @@ function on_target_select(parent, ability, targets)
   gen:activate()
   
   ability:activate(parent)
+  game:play_sfx("sfx/spell")
 end
 
 function create_explosion(parent, ability, targets)
@@ -68,6 +69,8 @@ function create_explosion(parent, ability, targets)
   end
   
   gen:activate()
+  
+  game:play_sfx("sfx/fire_impact_1")
 end
 
 function attack_target(parent, ability, targets)

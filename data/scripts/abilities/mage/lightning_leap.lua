@@ -56,6 +56,9 @@ function on_target_select(parent, ability, targets)
   
   anim:activate()
   ability:activate(parent)
+  
+  game:play_sfx("sfx/warp")
+  game:play_sfx("sfx/ElectricityDamage02")
 end
 
 function attack_target(parent, ability, targets)

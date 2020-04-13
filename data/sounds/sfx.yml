@@ -267,3 +267,13 @@ groups:
       - SAX12
       - SAX14
       - SAX15
+  qubodupIceAndElectricity:
+    prefix:  sfx/qubodupIceAndElectricitySpells/qubodup
+    postfix: ".ogg"
+    volume: 0.6
+    entries:
+      - ElectricityDamage01
+      - ElectricityDamage02
+      - IceDamage01
+      - IceDamage02
+      - IceDamage03

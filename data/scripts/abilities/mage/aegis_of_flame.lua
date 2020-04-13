@@ -26,6 +26,8 @@ function on_target_select(parent, ability, targets)
   anim:activate()
   
   ability:activate(parent)
+  
+  game:play_sfx("sfx/fire")
 end
 
 function create_fire_surface(parent, ability, targets)
@@ -37,6 +39,8 @@ function create_fire_surface(parent, ability, targets)
   local points = targets:random_affected_points(0.7)
   
   fire_surface(parent, ability, points, 2)
+  
+  game:play_sfx("sfx/fire_impact_1")
 end
 
 function create_aegis_effect(parent, ability, target)

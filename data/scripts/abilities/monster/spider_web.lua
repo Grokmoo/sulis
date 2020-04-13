@@ -39,6 +39,8 @@ function on_target_select(parent, ability, targets)
   for i = 1, #targets do
 	web_target(parent, ability, targets[i])
   end
+  
+  game:play_sfx("sfx/spell")
 end
 
 function on_moved(parent, ability, targets)
@@ -81,4 +83,6 @@ function web_target(parent, ability, target)
   gen:set_particle_size_dist(gen:fixed_dist(1.0), gen:fixed_dist(1.0))
   effect:add_anim(gen)
   effect:apply()
+  
+  game:play_sfx("sfx/insect")
 end

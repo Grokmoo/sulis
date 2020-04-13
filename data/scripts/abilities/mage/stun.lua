@@ -33,4 +33,6 @@ function on_target_select(parent, ability, targets)
   gen:set_position(gen:param(-0.75), gen:param(-0.75))
   gen:set_particle_size_dist(gen:fixed_dist(1.5), gen:fixed_dist(1.5))
   gen:activate()
+  
+  game:play_sfx("sfx/curse4")
 end

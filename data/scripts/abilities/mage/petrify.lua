@@ -49,4 +49,6 @@ function on_target_select(parent, ability, targets)
                      anim:param(0.0))
   effect:add_color_anim(anim)
   effect:apply()
+  
+  game:play_sfx("sfx/curse4")
 end

@@ -25,4 +25,6 @@ function on_target_select(parent, ability, targets)
   gen:activate()
   
   ability:activate(parent)
+  
+  game:play_sfx("sfx/shot")
 end

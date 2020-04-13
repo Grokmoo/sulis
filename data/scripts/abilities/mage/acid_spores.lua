@@ -35,6 +35,8 @@ function on_target_select(parent, ability, targets)
 	
     gen:activate()
   end
+  
+  game:play_sfx("sfx/water")
 end
 
 function attack_target(parent, ability, targets)
@@ -78,6 +80,8 @@ function attack_target(parent, ability, targets)
   anim:set_particle_duration_dist(anim:fixed_dist(0.3))
   effect:add_anim(anim)
   effect:apply()
+  
+  game:play_sfx("sfx/freeze2")
 end
 
 function apply_damage(parent, ability, targets)

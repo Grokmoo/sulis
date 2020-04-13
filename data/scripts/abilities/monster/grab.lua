@@ -45,7 +45,12 @@ function create_grab_effect(parent, ability, targets, hit)
   local target = targets:first()
   
   if not target:is_valid() then return end
-  if hit:is_miss() then return end
+  if hit:is_miss() then
+    game:play_sfx("sfx/swish-1")
+    return
+  end
+  
+  game:play_sfx("sfx/thwack-10")
   
   local duration = ability:duration()
   if hit:is_graze() then

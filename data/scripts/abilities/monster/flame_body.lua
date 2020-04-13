@@ -8,6 +8,7 @@ function on_activate(parent, ability)
   effect:apply()
   
   ability:activate(parent)
+  game:play_sfx("sfx/explode3")
 end
 
 function on_parent_moved(parent, ability)

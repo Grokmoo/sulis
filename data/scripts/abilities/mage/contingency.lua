@@ -55,6 +55,8 @@ function create_contingency(parent, ability, targets, selection)
 
   effect:apply()
   ability:activate(parent)
+  
+  game:play_sfx("sfx/echo02")
 end
 
 function fire_contingency(parent, ability)
@@ -79,6 +81,8 @@ function fire_contingency(parent, ability)
 	  game:warn("Unable to fire contingency for " .. selection)
 	end
   end
+  
+  game:play_sfx("sfx/echo02")
 end
 
 function on_effect_applied(parent, ability, targets, effect)

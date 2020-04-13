@@ -5,7 +5,7 @@ description: |
   Spit acid on an opponent, dealing damage and sundering armor.
 active:
   script: "acid_spit"
-  group: "Fighter"
+  group: "Special"
   ap: 2000
   duration:
     Instant

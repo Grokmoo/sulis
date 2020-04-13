@@ -46,5 +46,7 @@ function on_target_select(parent, ability, targets)
   anim:set_particle_duration_dist(anim:fixed_dist(1.0))
   effect:add_anim(anim)
   effect:apply()
+  
+  game:play_sfx("sfx/magicfail")
 end
 

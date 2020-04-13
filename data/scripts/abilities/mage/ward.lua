@@ -28,6 +28,8 @@ function on_target_select(parent, ability, targets)
   gen:set_draw_below_entities()
   effect:add_anim(gen)
   effect:apply()
+  
+  game:play_sfx("sfx/enchant2")
 end
 
 function on_effect_applied(parent, ability, targets, effect)

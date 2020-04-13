@@ -26,6 +26,8 @@ function on_target_select(parent, ability, targets)
   anim:activate()
   
   ability:activate(parent)
+  
+  game:play_sfx("sfx/freeze2")
 end
 
 
@@ -34,6 +36,8 @@ function attack_targets(parent, ability, targets)
   for i = 1, #targets do
     attack_target(parent, ability, targets[i])
   end
+  
+  game:play_sfx("sfx/IceDamage01")
 end
 
 function attack_target(parent, ability, target)

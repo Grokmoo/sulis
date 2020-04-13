@@ -52,6 +52,8 @@ function on_target_select(parent, ability, targets)
   
   gen:activate()
   ability:activate(parent)
+  
+  game:play_sfx("sfx/flamethrower")
 end
 
 function attack_target(parent, ability, targets)

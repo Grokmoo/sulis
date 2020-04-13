@@ -18,6 +18,8 @@ function on_target_select(parent, ability, targets)
   parent:take_damage(parent, damage, damage, "Raw")
   
   ability:activate(parent)
+  
+  game:play_sfx("sfx/explode5")
 end
 
 function create_explosion(parent, ability, targets)

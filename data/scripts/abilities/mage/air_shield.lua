@@ -21,6 +21,8 @@ function on_activate(parent, ability)
   effect:apply()
 
   ability:activate(parent)
+  
+  game:play_sfx("sfx/short_wind_sound")
 end
 
 function before_defense(parent, ability, targets)

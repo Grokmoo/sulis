@@ -26,8 +26,7 @@ function on_target_select(parent, ability, targets)
     duration = duration * 3 / 2
   end
   
-  local max_dmg = 8 + stats.caster_level / 2
-  target:take_damage(parent, 4, max_dmg, "Acid", 5)
+  apply_damage(parent, ability, targets)
   
   local effect = target:create_effect(ability:name(), duration)
   effect:set_tag("weaken")
@@ -57,4 +56,5 @@ function apply_damage(parent, ability, targets)
   
   local max_dmg = 8 + stats.caster_level / 2
   target:take_damage(parent, 4, max_dmg, "Acid", 5)
+  game:play_sfx("sfx/splash")
 end

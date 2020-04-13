@@ -44,6 +44,8 @@ function on_position(parent, ability, targets)
   end
 
   ability:activate(parent)
+  
+  game:play_sfx("sfx/stones_03")
 end
 
 function on_removed(parent, ability)

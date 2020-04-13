@@ -34,6 +34,7 @@ function on_target_select(parent, ability, targets)
   gen:activate()
   
   ability:activate(parent)
+  game:play_sfx("sfx/spell")
 end
 
 function attack_target(parent, ability, targets)
@@ -52,4 +53,6 @@ function attack_target(parent, ability, targets)
     gen:dist_param(gen:uniform_dist(-0.2, 0.2), gen:uniform_dist(-5.0, 5.0), gen:fixed_dist(5.0)))
   gen:set_particle_duration_dist(gen:fixed_dist(0.6))
   gen:activate()
+  
+  game:play_sfx("sfx/explode5")
 end

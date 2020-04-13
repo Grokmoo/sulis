@@ -34,6 +34,8 @@ function on_target_select(parent, ability, targets)
   anim:activate()
   
   ability:activate(parent)
+  
+  game:play_sfx("sfx/explode3")
 end
 
 function create_random_anim(parent, ability, targets)

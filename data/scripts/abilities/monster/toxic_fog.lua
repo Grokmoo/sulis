@@ -36,6 +36,9 @@ function on_target_select(parent, ability, targets)
   s_anim:set_draw_above_entities()
   surface:add_anim(s_anim)
   surface:apply()
+  
+  game:play_sfx("sfx/wind2")
+  game:play_sfx("sfx/freeze")
 end
 
 function on_moved(parent, ability, targets)

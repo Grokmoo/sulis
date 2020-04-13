@@ -32,4 +32,6 @@ function on_target_select(parent, ability, targets)
   effect:apply()
   
   ability:activate(parent)
+  
+  game:play_sfx("sfx/water")
 end

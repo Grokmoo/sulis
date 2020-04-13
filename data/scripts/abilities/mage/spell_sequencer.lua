@@ -84,6 +84,8 @@ function create_sequencer(parent, ability, targets, selection)
   ability:activate(parent)
   
   parent:add_ability("activate_sequencer")
+  
+  game:play_sfx("sfx/atmos02")
 end
 
 function on_removed(parent)

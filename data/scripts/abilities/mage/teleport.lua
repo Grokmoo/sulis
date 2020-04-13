@@ -42,6 +42,8 @@ function on_position(parent, ability, targets, custom_target)
   
   anim:activate()
   ability:activate(parent)
+  
+  game:play_sfx("sfx/teleport")
 end
 
 function move_target(parent, ability, targets)

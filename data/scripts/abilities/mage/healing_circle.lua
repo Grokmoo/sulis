@@ -47,6 +47,8 @@ function on_target_select(parent, ability, targets)
   for i = 1, #targets do
 	targets[i]:heal_damage(amount)
   end
+  
+  game:play_sfx("sfx/healing_full")
 end
 
 function apply_heal(parent, ability, targets)
@@ -64,4 +66,6 @@ function apply_heal(parent, ability, targets)
   for i = 1, #targets do
 	targets[i]:heal_damage(amount)
   end
+  
+  game:play_sfx("sfx/healing_full")
 end

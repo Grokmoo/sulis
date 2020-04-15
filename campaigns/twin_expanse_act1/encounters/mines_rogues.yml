@@ -2,6 +2,7 @@ id: mines_rogues
 auto_spawn: false
 min_gen_actors: 0
 max_gen_actors: 0
+music: music/theme_battle02
 entries:
   - id: mines_rogue01
     always: true

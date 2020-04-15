@@ -8,6 +8,8 @@ explored_tile: gui/area_unexplored
 max_vis_distance: 16
 max_vis_up_one_distance: 6
 world_map_location: serpents_mire
+default_music: music/theme_battle01
+ambient_sound: music/ambient_swamp
 on_rest:
   Disabled:
     message: You cannot rest here.  There are too many enemies about.

@@ -8,6 +8,8 @@ explored_tile: gui/area_unexplored
 max_vis_distance: 20
 max_vis_up_one_distance: 6
 world_map_location: southern_desert
+default_music: music/theme_desert01
+ambient_sound: music/ambient_wind
 on_rest:
   FireScript:
     id: campaign

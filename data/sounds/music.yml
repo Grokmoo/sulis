@@ -79,6 +79,16 @@ sounds:
   theme_desert01:
     file: caravan.ogg
     loops: true
+    volume: 0.8
+    delay: 5.0
+  theme_desert02:
+    file: EasternArcticDubstep.ogg
+    loops: true
+    volume: 0.4
+    delay: 5.0
+  theme_cave01:
+    file: dark_caves.ogg
+    loops: true
     volume: 0.6
     delay: 5.0
   theme_battle01:

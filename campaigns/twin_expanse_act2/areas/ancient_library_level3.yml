@@ -8,9 +8,10 @@ explored_tile: gui/area_unexplored
 max_vis_distance: 12
 max_vis_up_one_distance: 6
 world_map_location: ancient_library
+ambient_sound: music/ambient_cave
 on_rest:
   Disabled:
-    message: "<PLACEHOLDER>"
+    message: There are too many enemies about.  You may not rest here.
 location_kind: Underground
 layers:
   - terrain_base

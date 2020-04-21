@@ -8,6 +8,8 @@ explored_tile: gui/area_unexplored
 max_vis_distance: 12
 max_vis_up_one_distance: 6
 world_map_location: moonmouth
+ambient_sound: music/ambient_cave
+default_music: music/theme_grasslands03
 on_rest:
   FireScript:
     id: campaign

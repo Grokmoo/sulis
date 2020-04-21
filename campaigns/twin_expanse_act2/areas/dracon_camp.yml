@@ -8,6 +8,8 @@ explored_tile: gui/area_unexplored
 max_vis_distance: 20
 max_vis_up_one_distance: 6
 world_map_location: dracon_camp
+default_music: music/theme_desert02
+ambient_sound: music/ambient_wind
 on_rest:
   Disabled:
     message: You cannot rest here.  Find an inn or temple.

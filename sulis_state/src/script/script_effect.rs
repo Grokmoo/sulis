@@ -118,7 +118,7 @@ impl UserData for ScriptMenuSelection {
 /// `melee_accuracy`, `ranged_accuracy`, `spell_accuracy`, `defense`, `fortitude`,
 /// `reflex`, `will`, `concealment`, `concealment_ignore`, `crit_chance`,
 /// `hit_threshold`, `graze_threshold`, `graze_multiplier`, `hit_multiplier`,
-/// `crit_multiplier`, `movement_rate`, `attack_cost`, `ability_ap_cost`,
+/// `crit_multiplier`, `movement_rate`, `move_anim_rate`, `attack_cost`, `ability_ap_cost`,
 /// `hidden`, `free_ability_group_use`, abilities_disabled`, `move_disabled`,
 /// `attack_disabled`, `flanked_immunity`, `sneak_attack_immunity`, `crit_immunity`
 ///
@@ -182,6 +182,7 @@ fn check_for_bonus(effect: &ScriptAppliedEffect, kind: String) -> bool {
         "hit_multiplier" => HitMultiplier(0.0),
         "crit_multiplier" => CritMultiplier(0.0),
         "movement_rate" => MovementRate(0.0),
+        "move_anim_rate" => MoveAnimRate(0.0),
         "attack_cost" => AttackCost(0),
         "caster_level" => CasterLevel(0),
         "flanking_angle" => FlankingAngle(0),
@@ -356,7 +357,7 @@ impl UserData for ScriptAppliedEffect {
 /// `melee_accuracy`, `ranged_accuracy`, `spell_accuracy`, `defense`, `fortitude`,
 /// `reflex`, `will`, `concealment`, `concealment_ignore`, `crit_chance`,
 /// `hit_threshold`, `graze_threshold`, `graze_multiplier`, `hit_multiplier`,
-/// `crit_multiplier`, `movement_rate`, `attack_cost`, `ability_ap_cost`,
+/// `crit_multiplier`, `movement_rate`, `move_anim_rate`, `attack_cost`, `ability_ap_cost`,
 /// `caster_level`, `flanking_angle`
 ///
 /// # `add_damage(min: Float, max: Float, ap: Float (Optional), when: String (Optional))`
@@ -804,6 +805,7 @@ fn add_num_bonus(
         "hit_multiplier" => HitMultiplier(amount),
         "crit_multiplier" => CritMultiplier(amount),
         "movement_rate" => MovementRate(amount),
+        "move_anim_rate" => MoveAnimRate(amount),
         "attack_cost" => AttackCost(amount_int),
         "caster_level" => CasterLevel(amount_int),
         "flanking_angle" => FlankingAngle(amount_int),

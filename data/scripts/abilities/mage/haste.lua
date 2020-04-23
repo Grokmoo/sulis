@@ -19,7 +19,8 @@ function on_target_select(parent, ability, targets)
   local stats = parent:stats()
   local amount = (2 + stats.intellect_bonus / 20) * game:ap_display_factor()
   effect:add_num_bonus("ap", amount)
-  
+  effect:add_num_bonus("move_anim_rate", 0.3)
+
   local gen = target:create_anim("haste")
   gen:set_moves_with_parent()
   gen:set_position(gen:param(-0.5), gen:param(-0.5))

@@ -179,7 +179,10 @@ pub(in crate::animation) fn cleanup(mover: &Rc<RefCell<EntityState>>, model: &mu
     }
 }
 
-pub fn new(mover: &Rc<RefCell<EntityState>>, path: Vec<Point>, frame_time_millis: u32) -> Anim {
+pub fn new(mover: &Rc<RefCell<EntityState>>, path: Vec<Point>, base_time_millis: u32) -> Anim {
+    let frame_time_millis = base_time_millis as f32 / mover.borrow().actor.stats.move_anim_rate;
+    let frame_time_millis = frame_time_millis.round() as u32;
+
     let mut smoothed_path = Vec::new();
     let mut prev2 = path[0];
     let mut prev = path[0];

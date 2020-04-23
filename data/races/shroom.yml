@@ -2,7 +2,8 @@ id: shroom
 name: Shroom
 description: "Monster"
 size: 2by2
-movement_rate: 0.5
+movement_rate: 0.4
+move_anim_rate: 0.7
 base_stats:
   - kind: { attribute: { attribute: Strength, amount: 1 } }
   - kind: { attribute: { attribute: Dexterity, amount: 3 } }

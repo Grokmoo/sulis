@@ -2,7 +2,7 @@ id: wolf
 name: Wolf
 description: "Monster"
 size: 2by2
-movement_rate: 1.3
+movement_rate: 1.0
 base_stats:
   - kind: { attribute: { attribute: Strength, amount: 1 } }
   - kind: { attribute: { attribute: Dexterity, amount: 3 } }

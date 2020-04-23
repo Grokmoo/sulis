@@ -35,6 +35,7 @@ pub struct Race {
     pub name: String,
     pub description: String,
     pub movement_rate: f32,
+    pub move_anim_rate: f32,
     pub pc_death_prop: Option<Rc<Prop>>,
     pub size: Rc<ObjectSize>,
     pub base_stats: BonusList,
@@ -140,6 +141,7 @@ impl Race {
             name: builder.name,
             description: builder.description,
             movement_rate: builder.movement_rate,
+            move_anim_rate: builder.move_anim_rate,
             size,
             disabled_slots: builder.disabled_slots,
             base_stats: builder.base_stats,
@@ -217,6 +219,8 @@ impl Race {
     }
 }
 
+fn float_1() -> f32 { 1.0 }
+
 #[derive(Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct RaceBuilder {
@@ -233,6 +237,9 @@ pub struct RaceBuilder {
     pub hair_selections: Option<Vec<String>>,
     pub beard_selections: Option<Vec<String>>,
     pub portrait_selections: Option<Vec<String>>,
+
+    #[serde(default="float_1")]
+    pub move_anim_rate: f32,
 
     #[serde(default)]
     pub default_images: HashMap<ImageLayer, String>,

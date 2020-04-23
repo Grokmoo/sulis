@@ -7,7 +7,7 @@ inline_race:
   name: Skeletal Dragon
   description: "Monster"
   size: 4by4
-  movement_rate: 1.2
+  movement_rate: 0.9
   base_stats:
     - kind: { attribute: { attribute: Strength, amount: 10 } }
     - kind: { attribute: { attribute: Dexterity, amount: -4 } }

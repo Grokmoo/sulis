@@ -2,7 +2,7 @@ id: skeleton
 name: Skeleton
 description: "Monster"
 size: 2by2
-movement_rate: 1.0
+movement_rate: 0.8
 base_stats:
   - kind: { attribute: { attribute: Strength, amount: 2 } }
   - kind: { attribute: { attribute: Endurance, amount: 2 } }

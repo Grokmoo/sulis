@@ -180,6 +180,7 @@ fn add_bonus(
             state.add_text_arg("graze_multiplier", &format!("{:.2}", amount))
         }
         MovementRate(amount) => state.add_text_arg("movement_rate", &format!("{:.2}", amount)),
+        MoveAnimRate(amount) => state.add_text_arg("move_anim_rate", &format!("{:.2}", amount)),
         CasterLevel(amount) => add(state, "caster_level", amount),
         AttackCost(amount) => {
             let cost = Module::rules().to_display_ap(*amount);

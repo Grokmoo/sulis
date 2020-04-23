@@ -8,7 +8,7 @@ inline_race:
   name: "Flameling"
   description: "Monster"
   size: 3by3
-  movement_rate: 0.8
+  movement_rate: 0.7
   base_stats:
     - kind: { attribute: { attribute: Strength, amount: 4 } }
     - kind: { attribute: { attribute: Dexterity, amount: 4 } }

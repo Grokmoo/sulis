@@ -2,7 +2,7 @@ id: forest_troll
 name: Forest Troll
 description: "Monster"
 size: 3by3
-movement_rate: 1.2
+movement_rate: 1.0
 base_stats:
   - kind: { attribute: { attribute: Strength, amount: 4 } }
   - kind: { attribute: { attribute: Endurance, amount: 4 } }

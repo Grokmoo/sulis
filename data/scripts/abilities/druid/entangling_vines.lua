@@ -17,7 +17,8 @@ function on_target_select(parent, ability, targets)
   local stats = parent:stats()
   local bonus = (10 + stats.caster_level / 2 + stats.wisdom_bonus / 4) * 0.03
   surface:add_num_bonus("movement_rate", -bonus)
-  
+  surface:add_num_bonus("move_anim_rate", -0.3)
+
   surface:set_squares_to_fire_on_moved(6)
   local cb = ability:create_callback(parent)
   cb:set_on_surface_round_elapsed_fn("on_round_elapsed")

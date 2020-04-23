@@ -1763,6 +1763,7 @@ fn create_stats_table<'a>(
     stats.set("hit_multiplier", src.hit_multiplier)?;
     stats.set("crit_multiplier", src.crit_multiplier)?;
     stats.set("movement_rate", src.movement_rate)?;
+    stats.set("move_anim_rate", src.move_anim_rate)?;
     stats.set("attack_cost", src.attack_cost)?;
 
     stats.set("is_hidden", src.hidden)?;

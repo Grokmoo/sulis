@@ -3,6 +3,7 @@ function on_activate(parent, ability)
   
   local stats = parent:stats()
   effect:add_num_bonus("movement_rate", 0.8 + stats.level / 30)
+  effect:add_num_bonus("move_anim_rate", 0.3)
   effect:add_num_bonus("reflex", 10 + stats.level / 2)
   effect:add_attribute_bonus("Dexterity", 4 + stats.level / 5)
 

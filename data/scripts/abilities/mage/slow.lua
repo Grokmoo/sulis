@@ -29,6 +29,7 @@ function on_target_select(parent, ability, targets)
   local effect = target:create_effect(ability:name(), ability:duration())
   effect:set_tag("slow")
   effect:add_num_bonus("ap", amount)
+  effect:add_num_bonus("move_anim_rate", -0.3)
   
   local gen = target:create_anim("slow")
   gen:set_moves_with_parent()

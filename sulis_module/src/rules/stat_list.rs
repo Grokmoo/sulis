@@ -70,6 +70,7 @@ pub struct StatList {
     pub hit_multiplier: f32,
     pub crit_multiplier: f32,
     pub movement_rate: f32,
+    pub move_anim_rate: f32,
     pub attack_cost: i32,
     pub move_disabled: bool,
     pub attack_disabled: bool,
@@ -124,6 +125,7 @@ impl StatList {
             hit_multiplier: 0.0,
             crit_multiplier: 0.0,
             movement_rate: 0.0,
+            move_anim_rate: 0.0,
             attack_cost: 0,
             move_disabled: false,
             attack_disabled: false,
@@ -368,6 +370,7 @@ impl StatList {
             HitMultiplier(amount) => self.hit_multiplier += amount * times_f32,
             GrazeMultiplier(amount) => self.graze_multiplier += amount * times_f32,
             MovementRate(amount) => self.movement_rate += amount * times_f32,
+            MoveAnimRate(amount) => self.move_anim_rate += amount * times_f32,
             AttackCost(amount) => self.attack_cost -= amount * times_i32,
             FlankingAngle(amount) => self.flanking_angle -= amount * times_i32,
             CasterLevel(amount) => self.caster_level += amount * times_i32,
@@ -519,6 +522,7 @@ impl StatList {
         self.hit_multiplier += 1.0;
         self.crit_multiplier += rules.crit_damage_multiplier;
         self.movement_rate += actor.race.movement_rate;
+        self.move_anim_rate += actor.race.move_anim_rate;
         self.attack_cost += rules.attack_ap as i32;
 
         let size_bonus = actor.race.size.diagonal / 2.0;

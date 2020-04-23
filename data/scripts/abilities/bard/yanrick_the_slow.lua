@@ -48,6 +48,7 @@ function apply_effect(parent, ability, target)
   
   local effect = target:create_effect(ability:name(), ability:duration())
   effect:add_num_bonus("movement_rate", -amount / 25)
+  effect:add_num_bonus("move_anim_rate", -0.1)
 
   local anim = target:create_anim("slow")
   anim:set_moves_with_parent()

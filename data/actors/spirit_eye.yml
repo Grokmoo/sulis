@@ -7,7 +7,7 @@ inline_race:
   name: Spirit Eye
   description: "Monster"
   size: 1by1
-  movement_rate: 0.4
+  movement_rate: 0.6
   base_stats:
     - kind: { hit_points: 20 }
     - kind: { hidden }

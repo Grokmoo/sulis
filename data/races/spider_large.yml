@@ -2,7 +2,7 @@ id: spider_large
 name: Spider
 description: "Monster"
 size: 3by3
-movement_rate: 1.0
+movement_rate: 0.7
 base_stats:
   - kind: { attribute: { attribute: Strength, amount: 3 } }
   - kind: { attribute: { attribute: Dexterity, amount: 4 } }

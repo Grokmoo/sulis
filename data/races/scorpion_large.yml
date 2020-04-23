@@ -2,7 +2,8 @@ id: scorpion_large
 name: Scorpion
 description: "Monster"
 size: 3by3
-movement_rate: 1.0
+movement_rate: 0.7
+move_anim_rate: 0.9
 base_stats:
   - kind: { attribute: { attribute: Strength, amount: 3 } }
   - kind: { attribute: { attribute: Dexterity, amount: 4 } }

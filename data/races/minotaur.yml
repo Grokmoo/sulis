@@ -2,7 +2,7 @@ id: minotaur
 name: Minotaur
 description: "Monster"
 size: 3by3
-movement_rate: 1.2
+movement_rate: 1.0
 base_stats:
   - kind: { attribute: { attribute: Strength, amount: 10 } }
   - kind: { attribute: { attribute: Dexterity, amount: 1 } }

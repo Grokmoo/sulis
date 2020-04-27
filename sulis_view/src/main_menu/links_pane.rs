@@ -18,8 +18,6 @@ use std::any::Any;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use open;
-
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_core::widgets::{Button, Label};
 

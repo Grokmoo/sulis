@@ -38,7 +38,6 @@ use log::LevelFilter;
 use flexi_logger::{opt_format, Duplicate, Logger, LogSpecBuilder};
 use rand::{self, distributions::uniform::SampleUniform, seq::SliceRandom, Rng};
 use rand_pcg::Pcg64Mcg;
-use serde_yaml;
 
 use crate::config::{self, Config};
 use crate::io::{Audio, MainLoopUpdater, System};

@@ -28,9 +28,6 @@ use log::{Level, LevelFilter};
 use crate::io::keyboard_event::Key;
 use crate::io::{event::ClickKind, InputAction, KeyboardEvent};
 
-use dirs;
-use serde_yaml;
-
 thread_local! {
     static CONFIG: RefCell<Config> = RefCell::new(Config::init());
     static OLD_CONFIG: RefCell<Option<Config>> = RefCell::new(None);

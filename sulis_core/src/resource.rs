@@ -45,7 +45,6 @@ use std::path::PathBuf;
 use std::rc::Rc;
 
 use serde::{de, Deserialize, Deserializer};
-use serde_yaml;
 
 use crate::config::Config;
 use crate::io::SoundSource;

@@ -17,8 +17,6 @@
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use rlua;
-
 use crate::script::script_callback;
 use crate::{animation::Anim, EntityState, GameState, Script};
 use sulis_core::config::Config;

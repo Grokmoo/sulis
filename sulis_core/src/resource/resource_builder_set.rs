@@ -20,10 +20,6 @@ use std::fs::{self, File};
 use std::io::{Error, Read};
 use std::path::{Path, PathBuf};
 
-use serde;
-use serde_json;
-use serde_yaml;
-
 use crate::image::animated_image::AnimatedImageBuilder;
 use crate::image::composed_image::ComposedImageBuilder;
 use crate::image::simple_image::SimpleImageBuilder;

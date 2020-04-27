@@ -97,7 +97,6 @@ pub use self::script_subpos_animation::ScriptSubposAnimation;
 pub mod targeter;
 pub use self::targeter::TargeterData;
 
-use std;
 use std::cell::{Cell, RefCell};
 use std::rc::Rc;
 use std::sync::{Arc, Mutex};

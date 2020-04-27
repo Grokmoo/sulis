@@ -590,6 +590,39 @@ themes:
             children:
               title:
                 text: "Ambient Volume"
+          scroll_to_active_content:
+            from: options_window.content_sub_content
+            relative:
+              x: Center
+            size: [50, 8]
+            position: [0, 40]
+            children:
+              label:
+                from: label
+                kind: Label
+                text: "Scroll to Active"
+                text_params:
+                  scale: 6
+                relative:
+                  x: Zero
+                size: [32, 6]
+              on:
+                from: button
+                text: "On"
+                relative:
+                  x: Max
+                size: [8, 6]
+                custom:
+                  tooltip: "Scroll to the active character in combat."
+              off:
+                from: button
+                text: "Off"
+                relative:
+                  x: Max
+                size: [8, 6]
+                position: [-9, 0]
+                custom:
+                  tooltip: "Disable scrolling to the active character in combat."
           screen_shake_content:
             from: options_window.content_sub_content
             relative:

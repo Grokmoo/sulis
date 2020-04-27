@@ -179,6 +179,10 @@ impl Config {
         CONFIG.with(|c| c.borrow().input.crit_screen_shake)
     }
 
+    pub fn scroll_to_active() -> bool {
+        CONFIG.with(|c| c.borrow().display.scroll_to_active)
+    }
+
     pub fn bench_log_level() -> Level {
         CONFIG.with(|c| c.borrow().logging.bench_log_level)
     }
@@ -279,6 +283,7 @@ pub struct DisplayConfig {
     pub height_pixels: u32,
     pub default_font: String,
     pub default_cursor: String,
+    pub scroll_to_active: bool,
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone, Copy)]

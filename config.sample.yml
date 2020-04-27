@@ -2,7 +2,7 @@
 # The main game configuration file.  User preferences are set here.
 
 # If the user has an old revision, their config is automatically recreated from the sample.
-revision: 16
+revision: 18
 
 display:
     # Display Adapter - Glium is the only choice for now
@@ -42,6 +42,9 @@ display:
 
     # The default mouse pointer
     default_cursor: mouse
+    
+    # whether to automatically scroll to the active character in combat
+    scroll_to_active: true
 
 audio:
   # which audio device to output on, starting from 0

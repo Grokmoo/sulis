@@ -20,8 +20,8 @@ use std::rc::Rc;
 
 use crate::script::{CallbackData, FuncKind, TriggeredCallback};
 use crate::{AreaState, ChangeListener, ChangeListenerList, Effect, EntityState, GameState};
-use sulis_core::util::{gen_rand, Point};
-use sulis_module::{Faction, Module, Time, ROUND_TIME_MILLIS};
+use sulis_core::{config::Config, util::{gen_rand, Point}};
+use sulis_module::{Faction, Module, Time, ROUND_TIME_MILLIS, OnTrigger};
 
 fn add_campaign_elapsed_callback(cbs: &mut Vec<Rc<CallbackData>>) {
     let script_data = match Module::campaign().on_round_elapsed_script {
@@ -416,6 +416,15 @@ impl TurnManager {
         } else {
             GameState::clear_selected_party_member();
             area_state.range_indicators().remove_attack();
+        }
+
+        if Config::scroll_to_active() {
+            let (x, y) = {
+                let loc = &current.borrow().location;
+                (loc.x, loc.y)
+            };
+            let cb = OnTrigger::ScrollView(x, y);
+            GameState::add_ui_callback(vec![cb], &current, &current);
         }
 
         let mut current = current.borrow_mut();

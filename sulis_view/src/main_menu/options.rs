@@ -52,6 +52,7 @@ pub struct Options {
     cur_click_actions: Vec<(RawClick, ClickKind)>,
 
     cur_crit_screen_shake: bool,
+    cur_scroll_to_active: bool,
 
     audio_devices: Vec<String>,
     cur_audio_device: Option<usize>,
@@ -114,6 +115,7 @@ impl Options {
             cur_click_actions,
 
             cur_crit_screen_shake: config.input.crit_screen_shake,
+            cur_scroll_to_active: config.display.scroll_to_active,
 
             audio_devices,
             cur_audio_device,
@@ -164,6 +166,7 @@ impl Options {
         }
 
         config.input.crit_screen_shake = self.cur_crit_screen_shake;
+        config.display.scroll_to_active = self.cur_scroll_to_active;
 
         config.audio.device = self.cur_audio_device.unwrap_or(0);
         config.audio.master_volume = self.master_volume;
@@ -458,6 +461,29 @@ impl Options {
         Widget::add_child_to(&screen_shake_content, screen_shake_on);
         Widget::add_child_to(&screen_shake_content, screen_shake_off);
 
+        let scroll_to_active_on = Widget::with_theme(Button::empty(), "on");
+        scroll_to_active_on.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
+            let (parent, options) = Widget::parent_mut::<Options>(widget);
+            options.cur_scroll_to_active = true;
+            parent.borrow_mut().invalidate_children();
+        })));
+
+        let scroll_to_active_off = Widget::with_theme(Button::empty(), "off");
+        scroll_to_active_off.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
+            let (parent, options) = Widget::parent_mut::<Options>(widget);
+            options.cur_scroll_to_active = false;
+            parent.borrow_mut().invalidate_children();
+        })));
+        if self.cur_scroll_to_active {
+            scroll_to_active_on.borrow_mut().state.set_active(true);
+        } else {
+            scroll_to_active_off.borrow_mut().state.set_active(true);
+        }
+
+        let scroll_to_active_content = Widget::empty("scroll_to_active_content");
+        Widget::add_child_to(&scroll_to_active_content, scroll_to_active_on);
+        Widget::add_child_to(&scroll_to_active_content, scroll_to_active_off);
+
         let zoom_content = Widget::empty("default_zoom_content");
         let mut zoom_found = false;
         for zoom in DEFAULT_ZOOMS.iter() {
@@ -525,6 +551,7 @@ impl Options {
             anim_speed_title,
             anim_speed_content,
             zoom_content,
+            scroll_to_active_content,
         ]
     }
 

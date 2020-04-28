@@ -136,6 +136,7 @@ nodes:
       - text: "I'm not sure how helpful that is.  We don't even know how to get back to Rose Lake."
         to: blazing_road01
       - text: "I suppose we will have to try.  But, how to return to Rose Lake?"
+        to: blazing_road01
   blazing_road01:
     text: |
       [c=6868FF|#target_name#] - I believe I can provide more concrete help there.

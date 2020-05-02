@@ -186,23 +186,23 @@ impl WidgetKind for LoadWindow {
 
         for (index, ref meta) in self.entries.iter().enumerate() {
             let text_area = Widget::with_defaults(TextArea::empty());
-            text_area
-                .borrow_mut()
-                .state
-                .add_text_arg("player_name", &meta.player_name);
-            text_area
-                .borrow_mut()
-                .state
-                .add_text_arg("datetime", &meta.datetime);
-            text_area
-                .borrow_mut()
-                .state
-                .add_text_arg("current_area_name", &meta.current_area_name);
-            if meta.error.is_some() {
-                text_area
-                    .borrow_mut()
-                    .state
-                    .add_text_arg("error", &meta.error.as_ref().unwrap());
+            {
+                let area = &mut text_area.borrow_mut().state;
+                area.add_text_arg("player_name", &meta.player_name);
+                area.add_text_arg("datetime", &meta.datetime);
+                area.add_text_arg("current_area_name", &meta.current_area_name);
+
+                if let Some(level) = meta.level {
+                    area.add_text_arg("level", &format!("{}", level));
+                }
+
+                if let Some(class) = &meta.class {
+                    area.add_text_arg("class", class);
+                }
+
+                if let Some(error) = &meta.error {
+                    area.add_text_arg("error", error);
+                }
             }
 
             let widget = Widget::with_theme(Button::empty(), "entry");

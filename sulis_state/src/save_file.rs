@@ -49,6 +49,10 @@ impl SaveFile {
 #[serde(deny_unknown_fields)]
 pub struct SaveFileMetaData {
     pub player_name: String,
+
+    pub level: Option<u32>,
+    pub class: Option<String>,
+
     pub datetime: String,
     pub current_area_name: String,
 
@@ -127,6 +131,8 @@ fn create_meta_data(datetime: String) -> SaveFileMetaData {
 
     SaveFileMetaData {
         player_name: player.actor.actor.name.to_string(),
+        level: Some(player.actor.actor.total_level),
+        class: Some(player.actor.actor.base_class().name.to_string()),
         datetime,
         current_area_name: cur_area.area.area.name.to_string(),
         path: Default::default(),
@@ -204,6 +210,8 @@ fn create_error_meta(path: PathBuf, error: Error) -> SaveFileMetaData {
 
     SaveFileMetaData {
         player_name: "Unknown Player".to_string(),
+        level: None,
+        class: None,
         datetime,
         current_area_name: "Unknown Area".to_string(),
         path,

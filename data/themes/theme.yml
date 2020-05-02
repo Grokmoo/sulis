@@ -1170,13 +1170,13 @@ themes:
               font: "normal"
               scale: 6.0
             text: |
-              [?name|[s=8|#name# - #race# #sex#]
-              [s=6|Level #level_0# #class_0#]
-              [s=4|]
+              [?name|[s=8|#name#] [s=6|- Level #level_0# #class_0#]
+              [s=6|#race#]
+              [s=3|]
               [s=6|[x=0|Hit Points][x=30|Experience]]
               [x=0|#cur_hp# / #max_hp#][x=30|#cur_xp# / #next_xp#]
               
-              [?0_damage_min;s=6;x=0;y=25|Main Hand]
+              [?0_damage_min;s=6;x=0;y=24|Main Hand]
               [?0_damage_min;s=5;x=0|Damage: #0_damage_min# to #0_damage_max#
               ][?0_armor_penetration;s=5;x=0|Armor Pen: #0_armor_penetration#
               ][?0_melee_accuracy;s=5;x=0|Accuracy: #0_melee_accuracy#
@@ -1189,7 +1189,7 @@ themes:
               ][?0_hit_multiplier;s=5;x=0|Hit Multiplier: #0_hit_multiplier#
               ][?0_graze_multiplier;s=5;x=0|Graze Multiplier: #0_graze_multiplier#]
       
-              [?1_damage_min;s=6;x=35;y=25|Off Hand]
+              [?1_damage_min;s=6;x=35;y=24|Off Hand]
               [?1_damage_min;s=5;x=35|Damage: #1_damage_min# to #1_damage_max#
               ][?1_armor_penetration;s=5;x=35|Armor Pen: #1_armor_penetration#
               ][?1_melee_accuracy;s=5;x=35|Accuracy: #1_melee_accuracy#
@@ -1201,20 +1201,20 @@ themes:
               ][?1_crit_multiplier;s=5;x=35|Crit Multiplier: #1_crit_multiplier#
               ][?1_hit_multiplier;s=5;x=35|Hit Multiplier: #1_hit_multiplier#
               ][?1_graze_multiplier;s=5;x=35|Graze Multiplier: #1_graze_multiplier#]
-              [s=6;x=0;y=46|Accuracy]
+              [s=6;x=0;y=44|Accuracy]
               [s=5|[x=0|Melee: #melee_accuracy#][x=28|Ranged: #ranged_accuracy#][x=56|Spell: #spell_accuracy#]]
               [s=4|
               ][s=6.0;x=0|Armor: #armor#][?armor_slashing;s=5.0| (Slashing: #armor_slashing#)][?armor_piercing;s=5.0| (Piercing: #armor_piercing#)][?armor_crushing;s=5.0| (Crushing: #armor_crushing#)][?armor_acid;s=5.0| (Acid: #armor_acid#)][?armor_cold;s=5.0| (Cold: #armor_cold#)][?armor_shock;s=5.0| (Shock: #armor_shock#)][?armor_fire;s=5.0| (Fire: #armor_fire#)]
               [s=5|[x=0|Defense: #defense#][x=28|Fortitude: #fortitude#][x=56|Reflex: #reflex#][x=84|Will: #will#]]
               [s=4|
-              ][s=6;y=70|[x=0|Strength][r=30|#str#]
+              ][s=6;y=68|[x=0|Strength][r=30|#str#]
                    [x=0|Dexterity][r=30|#dex#]
                    [x=0|Endurance][r=30|#end#]
                    [x=0|Perception][r=30|#per#]
                    [x=0|Intellect][r=30|#int#]
                    [x=0|Wisdom][r=30|#wis#]]
               
-              [y=70;x=60;s=5|Range[x=90|#range#]]
+              [y=67;x=60;s=5|Range[x=90|#range#]]
               [x=60;s=5|Caster level[x=90|#caster_level#]]
               [x=60;s=5|Initiative[x=90|#initiative#]]
               [x=60;s=5|Movement Rate[x=90|#movement_rate#]]
@@ -1222,10 +1222,11 @@ themes:
               [x=60;s=5|Concealment[x=90|#concealment#]]
               [x=60;s=5|Concealment Ignore[x=90|#concealment_ignore#]]
               
-              [y=100;x=0|Graze][x=20|Hit][x=40|Crit]
+              [y=96;x=0|Graze][x=20|Hit][x=40|Crit]
               [x=0|#graze_threshold# / x#graze_multiplier#][x=20|#hit_threshold# / x#hit_multiplier#][x=40|#crit_chance#% /  x#crit_multiplier#]
       
-              [y=110;s=6|Resistances ][s=5|[?resistance_slashing|(Slashing: #resistance_slashing#%) ][?resistance_piercing|(Piercing: #resistance_piercing#%) ][?resistance_crushing|(Crushing: #resistance_crushing#%) ][?resistance_acid|(Acid: #resistance_acid#%) ][?resistance_cold|(Cold: #resistance_cold#%) ][?resistance_shock|(Shock: #resistance_shock#%) ][?resistance_fire|(Fire: #resistance_fire#%) ]]
+              [y=107;s=6|Resistances ]
+              [s=5|[?resistance_slashing|(Slashing: #resistance_slashing#%) ][?resistance_piercing|(Piercing: #resistance_piercing#%) ][?resistance_crushing|(Crushing: #resistance_crushing#%) ][?resistance_acid|(Acid: #resistance_acid#%) ][?resistance_cold|(Cold: #resistance_cold#%) ][?resistance_shock|(Shock: #resistance_shock#%) ][?resistance_fire|(Fire: #resistance_fire#%) ]]
               
               [?portrait;x=64;y=-3;i=#portrait#;s=40.0|]
               [?portrait;x=64;y=-3;i=portraits/frame;s=40.0|]]
@@ -1515,7 +1516,7 @@ themes:
         from: load_window_base
         background: bg_large
         border: { top: 6, bottom: 8, left: 6, right: 6 }
-        size: [120, 118]
+        size: [130, 118]
         relative:
           x: Center
           y: Center

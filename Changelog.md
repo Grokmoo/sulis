@@ -5,6 +5,35 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html) is used with major version changes for breaking save game and data format compatibility.
 
+## [0.5.0] - 2020-05-05
+
+### Added
+- Full audio support for all areas, actions, and abilities.  Includes music and various sound effects.
+- Players and enemies can now move through their allies during combat, as long as they end up in a valid spot
+- Critical hit screen shake feature.  Can be disabled in Options.
+- Scroll to the active character in combat.  Can be disabled in Options.
+- The AI can now make use of almost all spells and abilities in an intelligent manner
+- Show the player's level and class for all newly created save files
+
+### Changed
+- Balanced movement rate and movement animation speed for various monsters
+- Modal abilities now enable and disable in a more intuitive way
+- Script triggers may now fire multiple times if desired
+- Default keybindings were changed to be less surprising for some players
+- Reorganized the character sheet
+- Improved logging and built in benchmarking 
+- A large amount of internal code cleanup was done to bring things a bit closer to Rust best practices
+
+### Fixed
+- Fixed specific cases and added a general timeout to prevent combat becoming stuck on an AI turn
+- Fix a case where procedural gen could create an unreachable room
+- Prevent the player from leaving a targeter open when ending their turn
+- Improved animation for move backs when movement almost ended on an invalid square
+- An instance where the party was placed in the wrong location when moving between areas
+- Prevent the player from gaining information on unexplored areas with the mouseover
+- A rare crash that could occur when the mouse went out of screen bounds
+- Some typos and issues in conversations and descriptive text
+
 ## [0.4.0] - 2020-02-14
 
 ### Added

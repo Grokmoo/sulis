@@ -34,7 +34,7 @@ Note that Running with release mode is recommended.  The compilation process tak
 
 ## Troubleshooting
 
-If you encounter build errors on Linux, please see the recently changed Prerequisites above.
+If you encounter build errors on Linux, please check the Prerequisites section above first.
 
 Please check the [Issue Tracker](https://github.com/Grokmoo/sulis/issues) for known bugs.  You can [create an issue](https://github.com/Grokmoo/sulis/issues/new).  Please leave as much information as you can, including logs from your sulis user folder /log directory
 

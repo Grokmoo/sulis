@@ -1,6 +1,6 @@
 [package]
 name = "sulis"
-version = "0.4.0"
+version = "0.5.0"
 authors = ["Jared Stephen <grok_moo@yahoo.com>"]
 license = "GPLv3"
 description = "An RPG with Turn Based Combat"

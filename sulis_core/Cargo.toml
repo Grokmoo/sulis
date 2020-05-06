@@ -1,6 +1,6 @@
 [package]
 name = "sulis_core"
-version = "0.4.0"
+version = "0.5.0"
 authors = ["Jared Stephen <grok_moo@yahoo.com>"]
 edition = "2018"
 
@@ -8,7 +8,7 @@ edition = "2018"
 dirs = "2.0"
 backtrace = "0.3"
 flexi_logger = "0.15"
-image = "0.22"
+image = "0.23"
 glium = "0.25"
 lazy_static = "1.4"
 log = { version = "0.4", features = [ "serde" ] }
@@ -19,4 +19,4 @@ serde_derive = "1.0"
 serde_yaml = "0.8"
 serde_json = "1.0"
 rlua = "0.17"
-rodio = { version = "0.10", features = [ "vorbis" ] }
+rodio = { version = "0.11", features = [ "vorbis" ] }

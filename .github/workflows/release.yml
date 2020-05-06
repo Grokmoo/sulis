@@ -44,7 +44,9 @@ jobs:
             extension: '.exe'
     steps:
       - name: Install ALSA Dev
-        run: sudo apt-get install libasound2-dev
+        run: |
+          sudo apt-get update
+          sudo apt-get install libasound2-dev
       - name: Get the version
         id: get_version
         run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}

@@ -24,10 +24,17 @@ use crate::io::keyboard_event::Key;
 use crate::io::*;
 use crate::resource::ResourceSet;
 use crate::ui::{Cursor, Widget};
-use crate::util::{self, Point};
+use crate::util::{Point};
 
 use glium::backend::Facade;
-use glium::glutin::{ContextBuilder, VirtualKeyCode};
+use glium::glutin::{
+    ContextBuilder,
+    dpi::{LogicalSize, LogicalPosition},
+    event::{Event, KeyboardInput, MouseButton, WindowEvent, VirtualKeyCode, ElementState, MouseScrollDelta},
+    event_loop::{ControlFlow, EventLoop},
+    monitor::MonitorHandle,
+    window::{Fullscreen, WindowBuilder},
+};
 use glium::texture::{RawImage2d, SrgbTexture2d};
 use glium::uniforms::{MagnifySamplerFilter, MinifySamplerFilter, Sampler};
 use glium::{self, glutin, CapabilitiesSource, Rect, Surface};
@@ -98,12 +105,12 @@ const SWAP_FRAGMENT_SHADER_SRC: &str = r#"
 
 pub struct GliumDisplay {
     display: glium::Display,
-    events_loop: glium::glutin::EventsLoop,
+    events_loop: EventLoop<()>,
     base_program: glium::Program,
     swap_program: glium::Program,
     matrix: [[f32; 4]; 4],
     textures: HashMap<String, GliumTexture>,
-    hidpi_factor: f64,
+    scale_factor: f64,
 }
 
 struct GliumTexture {
@@ -115,7 +122,7 @@ pub struct GliumRenderer<'a> {
     target: &'a mut glium::Frame,
     display: &'a mut GliumDisplay,
     params: glium::DrawParameters<'a>,
-    hidpi_factor: f64,
+    scale_factor: f64,
 }
 
 impl<'a> GliumRenderer<'a> {
@@ -128,12 +135,12 @@ impl<'a> GliumRenderer<'a> {
             ..Default::default()
         };
 
-        let hidpi_factor = display.hidpi_factor;
+        let scale_factor = display.scale_factor;
         GliumRenderer {
             target,
             display,
             params,
-            hidpi_factor,
+            scale_factor,
         }
     }
 
@@ -203,16 +210,10 @@ fn draw_to_surface<T: glium::Surface>(
 
 impl<'a> GraphicsRenderer for GliumRenderer<'a> {
     fn set_scissor(&mut self, pos: Point, size: Size) {
-        let window_size = match self.display.display.gl_window().window().get_inner_size() {
-            None => {
-                error!("Unable to query display size");
-                return;
-            }
-            Some(size) => size,
-        };
+        let window_size = self.display.display.gl_window().window().inner_size();
         let (res_x, res_y) = Config::ui_size();
-        let scale_x = self.hidpi_factor * window_size.width / res_x as f64;
-        let scale_y = self.hidpi_factor * window_size.height / res_y as f64;
+        let scale_x = self.scale_factor * window_size.width as f64 / res_x as f64;
+        let scale_y = self.scale_factor * window_size.height as f64 / res_y as f64;
 
         let rect = glium::Rect {
             left: (pos.x as f64 * scale_x) as u32,
@@ -309,35 +310,55 @@ fn glium_error<E: ::std::fmt::Display>(e: E) -> Result<GliumDisplay, Error> {
     Err(Error::new(ErrorKind::Other, format!("{}", e)))
 }
 
-fn get_monitor(events_loop: &glium::glutin::EventsLoop) -> Option<glium::glutin::MonitorId> {
+fn get_monitor(events_loop: &EventLoop<()>) -> MonitorHandle {
     let target_monitor = Config::monitor();
-    for (index, monitor) in events_loop.get_available_monitors().enumerate() {
+    for (index, monitor) in events_loop.available_monitors().enumerate() {
         if index == target_monitor {
-            return Some(monitor);
+            return monitor;
         }
     }
     warn!(
         "Unable to find a monitor with configured index {}",
         target_monitor
     );
-    None
+
+    events_loop.primary_monitor()
 }
 
 fn try_get_display(
-    events_loop: &glium::glutin::EventsLoop,
-    monitor: Option<glium::glutin::MonitorId>,
+    events_loop: &EventLoop<()>,
+    monitor: MonitorHandle,
 ) -> Result<glium::Display, glium::backend::glutin::DisplayCreationError> {
+    let (res_x, res_y) = Config::display_resolution();
+
     let (fullscreen, decorations) = match Config::display_mode() {
         DisplayMode::Window => (None, true),
-        DisplayMode::BorderlessWindow => (None, false),
-        DisplayMode::Fullscreen => (monitor, false),
+        DisplayMode::BorderlessWindow => (Some(Fullscreen::Borderless(monitor)), false),
+        DisplayMode::Fullscreen => {
+            let mut selected_mode = None;
+            for mode in monitor.video_modes() {
+                let (mx, my): (u32, u32) = mode.size().into();
+
+                if mx == res_x && my == res_y {
+                    selected_mode = Some(mode);
+                    break;
+                }
+            }
+            match selected_mode {
+                None => {
+                    warn!("Unable to find a fullscreen video mode matching {} by {}", res_x, res_y);
+                    warn!("Falling back to windowed mode.");
+                    (None, false)
+                },
+                Some(mode) => (Some(Fullscreen::Exclusive(mode)), false),
+            }
+        }
     };
 
-    let (res_x, res_y) = Config::display_resolution();
     let dims = glutin::dpi::LogicalSize::new(res_x as f64, res_y as f64);
 
-    let window = glium::glutin::WindowBuilder::new()
-        .with_dimensions(dims)
+    let window = WindowBuilder::new()
+        .with_inner_size(dims)
         .with_title("Sulis")
         .with_decorations(decorations)
         .with_fullscreen(fullscreen.clone());
@@ -351,8 +372,8 @@ fn try_get_display(
         }
     };
 
-    let window = glium::glutin::WindowBuilder::new()
-        .with_dimensions(dims)
+    let window = WindowBuilder::new()
+        .with_inner_size(dims)
         .with_title("Sulis")
         .with_decorations(decorations)
         .with_fullscreen(fullscreen);
@@ -366,7 +387,7 @@ fn try_get_display(
 impl GliumDisplay {
     pub fn new() -> Result<GliumDisplay, Error> {
         debug!("Initialize Glium Display adapter.");
-        let events_loop = glium::glutin::EventsLoop::new();
+        let events_loop = EventLoop::new();
         let monitor = get_monitor(&events_loop);
 
         let display = match try_get_display(&events_loop, monitor.clone()) {
@@ -374,17 +395,13 @@ impl GliumDisplay {
             Err(e) => return glium_error(e),
         };
 
-        let mut hidpi_factor = 1.0;
-
-        if let Some(ref monitor) = monitor {
-            let physical_position = monitor.get_position();
-            // TODO this doesn't work if you have monitors with different hidpi factors
-            // would be very hard to solve in the general case, maybe just allow a configured
-            // logical position
-            let logical_position = physical_position.to_logical(monitor.get_hidpi_factor());
-            display.gl_window().window().set_position(logical_position);
-            hidpi_factor = monitor.get_hidpi_factor();
-        }
+        let scale_factor = monitor.scale_factor();
+        let physical_position = monitor.position();
+        // TODO this doesn't work if you have monitors with different hidpi factors
+        // would be very hard to solve in the general case, maybe just allow a configured
+        // logical position
+        let logical_position: LogicalPosition<f64> = physical_position.to_logical(scale_factor);
+        display.gl_window().window().set_outer_position(logical_position);
 
         info!("Initialized glium adapter:");
         info!("Version: {}", display.get_opengl_version_string());
@@ -401,7 +418,7 @@ impl GliumDisplay {
             display.get_context().get_capabilities()
         );
 
-        info!("Using hi dpi factor: {}", hidpi_factor);
+        info!("Using hi dpi scale factor: {}", scale_factor);
 
         let base_program = match glium::Program::from_source(
             &display,
@@ -423,7 +440,7 @@ impl GliumDisplay {
             Err(e) => return glium_error(e),
         };
 
-        display.gl_window().window().hide_cursor(true);
+        display.gl_window().window().set_cursor_visible(false);
 
         let (ui_x, ui_y) = Config::ui_size();
 
@@ -439,7 +456,7 @@ impl GliumDisplay {
                 [-1.0, -1.0, 0.0, 1.0f32],
             ],
             textures: HashMap::new(),
-            hidpi_factor,
+            scale_factor,
         })
     }
 }
@@ -459,13 +476,12 @@ impl IO for GliumDisplay {
     fn get_display_configurations(&self) -> Vec<DisplayConfiguration> {
         let mut configs = Vec::new();
 
-        for (index, monitor_id) in self.events_loop.get_available_monitors().enumerate() {
+        for (index, monitor_id) in self.events_loop.available_monitors().enumerate() {
             // glium get_name() does not seem to return anything useful in most cases
             let name = format!("Monitor {}", index + 1);
 
             let dims: (u32, u32) = monitor_id
-                .get_dimensions()
-                .to_logical(monitor_id.get_hidpi_factor())
+                .size()
                 .into();
 
             let mut resolutions = vec![dims];
@@ -494,17 +510,15 @@ impl IO for GliumDisplay {
     fn process_input(&mut self, root: Rc<RefCell<Widget>>) {
         let (ui_x, ui_y) = Config::ui_size();
         let mut mouse_move: Option<(f32, f32)> = None;
-        let display_size = match self.display.gl_window().window().get_inner_size() {
-            None => {
-                util::error_and_exit("Unable to get logical display size");
-                unreachable!();
-            }
-            Some(size) => size,
-        };
-        self.events_loop.poll_events(|event| {
-            if let glutin::Event::WindowEvent { event, .. } = event {
+        let display_size: LogicalSize<f64> =
+            self.display.gl_window().window().inner_size().to_logical(self.scale_factor);
+
+        use glium::glutin::platform::desktop::EventLoopExtDesktop;
+        self.events_loop.run_return(|event, _, flow| {
+            *flow = ControlFlow::Exit;
+            if let Event::WindowEvent { event, .. } = event {
                 match event {
-                    glium::glutin::WindowEvent::CursorMoved { position, .. } => {
+                    WindowEvent::CursorMoved { position, .. } => {
                         let mouse_x = (ui_x as f64 * position.x / display_size.width) as f32;
                         let mouse_y = (ui_y as f64 * position.y / display_size.height) as f32;
                         mouse_move = Some((mouse_x, mouse_y));
@@ -528,11 +542,11 @@ impl IO for GliumDisplay {
         let mut target = self.display.draw();
         target.clear_color(0.0, 0.0, 0.0, 1.0);
         {
-            let hidpi_factor = self.hidpi_factor;
+            let scale_factor = self.scale_factor;
             let mut renderer = GliumRenderer::new(&mut target, self);
             let (width, height) = renderer.target.get_dimensions();
-            let width = (width as f64 / hidpi_factor).round() as i32;
-            let height = (height as f64 / hidpi_factor).round() as i32;
+            let width = (width as f64 / scale_factor).round() as i32;
+            let height = (height as f64 / scale_factor).round() as i32;
             let pixel_size = Point::new(width, height);
             root.draw(&mut renderer, pixel_size, millis);
 
@@ -560,8 +574,8 @@ fn get_min_filter(filter: TextureMinFilter) -> MinifySamplerFilter {
     }
 }
 
-fn process_window_event(event: glutin::WindowEvent) -> Vec<InputAction> {
-    use glium::glutin::WindowEvent::*;
+fn process_window_event(event: WindowEvent) -> Vec<InputAction> {
+    use WindowEvent::*;
     match event {
         CloseRequested => vec![InputAction::Exit],
         ReceivedCharacter(c) => vec![InputAction::CharReceived(c)],
@@ -581,21 +595,21 @@ fn process_window_event(event: glutin::WindowEvent) -> Vec<InputAction> {
         MouseInput { state, button, .. } => {
             use crate::config::RawClick;
             let kind = match button {
-                glium::glutin::MouseButton::Left => Config::get_click_action(RawClick::Left),
-                glium::glutin::MouseButton::Right => Config::get_click_action(RawClick::Right),
-                glium::glutin::MouseButton::Middle => Config::get_click_action(RawClick::Middle),
+                MouseButton::Left => Config::get_click_action(RawClick::Left),
+                MouseButton::Right => Config::get_click_action(RawClick::Right),
+                MouseButton::Middle => Config::get_click_action(RawClick::Middle),
                 _ => return Vec::new(),
             };
 
             match state {
-                glium::glutin::ElementState::Pressed => vec![InputAction::MouseDown(kind)],
-                glium::glutin::ElementState::Released => vec![InputAction::MouseUp(kind)],
+                ElementState::Pressed => vec![InputAction::MouseDown(kind)],
+                ElementState::Released => vec![InputAction::MouseUp(kind)],
             }
         }
         MouseWheel { delta, .. } => {
             let amount = match delta {
-                glium::glutin::MouseScrollDelta::LineDelta(_, y) => y,
-                glium::glutin::MouseScrollDelta::PixelDelta(pos) => pos.y as f32,
+                MouseScrollDelta::LineDelta(_, y) => y,
+                MouseScrollDelta::PixelDelta(pos) => pos.y as f32,
             };
 
             // scrolling the mouse wheeel seems to be buggy at the moment, only take some events
@@ -613,8 +627,8 @@ fn process_window_event(event: glutin::WindowEvent) -> Vec<InputAction> {
     }
 }
 
-fn process_keyboard_input(input: glutin::KeyboardInput) -> Option<KeyboardEvent> {
-    if input.state != glutin::ElementState::Pressed {
+fn process_keyboard_input(input: KeyboardInput) -> Option<KeyboardEvent> {
+    if input.state != ElementState::Pressed {
         return None;
     }
     trace!("Glium keyboard input {:?}", input);
@@ -625,7 +639,7 @@ fn process_keyboard_input(input: glutin::KeyboardInput) -> Option<KeyboardEvent>
     };
 
     use crate::io::keyboard_event::Key::*;
-    use glium::glutin::VirtualKeyCode::*;
+    use VirtualKeyCode::*;
     let key = match key_code {
         A => KeyA,
         B => KeyB,

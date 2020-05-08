@@ -14,10 +14,11 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::thread;
 use std::fmt;
 use std::time::Duration;
 use std::collections::VecDeque;
-use std::cell::{Cell, RefCell};
+use std::cell::{RefCell};
 use std::io::{BufReader, Error, ErrorKind};
 use std::fs::File;
 
@@ -27,7 +28,6 @@ use crate::config::{AudioConfig, Config};
 use crate::resource::{sound_set::EntryBuilder, ResourceSet};
 
 thread_local! {
-    static AUDIO_PANIC: Cell<bool> = Cell::new(false);
     static AUDIO_QUEUE: RefCell<Vec<QueueEntry>> = RefCell::new(Vec::new());
 }
 
@@ -198,20 +198,7 @@ struct AudioSink {
 
 impl AudioSink {
     fn new(device: &Device, base_volume: f32) -> std::thread::Result<AudioSink> {
-        let sink = std::panic::catch_unwind(|| {
-            let sink = Sink::new(device);
-            sink.set_volume(base_volume);
-            sink
-        });
-
-        let sink = match sink {
-            Ok(sink) => sink,
-            Err(e) => {
-                warn!("Rodio panic attempted to setup audio device.  Audio disabled.");
-                AUDIO_PANIC.with(|a| a.set(true));
-                return Err(e);
-            }
-        };
+        let sink = Sink::new(device);
 
         Ok(AudioSink {
             sink,
@@ -320,27 +307,27 @@ impl AudioDevice {
     }
 
     fn new(device: Device, name: String, mut config: AudioConfig) -> std::thread::Result<AudioDevice> {
-        let already_failed = AUDIO_PANIC.with(|a| a.get());
-        if already_failed {
-            warn!("Unable to create audio device for {} due to previous panic.", name);
-            return Err(Box::new("Audio is disabled due to previous panic."));
-        }
+        // Run Rodio init in its own thread to avoid problems with winit:
+        // https://github.com/rust-windowing/winit/issues/1185
+        let device_init = thread::spawn(move || {
+            // precompute output volumes
+            config.music_volume *= config.master_volume;
+            config.effects_volume *= config.master_volume;
+            config.ambient_volume *= config.master_volume;
 
-        // precompute output volumes
-        config.music_volume *= config.master_volume;
-        config.effects_volume *= config.master_volume;
-        config.ambient_volume *= config.master_volume;
+            let music = AudioSink::new(&device, config.music_volume)?;
+            let ambient = AudioSink::new(&device, config.ambient_volume)?;
 
-        let music = AudioSink::new(&device, config.music_volume)?;
-        let ambient = AudioSink::new(&device, config.ambient_volume)?;
+            Ok(AudioDevice {
+                device,
+                name,
+                config,
+                music,
+                ambient,
+            })
+        });
 
-        Ok(AudioDevice {
-            device,
-            name,
-            config,
-            music,
-            ambient,
-        })
+        device_init.join()?
     }
 
     fn update(&mut self, elapsed_millis: u32) {
@@ -399,52 +386,63 @@ pub fn get_audio_devices() -> Vec<AudioDeviceInfo> {
 
     info!("Querying audio devices");
 
-    let devices = match rodio::output_devices() {
-        Err(e) => {
-            warn!("Error querying audio devices: {}", e);
-            return Vec::new();
-        },
-        Ok(devices) => devices,
-    };
-
-    let mut output = Vec::new();
-    for (index, device) in devices.enumerate() {
-        let name = device_name(&device, index);
-
-        if name.contains("CARD=") {
-            // this device will most likely crash rodio
-            continue;
-        }
-
-        let mut formats = match device.supported_output_formats() {
+    // Run Rodio init in its own thread to avoid problems with winit:
+    // https://github.com/rust-windowing/winit/issues/1185
+    let audio_thread = thread::spawn(move || {
+        let devices = match rodio::output_devices() {
             Err(e) => {
-                info!("Error getting supported formats for audio device {}: {}", name, e);
+                warn!("Error querying audio devices: {}", e);
+                return Vec::new();
+            },
+            Ok(devices) => devices,
+        };
+
+        let mut output = Vec::new();
+        for (index, device) in devices.enumerate() {
+            let name = device_name(&device, index);
+
+            if name.contains("CARD=") {
+                // this device will most likely crash rodio
                 continue;
-            }, Ok(formats) => formats,
-        };
+            }
 
-        if formats.next().is_none() {
-            info!("Audio device {} did not have any supported output formats.", name);
-            continue;
+            let mut formats = match device.supported_output_formats() {
+                Err(e) => {
+                    info!("Error getting supported formats for audio device {}: {}", name, e);
+                    continue;
+                }, Ok(formats) => formats,
+            };
+
+            if formats.next().is_none() {
+                info!("Audio device {} did not have any supported output formats.", name);
+                continue;
+            }
+
+            if let Err(e) = device.default_output_format() {
+                info!("Error getting an output format for audio device: {}: {}", name, e);
+                continue;
+            }
+
+            let config = audio_config.clone();
+            let audio_device = AudioDeviceInfo {
+                device,
+                name: name.to_string(),
+                config
+            };
+
+            info!("Found supported audio device: {}", name);
+            output.push(audio_device);
         }
 
-        if let Err(e) = device.default_output_format() {
-            info!("Error getting an output format for audio device: {}: {}", name, e);
-            continue;
-        }
+        output
+    });
 
-        let config = audio_config.clone();
-        let audio_device = AudioDeviceInfo {
-            device,
-            name: name.to_string(),
-            config
-        };
-
-        info!("Found supported audio device: {}", name);
-        output.push(audio_device);
+    match audio_thread.join() {
+        Err(e) => {
+            warn!("Error in audio setup: {:?}", e);
+            Vec::new()
+        }, Ok(output) => output,
     }
-
-    output
 }
 
 pub fn init_device(info: AudioDeviceInfo) -> Option<AudioDevice> {

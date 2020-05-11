@@ -212,13 +212,9 @@ impl Options {
                 parent.borrow_mut().invalidate_children();
             })));
 
-        let mut borderless = false;
         match self.cur_display_mode {
             DisplayMode::Window => mode_window.borrow_mut().state.set_active(true),
-            DisplayMode::BorderlessWindow => {
-                borderless = true;
-                mode_borderless.borrow_mut().state.set_active(true)
-            },
+            DisplayMode::BorderlessWindow => mode_borderless.borrow_mut().state.set_active(true),
             DisplayMode::Fullscreen => mode_fullscreen.borrow_mut().state.set_active(true),
         }
 
@@ -263,36 +259,34 @@ impl Options {
         let scrollpane = ScrollPane::new(ScrollDirection::Vertical);
         let resolution_pane = Widget::with_theme(scrollpane.clone(), "resolution_pane");
         let mut resolution_found = false;
-        for (w, h) in self.display_confs[self.cur_display_conf].resolutions.iter() {
-            let (w, h) = (*w, *h);
+        for res in self.display_confs[self.cur_display_conf].resolutions.iter() {
             let button = Widget::with_theme(Button::empty(), "resolution_button");
-            button
-                .borrow_mut()
-                .state
-                .add_text_arg("width", &w.to_string());
-            button
-                .borrow_mut()
-                .state
-                .add_text_arg("height", &h.to_string());
 
-            if borderless {
-                button.borrow_mut().state.set_enabled(false);
-            }
+            {
+                let state = &mut button.borrow_mut().state;
 
-            button
-                .borrow_mut()
-                .state
-                .add_callback(Callback::new(Rc::new(move |widget, _| {
+                state.add_text_arg("width", &res.width.to_string());
+                state.add_text_arg("height", &res.height.to_string());
+                let (w, h) = (res.width, res.height);
+                state.add_callback(Callback::new(Rc::new(move |widget, _| {
                     let (parent, options) = Widget::parent_mut::<Options>(widget);
                     options.cur_resolution = (w, h);
                     parent.borrow_mut().invalidate_children();
                 })));
 
-            if w == self.cur_resolution.0 && h == self.cur_resolution.1 {
-                if !borderless {
-                    button.borrow_mut().state.set_active(true);
+                if res.width == self.cur_resolution.0 && res.height == self.cur_resolution.1 {
+                    resolution_found = true;
+                    state.set_active(true);
                 }
-                resolution_found = true;
+
+                match self.cur_display_mode {
+                    DisplayMode::Window => (),
+                    DisplayMode::BorderlessWindow => {
+                        if !res.monitor_size { continue; }
+                        state.set_enabled(false);
+                    },
+                    DisplayMode::Fullscreen => if !res.fullscreen { continue; },
+                }
             }
 
             scrollpane.borrow().add_to_content(button);

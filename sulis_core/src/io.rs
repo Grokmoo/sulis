@@ -43,7 +43,15 @@ use crate::util::{Point, Rect, Scale, Size};
 pub struct DisplayConfiguration {
     pub name: String,
     pub index: usize,
-    pub resolutions: Vec<(u32, u32)>,
+    pub resolutions: Vec<Resolution>,
+}
+
+#[derive(Debug, Clone)]
+pub struct Resolution {
+    pub width: u32,
+    pub height: u32,
+    pub fullscreen: bool,
+    pub monitor_size: bool,
 }
 
 pub trait MainLoopUpdater {

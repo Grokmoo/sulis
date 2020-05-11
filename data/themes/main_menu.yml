@@ -755,7 +755,7 @@ themes:
                 relative:
                   height: Max
                 custom:
-                  tooltip: "Borderless Window - Select this along with maximum resolution for fullscreen."
+                  tooltip: "Borderless Window - Select this for fullscreen."
               mode_fullscreen:
                 from: button
                 text: "Fullscreen"

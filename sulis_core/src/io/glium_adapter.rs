@@ -480,6 +480,8 @@ impl IO for GliumDisplay {
             // glium get_name() does not seem to return anything useful in most cases
             let name = format!("Monitor {}", index + 1);
 
+
+            let modes: Vec<(u32, u32)> = monitor_id.video_modes().map(|mode| mode.size().into()).collect();
             let dims: (u32, u32) = monitor_id
                 .size()
                 .into();
@@ -487,12 +489,9 @@ impl IO for GliumDisplay {
             let mut resolutions = vec![dims];
             for (w, h) in RESOLUTIONS.iter() {
                 let (w, h) = (*w, *h);
-                if w > dims.0 || h > dims.1 {
-                    continue;
-                }
-                if w == dims.0 && h == dims.1 {
-                    continue;
-                }
+
+                if !modes.contains(&(w, h)) { continue; }
+                if resolutions.contains(&(w, h)) { continue; }
 
                 resolutions.push((w, h));
             }

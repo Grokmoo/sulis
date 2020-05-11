@@ -212,9 +212,13 @@ impl Options {
                 parent.borrow_mut().invalidate_children();
             })));
 
+        let mut borderless = false;
         match self.cur_display_mode {
             DisplayMode::Window => mode_window.borrow_mut().state.set_active(true),
-            DisplayMode::BorderlessWindow => mode_borderless.borrow_mut().state.set_active(true),
+            DisplayMode::BorderlessWindow => {
+                borderless = true;
+                mode_borderless.borrow_mut().state.set_active(true)
+            },
             DisplayMode::Fullscreen => mode_fullscreen.borrow_mut().state.set_active(true),
         }
 
@@ -271,6 +275,10 @@ impl Options {
                 .state
                 .add_text_arg("height", &h.to_string());
 
+            if borderless {
+                button.borrow_mut().state.set_enabled(false);
+            }
+
             button
                 .borrow_mut()
                 .state
@@ -281,7 +289,9 @@ impl Options {
                 })));
 
             if w == self.cur_resolution.0 && h == self.cur_resolution.1 {
-                button.borrow_mut().state.set_active(true);
+                if !borderless {
+                    button.borrow_mut().state.set_active(true);
+                }
                 resolution_found = true;
             }
 

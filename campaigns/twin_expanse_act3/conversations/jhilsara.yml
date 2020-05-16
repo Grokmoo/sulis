@@ -1,0 +1,78 @@
+id: jhilsara
+initial_nodes:
+  - id: questions
+    to_view:
+      - target_flag: joined
+  - id: reconsider
+    to_view:
+      - target_flag: rejected
+  - id: start01
+nodes:
+  start01:
+    text: |
+      [c=6868FF|#target_name#] - [c=888|This human Ciedar motions for you to approach.]
+      
+      Hello.  I'm Jhilsara.  I've got a proposition for you.
+    on_view:
+      - target_flag: already_talked
+    responses:
+      - text: "I am #player_name#.  Pleased to meet you."
+        to: start02
+      - text: "I'm #player_name#."
+        to: start02
+  start02:
+    text: |
+      [c=6868FF|#target_name#] - Very good.  You've heard about the goblin raids, yes?  There's quite a bit of gold for whoever can put a stop to them.
+    responses:
+      - text: "[c=888|Continue]"
+        to: start03
+  start03:
+    text: |
+      [c=6868FF|#target_name#] - I propose we join up.  I am a formidable mage, and you don't look like a pushover yourself.
+      
+      Together, we'll make short work of any goblins.
+    responses:
+      - text: "Agreed.  Let's be off, then."
+        to: join
+      - text: "I'm not sure.  Why should I let you join me?"
+        to: maybe
+      - text: "Sorry, the answer is no."
+        to: reject
+  reject:
+    text: |
+      [c=6868FF|#target_name#] - Alright, no hard feelings.  I'll be here for a while yet if you change your mind.
+    on_view:
+      - target_flag: rejected
+    responses:
+      - text: "Farewell, then."
+  maybe:
+    text: |
+      [c=6868FF|#target_name#] - Look, I'm not going to beg.  I just think we might make a good team.
+    responses:
+      - text: "Alright, Agreed."
+        to: join
+      - text: "Sorry, not interested."
+        to: reject
+  join:
+    text: |
+      [c=6868FF|#target_name#] - Great.  I'm ready when you are.
+    on_view:
+      - target_flag: joined
+      - fire_script:
+          id: wellswood
+          func: jhilsara_join
+    responses:
+      - text: "[c=888|Leave]"
+  reconsider:
+    text: |
+      [c=6868FF|#target_name#] - Have you reconsidered my offer to join up?
+    responses:
+      - text: "Yes, lets go."
+        to: join
+      - text: "Sorry, the answer is still no."
+        to: reject
+  questions:
+    text: |
+      [c=6868FF|#target_name#] - What is it?
+    responses:
+      - text: "Nothing right now, Jhilsara."

@@ -1,0 +1,65 @@
+id: twin_expanse_act3
+group:
+  id: a_twin_expanse
+  name: "The Twin Expanse"
+  position: 3
+name: Act 3
+starting_time:
+  day: 67
+  hour: 11
+starting_area: outskirts
+starting_location: [12, 14]
+description: |
+  After an arduous journey through the desert and underground, you have finally arrived back in the Twin Expanse - ready to seek your destiny.
+  
+  This is intended for a character who has completed Act II.  New characters may also be used - they will be given an appropriate level of experience and money to start the campaign.
+backstory_conversation: backstory
+max_starting_level: 15
+on_round_elapsed_script:
+  id: campaign
+  func: on_round_elapsed
+on_tick_script:
+  id: campaign
+  func: on_tick
+on_party_death_script:
+  id: campaign
+  func: on_party_death
+world_map:
+  size: [21.0, 12.0]
+  offset: [-1.0, -0.7]
+  locations:
+    wellswood:
+      name: "Wellswood Village"
+      position: [9, 8.5]
+      icon: town01
+      initially_enabled: false
+    wellswood_forest:
+      name: "Wellswood"
+      position: [6.0, 7.25]
+      icon: forest01
+      initially_enabled: false
+    last_edge:
+      name: "Last Edge"
+      position: [2, 3]
+      icon: desert_town01
+      initially_enabled: false
+    naathfir:
+      name: "Naathfir"
+      position: [8, 2.5]
+      icon: mountain_town01
+      initially_enabled: false
+    rose_lake:
+      name: "Rose Lake"
+      position: [9.75, 5.5]
+      icon: city01
+      initially_enabled: false
+    twain:
+      name: "Twain"
+      position: [14.75, 10.25]
+      icon: town02
+      initially_enabled: false
+    kels_bay:
+      name: "Kel's Bay"
+      position: [17.5, 7.75]
+      icon: city02
+      initially_enabled: false

@@ -1,0 +1,79 @@
+---
+id: "npc_cragnik"
+name: Cragnik
+race: rodian
+sex: Male
+portrait: portraits/ratkin05
+attributes:
+  str: 12
+  dex: 18
+  end: 9
+  per: 16
+  int: 13
+  wis: 10
+conversation: cragnik
+faction: Friendly
+images: {}
+hue: 0.4
+hair_color:
+  r: 1.0
+  g: 1.0
+  b: 1.0
+  a: 1.0
+skin_color:
+  r: 0.8078431487083435
+  g: 0.5803921818733215
+  b: 0.32156863808631899
+  a: 1.0
+inventory:
+  equipped:
+    Torso:
+      id: torso_leather
+      adjectives: [ exceptional ]
+    HeldMain:
+      id: shortsword
+      adjectives: [ exceptional, acid10 ]
+    HeldOff:
+      id: dagger
+      adjectives: [ exceptional ]
+    Legs:
+      id: legs_leather
+      adjectives: [ exceptional ]
+    Feet:
+      id: boots_leather
+      adjectives: [ exceptional ]
+    Hands:
+      id: gloves_leather
+      adjectives: [ exceptional ]
+  quick:
+    Usable1:
+      id: potion_healing
+      adjectives: []
+levels:
+  rogue: 13
+xp: 18000
+abilities:
+  - armor_light
+  - weapon_crossbow
+  - weapon_bow
+  - weapon_small_sword
+  - weapon_simple
+  - backstab
+  - hide
+  - smoke_bomb
+  - speedy
+  - backflip
+  - shadow_step
+  - attacker
+  - stun_grenade
+  - flanker
+  - weapon_small_sword
+  - rupture
+  - rapid_strikes
+  - acrobatic_fighting
+  - become_wind
+  - spike_trap
+  - dexterity_training
+  - feint
+  - speed_of_thought
+  - lightning_reflexes

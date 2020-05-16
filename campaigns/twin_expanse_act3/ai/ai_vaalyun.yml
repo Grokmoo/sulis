@@ -1,0 +1,5 @@
+id: ai_vaalyun
+script: ai_vaalyun
+hooks: {}
+  #OnDamaged: on_damaged
+  #OnRoundElapsed: on_round_elapsed

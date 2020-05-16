@@ -170,21 +170,19 @@ end
 function campaign_end(parent)
   remove_items({"merchant_supplies", "history_of_the_aegis"})
 
-  game:show_game_over_window("Congratulations, you have completed Act 2 of the Twin Expanse.  Please keep an eye on the project in the coming months for the release of the third and final act.  Thanks for playing!")
+  local export = game:create_module_export("twin_expanse_act3")
+  export:set_include_stash(true)
+  export:set_flag("completed_twin_expanse_act2")
 
-  --local export = game:create_module_export("twin_expanse_act2")
-  --export:set_include_stash(true)
-  --export:set_flag("completed_twin_expanse_act2")
-
-  --local player = game:player()
-  --local party = game:party()
-  --for i = 1, #party do
-  --    local member = party[i]
-  --    if not member:has_flag("__is_summoned_party_member") and player:id() ~= member:id() then
-  --        export:add_to_party(party[i])
-  --    end
-  --end
-  --export:activate()
+  local player = game:player()
+  local party = game:party()
+  for i = 1, #party do
+      local member = party[i]
+      if not member:has_flag("__is_summoned_party_member") and player:id() ~= member:id() then
+          export:add_to_party(party[i])
+      end
+  end
+  export:activate()
 end
 
 function remove_items(ids)

@@ -1,0 +1,25 @@
+id: intro
+initial_nodes:
+  - id: start01
+nodes:
+  start01:
+    text: |
+      [c=888|At last you step outside of the tunnel into the light.]
+    responses:
+      - text: |
+          [c=888|Continue]
+        to: start02
+  start02:
+    text: |
+      [c=888|The area around you is rocky but with signs of life everywhere.  A far cry from the endless desert.]
+    responses:
+      - text: |
+          [c=888|Continue]
+  start03:
+    text: |
+      [c=888|According to Razethar's directions, you should be just west of Last Edge.
+      
+      There, you should be able to resupply and ascertain what has happened since you have been gone.]
+    responses:
+      - text: |
+          [c=888|Go]

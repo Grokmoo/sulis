@@ -1,0 +1,7 @@
+id: the_twin_expanse
+src: "the_twin_expanse.png"
+size: [ 896, 512 ]
+groups:
+  misc:
+    areas:
+      worldmap: [0, 0, 896, 512]

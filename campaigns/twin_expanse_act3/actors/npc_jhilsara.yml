@@ -1,0 +1,75 @@
+---
+id: npc_jhilsara
+name: Jhilsara
+race: human
+sex: Female
+portrait: portraits/human47
+attributes:
+  str: 8
+  dex: 12
+  end: 10
+  per: 15
+  int: 19
+  wis: 14
+conversation: jhilsara
+faction: Friendly
+images:
+  Hair: creatures/hair11
+hue: 0.2
+hair_color:
+  r: 0.36
+  g: 0.2
+  b: 0.09
+  a: 1.0
+skin_color:
+  r: 0.45
+  g: 0.29
+  b: 0.16
+  a: 1.0
+inventory:
+  equipped:
+    HeldMain:
+      id: crossbow
+      adjectives: [ exceptional, fire10 ]
+    Feet:
+      id: boots_leather
+      adjectives: [ exceptional ]
+    Legs:
+      id: legs_pants
+      adjectives: [ exceptional ]
+    Torso:
+      id: torso_robe
+      adjectives: [ exceptional ]
+  quick:
+    Usable1:
+      id: potion_healing
+      adjectives: []
+    Usable2:
+      id: potion_mind
+      adjectives: []
+    AltHeldMain: { id: quarterstaff }
+levels:
+  mage: 13
+xp: 18000
+abilities:
+  - weapon_simple
+  - weapon_crossbow
+  - firebolt
+  - flare
+  - acid_bomb
+  - shock
+  - heal
+  - tenacious_soul
+  - dazzle
+  - flaming_fingers
+  - fire_shield
+  - deadly_caster
+  - haste
+  - luck
+  - fireball
+  - fire_master
+  - petrify
+  - chameleon
+  - ward
+  - zealous_caster
+  - healing_circle

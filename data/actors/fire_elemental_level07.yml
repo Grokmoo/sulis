@@ -16,7 +16,7 @@ levels:
 inventory:
   equipped: {}
 reward:
-  xp: 50
+  xp: 75
   loot: level5_misc
   loot_chance: 100
 abilities:

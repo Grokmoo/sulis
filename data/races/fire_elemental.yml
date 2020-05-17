@@ -1,5 +1,5 @@
 id: fire_elemental
-name: "Earth Elemental"
+name: "Fire Elemental"
 description: "Monster"
 size: 3by3
 movement_rate: 0.8
@@ -12,7 +12,7 @@ base_stats:
   - kind: { resistance: { kind: "Shock", amount: 50 } }
   - kind: { resistance: { kind: "Acid", amount: 50 } }
   - kind: { resistance: { kind: "Fire", amount: 100 } }
-  - kind: { armor: 12 }
+  - kind: { armor: 6 }
 base_attack:
   damage:
     min: 15

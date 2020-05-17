@@ -36,7 +36,7 @@ weighted_entries:
       reach1: 1
       concealment_ignore1: 1
   crossbow:
-    weight: 2
+    weight: 15
     adjective1:
       none: 5
       worn: 5
@@ -148,7 +148,7 @@ weighted_entries:
       reach1: 1
       concealment_ignore1: 1
   longbow:
-    weight: 1
+    weight: 10
     adjective1:
       none: 5
       worn: 5
@@ -260,7 +260,7 @@ weighted_entries:
       reach1: 1
       concealment_ignore1: 1
   shortbow:
-    weight: 5
+    weight: 20
     adjective1:
       none: 5
       worn: 5

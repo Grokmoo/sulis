@@ -36,7 +36,7 @@ weighted_entries:
       reach2: 1
       concealment_ignore2: 1
   crossbow:
-    weight: 3
+    weight: 15
     adjective1:
       exceptional: 5
       fine: 5
@@ -148,7 +148,7 @@ weighted_entries:
       reach2: 1
       concealment_ignore2: 1
   longbow:
-    weight: 2
+    weight: 10
     adjective1:
       exceptional: 5
       fine: 5
@@ -260,7 +260,7 @@ weighted_entries:
       reach2: 1
       concealment_ignore2: 1
   shortbow:
-    weight: 5
+    weight: 20
     adjective1:
       exceptional: 5
       fine: 5

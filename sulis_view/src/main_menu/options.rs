@@ -201,6 +201,16 @@ impl Options {
                 let (parent, options) = Widget::parent_mut::<Options>(widget);
                 options.cur_display_mode = DisplayMode::BorderlessWindow;
                 parent.borrow_mut().invalidate_children();
+
+                match options.display_confs[options.cur_display_conf].resolutions.first() {
+                    None => {
+                        warn!("No valid resolutions for current display mode.");
+                    },
+                    Some(res) => {
+                        // set the resolution to the first entry which is the largest
+                        options.cur_resolution = (res.width, res.height);
+                    }
+                };
             })));
         let mode_fullscreen = Widget::with_theme(Button::empty(), "mode_fullscreen");
         mode_fullscreen

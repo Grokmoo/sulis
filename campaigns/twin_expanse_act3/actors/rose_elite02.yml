@@ -1,0 +1,54 @@
+---
+id: rose_elite02
+name: "Rose Elite"
+race: human_simple
+sex: Male
+attributes:
+  str: 15
+  dex: 12
+  end: 13
+  per: 10
+  int: 10
+  wis: 10
+conversation: ~
+faction: Hostile
+images:
+  Foreground: empty
+  Shadow: empty
+  Background: creatures/human21
+hue: 0.7
+inventory:
+  equipped:
+    Feet:
+      id: boots_plate
+      adjectives: [ exceptional ]
+    Torso:
+      id: torso_plate
+      adjectives: [ exceptional ]
+    Legs:
+      id: legs_plate
+      adjectives: [ exceptional ]
+    HeldMain:
+      id: battleaxe
+      adjectives: [ exceptional ]
+    HeldOff:
+      id: shield_kite
+      adjectives: [ exceptional ]
+  quick: {}
+levels:
+  fighter: 12
+abilities:
+  - armor_light
+  - armor_medium
+  - armor_heavy
+  - weapon_axe
+  - weapon_crossbow
+  - weapon_bow
+  - weapon_small_sword
+  - weapon_large_sword
+  - weapon_spear
+  - weapon_mace
+  - weapon_simple
+  - blitz
+  - powerful_blows
+ai: ai_melee

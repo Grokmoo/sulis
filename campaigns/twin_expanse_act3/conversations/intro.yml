@@ -15,6 +15,7 @@ nodes:
     responses:
       - text: |
           [c=888|Continue]
+        to: start03
   start03:
     text: |
       [c=888|According to Razethar's directions, you should be just west of Last Edge.

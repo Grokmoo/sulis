@@ -1,0 +1,21 @@
+id: rose_elite_intro
+initial_nodes:
+  - id: start01
+nodes:
+  start01:
+    text: |
+      [c=888|You see a man wearing the Rose lake guardsman colors ahead.  He does not look friendly.]
+      
+      Halt!  You have been banished on the order of Lord Berkeley!
+    responses:
+      - text: "Lord Berkeley?  It seems like there have been some changes since I've been gone."  
+        to: start02
+      - text: "Wait!  Berkeley is a traitor!"
+        to: start02
+      - text: "I can see where this is going..."
+        to: start02
+  start02:
+    text: |
+      You are an enemy of the state.  The punishment is death.  To arms, men!
+    responses:
+      - text: "[c=f00|Fight!]"

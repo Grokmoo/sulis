@@ -1,0 +1,58 @@
+---
+id: rose_battlemage
+name: Rose Battlemage
+race: human
+sex: Male
+attributes:
+  str: 10
+  dex: 10
+  end: 10
+  per: 10
+  int: 10
+  wis: 10
+conversation: ~
+faction: Hostile
+images:
+  Foreground: empty
+  Background: creatures/human15
+  Shadow: empty
+hue: 0.1
+inventory:
+  equipped:
+    Feet:
+      id: boots_leather
+      adjectives: [ exceptional ]
+    Torso:
+      id: torso_robes
+      adjectives: [ exceptional ]
+    Legs:
+      id: legs_leather
+      adjectives: [ exceptional ]
+    HeldMain:
+      id: crossbow
+      adjectives: [ exceptional ]
+  quick:
+    AltHeldMain:
+      id: shortsword
+      adjectives: [ exceptional ]
+  quick: {}
+levels:
+  mage: 12
+abilities:
+  - armor_light
+  - armor_medium
+  - armor_heavy
+  - weapon_axe
+  - weapon_crossbow
+  - weapon_bow
+  - weapon_spear
+  - weapon_mace
+  - weapon_simple
+  - fireball
+  - frostbite
+  - heal
+  - rock_armor
+  - luck
+  - restoration
+  - crush
+ai: ai_mage

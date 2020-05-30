@@ -1,3 +1,8 @@
+function rose_elite_intro(parent)
+  local target = game:entity_with_id("rose_elite_lieutenant")
+  game:start_conversation("rose_elite_intro", target)
+end
+
 function on_area_load(parent)
   add_min_xp_coins()
   setup_party()

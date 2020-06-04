@@ -10,4 +10,4 @@ sulis_module = { path = "../sulis_module" }
 sulis_state = { path = "../sulis_state" }
 
 log = "0.4"
-serde = "1.0"
+serde = "1"

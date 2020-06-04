@@ -5,10 +5,10 @@ authors = ["Jared Stephen <grok_moo@yahoo.com>"]
 edition = "2018"
 
 [dependencies]
-dirs = "2.0"
+home = "0.5"
 backtrace = "0.3"
 flexi_logger = "0.15"
-image = "0.23"
+image = { version = "0.23", default_features = false, features = [ "png" ] }
 glium = "0.25"
 lazy_static = "1.4"
 log = { version = "0.4", features = [ "serde" ] }
@@ -19,4 +19,4 @@ serde_derive = "1.0"
 serde_yaml = "0.8"
 serde_json = "1.0"
 rlua = "0.17"
-rodio = { version = "0.11", features = [ "vorbis" ] }
+rodio = { version = "0.11", default_features = false, features = [ "vorbis" ] }

@@ -1,5 +1,5 @@
 id: bg1
-src: "bg1.jpg"
+src: "bg1.png"
 size: [ 1024, 1024 ]
 simple_image_gen_scale: 64
 groups:

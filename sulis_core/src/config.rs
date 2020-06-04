@@ -356,7 +356,7 @@ fn get_user_dir() -> PathBuf {
 }
 
 fn get_home_dir() -> PathBuf {
-    match dirs::home_dir() {
+    match home::home_dir() {
         Some(path) => path,
         None => PathBuf::new(),
     }

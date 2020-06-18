@@ -142,7 +142,7 @@ impl Widget {
             );
         }
 
-        self.state.set_border(theme.border.clone());
+        self.state.set_border(theme.border);
         self.state.text_params = theme.text_params.clone();
 
         theme.apply_text(&mut self.state);

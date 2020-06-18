@@ -640,6 +640,7 @@ groups:
       status_bard_inspiration: [352, 0]
       status_ability_uses: [384, 0]
       status_mage_ability_uses: [416, 0]
+      status_legendary: [448, 0]
       status_strength: [256, 32]
       status_dexterity: [288, 32]
       status_endurance: [320, 32]

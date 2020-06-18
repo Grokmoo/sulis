@@ -191,9 +191,7 @@ impl ActorState {
         let mut change = false;
         for (layer, ref image) in images.iter() {
             if let Some(img) = self.anim_image_layers.get(layer) {
-                if Rc::ptr_eq(img, image) {
-                    continue;
-                }
+                if img.id() == image.id() { continue; }
             }
             change = true;
             self.anim_image_layers.insert(*layer, Rc::clone(image));

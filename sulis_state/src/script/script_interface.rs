@@ -1012,7 +1012,7 @@ impl UserData for ScriptInterface {
         methods.add_method(
             "transition_party_to",
             |_, _, (x, y, area): (i32, i32, Option<String>)| {
-                let id = area.as_ref().map(|s| &**s);
+                let id = area.as_deref();
                 let p = Some(Point::new(x, y));
                 let time = Time {
                     day: 0,

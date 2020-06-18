@@ -47,6 +47,16 @@ use crate::ui::Widget;
 const MAX_ULPS: i32 = 100;
 const MAX_DIFF: f32 = 2.0 * std::f32::EPSILON;
 
+pub fn approx_eq_slice(a: &[f32], b: &[f32]) -> bool {
+    if a.len() != b.len() { return false ; }
+
+    for (a, b) in a.iter().zip(b.iter()) {
+        if !approx_eq(*a, *b) { return false; }
+    }
+
+    true
+}
+
 pub fn approx_eq(a: f32, b: f32) -> bool {
     if (a - b).abs() <= MAX_DIFF {
         return true;

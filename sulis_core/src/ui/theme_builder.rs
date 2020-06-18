@@ -51,7 +51,7 @@ impl RelativeBuilder {
 
         match to {
             None => {
-                to.replace(from.clone());
+                to.replace(from);
             }
             Some(to) => {
                 to.x = to.x.or(from.x);

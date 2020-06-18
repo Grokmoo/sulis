@@ -112,7 +112,7 @@ use std::rc::Rc;
 use crate::io::{DrawList, GraphicsRenderer};
 use crate::resource::{Font, ResourceSet};
 use crate::ui::{FontRenderer, WidgetState};
-use crate::util::{Offset, Rect};
+use crate::util::{Offset, Rect, approx_eq_slice};
 
 pub struct MarkupRenderer {
     font: Rc<Font>,
@@ -400,10 +400,12 @@ impl MarkupRenderer {
     fn append_to_draw_lists(&mut self, mut draw_list: DrawList) {
         let mut added = false;
         for list in self.draw_lists.iter_mut() {
-            if draw_list.texture == list.texture && draw_list.color_filter == list.color_filter {
-                list.append(&mut draw_list);
-                added = true;
-            }
+            if draw_list.texture != list.texture { continue; }
+
+            if !approx_eq_slice(&draw_list.color_filter, &list.color_filter) { continue; }
+
+            list.append(&mut draw_list);
+            added = true;
         }
         if !added {
             self.draw_lists.push(draw_list);

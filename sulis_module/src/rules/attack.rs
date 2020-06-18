@@ -25,7 +25,7 @@ use crate::rules::AttackKind::*;
 
 fn add_bonus(bonuses: &mut AttackBonuses, bonus_damage: &mut Vec<Damage>, bonus_kind: &BonusKind) {
     match bonus_kind {
-        BonusKind::Damage(damage) => bonus_damage.push(damage.clone()),
+        BonusKind::Damage(damage) => bonus_damage.push(*damage),
         BonusKind::MeleeAccuracy(amount) => bonuses.melee_accuracy += amount,
         BonusKind::RangedAccuracy(amount) => bonuses.ranged_accuracy += amount,
         BonusKind::SpellAccuracy(amount) => bonuses.spell_accuracy += amount,

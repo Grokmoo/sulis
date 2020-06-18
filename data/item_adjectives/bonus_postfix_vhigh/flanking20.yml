@@ -1,8 +1,8 @@
-id: dexterity3
-name: Dexterity
-name_postfix: " of Dexterity"
-item_status_icon: gui/status_dexterity
-value_modifier: 2.0
+id: flanking20
+name: Flanking
+name_postfix: " of Flanking"
+item_status_icon: gui/status_flanking
+value_modifier: 2.5
 value_add: 4000
 bonus_modifier: 1.0
 penalty_modifier: 1.0
@@ -11,5 +11,5 @@ attack_bonus_modifier: 1.0
 attack_penalty_modifier: 1.0
 bonuses:
   - kind:
-      attribute: { attribute: Dexterity, amount: 3 }
+      flanking_angle: 21
 attack_bonuses: {}

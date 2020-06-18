@@ -1,0 +1,59 @@
+id: level20_priest
+generate: {}
+weighted_entries: {}
+sub_lists:
+  level20_accessories:
+    weight: 100
+    quantity: [4, 8]
+probability_entries:
+  torso_robe:
+    weight: 80
+    adjective1:
+      legendary: 5
+      masterwork: 5
+    adjective2:
+      none: 8
+      will20: 2
+      intellect4: 2
+      mage_ability4: 2
+      warlock_power4: 2
+      resistance_acid4: 2
+      resistance_cold4: 2
+      resistance_shock4: 2
+      resistance_fire4: 2
+  helm_hood:
+    weight: 80
+    adjective1:
+      masterwork: 5
+      legendary: 5
+    adjective2:
+      none: 2
+      concealment20: 2
+      wisdom4: 2
+      concealment_ignore4: 2
+      action4: 2
+      bard_inspiration4: 2
+  healing_kit:
+    weight: 90
+    quantity: [5, 12]
+  potion_healing:
+    weight: 90
+    quantity: [5, 12]
+  potion_power:
+    weight: 75
+    quantity: [2, 4]
+  potion_body:
+    weight: 75
+    quantity: [2, 4]
+  potion_mind:
+    weight: 75
+    quantity: [2, 4]
+  potion_elements:
+    weight: 75
+    quantity: [2, 4]
+  poison_vial:
+    weight: 75
+    quantity: [1, 4]
+  potion_spellpower:
+    weight: 75
+    quantity: [4, 8]

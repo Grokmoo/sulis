@@ -1,0 +1,18 @@
+id: warlock_power4
+name: Warlock Power
+name_postfix: " of Power"
+item_status_icon: gui/status_warlock_power
+value_modifier: 2.5
+value_add: 6000
+bonus_modifier: 1.0
+penalty_modifier: 1.0
+attack_damage_modifier: 1.0
+attack_bonus_modifier: 1.0
+attack_penalty_modifier: 1.0
+bonuses:
+  - kind:
+      class_stat: { id: Power, amount: 40 }
+attack_bonuses: {}
+prereqs:
+  levels:
+    warlock: 1

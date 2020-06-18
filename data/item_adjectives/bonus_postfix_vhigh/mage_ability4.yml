@@ -1,0 +1,24 @@
+id: mage_ability4
+name: Mage Ability
+name_postfix: " of the Mage"
+item_status_icon: gui/status_mage_ability_uses
+value_modifier: 2.5
+value_add: 4000
+bonus_modifier: 1.0
+penalty_modifier: 1.0
+attack_damage_modifier: 1.0
+attack_bonus_modifier: 1.0
+attack_penalty_modifier: 1.0
+bonuses:
+  - kind:
+      group_uses_per_encounter: { group: "4th Circle", amount: 1 }
+  - kind:
+      group_uses_per_encounter: { group: "3rd Circle", amount: 1 }
+  - kind:
+      group_uses_per_encounter: { group: "2nd Circle", amount: 1 }
+  - kind:
+      group_uses_per_encounter: { group: "1st Circle", amount: 1 }
+attack_bonuses: {}
+prereqs:
+  levels:
+    mage: 1

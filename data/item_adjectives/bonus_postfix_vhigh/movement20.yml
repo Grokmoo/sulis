@@ -1,8 +1,8 @@
-id: dexterity3
-name: Dexterity
-name_postfix: " of Dexterity"
-item_status_icon: gui/status_dexterity
-value_modifier: 2.0
+id: movement20
+name: Movement
+name_postfix: " of Movement"
+item_status_icon: gui/status_movement
+value_modifier: 2.5
 value_add: 4000
 bonus_modifier: 1.0
 penalty_modifier: 1.0
@@ -11,5 +11,5 @@ attack_bonus_modifier: 1.0
 attack_penalty_modifier: 1.0
 bonuses:
   - kind:
-      attribute: { attribute: Dexterity, amount: 3 }
+      movement_rate: 0.2
 attack_bonuses: {}

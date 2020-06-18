@@ -1,0 +1,14 @@
+id: ranged_accuracy20
+name: Accuracy
+name_postfix: " of Accuracy"
+item_status_icon: gui/status_accuracy
+value_modifier: 2.5
+value_add: 6000
+bonus_modifier: 1.0
+penalty_modifier: 1.0
+attack_damage_modifier: 1.0
+attack_bonus_modifier: 1.0
+attack_penalty_modifier: 1.0
+bonuses: []
+attack_bonuses:
+  ranged_accuracy: 20

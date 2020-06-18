@@ -1,0 +1,84 @@
+id: level20_accessories
+generate:
+  1: 5
+  2: 1
+weighted_entries:
+  amulet_gold:
+    weight: 1
+    adjective1:
+      none: 2
+      perception4: 2
+      wisdom4: 2
+      intellect4: 2
+      caster_level4: 2
+      bard_inspiration4: 2
+      warlock_power4: 2
+      mage_ability4: 2
+      ability4: 2
+  amulet_silver:
+    weight: 2
+    adjective1:
+      none: 2
+      perception4: 2
+      wisdom4: 2
+      intellect4: 2
+      caster_level4: 2
+      bard_inspiration4: 2
+      warlock_power4: 2
+      mage_ability4: 2
+      ability4: 2
+  belt_leather:
+    weight: 2
+    adjective1:
+      none: 2
+      strength4: 2
+      endurance4: 2
+      fortitude20: 2
+      hit_points4: 2
+      resistance_crushing4: 2
+      resistance_piercing4: 2
+      resistance_slashing4: 2
+  cloak:
+    weight: 2
+    adjective1:
+      none: 2
+      dexterity4: 2
+      concealment20: 2
+      defense20: 2
+      resistance_acid4: 2
+      resistance_cold4: 2
+      resistance_shock4: 2
+      resistance_fire4: 2
+  ring_copper:
+    weight: 2
+    adjective1:
+      none: 1
+      accuracy20: 1
+      defense20: 1
+      fortitude20: 1
+      reflex20: 1
+      will20: 1
+      reach4: 1
+      action4: 1
+  ring_silver:
+    weight: 2
+    adjective1:
+      none: 1
+      accuracy20: 1
+      defense20: 1
+      fortitude20: 1
+      reflex20: 1
+      will20: 1
+      reach4: 1
+      action4: 1
+  ring_gold:
+    weight: 1
+    adjective1:
+      none: 1
+      accuracy20: 1
+      defense20: 1
+      fortitude20: 1
+      reflex20: 1
+      will20: 1
+      reach4: 1
+      action4: 1

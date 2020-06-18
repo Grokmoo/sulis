@@ -349,7 +349,8 @@ fn try_get_display(
         .with_title("Sulis")
         .with_decorations(decorations)
         .with_fullscreen(fullscreen.clone());
-    let context = ContextBuilder::new().with_pixel_format(24, 8);
+    let context = ContextBuilder::new()
+        .with_pixel_format(24, 8);
 
     match glium::Display::new(window, context, &events_loop) {
         Ok(display) => return Ok(display),

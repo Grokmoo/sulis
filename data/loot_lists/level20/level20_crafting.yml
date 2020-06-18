@@ -1,0 +1,63 @@
+id: level20_crafting
+generate:
+  5: 4
+  6: 4
+weighted_entries:
+  craft_gem01:
+    weight: 30
+  craft_gem02:
+    weight: 30
+  craft_gem03:
+    weight: 30
+  craft_gem04:
+    weight: 30
+  craft_gem05:
+    weight: 30
+  craft_gem06:
+    weight: 10
+  craft_gem07:
+    weight: 10
+  craft_gem08:
+    weight: 10
+  craft_gem09:
+    weight: 10
+  craft_gem10:
+    weight: 10
+  craft_bottle:
+    weight: 5
+  craft_cloth:
+    weight: 5
+  craft_coal:
+    weight: 5
+  craft_copper:
+    weight: 5
+  craft_crystal01:
+    weight: 30
+  craft_crystal02:
+    weight: 30
+  craft_feathers:
+    weight: 5
+  craft_gold:
+    weight: 10
+  craft_iron:
+    weight: 5
+  craft_leaf:
+    weight: 5
+  craft_leather:
+    weight: 5
+  craft_nails:
+    weight: 5
+  craft_paper:
+    weight: 5
+  craft_rope:
+    weight: 5
+  craft_silk:
+    weight: 20
+  craft_silver:
+    weight: 20
+  craft_steel:
+    weight: 5
+  craft_wood:
+    weight: 5
+  misc_trap:
+    weight: 5

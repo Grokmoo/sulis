@@ -1,0 +1,290 @@
+id: level20_armor
+probability_entries: {}
+# format is number of items: weight
+# i.e. 2: 1 means generate 2 items with weight 1
+generate:
+  1: 2
+  2: 2
+  3: 1
+weighted_entries:
+  torso_robe:
+    weight: 5
+    adjective1:
+      masterwork: 5
+      legendary: 5
+    adjective2:
+      none: 5
+      will20: 2
+      intellect4: 2
+      mage_ability4: 2
+      warlock_power4: 2
+      resistance_acid4: 2
+      resistance_cold4: 2
+      resistance_shock4: 2
+      resistance_fire4: 2
+  helm_hood:
+    weight: 5
+    adjective1:
+      masterwork: 5
+      legendary: 5
+    adjective2:
+      none: 4
+      concealment20: 2
+      wisdom4: 2
+      concealment_ignore4: 2
+      action4: 2
+      bard_inspiration4: 2
+  helm_hat:
+    weight: 5
+    adjective1:
+      masterwork: 5
+      legendary: 5
+    adjective2:
+      none: 4
+      reflex20: 2
+      dexterity4: 2
+      concealment_ignore4: 2
+      action4: 2
+      bard_inspiration4: 2
+  boots_leather:
+    weight: 5
+    adjective1:
+      masterwork: 5
+      legendary: 5
+    adjective2:
+      none: 4
+      movement20: 2
+      flanking20: 2
+      initiative4: 2
+      reflex20: 2
+      resistance_cold4: 2
+  boots_mail:
+    weight: 3
+    adjective1:
+      masterwork: 5
+      legendary: 5
+    adjective2:
+      none: 4
+      movement20: 2
+      flanking20: 2
+      initiative4: 2
+      reflex20: 2
+      resistance_cold4: 2
+  boots_plate:
+    weight: 2
+    adjective1:
+      masterwork: 5
+      legendary: 5
+    adjective2:
+      none: 4
+      movement20: 2
+      flanking20: 2
+      initiative4: 2
+      reflex20: 2
+      resistance_cold4: 2
+  gloves_leather:
+    weight: 5
+    adjective1:
+      masterwork: 5
+      legendary: 5
+    adjective2:
+      none: 3
+      reflex20: 2
+      dexterity4: 2
+      reach4: 2
+      resistance_fire4: 2
+  gloves_mail:
+    weight: 3
+    adjective1:
+      masterwork: 5
+      legendary: 5
+    adjective2:
+      none: 3
+      reflex20: 2
+      dexterity4: 2
+      reach4: 2
+      resistance_fire4: 2
+  gloves_plate:
+    weight: 2
+    adjective1:
+      masterwork: 5
+      legendary: 5
+    adjective2:
+      none: 3
+      reflex20: 2
+      dexterity4: 2
+      reach4: 2
+      resistance_fire4: 2
+  helm_leather:
+    weight: 5
+    adjective1:
+      masterwork: 5
+      legendary: 5
+    adjective2:
+      none: 3
+      perception4: 2
+      accuracy20: 2
+      concealment_ignore4: 2
+      resistance_acid4: 2
+  helm_mail:
+    weight: 3
+    adjective1:
+      masterwork: 5
+      legendary: 5
+    adjective2:
+      none: 3
+      perception4: 2
+      accuracy20: 2
+      concealment_ignore4: 2
+      resistance_acid4: 2
+  helm_plate:
+    weight: 2
+    adjective1:
+      masterwork: 5
+      legendary: 5
+    adjective2:
+      none: 3
+      perception4: 2
+      accuracy20: 2
+      concealment_ignore4: 2
+      resistance_acid4: 2
+  legs_leather:
+    weight: 5
+    adjective1:
+      masterwork: 5
+      legendary: 5
+    adjective2:
+      none: 3
+      movement20: 2
+      endurance4: 2
+      action4: 2
+      hit_points4: 2
+  legs_mail:
+    weight: 3
+    adjective1:
+      masterwork: 5
+      legendary: 5
+    adjective2:
+      none: 3
+      movement20: 2
+      endurance4: 2
+      action4: 2
+      hit_points4: 2
+  legs_plate:
+    weight: 2
+    adjective1:
+      masterwork: 5
+      legendary: 5
+    adjective2:
+      none: 3
+      movement20: 2
+      endurance4: 2
+      action4: 2
+      hit_points4: 2
+  torso_leather:
+    weight: 5
+    adjective1:
+      masterwork: 5
+      legendary: 5
+    adjective2:
+      none: 5
+      fortitude20: 2
+      strength4: 2
+      resistance_shock4: 2
+      resistance_crushing4: 2
+      resistance_piercing4: 2
+      resistance_slashing4: 2
+  torso_mail:
+    weight: 3
+    adjective1:
+      masterwork: 5
+      legendary: 5
+    adjective2:
+      none: 5
+      fortitude20: 2
+      strength4: 2
+      resistance_shock4: 2
+      resistance_crushing4: 2
+      resistance_piercing4: 2
+      resistance_slashing4: 2
+  torso_plate:
+    weight: 2
+    adjective1:
+      masterwork: 5
+      legendary: 5
+    adjective2:
+      none: 5
+      fortitude20: 2
+      strength4: 2
+      resistance_shock4: 2
+      resistance_crushing4: 2
+      resistance_piercing4: 2
+      resistance_slashing4: 2
+  shield_small:
+    weight: 5
+    adjective1:
+      masterwork: 5
+      legendary: 5
+    adjective2:
+      none: 5
+      defense20: 2
+      reflex20: 2
+      reach4: 2
+      action4: 2
+      resistance_crushing4: 2
+      resistance_piercing4: 2
+      resistance_slashing4: 2
+    variant:
+      none: 1
+      "0": 1
+  shield_heater:
+    weight: 5
+    adjective1:
+      masterwork: 5
+      legendary: 5
+    adjective2:
+      none: 5
+      defense20: 2
+      reflex20: 2
+      reach4: 2
+      action4: 2
+      resistance_crushing4: 2
+      resistance_piercing4: 2
+      resistance_slashing4: 2
+    variant:
+      none: 1
+      "0": 1
+  shield_kite:
+    weight: 5
+    adjective1:
+      masterwork: 5
+      legendary: 5
+    adjective2:
+      none: 5
+      defense20: 2
+      reflex20: 2
+      reach4: 2
+      action4: 2
+      resistance_crushing4: 2
+      resistance_piercing4: 2
+      resistance_slashing4: 2
+    variant:
+      none: 1
+      "0": 1
+  shield_large:
+    weight: 3
+    adjective1:
+      masterwork: 5
+      legendary: 5
+    adjective2:
+      none: 5
+      defense20: 2
+      reflex20: 2
+      reach4: 2
+      action4: 2
+      resistance_crushing4: 2
+      resistance_piercing4: 2
+      resistance_slashing4: 2
+    variant:
+      none: 1
+      "0": 1

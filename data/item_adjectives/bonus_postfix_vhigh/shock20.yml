@@ -1,0 +1,14 @@
+id: shock20
+name: Shock
+name_postfix: " of Shock"
+item_status_icon: gui/status_shock
+value_modifier: 2.5
+value_add: 8000
+bonus_modifier: 1.0
+penalty_modifier: 1.0
+attack_damage_modifier: 1.0
+attack_bonus_modifier: 1.0
+attack_penalty_modifier: 1.0
+bonuses: []
+attack_bonuses:
+  damage: { min: 8, max: 12, kind: Shock }

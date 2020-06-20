@@ -1,0 +1,6 @@
+id: 4by16
+width: 4
+height: 16
+cursor_image: "gui/empty"
+selection_image: "empty"
+relative_points: [[0, 0]]

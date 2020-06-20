@@ -749,6 +749,15 @@ uniform_sets:
       dark_bag, dark_coins, dark_mug_full, dark_mug_empty, dark_mug_tipped, dark_blood01, dark_blood02,
       dark_gem01, dark_gem02, dark_gem03, dark_chain_hook
     ]
+  aerial_decoration:
+    layer: aerial
+    size: [2, 2]
+    sprite_prefix: "tileset/"
+    impass: []
+    invis: []
+    tiles: [
+      chimney_red, chimney_grey, chimney_blue, chimney_yellow
+    ]
   decoration:
     layer: decoration
     size: [2, 2]

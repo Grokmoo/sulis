@@ -1,0 +1,7 @@
+id: chimney_smoke
+frame_time_millis: 125
+frames:
+  - props/chimney_smoke01
+  - props/chimney_smoke02
+  - props/chimney_smoke03
+  - props/chimney_smoke04

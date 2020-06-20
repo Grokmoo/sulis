@@ -1,0 +1,19 @@
+id: fire01
+frame_time_millis: 100
+frames:
+  - props/fire01_01
+  - props/fire01_02
+  - props/fire01_03
+  - props/fire01_04
+  - props/fire01_05
+  - props/fire01_06
+  - props/fire01_07
+  - props/fire01_08
+  - props/fire01_09
+  - props/fire01_10
+  - props/fire01_11
+  - props/fire01_12
+  - props/fire01_13
+  - props/fire01_14
+  - props/fire01_15
+  - props/fire01_16

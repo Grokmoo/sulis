@@ -1,0 +1,12 @@
+id: fire01
+name: Fire
+icon: inventory/misc_crate
+image: fire01
+size: 4by16
+visible: true
+interactive:
+  Not
+impass: [[0, 12], [1, 12], [2, 12], [3, 12],
+         [0, 13], [1, 13], [2, 13], [3, 13],
+         [0, 14], [1, 14], [2, 14], [3, 14],
+         [0, 15], [1, 15], [2, 15], [3, 15]]

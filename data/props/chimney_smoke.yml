@@ -1,0 +1,8 @@
+id: chimney_smoke
+name: Chimney Smoke
+icon: inventory/misc_crate
+image: chimney_smoke
+size: 2by4
+visible: true
+interactive:
+  Not

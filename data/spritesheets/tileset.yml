@@ -1371,3 +1371,11 @@ groups:
       dead_tree_med_bot: [3, 4, 4, 1]
       dead_tree_large_top: [7, 0, 7, 6]
       dead_tree_large_bot: [7, 6, 7, 1]
+  chimneys:
+    position: [53, 4]
+    size: [1, 1]
+    areas:
+      chimney_red: [0, 0]
+      chimney_grey: [0, 1]
+      chimney_blue: [0, 2]
+      chimney_yellow: [0, 3]

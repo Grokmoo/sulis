@@ -1362,3 +1362,12 @@ groups:
       cave_entry_bright_w: [0, 0, 2, 3]
       cave_entry_bright_c: [2, 0, 1, 3]
       cave_entry_bright_e: [3, 0, 2, 3]
+  dead_trees:
+    position: [44, 28]
+    areas:
+      dead_tree_small_top: [0, 0, 3, 2]
+      dead_tree_small_bot: [0, 2, 3, 1]
+      dead_tree_med_top: [3, 0, 4, 4]
+      dead_tree_med_bot: [3, 4, 4, 1]
+      dead_tree_large_top: [7, 0, 7, 6]
+      dead_tree_large_bot: [7, 6, 7, 1]

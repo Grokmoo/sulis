@@ -2647,3 +2647,30 @@ tiles:
     size: [4, 4]
     sprite: tileset/pillar_large_bot
     impass: [[1, 1], [2, 1], [1, 2], [2, 2]]
+  dead_tree_small_top:
+    layer: aerial
+    size: [6, 4]
+    sprite: tileset/dead_tree_small_top
+  dead_tree_small_bot:
+    layer: object
+    size: [6, 2]
+    sprite: tileset/dead_tree_small_bot
+    impass: [[2, 0], [3, 0], [2, 1], [3, 1]]
+  dead_tree_med_top:
+    layer: aerial
+    size: [8, 8]
+    sprite: tileset/dead_tree_med_top
+  dead_tree_med_bot:
+    layer: object
+    size: [8, 2]
+    sprite: tileset/dead_tree_med_bot
+    impass: [[2, 0], [3, 0], [2, 1], [3, 1]]
+  dead_tree_large_top:
+    layer: aerial
+    size: [14, 12]
+    sprite: tileset/dead_tree_large_top
+  dead_tree_large_bot:
+    layer: object
+    size: [14, 2]
+    sprite: tileset/dead_tree_large_bot
+    impass: [[6, 0], [7, 0], [6, 1], [7, 1]]

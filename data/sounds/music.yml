@@ -104,3 +104,7 @@ sounds:
     file: POL-battle-march-short.ogg
     loops: true
     volume: 0.5
+  village_ruins:
+    file: VillageRuins-isaiah658.ogg
+    loops: true
+    volume: 0.5

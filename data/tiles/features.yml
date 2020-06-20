@@ -1152,3 +1152,27 @@ features:
     size:
       width: 4
       height: 10
+  dead_tree_small:
+    entries:
+      - tiles:
+          dead_tree_small_top: [[0, 0]]
+          dead_tree_small_bot: [[0, 4]]
+    size:
+      width: 6
+      height: 6
+  dead_tree_med:
+    entries:
+      - tiles:
+          dead_tree_med_top: [[0, 0]]
+          dead_tree_med_bot: [[0, 8]]
+    size:
+      width: 8
+      height: 10
+  dead_tree_large:
+    entries:
+      - tiles:
+          dead_tree_large_top: [[0, 0]]
+          dead_tree_large_bot: [[0, 12]]
+    size:
+      width: 14
+      height: 14

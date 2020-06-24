@@ -482,11 +482,14 @@ pub fn setup_logger() {
     });
 
     panic::set_hook(Box::new(|p| {
-        error!("Thread main panic.");
-        warn!("with payload: {:?}", p.payload());
-        if let Some(loc) = p.location() {
-            warn!("at {:?}", loc);
+        if let Some(s) = p.payload().downcast_ref::<String>() {
+            error!("Thread main panic with: '{}'", s);
+        } else if let Some(s) = p.payload().downcast_ref::<&str>() {
+            error!("Thread main panic with: '{}'", s);
+        } else {
+            error!("Thread main panic");
         }
+        warn!("at {:?}", p.location());
 
         let bt = Backtrace::new();
         warn!("{:?}", bt);

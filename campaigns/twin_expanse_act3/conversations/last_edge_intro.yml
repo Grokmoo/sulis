@@ -1,0 +1,24 @@
+id: last_edge_intro
+initial_nodes:
+  - id: start01
+nodes:
+  start01:
+    text: |
+      [c=888|As you round the corner you see the town of Last Edge.  It is not a pretty sight.]
+    responses:
+      - text: |
+          [c=888|Continue]
+        to: start02
+  start02:
+    text: |
+      [c=888|Several buildings burn, and the entire area looks dead.  The town looks to be deserted.]
+    responses:
+      - text: |
+          [c=888|Continue]
+        to: start03
+  start03:
+    text: |
+      [c=888|Nearly deserted, at least.  You see a small group of people just to South.]
+    responses:
+      - text: |
+          [c=888|Go]

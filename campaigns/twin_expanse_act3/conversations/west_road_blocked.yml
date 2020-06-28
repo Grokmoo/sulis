@@ -1,0 +1,26 @@
+id: west_road_blocked
+initial_nodes:
+  - id: start01
+nodes:
+  start01:
+    text: |
+      [c=888|The road here has been blocked, probably by Berkeley's men.]
+    responses:
+      - text: |
+          [c=888|Continue]
+        to: start02
+  start02:
+    text: |
+      [c=888|You will have to go around.]
+    responses:
+      - text: |
+          [c=888|Continue]
+        to: start03
+  start03:
+    text: |
+      [c=888|Your only option appears to be to head North, into the mountains.]
+      
+      [c=888|What might wait for you up there, though?.]
+    responses:
+      - text: |
+          [c=888|Go]

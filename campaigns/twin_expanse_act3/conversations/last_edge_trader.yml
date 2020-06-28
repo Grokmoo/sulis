@@ -1,0 +1,82 @@
+id: last_edge_trader
+initial_nodes:
+  - id: main
+    to_view:
+      - target_flag: already_talked
+  - id: start01
+nodes:
+  start01:
+    text: |
+      [c=6868FF|#target_name#] - [c=888|By his look this man is obviously a merchant; probably a wandering trader.]
+      
+      [c=888|He looks up at you as you approach.]
+    on_view:
+      - target_flag: already_talked
+    responses:
+      - text: "What happened here?"
+        to: start02
+  start02:
+    text: |
+      [c=6868FF|#target_name#] - I was just on my way here when I saw the smoke.  Looks like Berkeley's army came through here.
+      
+      Times are changin, that's for sure.
+    responses:
+      - text: "Berkeley's army?  What is going on?"
+        to: start03
+  start03:
+    text: |
+      [c=6868FF|#target_name#] - You haven't heard?  The whole Rose Lake council was attacked and Berkeley has taken control of the city.
+      
+      He says it was the Dwarves.
+    responses:
+      - text: "But you aren't so sure?"
+        to: start03a
+      - text: "It wasn't the Dwarves!  Berkeley is responsible for the attack!"
+        to: start04
+  start03a:
+    text: |
+      [c=6868FF|#target_name#] - Yeah, I just don't see what the Dwarves stand to gain.  More likely a power grab by Berkeley, I say.
+    responses:
+      - text: "That's right.  Berkeley is responsible."
+        to: start04
+  start04:
+    text: |
+      [c=6868FF|#target_name#] - I suspect as much.  Nothing for us to do about it though.  The army will be headed on to Naathfir to take control there, I wager.
+    on_view:
+      - fire_script:
+          id: last_edge
+          func: trader_quest_update
+    responses:
+      - text: "[c=888|Continue]"
+        to: start05
+  start05:
+    text: |
+      [c=6868FF|#target_name#] - Anyway, I'll be moving on in a couple days.  There is nothing left here.
+    responses:
+      - text: "[c=888|Continue]"
+        to: main
+  main:
+    text: |
+      [c=6868FF|#target_name#] - We could trade, if you like.
+    responses:
+      - text: "Yes, I'll have a look."
+        on_select:
+          - show_merchant:
+              id: last_edge_trader
+              loot_list: level15_misc_merchant
+              buy_frac: 1.0
+              sell_frac: 0.25
+              refresh_time:
+                hour: 24
+      - text: "May we rest here?"
+        to: rest
+      - text: "Not now."
+  rest:
+    text: |
+      [c=6868FF|#target_name#] - Very well.  No harm will come to you here.
+    responses:
+      - text: "[c=888|Rest]"
+        on_select:
+          - fire_script:
+              id: last_edge
+              func: trader_rest

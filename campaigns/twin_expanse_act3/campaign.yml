@@ -42,7 +42,21 @@ world_map:
       name: "Last Edge"
       position: [2, 3]
       icon: desert_town01
+      initially_enabled: true
+      linked_area: last_edge
+      linked_area_pos: [62, 39]
+      travel_times:
+        west_road: 24
+    west_road:
+      name: "West Road"
+      position: [5, 2.5]
+      icon: flat03
       initially_enabled: false
+      initially_visible: false
+      linked_area: west_road
+      linked_area_pos: [6, 100]
+      travel_times:
+        last_edge: 24
     naathfir:
       name: "Naathfir"
       position: [8, 2.5]

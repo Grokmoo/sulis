@@ -1,0 +1,27 @@
+id: rose_elite_level14
+auto_spawn: true
+min_gen_actors: 6
+max_gen_actors: 6
+entries:
+  - id: rose_elite01
+    limit: 2
+    weight: 1
+  - id: rose_elite02
+    limit: 2
+    weight: 1
+  - id: rose_elite03
+    limit: 2
+    weight: 1
+  - id: rose_elite04
+    limit: 2
+    weight: 1
+  - id: rose_elite05
+    limit: 2
+    weight: 1
+  - id: rose_battlemage
+    limit: 1
+    weight: 2
+  - id: rose_warcryer
+    limit: 1
+    weight: 2
+    

@@ -1,0 +1,36 @@
+id: skeleton_lvl14_mage01
+ai: ai_mage
+name: Skeletal Pyromancer
+faction: Hostile
+images: {}
+race: skeleton
+attributes:
+  str: 10
+  dex: 10
+  end: 10
+  per: 10
+  int: 10
+  wis: 10
+levels:
+  mage: 14
+inventory:
+  equipped:
+    HeldMain: { id: quarterstaff }
+  quick:
+    AltHeldMain:
+      id: crossbow
+images:
+  Background: creatures/undead01
+reward:
+  xp: 120
+  loot: level1_misc
+  loot_chance: 35
+abilities:
+  - weapon_crossbow
+  - weapon_simple
+  - fireball
+  - firebolt
+  - fire_shield
+  - haste
+  - deadly_caster
+  - fire_master

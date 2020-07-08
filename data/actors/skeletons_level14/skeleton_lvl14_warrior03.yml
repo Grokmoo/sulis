@@ -1,0 +1,42 @@
+id: skeleton_lvl14_warrior03
+ai: ai_melee
+name: Skeletal Defender
+faction: Hostile
+images: {}
+race: skeleton
+attributes:
+  str: 10
+  dex: 10
+  end: 10
+  per: 10
+  int: 10
+  wis: 10
+levels:
+  fighter: 14
+inventory:
+  equipped:
+    HeldMain: { id: morningstar }
+    HeldOff: { id: shield_heater }
+  quick:
+    AltHeldMain:
+      id: shortbow
+reward:
+  xp: 120
+  loot: level1_misc
+  loot_chance: 35
+abilities:
+  - armor_light
+  - armor_medium
+  - armor_heavy
+  - weapon_axe
+  - weapon_crossbow
+  - weapon_bow
+  - weapon_small_sword
+  - weapon_large_sword
+  - weapon_spear
+  - weapon_mace
+  - weapon_simple
+  - mighty_blow
+  - inspire
+  - shield_throw
+  - defensive_fighting

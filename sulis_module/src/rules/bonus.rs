@@ -160,7 +160,7 @@ impl BonusList {
             }
 
             if let Some(merged_bonus) = merge_if_dup(&bonuses[i], &bonuses[i + 1]) {
-                mem::replace(&mut bonuses[i], merged_bonus);
+                let _ = mem::replace(&mut bonuses[i], merged_bonus);
                 bonuses.remove(i + 1);
             }
 

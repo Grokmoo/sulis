@@ -20,7 +20,7 @@ use std::rc::Rc;
 
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::ui::{animation_state, AnimationState, Color};
-use sulis_core::util::{self, invalid_data_error, Offset, Scale};
+use sulis_core::util::{self, invalid_data_error, Offset, Scale, Size};
 use sulis_module::area::PropData;
 use sulis_module::{prop, ItemState, LootList, Module, ObjectSizeIterator, Prop};
 
@@ -431,6 +431,10 @@ impl AreaDrawable for PropState {
         draw_list.set_color(color);
         self.append_to_draw_list(&mut draw_list, pos, millis + self.millis_offset);
         renderer.draw(draw_list);
+    }
+
+    fn size(&self) -> Size {
+        Size { width: self.prop.size.width, height: self.prop.size.height }
     }
 
     fn location(&self) -> &Location {

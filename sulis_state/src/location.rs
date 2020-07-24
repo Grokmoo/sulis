@@ -14,7 +14,6 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::cmp::Ordering;
 use std::fmt::{Debug, Formatter, Result};
 
 use crate::AreaState;
@@ -31,31 +30,9 @@ pub struct Location {
     pub area_height: i32,
 }
 
-impl Ord for Location {
-    fn cmp(&self, other: &Location) -> Ordering {
-        if self.y < other.y {
-            Ordering::Less
-        } else if self.y > other.y {
-            Ordering::Greater
-        } else if self.x < other.x {
-            Ordering::Less
-        } else if self.x > other.x {
-            Ordering::Greater
-        } else {
-            Ordering::Equal
-        }
-    }
-}
-
 impl Debug for Location {
     fn fmt(&self, fmt: &mut Formatter) -> Result {
         write!(fmt, "{{ {},{} in {} }}", self.x, self.y, self.area_id)
-    }
-}
-
-impl PartialOrd for Location {
-    fn partial_cmp(&self, other: &Location) -> Option<Ordering> {
-        Some(self.cmp(other))
     }
 }
 

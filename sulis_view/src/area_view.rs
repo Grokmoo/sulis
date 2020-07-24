@@ -16,7 +16,7 @@
 
 use std::any::Any;
 use std::cell::{RefCell, RefMut};
-use std::cmp;
+use std::cmp::{self, Ordering};
 use std::mem;
 use std::rc::Rc;
 use std::time;
@@ -399,7 +399,16 @@ impl AreaView {
             } else if !a.aerial() && b.aerial() {
                 std::cmp::Ordering::Less
             } else {
-                a.location().cmp(b.location())
+                let a_y = a.location().y + a.size().height;
+                let a_x = a.location().x + a.size().width / 2;
+                let b_y = b.location().y + b.size().height;
+                let b_x = b.location().x + b.size().width / 2;
+
+                if a_y < b_y { Ordering::Less }
+                else if a_y > b_y { Ordering::Greater }
+                else if a_x < b_x { Ordering::Less }
+                else if a_x > b_x { Ordering::Greater }
+                else { Ordering::Equal }
             }
         });
 

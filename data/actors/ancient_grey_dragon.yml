@@ -1,0 +1,57 @@
+id: ancient_grey_dragon
+name: Ancient Grey Dragon
+faction: Hostile
+inline_race:
+  id: ancient_grey_dragon
+  name: Ancient Grey Dragon
+  size: 6by5
+  movement_rate: 1.3
+  base_stats:
+    - kind: { attribute: { attribute: Strength, amount: 10 } }
+    - kind: { attribute: { attribute: Dexterity, amount: -2 } }
+    - kind: { attribute: { attribute: Endurance, amount: 10 } }
+    - kind: { attribute: { attribute: Intellect, amount: 4 } }
+    - kind: { hit_points: 150 }
+    - kind: { reach: 2.0 }
+  base_attack:
+    damage:
+      min: 30
+      max: 40
+      kind: Piercing
+    kind: #Melee
+      reach: 2.0
+    sounds:
+      miss: sfx/swish_2
+      graze: sfx/thwack-03
+      hit: sfx/hit_3
+      crit: sfx/hit_2
+  default_images:
+    Background: creatures/dragon_large02
+  ticker_offset: [-2.0, -2.0]
+  image_layer_offset_scale: 16
+  image_layer_offsets:
+    Shadow: [-32, -27]
+    Background: [-32, -27]
+attributes:
+  str: 10
+  dex: 10
+  end: 10
+  per: 10
+  int: 10
+  wis: 10
+levels:
+  mage: 19
+reward:
+  xp: 700
+  loot: level5_misc
+  loot_chance: 100
+abilities:
+  - deadly_caster
+  - acid_master
+  - heal
+  - ward
+  - chameleon
+  - petrify
+  - tail_whip
+  - trample
+ai: ai_melee

@@ -57,11 +57,25 @@ world_map:
       linked_area_pos: [6, 100]
       travel_times:
         last_edge: 24
+    mountains_of_naath:
+      name: "Mountains of Naath"
+      position: [6, 1.0]
+      icon: hills03
+      initially_enabled: false
+      initially_visible: false
+      linked_area: mountains_of_naath
+      linked_area_pos: [121, 60]
+      travel_times:
+        naathfir: 12
     naathfir:
       name: "Naathfir"
       position: [8, 2.5]
       icon: mountain_town01
       initially_enabled: false
+      linked_area: naathfir
+      linked_area_pos: [91, 6]
+      travel_times:
+        mountains_of_naath: 12
     rose_lake:
       name: "Rose Lake"
       position: [9.75, 5.5]

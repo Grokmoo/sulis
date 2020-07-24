@@ -9,12 +9,13 @@ groups:
       dragon01: [37, 33, 5, 6]
       demon_lord01: [51, 33, 5, 6]
       demon_lord01_shadow: [56, 33, 5, 6]
-      skeletal_giant: [12, 53, 4, 6]
-      skeletal_dragon: [16, 53, 8, 6]
-      flameling_small: [27, 50, 3, 3]
-      flameling_medium: [27, 53, 4, 6]
-      flameling_large: [31, 50, 7, 8]    
-      minotaur: [12, 59, 4, 5]      
+      skeletal_giant: [12, 50, 4, 6]
+      skeletal_dragon: [16, 50, 8, 6]
+      flameling_small: [29, 50, 3, 3]
+      flameling_medium: [35, 58, 4, 6]
+      flameling_large: [32, 50, 8, 8]    
+      minotaur: [12, 59, 4, 5]
+      dragon_large02: [16, 57, 10, 7]
   1by1:
     size: [1, 1]
     areas:
@@ -78,15 +79,9 @@ groups:
       treeman: [59, 31]
       
       slime_cube: [42, 35]
-      
-      cow0: [42, 42]
-      llama0: [46, 42]
   3by3:
     size: [3, 3]
     areas:
-      pig0: [50, 42]
-      sheep0: [53, 42]
-    
       selected3by3: [30, 36]
       slime1: [16, 36]
       slime2: [19, 36]
@@ -309,11 +304,11 @@ groups:
       imp01: [48, 27]
       imp01_shadow: [48, 30]
           
-      rodian01: [12, 50]
-      rodian02: [15, 50]
-      rodian03: [18, 50]
-      rodian04: [21, 50]
-      rodian05: [24, 50]
+      rodian01: [42, 42]
+      rodian02: [45, 42]
+      rodian03: [48, 42]
+      rodian04: [51, 42]
+      rodian05: [54, 42]
       
       undead01: [36, 24]
       undead02: [39, 24]

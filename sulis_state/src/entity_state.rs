@@ -33,7 +33,7 @@ use crate::{
 };
 use sulis_core::io::GraphicsRenderer;
 use sulis_core::ui::{color, Color};
-use sulis_core::util::{invalid_data_error, Offset, Scale};
+use sulis_core::util::{invalid_data_error, Offset, Scale, Size};
 use sulis_module::area::MAX_AREA_SIZE;
 use sulis_module::{
     actor::Faction, ai, Actor, DamageKind, HitKind, Module, ObjectSize, ObjectSizeIterator,
@@ -582,6 +582,8 @@ pub trait AreaDrawable {
         color: Color,
     );
 
+    fn size(&self) -> Size;
+
     fn location(&self) -> &Location;
 
     fn aerial(&self) -> bool;
@@ -641,6 +643,10 @@ impl AreaDrawable for EntityState {
         if let Some(ref slot) = self.texture_cache_slot {
             slot.draw(renderer, slot_loc, offset, scale, color, self.color_sec);
         }
+    }
+
+    fn size(&self) -> Size {
+        Size { width: self.size.width, height: self.size.height }
     }
 
     fn location(&self) -> &Location {

@@ -38,7 +38,7 @@ inline_race:
   image_layer_offset_scale: 16
   image_layer_offsets:
     Shadow: [-2, 0]
-    Background: [-32, -64]
+    Background: [-40, -64]
 attributes:
   str: 10
   dex: 10

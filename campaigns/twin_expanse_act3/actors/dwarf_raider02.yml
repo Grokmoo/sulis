@@ -1,0 +1,47 @@
+---
+id: dwarf_raider02
+name: Guard
+race: dwarf_simple
+sex: Male
+attributes:
+  str: 16
+  dex: 10
+  end: 16
+  per: 10
+  int: 10
+  wis: 10
+conversation: ~
+faction: Hostile
+images:
+  Shadow: empty
+  Foreground: empty
+  Background: creatures/dwarf06
+hue: 0.3
+inventory:
+  equipped:
+    HeldMain: { id: dwarven_battleaxe, adjectives: ["exceptional"] }
+    HeldOff: { id: dwarven_shield, adjectives: ["exceptional"] }
+    Torso: { id: torso_plate }
+    Legs: { id: legs_plate }
+    Feet: { id: boots_plate }
+    Hands: { id: gloves_plate }
+  quick: {}
+levels:
+  fighter: 13
+abilities:
+  - armor_light
+  - armor_medium
+  - armor_heavy
+  - weapon_axe
+  - weapon_crossbow
+  - weapon_bow
+  - weapon_small_sword
+  - weapon_large_sword
+  - weapon_spear
+  - weapon_mace
+  - weapon_simple
+  - shield_slam
+  - defensive_fighting
+  - guardian
+  - helping_hand
+ai: ai_defender

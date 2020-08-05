@@ -1,0 +1,45 @@
+---
+id: dwarf_raider01
+name: Guard
+race: dwarf_simple
+sex: Male
+attributes:
+  str: 15
+  dex: 10
+  end: 16
+  per: 10
+  int: 10
+  wis: 10
+conversation: ~
+faction: Hostile
+images:
+  Shadow: empty
+  Background: creatures/dwarf05
+  Foreground: empty
+hue: 0.2
+inventory:
+  equipped:
+    HeldMain: { id: dwarven_halberd, adjectives: [ "exceptional"] }
+    Torso: { id: torso_plate }
+    Legs: { id: legs_plate }
+    Feet: { id: boots_plate }
+    Hands: { id: gloves_plate }
+  quick: {}
+levels:
+  fighter: 13
+abilities:
+  - armor_light
+  - armor_medium
+  - armor_heavy
+  - weapon_axe
+  - weapon_crossbow
+  - weapon_bow
+  - weapon_small_sword
+  - weapon_large_sword
+  - weapon_spear
+  - weapon_mace
+  - weapon_simple
+  - powerful_blows
+  - blitz
+  - whirlwind_attack
+ai: ai_melee

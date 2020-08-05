@@ -1,0 +1,69 @@
+id: fire_drake_lvl12
+name: Fire Drake
+faction: Hostile
+inline_race:
+  id: fire_drake
+  name: Fire Drake
+  description: "Monster"
+  size: 3by3
+  movement_rate: 0.8
+  base_stats:
+    - kind: { attribute: { attribute: Strength, amount: 4 } }
+    - kind: { attribute: { attribute: Dexterity, amount: -2 } }
+    - kind: { attribute: { attribute: Endurance, amount: 2 } }
+    - kind: { attribute: { attribute: Intellect, amount: -4 } }
+    - kind: { reach: 1.0 }
+    - kind: { armor: 17 }
+    - kind: { resistance: { kind: "Fire", amount: 50 } }
+    - kind: { resistance: { kind: "Cold", amount: -25 } }
+    - kind: { melee_accuracy: 15 }
+  base_attack:
+    damage:
+      min: 20
+      max: 30
+      kind: Piercing
+    kind: #Melee
+      reach: 1.0
+    sounds:
+      miss: sfx/swish_2
+      graze: sfx/thwack-03
+      hit: sfx/hit_3
+      crit: sfx/hit_2
+  default_images:
+    Background: creatures/dragon_juvenile01
+    Shadow: creatures/ogre_shadow
+  ticker_offset: [-0.5, 1.0]
+  image_layer_offset_scale: 16
+  image_layer_offsets:
+    Shadow: [-8, -20]
+    Background: [-8, -20]
+attributes:
+  str: 10
+  dex: 10
+  end: 10
+  per: 10
+  int: 10
+  wis: 10
+levels:
+  fighter: 12
+inventory:
+  equipped: {}
+reward:
+  xp: 100
+  loot: level5_misc
+  loot_chance: 50
+abilities:
+  - armor_light
+  - armor_medium
+  - armor_heavy
+  - weapon_axe
+  - weapon_crossbow
+  - weapon_bow
+  - weapon_small_sword
+  - weapon_large_sword
+  - weapon_spear
+  - weapon_mace
+  - weapon_simple
+  - mighty_blow
+  - grapple
+ai: ai_melee

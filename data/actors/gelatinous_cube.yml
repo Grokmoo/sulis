@@ -1,0 +1,63 @@
+id: gelatinous_cube
+ai: ai_melee
+name: Gelatinous Cube
+faction: Hostile
+images: {}
+inline_race:
+  id: gelatinous_cube
+  name: Gelatinous Cube
+  description: "Monster"
+  size: 3by3
+  movement_rate: 0.8
+  base_stats:
+    - kind: { attribute: { attribute: Strength, amount: 10 } }
+    - kind: { attribute: { attribute: Dexterity, amount: -2 } }
+    - kind: { attribute: { attribute: Endurance, amount: 10 } }
+    - kind: { attribute: { attribute: Intellect, amount: -8 } }
+    - kind: { reach: 1.0 }
+    - kind: { armor: 10 }
+    - kind: { resistance: { kind: "Slashing", amount: 75 } }
+    - kind: { resistance: { kind: "Piercing", amount: 75 } }
+    - kind: { resistance: { kind: "Crushing", amount: 75 } }
+    - kind: { resistance: { kind: "Acid", amount: 100 } }
+    - kind: { resistance: { kind: "Shock", amount: 50 } }
+    - kind: { melee_accuracy: 15 }
+  base_attack:
+    damage:
+      min: 25
+      max: 35
+      kind: Acid
+    kind: #Melee
+      reach: 2.0
+    sounds:
+      miss: sfx/swish_2
+      graze: sfx/thwack-03
+      hit: sfx/hit_3
+      crit: sfx/hit_2
+  default_images:
+    Background: creatures/slime_cube
+    Shadow: creatures/4x4_large_shadow
+  ticker_offset: [0.0, 0.0]
+  image_layer_offset_scale: 16
+  image_layer_offsets:
+    Shadow: [-8, -19]
+    Background: [-8, -19]
+attributes:
+  str: 10
+  dex: 10
+  end: 10
+  per: 10
+  int: 10
+  wis: 10
+levels:
+  fighter: 16
+reward:
+  xp: 200
+  loot: level5_misc
+  loot_chance: 100
+abilities:
+  - weapon_simple
+  - mighty_blow
+  - acid_spit
+  - grab
+  - toxic_fog

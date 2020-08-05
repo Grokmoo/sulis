@@ -1,0 +1,48 @@
+---
+id: dwarf_chanter
+name: Guard
+race: dwarf_simple
+sex: Male
+attributes:
+  str: 12
+  dex: 10
+  end: 14
+  per: 13
+  int: 14
+  wis: 13
+conversation: ~
+faction: Hostile
+images:
+  Background: creatures/dwarf03
+  Shadow: empty
+  Foreground: empty
+hue: 0.8
+inventory:
+  equipped:
+    Torso: { id: torso_plate }
+    Legs: { id: legs_plate }
+    Feet: { id: boots_plate }
+    Hands: { id: gloves_plate }
+  quick: {}
+levels:
+  bard: 13
+abilities:
+  - armor_light
+  - armor_medium
+  - armor_heavy
+  - weapon_axe
+  - weapon_crossbow
+  - weapon_bow
+  - weapon_small_sword
+  - weapon_large_sword
+  - weapon_spear
+  - weapon_mace
+  - weapon_simple
+  - song_of_survival
+  - song_of_curses
+  - tune_of_unity
+  - theme_of_slaughter
+  - the_endurance_of_durad_vinsen
+  - the_loadstone_of_antimagic
+  - the_trolls_of_shelsham_woods
+ai: ai_mage

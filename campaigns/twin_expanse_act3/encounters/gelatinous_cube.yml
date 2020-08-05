@@ -1,0 +1,11 @@
+id: gelatinous_cube
+auto_spawn: true
+min_gen_actors: 4
+max_gen_actors: 5
+entries:
+  - id: gelatinous_cube
+    always: true
+  - id: shroom_large
+    weight: 1
+  - id: shroom_med
+    weight: 1

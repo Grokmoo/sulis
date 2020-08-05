@@ -1,0 +1,11 @@
+id: ancient_grey_dragon
+auto_spawn: true
+min_gen_actors: 3
+max_gen_actors: 4
+entries:
+  - id: ancient_grey_dragon
+    always: true
+  - id: shroom_large
+    weight: 1
+  - id: shroom_med
+    weight: 1

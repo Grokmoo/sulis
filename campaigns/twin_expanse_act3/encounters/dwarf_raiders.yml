@@ -1,0 +1,21 @@
+id: dwarf_raiders
+auto_spawn: true
+min_gen_actors: 5
+max_gen_actors: 5
+entries:
+  - id: dwarf_raider01
+    limit: 2
+    weight: 1
+  - id: dwarf_raider02
+    limit: 2
+    weight: 1
+  - id: dwarf_raider03
+    limit: 2
+    weight: 1
+  - id: dwarf_raider04
+    limit: 2
+    weight: 1
+  - id: dwarf_chanter
+    limit: 1
+    weight: 2
+    

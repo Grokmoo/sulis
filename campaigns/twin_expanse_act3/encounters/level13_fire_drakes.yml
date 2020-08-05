@@ -1,0 +1,7 @@
+id: level13_fire_drakes
+auto_spawn: true
+min_gen_actors: 5
+max_gen_actors: 6
+entries:
+  - id: fire_drake_lvl12
+    weight: 1

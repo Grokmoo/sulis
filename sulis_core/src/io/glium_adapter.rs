@@ -442,7 +442,7 @@ impl GliumDisplay {
             Err(e) => return glium_error(e),
         };
 
-        display.gl_window().window().set_cursor_visible(true);
+        display.gl_window().window().set_cursor_visible(false);
 
         let (ui_x, ui_y) = Config::ui_size();
 

@@ -14,6 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::time;
 use std::cell::{Ref, RefCell};
 use std::collections::HashMap;
 use std::io::{Error, ErrorKind};
@@ -24,7 +25,7 @@ use crate::io::keyboard_event::Key;
 use crate::io::*;
 use crate::resource::ResourceSet;
 use crate::ui::{Cursor, Widget};
-use crate::util::{Point};
+use crate::util::{Point, get_elapsed_millis};
 
 use glium::backend::Facade;
 use glium::glutin::{
@@ -105,7 +106,6 @@ const SWAP_FRAGMENT_SHADER_SRC: &str = r#"
 
 pub struct GliumDisplay {
     display: glium::Display,
-    event_loop: EventLoop<()>,
     base_program: glium::Program,
     swap_program: glium::Program,
     matrix: [[f32; 4]; 4],
@@ -306,7 +306,7 @@ impl<'a> GraphicsRenderer for GliumRenderer<'a> {
     }
 }
 
-fn glium_error<E: ::std::fmt::Display>(e: E) -> Result<GliumDisplay, Error> {
+fn glium_error<T, E: ::std::fmt::Display>(e: E) -> Result<T, Error> {
     Err(Error::new(ErrorKind::Other, format!("{}", e)))
 }
 
@@ -386,8 +386,19 @@ fn try_get_display(
     glium::Display::new(window, context, &event_loop)
 }
 
+const RESOLUTIONS: [(u32, u32); 8] = [
+    (3840, 2160),
+    (2560, 1440),
+    (1920, 1080),
+    (1768, 992),
+    (1600, 900),
+    (1536, 864),
+    (1366, 768),
+    (1280, 720),
+];
+
 impl GliumDisplay {
-    pub fn new() -> Result<GliumDisplay, Error> {
+    pub fn new() -> Result<(GliumDisplay, EventLoop<()>), Error> {
         debug!("Initialize Glium Display adapter.");
         let event_loop = EventLoop::new();
         let monitor = get_monitor(&event_loop);
@@ -446,9 +457,8 @@ impl GliumDisplay {
 
         let (ui_x, ui_y) = Config::ui_size();
 
-        Ok(GliumDisplay {
+        Ok((GliumDisplay {
             display,
-            event_loop,
             base_program,
             swap_program,
             matrix: [
@@ -459,26 +469,13 @@ impl GliumDisplay {
             ],
             textures: HashMap::new(),
             scale_factor,
-        })
+        }, event_loop))
     }
-}
 
-const RESOLUTIONS: [(u32, u32); 8] = [
-    (3840, 2160),
-    (2560, 1440),
-    (1920, 1080),
-    (1768, 992),
-    (1600, 900),
-    (1536, 864),
-    (1366, 768),
-    (1280, 720),
-];
-
-impl IO for GliumDisplay {
-    fn get_display_configurations(&self) -> Vec<DisplayConfiguration> {
+    fn get_display_configurations(&self, event_loop: &EventLoop<()>) -> Vec<DisplayConfiguration> {
         let mut configs = Vec::new();
 
-        for (index, monitor_id) in self.event_loop.available_monitors().enumerate() {
+        for (index, monitor_id) in event_loop.available_monitors().enumerate() {
             // glium get_name() does not seem to return anything useful in most cases
             let name = format!("Monitor {}", index + 1);
             let modes: Vec<(u32, u32)> = monitor_id.video_modes().map(|mode| mode.size().into()).collect();
@@ -507,38 +504,6 @@ impl IO for GliumDisplay {
         configs
     }
 
-    fn process_input(&mut self, root: Rc<RefCell<Widget>>) {
-        let (ui_x, ui_y) = Config::ui_size();
-        let mut mouse_move: Option<(f32, f32)> = None;
-        let display_size: LogicalSize<f64> = self.display.gl_window().window().inner_size().to_logical(self.scale_factor);
-
-
-        use glium::glutin::platform::desktop::EventLoopExtDesktop;
-
-        self.event_loop.run_return(|event, _, flow| {
-            *flow = ControlFlow::Exit;
-            if let Event::WindowEvent { event, .. } = event {
-                match event {
-                    WindowEvent::CursorMoved { position, .. } => {
-                        let mouse_x = (ui_x as f64 * position.x / display_size.width) as f32;
-                        let mouse_y = (ui_y as f64 * position.y / display_size.height) as f32;
-                        mouse_move = Some((mouse_x, mouse_y));
-                    }
-                    _ => {
-                        for action in process_window_event(event) {
-                            InputAction::handle_action(action, &root);
-                        }
-                    }
-                }
-            }
-        });
-
-        // merge all mouse move events into at most one per frame
-        if let Some((mouse_x, mouse_y)) = mouse_move {
-            InputAction::handle_action(InputAction::MouseMove(mouse_x, mouse_y), &root);
-        }
-    }
-
     fn render_output(&mut self, root: Ref<Widget>, millis: u32) {
         let mut target = self.display.draw();
         target.clear_color(0.0, 0.0, 0.0, 1.0);
@@ -555,6 +520,102 @@ impl IO for GliumDisplay {
         }
         target.finish().unwrap();
     }
+}
+
+pub fn main_loop(
+    mut io: GliumDisplay,
+    event_loop: EventLoop<()>,
+    mut audio: Option<AudioDevice>,
+    updater: Box<dyn MainLoopUpdater>,
+    root: Rc<RefCell<Widget>>
+) {
+    let mut scale = io.scale_factor;
+    let (ui_x, ui_y) = Config::ui_size();
+    let mut mouse_move: Option<(f32, f32)> = None;
+    let mut display_size: LogicalSize<f64> = io.display.gl_window().window().inner_size().to_logical(scale);
+
+    let frame_time = time::Duration::from_secs_f32(1.0 / Config::frame_rate() as f32);
+
+    info!("Starting main loop.");
+    let main_loop_start_time = time::Instant::now();
+
+    let mut frames = 0;
+    let mut render_time = time::Duration::from_secs(0);
+    let mut last_start_time = time::Instant::now();
+
+    let mut last_elapsed = 0;
+    let mut total_elapsed = 0;
+
+    event_loop.run(move |event, _, control_flow| {
+        *control_flow = ControlFlow::WaitUntil(last_start_time + frame_time);
+
+        match event {
+            Event::WindowEvent { event: WindowEvent::Resized(size), .. } => {
+                display_size = size.to_logical(scale);
+            },
+            Event::WindowEvent { event: WindowEvent::ScaleFactorChanged { scale_factor, new_inner_size, ..}, .. } => {
+                scale = scale_factor;
+                display_size = new_inner_size.to_logical(scale);
+            }
+            Event::NewEvents(_) => {
+                last_elapsed = get_elapsed_millis(last_start_time.elapsed());
+                last_start_time = time::Instant::now();
+                total_elapsed = get_elapsed_millis(main_loop_start_time.elapsed());
+            },
+            Event::MainEventsCleared => {
+                // merge all mouse move events into at most one per frame
+                if let Some((mouse_x, mouse_y)) = mouse_move {
+                    InputAction::handle_action(InputAction::MouseMove(mouse_x, mouse_y), &root);
+                }
+                mouse_move = None;
+
+                updater.update(&root, last_elapsed);
+                if updater.is_exit() {
+                    *control_flow = ControlFlow::Exit;
+                }
+
+                Audio::update(audio.as_mut(), last_elapsed);
+
+                if let Err(e) = Widget::update(&root, last_elapsed) {
+                    error!("There was a fatal error updating the UI tree state.");
+                    error!("{}", e);
+                    *control_flow = ControlFlow::Exit;
+                }
+
+                io.render_output(root.borrow(), total_elapsed);
+
+                render_time += last_start_time.elapsed();
+                frames += 1;
+            },
+            Event::LoopDestroyed => {
+                let secs = render_time.as_secs() as f64 + render_time.subsec_nanos() as f64 * 1e-9;
+                info!(
+                    "Rendered {} frames with total render time {:.4} seconds",
+                    frames, secs
+                );
+                info!(
+                    "Average frame render time: {:.2} milliseconds",
+                    1000.0 * secs / frames as f64
+                );
+            },
+            event => {
+                if let Event::WindowEvent { event, .. } = event {
+                    match event {
+                        WindowEvent::CursorMoved { position, .. } => {
+                            let mouse_x = (ui_x as f64 * position.x / display_size.width) as f32;
+                            let mouse_y = (ui_y as f64 * position.y / display_size.height) as f32;
+                            mouse_move = Some((mouse_x, mouse_y));
+                        }
+                        _ => {
+                            for action in process_window_event(event) {
+                                InputAction::handle_action(action, &root);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    });
 }
 
 fn get_mag_filter(filter: TextureMagFilter) -> MagnifySamplerFilter {

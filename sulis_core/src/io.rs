@@ -20,7 +20,7 @@ pub use self::audio::{Audio, AudioDevice, AudioDeviceInfo, SoundSource, create_a
 pub mod event;
 pub use self::event::Event;
 
-mod glium_adapter;
+pub mod glium_adapter;
 
 mod input_action;
 pub use self::input_action::InputAction;
@@ -32,6 +32,7 @@ use std::cell::{Ref, RefCell};
 use std::io::{Error};
 use std::rc::Rc;
 
+use glium::glutin::event_loop::EventLoop;
 use crate::extern_image::{ImageBuffer, Rgba};
 
 use crate::config::{Config, IOAdapter};
@@ -58,17 +59,6 @@ pub trait MainLoopUpdater {
     fn update(&self, root: &Rc<RefCell<Widget>>, millis: u32);
 
     fn is_exit(&self) -> bool;
-}
-
-pub trait IO {
-    fn process_input(&mut self, root: Rc<RefCell<Widget>>);
-
-    fn render_output(&mut self, root: Ref<Widget>, millis: u32);
-
-    /// Returns a list of available display configurations.  Each monitor
-    /// name is in the overall vec, with each entry in the vec for that key
-    /// a valid (x, y) display resolution
-    fn get_display_configurations(&self) -> Vec<DisplayConfiguration>;
 }
 
 pub trait GraphicsRenderer {
@@ -336,47 +326,9 @@ pub struct Vertex {
 
 implement_vertex!(Vertex, position, tex_coords);
 
-pub struct System {
-    io: Box<dyn IO>,
-    audio: Option<AudioDevice>,
-}
-
-impl System {
-    pub fn io(&mut self) -> &mut dyn IO {
-        self.io.as_mut()
-    }
-
-    pub fn audio(&mut self) -> Option<&mut AudioDevice> {
-        self.audio.as_mut()
-    }
-}
-
-pub fn create() -> Result<System, Error> {
-    let io = match Config::display_adapter() {
-        IOAdapter::Auto => get_auto_adapter(),
-        IOAdapter::Glium => get_glium_adapter(),
-    }?;
-
+pub fn create_glium() -> Result<(glium_adapter::GliumDisplay, EventLoop<()>, Option<AudioDevice>), Error> {
+    let (io, event_loop) = glium_adapter::GliumDisplay::new()?;
     let audio = create_audio_device();
 
-    Ok(System {
-        io,
-        audio,
-    })
-}
-
-#[cfg(not(target_os = "windows"))]
-pub fn get_auto_adapter() -> Result<Box<dyn IO>, Error> {
-    get_glium_adapter()
-}
-
-pub fn get_glium_adapter() -> Result<Box<dyn IO>, Error> {
-    let adapter = glium_adapter::GliumDisplay::new()?;
-
-    Ok(Box::new(adapter))
-}
-
-#[cfg(target_os = "windows")]
-pub fn get_auto_adapter() -> Result<Box<dyn IO>, Error> {
-    get_glium_adapter()
+    Ok((io, event_loop, audio))
 }

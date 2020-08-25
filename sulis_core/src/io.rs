@@ -54,8 +54,10 @@ pub struct Resolution {
     pub monitor_size: bool,
 }
 
-pub trait MainLoopUpdater {
-    fn update(&self, root: &Rc<RefCell<Widget>>, millis: u32);
+pub trait ControlFlowUpdater {
+    fn update(&mut self, millis: u32) -> Rc<RefCell<Widget>>;
+
+    fn root(&self) -> Rc<RefCell<Widget>>;
 
     fn is_exit(&self) -> bool;
 }
@@ -337,12 +339,30 @@ impl System {
         Ok(System::Glium(glium_system))
     }
 
-    pub fn main_loop(self, root: Rc<RefCell<Widget>>, updater: Box<dyn MainLoopUpdater>) {
+    pub fn main_loop(self, updater: Box<dyn ControlFlowUpdater>) {
         match self {
             System::Glium(glium_system) => {
-                glium_adapter::main_loop(glium_system, root, updater);
+                glium_adapter::main_loop(glium_system, updater);
+            }
+        }
+    }
+
+    pub fn get_display_configurations(&self) -> Vec<DisplayConfiguration> {
+        match self {
+            System::Glium(glium_system) => {
+                glium_system.io.get_display_configurations(&glium_system.event_loop)
             }
         }
     }
 }
 
+const RESOLUTIONS: [(u32, u32); 8] = [
+    (3840, 2160),
+    (2560, 1440),
+    (1920, 1080),
+    (1768, 992),
+    (1600, 900),
+    (1536, 864),
+    (1366, 768),
+    (1280, 720),
+];

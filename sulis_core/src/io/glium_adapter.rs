@@ -15,10 +15,8 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::time;
-use std::cell::{Ref, RefCell};
 use std::collections::HashMap;
 use std::io::{Error, ErrorKind};
-use std::rc::Rc;
 
 use crate::config::{Config, DisplayMode};
 use crate::io::keyboard_event::Key;
@@ -122,7 +120,6 @@ pub struct GliumRenderer<'a> {
     target: &'a mut glium::Frame,
     display: &'a mut GliumDisplay,
     params: glium::DrawParameters<'a>,
-    scale_factor: f64,
 }
 
 impl<'a> GliumRenderer<'a> {
@@ -135,12 +132,10 @@ impl<'a> GliumRenderer<'a> {
             ..Default::default()
         };
 
-        let scale_factor = display.scale_factor;
         GliumRenderer {
             target,
             display,
             params,
-            scale_factor,
         }
     }
 
@@ -386,17 +381,6 @@ fn try_get_display(
     glium::Display::new(window, context, &event_loop)
 }
 
-const RESOLUTIONS: [(u32, u32); 8] = [
-    (3840, 2160),
-    (2560, 1440),
-    (1920, 1080),
-    (1768, 992),
-    (1600, 900),
-    (1536, 864),
-    (1366, 768),
-    (1280, 720),
-];
-
 pub struct GliumSystem {
     pub io: GliumDisplay,
     pub event_loop: EventLoop<()>,
@@ -485,7 +469,7 @@ impl GliumDisplay {
         }, event_loop))
     }
 
-    fn get_display_configurations(&self, event_loop: &EventLoop<()>) -> Vec<DisplayConfiguration> {
+    pub(crate) fn get_display_configurations(&self, event_loop: &EventLoop<()>) -> Vec<DisplayConfiguration> {
         let mut configs = Vec::new();
 
         for (index, monitor_id) in event_loop.available_monitors().enumerate() {
@@ -517,7 +501,7 @@ impl GliumDisplay {
         configs
     }
 
-    fn render_output(&mut self, root: Ref<Widget>, millis: u32) {
+    fn render_output(&mut self, root: &Widget, millis: u32) {
         let mut target = self.display.draw();
         target.clear_color(0.0, 0.0, 0.0, 1.0);
         {
@@ -537,12 +521,12 @@ impl GliumDisplay {
 
 pub(crate) fn main_loop(
     system: GliumSystem,
-    root: Rc<RefCell<Widget>>,
-    updater: Box<dyn MainLoopUpdater>,
+    mut updater: Box<dyn ControlFlowUpdater>,
 ) {
     let mut io = system.io;
     let event_loop = system.event_loop;
     let mut audio = system.audio;
+    let mut root = updater.root();
 
     let mut scale = io.scale_factor;
     let (ui_x, ui_y) = Config::ui_size();
@@ -584,7 +568,7 @@ pub(crate) fn main_loop(
                 }
                 mouse_move = None;
 
-                updater.update(&root, last_elapsed);
+                root = updater.update(last_elapsed);
                 if updater.is_exit() {
                     *control_flow = ControlFlow::Exit;
                 }
@@ -597,7 +581,7 @@ pub(crate) fn main_loop(
                     *control_flow = ControlFlow::Exit;
                 }
 
-                io.render_output(root.borrow(), total_elapsed);
+                io.render_output(&root.borrow(), total_elapsed);
 
                 render_time += last_start_time.elapsed();
                 frames += 1;

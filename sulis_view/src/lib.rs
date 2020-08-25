@@ -124,7 +124,7 @@ pub use self::screen_shake::ScreenShake;
 mod script_menu;
 pub use self::script_menu::ScriptMenu;
 
-mod trigger_activator;
+pub mod trigger_activator;
 
 mod window_fade;
 pub use self::window_fade::WindowFade;
@@ -136,36 +136,9 @@ use std::any::Any;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use sulis_core::io::MainLoopUpdater;
 use sulis_core::ui::{Widget, WidgetKind};
 use sulis_core::widgets::{Button, ConfirmationWindow, Label};
 use sulis_state::{ChangeListener, GameState};
-
-pub struct GameMainLoopUpdater {
-    view: Rc<RefCell<RootView>>,
-}
-
-impl GameMainLoopUpdater {
-    pub fn new(view: &Rc<RefCell<RootView>>) -> GameMainLoopUpdater {
-        GameMainLoopUpdater {
-            view: Rc::clone(view),
-        }
-    }
-}
-
-impl MainLoopUpdater for GameMainLoopUpdater {
-    fn update(&self, root: &Rc<RefCell<Widget>>, millis: u32) {
-        let ui_cb = GameState::update(millis);
-
-        if let Some(cb) = ui_cb {
-            trigger_activator::activate(root, &cb.on_trigger, &cb.parent, &cb.target);
-        }
-    }
-
-    fn is_exit(&self) -> bool {
-        self.view.borrow().next_step.is_some()
-    }
-}
 
 pub struct PortraitPane {}
 

@@ -75,7 +75,7 @@ use std::any::Any;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use sulis_core::io::{GraphicsRenderer, InputAction, MainLoopUpdater};
+use sulis_core::io::{GraphicsRenderer, InputAction, ControlFlowUpdater};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_core::util::{Offset, Scale};
 use sulis_core::widgets::{list_box, Button, ConfirmationWindow, DropDown};
@@ -84,10 +84,26 @@ thread_local! {
     static EXIT: RefCell<bool> = RefCell::new(false);
 }
 
-pub struct EditorMainLoopUpdater {}
+pub struct EditorControlFlowUpdater {
+    root: Rc<RefCell<Widget>>,
+}
 
-impl MainLoopUpdater for EditorMainLoopUpdater {
-    fn update(&self, _root: &Rc<RefCell<Widget>>, _millis: u32) {}
+impl EditorControlFlowUpdater {
+    pub fn new(root: Rc<RefCell<Widget>>) -> EditorControlFlowUpdater {
+        EditorControlFlowUpdater {
+            root
+        }
+    }
+}
+
+impl ControlFlowUpdater for EditorControlFlowUpdater {
+    fn update(&mut self, _millis: u32) -> Rc<RefCell<Widget>> {
+        self.root()
+    }
+
+    fn root(&self) -> Rc<RefCell<Widget>> {
+        Rc::clone(&self.root)
+    }
 
     fn is_exit(&self) -> bool {
         EXIT.with(|exit| *exit.borrow())

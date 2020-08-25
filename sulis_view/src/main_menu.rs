@@ -37,7 +37,7 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 use sulis_core::config::Config;
-use sulis_core::io::{DisplayConfiguration, InputAction, MainLoopUpdater, AudioDeviceInfo};
+use sulis_core::io::{DisplayConfiguration, InputAction, AudioDeviceInfo};
 use sulis_core::ui::*;
 use sulis_core::util;
 use sulis_core::widgets::{Button, ConfirmationWindow, TextArea};
@@ -45,26 +45,6 @@ use sulis_module::{modification, Module};
 use sulis_state::{save_file, NextGameStep};
 
 use crate::{CharacterBuilder, LoadWindow};
-
-pub struct LoopUpdater {
-    view: Rc<RefCell<MainMenu>>,
-}
-
-impl LoopUpdater {
-    pub fn new(view: &Rc<RefCell<MainMenu>>) -> LoopUpdater {
-        LoopUpdater {
-            view: Rc::clone(view),
-        }
-    }
-}
-
-impl MainLoopUpdater for LoopUpdater {
-    fn update(&self, _root: &Rc<RefCell<Widget>>, _millis: u32) {}
-
-    fn is_exit(&self) -> bool {
-        self.view.borrow().is_exit()
-    }
-}
 
 enum Mode {
     New,
@@ -112,10 +92,6 @@ impl MainMenu {
     pub fn reset(&mut self) {
         self.mode = Mode::NoChoice;
         self.content = Widget::empty("content");
-    }
-
-    pub fn is_exit(&self) -> bool {
-        self.next_step.is_some()
     }
 
     pub fn next_step(&mut self) -> Option<NextGameStep> {

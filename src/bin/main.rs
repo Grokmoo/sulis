@@ -21,7 +21,6 @@ use std::rc::Rc;
 
 use log::{error, info};
 
-use sulis_core::io::{System};
 use sulis_core::resource::ResourceSet;
 use sulis_core::ui::{self, Cursor};
 use sulis_core::util::{self, ActiveResources};

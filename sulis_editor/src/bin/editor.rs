@@ -21,7 +21,7 @@ use sulis_core::config::Config;
 use sulis_core::resource::ResourceSet;
 use sulis_core::ui;
 use sulis_core::util;
-use sulis_core::io::{glium_adapter};
+use sulis_core::io::System;
 use sulis_module::Module;
 
 use sulis_editor::{EditorMainLoopUpdater, EditorView};
@@ -59,17 +59,17 @@ fn main() {
     }
 
     info!("Setting up display adapter.");
-    let (io, event_loop, audio) = match sulis_core::io::create_glium() {
-        Ok(data) => data,
+    let system = match System::create() {
+        Ok(system) => system,
         Err(e) => {
             error!("{}", e);
-            util::error_and_exit("Fatal error initializing the display.");
+            util::error_and_exit("Fatal error creating the display system.");
             unreachable!();
         }
     };
 
     let root = ui::create_ui_tree(EditorView::new());
 
-    glium_adapter::main_loop(io, event_loop, audio, Box::new(EditorMainLoopUpdater {}), root);
+    system.main_loop(root, Box::new(EditorMainLoopUpdater {}));
 }
 

@@ -20,7 +20,7 @@ pub use self::audio::{Audio, AudioDevice, AudioDeviceInfo, SoundSource, create_a
 pub mod event;
 pub use self::event::Event;
 
-pub mod glium_adapter;
+mod glium_adapter;
 
 mod input_action;
 pub use self::input_action::InputAction;
@@ -29,10 +29,9 @@ pub mod keyboard_event;
 pub use self::keyboard_event::KeyboardEvent;
 
 use std::cell::{RefCell};
-use std::io::{Error};
+use std::io::Error;
 use std::rc::Rc;
 
-use glium::glutin::event_loop::EventLoop;
 use crate::extern_image::{ImageBuffer, Rgba};
 
 use crate::config::{Config};
@@ -326,9 +325,24 @@ pub struct Vertex {
 
 implement_vertex!(Vertex, position, tex_coords);
 
-pub fn create_glium() -> Result<(glium_adapter::GliumDisplay, EventLoop<()>, Option<AudioDevice>), Error> {
-    let (io, event_loop) = glium_adapter::GliumDisplay::new()?;
-    let audio = create_audio_device();
-
-    Ok((io, event_loop, audio))
+pub enum System {
+    Glium(glium_adapter::GliumSystem),
 }
+
+impl System {
+    pub fn create() -> Result<System, Error> {
+        // just always create glium for now
+        let glium_system = glium_adapter::create_system()?;
+
+        Ok(System::Glium(glium_system))
+    }
+
+    pub fn main_loop(self, root: Rc<RefCell<Widget>>, updater: Box<dyn MainLoopUpdater>) {
+        match self {
+            System::Glium(glium_system) => {
+                glium_adapter::main_loop(glium_system, root, updater);
+            }
+        }
+    }
+}
+

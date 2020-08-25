@@ -21,6 +21,7 @@ use sulis_core::config::Config;
 use sulis_core::resource::ResourceSet;
 use sulis_core::ui;
 use sulis_core::util;
+use sulis_core::io::{glium_adapter};
 use sulis_module::Module;
 
 use sulis_editor::{EditorMainLoopUpdater, EditorView};
@@ -58,21 +59,17 @@ fn main() {
     }
 
     info!("Setting up display adapter.");
-    let mut system = match sulis_core::io::create() {
-        Ok(system) => system,
+    let (io, event_loop, audio) = match sulis_core::io::create_glium() {
+        Ok(data) => data,
         Err(e) => {
             error!("{}", e);
-            util::error_and_exit("There was a fatal error initializing the display.");
+            util::error_and_exit("Fatal error initializing the display.");
             unreachable!();
         }
     };
 
     let root = ui::create_ui_tree(EditorView::new());
 
-    if let Err(e) = util::main_loop(&mut system, root, Box::new(EditorMainLoopUpdater {})) {
-        error!("{}", e);
-        error!("Error in main loop.  Exiting...");
-    }
-
-    util::ok_and_exit("Main loop complete.");
+    glium_adapter::main_loop(io, event_loop, audio, Box::new(EditorMainLoopUpdater {}), root);
 }
+

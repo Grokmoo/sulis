@@ -397,6 +397,19 @@ const RESOLUTIONS: [(u32, u32); 8] = [
     (1280, 720),
 ];
 
+pub struct GliumSystem {
+    pub io: GliumDisplay,
+    pub event_loop: EventLoop<()>,
+    pub audio: Option<AudioDevice>,
+}
+
+pub fn create_system() -> Result<GliumSystem, Error> {
+    let (io, event_loop) = glium_adapter::GliumDisplay::new()?;
+    let audio = create_audio_device();
+
+    Ok(GliumSystem { io, event_loop, audio })
+}
+
 impl GliumDisplay {
     pub fn new() -> Result<(GliumDisplay, EventLoop<()>), Error> {
         debug!("Initialize Glium Display adapter.");
@@ -522,13 +535,15 @@ impl GliumDisplay {
     }
 }
 
-pub fn main_loop(
-    mut io: GliumDisplay,
-    event_loop: EventLoop<()>,
-    mut audio: Option<AudioDevice>,
+pub(crate) fn main_loop(
+    system: GliumSystem,
+    root: Rc<RefCell<Widget>>,
     updater: Box<dyn MainLoopUpdater>,
-    root: Rc<RefCell<Widget>>
 ) {
+    let mut io = system.io;
+    let event_loop = system.event_loop;
+    let mut audio = system.audio;
+
     let mut scale = io.scale_factor;
     let (ui_x, ui_y) = Config::ui_size();
     let mut mouse_move: Option<(f32, f32)> = None;

@@ -18,15 +18,92 @@
 
 use std::collections::HashMap;
 use std::rc::Rc;
+use std::cell::RefCell;
 
 use log::{error, info};
 
 use sulis_core::resource::ResourceSet;
-use sulis_core::ui::{self, Cursor};
+use sulis_core::io::System;
+use sulis_core::ui::{self, Cursor, Widget};
 use sulis_core::util::{self, ActiveResources};
 use sulis_module::{Actor, Module};
 use sulis_state::{GameState, NextGameStep, SaveState};
-use sulis_view::{main_menu, RootView};
+use sulis_view::{main_menu::{self, MainMenu}, RootView, trigger_activator};
+
+struct ControlFlowUpdater {
+    root: Rc<RefCell<Widget>>,
+    mode: UiMode,
+    exit: bool,
+}
+
+#[derive(Clone)]
+enum UiMode {
+    MainMenu(Rc<RefCell<MainMenu>>),
+    Game(Rc<RefCell<RootView>>),
+}
+
+impl ControlFlowUpdater {
+    fn new(system: &System) -> ControlFlowUpdater {
+        let view = main_menu::MainMenu::new(
+            system.get_display_configurations(),
+            sulis_core::io::audio::get_audio_devices(),
+        );
+        let root = ui::create_ui_tree(view.clone());
+
+        ControlFlowUpdater {
+            root,
+            mode: UiMode::MainMenu(view),
+            exit: false,
+        }
+    }
+
+    fn handle_next_step(&mut self, step: NextGameStep) {
+        use NextGameStep::*;
+        match step {
+            Exit => {
+                self.exit = true;
+            }, NewCampaign { pc_actor } => {
+
+            }, LoadCampaign { save_state } => {
+
+            }, LoadModuleAndNewCampaign { pc_actor, party_actors, flags, module_dir } => {
+
+            }, MainMenu => {
+
+            }, MainMenuReloadResources => {
+
+            }, RecreateIo => {
+
+            }
+        }
+    }
+
+    fn update(&mut self, millis: u32) -> Rc<RefCell<Widget>> {
+        let mode = self.mode.clone();
+
+        match mode {
+            UiMode::MainMenu(view) => {
+                if let Some(step) = view.borrow_mut().next_step() {
+                    self.handle_next_step(step);
+                }
+            }, UiMode::Game(view) => {
+                let ui_cb = GameState::update(millis);
+
+                if let Some(cb) = ui_cb {
+                    trigger_activator::activate(&self.root, &cb.on_trigger, &cb.parent, &cb.target);
+                }
+
+                if let Some(step) = view.borrow_mut().next_step() {
+                    self.handle_next_step(step);
+                }
+            }
+        }
+
+        Rc::clone(&self.root)
+    }
+
+    fn is_exit(&self) -> bool { self.exit }
+}
 
 fn init() -> System {
     // CONFIG will be lazily initialized here; if it fails it
@@ -44,11 +121,11 @@ fn create_io() -> System {
     Cursor::update_max();
 
     info!("Setting up display adapter.");
-    match sulis_core::io::create() {
+    match System::create() {
         Ok(system) => system,
         Err(e) => {
             error!("{}", e);
-            util::error_and_exit("There was a fatal error initializing the display.");
+            util::error_and_exit("There was a fatal error initializing the display system.");
             unreachable!();
         }
     }
@@ -82,7 +159,7 @@ fn load_resources() {
 
 fn main_menu(system: &mut System) -> NextGameStep {
     let view = main_menu::MainMenu::new(
-        system.io().get_display_configurations(),
+        system.get_display_configurations(),
         sulis_core::io::audio::get_audio_devices(),
     );
     let loop_updater = main_menu::LoopUpdater::new(&view);

@@ -24,7 +24,7 @@ use sulis_core::util;
 use sulis_core::io::System;
 use sulis_module::Module;
 
-use sulis_editor::{EditorMainLoopUpdater, EditorView};
+use sulis_editor::{EditorControlFlowUpdater, EditorView};
 
 fn main() {
     // CONFIG will be lazily initialized here; if it fails it
@@ -70,6 +70,6 @@ fn main() {
 
     let root = ui::create_ui_tree(EditorView::new());
 
-    system.main_loop(root, Box::new(EditorMainLoopUpdater {}));
+    system.main_loop(Box::new(EditorControlFlowUpdater::new(root)));
 }
 

@@ -20,7 +20,6 @@ pub use self::point::{Offset, Point, Rect, Scale};
 pub mod size;
 pub use self::size::Size;
 
-use std::cell::RefCell;
 use std::cmp::Ordering;
 use std::f32;
 use std::fmt;
@@ -29,9 +28,7 @@ use std::io::{Error, ErrorKind};
 use std::ops::*;
 use std::panic;
 use std::path::PathBuf;
-use std::rc::Rc;
 use std::time::Duration;
-use std::{thread, time};
 
 use backtrace::Backtrace;
 use log::LevelFilter;
@@ -40,9 +37,7 @@ use rand::{self, distributions::uniform::SampleUniform, seq::SliceRandom, Rng};
 use rand_pcg::Pcg64Mcg;
 
 use crate::config::{self, Config};
-use crate::io::{Audio, MainLoopUpdater};
 use crate::resource::write_to_file;
-use crate::ui::Widget;
 
 const MAX_ULPS: i32 = 100;
 const MAX_DIFF: f32 = 2.0 * std::f32::EPSILON;

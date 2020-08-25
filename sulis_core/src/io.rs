@@ -28,14 +28,14 @@ pub use self::input_action::InputAction;
 pub mod keyboard_event;
 pub use self::keyboard_event::KeyboardEvent;
 
-use std::cell::{Ref, RefCell};
+use std::cell::{RefCell};
 use std::io::{Error};
 use std::rc::Rc;
 
 use glium::glutin::event_loop::EventLoop;
 use crate::extern_image::{ImageBuffer, Rgba};
 
-use crate::config::{Config, IOAdapter};
+use crate::config::{Config};
 use crate::resource::{Sprite};
 use crate::ui::{Color, Widget};
 use crate::util::{Point, Rect, Scale, Size};

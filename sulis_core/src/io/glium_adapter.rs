@@ -212,8 +212,8 @@ impl<'a> GraphicsRenderer for GliumRenderer<'a> {
     fn set_scissor(&mut self, pos: Point, size: Size) {
         let window_size = self.display.display.gl_window().window().inner_size();
         let (res_x, res_y) = Config::ui_size();
-        let scale_x = self.scale_factor * window_size.width as f64 / res_x as f64;
-        let scale_y = self.scale_factor * window_size.height as f64 / res_y as f64;
+        let scale_x = window_size.width as f64 / res_x as f64;
+        let scale_y = window_size.height as f64 / res_y as f64;
 
         let rect = glium::Rect {
             left: (pos.x as f64 * scale_x) as u32,

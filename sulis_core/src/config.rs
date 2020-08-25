@@ -86,10 +86,6 @@ impl Config {
         CONFIG.with(|c| c.borrow().display.default_cursor.to_string())
     }
 
-    pub fn display_adapter() -> IOAdapter {
-        CONFIG.with(|c| c.borrow().display.adapter)
-    }
-
     pub fn display_mode() -> DisplayMode {
         CONFIG.with(|c| c.borrow().display.mode)
     }
@@ -268,7 +264,6 @@ pub struct AudioConfig {
 #[derive(Debug, Deserialize, Serialize, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct DisplayConfig {
-    pub adapter: IOAdapter,
     pub mode: DisplayMode,
     pub monitor: usize,
     pub frame_rate: u32,
@@ -323,13 +318,6 @@ impl RawClick {
     pub fn iter() -> impl Iterator<Item = &'static RawClick> {
         RAW_CLICKS.iter()
     }
-}
-
-#[derive(Debug, Deserialize, Serialize, Copy, Clone)]
-#[serde(deny_unknown_fields)]
-pub enum IOAdapter {
-    Auto,
-    Glium,
 }
 
 #[cfg(not(target_os = "windows"))]

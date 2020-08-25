@@ -2,12 +2,9 @@
 # The main game configuration file.  User preferences are set here.
 
 # If the user has an old revision, their config is automatically recreated from the sample.
-revision: 18
+revision: 19
 
 display:
-    # Display Adapter - Glium is the only choice for now
-    adapter: Auto
-
     # Display Mode - Fullscreen, BorderlessWindow, Window
     mode: Window
 

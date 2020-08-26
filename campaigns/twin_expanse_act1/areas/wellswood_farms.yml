@@ -36,6 +36,7 @@ actors:
     location:
       x: 12
       y: 15
+    unique_id: gethruk
   - id: farmer02
     location:
       x: 21

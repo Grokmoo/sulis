@@ -116,7 +116,7 @@ impl AreaView {
         self.overlay_handler.update_cursor_and_hover(widget, x, y);
     }
 
-    pub fn center_scroll_on(
+    fn center_scroll_on(
         &mut self,
         entity: &Rc<RefCell<EntityState>>,
         area_width: i32,

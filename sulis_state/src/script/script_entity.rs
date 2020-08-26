@@ -1628,6 +1628,8 @@ fn move_towards_dest(parent: Rc<RefCell<EntityState>>, dest: Destination) -> Res
     let mgr = GameState::turn_manager();
     let area = GameState::get_area_state(&parent.borrow().location.area_id).unwrap();
     let mut to_ignore = Vec::new();
+    to_ignore.push(parent.borrow().index());
+
     for e in area.borrow().entity_iter() {
         let other = mgr.borrow().entity(*e);
         if parent.borrow().ai_group() != other.borrow().ai_group() { continue; }

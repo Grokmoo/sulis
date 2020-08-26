@@ -5,7 +5,7 @@ end
 
 function gethruk_leave_intro(parent)
   local target = game:entity_with_id("gethruk")
-  if not target:move_towards_point(24, 50) then
+  if not target:move_towards_point(25, 52) then
     game:log("Gethruk unable to move")
   end
 

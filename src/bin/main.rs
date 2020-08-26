@@ -201,10 +201,13 @@ fn create_io() -> System {
 }
 
 fn load_resources() {
+    let start = std::time::Instant::now();
+
     let active = ActiveResources::read();
 
     let dirs = active.directories();
 
+    let start_main = std::time::Instant::now();
     info!("Reading resources from '{:?}'", dirs);
     let yaml = match ResourceSet::load_resources(dirs.clone()) {
         Err(e) => {
@@ -214,6 +217,7 @@ fn load_resources() {
         }
         Ok(yaml) => yaml,
     };
+    info!("Loaded base resources in {}s", util::format_elapsed_secs(start_main.elapsed()));
 
     if dirs.len() > 1 {
         info!("Loading module '{}'", dirs[1]);
@@ -224,6 +228,8 @@ fn load_resources() {
             Ok(()) => (),
         }
     }
+
+    info!("Loaded all resources in {}s", util::format_elapsed_secs(start.elapsed()));
 }
 
 fn main() {

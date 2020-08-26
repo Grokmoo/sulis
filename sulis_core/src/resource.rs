@@ -53,7 +53,7 @@ use crate::image::{
 };
 use crate::resource::resource_builder_set::ResourceBuilderSet;
 use crate::ui::{Theme, ThemeSet};
-use crate::util::invalid_data_error;
+use crate::util::{self, invalid_data_error};
 
 thread_local! {
     static RESOURCE_SET: RefCell<ResourceSet> = RefCell::new(ResourceSet::default());
@@ -78,6 +78,7 @@ impl ResourceSet {
             ));
         }
 
+        let yaml_start = std::time::Instant::now();
         let root = dirs.remove(0);
         let path = Path::new(&root);
         let mut yaml = YamlResourceSet::new(&path)?;
@@ -101,8 +102,15 @@ impl ResourceSet {
             }
         }
 
+        log::info!("  Loaded YAML in {}s", util::format_elapsed_secs(yaml_start.elapsed()));
+
+        let builder_start = std::time::Instant::now();
         let builder_set = ResourceBuilderSet::from_yaml(&mut yaml)?;
+        log::info!("  Loaded Builders in {}s", util::format_elapsed_secs(builder_start.elapsed()));
+
+        let res_start = std::time::Instant::now();
         ResourceSet::load_builders(builder_set)?;
+        log::info!("  Built resources in {}s", util::format_elapsed_secs(res_start.elapsed()));
 
         Ok(yaml)
     }
@@ -119,10 +127,13 @@ impl ResourceSet {
 
             set.themes = builder_set.theme_builder.create_theme_set()?;
 
+            let sound_start = std::time::Instant::now();
             for (id, sounds) in builder_set.sound_set_builders {
                 insert_if_ok_boxed("sound_set", id, SoundSet::new(sounds), &mut set.sound_sets);
             }
+            info!("    Loaded sounds in {}s", util::format_elapsed_secs(sound_start.elapsed()));
 
+            let sprite_start = std::time::Instant::now();
             for (id, sheet) in builder_set.spritesheet_builders {
                 insert_if_ok_boxed(
                     "spritesheet",
@@ -131,10 +142,13 @@ impl ResourceSet {
                     &mut set.spritesheets,
                 );
             }
+            info!("    Loaded sprites in {}s", util::format_elapsed_secs(sprite_start.elapsed()));
 
+            let font_start = std::time::Instant::now();
             for (id, font) in builder_set.font_builders {
                 insert_if_ok_boxed("font", id, Font::new(font), &mut set.fonts);
             }
+            info!("    Loaded fonts in {}s", util::format_elapsed_secs(font_start.elapsed()));
 
             if !set.fonts.contains_key(&Config::default_font()) {
                 return invalid_data_error(&format!(
@@ -142,6 +156,8 @@ impl ResourceSet {
                     Config::default_font()
                 ));
             }
+
+            let image_start = std::time::Instant::now();
 
             let empty = Rc::new(EmptyImage {});
             set.images.insert(empty.id(), empty);
@@ -190,6 +206,8 @@ impl ResourceSet {
                     &mut set.images,
                 );
             }
+
+            info!("    Loaded images in {}s", util::format_elapsed_secs(image_start.elapsed()));
 
             Ok(())
         })

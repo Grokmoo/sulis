@@ -72,7 +72,9 @@ impl WidgetKind for LinksPane {
 }
 
 fn open_link(link: &str) {
-    if open::that(link).is_err() {
+    let thread = open::that_in_background(link);
+
+    if thread.join().is_err() {
         warn!("Unable to open link using web browser: {}", link);
     }
 }

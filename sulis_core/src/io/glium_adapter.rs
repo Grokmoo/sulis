@@ -575,6 +575,8 @@ pub(crate) fn main_loop(
 
                 Audio::update(audio.as_mut(), last_elapsed);
 
+                // TODO updater should control root update and the timer should be dependant on when the UI mode
+                // changed, not total game timer
                 if let Err(e) = Widget::update(&root, last_elapsed) {
                     error!("There was a fatal error updating the UI tree state.");
                     error!("{}", e);

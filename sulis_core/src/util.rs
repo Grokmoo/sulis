@@ -363,77 +363,11 @@ pub fn format_elapsed_secs(elapsed: Duration) -> String {
     format!("{:.6}", secs)
 }
 
-pub fn ok_and_exit(message: &str) {
-    info!("{}", message);
-    info!("Exiting...");
-    ::std::process::exit(0)
-}
-
 pub fn error_and_exit(error: &str) {
     error!("{}", error);
     error!("Exiting...");
     ::std::process::exit(1)
 }
-
-// pub fn main_loop(
-//     system: &mut System,
-//     root: Rc<RefCell<Widget>>,
-//     updater: Box<dyn MainLoopUpdater>,
-// ) -> Result<(), Error> {
-//     let fpms = (1000.0 / (Config::frame_rate() as f32)) as u64;
-//     let frame_time = time::Duration::from_millis(fpms);
-//     trace!("Computed {} frames per milli.", fpms);
-
-//     info!("Starting main loop.");
-//     let main_loop_start_time = time::Instant::now();
-
-//     let mut frames = 0;
-//     let mut render_time = time::Duration::from_secs(0);
-//     let mut last_start_time = time::Instant::now();
-
-//     loop {
-//         let last_elapsed = get_elapsed_millis(last_start_time.elapsed());
-//         last_start_time = time::Instant::now();
-//         let total_elapsed = get_elapsed_millis(main_loop_start_time.elapsed());
-
-//         system.io().process_input(Rc::clone(&root));
-//         updater.update(&root, last_elapsed);
-
-//         Audio::update(system.audio(), last_elapsed);
-
-//         if let Err(e) = Widget::update(&root, last_elapsed) {
-//             error!("There was a fatal error updating the UI tree state.");
-//             return Err(e);
-//         }
-
-//         system.io().render_output(root.borrow(), total_elapsed);
-
-//         if updater.is_exit() {
-//             trace!("Exiting main loop.");
-//             break;
-//         }
-
-//         let frame_elapsed = last_start_time.elapsed();
-//         if frame_time > frame_elapsed {
-//             thread::sleep(frame_time - frame_elapsed);
-//         }
-
-//         render_time += frame_elapsed;
-//         frames += 1;
-//     }
-
-//     let secs = render_time.as_secs() as f64 + render_time.subsec_nanos() as f64 * 1e-9;
-//     info!(
-//         "Rendered {} frames with total render time {:.4} seconds",
-//         frames, secs
-//     );
-//     info!(
-//         "Average frame render time: {:.2} milliseconds",
-//         1000.0 * secs / frames as f64
-//     );
-
-//     Ok(())
-// }
 
 pub fn setup_logger() {
     let mut path = config::USER_DIR.clone();

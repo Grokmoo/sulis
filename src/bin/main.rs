@@ -23,14 +23,16 @@ use std::cell::RefCell;
 use log::{error, info};
 
 use sulis_core::resource::ResourceSet;
-use sulis_core::io::System;
+use sulis_core::io::{DisplayConfiguration, System, ControlFlowUpdater};
 use sulis_core::ui::{self, Cursor, Widget};
 use sulis_core::util::{self, ActiveResources};
 use sulis_module::{Actor, Module};
 use sulis_state::{GameState, NextGameStep, SaveState};
 use sulis_view::{main_menu::{self, MainMenu}, RootView, trigger_activator};
 
-struct ControlFlowUpdater {
+struct GameControlFlowUpdater {
+    display_configurations: Vec<DisplayConfiguration>,
+
     root: Rc<RefCell<Widget>>,
     mode: UiMode,
     exit: bool,
@@ -42,19 +44,69 @@ enum UiMode {
     Game(Rc<RefCell<RootView>>),
 }
 
-impl ControlFlowUpdater {
-    fn new(system: &System) -> ControlFlowUpdater {
+impl ControlFlowUpdater for GameControlFlowUpdater {
+    fn update(&mut self, millis: u32) -> Rc<RefCell<Widget>> {
+        self.update_mode(millis);
+        self.root()
+    }
+
+    fn root(&self) -> Rc<RefCell<Widget>> {
+        Rc::clone(&self.root)
+    }
+
+    fn is_exit(&self) -> bool {
+        self.exit
+    }
+}
+
+impl GameControlFlowUpdater {
+    fn new(system: &System) -> GameControlFlowUpdater {
+        let display_configurations = system.get_display_configurations();
         let view = main_menu::MainMenu::new(
-            system.get_display_configurations(),
+            display_configurations.clone(),
             sulis_core::io::audio::get_audio_devices(),
         );
         let root = ui::create_ui_tree(view.clone());
 
-        ControlFlowUpdater {
+        GameControlFlowUpdater {
+            display_configurations,
             root,
             mode: UiMode::MainMenu(view),
             exit: false,
         }
+    }
+
+    fn main_menu(&mut self) {
+        let view = main_menu::MainMenu::new(
+            self.display_configurations.clone(),
+            sulis_core::io::audio::get_audio_devices(),
+        );
+        self.root = ui::create_ui_tree(view.clone());
+        self.mode = UiMode::MainMenu(view);
+    }
+
+    fn new_campaign(&mut self, pc_actor: Rc<Actor>, party_actors: Vec<Rc<Actor>>, flags: HashMap<String, String>) {
+        info!("Initializing game state.");
+        if let Err(e) = GameState::init(pc_actor, party_actors, flags) {
+            error!("{}", e);
+            util::error_and_exit("There was a fatal error creating the game state.");
+        };
+    
+        let view = RootView::new();
+        self.root = ui::create_ui_tree(view.clone());
+        self.mode = UiMode::Game(view);
+    }
+
+    fn load_campaign(&mut self, save_state: SaveState) {
+        info!("Loading game state.");
+        if let Err(e) = GameState::load(save_state) {
+            error!("{}", e);
+            util::error_and_exit("There was a fatal error loading the game state.");
+        };
+
+        let view = RootView::new();
+        self.root = ui::create_ui_tree(view.clone());
+        self.mode = UiMode::Game(view);
     }
 
     fn handle_next_step(&mut self, step: NextGameStep) {
@@ -63,22 +115,28 @@ impl ControlFlowUpdater {
             Exit => {
                 self.exit = true;
             }, NewCampaign { pc_actor } => {
-
+                self.new_campaign(pc_actor, Vec::new(), HashMap::new());
             }, LoadCampaign { save_state } => {
-
+                self.load_campaign(*save_state);
             }, LoadModuleAndNewCampaign { pc_actor, party_actors, flags, module_dir } => {
-
+                let mut active = ActiveResources::read();
+                active.campaign = Some(module_dir);
+                active.write();
+                load_resources();
+                self.new_campaign(pc_actor, party_actors, flags);
             }, MainMenu => {
-
+                self.main_menu();
             }, MainMenuReloadResources => {
-
-            }, RecreateIo => {
-
+                load_resources();
+                self.main_menu();
+            }, RecreateIO => {
+                // TODO recreate IO
+                self.main_menu();
             }
         }
     }
 
-    fn update(&mut self, millis: u32) -> Rc<RefCell<Widget>> {
+    fn update_mode(&mut self, millis: u32) {
         let mode = self.mode.clone();
 
         match mode {
@@ -98,11 +156,7 @@ impl ControlFlowUpdater {
                 }
             }
         }
-
-        Rc::clone(&self.root)
     }
-
-    fn is_exit(&self) -> bool { self.exit }
 }
 
 fn init() -> System {
@@ -157,103 +211,9 @@ fn load_resources() {
     }
 }
 
-fn main_menu(system: &mut System) -> NextGameStep {
-    let view = main_menu::MainMenu::new(
-        system.get_display_configurations(),
-        sulis_core::io::audio::get_audio_devices(),
-    );
-    let loop_updater = main_menu::LoopUpdater::new(&view);
-    let root = ui::create_ui_tree(view.clone());
-
-    if let Err(e) = util::main_loop(system, root, Box::new(loop_updater)) {
-        error!("{}", e);
-        util::error_and_exit("Error in module starter.");
-    }
-
-    let mut view = view.borrow_mut();
-    match view.next_step() {
-        None => NextGameStep::Exit,
-        Some(step) => step,
-    }
-}
-
-fn new_campaign(
-    system: &mut System,
-    pc_actor: Rc<Actor>,
-    party_actors: Vec<Rc<Actor>>,
-    flags: HashMap<String, String>,
-) -> NextGameStep {
-    info!("Initializing game state.");
-    if let Err(e) = GameState::init(pc_actor, party_actors, flags) {
-        error!("{}", e);
-        util::error_and_exit("There was a fatal error creating the game state.");
-    };
-
-    run_campaign(system)
-}
-
-fn load_campaign(system: &mut System, save_state: SaveState) -> NextGameStep {
-    info!("Loading game state.");
-    if let Err(e) = GameState::load(save_state) {
-        error!("{}", e);
-        util::error_and_exit("There was a fatal error loading the game state.");
-    };
-
-    run_campaign(system)
-}
-
-fn run_campaign(system: &mut System) -> NextGameStep {
-    let view = RootView::new();
-    let loop_updater = sulis_view::GameMainLoopUpdater::new(&view);
-    let root = ui::create_ui_tree(view.clone());
-
-    if let Err(e) = util::main_loop(system, root, Box::new(loop_updater)) {
-        error!("{}", e);
-        error!("Error in main loop.  Exiting...");
-    }
-
-    let mut view = view.borrow_mut();
-    match view.next_step() {
-        None => NextGameStep::Exit,
-        Some(step) => step,
-    }
-}
-
 fn main() {
-    let mut system = init();
+    let system = init();
 
-    let mut next_step = NextGameStep::MainMenu;
-    loop {
-        use sulis_state::NextGameStep::*;
-        next_step = match next_step {
-            Exit => break,
-            NewCampaign { pc_actor } => {
-                new_campaign(&mut system, pc_actor, Vec::new(), HashMap::new())
-            }
-            LoadCampaign { save_state } => load_campaign(&mut system, *save_state),
-            MainMenu => main_menu(&mut system),
-            MainMenuReloadResources => {
-                load_resources();
-                main_menu(&mut system)
-            }
-            LoadModuleAndNewCampaign {
-                pc_actor,
-                party_actors,
-                flags,
-                module_dir,
-            } => {
-                let mut active = ActiveResources::read();
-                active.campaign = Some(module_dir);
-                active.write();
-                load_resources();
-                new_campaign(&mut system, pc_actor, party_actors, flags)
-            }
-            RecreateIO => {
-                system = create_io();
-                main_menu(&mut system)
-            }
-        };
-    }
-
-    util::ok_and_exit("Received exit result.");
+    let flow_controller = GameControlFlowUpdater::new(&system);
+    system.main_loop(Box::new(flow_controller));
 }

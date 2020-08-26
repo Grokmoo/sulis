@@ -59,6 +59,8 @@ pub trait ControlFlowUpdater {
 
     fn root(&self) -> Rc<RefCell<Widget>>;
 
+    fn recreate_window(&mut self) -> bool;
+
     fn is_exit(&self) -> bool;
 }
 

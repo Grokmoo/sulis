@@ -32,7 +32,8 @@ use sulis_view::{main_menu::{self, MainMenu}, RootView, trigger_activator};
 
 struct GameControlFlowUpdater {
     display_configurations: Vec<DisplayConfiguration>,
-
+    recreate_window: bool,
+    
     root: Rc<RefCell<Widget>>,
     mode: UiMode,
     exit: bool,
@@ -46,8 +47,21 @@ enum UiMode {
 
 impl ControlFlowUpdater for GameControlFlowUpdater {
     fn update(&mut self, millis: u32) -> Rc<RefCell<Widget>> {
+        if let Err(e) = Widget::update(&self.root, millis) {
+            error!("There was a fatal error updating the UI tree state.");
+            error!("{}", e);
+            self.exit = true;
+            return self.root();
+        }
+
         self.update_mode(millis);
         self.root()
+    }
+
+    fn recreate_window(&mut self) -> bool {
+        let recreate = self.recreate_window;
+        self.recreate_window = false;
+        recreate
     }
 
     fn root(&self) -> Rc<RefCell<Widget>> {
@@ -70,6 +84,7 @@ impl GameControlFlowUpdater {
 
         GameControlFlowUpdater {
             display_configurations,
+            recreate_window: false,
             root,
             mode: UiMode::MainMenu(view),
             exit: false,
@@ -130,7 +145,7 @@ impl GameControlFlowUpdater {
                 load_resources();
                 self.main_menu();
             }, RecreateIO => {
-                // TODO recreate IO
+                self.recreate_window = true;
                 self.main_menu();
             }
         }

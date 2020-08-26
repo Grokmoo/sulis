@@ -7,7 +7,7 @@ edition = "2018"
 [dependencies]
 home = "0.5"
 backtrace = "0.3"
-flexi_logger = "0.15"
+flexi_logger = { version = "0.15", default_features = false }
 image = { version = "0.23", default_features = false, features = [ "png" ] }
 glium = "0.27"
 lazy_static = "1.4"

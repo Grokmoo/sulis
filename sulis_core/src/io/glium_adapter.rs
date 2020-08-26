@@ -30,7 +30,7 @@ use glium::glutin::{
     dpi::{LogicalSize, LogicalPosition},
     ContextBuilder,
     event::{Event, KeyboardInput, MouseButton, WindowEvent, VirtualKeyCode, ElementState, MouseScrollDelta},
-    event_loop::{ControlFlow, EventLoop},
+    event_loop::{ControlFlow, EventLoop, EventLoopWindowTarget},
     monitor::MonitorHandle,
     window::{Fullscreen, WindowBuilder},
 };
@@ -104,6 +104,7 @@ const SWAP_FRAGMENT_SHADER_SRC: &str = r#"
 
 pub struct GliumDisplay {
     display: glium::Display,
+    monitor: MonitorHandle,
     base_program: glium::Program,
     swap_program: glium::Program,
     matrix: [[f32; 4]; 4],
@@ -305,31 +306,10 @@ fn glium_error<T, E: ::std::fmt::Display>(e: E) -> Result<T, Error> {
     Err(Error::new(ErrorKind::Other, format!("{}", e)))
 }
 
-fn get_monitor(event_loop: &EventLoop<()>) -> MonitorHandle {
-    let target_monitor = Config::monitor();
-    for (index, monitor) in event_loop.available_monitors().enumerate() {
-        if index == target_monitor {
-            return monitor;
-        }
-    }
-    warn!(
-        "Unable to find a monitor with configured index {}",
-        target_monitor
-    );
-
-    // return primary monitor
-    event_loop.available_monitors().next().unwrap()
-}
-
-fn try_get_display(
-    event_loop: &EventLoop<()>,
-    monitor: MonitorHandle,
-) -> Result<glium::Display, glium::backend::glutin::DisplayCreationError> {
-    let (res_x, res_y) = Config::display_resolution();
-
-    let (fullscreen, decorations) = match Config::display_mode() {
+fn configured_fullscreen(res_x: u32, res_y: u32, monitor: &MonitorHandle) -> (Option<Fullscreen>, bool) {
+    match Config::display_mode() {
         DisplayMode::Window => (None, true),
-        DisplayMode::BorderlessWindow => (Some(Fullscreen::Borderless(monitor)), false),
+        DisplayMode::BorderlessWindow => (Some(Fullscreen::Borderless(monitor.clone())), false),
         DisplayMode::Fullscreen => {
             let mut selected_mode = None;
             for mode in monitor.video_modes() {
@@ -349,7 +329,24 @@ fn try_get_display(
                 Some(mode) => (Some(Fullscreen::Exclusive(mode)), false),
             }
         }
+    }
+}
+
+fn try_get_display(
+    event_loop: &EventLoopWindowTarget<()>,
+    monitors: &[MonitorHandle],
+) -> Result<(glium::Display, MonitorHandle), glium::backend::glutin::DisplayCreationError> {
+    let monitor_index = Config::monitor();
+    let monitor = if monitor_index >= monitors.len() {
+        warn!("No available monitor at specified index: {}", monitor_index);
+        monitors[0].clone()
+    } else {
+        monitors[monitor_index].clone()
     };
+
+    let (res_x, res_y) = Config::display_resolution();
+
+    let (fullscreen, decorations) = configured_fullscreen(res_x, res_y, &monitor);
 
     let dims = LogicalSize::new(res_x as f64, res_y as f64);
 
@@ -361,13 +358,21 @@ fn try_get_display(
     let context = ContextBuilder::new()
         .with_pixel_format(24, 8);
 
-    match glium::Display::new(window, context, &event_loop) {
-        Ok(display) => return Ok(display),
+    match context.build_windowed(window, event_loop) {
+        Ok(windowed_context) => {
+            match glium::Display::from_gl_window(windowed_context) {
+                Ok(display) => return Ok((display, monitor)),
+                Err(e) => {
+                    warn!("Unable to create hardware accelerated OpenGL display.  Falling back...");
+                    warn!("{}", e);
+                }
+            }
+        },
         Err(e) => {
-            warn!("Unable to create hardware accelerated display, falling back...");
+            warn!("Unable to create hardware accelerated context.  Falling back...");
             warn!("{}", e);
         }
-    };
+    }
 
     let window = WindowBuilder::new()
         .with_inner_size(dims)
@@ -377,8 +382,11 @@ fn try_get_display(
     let context = ContextBuilder::new()
         .with_hardware_acceleration(None)
         .with_pixel_format(24, 8);
+    let windowed_context = context.build_windowed(window, event_loop)?;
 
-    glium::Display::new(window, context, &event_loop)
+    let display = glium::Display::from_gl_window(windowed_context)?;
+
+    Ok((display, monitor))
 }
 
 pub struct GliumSystem {
@@ -398,9 +406,15 @@ impl GliumDisplay {
     pub fn new() -> Result<(GliumDisplay, EventLoop<()>), Error> {
         debug!("Initialize Glium Display adapter.");
         let event_loop = EventLoop::new();
-        let monitor = get_monitor(&event_loop);
 
-        let display = match try_get_display(&event_loop, monitor.clone()) {
+        let monitors: Vec<MonitorHandle> = event_loop.available_monitors().collect();
+        if monitors.is_empty() {
+            return Err(Error::new(ErrorKind::Other, 
+                "Unable to detect any available monitors."
+            ));
+        }
+
+        let (display, monitor) = match try_get_display(&event_loop, &monitors) {
             Ok(display) => display,
             Err(e) => return glium_error(e),
         };
@@ -456,6 +470,7 @@ impl GliumDisplay {
 
         Ok((GliumDisplay {
             display,
+            monitor,
             base_program,
             swap_program,
             matrix: [
@@ -571,17 +586,23 @@ pub(crate) fn main_loop(
                 root = updater.update(last_elapsed);
                 if updater.is_exit() {
                     *control_flow = ControlFlow::Exit;
+                } else if updater.recreate_window() {
+                    let gl_window = io.display.gl_window();
+                    let window = gl_window.window();
+                    let (res_x, res_y) = Config::display_resolution();
+                    let (fullscreen, decorations) = configured_fullscreen(res_x, res_y, &io.monitor);
+                    let set_res = fullscreen.is_none();
+
+                    window.set_fullscreen(fullscreen);
+                    window.set_decorations(decorations);
+
+                    if set_res {
+                        let dims = LogicalSize::new(res_x as f64, res_y as f64);
+                        window.set_inner_size(dims);
+                    }
                 }
 
                 Audio::update(audio.as_mut(), last_elapsed);
-
-                // TODO updater should control root update and the timer should be dependant on when the UI mode
-                // changed, not total game timer
-                if let Err(e) = Widget::update(&root, last_elapsed) {
-                    error!("There was a fatal error updating the UI tree state.");
-                    error!("{}", e);
-                    *control_flow = ControlFlow::Exit;
-                }
 
                 io.render_output(&root.borrow(), total_elapsed);
 
@@ -603,8 +624,8 @@ pub(crate) fn main_loop(
                 if let Event::WindowEvent { event, .. } = event {
                     match event {
                         WindowEvent::CursorMoved { position, .. } => {
-                            let mouse_x = (ui_x as f64 * position.x / display_size.width) as f32;
-                            let mouse_y = (ui_y as f64 * position.y / display_size.height) as f32;
+                            let mouse_x = (ui_x as f64 * position.x / display_size.width) as f32 / scale as f32;
+                            let mouse_y = (ui_y as f64 * position.y / display_size.height) as f32 / scale as f32;
                             mouse_move = Some((mouse_x, mouse_y));
                         }
                         _ => {

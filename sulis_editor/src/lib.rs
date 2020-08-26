@@ -72,7 +72,7 @@ use crate::wall_picker::WallPicker;
 extern crate log;
 
 use std::any::Any;
-use std::cell::RefCell;
+use std::cell::{RefCell, Cell};
 use std::rc::Rc;
 
 use sulis_core::io::{GraphicsRenderer, InputAction, ControlFlowUpdater};
@@ -81,7 +81,7 @@ use sulis_core::util::{Offset, Scale};
 use sulis_core::widgets::{list_box, Button, ConfirmationWindow, DropDown};
 
 thread_local! {
-    static EXIT: RefCell<bool> = RefCell::new(false);
+    static EXIT: Cell<bool> = Cell::new(false);
 }
 
 pub struct EditorControlFlowUpdater {
@@ -91,22 +91,30 @@ pub struct EditorControlFlowUpdater {
 impl EditorControlFlowUpdater {
     pub fn new(root: Rc<RefCell<Widget>>) -> EditorControlFlowUpdater {
         EditorControlFlowUpdater {
-            root
+            root,
         }
     }
 }
 
 impl ControlFlowUpdater for EditorControlFlowUpdater {
-    fn update(&mut self, _millis: u32) -> Rc<RefCell<Widget>> {
+    fn update(&mut self, millis: u32) -> Rc<RefCell<Widget>> {
+        if let Err(e) = Widget::update(&self.root, millis) {
+            error!("There was a fatal error updating the UI tree state.");
+            error!("{}", e);
+            EXIT.with(|exit| exit.set(true));
+        }
+
         self.root()
     }
+
+    fn recreate_window(&mut self) -> bool { false }
 
     fn root(&self) -> Rc<RefCell<Widget>> {
         Rc::clone(&self.root)
     }
 
     fn is_exit(&self) -> bool {
-        EXIT.with(|exit| *exit.borrow())
+        EXIT.with(|exit| exit.get())
     }
 }
 
@@ -160,7 +168,7 @@ impl WidgetKind for EditorView {
             Back => {
                 let exit_window = Widget::with_theme(
                     ConfirmationWindow::new(Callback::with(Box::new(|| {
-                        EXIT.with(|exit| *exit.borrow_mut() = true);
+                        EXIT.with(|exit| exit.set(true));
                     }))),
                     "exit_confirmation_window",
                 );
@@ -229,7 +237,7 @@ impl WidgetKind for EditorView {
                     let root = Widget::get_root(widget);
                     let exit_window = Widget::with_theme(
                         ConfirmationWindow::new(Callback::with(Box::new(|| {
-                            EXIT.with(|exit| *exit.borrow_mut() = true);
+                            EXIT.with(|exit| exit.set(true));
                         }))),
                         "exit_confirmation_window",
                     );

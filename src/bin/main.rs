@@ -47,6 +47,8 @@ enum UiMode {
 
 impl ControlFlowUpdater for GameControlFlowUpdater {
     fn update(&mut self, millis: u32) -> Rc<RefCell<Widget>> {
+        self.update_mode(millis);
+
         if let Err(e) = Widget::update(&self.root, millis) {
             error!("There was a fatal error updating the UI tree state.");
             error!("{}", e);
@@ -54,7 +56,6 @@ impl ControlFlowUpdater for GameControlFlowUpdater {
             return self.root();
         }
 
-        self.update_mode(millis);
         self.root()
     }
 

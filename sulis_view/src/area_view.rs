@@ -80,7 +80,7 @@ const BASE_LAYER_ID: &str = "__base_layer__";
 const AERIAL_LAYER_ID: &str = "__aerial_layer__";
 
 impl AreaView {
-    pub fn new() -> Rc<RefCell<AreaView>> {
+    pub fn new(scroll: Scrollable) -> Rc<RefCell<AreaView>> {
         Rc::new(RefCell::new(AreaView {
             targeter_label: Widget::with_theme(Label::empty(), "targeter_label"),
             scale: (1.0, 1.0),
@@ -91,7 +91,7 @@ impl AreaView {
                 TILE_SIZE,
             ),
             layers: Vec::new(),
-            scroll: Scrollable::default(),
+            scroll,
             targeter_tile: None,
             range_indicator_image_set: None,
             active_entity: None,
@@ -147,6 +147,8 @@ impl AreaView {
 
         (x, y)
     }
+
+    pub fn get_scroll(&self) -> Scrollable { self.scroll }
 
     pub fn screen_shake(&mut self) {
         if !Config::crit_screen_shake() { return; }

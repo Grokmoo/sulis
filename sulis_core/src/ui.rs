@@ -86,6 +86,7 @@ pub fn compute_area_scaling(pixel_size: Point) -> (f32, f32) {
     (scale_x, scale_y)
 }
 
+#[derive(Copy, Clone)]
 pub struct Scrollable {
     x: f32,
     y: f32,

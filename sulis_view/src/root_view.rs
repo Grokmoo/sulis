@@ -25,7 +25,7 @@ use crate::{
 };
 use sulis_core::config::Config;
 use sulis_core::io::{keyboard_event::Key, InputAction};
-use sulis_core::ui::{Callback, Cursor, Widget, WidgetKind};
+use sulis_core::ui::{Callback, Cursor, Scrollable, Widget, WidgetKind};
 use sulis_core::util;
 use sulis_core::widgets::{Button, ConfirmationWindow, Label};
 use sulis_module::{area::OnRest, Module};
@@ -83,7 +83,7 @@ impl RootView {
     }
 
     pub fn new() -> Rc<RefCell<RootView>> {
-        let area_view = AreaView::new();
+        let area_view = AreaView::new(Scrollable::default());
         let area_view_widget = Widget::with_defaults(area_view.clone());
 
         let console = ConsoleWindow::new();
@@ -486,7 +486,8 @@ impl WidgetKind for RootView {
 
         self.console_widget.borrow_mut().state.set_visible(false);
 
-        self.area_view = AreaView::new();
+        let prev_scroll = self.area_view.borrow().get_scroll();
+        self.area_view = AreaView::new(prev_scroll);
         self.area_view_widget = Widget::with_defaults(self.area_view.clone());
 
         let bot_pane = Widget::empty("bottom_pane");

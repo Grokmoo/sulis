@@ -33,10 +33,12 @@ use sulis_view::{main_menu::{self, MainMenu}, RootView, trigger_activator};
 struct GameControlFlowUpdater {
     display_configurations: Vec<DisplayConfiguration>,
     recreate_window: bool,
-    
+
     root: Rc<RefCell<Widget>>,
     mode: UiMode,
     exit: bool,
+
+    next_step: Option<NextGameStep>,
 }
 
 #[derive(Clone)]
@@ -47,6 +49,10 @@ enum UiMode {
 
 impl ControlFlowUpdater for GameControlFlowUpdater {
     fn update(&mut self, millis: u32) -> Rc<RefCell<Widget>> {
+        if let Some(step) = self.next_step.take() {
+            self.handle_next_step(step);
+        }
+
         self.update_mode(millis);
 
         if let Err(e) = Widget::update(&self.root, millis) {
@@ -89,6 +95,7 @@ impl GameControlFlowUpdater {
             root,
             mode: UiMode::MainMenu(view),
             exit: false,
+            next_step: None,
         }
     }
 
@@ -107,7 +114,7 @@ impl GameControlFlowUpdater {
             error!("{}", e);
             util::error_and_exit("There was a fatal error creating the game state.");
         };
-    
+
         let view = RootView::new();
         self.root = ui::create_ui_tree(view.clone());
         self.mode = UiMode::Game(view);
@@ -155,11 +162,11 @@ impl GameControlFlowUpdater {
     fn update_mode(&mut self, millis: u32) {
         let mode = self.mode.clone();
 
+        // here, save the next step to be handled next frame to give a
+        // chance for the loading screen to pop up
         match mode {
             UiMode::MainMenu(view) => {
-                if let Some(step) = view.borrow_mut().next_step() {
-                    self.handle_next_step(step);
-                }
+                self.next_step = view.borrow_mut().next_step();
             }, UiMode::Game(view) => {
                 let ui_cb = GameState::update(millis);
 
@@ -167,9 +174,7 @@ impl GameControlFlowUpdater {
                     trigger_activator::activate(&self.root, &cb.on_trigger, &cb.parent, &cb.target);
                 }
 
-                if let Some(step) = view.borrow_mut().next_step() {
-                    self.handle_next_step(step);
-                }
+                self.next_step = view.borrow_mut().next_step();
             }
         }
     }

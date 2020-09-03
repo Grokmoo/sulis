@@ -1516,7 +1516,7 @@ themes:
         from: load_window_base
         background: bg_large
         border: { top: 6, bottom: 8, left: 6, right: 6 }
-        size: [130, 118]
+        size: [150, 138]
         relative:
           x: Center
           y: Center

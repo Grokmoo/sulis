@@ -339,8 +339,8 @@ themes:
                       width: Max
                       height: Max
                     text: |
-                      [?error;c=f00|Invalid or Corrupt][!error|[s=7|#player_name#] [?level;s=6;x=30|Level #level#]][s=6;x=55|#datetime#]
-                      [!error|#current_area_name# [?class;s=6;x=30|#class#]]
+                      [?error;c=f00|Invalid or Corrupt][!error|[s=7|#player_name#] [?level;s=6;x=50|Level #level# [?class;|#class#]]][s=6;x=80|#datetime#]
+                      [!error|#current_area_name#]
       delete:
         from: button
         size: [25, 10]

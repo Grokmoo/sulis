@@ -600,6 +600,8 @@ pub(crate) fn main_loop(
                         let dims = LogicalSize::new(res_x as f64, res_y as f64);
                         window.set_inner_size(dims);
                     }
+
+                    audio = create_audio_device();
                 }
 
                 Audio::update(audio.as_mut(), last_elapsed);

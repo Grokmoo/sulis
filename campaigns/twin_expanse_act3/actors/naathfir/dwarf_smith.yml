@@ -1,0 +1,28 @@
+---
+id: dwarf_smith
+name: Smith
+race: dwarf
+sex: Male
+attributes:
+  str: 10
+  dex: 10
+  end: 10
+  per: 10
+  int: 10
+  wis: 10
+conversation: dwarf_smith
+faction: Neutral
+images:
+  Background: creatures/dwarf04
+  Foreground: empty
+  Shadow: empty
+hue: 1.0
+inventory:
+  equipped: {}
+  quick: {}
+  pc_starting_coins: 0
+  pc_starting_items: []
+levels:
+  fighter: 12
+abilities: []
+ai: ~

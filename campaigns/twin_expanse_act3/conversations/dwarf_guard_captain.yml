@@ -1,0 +1,7 @@
+id: dwarf_guard_captain
+initial_nodes:
+  - id: start01
+nodes:
+  start01:
+    text: "You are free to move about the town."
+    responses: []

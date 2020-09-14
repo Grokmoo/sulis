@@ -1,0 +1,28 @@
+---
+id: dwarf_merch
+name: Merchant
+race: dwarf
+sex: Male
+attributes:
+  str: 10
+  dex: 10
+  end: 10
+  per: 10
+  int: 10
+  wis: 10
+conversation: dwarf_merch
+faction: Neutral
+images:
+  Foreground: empty
+  Shadow: empty
+  Background: creatures/dwarf02
+hue: 0.70000
+inventory:
+  equipped: {}
+  quick: {}
+  pc_starting_coins: 0
+  pc_starting_items: []
+levels:
+  fighter: 12
+abilities: []
+ai: ~

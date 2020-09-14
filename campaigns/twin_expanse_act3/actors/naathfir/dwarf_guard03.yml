@@ -1,0 +1,45 @@
+---
+id: dwarf_guard03
+name: Guard
+race: dwarf_simple
+sex: Male
+attributes:
+  str: 10
+  dex: 10
+  end: 10
+  per: 10
+  int: 10
+  wis: 10
+conversation: ~
+faction: Neutral
+images:
+  Background: creatures/dwarf07
+  Shadow: empty
+  Foreground: empty
+hue: 0.5
+inventory:
+  equipped:
+    HeldMain: { id: dwarven_battleaxe }
+    HeldOff: { id: dwarven_shield }
+    Torso: { id: torso_mail }
+    Legs: { id: legs_mail }
+    Feet: { id: boots_mail }
+    Hands: { id: gloves_mail }
+  quick: {}
+levels:
+  fighter: 12
+abilities:
+  - armor_light
+  - armor_medium
+  - armor_heavy
+  - weapon_axe
+  - weapon_crossbow
+  - weapon_bow
+  - weapon_small_sword
+  - weapon_large_sword
+  - weapon_spear
+  - weapon_mace
+  - weapon_simple
+  - shield_slam
+  - defensive_fighting
+  - guardian

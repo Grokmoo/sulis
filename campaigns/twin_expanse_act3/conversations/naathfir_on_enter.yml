@@ -1,0 +1,44 @@
+id: naathfir_on_enter
+initial_nodes:
+  - id: start01
+nodes:
+  start01:
+    text: |
+      [c=888|With an unexpected degree of stealth, several dwarves slip out of the cliffs around you.]
+      
+      [[c=888|They ready their weapons.]
+    responses:
+      - text: "[c=888|Continue]"
+        to: start02
+  start02:
+    text: |
+      [c=6868FF|#target_name#] - [c=888|Seeing you, the lead dwarf gives a signal to hold.]
+      
+      You are not one of Berkeley's men.  I guess that explains how you came to us through the mountains.
+    responses:
+      - text: "What is going on here?"
+        to: start03
+  start03:
+    text: |
+      [c=6868FF|#target_name#] - As I'm sure you are aware, the humans under the command of Councillor Berkeley have seemingly gone mad.  We are under siege.
+    responses:
+      - text: "[c=888|Continue]"
+        to: start04
+  start04:
+    text: |
+      [c=6868FF|#target_name#] - I recognize you from your last visit to Naathfir, and I know you are no friend of Berkeley.  You may enter the town and trade if you wish.  But know that we may come under attack at any time.
+      
+      [c=888|He turns to end the conversation.]
+    on_view:
+      - fire_script:
+          id: naathfir
+          func: start_dwarves_quest
+    responses:
+      - text: "I have a few more questions."
+        to: start05
+      - text: "Farewell."
+  start05:
+    text: |
+      [c=6868FF|#target_name#] - Our Clan-Chief should be in the town square.  I'm afraid I have other matters to attend to.
+    responses:
+      - text: "Farewell."

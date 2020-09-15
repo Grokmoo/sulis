@@ -1,0 +1,85 @@
+id: naathfir_clan_chief
+initial_nodes:
+  - id: planned
+    to_view:
+      - target_flag: already_planned
+  - id: main
+    to_view:
+      - target_flag: already_talked
+  - id: start01
+nodes:
+  start01:
+    text: |
+      [c=888|This venerable Dwarf has elaborate jewels in his armor and holds a massive tome  Obviously someone of great importance to the clan.]
+      
+      [c=6868FF|#target_name#] - Greetings.  I suppose you have questions?
+    on_view:
+      - target_flag: already_talked
+    responses:
+      - text: "[c=888|Continue]"
+        to: main
+  planned:
+    text: |
+      Good luck.
+    responses: []
+  main:
+    text: |
+      [c=888|The Clan Chief waits for you to speak.]
+    responses:
+      - text: "We need to travel to Rose Lake."
+        to: ask_rose_lake
+      - text: "We want to help you defeat Berkeley's forces."
+        to: ask_to_help
+      - text: "Farewell."
+  ask_rose_lake:
+    text: |
+      [c=6868FF|#target_name#] - I am afraid to say that the road is impassable.  Our own forces are the least of your concerns.  An entire army of Berkeley's troops block your way.
+    responses:
+      - text: "I see."
+        to: main
+  ask_to_help:
+    text: |
+      [c=6868FF|#target_name#] - It is noble of you to offer.  We are able to fend off the Rose Guard well enough, but we only hold here because Berkeley himself has not yet ... graced us with his presence.
+    responses:
+      - text: "[c=888|Continue]"
+        to: ask_to_help02
+  ask_to_help02:
+    text: |
+      [c=6868FF|#target_name#] - The rumor is he has uncovered some kind of pre-Sundering artifact.  Whatever it is, none seem to be able to oppose it.
+    responses:
+      - text: "We have a plan to defeat Berkeley."
+        to: ask_to_help03
+  ask_to_help03:
+    text: |
+      [c=888|He looks you over.]
+      
+      [c=6868FF|#target_name#] - That may be.  I suppose we might help one another.
+    responses:
+      - text: "What do you have in mind?"
+        to: ask_to_help04
+  ask_to_help04:
+    text: |
+      [c=6868FF|#target_name#] - On the eastern side of town, there is a passageway that leads out to the Volgar River.  It is a difficult journey, but follow the river upstream and you will reach the Rose pastures.  From there, you should be able to sneak into the city.
+    responses:
+      - text: "[c=888|Continue]"
+        to: ask_to_help05
+  ask_to_help05:
+    text: |
+      [c=6868FF|#target_name#] - We will await your signal.
+      
+      [c=888|He hands you a magic rune.]
+      
+      [c=6868FF|#target_name#] - When the time is right, open the city gates.  We will attack, giving you a chance to get at Berkeley himself.
+    on_view:
+      - target_flag: already_planned
+      - fire_script:
+          id: naathfir
+          func: dwarves_planned
+    responses:
+      - text: "[c=888|Continue]"
+        to: ask_to_help06
+  ask_to_help06:
+    text: |
+      [c=6868FF|#target_name#] - Good luck.  Active the Rune when you are in the city.  We will ready ourselves here.  It will take us about a day to reach Rose Lake.
+    responses:
+      - text: "Understood.  Farewell."

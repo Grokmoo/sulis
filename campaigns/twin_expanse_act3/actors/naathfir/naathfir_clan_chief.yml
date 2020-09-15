@@ -1,0 +1,26 @@
+---
+id: naathfir_clan_chief
+name: Clan Chief
+race: dwarf
+sex: Male
+attributes:
+  str: 10
+  dex: 10
+  end: 10
+  per: 10
+  int: 10
+  wis: 10
+conversation: naathfir_clan_chief
+faction: Neutral
+images:
+  Background: creatures/dwarf01
+  Foreground: empty
+  Shadow: empty
+hue: 0.6
+inventory:
+  equipped: {}
+  quick: {}
+levels:
+  fighter: 16
+abilities: []
+ai: ~

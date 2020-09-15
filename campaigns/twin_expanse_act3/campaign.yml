@@ -76,6 +76,12 @@ world_map:
       linked_area_pos: [91, 6]
       travel_times:
         mountains_of_naath: 12
+    volgar_river:
+      name: "Volgar River"
+      position: [11, 3.5]
+      icon: forest01
+      initially_enabled: false
+      initially_visible: false
     rose_lake:
       name: "Rose Lake"
       position: [9.75, 5.5]

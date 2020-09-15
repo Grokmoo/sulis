@@ -1,0 +1,5 @@
+id: dwarven_signal_rune
+name: "Dwarven Signal Rune"
+icon: inventory/craft_crystal01
+weight: 10
+value: 2

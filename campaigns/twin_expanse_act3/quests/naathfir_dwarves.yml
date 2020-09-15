@@ -4,3 +4,6 @@ entries:
   start:
     description: |
       I spoke to the Guard captain of the Dwarves in Naathfir.  They are under attack by the forces of Rose Lake.  Perhaps we can help each other.
+  planned:
+    description: |
+      Speaking with the Clan Chief of Naathfir, we came up with a plan.  I will travel East out of Naathfir and follow the Volgar river up to the Rose Pastures.  From there, I will sneak into Rose Lake, signal the Dwarves, and open the gates.  The dwarves will attack as a distraction, allowing me to get at Berkeley and end the war.

@@ -15,3 +15,15 @@ nodes:
               sell_frac: 0.25
               refresh_time:
                 hour: 24
+      - text: "May we rest here?"
+        to: rest
+      - text: "No thanks.  Farewell."
+  rest:
+    text: |
+      [c=6868FF|#target_name#] - Very well.  No harm will come to you here.
+    responses:
+      - text: "[c=888|Rest]"
+        on_select:
+          - fire_script:
+              id: naathfir
+              func: merch_rest

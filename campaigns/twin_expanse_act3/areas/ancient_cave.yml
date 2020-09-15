@@ -9,11 +9,11 @@ max_vis_distance: 12
 max_vis_up_one_distance: 6
 world_map_location: mountains_of_naath
 ambient_sound: ~
-default_music: ~
+default_music: music/theme_cave01
 default_combat_music: ~
 on_rest:
   Disabled:
-    message: "<PLACEHOLDER>"
+    message: You cannot rest here.  Find an inn or temple.
 location_kind: Underground
 layers:
   - terrain_base

@@ -11,10 +11,10 @@ attributes:
   int: 10
   wis: 10
 levels:
-  fighter: 10
+  fighter: 12
 inventory:
   equipped:
-    HeldMain: { id: greataxe }
+    HeldMain: { id: greataxe, adjectives: [ exceptional ] }
   quick:
     Usable1: { id: potion_healing }
 reward:

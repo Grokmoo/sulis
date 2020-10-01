@@ -1,0 +1,13 @@
+id: goblins_champs
+auto_spawn: false
+min_gen_actors: 7
+max_gen_actors: 8
+entries:
+  - id: goblin_ranger
+    weight: 3
+  - id: goblin_killer
+    weight: 3
+  - id: goblin_champion
+    weight: 2
+  - id: goblin_mage
+    weight: 2

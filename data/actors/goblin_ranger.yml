@@ -12,12 +12,12 @@ attributes:
   int: 10
   wis: 10
 levels:
-  rogue: 10
+  rogue: 12
 inventory:
   equipped:
-    HeldMain: { id: longbow }
+    HeldMain: { id: longbow, adjectives: [ exceptional ] }
   quick:
-    AltHeldMain: { id: dagger }
+    AltHeldMain: { id: dagger, adjectives: [ exceptional ] }
 reward:
   xp: 50
   loot: level5_misc
@@ -33,3 +33,5 @@ abilities:
   - backstab
   - flanker
   - flanker
+  - shrapnel_grenade
+  - corrupted_strike

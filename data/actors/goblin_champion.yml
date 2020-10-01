@@ -11,12 +11,12 @@ attributes:
   int: 10
   wis: 10
 levels:
-  fighter: 10
+  fighter: 12
 inventory:
   equipped:
-    HeldMain: { id: shortsword }
-    HeldOff: { id: shield_large }
-    Torso: { id: torso_plate }
+    HeldMain: { id: shortsword, adjectives: [ exceptional ] }
+    HeldOff: { id: shield_large, adjectives: [ exceptional ] }
+    Torso: { id: torso_plate, adjectives: [ exceptional ] }
 reward:
   xp: 50
   loot: level5_misc

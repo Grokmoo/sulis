@@ -7,3 +7,6 @@ entries:
   planned:
     description: |
       Speaking with the Clan Chief of Naathfir, we came up with a plan.  I will travel East out of Naathfir and follow the Volgar river up to the Rose Pastures.  From there, I will sneak into Rose Lake, signal the Dwarves, and open the gates.  The dwarves will attack as a distraction, allowing me to get at Berkeley and end the war.
+  rose_lake:
+    description: |
+      Following the Volgar River, I have located the path to reach a side entrance into Rose Lake.

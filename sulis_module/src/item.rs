@@ -301,17 +301,11 @@ impl Item {
     }
 
     pub fn is_armor(&self) -> bool {
-        match self.kind {
-            ItemKind::Armor { .. } => true,
-            _ => false,
-        }
+        matches!(self.kind, ItemKind::Armor { .. })
     }
 
     pub fn is_weapon(&self) -> bool {
-        match self.kind {
-            ItemKind::Weapon { .. } => true,
-            _ => false,
-        }
+        matches!(self.kind, ItemKind::Weapon { .. })
     }
 }
 

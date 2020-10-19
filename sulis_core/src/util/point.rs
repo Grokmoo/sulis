@@ -42,16 +42,22 @@ pub struct Rect {
     pub h: f32,
 }
 
-#[derive(Copy, Clone, Default, Deserialize, Serialize, Eq, Hash, PartialEq, Ord)]
+#[derive(Copy, Clone, Default, Deserialize, Serialize, Eq, Hash, PartialEq)]
 #[serde(deny_unknown_fields)]
 pub struct Point {
     pub x: i32,
     pub y: i32,
 }
 
+impl Ord for Point {
+    fn cmp(&self, other: &Point) -> cmp::Ordering {
+        self.cmp_hash().cmp(&other.cmp_hash())
+    }
+}
+
 impl PartialOrd for Point {
     fn partial_cmp(&self, other: &Point) -> Option<cmp::Ordering> {
-        Some(self.cmp_hash().cmp(&other.cmp_hash()))
+        Some(self.cmp(&other))
     }
 }
 

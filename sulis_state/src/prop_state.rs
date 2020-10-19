@@ -262,24 +262,15 @@ impl PropState {
     }
 
     pub fn is_door(&self) -> bool {
-        match self.interactive {
-            Interactive::Door { .. } => true,
-            _ => false,
-        }
+        matches!(self.interactive, Interactive::Door { .. })
     }
 
     pub fn is_hover(&self) -> bool {
-        match self.interactive {
-            Interactive::Hover { .. } => true,
-            _ => false,
-        }
+        matches!(self.interactive, Interactive::Hover { .. })
     }
 
     pub fn is_container(&self) -> bool {
-        match self.interactive {
-            Interactive::Container { .. } => true,
-            _ => false,
-        }
+        matches!(self.interactive, Interactive::Container { .. })
     }
 
     pub fn toggle_active(&mut self) {

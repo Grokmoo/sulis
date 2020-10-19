@@ -183,17 +183,11 @@ impl Attack {
     }
 
     pub fn is_melee(&self) -> bool {
-        match self.kind {
-            Melee { .. } => true,
-            _ => false,
-        }
+        matches!(self.kind, Melee { .. })
     }
 
     pub fn is_ranged(&self) -> bool {
-        match self.kind {
-            Ranged { .. } => true,
-            _ => false,
-        }
+        matches!(self.kind, Ranged { .. })
     }
 
     pub fn get_ranged_projectile(&self) -> Option<Rc<dyn Image>> {

@@ -492,10 +492,7 @@ impl AttackBuilder {
     }
 
     pub fn is_melee(&self) -> bool {
-        match self.kind {
-            AttackKindBuilder::Melee { .. } => true,
-            _ => false,
-        }
+        matches!(self.kind, AttackKindBuilder::Melee { .. })
     }
 }
 

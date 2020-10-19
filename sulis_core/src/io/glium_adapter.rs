@@ -309,7 +309,7 @@ fn glium_error<T, E: ::std::fmt::Display>(e: E) -> Result<T, Error> {
 fn configured_fullscreen(res_x: u32, res_y: u32, monitor: &MonitorHandle) -> (Option<Fullscreen>, bool) {
     match Config::display_mode() {
         DisplayMode::Window => (None, true),
-        DisplayMode::BorderlessWindow => (Some(Fullscreen::Borderless(monitor.clone())), false),
+        DisplayMode::BorderlessWindow => (Some(Fullscreen::Borderless(Some(monitor.clone()))), false),
         DisplayMode::Fullscreen => {
             let mut selected_mode = None;
             for mode in monitor.video_modes() {
@@ -769,7 +769,7 @@ fn process_keyboard_input(input: KeyboardInput) -> Option<KeyboardEvent> {
         Space => KeySpace,
         Return => KeyEnter,
         Grave => KeyGrave,
-        Minus | Subtract => KeyMinus,
+        Minus | NumpadSubtract => KeyMinus,
         Equals => KeyEquals,
         LBracket => KeyLeftBracket,
         RBracket => KeyRightBracket,

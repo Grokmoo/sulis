@@ -14,7 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::thread;
+use std::thread::{self, JoinHandle};
 use std::fmt;
 use std::time::Duration;
 use std::collections::VecDeque;
@@ -22,7 +22,8 @@ use std::cell::{RefCell};
 use std::io::{BufReader, Error, ErrorKind};
 use std::fs::File;
 
-use rodio::{Sink, Device, DeviceTrait, Source, Decoder, source::Buffered};
+use rodio::{Sink, Device, DeviceTrait, Source, Decoder, source::Buffered, OutputStream, OutputStreamHandle};
+use cpal::traits::HostTrait;
 
 use crate::config::{AudioConfig, Config};
 use crate::resource::{sound_set::EntryBuilder, ResourceSet};
@@ -197,8 +198,14 @@ struct AudioSink {
 }
 
 impl AudioSink {
-    fn new(device: &Device, base_volume: f32) -> std::thread::Result<AudioSink> {
-        let sink = Sink::new(device);
+    fn new(handle: &OutputStreamHandle, base_volume: f32) -> Result<AudioSink, String> {
+        // TODO PlayError doesn't implement std::error::Error yet
+        let sink = match Sink::try_new(handle) {
+            Ok(sink) => sink,
+            Err(_) => {
+                return Err("Error decoding audio or output device was lost".to_string());
+            }
+        };
 
         Ok(AudioSink {
             sink,
@@ -208,7 +215,7 @@ impl AudioSink {
         })
     }
 
-    fn update(&mut self, device: &Device, elapsed_millis: u32) {
+    fn update(&mut self, handle: &OutputStreamHandle, elapsed_millis: u32) {
         let millis = elapsed_millis as i32;
 
         loop {
@@ -248,7 +255,7 @@ impl AudioSink {
                 Stop => {
                     self.cur_id.clear();
                     self.sink.stop();
-                    self.sink = Sink::new(device);
+                    self.sink = Sink::try_new(handle).expect("Failed to create new sink");
                     self.sink.set_volume(self.base_volume);
                 },
                 Start(sound) => {
@@ -294,11 +301,41 @@ impl AudioSink {
 }
 
 pub struct AudioDevice {
-    device: Device,
+    stream_handle: OutputStreamHandle,
     name: String,
     config: AudioConfig,
     music: AudioSink,
     ambient: AudioSink,
+}
+
+fn new_device(device: Device, name: String, mut config: AudioConfig) -> Result<AudioDevice, String> {
+    // precompute output volumes
+    config.music_volume *= config.master_volume;
+    config.effects_volume *= config.master_volume;
+    config.ambient_volume *= config.master_volume;
+
+    let (stream, stream_handle) = match OutputStream::try_from_device(&device) {
+        Ok(data) => data,
+        Err(e) => {
+            warn!("Error creating audio output stream: {}", e);
+            return Err("Unable to create audio output stream".to_string())
+        }
+    };
+
+    // TODO to handle this properly we probably need to move all audio processing
+    // into its own thread.  we can't send stream and dropping it stops all playback
+    std::mem::forget(stream);
+
+    let music = AudioSink::new(&stream_handle, config.music_volume)?;
+    let ambient = AudioSink::new(&stream_handle, config.ambient_volume)?;
+
+    Ok(AudioDevice {
+        stream_handle,
+        name,
+        config,
+        music,
+        ambient,
+    })
 }
 
 impl AudioDevice {
@@ -306,33 +343,27 @@ impl AudioDevice {
         &self.name
     }
 
-    fn new(device: Device, name: String, mut config: AudioConfig) -> std::thread::Result<AudioDevice> {
+    fn new(device: Device, name: String, config: AudioConfig) -> Result<AudioDevice, String> {
         // Run Rodio init in its own thread to avoid problems with winit:
+        // this is really nasty now that you can't send cpal stuff over threads easily
         // https://github.com/rust-windowing/winit/issues/1185
-        let device_init = thread::spawn(move || {
-            // precompute output volumes
-            config.music_volume *= config.master_volume;
-            config.effects_volume *= config.master_volume;
-            config.ambient_volume *= config.master_volume;
-
-            let music = AudioSink::new(&device, config.music_volume)?;
-            let ambient = AudioSink::new(&device, config.ambient_volume)?;
-
-            Ok(AudioDevice {
-                device,
-                name,
-                config,
-                music,
-                ambient,
-            })
+        let device_init: JoinHandle<Result<AudioDevice, String>> = thread::spawn(move || {
+            new_device(device, name, config)
         });
 
-        device_init.join()?
+        let result = match device_init.join() {
+            Ok(result) => result,
+            Err(_) => {
+                return Err("Thread panic initializing audio system".to_string());
+            }
+        };
+
+        result
     }
 
     fn update(&mut self, elapsed_millis: u32) {
-        self.music.update(&self.device, elapsed_millis);
-        self.ambient.update(&self.device, elapsed_millis);
+        self.music.update(&self.stream_handle, elapsed_millis);
+        self.ambient.update(&self.stream_handle, elapsed_millis);
     }
 
     fn play(&mut self, entry: QueueEntry) {
@@ -362,7 +393,7 @@ impl AudioDevice {
     }
 
     fn play_sfx(&mut self, sound: SoundSource) {
-        let mut sink = match AudioSink::new(&self.device, self.config.effects_volume) {
+        let mut sink = match AudioSink::new(&self.stream_handle, self.config.effects_volume) {
             Err(_) => return,
             Ok(sink) => sink,
         };
@@ -386,10 +417,12 @@ pub fn get_audio_devices() -> Vec<AudioDeviceInfo> {
 
     info!("Querying audio devices");
 
+    let host = cpal::default_host();
+
     // Run Rodio init in its own thread to avoid problems with winit:
     // https://github.com/rust-windowing/winit/issues/1185
     let audio_thread = thread::spawn(move || {
-        let devices = match rodio::output_devices() {
+        let devices = match host.output_devices() {
             Err(e) => {
                 warn!("Error querying audio devices: {}", e);
                 return Vec::new();
@@ -406,20 +439,20 @@ pub fn get_audio_devices() -> Vec<AudioDeviceInfo> {
                 continue;
             }
 
-            let mut formats = match device.supported_output_formats() {
+            let mut formats = match device.supported_output_configs() {
                 Err(e) => {
-                    info!("Error getting supported formats for audio device {}: {}", name, e);
+                    info!("Error getting supported configs for audio device {}: {}", name, e);
                     continue;
                 }, Ok(formats) => formats,
             };
 
             if formats.next().is_none() {
-                info!("Audio device {} did not have any supported output formats.", name);
+                info!("Audio device {} did not have any supported output configs.", name);
                 continue;
             }
 
-            if let Err(e) = device.default_output_format() {
-                info!("Error getting an output format for audio device: {}: {}", name, e);
+            if let Err(e) = device.default_output_config() {
+                info!("Error getting an output config for audio device: {}: {}", name, e);
                 continue;
             }
 

@@ -102,6 +102,11 @@ wall_kinds:
     fill_tile: _base
     extended: [ roof_adobe_flat_ext1, roof_adobe_flat_ext2 ]
     interior_border: false
+  - id: sewer_walls
+    base_tile: _ext1_outer_edge_s
+    fill_tile: _base
+    extended: [ sewer_walls_ext1, sewer_walls_ext2 ]
+    interior_border: true
 terrain_rules:
   grid_width: 2
   grid_height: 2
@@ -157,12 +162,16 @@ terrain_kinds:
       grass_med: water_light_to_grass_med
       grass_dark: water_light_to_grass_dark
       sand: sand_to_water_light
+  - id: water_sewer
+    variants: []
   - id: water_ice
     variants: [1, 2, 3, 4, 5]
   - id: water_poison
     variants: [1, 2, 3]
   - id: water_swamp
     variants: [1, 2, 3]
+  - id: sewer_floor
+    variants: [1, 2]
   - id: ice
     variants: [1, 2, 3]
   - id: lava
@@ -231,6 +240,7 @@ uniform_sets:
       water_poison_base, water_poison_base_variant1, water_poison_base_variant2, water_poison_base_variant3,
       water_swamp_base, water_swamp_base_variant1, water_swamp_base_variant2, water_swamp_base_variant3,
       water_ice_base, water_ice_base_variant1, water_ice_base_variant2, water_ice_base_variant3, water_ice_base_variant4, water_ice_base_variant5,
+      water_sewer_base,
       lava_base, lava_base_variant1, lava_base_variant2, lava_base_variant3,
       pit_brown_base,
       pit_black_base,
@@ -270,6 +280,7 @@ uniform_sets:
       cobble_dirt_base, cobble_dirt_base_variant1, cobble_dirt_base_variant2, cobble_dirt_base_variant3,
       cobble_plain_base, cobble_plain_base_variant1, cobble_plain_base_variant2, cobble_plain_base_variant3,
       stone_bordered_base, fancy_carpet_base,
+      sewer_floor_base, sewer_floor_base_variant1, sewer_floor_base_variant2,
     ]
   base2_all_passable:
     layer: terrain_border
@@ -425,6 +436,11 @@ uniform_sets:
       fancy_carpet_inner_edge_se, fancy_carpet_inner_edge_sw, fancy_carpet_inner_edge_ne, fancy_carpet_inner_edge_nw,
       fancy_carpet_outer_edge_nw, fancy_carpet_outer_edge_n, fancy_carpet_outer_edge_ne, fancy_carpet_outer_edge_w,
       fancy_carpet_outer_edge_e, fancy_carpet_outer_edge_sw, fancy_carpet_outer_edge_s, fancy_carpet_outer_edge_se,
+      
+      sewer_floor_outer_edge_all, sewer_floor_top2, sewer_floor_inner_edge_ne_sw, sewer_floor_inner_edge_nw_se,
+      sewer_floor_inner_edge_se, sewer_floor_inner_edge_sw, sewer_floor_inner_edge_ne, sewer_floor_inner_edge_nw,
+      sewer_floor_outer_edge_nw, sewer_floor_outer_edge_n, sewer_floor_outer_edge_ne, sewer_floor_outer_edge_w,
+      sewer_floor_outer_edge_e, sewer_floor_outer_edge_sw, sewer_floor_outer_edge_s, sewer_floor_outer_edge_se,
     ]
   base2_impass:
     layer: terrain_border
@@ -458,7 +474,7 @@ uniform_sets:
     invis: []
     tiles: [
       water_light_inner_edge_se, water_med_inner_edge_se, water_dark_inner_edge_se, water_poison_inner_edge_se, water_ice_inner_edge_se,
-      water_swamp_inner_edge_se, lava_inner_edge_se, pit_brown_inner_edge_se, pit_black_inner_edge_se,
+      water_swamp_inner_edge_se, water_sewer_inner_edge_se, lava_inner_edge_se, pit_brown_inner_edge_se, pit_black_inner_edge_se,
       pit_dark_inner_edge_se,
       water_light_to_grass_med_inner_edge_se, water_light_to_grass_dark_inner_edge_se,
       sand_to_water_med_inner_edge_se, sand_to_water_light_inner_edge_se, ice_to_water_med_inner_edge_se,
@@ -471,7 +487,7 @@ uniform_sets:
     invis: []
     tiles: [
       water_light_inner_edge_sw, water_med_inner_edge_sw, water_dark_inner_edge_sw, water_poison_inner_edge_sw, water_ice_inner_edge_sw,
-      water_swamp_inner_edge_sw, lava_inner_edge_sw, pit_brown_inner_edge_sw, pit_black_inner_edge_sw,
+      water_swamp_inner_edge_sw, water_sewer_inner_edge_sw, lava_inner_edge_sw, pit_brown_inner_edge_sw, pit_black_inner_edge_sw,
       pit_dark_inner_edge_sw,
       water_light_to_grass_med_inner_edge_sw, water_light_to_grass_dark_inner_edge_sw,
       sand_to_water_med_inner_edge_sw, sand_to_water_light_inner_edge_sw, ice_to_water_med_inner_edge_sw,
@@ -484,7 +500,7 @@ uniform_sets:
     invis: []
     tiles: [
       water_light_inner_edge_ne, water_med_inner_edge_ne, water_dark_inner_edge_ne, water_poison_inner_edge_ne, water_ice_inner_edge_ne,
-      water_swamp_inner_edge_ne, lava_inner_edge_ne, pit_brown_inner_edge_ne, pit_black_inner_edge_ne,
+      water_swamp_inner_edge_ne, water_sewer_inner_edge_ne, lava_inner_edge_ne, pit_brown_inner_edge_ne, pit_black_inner_edge_ne,
       pit_dark_inner_edge_ne,
       water_light_to_grass_med_inner_edge_ne, water_light_to_grass_dark_inner_edge_ne,
       sand_to_water_med_inner_edge_ne, sand_to_water_light_inner_edge_ne, ice_to_water_med_inner_edge_ne,
@@ -497,7 +513,7 @@ uniform_sets:
     invis: []
     tiles: [
       water_light_inner_edge_nw, water_med_inner_edge_nw, water_dark_inner_edge_nw, water_poison_inner_edge_nw, water_ice_inner_edge_nw,
-      water_swamp_inner_edge_nw, lava_inner_edge_nw, pit_brown_inner_edge_nw, pit_black_inner_edge_nw,
+      water_swamp_inner_edge_nw, water_sewer_inner_edge_nw, lava_inner_edge_nw, pit_brown_inner_edge_nw, pit_black_inner_edge_nw,
       pit_dark_inner_edge_nw,
       water_light_to_grass_med_inner_edge_nw, water_light_to_grass_dark_inner_edge_nw,
       sand_to_water_med_inner_edge_nw, sand_to_water_light_inner_edge_nw, ice_to_water_med_inner_edge_nw,
@@ -510,7 +526,7 @@ uniform_sets:
     invis: []
     tiles: [
       water_light_outer_edge_nw, water_med_outer_edge_nw, water_dark_outer_edge_nw, water_poison_outer_edge_nw, water_ice_outer_edge_nw,
-      water_swamp_outer_edge_nw, lava_outer_edge_nw, pit_brown_outer_edge_nw, pit_black_outer_edge_nw,
+      water_swamp_outer_edge_nw, water_sewer_outer_edge_nw, lava_outer_edge_nw, pit_brown_outer_edge_nw, pit_black_outer_edge_nw,
       pit_dark_outer_edge_nw,
       water_light_to_grass_med_outer_edge_nw, water_light_to_grass_dark_outer_edge_nw,
       sand_to_water_med_outer_edge_nw, sand_to_water_light_outer_edge_nw, ice_to_water_med_outer_edge_nw,
@@ -523,7 +539,7 @@ uniform_sets:
     invis: []
     tiles: [
       water_light_outer_edge_n, water_med_outer_edge_n, water_dark_outer_edge_n, water_poison_outer_edge_n, water_ice_outer_edge_n,
-      water_swamp_outer_edge_n, lava_outer_edge_n, pit_brown_outer_edge_n, pit_black_outer_edge_n,
+      water_swamp_outer_edge_n, water_sewer_outer_edge_n, lava_outer_edge_n, pit_brown_outer_edge_n, pit_black_outer_edge_n,
       pit_dark_outer_edge_n,
       water_light_to_grass_med_outer_edge_n, water_light_to_grass_dark_outer_edge_n,
       sand_to_water_med_outer_edge_n, sand_to_water_light_outer_edge_n, ice_to_water_med_outer_edge_n,
@@ -536,7 +552,7 @@ uniform_sets:
     invis: []
     tiles: [
       water_light_outer_edge_ne, water_med_outer_edge_ne, water_dark_outer_edge_ne, water_poison_outer_edge_ne, water_ice_outer_edge_ne,
-      water_swamp_outer_edge_ne, lava_outer_edge_ne, pit_brown_outer_edge_ne, pit_black_outer_edge_ne,
+      water_swamp_outer_edge_ne, water_sewer_outer_edge_ne, lava_outer_edge_ne, pit_brown_outer_edge_ne, pit_black_outer_edge_ne,
       pit_dark_outer_edge_ne,
       water_light_to_grass_med_outer_edge_ne, water_light_to_grass_dark_outer_edge_ne,
       sand_to_water_med_outer_edge_ne, sand_to_water_light_outer_edge_ne, ice_to_water_med_outer_edge_ne,
@@ -549,7 +565,7 @@ uniform_sets:
     invis: []
     tiles: [
       water_light_outer_edge_w, water_med_outer_edge_w, water_dark_outer_edge_w, water_poison_outer_edge_w, water_ice_outer_edge_w,
-      water_swamp_outer_edge_w, lava_outer_edge_w, pit_brown_outer_edge_w, pit_black_outer_edge_w,
+      water_swamp_outer_edge_w, water_sewer_outer_edge_w, lava_outer_edge_w, pit_brown_outer_edge_w, pit_black_outer_edge_w,
       pit_dark_outer_edge_w,
       water_light_to_grass_med_outer_edge_w, water_light_to_grass_dark_outer_edge_w,
       sand_to_water_med_outer_edge_w, sand_to_water_light_outer_edge_w, ice_to_water_med_outer_edge_w,
@@ -562,7 +578,7 @@ uniform_sets:
     invis: []
     tiles: [
       water_light_outer_edge_e, water_med_outer_edge_e, water_dark_outer_edge_e, water_poison_outer_edge_e, water_ice_outer_edge_e,
-      water_swamp_outer_edge_e, lava_outer_edge_e, pit_brown_outer_edge_e, pit_black_outer_edge_e,
+      water_swamp_outer_edge_e, water_sewer_outer_edge_e, lava_outer_edge_e, pit_brown_outer_edge_e, pit_black_outer_edge_e,
       pit_dark_outer_edge_e,
       water_light_to_grass_med_outer_edge_e, water_light_to_grass_dark_outer_edge_e,
       sand_to_water_med_outer_edge_e, sand_to_water_light_outer_edge_e, ice_to_water_med_outer_edge_e,
@@ -575,7 +591,7 @@ uniform_sets:
     invis: []
     tiles: [
       water_light_outer_edge_sw, water_med_outer_edge_sw, water_dark_outer_edge_sw, water_poison_outer_edge_sw, water_ice_outer_edge_sw,
-      water_swamp_outer_edge_sw, lava_outer_edge_sw, pit_brown_outer_edge_sw, pit_black_outer_edge_sw,
+      water_swamp_outer_edge_sw, water_sewer_outer_edge_sw, lava_outer_edge_sw, pit_brown_outer_edge_sw, pit_black_outer_edge_sw,
       pit_dark_outer_edge_sw,
       water_light_to_grass_med_outer_edge_sw, water_light_to_grass_dark_outer_edge_sw,
       sand_to_water_med_outer_edge_sw, sand_to_water_light_outer_edge_sw, ice_to_water_med_outer_edge_sw,
@@ -588,7 +604,7 @@ uniform_sets:
     invis: []
     tiles: [
       water_light_outer_edge_s, water_med_outer_edge_s, water_dark_outer_edge_s, water_poison_outer_edge_s, water_ice_outer_edge_s,
-      water_swamp_outer_edge_s, lava_outer_edge_s, pit_brown_outer_edge_s, pit_black_outer_edge_s,
+      water_swamp_outer_edge_s, water_sewer_outer_edge_s, lava_outer_edge_s, pit_brown_outer_edge_s, pit_black_outer_edge_s,
       pit_dark_outer_edge_s,
       water_light_to_grass_med_outer_edge_s, water_light_to_grass_dark_outer_edge_s,
       sand_to_water_med_outer_edge_s, sand_to_water_light_outer_edge_s, ice_to_water_med_outer_edge_s,
@@ -601,7 +617,7 @@ uniform_sets:
     invis: []
     tiles: [
       water_light_outer_edge_se, water_med_outer_edge_se, water_dark_outer_edge_se, water_poison_outer_edge_se, water_ice_outer_edge_se,
-      water_swamp_outer_edge_se, lava_outer_edge_se, pit_brown_outer_edge_se, pit_black_outer_edge_se,
+      water_swamp_outer_edge_se, water_sewer_outer_edge_se, lava_outer_edge_se, pit_brown_outer_edge_se, pit_black_outer_edge_se,
       pit_dark_outer_edge_se,
       water_light_to_grass_med_outer_edge_se, water_light_to_grass_dark_outer_edge_se,
       sand_to_water_med_outer_edge_se, sand_to_water_light_outer_edge_se, ice_to_water_med_outer_edge_se,
@@ -1261,6 +1277,72 @@ non_uniform_sets:
         impass: [[1, 0], [1, 1]]
       ext1_outer_edge_se:
         impass: [[0, 0], [0, 1]]
+  sewer_walls:
+    layer: walls
+    size: [2, 2]
+    sprite_prefix: "tileset/sewer_walls_"
+    tiles:
+      ext1_outer_edge_s:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      ext1_outer_edge_sw:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      ext1_outer_edge_se:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      ext2_outer_edge_sw:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      ext2_outer_edge_s:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      ext2_outer_edge_se:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+  sewer_walls_aerial:
+    layer: walls_aerial
+    size: [2, 2]
+    sprite_prefix: "tileset/sewer_walls_"
+    tiles:
+      outer_edge_nw:
+        impass: [[0, 1], [1, 1]]
+        invis: [[1, 1]]
+      outer_edge_n:
+        impass: [[0, 1], [1, 1]]
+        invis: [[0, 1], [1, 1]]
+      outer_edge_ne:
+        impass: [[0, 1], [1, 1]]
+        invis: [[0, 1]]
+      outer_edge_w:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+        invis: [[1, 0], [1, 1]]
+      outer_edge_e:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+        invis: [[0, 0], [0, 1]]
+      inner_edge_nw:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+        invis: [[1, 0], [0, 1], [1, 1]]
+      inner_edge_ne:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+        invis: [[0, 0], [0, 1], [1, 1]]
+  sewer_walls_base:
+    layer: walls_top
+    size: [2, 2]
+    sprite_prefix: "tileset/sewer_walls_"
+    tiles:
+      base:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+        invis: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      outer_edge_sw:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+        invis: [[1, 0]]
+      outer_edge_s:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+        invis: [[0, 0], [1, 0]]
+      outer_edge_se:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+        invis: [[0, 0]]
+      inner_edge_sw:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+        invis: [[0, 0], [1, 0], [1, 1]]
+      inner_edge_se:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+        invis: [[0, 0], [1, 0], [0, 1]]
   cave_wall:
     layer: walls
     size: [2, 2]
@@ -2683,3 +2765,19 @@ tiles:
     size: [14, 2]
     sprite: tileset/dead_tree_large_bot
     impass: [[6, 0], [7, 0], [6, 1], [7, 1]]
+  sewer_opening:
+    layer: object
+    size: [4, 2]
+    sprite: tileset/sewer_opening
+  sewer_grate:
+    layer: object
+    size: [4, 2]
+    sprite: tileset/sewer_grate
+  sewer_pipe:
+    layer: object
+    size: [2, 2]
+    sprite: tileset/sewer_pipe
+  sewer_wall_crack:
+    layer: object
+    size: [2, 2]
+    sprite: tileset/sewer_wall_crack

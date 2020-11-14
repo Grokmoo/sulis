@@ -132,10 +132,11 @@ impl EdgesList {
         match Module::tile(&tile_id) {
             None => {
                 trace!(
-                    "Edge tile with '{}', '{}' not found for '{}'",
+                    "Edge tile with '{}', '{}' not found for '{}'.  Full path: '{}'",
                     edge_postfix,
                     dir_postfix,
-                    id
+                    id,
+                    tile_id,
                 );
                 None
             }

@@ -500,7 +500,7 @@ uniform_sets:
     invis: []
     tiles: [
       water_light_inner_edge_ne, water_med_inner_edge_ne, water_dark_inner_edge_ne, water_poison_inner_edge_ne, water_ice_inner_edge_ne,
-      water_swamp_inner_edge_ne, water_sewer_inner_edge_ne, lava_inner_edge_ne, pit_brown_inner_edge_ne, pit_black_inner_edge_ne,
+      water_swamp_inner_edge_ne, lava_inner_edge_ne, pit_brown_inner_edge_ne, pit_black_inner_edge_ne,
       pit_dark_inner_edge_ne,
       water_light_to_grass_med_inner_edge_ne, water_light_to_grass_dark_inner_edge_ne,
       sand_to_water_med_inner_edge_ne, sand_to_water_light_inner_edge_ne, ice_to_water_med_inner_edge_ne,
@@ -513,7 +513,7 @@ uniform_sets:
     invis: []
     tiles: [
       water_light_inner_edge_nw, water_med_inner_edge_nw, water_dark_inner_edge_nw, water_poison_inner_edge_nw, water_ice_inner_edge_nw,
-      water_swamp_inner_edge_nw, water_sewer_inner_edge_nw, lava_inner_edge_nw, pit_brown_inner_edge_nw, pit_black_inner_edge_nw,
+      water_swamp_inner_edge_nw, lava_inner_edge_nw, pit_brown_inner_edge_nw, pit_black_inner_edge_nw,
       pit_dark_inner_edge_nw,
       water_light_to_grass_med_inner_edge_nw, water_light_to_grass_dark_inner_edge_nw,
       sand_to_water_med_inner_edge_nw, sand_to_water_light_inner_edge_nw, ice_to_water_med_inner_edge_nw,
@@ -526,7 +526,7 @@ uniform_sets:
     invis: []
     tiles: [
       water_light_outer_edge_nw, water_med_outer_edge_nw, water_dark_outer_edge_nw, water_poison_outer_edge_nw, water_ice_outer_edge_nw,
-      water_swamp_outer_edge_nw, water_sewer_outer_edge_nw, lava_outer_edge_nw, pit_brown_outer_edge_nw, pit_black_outer_edge_nw,
+      water_swamp_outer_edge_nw, lava_outer_edge_nw, pit_brown_outer_edge_nw, pit_black_outer_edge_nw,
       pit_dark_outer_edge_nw,
       water_light_to_grass_med_outer_edge_nw, water_light_to_grass_dark_outer_edge_nw,
       sand_to_water_med_outer_edge_nw, sand_to_water_light_outer_edge_nw, ice_to_water_med_outer_edge_nw,
@@ -539,7 +539,7 @@ uniform_sets:
     invis: []
     tiles: [
       water_light_outer_edge_n, water_med_outer_edge_n, water_dark_outer_edge_n, water_poison_outer_edge_n, water_ice_outer_edge_n,
-      water_swamp_outer_edge_n, water_sewer_outer_edge_n, lava_outer_edge_n, pit_brown_outer_edge_n, pit_black_outer_edge_n,
+      water_swamp_outer_edge_n, lava_outer_edge_n, pit_brown_outer_edge_n, pit_black_outer_edge_n,
       pit_dark_outer_edge_n,
       water_light_to_grass_med_outer_edge_n, water_light_to_grass_dark_outer_edge_n,
       sand_to_water_med_outer_edge_n, sand_to_water_light_outer_edge_n, ice_to_water_med_outer_edge_n,
@@ -552,7 +552,7 @@ uniform_sets:
     invis: []
     tiles: [
       water_light_outer_edge_ne, water_med_outer_edge_ne, water_dark_outer_edge_ne, water_poison_outer_edge_ne, water_ice_outer_edge_ne,
-      water_swamp_outer_edge_ne, water_sewer_outer_edge_ne, lava_outer_edge_ne, pit_brown_outer_edge_ne, pit_black_outer_edge_ne,
+      water_swamp_outer_edge_ne, lava_outer_edge_ne, pit_brown_outer_edge_ne, pit_black_outer_edge_ne,
       pit_dark_outer_edge_ne,
       water_light_to_grass_med_outer_edge_ne, water_light_to_grass_dark_outer_edge_ne,
       sand_to_water_med_outer_edge_ne, sand_to_water_light_outer_edge_ne, ice_to_water_med_outer_edge_ne,
@@ -1010,6 +1010,21 @@ uniform_sets:
       wood_outer_edge_nw, wood_outer_edge_n, wood_outer_edge_ne
     ]
 non_uniform_sets:
+  water_sewer_border:
+    layer: terrain_border
+    size: [2, 2]
+    sprite_prefix: "tileset/water_sewer_"
+    tiles:
+      outer_edge_nw:
+        impass: [[1, 0], [1, 1]]
+      outer_edge_ne:
+        impass: [[0, 0], [0, 1]]
+      outer_edge_n:
+        impass: [[0, 0], [0, 1], [1, 0], [1, 1]]
+      inner_edge_ne:
+        impass: [[0, 0], [0, 1], [1, 0], [1, 1]]
+      inner_edge_nw:
+        impass: [[0, 0], [0, 1], [1, 0], [1, 1]]
   dungeon_bars:
     layer: walls_aerial
     size: [2, 2]

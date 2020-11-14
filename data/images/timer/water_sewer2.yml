@@ -1,0 +1,7 @@
+id: water_sewer2
+frame_time_millis: 150
+frames:
+  - "props/water_sewer02_01"
+  - "props/water_sewer02_02"
+  - "props/water_sewer02_03"
+  - "props/water_sewer02_04"

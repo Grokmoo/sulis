@@ -1,0 +1,9 @@
+id: water_sewer2
+name: water_sewer2
+icon: inventory/misc_crate
+image: water_sewer2
+random_millis_offset: 600
+size: 2by2
+visible: true
+interactive:
+  Not

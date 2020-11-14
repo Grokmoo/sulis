@@ -270,3 +270,21 @@ groups:
       fire01_14: [52, 0]
       fire01_15: [56, 0]
       fire01_16: [60, 0]
+  water_sewer01:
+    position: [52, 22]
+    size: [2, 2]
+    areas:
+      water_sewer01_01: [0, 0]
+      water_sewer01_02: [2, 0]
+      water_sewer01_03: [4, 0]
+      water_sewer01_04: [6, 0]
+      water_sewer01_05: [8, 0]
+      water_sewer01_06: [10, 0]
+  water_sewer02:
+    position: [56, 24]
+    size: [2, 2]
+    areas:
+      water_sewer02_01: [0, 0]
+      water_sewer02_02: [2, 0]
+      water_sewer02_03: [3, 0]
+      water_sewer02_04: [4, 0]

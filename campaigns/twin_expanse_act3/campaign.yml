@@ -82,6 +82,8 @@ world_map:
       icon: forest01
       initially_enabled: false
       initially_visible: false
+      travel_times:
+        rose_lake: 12
     rose_lake:
       name: "Rose Lake"
       position: [9.75, 5.5]
@@ -89,6 +91,8 @@ world_map:
       initially_enabled: false
       linked_area: rose_lake
       linked_area_pos: [3, 6]
+      travel_times:
+        volgar_river: 12
     twain:
       name: "Twain"
       position: [14.75, 10.25]

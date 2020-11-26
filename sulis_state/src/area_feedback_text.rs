@@ -204,7 +204,7 @@ impl AreaFeedbackText {
     }
 
     pub fn add_icon_entry(&mut self, icon: IconKind, color_kind: ColorKind) {
-        self.total_text.push_str("w");
+        self.total_text.push('w');
         self.entries.push(Entry {
             text: String::new(),
             icon: Some(icon),

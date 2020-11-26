@@ -128,10 +128,6 @@ nodes:
       [c=68FF68|Vaalyun] - [c=888|Vaalyun seems distraught.]
       
       The ring gone and no leads...
-    on_view:
-      - fire_script:
-          id: vezula_hills
-          func: learn_ring_gone
     responses:
       - text: "Who was that?"
         to: vaalyun_who

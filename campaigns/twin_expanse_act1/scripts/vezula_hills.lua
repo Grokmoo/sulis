@@ -9,16 +9,14 @@ function rockslide_final_fate(parent)
   game:set_quest_entry_state("the_rockslide", "final_fate", "Visible")
   game:set_quest_state("the_rockslide", "Complete")
   game:add_party_xp(100)
+  
+  game:set_quest_entry_state("vaalyuns_journey", "ring_gone", "Visible")
+  game:add_party_xp(50)
 end
 
 function kaelwyn_leave(parent)
   local target = game:entity_with_id("kaelwyn")
   target:remove()
-end
-
-function learn_ring_gone(parent)
-  game:set_quest_entry_state("vaalyuns_journey", "ring_gone", "Visible")
-  game:add_party_xp(50)
 end
 
 function enable_worldmap(parent)

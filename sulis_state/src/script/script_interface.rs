@@ -47,7 +47,7 @@ use sulis_module::{Faction, ItemState, Module, OnTrigger, Time};
 /// # `party() -> Table<ScriptEntity>`
 /// Returns a table containing all current party members.
 ///
-/// # `entity_with_id(id: String) -> Table<ScriptEntity>`
+/// # `entity_with_id(id: String) -> ScriptEntity`
 /// Returns a `ScriptEntity` object for the entity with the given unique
 /// id, if such an entity can be found.  Otherwise, returns the invalid `ScriptEntity`.  The ID is
 /// the unique id associated with the individual entity, which is typically the same as the actor
@@ -55,11 +55,11 @@ use sulis_module::{Faction, ItemState, Module, OnTrigger, Time};
 /// ## Examples
 /// ```lua
 ///   entity = game:entity_with_id("id1")
-///   if not entity:is_valid() return end
+///   if not entity:is_valid() then return end
 ///   game:log("Found entity with name " .. entity:name())
 ///```
 ///
-/// # `entities_with_ids(ids: Table) -> ScriptEntity`
+/// # `entities_with_ids(ids: Table) -> Table<ScriptEntity>`
 /// Returns a list of `ScriptEntity` objects for each of the specified
 /// ids that are found.  The list may be empty.  Also see `entity_with_id(id)`.
 /// ## Examples

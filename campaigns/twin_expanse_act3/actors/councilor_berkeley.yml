@@ -23,8 +23,8 @@ inventory:
       id: boots_leather
       adjectives: [ exceptional ]
     Torso:
-      id: torso_robes
-      adjectives: [ ]
+      id: torso_robe
+      adjectives: [ exceptional ]
     Legs:
       id: legs_leather
       adjectives: [ exceptional ]

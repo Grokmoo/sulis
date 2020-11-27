@@ -89,6 +89,22 @@ pub(crate) fn transition_to(area_id: Option<&str>, p: Option<Point>, offset: Poi
             &pc,
             &pc,
         );
+    } else {
+        let mut triggers = Vec::new();
+        for trigger in area.area.area.triggers.iter() {
+            if trigger.fire_more_than_once && matches!(trigger.kind, TriggerKind::OnAreaLoad) {
+                triggers.push(trigger.clone());
+            }
+        }
+
+        if !triggers.is_empty() {
+            GameState::add_ui_callbacks_of_kind(
+                &triggers,
+                TriggerKind::OnAreaLoad,
+                &pc,
+                &pc
+            );
+        }
     }
 }
 

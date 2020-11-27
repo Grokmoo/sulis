@@ -134,6 +134,13 @@ triggers:
           id: rose_lake
           func: on_enter
     initially_enabled: true
+  - kind: OnAreaLoad
+    on_activate:
+      - fire_script:
+          id: rose_lake
+          func: on_area_load
+    initially_enabled: true
+    fire_more_than_once: true
 terrain:
   kinds:
     - grass_light

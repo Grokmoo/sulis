@@ -11,3 +11,7 @@ function pull_lever(parent)
   game:spawn_actor_at("dwarf_raider01", 125, 68, "Neutral", "rose_lake")
   game:spawn_actor_at("dwarf_raider02", 125, 74, "Neutral", "rose_lake")
 end
+
+function on_area_load(parent)
+  
+end

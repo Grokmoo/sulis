@@ -9,11 +9,11 @@ max_vis_distance: 20
 max_vis_up_one_distance: 6
 world_map_location: rose_lake
 ambient_sound: ~
-default_music: ~
+default_music: music/theme_battle03
 default_combat_music: ~
 on_rest:
   Disabled:
-    message: "<PLACEHOLDER>"
+    message: You cannot rest here.  Find an inn or temple.
 location_kind: Outdoors
 layers:
   - terrain_base

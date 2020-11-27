@@ -13,7 +13,7 @@ default_music: ~
 default_combat_music: ~
 on_rest:
   Disabled:
-    message: "<PLACEHOLDER>"
+    message: You cannot rest here.  Find an inn or temple.
 location_kind: Indoors
 layers:
   - terrain_base

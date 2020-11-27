@@ -6,4 +6,34 @@ nodes:
     text: |
       [c=888|Before you once again stands Aurelianus Berkeley.  He no longer reflects the calm demeanor of the last time you saw him.]
     responses:
-      - text: "[c=888|Fight]"
+      - text: "[c=888|Continue]"
+        to: start02
+  start02:
+    text: |
+      [c=6868FF|#target_name#] - You again?  How is that you have come here?
+    responses:
+      - text: "[c=888|Continue]"
+        to: start03
+  start03:
+    text: |
+      [c=6868FF|#target_name#] - I am so close - This is all just a distraction!  Begone, all of you!
+    responses:
+      - text: "[c=888|Continue]"
+        to: start04
+  start04:
+    text: |
+      [c=888|He waves the Aegis as before, but the gemstone begins to glow red.]
+      
+      [c=888|Suddenly, it factures and cracks, with a blinding flash of light!]
+    responses:
+      - text: "[c=888|Continue]"
+        to: start05
+  start05:
+    text: |
+      [c=888|Everything around you turns white and year hear what seems to be a distant scream.]
+    responses:
+       - text: "[c=888|Continue]"
+         on_select:
+           - fire_script:
+               id: rose_lake
+               func: to_xandala

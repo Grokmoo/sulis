@@ -12,3 +12,6 @@ entries:
   counterattack:
     description: |
       I have made a plan with the Dwarves to launch a counter-attack at Rose Lake.
+  to_xandala:
+    description: |
+      We opened the gate at Rose Lake as planned.  Berkeley confronted us and used the Aegis, which seems to have backfired, teleporting all of us to an unknown destination.

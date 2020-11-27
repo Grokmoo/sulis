@@ -24,7 +24,7 @@ use sulis_core::ui::AnimationState;
 use sulis_core::util::{unable_to_create_error, Offset, Point, Rect};
 
 use crate::area::tile::verify_point;
-use crate::{LootList, Module, ObjectSize};
+use crate::{LootList, Module, ObjectSize, OnTrigger};
 
 #[derive(Debug)]
 pub enum Interactive {
@@ -36,6 +36,8 @@ pub enum Interactive {
         initially_open: bool,
         closed_impass: Vec<Point>,
         closed_invis: Vec<Point>,
+        on_activate: Vec<OnTrigger>,
+        fire_more_than_once: bool,
     },
     Hover,
 }
@@ -143,10 +145,14 @@ impl Prop {
                 initially_open,
                 closed_impass,
                 closed_invis,
+                on_activate,
+                fire_more_than_once,
             } => Interactive::Door {
                 initially_open,
                 closed_impass,
                 closed_invis,
+                on_activate,
+                fire_more_than_once,
             },
         };
 
@@ -195,6 +201,12 @@ pub enum InteractiveBuilder {
         initially_open: bool,
         closed_impass: Vec<Point>,
         closed_invis: Vec<Point>,
+
+        #[serde(default)]
+        on_activate: Vec<OnTrigger>,
+
+        #[serde(default)]
+        fire_more_than_once: bool,
     },
     Hover,
 }

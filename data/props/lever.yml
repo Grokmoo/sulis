@@ -14,3 +14,8 @@ interactive:
                     [0, 1], [1, 1], [2, 1],
                     [0, 2], [1, 2], [2, 2]]
     closed_invis:  []
+    on_activate:
+      - fire_script:
+          id: rose_lake
+          func: pull_lever
+    fire_more_than_once: false

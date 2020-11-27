@@ -328,7 +328,7 @@ impl PropSaveState {
                     items,
                 }
             }
-            Interactive::Door { open } => Door { open },
+            Interactive::Door { open, activate_fired, .. } => Door { open, activate_fired },
             Interactive::Hover { ref text } => Hover { text: text.clone() },
         };
 
@@ -353,6 +353,9 @@ pub enum PropInteractiveSaveState {
     },
     Door {
         open: bool,
+
+        #[serde(default)]
+        activate_fired: bool,
     },
     Hover {
         text: String,

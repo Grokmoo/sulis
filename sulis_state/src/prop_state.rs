@@ -22,11 +22,11 @@ use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::ui::{animation_state, AnimationState, Color};
 use sulis_core::util::{self, invalid_data_error, Offset, Scale, Size};
 use sulis_module::area::PropData;
-use sulis_module::{prop, ItemState, LootList, Module, ObjectSizeIterator, Prop};
+use sulis_module::{prop, ItemState, LootList, Module, ObjectSizeIterator, Prop, OnTrigger};
 
 use crate::entity_state::AreaDrawable;
 use crate::save_state::PropInteractiveSaveState;
-use crate::{ChangeListenerList, EntityTextureCache, ItemList, Location};
+use crate::{GameState, ChangeListenerList, EntityTextureCache, ItemList, Location};
 
 #[derive(Debug)]
 pub enum Interactive {
@@ -38,6 +38,9 @@ pub enum Interactive {
     },
     Door {
         open: bool,
+        activate_fired: bool,
+        on_activate: Vec<OnTrigger>,
+        fire_more_than_once: bool,
     },
     Hover {
         text: String,
@@ -86,7 +89,7 @@ impl PropState {
 
         let mut anim_state = AnimationState::default();
 
-        let interactive = match prop_data.prop.interactive {
+        let interactive = match &prop_data.prop.interactive {
             prop::Interactive::Hover => {
                 let text = prop_data.hover_text.clone().unwrap_or_default();
                 Interactive::Hover { text }
@@ -97,18 +100,23 @@ impl PropState {
                 }
                 Interactive::Not
             }
-            prop::Interactive::Container { ref loot } => Interactive::Container {
+            prop::Interactive::Container { loot } => Interactive::Container {
                 items,
                 loot_to_generate: loot.clone(),
                 temporary,
             },
-            prop::Interactive::Door { initially_open, .. } => {
-                if initially_open {
+            prop::Interactive::Door {
+                ref initially_open, ref on_activate, ref fire_more_than_once, ..
+            } => {
+                if *initially_open {
                     anim_state.toggle(animation_state::Kind::Active);
                 }
 
                 Interactive::Door {
-                    open: initially_open,
+                    open: *initially_open,
+                    activate_fired: false,
+                    on_activate: on_activate.clone(),
+                    fire_more_than_once: *fire_more_than_once,
                 }
             }
         };
@@ -187,15 +195,17 @@ impl PropState {
                     temporary,
                 };
             }
-            PropInteractiveSaveState::Door { open } => {
-                // the base prop interactive must match, if not don't load this.
-                // this is for save compat.
-                match self.prop.interactive {
-                    prop::Interactive::Door { .. } => (),
-                    _ => return Ok(()),
-                }
+            PropInteractiveSaveState::Door { open, activate_fired } => {
+                if let prop::Interactive::Door { on_activate, fire_more_than_once, .. } =
+                    &self.prop.interactive {
 
-                self.interactive = Interactive::Door { open };
+                    self.interactive = Interactive::Door {
+                        open,
+                        activate_fired,
+                        on_activate: on_activate.clone(),
+                        fire_more_than_once: *fire_more_than_once,
+                    };
+                }
 
                 if open {
                     self.animation_state.add(animation_state::Kind::Active);
@@ -299,9 +309,20 @@ impl PropState {
                     items.add_quantity(qty, item);
                 }
             }
-            Interactive::Door { ref mut open } => {
+            Interactive::Door {
+                ref mut open, ref mut activate_fired, ref on_activate, ref fire_more_than_once, ..
+            } => {
                 let cur_open = *open;
                 *open = !cur_open;
+
+                if !cur_open {
+                    if *fire_more_than_once || !(*activate_fired) {
+                        let player = GameState::player();
+                        GameState::add_ui_callback(on_activate.clone(), &player, &player);
+                    }
+
+                    *activate_fired = true;
+                }
             }
         }
     }

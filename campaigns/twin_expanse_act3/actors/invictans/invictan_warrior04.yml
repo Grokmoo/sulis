@@ -1,0 +1,52 @@
+---
+id: invictan_warrior04
+name: "Invictan Warrior"
+race: human_simple
+sex: Male
+attributes:
+  str: 12
+  dex: 15
+  end: 13
+  per: 10
+  int: 10
+  wis: 10
+conversation: ~
+faction: Hostile
+images:
+  Background: creatures/human21
+  Foreground: empty
+  Shadow: empty
+hue: 0.9
+inventory:
+  equipped:
+    Feet:
+      id: boots_plate
+      adjectives: [ exceptional ]
+    Torso:
+      id: torso_plate
+      adjectives: [ exceptional ]
+    Legs:
+      id: legs_plate
+      adjectives: [ exceptional ]
+    HeldMain:
+      id: longbow
+      adjectives: [ exceptional ]
+  quick: {}
+levels:
+  fighter: 15
+abilities:
+  - armor_light
+  - armor_medium
+  - armor_heavy
+  - weapon_axe
+  - weapon_crossbow
+  - weapon_bow
+  - weapon_small_sword
+  - weapon_large_sword
+  - weapon_spear
+  - weapon_mace
+  - weapon_simple
+  - penetrating_shot
+  - point_blank_shot
+  - powerful_shot
+ai: ai_ranged

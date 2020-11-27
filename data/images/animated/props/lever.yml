@@ -1,0 +1,4 @@
+id: props/lever
+states:
+  normal: props/lever_closed
+  active: props/lever_open

@@ -1,0 +1,29 @@
+id: invictans_level16
+auto_spawn: true
+min_gen_actors: 6
+max_gen_actors: 6
+entries:
+  - id: invictan_warrior01
+    limit: 2
+    weight: 1
+  - id: invictan_warrior02
+    limit: 2
+    weight: 1
+  - id: invictan_warrior03
+    limit: 2
+    weight: 1
+  - id: invictan_warrior04
+    limit: 2
+    weight: 1
+  - id: invictan_warrior05
+    limit: 2
+    weight: 1
+  - id: invictan_battlemage
+    limit: 1
+    weight: 2
+  - id: invictan_battlecryer
+    limit: 1
+    weight: 2
+  - id: invictan_warlock
+    limit: 1
+    weight: 2

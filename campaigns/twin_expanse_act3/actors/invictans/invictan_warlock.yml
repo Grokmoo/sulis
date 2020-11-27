@@ -1,0 +1,56 @@
+---
+id: invictan_warlock
+name: Invictan Warlock
+race: human
+sex: Male
+attributes:
+  str: 12
+  dex: 13
+  end: 12
+  per: 12
+  int: 13
+  wis: 14
+conversation: ~
+faction: Hostile
+images:
+  Foreground: empty
+  Background: creatures/human14
+  Shadow: empty
+hue: 0.8
+inventory:
+  equipped:
+    Feet:
+      id: boots_leather
+      adjectives: [ exceptional ]
+    Torso:
+      id: torso_robes
+      adjectives: [ exceptional ]
+    Legs:
+      id: legs_leather
+      adjectives: [ exceptional ]
+    HeldMain:
+      id: crossbow
+      adjectives: [ exceptional ]
+  quick:
+    AltHeldMain:
+      id: shortsword
+      adjectives: [ exceptional ]
+  quick: {}
+levels:
+  warlock: 16
+abilities:
+  - armor_light
+  - armor_medium
+  - armor_heavy
+  - weapon_axe
+  - weapon_crossbow
+  - weapon_bow
+  - weapon_spear
+  - weapon_mace
+  - weapon_simple
+  - block_pain
+  - feedback
+  - clear_thoughts
+  - psychic_yell
+  - assay
+ai: ai_mage

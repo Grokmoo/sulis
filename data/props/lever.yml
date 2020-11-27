@@ -1,0 +1,16 @@
+id: lever
+name: Lever
+icon: inventory/misc_crate
+image: props/lever
+size: 3by3
+impass: [[0, 0], [1, 0], [2, 0],
+         [0, 1], [1, 1], [2, 1],
+         [0, 2], [1, 2], [2, 2]]
+invis: []
+interactive:
+  Door:
+    initially_open: false
+    closed_impass: [[0, 0], [1, 0], [2, 0],
+                    [0, 1], [1, 1], [2, 1],
+                    [0, 2], [1, 2], [2, 2]]
+    closed_invis:  []

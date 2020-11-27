@@ -1,0 +1,19 @@
+id: minotaur_level16
+auto_spawn: true
+min_gen_actors: 4
+max_gen_actors: 4
+entries:
+  - id: minotaur_champion
+    always: true
+  - id: skeleton_lvl14_rogue01
+    weight: 1
+  - id: skeleton_lvl14_rogue02
+    weight: 1
+  - id: skeleton_lvl14_rogue03
+    weight: 1
+  - id: skeleton_lvl14_mage01
+    weight: 1
+  - id: skeleton_lvl14_mage02
+    weight: 1
+  - id: skeleton_lvl14_mage03
+    weight: 1

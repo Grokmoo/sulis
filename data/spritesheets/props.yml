@@ -288,3 +288,9 @@ groups:
       water_sewer02_02: [2, 0]
       water_sewer02_03: [3, 0]
       water_sewer02_04: [4, 0]
+  lever:
+    position: [45, 27]
+    size: [3, 3]
+    areas:
+      lever_closed: [0, 0]
+      lever_open: [3, 0]

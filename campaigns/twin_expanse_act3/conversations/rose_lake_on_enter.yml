@@ -1,0 +1,11 @@
+id: rose_lake_on_enter
+initial_nodes:
+  - id: start01
+nodes:
+  start01:
+    text: |
+      [c=888|As you make your way down the street, several armed soldiers confront you.  They wear emblems not familiar to you.]
+      
+      [[c=888|They are not of Rose Lake.]
+    responses:
+      - text: "[c=888|Fight]"

@@ -1,0 +1,55 @@
+---
+id: invictan_battlecryer
+name: Invictan Warcryer
+race: human
+sex: Male
+attributes:
+  str: 10
+  dex: 10
+  end: 10
+  per: 10
+  int: 10
+  wis: 10
+conversation: ~
+faction: Hostile
+images:
+  Shadow: empty
+  Foreground: empty
+  Background: creatures/human08
+hue: 0.1
+inventory:
+  equipped:
+    Feet:
+      id: boots_leather
+      adjectives: [ exceptional ]
+    Torso:
+      id: torso_leather
+      adjectives: [ exceptional ]
+    Legs:
+      id: legs_leather
+      adjectives: [ exceptional ]
+    HeldMain:
+      id: crossbow
+      adjectives: [ exceptional ]
+  quick:
+    AltHeldMain:
+      id: shortsword
+      adjectives: [ exceptional ]
+levels:
+  bard: 16
+abilities:
+  - armor_light
+  - armor_medium
+  - armor_heavy
+  - weapon_axe
+  - weapon_crossbow
+  - weapon_bow
+  - weapon_spear
+  - weapon_mace
+  - weapon_simple
+  - song_of_heroes
+  - tune_of_unity
+  - inconspicuous_melody
+  - elril_the_mighty
+  - arnad_the_slayer_of_kings
+ai: ai_ranged

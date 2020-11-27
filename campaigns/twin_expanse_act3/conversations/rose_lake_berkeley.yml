@@ -1,0 +1,9 @@
+id: rose_lake_berkeley
+initial_nodes:
+  - id: start01
+nodes:
+  start01:
+    text: |
+      [c=888|Before you once again stands Aurelianus Berkeley.  He no longer reflects the calm demeanor of the last time you saw him.]
+    responses:
+      - text: "[c=888|Fight]"

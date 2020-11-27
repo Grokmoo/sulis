@@ -221,13 +221,14 @@ use sulis_module::{Faction, ItemState, Module, OnTrigger, Time};
 /// Returns true if the specified coordinates in the current area are passable for
 /// the entity, false otherwise.
 ///
-/// # `spawn_actor_at(id: String, x: Int, y: Int, faction: String (Optional)) -> ScriptEntity`
+/// # `spawn_actor_at(id: String, x: Int, y: Int, faction: String (Optional), area: String
+/// (Optional)) -> ScriptEntity`
 /// Attempts the spawn an instance of the actor with the specified `id` at the
-/// coordinates `x`, `y` in the current area.  If successful, returns the
+/// coordinates `x`, `y` in the current area, unless area is specified.  If successful, returns the
 /// ScriptEntity that was just spawned.  If not, returns the invalid ScriptEntity.
 /// Optionally, you may set the faction of the spawned actor to the specified value.
 /// Must be "Hostile", "Neutral", or "Friendly".  This method can fail if the
-/// ID or coordinates are invalid, or if the location is not passable for the entity
+/// ID or coordinates are invalid, or if the location is not passable for the entity.
 ///
 /// # `spawn_encounter_at(x: Int, y: Int, area_id: String (Optional))`
 /// Causes the encounter in the current area at `x`, `y` to spawn entities based
@@ -671,7 +672,7 @@ impl UserData for ScriptInterface {
 
         methods.add_method(
             "spawn_actor_at",
-            |_, _, (id, x, y, faction): (String, i32, i32, Option<String>)| {
+            |_, _, (id, x, y, faction, area): (String, i32, i32, Option<String>, Option<String>)| {
                 let actor = match Module::actor(&id) {
                     None => {
                         warn!("Unable to spawn actor '{}': not found", id);
@@ -682,10 +683,19 @@ impl UserData for ScriptInterface {
 
                 let size = Rc::clone(&actor.race.size);
 
-                let area_state = GameState::area_state();
+                let area_state = if let Some(area_id) = area {
+                    if let Some(area) = GameState::get_area_state(&area_id) {
+                        area
+                    } else {
+                        warn!("Invalid actor spawn area '{}'", area_id);
+                        return Ok(ScriptEntity::invalid());
+                    }
+                } else {
+                    GameState::area_state()
+                };
 
                 if !area_state.borrow().is_passable_size(&size, x, y) {
-                    info!(
+                    warn!(
                         "Unable to spawn actor '{}' at {},{}: not passable",
                         id, x, y
                     );

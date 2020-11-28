@@ -1,0 +1,79 @@
+id: berkeley_final
+initial_nodes:
+  - id: start01
+nodes:
+  start01:
+    text: |
+      [c=888|Berkeley is chanting some sort of incantation as you enter the room.  He seems to be drawing power from two nearby stone pillars.]
+    responses:
+      - text: "[c=888|Continue]"
+        to: start02
+  start02:
+    text: |
+      [c=6868FF|#target_name#] - I must thank you!  Through some accident, the Aegis has called me to its home!  Xandala, the heart of the first Sundering!  Finally, my plans come to fruition!
+    responses:
+      - text: "[c=888|Continue]"
+        to: main
+  main:
+    text: |
+      [c=6868FF|#target_name#] - I will grant you a few answers, before you die.
+    responses:
+      - text: "The 'first' Sundering?  What do you mean?"
+        to: ask_sundering01
+      - text: "Another Sundering will kill millions!"
+        to_view:
+          - target_flag: sundering
+        to: ask_death_toll01
+      - text: "Usuvior perished in the first Sundering.  Surely the same will happen to you."
+        to_view:
+          - target_flag: sundering
+        to: ask_usuvior01
+      - text: "You are mad."
+        to_view:
+          - target_flag: sundering
+        to: ask_mad01
+      - text: "Time to end this."
+        to: final
+  ask_sundering01:
+    text: |
+      [c=6868FF|#target_name#] - Sad that only now do you understand.
+    responses:
+      - text: "[c=888|Continue]"
+        to: ask_sundering02
+  ask_sundering02:
+    text: |
+      [c=6868FF|#target_name#] - Here on this site, where the barrier between Eao and the heavens is weakest, I will grant myself the power of a god!  Just as Usuvior did thousands of years ago.
+    on_view:
+      - target_flag: sundering
+    responses:
+      - text: "[c=888|Continue]"
+        to: ask_sundering03
+  ask_sundering03:
+    text: |
+      [c=6868FF|#target_name#] - A second Sundering is a small price to pay for such power.
+    responses:
+      - text: "[c=888|Continue]"
+        to: main
+  ask_death_toll01:
+    text: |
+      [c=6868FF|#target_name#] - It is true some will die, but think of how many will live!  Once I am a God, I will ensure the world enters a golden age!
+    responses:
+      - text: "[c=888|Continue]"
+        to: main
+  ask_mad01:
+    text: |
+      [c=6868FF|#target_name#] - I did not expect you to understand.  Closed minded fools, all of you.  It is no matter.
+    responses:
+      - text: "[c=888|Continue]"
+        to: main
+  ask_usuvior01:
+    text: |
+      [c=6868FF|#target_name#] - You are a fool to believe that.  Usuvior's soul may have been absorbed by the gods, but mine will not!  I have studied this magic for decades and nothing will stand in my way, not even the gods themselves!
+    responses:
+      - text: "[c=888|Continue]"
+        to: main
+  final:
+    text: |
+      [c=888|Berkeley seems to be drawing power from two stone pillars in the room.  They will need to be destroyed.]
+    responses:
+      - text: "[c=800|Fight]"

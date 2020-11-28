@@ -15,3 +15,6 @@ entries:
   to_xandala:
     description: |
       We opened the gate at Rose Lake as planned.  Berkeley confronted us and used the Aegis, which seems to have backfired, teleporting all of us to an unknown destination.
+  final_battle:
+    description: |
+      We confronted Berkeley in a cave at the heart of the Sundering, in distant Xandala.

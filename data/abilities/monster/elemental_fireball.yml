@@ -1,0 +1,24 @@
+id: elemental_fireball
+name: "Fireball"
+icon: abilities/fireball
+description: |
+  You launch an explosive bolt of elemental fire at a visible location of your choice.  Upon reaching its destination, it explodes dealing damage to all targets within a 5 tile radius.
+  The explosion leaves behind a large fire surface that lasts for 2 turns, burning any who enter it.
+active:
+  script: "fireball"
+  group: "Special"
+  ap: 3000
+  duration:
+    Instant
+  cooldown: 3
+  combat_only: true
+  range:
+    Radius: 15.0
+  ai:
+    priority: 10
+    kind: Damage
+    group: Multiple
+    range: Visible
+    target: AnyGround
+  short_description: |
+    Deal large fire damage to a group of opponents.

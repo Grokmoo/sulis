@@ -1,0 +1,10 @@
+id: elementals_level15
+auto_spawn: true
+min_gen_actors: 4
+max_gen_actors: 5
+entries:
+  - id: earth_elemental_level15
+    weight: 1
+  - id: fire_elemental_level15
+    weight: 1
+    

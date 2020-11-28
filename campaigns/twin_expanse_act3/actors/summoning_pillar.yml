@@ -1,0 +1,56 @@
+---
+id: summoning_pillar
+name: Summoning Pillar
+inline_race:
+  id: summoning_pillar
+  name: "Summoning Pillar"
+  description: "Object"
+  size: 3by3
+  movement_rate: 0.1
+  base_stats:
+    - kind: { hit_points: 20 }
+    - kind: { resistance: { kind: "Slashing", amount: 50 } }
+    - kind: { resistance: { kind: "Piercing", amount: 50 } }
+    - kind: { resistance: { kind: "Fire", amount: 25 } }
+    - kind: { resistance: { kind: "Shock", amount: 25 } }
+    - kind: { armor: 10 }
+    - kind: { flanked_immunity }
+    - kind: { crit_immunity }
+    - kind: { sneak_attack_immunity }
+  base_attack:
+    damage:
+      min: 0
+      max: 1
+      kind: Crushing
+    kind: #Melee
+      reach: 1.0
+    sounds:
+      miss: sfx/swish_2
+      graze: sfx/thwack-03
+      hit: sfx/hit_3
+      crit: sfx/hit_2
+  default_images:
+    Background: creatures/summoning_pillar
+  ticker_offset: [0.0, 1.5]
+  image_layer_offset_scale: 16
+  image_layer_offsets:
+    Background: [-4, -16]
+sex: Male
+attributes:
+  str: 1
+  dex: 1
+  end: 10
+  per: 1
+  int: 1
+  wis: 1
+conversation: ~
+faction: Hostile
+images: {}
+hue: 0.8
+inventory:
+  equipped: {}
+  quick: {}
+levels:
+  fighter: 10
+abilities: []
+ai: ~

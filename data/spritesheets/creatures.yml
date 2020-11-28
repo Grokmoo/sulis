@@ -16,6 +16,7 @@ groups:
       flameling_large: [32, 50, 8, 8]    
       minotaur: [12, 59, 4, 5]
       dragon_large02: [16, 57, 10, 7]
+      summoning_pillar: [26, 60, 3, 4]
   1by1:
     size: [1, 1]
     areas:

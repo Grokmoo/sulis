@@ -1,0 +1,10 @@
+id: ai_berkeley
+script: ai_berkeley
+hooks:
+  OnDamaged: berkeley_on_damaged
+  OnRoundElapsed: berkeley_on_round_elapsed
+  AfterAttack: after_attack
+  AiAction: ai_action_berkeley
+params:
+  AttackWhenHasAbilitiesChance: 0
+  AlwaysUseAbilityPriority: 1

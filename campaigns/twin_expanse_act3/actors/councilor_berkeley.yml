@@ -5,11 +5,11 @@ race: human
 sex: Male
 attributes:
   str: 10
-  dex: 10
-  end: 10
-  per: 10
-  int: 10
-  wis: 10
+  dex: 13
+  end: 36
+  per: 16
+  int: 20
+  wis: 12
 conversation: rose_lake_berkeley
 faction: Neutral
 images:
@@ -21,35 +21,42 @@ inventory:
   equipped:
     Feet:
       id: boots_leather
-      adjectives: [ exceptional ]
+      adjectives: [ legendary, reflex20, concealment20 ]
     Torso:
-      id: torso_robe
-      adjectives: [ exceptional ]
+      id: torso_leather
+      adjectives: [ legendary , defense20, will20 ]
     Legs:
       id: legs_leather
-      adjectives: [ exceptional ]
+      adjectives: [ legendary, caster_level4 ]
     HeldMain:
       id: quarterstaff
-      adjectives: [ exceptional ]
+      adjectives: [ legendary, mage_ability4 ]
   quick:
     AltHeldMain:
       id: shortsword
-      adjectives: [ exceptional ]
+      adjectives: [ legendary, accuracy20 ]
   quick: {}
 levels:
-  mage: 20
+  mage: 19
 abilities:
   - armor_light
-  - armor_medium
-  - armor_heavy
   - weapon_axe
   - weapon_crossbow
   - weapon_bow
   - weapon_spear
   - weapon_mace
   - weapon_simple
+  - practiced_caster
+  - zealous_caster
+  - zealous_caster
+  - zealous_caster
+  - zealous_caster
+  - deadly_caster
   - fireball
+  - firebolt
+  - crush
   - acid_bomb
+  - flaming_fingers
   - healing_circle
   - chameleon
   - haste
@@ -57,4 +64,4 @@ abilities:
   - vacuum
   - chameleon
   - cryofreeze
-ai: ai_mage
+ai: ai_berkeley

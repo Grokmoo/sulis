@@ -1,0 +1,31 @@
+id: invictans_boss
+auto_spawn: false
+min_gen_actors: 5
+max_gen_actors: 5
+entries:
+  - id: invictan_general
+    always: true
+  - id: invictan_warrior01
+    limit: 2
+    weight: 1
+  - id: invictan_warrior02
+    limit: 2
+    weight: 1
+  - id: invictan_warrior03
+    limit: 2
+    weight: 1
+  - id: invictan_warrior04
+    limit: 2
+    weight: 1
+  - id: invictan_warrior05
+    limit: 2
+    weight: 1
+  - id: invictan_battlemage
+    limit: 1
+    weight: 2
+  - id: invictan_battlecryer
+    limit: 1
+    weight: 2
+  - id: invictan_warlock
+    limit: 1
+    weight: 2

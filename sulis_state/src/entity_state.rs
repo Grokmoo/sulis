@@ -213,7 +213,8 @@ impl EntityState {
                     }
                     ai::FuncKind::OnRoundElapsed => {
                         cbs.add_func(script::FuncKind::OnRoundElapsed, func)
-                    }
+                    },
+                    ai::FuncKind::AiAction => (), // this is handled specially when running the AI
                 }
             }
             self.ai_callbacks = Some(Rc::new(cbs));

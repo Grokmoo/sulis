@@ -24,6 +24,7 @@ pub enum FuncKind {
     AfterAttack,
     BeforeDefense,
     OnRoundElapsed,
+    AiAction,
 }
 
 #[derive(Deserialize, Debug, Clone)]

@@ -19,6 +19,7 @@ use std::rc::Rc;
 
 use crate::script::script_callback;
 use crate::{animation::Anim, EntityState, GameState, Script};
+use sulis_module::ai::FuncKind;
 use sulis_core::config::Config;
 
 pub struct AI {
@@ -146,12 +147,18 @@ impl EntityAI {
             return State::End;
         }
 
-        if self.entity.borrow().actor.actor.ai.is_none() {
-            return State::End;
-        }
+        let ai_template = match &self.entity.borrow().actor.actor.ai {
+            None => return State::End,
+            Some(template) => Rc::clone(template),
+        };
+
+        let func = match ai_template.hooks.get(&FuncKind::AiAction) {
+            None => "ai_action",
+            Some(func) => func,
+        };
 
         self.actions_taken_this_turn += 1;
 
-        Script::ai(&self.entity, "ai_action")
+        Script::ai(&self.entity, func)
     }
 }

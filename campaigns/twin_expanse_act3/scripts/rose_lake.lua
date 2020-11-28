@@ -27,4 +27,5 @@ end
 function to_xandala(parent)
   game:set_quest_entry_state("the_aegis", "to_xandala", "Visible")
   game:transition_party_to(120, 120, "xandala")
+  game:run_script_delayed("campaign", "heal_party", 0.0)
 end

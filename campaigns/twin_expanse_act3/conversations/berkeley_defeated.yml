@@ -1,0 +1,43 @@
+id: berkeley_defeated
+initial_nodes:
+  - id: start01
+nodes:
+  start01:
+    text: |
+      [c=888|Battered and bloody, Berkeley staggers.  He can fight no more.]
+    responses:
+      - text: "[c=888|Continue]"
+        to: start02
+  start02:
+    text: |
+      [c=6868FF|#target_name#] - This cannot be...
+    responses:
+      - text: "[c=888|Continue]"
+        to: start03
+  start03:
+    text: |
+      [c=6868FF|#target_name#] - I...
+    responses:
+      - text: "[c=888|Continue]"
+        to: start04
+  start04:
+    text: |
+      [c=6868FF|#target_name#] - am...
+    responses:
+      - text: "[c=888|Continue]"
+        to: start05
+  start05:
+    text: |
+      [c=6868FF|#target_name#] - a god!
+    responses:
+      - text: "[c=888|Continue]"
+        to: start06
+  start06:
+    text: |
+      [c=888|Berkeley slumps over.  He is dead.]
+    responses:
+      - text: "[c=888|Continue]"
+        on_select:
+          - fire_script:
+              id: xandala
+              func: boss_death

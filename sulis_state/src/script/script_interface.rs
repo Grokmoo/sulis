@@ -287,6 +287,9 @@ use sulis_module::{Faction, ItemState, Module, OnTrigger, Time};
 /// asynchronously on the next frame, so the remaineder of this script script will execute
 /// immediately.
 ///
+/// # `exit_to_menu()`
+/// Causes the game to exit to the main menu.
+///
 /// # `scroll_view(x: Int, y: Int)`
 /// Causes the view of the current area to scroll to the specified `x`, `y` coordinates.
 /// This done using a smooth scroll effect.  The scroll begins on the next frame, so the
@@ -864,6 +867,13 @@ impl UserData for ScriptInterface {
         methods.add_method("show_cutscene", |_, _, id: String| {
             let pc = GameState::player();
             let cb = OnTrigger::ShowCutscene(id);
+            GameState::add_ui_callback(vec![cb], &pc, &pc);
+            Ok(())
+        });
+
+        methods.add_method("exit_to_menu", |_, _, ()| {
+            let pc = GameState::player();
+            let cb = OnTrigger::ExitToMenu;
             GameState::add_ui_callback(vec![cb], &pc, &pc);
             Ok(())
         });

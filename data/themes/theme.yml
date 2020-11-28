@@ -1361,7 +1361,7 @@ themes:
             position: [0, 3]
             text_params:
               scale: 7
-            text: "The End for now"
+            text: "The End"
           content:
             from: text_area
             text: "#0#"

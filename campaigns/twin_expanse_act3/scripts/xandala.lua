@@ -16,3 +16,20 @@ function boss_init(player)
   boss:set_faction("Hostile")
   game:spawn_encounter_at(29, 7)
 end
+
+function boss_death(player)
+  local boss = game:entity_with_id("berkeley_final")
+  local max_hp = boss:stats().max_hp
+  boss:take_damage(player, max_hp, max_hp, "Raw", 1000)
+  game:scroll_view(boss:x(), boss:y())
+  game:block_ui(2.0)
+  game:run_script_delayed("xandala", "show_cutscene", 2.0)
+end
+
+function show_cutscene(player)
+  game:show_cutscene("campaign_end")
+end
+
+function on_cutscene_end(player)
+  game:exit_to_menu()
+end

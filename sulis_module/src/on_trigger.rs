@@ -145,6 +145,7 @@ pub enum OnTrigger {
     FireScript(ScriptData),
     SayLine(String),
     GameOverWindow(String),
+    ExitToMenu,
     ScrollView(i32, i32),
     ScreenShake,
     LoadModule(ModuleLoadData),

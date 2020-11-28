@@ -2,8 +2,17 @@
 function berkeley_on_damaged(parent, targets, hit)
     local target = targets:first()
 	
-	game:log(parent:name() .. " damaged by " .. target:name() .. ": "
-	    .. hit:kind() .. " for " .. hit:total_damage() .. " damage.")
+	local cur_hp = parent:stats().current_hp
+	
+	if cur_hp > 0 then return end
+	
+	-- don't heal him for his final speech more than once
+	if parent:has_flag("defeated") then return end
+	
+	parent:set_flag("defeated")
+	parent:heal_damage(1)
+	
+	game:start_conversation("berkeley_defeated", parent)
 end
 
 -- OnRoundElapsed Hook

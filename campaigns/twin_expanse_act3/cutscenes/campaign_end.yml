@@ -1,0 +1,22 @@
+id: campaign_end
+frames:
+  - text: |
+      As Berkeley breathed his last, his few remaining followers quickly scattered.
+  - text: |
+      In Rose Lake, the remaining members of the Rose Guard loyal to the council were able to take control of the city.  In time, the city recovered, and even flourished.
+  - text: |
+      For their part in liberating the city, the Dwarves of Naathfir were offered many thanks and a hefty reward.  Trade prospered between the two peoples for generations.
+  - text: |
+      With the continuing lack of support from Rose Lake, the town of Wellswood drifted away from the larger city.  Although too small to put up much of a fight, the people of the village would provide taxes and support to Rose Lake only begrudgingly for many years.
+  - text: |
+      The death of Berkeley created a power vaccum in Oasis.  The following years were extremely bloody as one petty warlord after another seized control.  Eventually, trade routes no longer traveled through Oasis, the town shriveled, and died.
+  - text: |
+      The Dracon of the Sciedan ultimately regained control of the area around Oasis, leading to a bit of resurgance for the dying race.
+  - text: |
+      With the Aegis broken, there was no quick way home for the survivors of the battle of Xandala.
+  - text: |
+     Were you able to make your way home?  Did the bards sing of your adventurers, or were your actions in stopping the second Sundering forgotten?  Only you can say.
+on_end:
+  - fire_script:
+      id: xandala
+      func: on_cutscene_end

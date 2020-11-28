@@ -239,6 +239,7 @@ pub fn activate(
             ShowCutscene(ref cutscene) => show_cutscene(widget, cutscene),
             FireScript(ref script) => fire_script(&script.id, &script.func, pc, target),
             GameOverWindow(ref text) => game_over_window(widget, text.to_string()),
+            ExitToMenu => exit_to_menu(widget),
             ScrollView(x, y) => scroll_view(widget, *x, *y),
             ScreenShake => screen_shake(widget),
             LoadModule(ref module_data) => load_module(widget, module_data),
@@ -436,6 +437,11 @@ pub fn screen_shake(widget: &Rc<RefCell<Widget>>) {
     };
 
     area_view.borrow_mut().screen_shake();
+}
+
+fn exit_to_menu(widget: &Rc<RefCell<Widget>>) {
+    let (_, view) = Widget::parent_mut::<RootView>(widget);
+    view.next_step = Some(NextGameStep::MainMenu);
 }
 
 fn game_over_window(widget: &Rc<RefCell<Widget>>, text: String) {

@@ -9,8 +9,8 @@ max_vis_distance: 16
 max_vis_up_one_distance: 6
 world_map_location: ~
 ambient_sound: ~
-default_music: music/theme_cave01
-default_combat_music: music/theme_boss_battle01
+default_music: music/theme_boss_battle01
+default_combat_music: ~
 on_rest:
   Disabled:
     message: You cannot rest here.  Find an inn or temple.

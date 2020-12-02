@@ -25,7 +25,7 @@ inventory:
     Hands: { id: gloves_plate }
   quick: {}
 levels:
-  bard: 13
+  bard: 12
 abilities:
   - armor_light
   - armor_medium

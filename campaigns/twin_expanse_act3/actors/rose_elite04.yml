@@ -20,20 +20,20 @@ hue: 0.9
 inventory:
   equipped:
     Feet:
-      id: boots_plate
+      id: boots_mail
       adjectives: [ exceptional ]
     Torso:
-      id: torso_plate
+      id: torso_mail
       adjectives: [ exceptional ]
     Legs:
-      id: legs_plate
+      id: legs_mail
       adjectives: [ exceptional ]
     HeldMain:
       id: longbow
       adjectives: [ exceptional ]
   quick: {}
 levels:
-  fighter: 12
+  fighter: 11
 abilities:
   - armor_light
   - armor_medium

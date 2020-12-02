@@ -28,7 +28,7 @@ inventory:
     AltHeldMain:
       id: warhammer
 levels:
-  fighter: 13
+  fighter: 12
 abilities:
   - armor_light
   - armor_medium

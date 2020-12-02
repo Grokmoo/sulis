@@ -27,7 +27,7 @@ inventory:
     Hands: { id: gloves_plate }
   quick: {}
 levels:
-  fighter: 13
+  fighter: 12
 abilities:
   - armor_light
   - armor_medium

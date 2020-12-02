@@ -33,7 +33,7 @@ inventory:
       adjectives: [ exceptional ]
   quick: {}
 levels:
-  fighter: 12
+  fighter: 11
 abilities:
   - armor_light
   - armor_medium

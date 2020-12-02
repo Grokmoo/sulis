@@ -1,7 +1,7 @@
 id: rose_elite_level13
 auto_spawn: true
-min_gen_actors: 5
-max_gen_actors: 5
+min_gen_actors: 4
+max_gen_actors: 4
 entries:
   - id: rose_elite01
     limit: 2

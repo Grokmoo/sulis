@@ -37,7 +37,7 @@ inventory:
       adjectives: [ exceptional ]
   quick: {}
 levels:
-  mage: 12
+  mage: 11
 abilities:
   - armor_light
   - armor_medium
@@ -53,6 +53,5 @@ abilities:
   - heal
   - rock_armor
   - luck
-  - restoration
   - crush
 ai: ai_mage

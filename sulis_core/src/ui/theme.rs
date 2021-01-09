@@ -347,13 +347,7 @@ pub fn expand_text_args(text: &str, state: &WidgetState) -> String {
                     // ## code just gives a #
                     out.push(c);
                 } else {
-                    let text_arg = match state.get_text_arg(&cur_arg) {
-                        None => {
-                            // trace!("No text arg '{}' for text '{}'", cur_arg, text);
-                            ""
-                        }
-                        Some(arg) => arg,
-                    };
+                    let text_arg = state.get_text_arg(&cur_arg).unwrap_or_default();
                     out.push_str(text_arg);
                 }
                 arg_accum = false;

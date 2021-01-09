@@ -5,10 +5,10 @@ description: |
   You gain significant bonus damage when attacking while hidden or flanking an opponent.
 bonuses:
   - kind:
-      damage: { min: 10, max: 18, ap: 8 }
+      damage: { min: 10, max: 18, ap: 20 }
     when:  AttackWhenHidden
   - kind:
-      damage: { min: 7, max: 13, ap: 5 }
+      damage: { min: 7, max: 13, ap: 12 }
     when: AttackWhenFlanking
 upgrades:
   - description: |

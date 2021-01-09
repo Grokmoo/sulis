@@ -50,18 +50,18 @@ end
 
 function apply_penalty1(parent, ability, targets)
   local effect = parent:create_effect(ability:name(), 0)
-  effect:add_num_bonus("melee_accuracy", -20)
+  effect:add_num_bonus("melee_accuracy", -30)
   effect:apply()
 end
 
 function apply_penalty2(parent, ability, targets)
   local effect = parent:create_effect(ability:name(), 0)
-  effect:add_num_bonus("melee_accuracy", -40)
+  effect:add_num_bonus("melee_accuracy", -60)
   effect:apply()
 end
 
 function apply_penalty3(parent, ability, targets)
   local effect = parent:create_effect(ability:name(), 0)
-  effect:add_num_bonus("melee_accuracy", -60)
+  effect:add_num_bonus("melee_accuracy", -90)
   effect:apply()
 end

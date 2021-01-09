@@ -495,8 +495,8 @@ impl StatList {
         let damage_stat_bonus = if is_melee { str_bonus } else { dex_bonus } as f32;
 
         self.graze_multiplier += 0.02 * damage_stat_bonus;
-        self.hit_multiplier += 0.04 * damage_stat_bonus;
-        self.crit_multiplier += 0.08 * damage_stat_bonus;
+        self.hit_multiplier += 0.03 * damage_stat_bonus;
+        self.crit_multiplier += 0.06 * damage_stat_bonus;
 
         if self.hit_multiplier < self.graze_multiplier {
             self.hit_multiplier = self.graze_multiplier;

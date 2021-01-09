@@ -46,6 +46,7 @@ function create_grapple_effect(parent, ability, targets, hit)
     game:play_sfx("sfx/hit_3")
     effect:add_move_disabled()
     effect:add_attack_disabled()
+	effect:add_abilities_disabled()
   end
   
   local gen = target:create_anim("imprison")

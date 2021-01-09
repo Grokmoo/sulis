@@ -729,7 +729,7 @@ impl ActorState {
 
     pub fn get_move_ap_cost(&self, squares: u32) -> u32 {
         let rules = Module::rules();
-        ((rules.movement_ap as f32) / self.stats.movement_rate) as u32 * squares
+        (((rules.movement_ap as f32) / self.stats.movement_rate) as u32 * squares).max(1)
     }
 
     pub fn set_overflow_ap(&mut self, ap: i32) {

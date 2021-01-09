@@ -24,6 +24,9 @@ sounds:
   guitar:
     file: sfx/guitar-1.ogg
     volume: 0.4
+  flamethrower:
+    file: sfx/spell/flamethrower.ogg
+    volume: 2.0
 groups:
   jute-dh-rpgsounds:
     prefix: sfx/jute-dh-rpgsounds/
@@ -99,7 +102,6 @@ groups:
       - explode3
       - explode4
       - explode5
-      - flamethrower
       - forcepulse
       - forcepush
       - freeze

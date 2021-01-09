@@ -484,6 +484,10 @@ impl Shape {
         p: Point,
         los_params: LosParams,
     ) -> bool {
+        if !area.area.area.coords_valid(p.x, p.y) {
+            return true;
+        }
+
         let p_index = (p.x + p.y * area.area.width) as usize;
 
         if los_params.impass_blocks {

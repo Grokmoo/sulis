@@ -152,10 +152,7 @@ impl EntityAI {
             Some(template) => Rc::clone(template),
         };
 
-        let func = match ai_template.hooks.get(&FuncKind::AiAction) {
-            None => "ai_action",
-            Some(func) => func,
-        };
+        let func = ai_template.hooks.get(&FuncKind::AiAction).map(|f| f.as_str()).unwrap_or("ai_action");
 
         self.actions_taken_this_turn += 1;
 

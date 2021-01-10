@@ -14,7 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::any::Any;
+use std::{any::Any};
 use std::cell::RefCell;
 use std::rc::Rc;
 

@@ -272,10 +272,7 @@ impl EntityState {
     pub fn add_num_flag(&mut self, flag: &str, value: f32) {
         let cur_val = match self.get_custom_flag(flag) {
             None => 0.0,
-            Some(ref val_str) => match val_str.parse::<f32>() {
-                Err(_) => 0.0,
-                Ok(val) => val,
-            },
+            Some(val_str) => val_str.parse::<f32>().unwrap_or(0.0),
         };
         self.set_custom_flag(flag, &(cur_val + value).to_string());
     }
@@ -283,10 +280,7 @@ impl EntityState {
     pub fn get_num_flag(&self, flag: &str) -> f32 {
         match self.get_custom_flag(flag) {
             None => 0.0,
-            Some(ref val_str) => match val_str.parse::<f32>() {
-                Err(_) => 0.0,
-                Ok(val) => val,
-            },
+            Some(val_str) => val_str.parse::<f32>().unwrap_or(0.0),
         }
     }
 
@@ -359,7 +353,7 @@ impl EntityState {
         }
     }
 
-    pub fn pc_vis_mut<'a>(&'a mut self) -> &'a mut Vec<bool> {
+    pub fn pc_vis_mut(&mut self) -> &mut Vec<bool> {
         match self.ai_state {
             AIState::Player { ref mut vis, .. } => vis,
             AIState::AI { .. } => panic!(),

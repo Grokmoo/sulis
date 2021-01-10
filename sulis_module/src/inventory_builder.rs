@@ -129,7 +129,7 @@ impl InventoryBuilder {
     }
 
     /// Iterates over the items in this inventory, validating that they exist
-    pub fn pc_starting_item_iter<'a>(&'a self) -> impl Iterator<Item = (u32, ItemState)> + 'a {
+    pub fn pc_starting_item_iter(&self) -> impl Iterator<Item = (u32, ItemState)> + '_ {
         self.pc_starting_items.iter().filter_map(|entry| {
             let qty = entry.quantity;
             let item = &entry.item;
@@ -152,7 +152,7 @@ impl InventoryBuilder {
     /// Provides an iterator over all the items in this inventory.
     /// Validates as much as possible that items are valid for the specified slots,
     /// but cannot do validations that depend on the actor.
-    pub fn equipped_iter<'a>(&'a self) -> impl Iterator<Item = (Slot, ItemState)> + 'a {
+    pub fn equipped_iter(&self) -> impl Iterator<Item = (Slot, ItemState)> + '_ {
         self.equipped.iter().filter_map(|(slot, item_save)| {
             let slot = *slot;
             let item = match Module::create_get_item(&item_save.id, &item_save.adjectives) {
@@ -177,7 +177,7 @@ impl InventoryBuilder {
     /// Provides an iterator over all the quick slot item in this defined inventory.
     /// Validates as much as possible that the items are valid for the slots, but cannot do
     /// any validation that also depends on the actor.
-    pub fn quick_iter<'a>(&'a self) -> impl Iterator<Item = (QuickSlot, ItemState)> + 'a {
+    pub fn quick_iter(&self) -> impl Iterator<Item = (QuickSlot, ItemState)> + '_ {
         self.quick.iter().filter_map(|(slot, item_save)| {
             let slot = *slot;
             let item = match Module::create_get_item(&item_save.id, &item_save.adjectives) {

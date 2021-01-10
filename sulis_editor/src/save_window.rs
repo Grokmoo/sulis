@@ -266,10 +266,7 @@ impl WidgetKind for SaveWindow {
         {
             Widget::add_child_to(&world_map_box, Widget::with_defaults(Label::empty()));
             let model = &self.area_editor.borrow().model;
-            let loc = match model.world_map_location.as_ref() {
-                None => "",
-                Some(loc) => loc,
-            };
+            let loc = model.world_map_location.as_deref().unwrap_or_default();
             let field = Widget::with_defaults(InputField::new(loc));
 
             let area_editor_ref = Rc::clone(&self.area_editor);

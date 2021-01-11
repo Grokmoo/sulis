@@ -36,6 +36,7 @@ function after_attack(parent, ability, targets, hit)
   local stats = parent:stats()
   local amount = 1 + (stats.level / 8 + stats.intellect_bonus / 8) * factor
 
+  target:remove_effects_with_tag("disease")
   local effect = target:create_effect(ability:name())
   effect:set_tag("disease")
   
@@ -43,6 +44,7 @@ function after_attack(parent, ability, targets, hit)
   effect:add_attribute_bonus("Dexterity", -amount)
   effect:add_attribute_bonus("Endurance", -amount)
   effect:add_attribute_bonus("Perception", -amount)
+  effect:set_icon("gui/status_disease", "Disease")
   
   local anim = target:create_particle_generator("heal")
   anim:set_moves_with_parent()

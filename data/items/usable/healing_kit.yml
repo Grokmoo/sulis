@@ -13,5 +13,5 @@ usable:
     priority: 10
     kind: Heal
     group: Single
-    range: Touch
-  short_description: "Heals damage on an ally slowly over time."
+    range: Short
+  short_description: "Heals damage on an ally slowly over time.  Also will heal one disease or injury."

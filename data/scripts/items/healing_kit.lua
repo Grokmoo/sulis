@@ -1,8 +1,8 @@
 function on_activate(parent, item)
-  local targets = parent:targets():friendly():touchable()
+  local targets = parent:targets():friendly():visible_within(5.0)
   
   local targeter = parent:create_targeter_for_item(item)
-  targeter:set_selection_touchable()
+  targeter:set_selection_radius(5.0)
   targeter:add_all_selectable(targets)
   targeter:add_all_effectable(targets)
   targeter:activate()
@@ -31,6 +31,19 @@ function on_target_select(parent, item, targets)
   effect:apply()
   
   item:activate(parent)
+  
+  -- remove one disease or injury
+  local injuries = target:get_effects_with_tag("injury")
+  for _, effect in ipairs(injuries) do
+    effect:mark_for_removal()
+	return
+  end
+  
+  local diseases = target:get_effects_with_tag("disease")
+  for _, effect in ipairs(diseases) do
+    effect:mark_for_removal()
+	return
+  end
 end
 
 function apply_heal(parent, item, targets)

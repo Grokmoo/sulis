@@ -28,6 +28,7 @@ function on_target_select(parent, ability, targets)
   
   local amount = (1 + stats.caster_level / 8 + stats.wisdom_bonus / 8) * factor
   
+  target:remove_effects_with_tag("disease")
   local effect = target:create_effect(ability:name())
   effect:set_tag("disease")
   effect:set_icon("gui/status_disease", "Disease")

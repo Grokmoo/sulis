@@ -11,5 +11,5 @@ attack_bonus_modifier: 1.0
 attack_penalty_modifier: 1.0
 bonuses:
   - kind:
-      action_points: 1000
+      action_points: 600
 attack_bonuses: {}

@@ -1,5 +1,5 @@
 id: goblins_champs
-auto_spawn: false
+auto_spawn: true
 min_gen_actors: 7
 max_gen_actors: 8
 entries:

@@ -3,6 +3,7 @@ function on_enter(parent)
 end
 
 function pull_lever(parent)
+  game:say_line("You the noise of the gate opening just outside.", parent)
   game:set_quest_entry_state("naathfir_dwarves", "the_attack", "Visible")
   game:set_quest_state("naathfir_dwarves", "Complete")
   

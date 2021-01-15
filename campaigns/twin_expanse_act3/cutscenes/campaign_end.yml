@@ -15,7 +15,9 @@ frames:
   - text: |
       With the Aegis broken, there was no quick way home for the survivors of the battle of Xandala.
   - text: |
-     Were you able to make your way home?  Did the bards sing of your adventurers, or were your actions in stopping the second Sundering forgotten?  Only you can say.
+     Were you able to make your way home?  Did the bards sing of your adventurers, or were your actions in stopping the second Sundering forgotten?
+  - text: |
+     Only you can say.
 on_end:
   - fire_script:
       id: xandala

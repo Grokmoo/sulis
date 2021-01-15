@@ -21,8 +21,20 @@ function boss_death(player)
   local boss = game:entity_with_id("berkeley_final")
   local max_hp = boss:stats().max_hp
   boss:take_damage(player, max_hp, max_hp, "Raw", 1000)
+  
   game:scroll_view(boss:x(), boss:y())
   game:block_ui(2.0)
+  game:run_script_delayed("xandala", "boss_death2", 2.0)
+end
+
+function boss_death2(player)
+  game:block_ui(2.0)
+
+  local targets = player:targets():hostile():to_table()
+  for i = 1, #targets do
+    targets[i]:remove()
+  end
+  
   game:run_script_delayed("xandala", "show_cutscene", 2.0)
 end
 

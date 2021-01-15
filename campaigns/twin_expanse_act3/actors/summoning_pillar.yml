@@ -9,11 +9,14 @@ inline_race:
   movement_rate: 0.1
   base_stats:
     - kind: { hit_points: 20 }
-    - kind: { resistance: { kind: "Slashing", amount: 50 } }
-    - kind: { resistance: { kind: "Piercing", amount: 50 } }
+    - kind: { resistance: { kind: "Slashing", amount: 70 } }
+    - kind: { resistance: { kind: "Piercing", amount: 70 } }
+    - kind: { resistance: { kind: "Crushing", amount: 50 } }
     - kind: { resistance: { kind: "Fire", amount: 25 } }
-    - kind: { resistance: { kind: "Shock", amount: 25 } }
-    - kind: { armor: 10 }
+    - kind: { resistance: { kind: "Shock", amount: 50 } }
+    - kind: { resistance: { kind: "Cold", amount: 25 } }
+    - kind: { resistance: { kind: "Acid", amount: 25 } }
+    - kind: { armor: 30 }
     - kind: { flanked_immunity }
     - kind: { crit_immunity }
     - kind: { sneak_attack_immunity }

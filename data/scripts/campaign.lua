@@ -36,6 +36,9 @@ function on_party_death(parent)
 end
 
 function add_injury(parent)
+  -- don't add injuries outside of combat
+  if not game:is_combat_active() then return end
+
   game:say_line("Injured!", parent)
   
   local injuries = {

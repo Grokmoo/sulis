@@ -32,6 +32,9 @@ use sulis_module::{Faction, ItemState, Module, OnTrigger, Time};
 /// Plays the sound effect with the specified ID.  Optionally multiple the
 /// sound base volume by the specified volume
 ///
+/// # `is_combat_active() -> Bool`
+/// Returns true if the game is currently in combat mode, false otherwise
+///
 /// # `current_round() -> Int`
 /// Returns the current round, or the total number of rounds of playtime that have elapsed.
 /// This number increases by 1 for every complete round of combat, or by 1 for every 5 seconds
@@ -362,6 +365,12 @@ impl UserData for ScriptInterface {
             let vol = vol.unwrap_or(1.0);
             sulis_core::io::Audio::play_sfx(&id, vol);
             Ok(())
+        });
+
+        methods.add_method("is_combat_active", |_, _, ()| {
+            let mgr = GameState::turn_manager();
+            let result = mgr.borrow().is_combat_active();
+            Ok(result)
         });
 
         methods.add_method("current_round", |_, _, ()| {

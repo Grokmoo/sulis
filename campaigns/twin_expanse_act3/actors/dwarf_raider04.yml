@@ -29,6 +29,8 @@ inventory:
       id: warhammer
 levels:
   fighter: 12
+reward:
+  xp: 100
 abilities:
   - armor_light
   - armor_medium

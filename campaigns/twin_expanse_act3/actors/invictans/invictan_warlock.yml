@@ -38,6 +38,8 @@ inventory:
   quick: {}
 levels:
   warlock: 16
+reward:
+  xp: 200
 abilities:
   - armor_light
   - armor_medium

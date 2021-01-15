@@ -34,6 +34,8 @@ inventory:
   quick: {}
 levels:
   fighter: 15
+reward:
+  xp: 200
 abilities:
   - armor_light
   - armor_medium

@@ -1,7 +1,7 @@
 id: invictans_level16
 auto_spawn: true
-min_gen_actors: 6
-max_gen_actors: 6
+min_gen_actors: 5
+max_gen_actors: 5
 entries:
   - id: invictan_warrior01
     limit: 2

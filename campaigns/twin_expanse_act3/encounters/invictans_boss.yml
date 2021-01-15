@@ -1,7 +1,7 @@
 id: invictans_boss
 auto_spawn: false
-min_gen_actors: 5
-max_gen_actors: 5
+min_gen_actors: 4
+max_gen_actors: 4
 entries:
   - id: invictan_general
     always: true

@@ -12,8 +12,8 @@ equippable:
   bonuses: []
   attack:
     damage:
-      min: 20
-      max: 28
+      min: 16
+      max: 23
       kind: Piercing
     kind: # Melee
       reach: 2.0

@@ -12,8 +12,8 @@ equippable:
   bonuses: []
   attack:
     damage:
-      min: 22
-      max: 30
+      min: 18
+      max: 25
       ap: 5
       kind: Slashing
     kind: # Melee

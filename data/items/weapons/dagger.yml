@@ -14,7 +14,7 @@ equippable:
     damage:
       min: 10
       max: 15
-      ap: 3
+      ap: 5
       kind: Piercing
     kind: # Melee
       reach: 0.5

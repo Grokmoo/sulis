@@ -14,8 +14,8 @@ equippable:
         defense: 7
   attack:
     damage:
-      min: 22
-      max: 30
+      min: 18
+      max: 25
       ap: 3
       kind: Slashing
     kind: # Melee

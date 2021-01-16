@@ -18,7 +18,7 @@ equippable:
         ranged_accuracy: -20
   attack:
     damage:
-      min: 18
+      min: 15
       max: 25
       ap: 10
       kind: Piercing

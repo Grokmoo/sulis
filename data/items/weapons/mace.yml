@@ -14,7 +14,7 @@ equippable:
     damage:
       min: 12
       max: 18
-      ap: 3
+      ap: 4
       kind: Crushing
     kind: # Melee
       reach: 0.5

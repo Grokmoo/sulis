@@ -469,6 +469,7 @@ impl StatList {
         }
 
         self.attack_range = attack_range.unwrap_or(0.0);
+        self.armor.finalize();
 
         let base_accuracy = rules.base_accuracy as i32;
         let base_defense = rules.base_defense as i32;

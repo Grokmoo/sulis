@@ -70,6 +70,8 @@ abilities:
   - id: rock_armor
     position: [5, 8.05]
   - id: stun
+    position: [4, 7.75]
+  - id: rust
     position: [6, 7.75]
   - id: petrify
     position: [5, 9.05]

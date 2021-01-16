@@ -60,8 +60,6 @@ function attack_target(parent, ability, target)
     amount = amount * 1.5
   end
   
-  game:log("attack " .. target:name())
-  
   effect = target:create_effect(ability:name(), ability:duration())
   effect:set_tag("blind")
   effect:add_num_bonus("melee_accuracy", amount)

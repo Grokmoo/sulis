@@ -19,8 +19,8 @@ use crate::rules::DamageKind;
 #[derive(Deserialize, Debug, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct Armor {
-    base: u32,
-    kinds: [u32; 7],
+    base: i32,
+    kinds: [i32; 7],
 }
 
 impl Default for Armor {
@@ -33,19 +33,23 @@ impl Default for Armor {
 }
 
 impl Armor {
-    pub fn add_base(&mut self, amount: i32) {
-        if self.base as i32 + amount < 0 {
+    pub fn finalize(&mut self) {
+        if self.base < 0 {
             self.base = 0;
-        } else {
-            self.base = (self.base as i32 + amount) as u32;
         }
 
         for index in 0..self.kinds.len() {
-            if self.kinds[index] as i32 + amount < 0 {
+            if self.kinds[index] < 0 {
                 self.kinds[index] = 0;
-            } else {
-                self.kinds[index] = (self.kinds[index] as i32 + amount) as u32;
             }
+        }
+    }
+
+    pub fn add_base(&mut self, amount: i32) {
+        self.base += amount;
+
+        for index in 0..self.kinds.len() {
+            self.kinds[index] += amount;
         }
     }
 
@@ -55,16 +59,12 @@ impl Armor {
         }
 
         let index = kind.index();
-        if self.kinds[index] as i32 + amount < 0 {
-            self.kinds[index] = 0;
-        } else {
-            self.kinds[index] = (self.kinds[index] as i32 + amount) as u32;
-        }
+        self.kinds[index] += amount;
     }
 
     /// Returns the amount of armor that this Armor value
     /// applies to the specified damage kind.
-    pub fn amount(&self, check_kind: DamageKind) -> u32 {
+    pub fn amount(&self, check_kind: DamageKind) -> i32 {
         if check_kind == DamageKind::Raw {
             return 0;
         }
@@ -72,17 +72,17 @@ impl Armor {
         self.kinds[check_kind.index()]
     }
 
-    pub fn base(&self) -> u32 {
+    pub fn base(&self) -> i32 {
         self.base
     }
 
     pub fn is_empty(&self) -> bool {
-        if self.base > 0 {
+        if self.base != 0 {
             return false;
         }
 
         for val in self.kinds.iter() {
-            if *val > 0 {
+            if *val != 0 {
                 return false;
             }
         }

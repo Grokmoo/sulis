@@ -222,6 +222,8 @@ groups:
       spike_trap: [5, 14]
       sticky_trap: [6, 14]
       fire_trap: [7, 14]
+      rust: [8, 14]
+      natures_axe: [9, 14]
       
       shrapnel_grenade: [0, 15]
       stun_grenade: [1, 15]

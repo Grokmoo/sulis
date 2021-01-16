@@ -24,6 +24,10 @@ function on_target_select(parent, ability, targets)
   effect:add_num_bonus("reflex", -amount)
   effect:add_num_bonus("will", -amount)
   
+  if parent:ability_level(ability) > 1 then
+    effect:add_num_bonus("armor", -5 - stats.caster_level - stats.intellect_bonus / 3)
+  end
+  
   local gen = target:create_particle_generator("arrow_down")
   gen:set_moves_with_parent()
   gen:set_position(gen:param(0.0), gen:param(-1.5))

@@ -8,14 +8,14 @@ function on_activate(parent, ability)
   effect:deactivate_with(ability)
   local stats = parent:stats()
   
-  effect:add_num_bonus("melee_accuracy", 10 + stats.level / 2)
+  effect:add_num_bonus("melee_accuracy", 10 + stats.level / 3)
   effect:add_num_bonus("defense", -10)
  
   if parent:ability_level(ability) > 1 then
-    effect:add_damage(3, 8 + stats.level / 2, 5)
+    effect:add_damage(3, 9 + stats.level / 3, 5)
 	effect:add_num_bonus("crit_multiplier", 0.5)
   else
-    effect:add_damage(2, 5 + stats.level / 2, 0)
+    effect:add_damage(2, 5 + stats.level / 3, 0)
   end
   
   local cb = ability:create_callback(parent)

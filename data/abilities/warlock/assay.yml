@@ -25,3 +25,6 @@ active:
 prereqs:
   total_level: 4
   abilities: [ block_pain]
+upgrades:
+  - description: |
+      The damage reduction of the target's armor is now also greatly reduced.

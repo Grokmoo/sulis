@@ -9,6 +9,8 @@ abilities:
     position: [2.0, 4.5]
   - id: layer_of_bark
     position: [4.0, 6]
+  - id: natures_axe
+    position: [4.5, 4.5]
   - id: tree_shape
     position: [5.0, 2.5]
   - id: polymorph

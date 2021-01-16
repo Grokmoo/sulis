@@ -1,0 +1,26 @@
+id: natures_axe
+name: "Nature's Axe"
+icon: abilities/natures_axe
+description: |
+  The power of nature sunders your enemy's armor.  All hostiles in an area lose a significant amount of armor damage reduction for the duration of the spell.
+active:
+  script: "natures_axe"
+  group: "Druid"
+  ap: 3000
+  duration:
+    Rounds: 3
+  cooldown: 5
+  combat_only: true
+  range:
+    Radius: 15.0
+  ai:
+    priority: 10
+    kind: Damage
+    group: Single
+    range: Visible
+    target: AnyGround
+  short_description: |
+    Reduces the armor of enemies in an area.
+prereqs:
+  abilities: [ layer_of_bark ]
+  total_level: 6

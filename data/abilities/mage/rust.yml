@@ -1,0 +1,23 @@
+id: rust
+name: "Rust"
+icon: abilities/rust
+description: |
+  A single target's armor becomes magically weakened, greatly reducing their damage reduction.  This spell has no effect on unarmored targets.
+active:
+  script: "rust"
+  group: "2nd Circle"
+  ap: 2000
+  duration:
+    Rounds: 3
+  cooldown: 3
+  combat_only: true
+  range: Visible
+  ai:
+    priority: 30
+    kind: Debuff
+    group: Single
+    range: Visible
+  short_description: |
+    Decrease the armor of a single target.
+prereqs:
+  total_level: 5

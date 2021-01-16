@@ -13,9 +13,9 @@ function on_activate(parent, ability)
   
   if parent:ability_level(ability) > 1 then
     effect:add_num_bonus("graze_multiplier", 0.25)
-	effect:add_damage(5, 12 + stats.level / 2, 0)
+	effect:add_damage(3, 9 + stats.level / 3, 0)
   else
-    effect:add_damage(2, 8 + stats.level / 2, 0)
+    effect:add_damage(2, 5 + stats.level / 3, 0)
   end
   
   local cb = ability:create_callback(parent)

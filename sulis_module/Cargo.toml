@@ -1,6 +1,6 @@
 [package]
 name = "sulis_module"
-version = "0.5.0"
+version = "0.6.0"
 authors = ["Jared Stephen <grok_moo@yahoo.com>"]
 edition = "2018"
 

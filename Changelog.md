@@ -5,6 +5,42 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html) is used with major version changes for breaking save game and data format compatibility.
 
+## [0.6.0] - 2021-01-15
+
+### Added
+- The third and final act of the Twin Expanse is now ready to play.
+- Higher level legendary enchantments and items are now available.
+- New sewer tileset and miscellaneous town tiles
+- Several new abilities have been added to give more options for reducing enemy armor.
+- The Disease status now has a proper icon and may be treated with healing kits.
+- Injuries may now be removed with a healing kit.
+- Script triggers may now be set to fire when a prop is activated.
+- Script entity spawning now optionally takes the desired area.
+
+### Changed
+- General fixes and balancing to the Endless Dungeon campaign.
+- Running away from combat is much more doable in most cases.
+- Improved Rogue backstab ability substantially.
+- Rebalanced a number of abilities and item bonuses.
+- Improved display mode and resolution selection.
+- Party members will no longer accrue injuries if reduced to 0 hit points outside of combat.
+- Rebalanced weapon damage and armor penetration.  Two handed weapons do less damage.
+- Reduced armor damage reduction, especially at high armor levels.
+- Pruned a number of unneeded dependencies to reduce compilation time.
+- AI script method name can now be overridden for more flexibility in the script.
+
+### Fixed
+- Larger monsters now draw in the correct order to prevent overlap issues.
+- Scroll to player on area load now works correctly.
+- Character text should no longer overlap on the load menu.
+- Prevented an infinite XP exploit in a Vaalyun's quest conversation.
+- The Grapple ability will now disable the target's ability use.
+- Added missing sound effects on Dwarven items and the Flaming Fingers spell.
+- OnAreaLoad script triggers should now fire multiple times when specified to do so.
+- Fixed formatting and display of panic messages when a crash occurs.
+- Fixed a rare crash when computing targets for an ability.
+- Fixed a rare crash when calculating movement rate.
+
 ## [0.5.0] - 2020-05-05
 
 ### Added

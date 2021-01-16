@@ -33,7 +33,7 @@ use std::time::Duration;
 use backtrace::Backtrace;
 use log::LevelFilter;
 use flexi_logger::{opt_format, Duplicate, Logger, LogSpecBuilder};
-use rand::{self, distributions::uniform::SampleUniform, seq::SliceRandom, Rng};
+use rand::{self, distributions::uniform::{SampleUniform}, seq::SliceRandom, Rng};
 use rand_pcg::Pcg64Mcg;
 
 use crate::config::{self, Config};
@@ -87,8 +87,8 @@ impl ReproducibleRandom {
         }
     }
 
-    pub fn gen<T: SampleUniform + Sized>(&mut self, min: T, max: T) -> T {
-        self.gen.gen_range(min, max)
+    pub fn gen<T: SampleUniform + PartialOrd>(&mut self, min: T, max: T) -> T {
+        self.gen.gen_range(min..max)
     }
 
     pub fn shuffle<T>(&mut self, values: &mut [T]) {
@@ -111,8 +111,8 @@ pub fn shuffle<T>(values: &mut [T]) {
     values.shuffle(&mut rand::thread_rng());
 }
 
-pub fn gen_rand<T: SampleUniform + Sized>(min: T, max: T) -> T {
-    rand::thread_rng().gen_range(min, max)
+pub fn gen_rand<T: SampleUniform + PartialOrd>(min: T, max: T) -> T {
+    rand::thread_rng().gen_range(min..max)
 }
 
 fn active_resources_file_path() -> PathBuf {

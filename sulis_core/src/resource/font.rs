@@ -143,7 +143,7 @@ impl Font {
             Some(img) => img,
         };
 
-        let image = image.to_rgba();
+        let image = image.to_rgba8();
         let (image_width, image_height) = image.dimensions();
         let image_size = Size::new(image_width as i32, image_height as i32);
 

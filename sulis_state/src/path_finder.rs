@@ -27,6 +27,7 @@ use sulis_module::area::{Destination, LocationChecker, PathFinder, PathFinderGri
 pub struct StateLocationChecker<'a, 'b> {
     width: i32,
     grid: &'a PathFinderGrid,
+    explored: Option<&'a [bool]>,
     prop_grid: &'a [bool],
     entity_grid: &'a [Vec<usize>],
     requester: &'b EntityState,
@@ -38,11 +39,17 @@ impl<'a, 'b> StateLocationChecker<'a, 'b> {
         area_state: &'a AreaState,
         requester: &'b EntityState,
         entities_to_ignore: &'b [usize],
+        use_explored: bool,
     ) -> StateLocationChecker<'a, 'b> {
         let width = area_state.area.width;
         let grid = &area_state.area.path_grid(&requester.size());
         let prop_grid = area_state.props().entire_pass_grid();
         let entity_grid = &area_state.entity_grid;
+        let explored = if use_explored {
+            Some(area_state.pc_explored.as_slice())
+        } else {
+            None
+        };
 
         StateLocationChecker {
             width,
@@ -51,6 +58,7 @@ impl<'a, 'b> StateLocationChecker<'a, 'b> {
             entity_grid,
             requester,
             entities_to_ignore,
+            explored,
         }
     }
 }
@@ -63,6 +71,10 @@ impl<'a, 'b> LocationChecker for StateLocationChecker<'a, 'b> {
 
         self.requester.points(x, y).all(|p| {
             let index = (p.x + p.y * self.width) as usize;
+
+            if let Some(explored) = self.explored {
+                if !explored[index] { return false; }
+            }
 
             if !self.prop_grid[index] {
                 return false;
@@ -161,7 +173,12 @@ fn find_path(
     dest: Destination,
     check_ap: bool,
 ) -> Option<Vec<Point>> {
-    let checker = StateLocationChecker::new(area_state, entity, entities_to_ignore);
+    let checker = StateLocationChecker::new(
+        area_state,
+        entity,
+        entities_to_ignore,
+        entity.is_party_member()
+    );
 
     if entity.is_party_member() {
         path_finder.set_max_iterations(2_000);

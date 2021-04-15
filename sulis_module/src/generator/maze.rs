@@ -15,7 +15,6 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::cmp::Ordering;
-use std::io::Error;
 
 use indexmap::{IndexMap, IndexSet};
 
@@ -82,7 +81,7 @@ impl Maze {
         params: &RoomParams,
         rand: &mut ReproducibleRandom,
         open_locs: &[Point],
-    ) -> Result<(), Error> {
+    ) {
         self.generate_rooms(params, open_locs, rand);
         info!("Generated {} total rooms {:?}", self.rooms.len(), rand);
 
@@ -96,7 +95,6 @@ impl Maze {
             self.remove_dead_ends(params, rand);
             info!("  Removed dead ends {:?}", rand);
         }
-        Ok(())
     }
 
     fn remove_dead_ends(&mut self, params: &RoomParams, rand: &mut ReproducibleRandom) {

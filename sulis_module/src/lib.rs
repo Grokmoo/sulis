@@ -14,7 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-
+#![allow(clippy::upper_case_acronyms)]
 #![allow(clippy::manual_range_contains)]
 
 #[macro_use]

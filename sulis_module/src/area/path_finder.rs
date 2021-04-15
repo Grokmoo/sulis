@@ -307,9 +307,8 @@ impl PathFinder {
         trace!("Reconstructing path");
 
         // let reconstruct_time = time::Instant::now();
-        let mut path: Vec<Point> = Vec::new();
+        let mut path: Vec<Point> = vec![self.get_point(current)];
 
-        path.push(self.get_point(current));
         loop {
             //trace!("Current {}", current);
             current = match self.came_from.get(&current) {

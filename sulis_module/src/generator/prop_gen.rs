@@ -52,7 +52,7 @@ impl<'a, 'b> PropGen<'a, 'b> {
     pub(crate) fn generate(
         &mut self,
         addn_passes: &[PropPass],
-    ) -> Result<Vec<PropDataBuilder>, Error> {
+    ) -> Vec<PropDataBuilder> {
         let mut props = Vec::new();
 
         for pass in self.params.passes.iter().chain(addn_passes) {
@@ -83,7 +83,7 @@ impl<'a, 'b> PropGen<'a, 'b> {
             }
         }
 
-        let mut out = Vec::new();
+        let mut out = Vec::with_capacity(props.len());
         for prop in props {
             out.push(PropDataBuilder {
                 id: prop.prop.id.to_string(),
@@ -93,7 +93,7 @@ impl<'a, 'b> PropGen<'a, 'b> {
                 hover_text: None,
             });
         }
-        Ok(out)
+        out
     }
 }
 

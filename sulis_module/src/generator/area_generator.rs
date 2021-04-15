@@ -121,7 +121,7 @@ impl AreaGenerator {
                 Point::new(x, y)
             })
             .collect();
-        maze.generate(&self.room_params, model.rand_mut(), &open_locs)?;
+        maze.generate(&self.room_params, model.rand_mut(), &open_locs);
         info!("Maze generated {:?}", model.rand());
 
         self.add_walls(&mut model, &maze);
@@ -155,11 +155,11 @@ impl AreaGenerator {
 
         info!("Generating props {:?}", model.rand());
         let mut gen = PropGen::new(&mut model, &layers, &self.prop_params, &maze);
-        let props = gen.generate(&params.props.passes)?;
+        let props = gen.generate(&params.props.passes);
 
         info!("Generating encounters {:?}", model.rand());
         let mut gen = EncounterGen::new(&mut model, &layers, &self.encounter_params, &maze);
-        let encounters = gen.generate(&params.encounters.passes)?;
+        let encounters = gen.generate(&params.encounters.passes);
 
         info!("Final Layer Gen {:?}", model.rand());
         let layers = self.create_layers(width, height, &model.model)?;

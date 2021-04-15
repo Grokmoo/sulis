@@ -163,9 +163,8 @@ impl ActiveResources {
     }
 
     pub fn directories(&self) -> Vec<String> {
-        let mut dirs = Vec::new();
+        let mut dirs = vec![Config::resources_config().directory];
 
-        dirs.push(Config::resources_config().directory);
         if let Some(ref dir) = self.campaign {
             dirs.push(dir.to_string());
         }

@@ -139,8 +139,11 @@ impl Area {
             props.push(prop_data);
         }
 
-        let transitions = Area::read_transitions(&builder.transitions, builder.width as i32,
-            builder.height as i32)?;
+        let transitions = Area::read_transitions(
+            &builder.transitions, 
+            builder.width as i32,
+            builder.height as i32
+        );
 
         let (triggers, encounters) = Area::read_triggers_and_encounters(&builder)?;
 
@@ -262,7 +265,7 @@ impl Area {
         input: &[TransitionBuilder],
         width: i32,
         height: i32,
-    ) -> Result<Vec<Transition>, Error> {
+    ) -> Vec<Transition> {
         let mut transitions: Vec<Transition> = Vec::new();
         for (index, t_builder) in input.iter().enumerate() {
             let image = match ResourceSet::image(&t_builder.image_display) {
@@ -310,7 +313,7 @@ impl Area {
             transitions.push(transition);
         }
 
-        Ok(transitions)
+        transitions
     }
 
     pub fn coords_valid(&self, x: i32, y: i32) -> bool {

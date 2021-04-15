@@ -262,16 +262,14 @@ fn read_file(
     match value {
         Value::Mapping(ref mut mapping) => {
             let dir = Value::String(dir_str.to_string());
-            let mut seq = serde_yaml::Sequence::new();
-            seq.push(dir);
+            let seq = vec![dir];
             mapping.insert(
                 Value::String(DIRECTORY_VAL_STR.to_string()),
                 Value::Sequence(seq),
             );
 
             let file = Value::String(path_str);
-            let mut seq = serde_yaml::Sequence::new();
-            seq.push(file);
+            let seq = vec![file];
             mapping.insert(
                 Value::String(FILE_VAL_STR.to_string()),
                 Value::Sequence(seq),

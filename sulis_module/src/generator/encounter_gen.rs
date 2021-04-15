@@ -51,7 +51,7 @@ impl<'a, 'b> EncounterGen<'a, 'b> {
     pub(crate) fn generate(
         &mut self,
         addn_passes: &[EncounterPass],
-    ) -> Result<Vec<EncounterDataBuilder>, Error> {
+    ) -> Vec<EncounterDataBuilder> {
         let mut encounters = Vec::new();
 
         for pass in self.params.passes.iter().chain(addn_passes) {
@@ -83,7 +83,7 @@ impl<'a, 'b> EncounterGen<'a, 'b> {
             }
         }
 
-        let mut out = Vec::new();
+        let mut out = Vec::with_capacity(encounters.len());
         for encounter in encounters {
             out.push(EncounterDataBuilder {
                 id: encounter.encounter.id.to_string(),
@@ -91,7 +91,7 @@ impl<'a, 'b> EncounterGen<'a, 'b> {
                 size: Size::new(encounter.w, encounter.h),
             });
         }
-        Ok(out)
+        out
     }
 }
 

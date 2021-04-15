@@ -314,18 +314,19 @@ impl WidgetKind for EditorView {
         let pass_picker_kind = PassPicker::new();
         let vis_picker_kind = VisPicker::new();
 
-        let mut pickers = Vec::new();
-        pickers.push(Widget::with_defaults(tile_picker_kind.clone()));
-        pickers.push(Widget::with_defaults(terrain_picker_kind.clone()));
-        pickers.push(Widget::with_defaults(wall_picker_kind.clone()));
-        pickers.push(Widget::with_defaults(feature_picker_kind.clone()));
-        pickers.push(Widget::with_defaults(actor_picker_kind.clone()));
-        pickers.push(Widget::with_defaults(prop_picker_kind.clone()));
-        pickers.push(Widget::with_defaults(elev_picker_kind.clone()));
-        pickers.push(Widget::with_defaults(encounter_picker_kind.clone()));
-        pickers.push(Widget::with_defaults(trigger_picker_kind.clone()));
-        pickers.push(Widget::with_defaults(pass_picker_kind.clone()));
-        pickers.push(Widget::with_defaults(vis_picker_kind.clone()));
+        let pickers = vec![
+            Widget::with_defaults(tile_picker_kind.clone()),
+            Widget::with_defaults(terrain_picker_kind.clone()),
+            Widget::with_defaults(wall_picker_kind.clone()),
+            Widget::with_defaults(feature_picker_kind.clone()),
+            Widget::with_defaults(actor_picker_kind.clone()),
+            Widget::with_defaults(prop_picker_kind.clone()),
+            Widget::with_defaults(elev_picker_kind.clone()),
+            Widget::with_defaults(encounter_picker_kind.clone()),
+            Widget::with_defaults(trigger_picker_kind.clone()),
+            Widget::with_defaults(pass_picker_kind.clone()),
+            Widget::with_defaults(vis_picker_kind.clone()),
+        ];
         for picker in pickers.iter() {
             picker.borrow_mut().state.set_visible(false);
         }
@@ -390,7 +391,7 @@ impl WidgetKind for EditorView {
 
         let area_editor = Widget::with_defaults(area_editor_kind);
 
-        let mut children = Vec::new();
+        let mut children = Vec::with_capacity(pickers.len() + 2);
         children.push(area_editor);
         children.extend_from_slice(&pickers);
         children.push(top_bar);

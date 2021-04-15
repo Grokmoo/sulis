@@ -1624,11 +1624,11 @@ impl UserData for ScriptEntity {
     }
 }
 
+#[allow(clippy::unnecessary_wraps)] // this must return a result to be added as a method in the LUA context
 fn move_towards_dest(parent: Rc<RefCell<EntityState>>, dest: Destination) -> Result<bool> {
     let mgr = GameState::turn_manager();
     let area = GameState::get_area_state(&parent.borrow().location.area_id).unwrap();
-    let mut to_ignore = Vec::new();
-    to_ignore.push(parent.borrow().index());
+    let mut to_ignore = vec![parent.borrow().index()];
 
     for e in area.borrow().entity_iter() {
         let other = mgr.borrow().entity(*e);

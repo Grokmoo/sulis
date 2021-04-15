@@ -124,15 +124,15 @@ impl ActionHoverInfo {
         }
     }
 
-    fn new(size: &Rc<ObjectSize>, point: Point) -> Option<ActionHoverInfo> {
-        Some(ActionHoverInfo {
+    fn new(size: &Rc<ObjectSize>, point: Point) -> ActionHoverInfo {
+        ActionHoverInfo {
             size: Rc::clone(size),
             x: point.x,
             y: point.y,
             path: Vec::new(),
             ap: 0,
             total_ap: 0,
-        })
+        }
     }
 
     fn with_ap(
@@ -140,15 +140,15 @@ impl ActionHoverInfo {
         point: Point,
         total_ap: i32,
         ap: i32,
-    ) -> Option<ActionHoverInfo> {
-        Some(ActionHoverInfo {
+    ) -> ActionHoverInfo {
+        ActionHoverInfo {
             size: Rc::clone(&entity.size),
             x: point.x,
             y: point.y,
             path: Vec::new(),
             ap,
             total_ap,
-        })
+        }
     }
 
     fn with_path(
@@ -156,16 +156,16 @@ impl ActionHoverInfo {
         point: Point,
         path: &[(f32, f32)],
         ap: i32,
-    ) -> Option<ActionHoverInfo> {
+    ) -> ActionHoverInfo {
         let size = Rc::clone(&entity.size);
-        Some(ActionHoverInfo {
+        ActionHoverInfo {
             size,
             x: point.x,
             y: point.y,
             path: path.iter().copied().collect(),
             ap,
             total_ap: entity.actor.ap() as i32,
-        })
+        }
     }
 }
 
@@ -220,7 +220,7 @@ impl ActionKind for SelectAction {
 
     fn get_hover_info(&self) -> Option<ActionHoverInfo> {
         let point = self.target.borrow().location.to_point();
-        ActionHoverInfo::new(&self.target.borrow().size, point)
+        Some(ActionHoverInfo::new(&self.target.borrow().size, point))
     }
 
     fn fire_action(&mut self, _widget: &Rc<RefCell<Widget>>) -> bool {
@@ -287,7 +287,7 @@ impl ActionKind for DialogAction {
 
     fn get_hover_info(&self) -> Option<ActionHoverInfo> {
         let point = self.target.borrow().location.to_point();
-        ActionHoverInfo::new(&self.target.borrow().size, point)
+        Some(ActionHoverInfo::new(&self.target.borrow().size, point))
     }
 
     fn fire_action(&mut self, _widget: &Rc<RefCell<Widget>>) -> bool {
@@ -349,7 +349,7 @@ impl ActionKind for DoorPropAction {
         let area_state = area_state.borrow();
         let prop = area_state.props().get(self.index);
         let point = prop.location.to_point();
-        ActionHoverInfo::new(&prop.prop.size, point)
+        Some(ActionHoverInfo::new(&prop.prop.size, point))
     }
 
     fn fire_action(&mut self, _widget: &Rc<RefCell<Widget>>) -> bool {
@@ -405,7 +405,7 @@ impl ActionKind for LootPropAction {
         let area_state = area_state.borrow();
         let prop = area_state.props().get(self.index);
         let point = prop.location.to_point();
-        ActionHoverInfo::new(&prop.prop.size, point)
+        Some(ActionHoverInfo::new(&prop.prop.size, point))
     }
 
     fn fire_action(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
@@ -480,7 +480,7 @@ impl ActionKind for TransitionAction {
             None => return None,
             Some(ref transition) => transition,
         };
-        ActionHoverInfo::new(&transition.size, transition.from)
+        Some(ActionHoverInfo::new(&transition.size, transition.from))
     }
 
     fn fire_action(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
@@ -599,7 +599,7 @@ impl ActionKind for AttackAction {
     fn get_hover_info(&self) -> Option<ActionHoverInfo> {
         let point = self.target.borrow().location.to_point();
         let total_ap = self.pc.borrow().actor.ap() as i32;
-        ActionHoverInfo::with_ap(&self.target.borrow(), point, total_ap, self.ap)
+        Some(ActionHoverInfo::with_ap(&self.target.borrow(), point, total_ap, self.ap))
     }
 
     fn fire_action(&mut self, _widget: &Rc<RefCell<Widget>>) -> bool {
@@ -843,7 +843,7 @@ impl ActionKind for MoveAction {
             self.dest.x as i32 - entity.size.width / 2,
             self.dest.y as i32 - entity.size.height / 2,
         );
-        ActionHoverInfo::with_path(entity, p, &self.path, self.ap)
+        Some(ActionHoverInfo::with_path(entity, p, &self.path, self.ap))
     }
 
     fn ap(&self) -> i32 {

@@ -958,18 +958,15 @@ impl TurnManager {
     /// is used when loading, in order to associate animations with effects
     pub fn add_removal_listener_for_effect(&mut self, index: usize, marked: Vec<Rc<Cell<bool>>>) {
         match self.effects.get_mut(index) {
-            None => unreachable!(),
-            Some(ref mut effect) => match effect {
-                None => unreachable!(),
-                Some(ref mut effect) => {
-                    effect.removal_listeners.add(ChangeListener::new(
-                        "anim",
-                        Box::new(move |_| {
-                            marked.iter().for_each(|m| m.set(true));
-                        }),
-                    ));
-                }
+            Some(Some(effect)) => {
+                effect.removal_listeners.add(ChangeListener::new(
+                    "anim",
+                    Box::new(move |_| {
+                        marked.iter().for_each(|m| m.set(true));
+                    }),
+                ));
             },
+            None | Some(None) => unreachable!(),
         }
     }
 

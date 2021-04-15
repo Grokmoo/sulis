@@ -278,6 +278,7 @@ impl UserData for ScriptParticleGenerator {
     }
 }
 
+#[allow(clippy::unnecessary_wraps)] // this must return a result to be added as a method in the LUA context
 fn dist_param(
     _lua: Context,
     _: &ScriptParticleGenerator,
@@ -308,6 +309,7 @@ fn dist_param(
     }
 }
 
+#[allow(clippy::unnecessary_wraps)] // this must return a result to be added as a method in the LUA context
 pub fn param<T>(
     _lua: Context,
     _: &T,

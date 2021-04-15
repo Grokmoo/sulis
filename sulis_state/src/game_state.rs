@@ -372,7 +372,7 @@ impl GameState {
 
         pc_state.borrow_mut().actor.init_turn();
 
-        let mut party = Vec::new();
+        let mut party = Vec::with_capacity(party_actors.len() + 1);
         party.push(Rc::clone(&pc_state));
 
         for member in party_actors {
@@ -411,8 +411,7 @@ impl GameState {
         let mut areas: HashMap<String, Rc<RefCell<AreaState>>> = HashMap::new();
         areas.insert(campaign.starting_area.to_string(), Rc::clone(&area_state));
 
-        let mut selected = Vec::new();
-        selected.push(Rc::clone(&pc_state));
+        let selected = vec![Rc::clone(&pc_state)];
 
         Ok(GameState {
             user_zoom: Config::default_zoom(),

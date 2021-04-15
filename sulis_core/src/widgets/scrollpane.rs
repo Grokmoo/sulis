@@ -19,7 +19,7 @@ use std::cell::RefCell;
 use std::cmp;
 use std::rc::Rc;
 
-use crate::io::{GraphicsRenderer, InputAction};
+use crate::io::{GraphicsRenderer, InputAction, event::ClickKind};
 use crate::ui::{Callback, Widget, WidgetKind, WidgetState};
 use crate::util::{Point, Size};
 use crate::widget_kind;
@@ -203,6 +203,8 @@ struct Scrollbar {
     up: Rc<RefCell<Widget>>,
     down: Rc<RefCell<Widget>>,
     thumb: Rc<RefCell<Widget>>,
+
+    thumb_accum: f32,
 }
 
 impl Scrollbar {
@@ -212,7 +214,7 @@ impl Scrollbar {
     ) -> Rc<RefCell<Scrollbar>> {
         let up = Widget::with_theme(Button::empty(), "up");
         let down = Widget::with_theme(Button::empty(), "down");
-        let thumb = Widget::with_theme(Button::empty(), "thumb");
+        let thumb = Widget::with_theme(ScrollThumb::new(), "thumb");
 
         Rc::new(RefCell::new(Scrollbar {
             direction,
@@ -225,6 +227,7 @@ impl Scrollbar {
             down,
             thumb,
             content_size: 0,
+            thumb_accum: 0.0,
         }))
     }
 
@@ -242,16 +245,20 @@ impl Scrollbar {
             ScrollDirection::Horizontal => self.compute_min_max_x(&parent.borrow()),
         }
 
-        self.cur_pos += dir * self.delta as i32;
+        self.adjust_cur_pos(dir * self.delta as i32);
+
+        let pane = Widget::direct_parent(&self.widget);
+        pane.borrow_mut().invalidate_layout();
+    }
+
+    fn adjust_cur_pos(&mut self, amount: i32) {
+        self.cur_pos += amount;
 
         if self.cur_pos < self.min_pos {
             self.cur_pos = self.min_pos
         } else if self.cur_pos > self.max_pos {
             self.cur_pos = self.max_pos
         }
-
-        let pane = Widget::direct_parent(&self.widget);
-        pane.borrow_mut().invalidate_layout();
     }
 
     fn compute_min_max_x(&mut self, widget: &Widget) {
@@ -284,6 +291,17 @@ impl Scrollbar {
         if self.max_pos < self.min_pos {
             self.max_pos = self.min_pos
         }
+    }
+
+    fn drag_thumb(&mut self, scrollable_size: i32, delta: f32) {
+        let ratio = (self.max_pos - self.min_pos) as f32 * delta / (scrollable_size as f32);
+
+        // accumlate any floating point error over multiple frames
+        let accum = ratio + self.thumb_accum;
+        self.thumb_accum = accum.fract();
+        let adjust = (accum - accum.fract()) as i32;
+
+        self.adjust_cur_pos(adjust);
     }
 
     fn set_thumb_state_vertical(&mut self, state: &WidgetState, thumb_frac: f32) {
@@ -361,7 +379,7 @@ impl WidgetKind for Scrollbar {
         let widget_size = self.content_size as f32;
         let thumb_frac = widget_size / ((self.max_pos as f32 - self.min_pos as f32) + widget_size);
 
-        self.thumb.borrow_mut().state.set_enabled(false);
+        //self.thumb.borrow_mut().state.set_enabled(false);
         widget.state.set_visible(thumb_frac < 1.0);
 
         match self.direction {
@@ -396,5 +414,64 @@ impl WidgetKind for Scrollbar {
             Rc::clone(&self.down),
             Rc::clone(&self.thumb),
         ]
+    }
+}
+
+struct ScrollThumb {
+
+}
+
+impl ScrollThumb {
+    fn new() -> Rc<RefCell<ScrollThumb>> {
+        Rc::new(RefCell::new(ScrollThumb { }))
+    }
+}
+
+impl WidgetKind for ScrollThumb {
+    widget_kind!("scrollthumb");
+
+    fn on_mouse_drag(
+        &mut self,
+        widget: &Rc<RefCell<Widget>>,
+        _kind: ClickKind,
+        delta_x: f32,
+        delta_y: f32,
+    ) -> bool {
+        let (parent, bar) = Widget::parent_mut::<Scrollbar>(widget);
+
+        let parent_parent = Widget::direct_parent(&parent);
+        parent_parent.borrow_mut().invalidate_layout();
+
+        Widget::get_root(&parent_parent).borrow_mut().set_mouse_drag_child(widget);
+
+        match bar.direction {
+            ScrollDirection::Horizontal => {
+                let mut scrollable_width = parent.borrow().state.inner_width();
+                // subtract width of the left/right buttons as well as the thumb
+                for child in parent.borrow().children.iter() {
+                    scrollable_width -= child.borrow().state.width();
+                }
+
+                bar.drag_thumb(scrollable_width, delta_x);
+            }, ScrollDirection::Vertical => {
+                let mut scrollable_height = parent.borrow().state.inner_height();
+                // subtract height of the up/down buttons as well as the thumb
+                for child in parent.borrow().children.iter() {
+                    scrollable_height -= child.borrow().state.height();
+                }
+
+                bar.drag_thumb(scrollable_height, delta_y);
+            }
+        }
+
+        true
+    }
+
+    fn on_mouse_release(&mut self, widget: &Rc<RefCell<Widget>>, kind: ClickKind) -> bool {
+        self.super_on_mouse_release(widget, kind);
+
+        Widget::get_root(widget).borrow_mut().clear_mouse_drag_child(widget);
+
+        true
     }
 }

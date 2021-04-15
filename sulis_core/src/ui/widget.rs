@@ -34,6 +34,7 @@ pub struct Widget {
     theme_id: String,
     pub theme_subname: String,
 
+    mouse_drag_child: Option<Rc<RefCell<Widget>>>,
     modal_child: Option<Rc<RefCell<Widget>>>,
     pub(crate) keyboard_focus_child: Option<Rc<RefCell<Widget>>>,
     parent: Option<Rc<RefCell<Widget>>>,
@@ -123,6 +124,18 @@ impl Widget {
         self.marked_for_layout = true;
     }
 
+    pub(crate) fn set_mouse_drag_child(&mut self, child: &Rc<RefCell<Widget>>) {
+        self.mouse_drag_child = Some(Rc::clone(child));
+    }
+
+    pub(crate) fn clear_mouse_drag_child(&mut self, child: &Rc<RefCell<Widget>>) {
+        if let Some(cur) = self.mouse_drag_child.as_ref() {
+            if Rc::ptr_eq(cur, child) {
+                self.mouse_drag_child = None;
+            }
+        }
+    }
+
     pub fn do_base_layout(&mut self) {
         self.do_self_layout();
         self.do_children_layout();
@@ -184,6 +197,7 @@ impl Widget {
             kind: Rc::clone(&kind),
             children: Vec::new(),
             modal_child: None,
+            mouse_drag_child: None,
             keyboard_focus_child: None,
             parent: None,
             marked_for_layout: true,
@@ -688,7 +702,7 @@ impl Widget {
         if widget.borrow().state.is_mouse_over {
             return false;
         }
-
+        
         match event.kind {
             event::Kind::MouseMove { .. } => (),
             _ => trace!(
@@ -730,6 +744,13 @@ impl Widget {
             return Widget::dispatch_event(&child, event);
         }
 
+        let has_mouse_drag_child = widget.borrow().mouse_drag_child.is_some();
+        if has_mouse_drag_child {
+            let child = Rc::clone(widget.borrow().mouse_drag_child.as_ref().unwrap());
+            trace!("Dispatch to mouse drag child: {}", child.borrow().theme_id);
+            return Widget::dispatch_event(&child, event);
+        }
+
         // iterate in this way using indices so we don't maintain any
         // borrows except for the active child widget - this will allow
         // the child to mutate any other widget in the tree
@@ -743,11 +764,9 @@ impl Widget {
                 continue;
             }
 
-            if child
-                .borrow()
-                .state
-                .in_bounds(Cursor::get_x(), Cursor::get_y())
-            {
+            let in_bounds = child.borrow().state.in_bounds(Cursor::get_x(), Cursor::get_y());
+
+            if in_bounds {
                 if !child.borrow().state.mouse_is_inside {
                     trace!("Dispatch mouse entered to '{}'", child.borrow().theme_id);
                     Widget::dispatch_event(&child, Event::entered_from(&event));

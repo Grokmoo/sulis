@@ -1105,6 +1105,7 @@ impl AreaTargeter {
             return;
         }
 
+        self.parent.borrow().explore_self_location();
         self.cancel = true;
 
         let affected = self

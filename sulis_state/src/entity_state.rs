@@ -33,7 +33,7 @@ use crate::{
 };
 use sulis_core::io::GraphicsRenderer;
 use sulis_core::ui::{color, Color};
-use sulis_core::util::{invalid_data_error, Offset, Scale, Size};
+use sulis_core::util::{invalid_data_error, Offset, Scale, Size, Point};
 use sulis_module::area::MAX_AREA_SIZE;
 use sulis_module::{
     actor::Faction, ai, Actor, DamageKind, HitKind, Module, ObjectSize, ObjectSizeIterator,
@@ -367,6 +367,29 @@ impl EntityState {
         }
     }
 
+    pub fn explore_self_location(&self) {
+        let area = GameState::get_area_state(&self.location.area_id).unwrap();
+        let is_current = Rc::ptr_eq(&GameState::area_state(), &area);
+        let mut changed = false;
+        let mut area = area.borrow_mut();
+        let width = area.area.width;
+
+        for y in -2..self.size.height {
+            for x in -1..self.size.width + 1 {
+                let p = Point::new(x + self.location.x, y + self.location.y);
+                let index = (p.x + p.y * width) as usize;
+                if !area.pc_explored[index] {
+                    changed = true;
+                    area.pc_explored[index] = true;
+                }
+            }
+        }
+
+        if is_current && changed {
+            area.pc_vis_full_redraw();
+        }
+    }
+
     pub fn is_hostile(&self, other: &EntityState) -> bool {
         let self_faction = self.actor.faction();
         let other_faction = other.actor.faction();
@@ -452,6 +475,8 @@ impl EntityState {
             let attack_ap = entity.borrow().actor.stats.attack_cost;
             entity.borrow_mut().actor.remove_ap(attack_ap as u32);
         }
+
+        entity.borrow().explore_self_location();
     }
 
     pub fn add_xp(&mut self, xp: u32) {

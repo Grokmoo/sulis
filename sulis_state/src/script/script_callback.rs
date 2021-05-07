@@ -317,10 +317,7 @@ impl CallbackData {
     }
 
     pub fn get_func(&self, func: FuncKind) -> Option<String> {
-        match self.funcs.get(&func) {
-            None => None,
-            Some(func) => Some(func.to_string()),
-        }
+        self.funcs.get(&func).cloned()
     }
 
     pub fn update_entity_refs_on_load(

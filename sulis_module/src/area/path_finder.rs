@@ -59,7 +59,7 @@ struct OpenEntry {
 
 impl OpenEntry {
     pub fn new(index: i32, f_score: i32) -> OpenEntry {
-        OpenEntry { index, f_score }
+        OpenEntry { f_score, index }
     }
 }
 

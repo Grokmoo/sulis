@@ -205,17 +205,11 @@ impl ItemButton {
             }
             Kind::Quick { ref player, quick } => {
                 let pc = player.borrow();
-                match pc.actor.inventory().quick(quick) {
-                    None => None,
-                    Some(item_state) => Some(item_state.clone()),
-                }
+                pc.actor.inventory().quick(quick).cloned()
             }
             Kind::Equipped { ref player, slot } => {
                 let pc = player.borrow();
-                match pc.actor.inventory().equipped(slot) {
-                    None => None,
-                    Some(item_state) => Some(item_state.clone()),
-                }
+                pc.actor.inventory().equipped(slot).cloned()
             }
             Kind::Prop {
                 prop_index,

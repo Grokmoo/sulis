@@ -226,9 +226,9 @@ impl Item {
             let image = build_hash_map(&builder.id, variant.image)?;
             let alternate_image = build_hash_map(&builder.id, variant.alternate_image)?;
             variants.push(Variant {
-                icon,
                 image,
                 alternate_image,
+                icon,
             });
         }
 

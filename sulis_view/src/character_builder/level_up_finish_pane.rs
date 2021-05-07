@@ -51,10 +51,7 @@ impl BuilderPane for LevelUpFinishPane {
         builder.finish.borrow_mut().state.set_visible(true);
         builder.finish.borrow_mut().state.set_enabled(true);
 
-        self.class = match builder.class {
-            None => None,
-            Some(ref class) => Some(Rc::clone(class)),
-        };
+        self.class = builder.class.as_ref().map(|c| Rc::clone(c));
 
         self.abilities = builder.abilities.clone();
 

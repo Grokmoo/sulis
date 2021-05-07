@@ -199,10 +199,7 @@ impl Effect {
     }
 
     pub fn surface(&self) -> Option<(&str, &Vec<Point>)> {
-        match self.surface {
-            None => None,
-            Some(ref surface) => Some((&surface.area_id, &surface.points)),
-        }
+        self.surface.as_ref().map(|s| (s.area_id.as_str(), &s.points))
     }
 
     pub fn deactivates_with(&self, id: &str) -> bool {

@@ -154,10 +154,7 @@ impl Config {
 
     pub fn get_input_action(k: KeyboardEvent) -> Option<InputAction> {
         debug!("Got keyboard input '{:?}'", k);
-        CONFIG.with(|c| match c.borrow().input.keybindings.get(&k.key) {
-            None => None,
-            Some(action) => Some(*action),
-        })
+        CONFIG.with(|c| c.borrow().input.keybindings.get(&k.key).copied())
     }
 
     pub fn scroll_speed() -> f32 {

@@ -223,10 +223,7 @@ fn export_character(pc: &ActorState) {
         Ok(filename) => filename,
     };
 
-    let portrait = match pc.actor.portrait {
-        None => None,
-        Some(ref img) => Some(img.id()),
-    };
+    let portrait = pc.actor.portrait.as_ref().map(|i| i.id());
 
     let abilities = pc
         .actor

@@ -43,14 +43,8 @@ impl ScriptItemKind {
                     Some(&(_, ref item)) => Some(item.clone()),
                 }
             }
-            ScriptItemKind::Quick(slot) => match parent.borrow().actor.inventory().quick(*slot) {
-                None => None,
-                Some(item) => Some(item.clone()),
-            },
-            ScriptItemKind::WithID(id) => match Module::item(id) {
-                None => None,
-                Some(item) => Some(ItemState::new(item, None)),
-            },
+            ScriptItemKind::Quick(slot) => parent.borrow().actor.inventory().quick(*slot).cloned(),
+            ScriptItemKind::WithID(id) => Module::item(id).map(|i| ItemState::new(i, None)),
         }
     }
 

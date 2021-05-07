@@ -14,7 +14,6 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-#![allow(clippy::upper_case_acronyms)]
 #![allow(clippy::manual_range_contains)]
 
 #[macro_use]
@@ -650,10 +649,7 @@ impl Module {
     }
 
     pub fn module_dir() -> Option<String> {
-        MODULE.with(|m| match m.borrow().root_dir {
-            None => None,
-            Some(ref dir) => Some(dir.to_string()),
-        })
+        MODULE.with(|m| m.borrow().root_dir.as_ref().cloned())
     }
 
     pub fn is_initialized() -> bool {
@@ -776,10 +772,7 @@ impl Module {
     pub fn script(id: &str) -> Option<String> {
         MODULE.with(|r| {
             let module = r.borrow();
-            match module.scripts.get(id) {
-                None => None,
-                Some(script) => Some(script.to_string()),
-            }
+            module.scripts.get(id).cloned()
         })
     }
 

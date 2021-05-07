@@ -206,10 +206,7 @@ pub fn item_on_target_select(
 ) -> Result<()> {
     let mut targets = ScriptEntitySet::new(parent, &targets);
     targets.selected_point = Some((selected_point.x, selected_point.y));
-    let arg = match custom_target {
-        None => None,
-        Some(entity) => Some(ScriptEntity::from(&entity)),
-    };
+    let arg = custom_target.map(|t| ScriptEntity::from(&t));
     targets.affected_points = affected_points.into_iter().map(|p| (p.x, p.y)).collect();
     item_script(parent, kind, targets, arg, func)
 }
@@ -272,10 +269,7 @@ pub fn ability_on_target_select(
 ) -> Result<()> {
     let mut targets = ScriptEntitySet::new(parent, &targets);
     targets.selected_point = Some((selected_point.x, selected_point.y));
-    let arg = match custom_target {
-        None => None,
-        Some(entity) => Some(ScriptEntity::from(&entity)),
-    };
+    let arg = custom_target.map(|t| ScriptEntity::from(&t));
     targets.affected_points = affected_points.into_iter().map(|p| (p.x, p.y)).collect();
     ability_script(parent, ability, targets, arg, func)
 }

@@ -54,10 +54,7 @@ impl ItemState {
     }
 
     pub fn from(id: &str) -> Option<ItemState> {
-        match Module::item(id) {
-            None => None,
-            Some(item) => Some(ItemState::new(item, None)),
-        }
+        Module::item(id).map(|i| ItemState::new(i, None))
     }
 
     pub fn image_iter(&self) -> Iter<ImageLayer, Rc<dyn Image>> {

@@ -566,10 +566,7 @@ impl GameState {
                 }
             }
 
-            let entity = match state.selected.first() {
-                None => None,
-                Some(ref entity) => Some(Rc::clone(entity)),
-            };
+            let entity = state.selected.first().map(|s| Rc::clone(s));
             state.party_listeners.notify(&entity);
         })
     }
@@ -609,10 +606,7 @@ impl GameState {
 
             state.selected.retain(|e| !Rc::ptr_eq(e, &entity));
 
-            let entity = match state.selected.first() {
-                None => None,
-                Some(ref entity) => Some(Rc::clone(entity)),
-            };
+            let entity = state.selected.first().map(|s| Rc::clone(s));
             state.party_listeners.notify(&entity);
         });
 
@@ -708,10 +702,7 @@ impl GameState {
                 info!("Removed or Disabled a dead party member; notifying listeners");
                 state.party_death_listeners.notify(&state.party);
 
-                let entity = match state.selected.first() {
-                    None => None,
-                    Some(ref entity) => Some(Rc::clone(entity)),
-                };
+                let entity = state.selected.first().map(|s| Rc::clone(s));
                 state.party_listeners.notify(&entity);
                 true
             } else {
@@ -762,10 +753,7 @@ impl GameState {
                 .compute_pc_visibility(&entity, 0, 0);
             state.party.push(Rc::clone(&entity));
 
-            let entity = match state.selected.first() {
-                None => None,
-                Some(ref entity) => Some(Rc::clone(entity)),
-            };
+            let entity = state.selected.first().map(|s| Rc::clone(s));
             state.party_listeners.notify(&entity);
         });
 
@@ -936,10 +924,7 @@ impl GameState {
     }
 
     pub fn get_area_state(id: &str) -> Option<Rc<RefCell<AreaState>>> {
-        STATE.with(|s| match s.borrow().as_ref().unwrap().areas.get(id) {
-            None => None,
-            Some(area_state) => Some(Rc::clone(&area_state)),
-        })
+        STATE.with(|s| s.borrow().as_ref().unwrap().areas.get(id).map(|a| Rc::clone(a)))
     }
 
     pub fn area_state() -> Rc<RefCell<AreaState>> {

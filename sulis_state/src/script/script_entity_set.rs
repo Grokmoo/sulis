@@ -218,10 +218,7 @@ impl ScriptEntitySet {
 
         let indices = entities
             .iter()
-            .map(|e| match e {
-                None => None,
-                Some(e) => Some(e.borrow().index()),
-            })
+            .map(|e| e.as_ref().map(|e| e.borrow().index()))
             .collect();
         ScriptEntitySet {
             parent,
@@ -310,10 +307,8 @@ impl UserData for ScriptEntitySet {
         });
         methods.add_method("is_empty", |_, set, ()| Ok(set.indices.is_empty()));
         methods.add_method("first", |_, set, ()| {
-            for index in set.indices.iter() {
-                if let Some(index) = index {
-                    return Ok(ScriptEntity::new(*index));
-                }
+            if let Some(index) = set.indices.iter().flatten().next() {
+                return Ok(ScriptEntity::new(*index));
             }
 
             warn!("Attempted to get first element of EntitySet that has no valid entities");

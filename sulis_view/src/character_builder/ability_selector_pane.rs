@@ -109,10 +109,7 @@ impl BuilderPane for AbilitySelectorPane {
         let prereq_actor = {
             let state = &self.pc.borrow().actor;
 
-            let class = match builder.class.clone() {
-                Some(class) => Some((class, 1)),
-                None => None,
-            };
+            let class = builder.class.as_ref().map(|c| (Rc::clone(c), 1));
 
             Rc::new(Actor::from(
                 &state.actor,

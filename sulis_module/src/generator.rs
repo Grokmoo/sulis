@@ -142,8 +142,8 @@ impl<T> WeightedList<T> {
         }
 
         Ok(WeightedList {
-            entries,
             total_weight,
+            entries,
         })
     }
 

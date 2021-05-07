@@ -176,9 +176,9 @@ impl LayerSet {
             height,
             layers,
             entity_layer_index,
+            elevation,
             passable,
             visible,
-            elevation,
         })
     }
 

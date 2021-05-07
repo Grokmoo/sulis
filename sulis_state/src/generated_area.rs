@@ -158,11 +158,11 @@ impl GeneratedArea {
             area,
             width,
             height,
-            props,
-            encounters,
             layer_set,
             path_grids,
+            props,
             transitions,
+            encounters,
         })
     }
 

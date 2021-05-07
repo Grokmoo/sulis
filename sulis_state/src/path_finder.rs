@@ -54,11 +54,11 @@ impl<'a, 'b> StateLocationChecker<'a, 'b> {
         StateLocationChecker {
             width,
             grid,
+            explored,
             prop_grid,
             entity_grid,
             requester,
             entities_to_ignore,
-            explored,
         }
     }
 }

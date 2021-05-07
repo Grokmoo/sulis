@@ -189,10 +189,7 @@ impl BuilderPane for CosmeticSelectorPane {
         builder.hue = self.hue;
         builder.skin_color = self.skin_color;
         builder.hair_color = self.hair_color;
-        builder.portrait = match self.portrait {
-            None => None,
-            Some(ref image) => Some(image.id()),
-        };
+        builder.portrait = self.portrait.as_ref().map(|i| i.id());
         builder.next(&widget);
     }
 

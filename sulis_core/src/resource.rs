@@ -359,12 +359,7 @@ pub fn all_resources<V: ?Sized>(map: &HashMap<String, Rc<V>>) -> Vec<Rc<V>> {
 
 #[allow(clippy::implicit_hasher)]
 pub fn get_resource<V: ?Sized>(id: &str, map: &HashMap<String, Rc<V>>) -> Option<Rc<V>> {
-    let resource = map.get(id);
-
-    match resource {
-        None => None,
-        Some(r) => Some(Rc::clone(r)),
-    }
+    map.get(id).map(|r| Rc::clone(r))
 }
 
 #[allow(clippy::implicit_hasher)]

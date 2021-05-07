@@ -95,10 +95,7 @@ impl<T: Display + Clone> WidgetKind for MutuallyExclusiveListBox<T> {
                     if !cur_state {
                         for (index, child) in parent.borrow().children.iter().enumerate() {
                             if Rc::ptr_eq(child, widget) {
-                                parent_list_box.active_entry = match parent_list_box.get(index) {
-                                    None => None,
-                                    Some(entry) => Some(entry.clone()),
-                                };
+                                parent_list_box.active_entry = parent_list_box.get(index).cloned();
                             }
                             child.borrow_mut().state.set_active(false);
                         }

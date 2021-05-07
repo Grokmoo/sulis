@@ -220,10 +220,7 @@ impl AreaState {
             }
         }
 
-        match index {
-            Some(i) => Some(&self.merchants[i]),
-            None => None,
-        }
+        index.map(|i| &self.merchants[i])
     }
 
     pub fn get_merchant_mut(&mut self, id: &str) -> Option<&mut MerchantState> {
@@ -359,10 +356,7 @@ impl AreaState {
     }
 
     pub fn targeter(&self) -> Option<Rc<RefCell<AreaTargeter>>> {
-        match self.targeter {
-            None => None,
-            Some(ref targeter) => Some(Rc::clone(targeter)),
-        }
+        self.targeter.as_ref().map(|t| Rc::clone(t))
     }
 
     pub(crate) fn set_targeter(&mut self, mut targeter: AreaTargeter) {

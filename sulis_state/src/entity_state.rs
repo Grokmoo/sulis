@@ -263,10 +263,7 @@ impl EntityState {
     }
 
     pub fn get_custom_flag(&self, flag: &str) -> Option<String> {
-        match self.custom_flags.get(flag) {
-            None => None,
-            Some(val) => Some(val.to_string()),
-        }
+        self.custom_flags.get(flag).cloned()
     }
 
     pub fn add_num_flag(&mut self, flag: &str, value: f32) {

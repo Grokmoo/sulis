@@ -105,18 +105,12 @@ impl RootView {
 
     /// Gets the merchant window if it is currently opened
     pub fn get_merchant_window(&self, widget: &Rc<RefCell<Widget>>) -> Option<Rc<RefCell<Widget>>> {
-        match Widget::get_child_with_name(widget, merchant_window::NAME) {
-            None => None,
-            Some(ref window) => Some(Rc::clone(window)),
-        }
+        Widget::get_child_with_name(widget, merchant_window::NAME).map(|w| Rc::clone(&w))
     }
 
     /// Gets the prop window if it is currently opened
     pub fn get_prop_window(&self, widget: &Rc<RefCell<Widget>>) -> Option<Rc<RefCell<Widget>>> {
-        match Widget::get_child_with_name(widget, prop_window::NAME) {
-            None => None,
-            Some(ref window) => Some(Rc::clone(window)),
-        }
+        Widget::get_child_with_name(widget, prop_window::NAME).map(|w| Rc::clone(&w))
     }
 
     pub fn set_merchant_window(
@@ -126,6 +120,7 @@ impl RootView {
         merchant_id: &str,
     ) {
         self.set_window(widget, self::merchant_window::NAME, desired_state, &|| {
+            #[allow(clippy::manual_map)] // clippy suggest does not work here
             match GameState::selected().first() {
                 None => None,
                 Some(ref entity) => Some(MerchantWindow::new(merchant_id, Rc::clone(entity))),
@@ -142,6 +137,7 @@ impl RootView {
         prop_index: usize,
     ) {
         self.set_window(widget, self::prop_window::NAME, desired_state, &|| {
+            #[allow(clippy::manual_map)] // clippy suggest does not work here
             match GameState::selected().first() {
                 None => None,
                 Some(ref entity) => Some(PropWindow::new(prop_index, Rc::clone(entity))),
@@ -153,6 +149,7 @@ impl RootView {
 
     pub fn set_inventory_window(&mut self, widget: &Rc<RefCell<Widget>>, desired_state: bool) {
         self.set_window(widget, self::inventory_window::NAME, desired_state, &|| {
+            #[allow(clippy::manual_map)] // clippy suggest does not work here
             match GameState::selected().first() {
                 None => None,
                 Some(ref entity) => Some(InventoryWindow::new(entity)),
@@ -162,6 +159,7 @@ impl RootView {
 
     pub fn set_character_window(&mut self, widget: &Rc<RefCell<Widget>>, desired_state: bool) {
         self.set_window(widget, self::character_window::NAME, desired_state, &|| {
+            #[allow(clippy::manual_map)] // clippy suggest does not work here
             match GameState::selected().first() {
                 None => None,
                 Some(ref entity) => Some(CharacterWindow::new(entity)),

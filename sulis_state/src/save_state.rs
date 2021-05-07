@@ -95,8 +95,8 @@ impl SaveState {
         }
 
         let quest_state = QuestSaveState {
-            current_quest,
             quests,
+            current_quest,
         };
 
         let mgr = GameState::turn_manager();
@@ -312,10 +312,7 @@ impl PropSaveState {
                 ref loot_to_generate,
                 temporary,
             } => {
-                let loot_to_generate = match loot_to_generate {
-                    None => None,
-                    Some(ref loot_list) => Some(loot_list.id.to_string()),
-                };
+                let loot_to_generate = loot_to_generate.as_ref().map(|l| l.id.to_string());
 
                 let items = items
                     .iter()
@@ -450,14 +447,13 @@ impl EntitySaveState {
                 levels.insert(class.id.to_string(), *level);
             }
 
-            let reward = match actor.reward {
-                None => None,
-                Some(ref reward) => Some(RewardBuilder {
+            let reward = actor.reward.as_ref().map(|reward| {
+                RewardBuilder {
                     xp: reward.xp,
                     loot: reward.loot.as_ref().map(|l| l.id.to_string()),
                     loot_chance: Some(reward.loot_chance),
-                }),
-            };
+                }
+            });
 
             let mut abilities: Vec<String> = Vec::new();
             for owned_ability in actor.abilities.iter() {
@@ -466,10 +462,7 @@ impl EntitySaveState {
                 }
             }
 
-            let ai = match &actor.ai {
-                None => None,
-                Some(ai) => Some(ai.id.to_string()),
-            };
+            let ai = actor.ai.as_ref().map(|ai| ai.id.to_string());
 
             Some(ActorBuilder {
                 id: actor.id.to_string(),

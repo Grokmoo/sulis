@@ -223,10 +223,10 @@ impl RangeIndicator {
         // }
 
         RangeIndicator {
+            kind,
+            parent,
             neighbors,
             half_width,
-            parent,
-            kind,
         }
     }
 

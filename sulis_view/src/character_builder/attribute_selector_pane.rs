@@ -286,7 +286,7 @@ pub struct AbilityButton {
 
 impl AbilityButton {
     pub fn new(ability: Rc<Ability>, class: Rc<Class>) -> Rc<RefCell<AbilityButton>> {
-        Rc::new(RefCell::new(AbilityButton { ability, class }))
+        Rc::new(RefCell::new(AbilityButton { class, ability }))
     }
 }
 

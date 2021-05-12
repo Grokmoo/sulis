@@ -18,6 +18,7 @@ use std::any::Any;
 use std::cell::RefCell;
 use std::rc::Rc;
 
+use sulis_core::config::Config;
 use sulis_core::io::event::ClickKind;
 use sulis_core::ui::{Widget, WidgetKind};
 use sulis_core::widgets::ProgressBar;
@@ -38,6 +39,10 @@ pub fn check_end_turn(widget: &Rc<RefCell<Widget>>) {
             None => return,
             Some(entity) => entity,
         };
+
+        let time = GameState::animation_block_time(&entity);
+        if time.greater_than(Config::animation_base_time_millis() * 10) { return; }
+
         let entity = entity.borrow();
         if !entity.is_party_member() {
             return;

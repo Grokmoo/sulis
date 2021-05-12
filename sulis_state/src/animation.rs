@@ -183,6 +183,13 @@ impl AnimState {
             || AnimState::has_any_blocking_vec(&self.above_anims)
     }
 
+    pub fn anim_blocked_time(&self, entity: &Rc<RefCell<EntityState>>) -> ExtInt {
+        let v1 = AnimState::blocked_time_vec(&self.no_draw_anims, entity);
+        let v2 = AnimState::blocked_time_vec(&self.below_anims, entity);
+        let v3 = AnimState::blocked_time_vec(&self.above_anims, entity);
+        v1.max(v2).max(v3)
+    }
+
     pub fn has_blocking_anims(&self, entity: &Rc<RefCell<EntityState>>) -> bool {
         AnimState::has_blocking_vec(&self.no_draw_anims, entity)
             || AnimState::has_blocking_vec(&self.below_anims, entity)
@@ -210,6 +217,19 @@ impl AnimState {
             return true;
         }
         false
+    }
+
+    fn blocked_time_vec(vec: &[Anim], entity: &Rc<RefCell<EntityState>>) -> ExtInt {
+        let mut time = ExtInt::Int(0);
+        for anim in vec {
+            if !anim.is_blocking() { continue; }
+            if !Rc::ptr_eq(entity, anim.owner()) { continue; }
+
+            let remaining = anim.duration_millis - anim.elapsed;
+            time = time.max(remaining);
+        }
+
+        time
     }
 
     fn has_blocking_vec(vec: &[Anim], entity: &Rc<RefCell<EntityState>>) -> bool {

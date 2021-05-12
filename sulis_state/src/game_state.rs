@@ -1046,6 +1046,10 @@ impl GameState {
         ANIMATIONS.with(|a| a.borrow().has_any_blocking_anims())
     }
 
+    pub fn animation_block_time(entity: &Rc<RefCell<EntityState>>) -> ExtInt {
+        ANIMATIONS.with(|a| a.borrow().anim_blocked_time(entity))
+    }
+
     pub fn has_blocking_animations(entity: &Rc<RefCell<EntityState>>) -> bool {
         ANIMATIONS.with(|a| a.borrow().has_blocking_anims(entity))
     }

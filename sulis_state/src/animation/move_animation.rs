@@ -170,7 +170,7 @@ pub(in crate::animation) fn cleanup(mover: &Rc<RefCell<EntityState>>, model: &mu
         let frac = 1000.0 / base_time as f32;
         let x = Param::with_speed(-dx, dx * frac);
         let y = Param::with_speed(-dy, dy * frac);
-        let anim = Anim::new_entity_subpos(&mover, ExtInt::Int(base_time), x, y);
+        let anim = Anim::new_entity_subpos(mover, ExtInt::Int(base_time), x, y);
         GameState::add_animation(anim);
 
         mover.borrow_mut().sub_pos = (-dx, -dy);

@@ -396,7 +396,7 @@ impl WidgetKind for Scrollbar {
             .borrow_mut()
             .state
             .add_callback(Callback::new(Rc::new(move |widget, _| {
-                let (_, kind) = Widget::parent_mut::<Scrollbar>(&widget);
+                let (_, kind) = Widget::parent_mut::<Scrollbar>(widget);
                 kind.update_children_position(&widget_ref, -1);
             })));
 
@@ -405,7 +405,7 @@ impl WidgetKind for Scrollbar {
             .borrow_mut()
             .state
             .add_callback(Callback::new(Rc::new(move |widget, _| {
-                let (_, kind) = Widget::parent_mut::<Scrollbar>(&widget);
+                let (_, kind) = Widget::parent_mut::<Scrollbar>(widget);
                 kind.update_children_position(&widget_ref, 1);
             })));
 

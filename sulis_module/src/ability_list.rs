@@ -44,7 +44,7 @@ impl AbilityList {
                     warn!("Unable to find ability '{}'", entry.id);
                     return unable_to_create_error("ability_list", &builder.id);
                 }
-                Some(ref ability) => Rc::clone(ability),
+                Some(ability) => Rc::clone(ability),
             };
 
             entries.push(Entry {

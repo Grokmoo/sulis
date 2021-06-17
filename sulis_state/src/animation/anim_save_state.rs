@@ -99,7 +99,7 @@ impl AnimSaveState {
                 warn!("Invalid owner for animation {}", self.owner);
                 return None;
             }
-            Some(ref entity) => Rc::clone(entity),
+            Some(entity) => Rc::clone(entity),
         };
 
         let mut anim = match self.kind {

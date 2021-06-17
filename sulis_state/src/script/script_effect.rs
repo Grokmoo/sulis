@@ -846,19 +846,19 @@ fn apply(effect_data: &ScriptEffect) -> Result<()> {
     let mut anims = Vec::new();
     let mut marked = Vec::new();
     for anim in effect_data.color_anims.iter() {
-        anims.push(script_color_animation::create_anim(&anim)?);
+        anims.push(script_color_animation::create_anim(anim)?);
     }
 
     for anim in effect_data.scale_anims.iter() {
-        anims.push(script_scale_animation::create_anim(&anim)?);
+        anims.push(script_scale_animation::create_anim(anim)?);
     }
 
     for anim in effect_data.image_layer_anims.iter() {
-        anims.push(script_image_layer_animation::create_anim(&anim)?);
+        anims.push(script_image_layer_animation::create_anim(anim)?);
     }
 
     for anim in effect_data.subpos_anims.iter() {
-        anims.push(script_subpos_animation::create_anim(&anim)?);
+        anims.push(script_subpos_animation::create_anim(anim)?);
     }
 
     for mut anim in anims {
@@ -870,7 +870,7 @@ fn apply(effect_data: &ScriptEffect) -> Result<()> {
     match &effect_data.kind {
         Kind::Entity(parent) => {
             for pgen in effect_data.pgens.iter() {
-                let mut pgen = script_particle_generator::create_pgen(&pgen, pgen.owned_model())?;
+                let mut pgen = script_particle_generator::create_pgen(pgen, pgen.owned_model())?;
                 pgen.set_removal_effect(effect_index);
                 marked.push(pgen.get_marked_for_removal());
                 GameState::add_animation(pgen);
@@ -890,7 +890,7 @@ fn apply(effect_data: &ScriptEffect) -> Result<()> {
             let index = mgr.borrow_mut().add_effect(effect, &entity, cbs, marked);
 
             // fire the on_applied cbs
-            let sae = ScriptAppliedEffect::new(&mgr.borrow().effect(index), index);
+            let sae = ScriptAppliedEffect::new(mgr.borrow().effect(index), index);
             on_applied_cbs
                 .iter()
                 .for_each(|cb| cb.on_effect_applied(sae.clone()));
@@ -903,7 +903,7 @@ fn apply(effect_data: &ScriptEffect) -> Result<()> {
             let points: Vec<_> = points.iter().map(|(x, y)| Point::new(*x, *y)).collect();
             for pgen in effect_data.pgens.iter() {
                 for p in points.iter() {
-                    let mut pgen = script_particle_generator::create_surface_pgen(&pgen, p.x, p.y)?;
+                    let mut pgen = script_particle_generator::create_surface_pgen(pgen, p.x, p.y)?;
                     pgen.set_removal_effect(effect_index);
                     marked.push(pgen.get_marked_for_removal());
                     GameState::add_animation(pgen);

@@ -232,7 +232,7 @@ impl UserData for ScriptInventory {
 
             Ok(match inv.equipped(Slot::HeldOff) {
                 None => false,
-                Some(ref item_state) => match item_state.item.equippable {
+                Some(item_state) => match item_state.item.equippable {
                     None => false,
                     Some(ref equippable) => equippable.attack.is_none(),
                 },

@@ -111,7 +111,7 @@ impl WidgetKind for InputField {
         }
 
         let theme = &widget.theme;
-        if let Some(ref image_id) = theme.custom.get("carat_image") {
+        if let Some(image_id) = theme.custom.get("carat_image") {
             self.carat = ResourceSet::image(image_id);
         }
 

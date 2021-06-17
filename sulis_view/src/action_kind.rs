@@ -73,13 +73,13 @@ fn get_prop_or_transition_action(x: i32, y: i32) -> Option<Box<dyn ActionKind>> 
     // an open door (regardless of enabled) does not block a transition
 
     if prop.is_container() && prop.is_enabled() {
-        return LootPropAction::create_if_valid(index, &prop);
+        return LootPropAction::create_if_valid(index, prop);
     }
 
     if prop.is_door() {
         if !prop.is_active() {
             // open door action (if enabled)
-            return DoorPropAction::create_if_valid(index, &prop);
+            return DoorPropAction::create_if_valid(index, prop);
         }
 
         if let Some(action) = TransitionAction::create_if_valid(x, y, &area_state) {
@@ -87,7 +87,7 @@ fn get_prop_or_transition_action(x: i32, y: i32) -> Option<Box<dyn ActionKind>> 
         }
 
         // close door action (if enabled)
-        return DoorPropAction::create_if_valid(index, &prop);
+        return DoorPropAction::create_if_valid(index, prop);
     }
 
     TransitionAction::create_if_valid(x, y, &area_state)

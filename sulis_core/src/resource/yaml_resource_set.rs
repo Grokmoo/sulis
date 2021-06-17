@@ -75,7 +75,7 @@ impl YamlResourceKind {
                 warn!("{}", e);
                 return None;
             }
-            Ok(ref path) => path.to_string_lossy().to_string(),
+            Ok(path) => path.to_string_lossy().to_string(),
         };
 
         YamlResourceKind::from_str(&path_str)

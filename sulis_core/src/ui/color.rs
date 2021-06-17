@@ -44,7 +44,7 @@ fn float_one() -> f32 {
 }
 
 fn get_component(text: &str, max: f32) -> f32 {
-    let component = i32::from_str_radix(&text, 16);
+    let component = i32::from_str_radix(text, 16);
     match component {
         Err(_) => {
             warn!("Unable to parse color component from '{}'", text);

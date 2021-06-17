@@ -305,7 +305,7 @@ impl BuilderSet for CharacterCreator {
             Some(ref inv) => inv.clone(),
         };
 
-        inventory.remove_invalid_items(&builder.race.as_ref().unwrap());
+        inventory.remove_invalid_items(builder.race.as_ref().unwrap());
 
         let actor = ActorBuilder {
             id: id.to_string(),

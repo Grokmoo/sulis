@@ -498,7 +498,7 @@ fn show_merchant(widget: &Rc<RefCell<Widget>>, merch: &MerchantData) {
     }
 
     let (root, view) = Widget::parent_mut::<RootView>(widget);
-    view.set_merchant_window(&root, true, &id);
+    view.set_merchant_window(&root, true, id);
 }
 
 fn show_cutscene(widget: &Rc<RefCell<Widget>>, cutscene_id: &str) {

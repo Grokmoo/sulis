@@ -80,7 +80,7 @@ impl ObjectSize {
 
     pub fn relative_points(&self) -> ObjectSizeIterator {
         ObjectSizeIterator {
-            size: &self,
+            size: self,
             index: 0,
             x_offset: 0,
             y_offset: 0,
@@ -89,7 +89,7 @@ impl ObjectSize {
 
     pub fn points(&self, x: i32, y: i32) -> ObjectSizeIterator {
         ObjectSizeIterator {
-            size: &self,
+            size: self,
             index: 0,
             x_offset: x,
             y_offset: y,

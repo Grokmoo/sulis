@@ -140,7 +140,7 @@ impl MerchantState {
     pub fn add(&mut self, item_state: ItemState) {
         self.items.add(item_state);
 
-        self.listeners.notify(&self);
+        self.listeners.notify(self);
     }
 
     /// removes one copy of the item at the specified index
@@ -148,7 +148,7 @@ impl MerchantState {
         let result = self.items.remove(index);
 
         if result.is_some() {
-            self.listeners.notify(&self);
+            self.listeners.notify(self);
         }
 
         result

@@ -61,7 +61,7 @@ impl<'a, 'b> PropGen<'a, 'b> {
                 let (w, h) = (self.model.area_width, self.model.area_height);
                 let data = PropData::gen(&mut self.model, w, h, prop);
 
-                if pass.require_passable && !data.is_passable(&self.layers) {
+                if pass.require_passable && !data.is_passable(self.layers) {
                     continue;
                 }
 
@@ -71,7 +71,7 @@ impl<'a, 'b> PropGen<'a, 'b> {
                         .to_region_coords(data.x + data.w(), data.y + data.h()),
                 );
 
-                if !pass.allowable_regions.check_coords(&self.maze, p1, p2) {
+                if !pass.allowable_regions.check_coords(self.maze, p1, p2) {
                     continue;
                 }
 

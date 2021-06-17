@@ -551,7 +551,7 @@ impl GeneratorModel {
 
         let initial_duration = match self.particle_frame_time_offset_dist.as_ref() {
             None => 0.0,
-            Some(ref dist) => dist.generate(),
+            Some(dist) => dist.generate(),
         };
 
         Particle {

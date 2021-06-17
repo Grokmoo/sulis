@@ -197,7 +197,7 @@ impl Ord for ExtInt {
     fn cmp(&self, other: &ExtInt) -> Ordering {
         match self {
             ExtInt::Int(val) => match other {
-                ExtInt::Int(other) => val.cmp(&other),
+                ExtInt::Int(other) => val.cmp(other),
                 ExtInt::Infinity => Ordering::Less,
             },
             ExtInt::Infinity => match other {

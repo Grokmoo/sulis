@@ -77,7 +77,7 @@ fn build_source(
         };
 
         let s_id = format!("{}/{}", builder_id, entry_id);
-        if let Ok(sound_source) = SoundSource::new(s_id, file, &entry_builder) {
+        if let Ok(sound_source) = SoundSource::new(s_id, file, entry_builder) {
             source = Some(sound_source);
             break;
         }

@@ -69,7 +69,7 @@ impl<'a, 'b> FeatureGen<'a, 'b> {
                         .to_region_coords(data.x + data.w(), data.y + data.h()),
                 );
 
-                if !pass.allowable_regions.check_coords(&self.maze, p1, p2) {
+                if !pass.allowable_regions.check_coords(self.maze, p1, p2) {
                     continue;
                 }
 
@@ -77,7 +77,7 @@ impl<'a, 'b> FeatureGen<'a, 'b> {
                     continue;
                 }
 
-                if pass.require_passable && !data.is_passable(&self.layers) {
+                if pass.require_passable && !data.is_passable(self.layers) {
                     continue;
                 }
 

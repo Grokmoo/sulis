@@ -109,7 +109,7 @@ impl WidgetKind for CharacterWindow {
             .borrow_mut()
             .state
             .add_callback(Callback::new(Rc::new(move |widget, _| {
-                let root = Widget::get_root(&widget);
+                let root = Widget::get_root(widget);
                 let window =
                     Widget::with_defaults(CharacterBuilder::level_up(Rc::clone(&char_ref)));
                 window.borrow_mut().state.set_modal(true);
@@ -192,7 +192,7 @@ pub fn get_inventory(pc: &ActorState, include_stash: bool) -> InventoryBuilder {
             .borrow()
             .items()
             .iter()
-            .map(|(qty, item)| ItemListEntrySaveState::new(*qty, &item))
+            .map(|(qty, item)| ItemListEntrySaveState::new(*qty, item))
             .collect()
     } else {
         Vec::new()
@@ -201,13 +201,13 @@ pub fn get_inventory(pc: &ActorState, include_stash: bool) -> InventoryBuilder {
     let equipped = Slot::iter()
         .map(|slot| (*slot, pc.inventory().equipped(*slot)))
         .filter(|(_, item)| item.is_some())
-        .map(|(slot, item)| (slot, ItemSaveState::new(&item.unwrap())))
+        .map(|(slot, item)| (slot, ItemSaveState::new(item.unwrap())))
         .collect();
 
     let quick = QuickSlot::iter()
         .map(|slot| (*slot, pc.inventory().quick(*slot)))
         .filter(|(_, item)| item.is_some())
-        .map(|(slot, item)| (slot, ItemSaveState::new(&item.unwrap())))
+        .map(|(slot, item)| (slot, ItemSaveState::new(item.unwrap())))
         .collect();
 
     InventoryBuilder::new(equipped, quick, coins, items)
@@ -238,7 +238,7 @@ fn export_character(pc: &ActorState) {
         .map(|(class, level)| (class.id.to_string(), *level))
         .collect();
 
-    let inventory = get_inventory(&pc, true);
+    let inventory = get_inventory(pc, true);
 
     let actor = ActorBuilder {
         id,
@@ -306,7 +306,7 @@ pub fn create_abilities_pane(pc: &ActorState, show_passive: bool) -> Rc<RefCell<
         .state
         .add_callback(Callback::new(Rc::new(move |widget, _| {
             let result = !show_passive;
-            let (parent, window) = Widget::parent_mut::<CharacterWindow>(&widget);
+            let (parent, window) = Widget::parent_mut::<CharacterWindow>(widget);
             window.active_pane = ActivePane::Ability {
                 show_passives: result,
             };
@@ -335,7 +335,7 @@ pub fn create_abilities_pane(pc: &ActorState, show_passive: bool) -> Rc<RefCell<
             state.add_text_arg("name", &ability.name);
         }
 
-        let ability_ref = Rc::clone(&ability);
+        let ability_ref = Rc::clone(ability);
         let details_widget_ref = Rc::clone(&details_widget);
         let details_ref = Rc::clone(&details);
         button
@@ -412,7 +412,7 @@ fn add_effect_text_args(effect: &Effect, widget_state: &mut WidgetState) {
             );
         }
     }
-    add_bonus_text_args(&effect.bonuses(), widget_state);
+    add_bonus_text_args(effect.bonuses(), widget_state);
 }
 
 fn add_if_nonzero(state: &mut WidgetState, index: usize, name: &str, value: f32) {

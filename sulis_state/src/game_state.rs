@@ -93,7 +93,7 @@ impl GameState {
             }
 
             let area_state = match areas.get(&save_state.current_area) {
-                Some(ref area) => Ok(Rc::clone(area)),
+                Some(area) => Ok(Rc::clone(area)),
                 None => invalid_data_error(&format!(
                     "Unable to load current area '{}'",
                     save_state.current_area
@@ -117,7 +117,7 @@ impl GameState {
             for index in save_state.party {
                 match entities.get(&index) {
                     None => return invalid_data_error(&format!("Invalid party index {}", index)),
-                    Some(ref entity) => party.push(Rc::clone(entity)),
+                    Some(entity) => party.push(Rc::clone(entity)),
                 }
             }
 
@@ -126,7 +126,7 @@ impl GameState {
                     None => {
                         return invalid_data_error(&format!("Invalid selected index {}", index))
                     }
-                    Some(ref entity) => selected.push(Rc::clone(entity)),
+                    Some(entity) => selected.push(Rc::clone(entity)),
                 }
             }
 
@@ -168,7 +168,7 @@ impl GameState {
                         None => {
                             return invalid_data_error(&format!("Invalid effect entity {}", index));
                         }
-                        Some(ref entity) => Rc::clone(entity),
+                        Some(entity) => Rc::clone(entity),
                     };
 
                     // the index has changed with the load
@@ -528,7 +528,7 @@ impl GameState {
     }
 
     pub fn turn_manager() -> Rc<RefCell<TurnManager>> {
-        TURN_MANAGER.with(|m| Rc::clone(&m))
+        TURN_MANAGER.with(|m| Rc::clone(m))
     }
 
     pub fn set_selected_party_member(entity: Rc<RefCell<EntityState>>) {
@@ -690,7 +690,7 @@ impl GameState {
 
             let pc = Rc::clone(&state.party[0]); // don't ever remove the PC
             state.party.retain(|e| {
-                if Rc::ptr_eq(&e, &pc) {
+                if Rc::ptr_eq(e, &pc) {
                     return true;
                 }
                 let actor = &e.borrow().actor;
@@ -838,7 +838,7 @@ impl GameState {
     fn setup_area_state(area_id: &str) -> Result<Rc<RefCell<AreaState>>, Error> {
         debug!("Setting up area state from {}", &area_id);
 
-        let area = Module::area(&area_id);
+        let area = Module::area(area_id);
         let area = match area {
             Some(a) => a,
             None => {

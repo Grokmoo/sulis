@@ -51,7 +51,7 @@ impl WidgetKind for ColorButton {
     fn layout(&mut self, widget: &mut Widget) {
         widget.do_base_layout();
 
-        if let Some(ref icon_id) = widget.theme.custom.get("icon") {
+        if let Some(icon_id) = widget.theme.custom.get("icon") {
             self.icon = ResourceSet::image(icon_id);
         }
     }

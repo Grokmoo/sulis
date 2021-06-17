@@ -77,7 +77,7 @@ impl WidgetKind for ModsSelector {
         let active = Widget::with_theme(active_pane.clone(), "active");
 
         self.available_mods
-            .sort_by(|ref a, ref b| a.name.cmp(&b.name));
+            .sort_by(|a, b| a.name.cmp(&b.name));
 
         let len = self.available_mods.len();
         for (index, modif) in self.available_mods.iter().enumerate() {

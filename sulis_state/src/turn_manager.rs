@@ -201,21 +201,21 @@ impl TurnManager {
 
     pub fn effect_iter(&self) -> EffectIterator {
         EffectIterator {
-            mgr: &self,
+            mgr: self,
             index: 0,
         }
     }
 
     pub fn active_iter(&self) -> ActiveEntityIterator {
         ActiveEntityIterator {
-            mgr: &self,
+            mgr: self,
             entry_iter: self.order.iter(),
         }
     }
 
     pub fn entity_iter(&self) -> EntityIterator {
         EntityIterator {
-            mgr: &self,
+            mgr: self,
             index: 0,
         }
     }
@@ -281,7 +281,7 @@ impl TurnManager {
         let indices: Vec<_> = self.entities_move_callback_next_update.drain().collect();
         for index in indices {
             let entity = self.entity(index);
-            cbs.append(&mut entity.borrow().callbacks(&self));
+            cbs.append(&mut entity.borrow().callbacks(self));
         }
 
         cbs
@@ -386,14 +386,14 @@ impl TurnManager {
     pub fn next(&mut self) -> Vec<Rc<CallbackData>> {
         if self.is_combat_active() && self.check_combat_run_away() {
             self.set_combat_active(false);
-            self.listeners.notify(&self);
+            self.listeners.notify(self);
             return Vec::new();
         }
 
         let cbs = self.iterate_to_next_entity();
         self.init_turn_for_current_entity(&mut GameState::area_state().borrow_mut());
 
-        self.listeners.notify(&self);
+        self.listeners.notify(self);
         cbs
     }
 
@@ -424,7 +424,7 @@ impl TurnManager {
                 (loc.x, loc.y)
             };
             let cb = OnTrigger::ScrollView(x, y);
-            GameState::add_ui_callback(vec![cb], &current, &current);
+            GameState::add_ui_callback(vec![cb], current, current);
         }
 
         let mut current = current.borrow_mut();
@@ -541,7 +541,7 @@ impl TurnManager {
             if !entity.is_hostile(&mover.borrow()) {
                 continue;
             }
-            if !entity.location.is_in(&area_state) {
+            if !entity.location.is_in(area_state) {
                 continue;
             }
             if entity.actor.actor.ai.is_none() && !entity.is_party_member() {
@@ -575,7 +575,7 @@ impl TurnManager {
             if entity.is_ai_active() {
                 continue;
             }
-            if !entity.location.is_in(&area_state) {
+            if !entity.location.is_in(area_state) {
                 continue;
             }
 
@@ -592,12 +592,12 @@ impl TurnManager {
         for group in &groups_to_activate {
             let enc_ref = self.ai_groups.get(group).unwrap().clone();
             if enc_ref.area_id == area_state.area.area.id {
-                area_state.fire_on_encounter_activated(enc_ref.encounter_index, &mover);
+                area_state.fire_on_encounter_activated(enc_ref.encounter_index, mover);
             } else {
                 let area_state = GameState::get_area_state(&enc_ref.area_id).unwrap();
                 area_state
                     .borrow_mut()
-                    .fire_on_encounter_activated(enc_ref.encounter_index, &mover);
+                    .fire_on_encounter_activated(enc_ref.encounter_index, mover);
             }
         }
 
@@ -620,7 +620,7 @@ impl TurnManager {
             self.init_turn_for_current_entity(area_state);
         }
 
-        self.listeners.notify(&self);
+        self.listeners.notify(self);
     }
 
     fn activate_entity_ai(&self, entity: &mut EntityState, groups: &mut HashSet<usize>) {
@@ -811,7 +811,7 @@ impl TurnManager {
 
         for cb in surface.callbacks.iter() {
             let cb = TriggeredCallback::with_target(
-                Rc::clone(&cb),
+                Rc::clone(cb),
                 FuncKind::OnEnteredSurface,
                 entity_index,
             );
@@ -834,7 +834,7 @@ impl TurnManager {
 
         for cb in surface.callbacks.iter() {
             let cb = TriggeredCallback::with_target(
-                Rc::clone(&cb),
+                Rc::clone(cb),
                 FuncKind::OnExitedSurface,
                 entity_index,
             );
@@ -875,7 +875,7 @@ impl TurnManager {
 
         entity.borrow_mut().set_index(index);
         entity.borrow_mut().actor.init_turn();
-        self.listeners.notify(&self);
+        self.listeners.notify(self);
 
         index
     }
@@ -981,7 +981,7 @@ impl TurnManager {
         let cbs;
         let mut entities = HashSet::new();
         if let Some(effect) = &self.effects[index] {
-            if let Some((ref area_id, ref points)) = effect.surface() {
+            if let Some((area_id, points)) = effect.surface() {
                 let area = GameState::get_area_state(area_id).unwrap();
                 entities = area.borrow_mut().remove_surface(index, points);
             }
@@ -1040,7 +1040,7 @@ impl TurnManager {
     fn remove_entity(&mut self, index: usize) {
         let entity = Rc::clone(self.entities[index].as_ref().unwrap());
         let area_state = GameState::get_area_state(&entity.borrow().location.area_id).unwrap();
-        let surfaces = area_state.borrow_mut().remove_entity(&entity, &self);
+        let surfaces = area_state.borrow_mut().remove_entity(&entity, self);
 
         for surface in surfaces.iter() {
             self.remove_from_surface(index, *surface);
@@ -1091,7 +1091,7 @@ impl TurnManager {
                 .fire_on_encounter_cleared(enc_ref.encounter_index, &entity);
         }
 
-        self.listeners.notify(&self);
+        self.listeners.notify(self);
     }
 }
 

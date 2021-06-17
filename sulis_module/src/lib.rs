@@ -642,7 +642,7 @@ impl Module {
             insert_if_ok(
                 "feature",
                 id.to_string(),
-                Feature::new(id, feature_builder, &module),
+                Feature::new(id, feature_builder, module),
                 &mut module.features,
             );
         }
@@ -714,23 +714,23 @@ impl Module {
             new_id.push_str(id);
             new_id.push_str("__ADJ__");
             for adj in adjectives.iter() {
-                new_id.push_str(&adj);
+                new_id.push_str(adj);
             }
 
-            if let Some(ref item) = module.items.get(&new_id) {
+            if let Some(item) = module.items.get(&new_id) {
                 return Some(Rc::clone(item));
             }
 
             let base_item = match module.items.get(id) {
                 None => return None,
-                Some(ref item) => Rc::clone(item),
+                Some(item) => Rc::clone(item),
             };
 
             let mut adjs = Vec::new();
             for adj_id in adjectives.iter() {
                 let adjective = match module.item_adjectives.get(adj_id) {
                     None => return None,
-                    Some(ref adj) => Rc::clone(adj),
+                    Some(adj) => Rc::clone(adj),
                 };
                 adjs.push(adjective);
             }

@@ -189,7 +189,7 @@ impl ActorState {
 
     pub fn add_anim_image_layers(&mut self, images: &HashMap<ImageLayer, Rc<dyn Image>>) {
         let mut change = false;
-        for (layer, ref image) in images.iter() {
+        for (layer, image) in images.iter() {
             if let Some(img) = self.anim_image_layers.get(layer) {
                 if img.id() == image.id() { continue; }
             }
@@ -319,7 +319,7 @@ impl ActorState {
     pub fn can_use_quick(&self, slot: QuickSlot) -> bool {
         match self.inventory.quick(slot) {
             None => false,
-            Some(ref item) => self.can_use(item),
+            Some(item) => self.can_use(item),
         }
     }
 
@@ -370,7 +370,7 @@ impl ActorState {
 
         match self.ability_states.get(id) {
             None => NoSuchAbility,
-            Some(ref state) => {
+            Some(state) => {
                 if state.is_active_mode() {
                     return Enabled;
                 }
@@ -399,7 +399,7 @@ impl ActorState {
 
         match self.ability_states.get(id) {
             None => false,
-            Some(ref state) => {
+            Some(state) => {
                 if self.p_stats.ap() < state.activate_ap() {
                     return false;
                 }
@@ -560,7 +560,7 @@ impl ActorState {
     #[must_use]
     pub fn set_quick(&mut self, item: ItemState, slot: QuickSlot) -> Option<ItemState> {
         let item = self.inventory.set_quick(item, slot);
-        self.listeners.notify(&self);
+        self.listeners.notify(self);
         item
     }
 
@@ -569,7 +569,7 @@ impl ActorState {
     #[must_use]
     pub fn clear_quick(&mut self, slot: QuickSlot) -> Option<ItemState> {
         let item = self.inventory.clear_quick(slot);
-        self.listeners.notify(&self);
+        self.listeners.notify(self);
         item
     }
 
@@ -611,7 +611,7 @@ impl ActorState {
             return false;
         }
 
-        self.inventory.can_equip(&item, &self.stats, &self.actor)
+        self.inventory.can_equip(item, &self.stats, &self.actor)
     }
 
     pub fn can_unequip(&self, _slot: Slot) -> bool {
@@ -708,7 +708,7 @@ impl ActorState {
 
     pub fn add_xp(&mut self, xp: u32) {
         self.p_stats.add_xp(xp, &self.actor);
-        self.listeners.notify(&self);
+        self.listeners.notify(self);
     }
 
     pub fn xp(&self) -> u32 {
@@ -743,38 +743,38 @@ impl ActorState {
 
     pub(crate) fn add_ap(&mut self, ap: u32) {
         self.p_stats.add_ap(ap);
-        self.listeners.notify(&self);
+        self.listeners.notify(self);
     }
 
     pub(crate) fn remove_class_stats(&mut self, ability: &Ability) {
         self.p_stats.remove_class_stats(ability);
-        self.listeners.notify(&self);
+        self.listeners.notify(self);
     }
 
     pub(crate) fn remove_ap(&mut self, ap: u32) {
         self.p_stats.remove_ap(ap);
-        self.listeners.notify(&self);
+        self.listeners.notify(self);
     }
 
     pub(crate) fn remove_hp(&mut self, hp: u32) {
         self.p_stats.remove_hp(hp);
-        self.listeners.notify(&self);
+        self.listeners.notify(self);
     }
 
     pub(crate) fn add_hp(&mut self, hp: u32) {
         self.p_stats.add_hp(hp, self.stats.max_hp);
-        self.listeners.notify(&self);
+        self.listeners.notify(self);
     }
 
     pub(crate) fn remove_class_stat(&mut self, stat: &str, amount: u32) {
         self.p_stats.remove_class_stat(stat, amount);
-        self.listeners.notify(&self);
+        self.listeners.notify(self);
     }
 
     pub(crate) fn add_class_stat(&mut self, stat: &str, amount: u32) {
         let max = self.stats.class_stat_max(stat);
         self.p_stats.add_class_stat(stat, amount, max);
-        self.listeners.notify(&self);
+        self.listeners.notify(self);
     }
 
     pub fn elapse_time(&mut self, millis_elapsed: u32, all_effects: &[Option<Effect>]) {
@@ -807,12 +807,12 @@ impl ActorState {
 
     pub fn init_day(&mut self) {
         self.p_stats.init_day(&self.stats);
-        self.listeners.notify(&self);
+        self.listeners.notify(self);
     }
 
     pub fn end_encounter(&mut self) {
         self.p_stats.end_encounter(&self.stats);
-        self.listeners.notify(&self);
+        self.listeners.notify(self);
     }
 
     pub fn init_turn(&mut self) {
@@ -826,12 +826,12 @@ impl ActorState {
         self.started_turn_with_no_ap_for_actions = !self.has_ap_for_any_action();
         debug!("Initial AP: {}", self.ap());
 
-        self.listeners.notify(&self);
+        self.listeners.notify(self);
     }
 
     pub fn end_turn(&mut self) {
         self.p_stats.end_turn();
-        self.listeners.notify(&self);
+        self.listeners.notify(self);
     }
 
     pub fn compute_stats(&mut self) {
@@ -906,7 +906,7 @@ impl ActorState {
 
         let mut equipped_armor = HashMap::new();
         for slot in Slot::iter() {
-            if let Some(ref item_state) = self.inventory.equipped(*slot) {
+            if let Some(item_state) = self.inventory.equipped(*slot) {
                 if let ItemKind::Armor { kind } = item_state.item.kind {
                     equipped_armor.insert(*slot, kind);
                 }
@@ -926,6 +926,6 @@ impl ActorState {
 
         self.p_stats.recompute_level_up(&self.actor);
 
-        self.listeners.notify(&self);
+        self.listeners.notify(self);
     }
 }

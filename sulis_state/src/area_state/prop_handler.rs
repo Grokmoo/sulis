@@ -52,7 +52,7 @@ impl PropHandler {
     pub fn populate(&mut self, props: &[PropData]) {
         for data in props {
             let location = Location::from_point(data.location, &self.area);
-            if let Err(e) = self.add(&data, location, false) {
+            if let Err(e) = self.add(data, location, false) {
                 warn!("Unable to add prop at {:?}", &data.location);
                 warn!("{}", e);
             }
@@ -289,7 +289,7 @@ impl PropHandler {
 
     pub fn iter(&self) -> PropIterator {
         PropIterator {
-            handler: &self,
+            handler: self,
             index: 0,
         }
     }
@@ -304,7 +304,7 @@ impl PropHandler {
     }
 
     pub fn get(&self, index: usize) -> &PropState {
-        &self.props[index].as_ref().unwrap()
+        self.props[index].as_ref().unwrap()
     }
 
     pub fn get_mut(&mut self, index: usize) -> &mut PropState {

@@ -48,7 +48,7 @@ impl WidgetKind for QuestWindow {
         let quests = GameState::quest_state();
 
         if self.active_quest.is_none() {
-            if let Some(ref current_id) = quests.current_quest() {
+            if let Some(current_id) = quests.current_quest() {
                 if let Some(quest) = Module::quest(current_id) {
                     self.active_quest = Some(quest);
                 }
@@ -142,7 +142,7 @@ impl WidgetKind for QuestWindow {
         let quest_entries_widget = Widget::with_theme(quest_entries_pane.clone(), "quest_entries");
 
         if let Some(ref quest) = self.active_quest {
-            if let Some(ref quest_state) = quests.quest(&quest.id) {
+            if let Some(quest_state) = quests.quest(&quest.id) {
                 for (id, _quest_entry) in quest_state.iter().rev() {
                     let active = match quests.entry_state(&quest.id, id) {
                         QuestEntryState::Hidden => continue,
@@ -157,7 +157,7 @@ impl WidgetKind for QuestWindow {
                         let state = &mut entry.borrow_mut().state;
                         state.set_active(active);
 
-                        if let Some(ref quest_data) = quest.entries.get(id) {
+                        if let Some(quest_data) = quest.entries.get(id) {
                             state.add_text_arg("description", &quest_data.description);
                         }
                     }

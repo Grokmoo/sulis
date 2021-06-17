@@ -72,7 +72,7 @@ impl WidgetKind for PortraitView {
                 widget.borrow_mut().state.set_visible(false);
                 widget
             }
-            Some(ref stat) => {
+            Some(stat) => {
                 let cur = entity.actor.current_class_stat(&stat.id);
                 let max = entity.actor.stats.class_stat_max(&stat.id);
                 let frac = cur.divide(max);
@@ -94,7 +94,7 @@ impl WidgetKind for PortraitView {
             .borrow_mut()
             .state
             .add_callback(Callback::new(Rc::new(move |widget, _| {
-                let root = Widget::get_root(&widget);
+                let root = Widget::get_root(widget);
                 let window =
                     Widget::with_defaults(CharacterBuilder::level_up(Rc::clone(&entity_ref)));
                 window.borrow_mut().state.set_modal(true);

@@ -66,43 +66,43 @@ pub struct EdgesList {
 impl EdgesList {
     pub fn new(id: &str, prefix: &str, rules: &EdgeRules) -> Result<EdgesList, Error> {
         let inner_nw =
-            EdgesList::get_edge(&prefix, &id, &rules.inner_edge_postfix, &rules.nw_postfix);
+            EdgesList::get_edge(prefix, id, &rules.inner_edge_postfix, &rules.nw_postfix);
         let inner_ne =
-            EdgesList::get_edge(&prefix, &id, &rules.inner_edge_postfix, &rules.ne_postfix);
+            EdgesList::get_edge(prefix, id, &rules.inner_edge_postfix, &rules.ne_postfix);
         let inner_sw =
-            EdgesList::get_edge(&prefix, &id, &rules.inner_edge_postfix, &rules.sw_postfix);
+            EdgesList::get_edge(prefix, id, &rules.inner_edge_postfix, &rules.sw_postfix);
         let inner_se =
-            EdgesList::get_edge(&prefix, &id, &rules.inner_edge_postfix, &rules.se_postfix);
+            EdgesList::get_edge(prefix, id, &rules.inner_edge_postfix, &rules.se_postfix);
 
         let outer_n =
-            EdgesList::get_edge(&prefix, &id, &rules.outer_edge_postfix, &rules.n_postfix);
+            EdgesList::get_edge(prefix, id, &rules.outer_edge_postfix, &rules.n_postfix);
         let outer_s =
-            EdgesList::get_edge(&prefix, &id, &rules.outer_edge_postfix, &rules.s_postfix);
+            EdgesList::get_edge(prefix, id, &rules.outer_edge_postfix, &rules.s_postfix);
         let outer_e =
-            EdgesList::get_edge(&prefix, &id, &rules.outer_edge_postfix, &rules.e_postfix);
+            EdgesList::get_edge(prefix, id, &rules.outer_edge_postfix, &rules.e_postfix);
         let outer_w =
-            EdgesList::get_edge(&prefix, &id, &rules.outer_edge_postfix, &rules.w_postfix);
+            EdgesList::get_edge(prefix, id, &rules.outer_edge_postfix, &rules.w_postfix);
         let outer_ne =
-            EdgesList::get_edge(&prefix, &id, &rules.outer_edge_postfix, &rules.ne_postfix);
+            EdgesList::get_edge(prefix, id, &rules.outer_edge_postfix, &rules.ne_postfix);
         let outer_nw =
-            EdgesList::get_edge(&prefix, &id, &rules.outer_edge_postfix, &rules.nw_postfix);
+            EdgesList::get_edge(prefix, id, &rules.outer_edge_postfix, &rules.nw_postfix);
         let outer_se =
-            EdgesList::get_edge(&prefix, &id, &rules.outer_edge_postfix, &rules.se_postfix);
+            EdgesList::get_edge(prefix, id, &rules.outer_edge_postfix, &rules.se_postfix);
         let outer_sw =
-            EdgesList::get_edge(&prefix, &id, &rules.outer_edge_postfix, &rules.sw_postfix);
+            EdgesList::get_edge(prefix, id, &rules.outer_edge_postfix, &rules.sw_postfix);
         let outer_all =
-            EdgesList::get_edge(&prefix, &id, &rules.outer_edge_postfix, &rules.all_postfix);
+            EdgesList::get_edge(prefix, id, &rules.outer_edge_postfix, &rules.all_postfix);
 
         let inner_ne_sw = EdgesList::get_edge(
-            &prefix,
-            &id,
+            prefix,
+            id,
             &rules.inner_edge_postfix,
             &rules.ne_sw_postfix,
         );
 
         let inner_nw_se = EdgesList::get_edge(
-            &prefix,
-            &id,
+            prefix,
+            id,
             &rules.inner_edge_postfix,
             &rules.nw_se_postfix,
         );
@@ -230,7 +230,7 @@ impl TerrainTiles {
             None => &self.edges,
             Some(index) => match self.borders.get(&index) {
                 None => &self.edges,
-                Some(ref edges) => edges,
+                Some(edges) => edges,
             },
         }
     }

@@ -354,7 +354,7 @@ impl AreaView {
             w: (TILE_CACHE_TEXTURE_SIZE / TILE_SIZE) as f32,
             h: (TILE_CACHE_TEXTURE_SIZE / TILE_SIZE) as f32,
         };
-        let mut draw_list = DrawList::from_texture_id(&id, &TEX_COORDS, rect);
+        let mut draw_list = DrawList::from_texture_id(id, &TEX_COORDS, rect);
         draw_list.set_scale(scale);
         draw_list.set_color(color);
         renderer.draw(draw_list);
@@ -511,7 +511,7 @@ impl AreaView {
             };
             trace!("Caching layer '{}'", layer.id);
 
-            self.draw_layer_to_texture(renderer, &layer, texture_id);
+            self.draw_layer_to_texture(renderer, layer, texture_id);
         }
 
         self.entity_texture_cache.invalidate();
@@ -584,7 +584,7 @@ impl WidgetKind for AreaView {
 
         self.overlay_handler.apply_theme(theme);
 
-        if let Some(ref image_id) = theme.custom.get("targeter_tile") {
+        if let Some(image_id) = theme.custom.get("targeter_tile") {
             self.targeter_tile = ResourceSet::image(image_id);
         }
 
@@ -627,24 +627,24 @@ impl WidgetKind for AreaView {
                 theme.get_custom_or_default(&id, color::LIGHT_GRAY);
         }
 
-        if let Some(ref image_id) = theme.custom.get("feedback_icon_concealment") {
+        if let Some(image_id) = theme.custom.get("feedback_icon_concealment") {
             self.feedback_text_params.concealment_icon = ResourceSet::image_else_empty(image_id);
         }
 
-        if let Some(ref image_id) = theme.custom.get("feedback_icon_backstab") {
+        if let Some(image_id) = theme.custom.get("feedback_icon_backstab") {
             self.feedback_text_params.backstab_icon = ResourceSet::image_else_empty(image_id);
         }
-        if let Some(ref image_id) = theme.custom.get("feedback_icon_flanking") {
+        if let Some(image_id) = theme.custom.get("feedback_icon_flanking") {
             self.feedback_text_params.flanking_icon = ResourceSet::image_else_empty(image_id);
         }
 
-        if let Some(ref image_id) = theme.custom.get("feedback_icon_crit") {
+        if let Some(image_id) = theme.custom.get("feedback_icon_crit") {
             self.feedback_text_params.crit_icon = ResourceSet::image_else_empty(image_id);
         }
-        if let Some(ref image_id) = theme.custom.get("feedback_icon_hit") {
+        if let Some(image_id) = theme.custom.get("feedback_icon_hit") {
             self.feedback_text_params.hit_icon = ResourceSet::image_else_empty(image_id);
         }
-        if let Some(ref image_id) = theme.custom.get("feedback_icon_graze") {
+        if let Some(image_id) = theme.custom.get("feedback_icon_graze") {
             self.feedback_text_params.graze_icon = ResourceSet::image_else_empty(image_id);
         }
 
@@ -796,7 +796,7 @@ impl WidgetKind for AreaView {
             x: self.scroll.x(),
             y: self.scroll.y(),
         };
-        if let Some(ref indicator) = state.range_indicator() {
+        if let Some(indicator) = state.range_indicator() {
             let mut draw_list = indicator.get_draw_list(image_set, offset, millis);
             draw_list.set_scale(scale);
             renderer.draw(draw_list);
@@ -841,7 +841,7 @@ impl WidgetKind for AreaView {
                 .overlay_handler
                 .select_party_in_box(widget, self.scale, scroll);
             for entity in party.iter() {
-                self.draw_selection(&entity, renderer, scale, widget, millis);
+                self.draw_selection(entity, renderer, scale, widget, millis);
             }
         }
 
@@ -853,7 +853,7 @@ impl WidgetKind for AreaView {
         GameState::draw_above_entities(renderer, offset, scale, millis);
         self.draw_layer(renderer, scale, widget, AERIAL_LAYER_ID, area_color);
 
-        if let Some(ref hover) = self.overlay_handler.hover_sprite() {
+        if let Some(hover) = self.overlay_handler.hover_sprite() {
             let rect = Rect {
                 x: (hover.x + p.x) as f32 - self.scroll.x(),
                 y: (hover.y + p.y) as f32 - self.scroll.y(),

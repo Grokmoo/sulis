@@ -147,7 +147,7 @@ impl WidgetKind for WorldMapWindow {
                 )
             };
 
-            if add_callback && !add_travel_callback(&cur_location_id, &location, &button, &label) {
+            if add_callback && !add_travel_callback(&cur_location_id, location, &button, &label) {
                 button.borrow_mut().state.set_enabled(false);
             }
 
@@ -215,7 +215,7 @@ fn travel_callback(area_id: String, x: i32, y: i32, travel_time: Time) -> Callba
             Point::default(),
             travel_time,
         );
-        let root = Widget::get_root(&widget);
+        let root = Widget::get_root(widget);
         root.borrow_mut().invalidate_children();
     }))
 }

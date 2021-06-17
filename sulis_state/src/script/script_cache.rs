@@ -136,7 +136,7 @@ where
             });
         }
 
-        Ok(Rc::clone(&cache.get(id).unwrap()))
+        Ok(Rc::clone(cache.get(id).unwrap()))
     })?;
 
     let reporting = REPORTING.with(|r| r.get());

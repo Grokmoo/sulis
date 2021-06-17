@@ -71,7 +71,7 @@ impl<'a, 'b> EncounterGen<'a, 'b> {
                         .to_region_coords(data.x + data.w, data.y + data.h),
                 );
 
-                if !pass.allowable_regions.check_coords(&self.maze, p1, p2) {
+                if !pass.allowable_regions.check_coords(self.maze, p1, p2) {
                     continue;
                 }
 

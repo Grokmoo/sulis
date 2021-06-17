@@ -153,7 +153,7 @@ impl WidgetKind for AttributeSelectorPane {
         };
 
         let kits_pane = Widget::empty("kits_pane");
-        for (index, ref kit) in class.kits.iter().enumerate() {
+        for (index, kit) in class.kits.iter().enumerate() {
             let kit_button = Widget::with_theme(Button::empty(), "kit_button");
             kit_button
                 .borrow_mut()
@@ -304,7 +304,7 @@ impl WidgetKind for AbilityButton {
         );
 
         Widget::set_mouse_over_widget(
-            &widget,
+            widget,
             hover,
             widget.borrow().state.inner_right(),
             widget.borrow().state.inner_top(),

@@ -439,7 +439,7 @@ impl UserData for ScriptInterface {
                 .iter()
                 .map(|e| Some(Rc::clone(e)))
                 .collect();
-            Ok(ScriptEntitySet::new(&parent, &affected))
+            Ok(ScriptEntitySet::new(parent, &affected))
         });
 
         methods.add_method("get_targeter_selectable", |_, _, ()| {
@@ -451,7 +451,7 @@ impl UserData for ScriptInterface {
                 .iter()
                 .map(|e| Some(Rc::clone(e)))
                 .collect();
-            Ok(ScriptEntitySet::new(&parent, &selectable))
+            Ok(ScriptEntitySet::new(parent, &selectable))
         });
 
         methods.add_method("is_targeter_free_select", |_, _, ()| {

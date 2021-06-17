@@ -196,7 +196,7 @@ impl PregenOutput {
         })?;
 
         let (w, h) = (area.width, area.height);
-        let transition_out = generator.generate_transitions(w, h, &mut rand, &params)?;
+        let transition_out = generator.generate_transitions(w, h, &mut rand, params)?;
 
         info!(
             "Area pregen complete in {} secs",

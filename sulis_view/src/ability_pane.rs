@@ -72,7 +72,7 @@ impl WidgetKind for AbilityPane {
             Some(ref ability) => ability,
         };
 
-        add_ability_text_args(&mut self.details.borrow_mut().state, &ability);
+        add_ability_text_args(&mut self.details.borrow_mut().state, ability);
 
         vec![Rc::clone(&self.details)]
     }

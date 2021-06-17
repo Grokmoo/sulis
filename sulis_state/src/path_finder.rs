@@ -42,7 +42,7 @@ impl<'a, 'b> StateLocationChecker<'a, 'b> {
         use_explored: bool,
     ) -> StateLocationChecker<'a, 'b> {
         let width = area_state.area.width;
-        let grid = &area_state.area.path_grid(&requester.size());
+        let grid = &area_state.area.path_grid(requester.size());
         let prop_grid = area_state.props().entire_pass_grid();
         let entity_grid = &area_state.entity_grid;
         let explored = if use_explored {

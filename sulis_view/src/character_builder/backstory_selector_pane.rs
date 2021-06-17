@@ -103,7 +103,7 @@ impl WidgetKind for BackstorySelectorPane {
         let responses = Widget::empty("responses");
         {
             for response in self.convo.responses(&self.cur_node) {
-                let response_button = ResponseButton::new(&response);
+                let response_button = ResponseButton::new(response);
                 let widget = Widget::with_defaults(response_button);
                 Widget::add_child_to(&responses, widget);
             }

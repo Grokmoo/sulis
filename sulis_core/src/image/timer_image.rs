@@ -64,7 +64,7 @@ impl TimerImage {
                 }
             }
 
-            frames.push(Rc::clone(&image));
+            frames.push(Rc::clone(image));
         }
 
         let total_frame_time = builder.frame_time_millis * frames.len() as u32;

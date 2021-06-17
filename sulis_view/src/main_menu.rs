@@ -118,7 +118,7 @@ impl WidgetKind for MainMenu {
                     "exit_confirmation_window",
                 );
                 exit_window.borrow_mut().state.set_modal(true);
-                Widget::add_child_to(&widget, exit_window);
+                Widget::add_child_to(widget, exit_window);
             }
             _ => return false,
         }

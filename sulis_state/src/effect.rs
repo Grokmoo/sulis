@@ -90,7 +90,7 @@ impl Effect {
                             aura
                         ));
                     }
-                    Some(ref entity) => {
+                    Some(entity) => {
                         surface.aura = Some(entity.borrow().index());
                     }
                 }
@@ -246,7 +246,7 @@ impl Effect {
         self.cur_duration += millis_elapsed;
 
         if cur_mod != self.cur_duration / ROUND_TIME_MILLIS {
-            self.listeners.notify(&self);
+            self.listeners.notify(self);
 
             return self.callbacks.clone();
         }
@@ -259,7 +259,7 @@ impl Effect {
             ExtInt::Infinity => false,
             ExtInt::Int(total_duration) => {
                 if self.cur_duration >= total_duration {
-                    self.removal_listeners.notify(&self);
+                    self.removal_listeners.notify(self);
                     debug!("Removing effect");
                     true
                 } else {

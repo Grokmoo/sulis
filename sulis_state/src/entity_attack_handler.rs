@@ -122,7 +122,7 @@ pub fn weapon_attack(
     }
 
     if had_crit {
-        GameState::add_ui_callback(vec![OnTrigger::ScreenShake], &parent, &target);
+        GameState::add_ui_callback(vec![OnTrigger::ScreenShake], parent, target);
     }
 
     ActorState::check_death(parent, target);

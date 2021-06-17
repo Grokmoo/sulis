@@ -113,7 +113,7 @@ impl LootList {
                 "Item adjective and variant may not be specified in loot sub_list entries: '{}'",
                 id
             );
-            return unable_to_create_error("loot_list", &builder_id);
+            return unable_to_create_error("loot_list", builder_id);
         }
 
         let (min_qty, max_qty) = match entry_in.quantity {
@@ -142,7 +142,7 @@ impl LootList {
     ) -> Result<Entry, Error> {
         if module.items.get(&id).is_none() {
             warn!("Unable to find item '{}'", id);
-            return unable_to_create_error("loot_list", &builder_id);
+            return unable_to_create_error("loot_list", builder_id);
         }
 
         let (min_qty, max_qty) = match entry_in.quantity {
@@ -159,7 +159,7 @@ impl LootList {
             }
             if module.item_adjectives.get(&id).is_none() {
                 warn!("Unable to find item adjective '{}'", id);
-                return unable_to_create_error("loot_list", &builder_id);
+                return unable_to_create_error("loot_list", builder_id);
             }
             adjective1.push((id, weight));
         }
@@ -173,7 +173,7 @@ impl LootList {
             }
             if module.item_adjectives.get(&id).is_none() {
                 warn!("Unable to find item adjective '{}'", id);
-                return unable_to_create_error("loot_list", &builder_id);
+                return unable_to_create_error("loot_list", builder_id);
             }
             adjective2.push((id, weight));
         }
@@ -189,7 +189,7 @@ impl LootList {
                 Ok(val) => val,
                 Err(_) => {
                     warn!("Variant IDs must be parsable integers: '{}'", id);
-                    return unable_to_create_error("loot_list", &builder_id);
+                    return unable_to_create_error("loot_list", builder_id);
                 }
             };
             variant.push((value, weight));

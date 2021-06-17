@@ -211,7 +211,7 @@ impl Item {
                     warn!("No item adjective found with id '{}'", adj_id);
                     return unable_to_create_error("item", &builder.id);
                 }
-                Some(ref adj) => Rc::clone(adj),
+                Some(adj) => Rc::clone(adj),
             };
             adjectives.push(adjective);
         }

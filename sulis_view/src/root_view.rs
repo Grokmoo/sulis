@@ -123,7 +123,7 @@ impl RootView {
             #[allow(clippy::manual_map)] // clippy suggest does not work here
             match GameState::selected().first() {
                 None => None,
-                Some(ref entity) => Some(MerchantWindow::new(merchant_id, Rc::clone(entity))),
+                Some(entity) => Some(MerchantWindow::new(merchant_id, Rc::clone(entity))),
             }
         });
 
@@ -140,7 +140,7 @@ impl RootView {
             #[allow(clippy::manual_map)] // clippy suggest does not work here
             match GameState::selected().first() {
                 None => None,
-                Some(ref entity) => Some(PropWindow::new(prop_index, Rc::clone(entity))),
+                Some(entity) => Some(PropWindow::new(prop_index, Rc::clone(entity))),
             }
         });
 
@@ -152,7 +152,7 @@ impl RootView {
             #[allow(clippy::manual_map)] // clippy suggest does not work here
             match GameState::selected().first() {
                 None => None,
-                Some(ref entity) => Some(InventoryWindow::new(entity)),
+                Some(entity) => Some(InventoryWindow::new(entity)),
             }
         });
     }
@@ -162,7 +162,7 @@ impl RootView {
             #[allow(clippy::manual_map)] // clippy suggest does not work here
             match GameState::selected().first() {
                 None => None,
-                Some(ref entity) => Some(CharacterWindow::new(entity)),
+                Some(entity) => Some(CharacterWindow::new(entity)),
             }
         });
     }
@@ -215,7 +215,7 @@ impl RootView {
                         Some(kind) => kind,
                     };
                     let window = Widget::with_defaults(widget_kind);
-                    Widget::add_child_to(&widget, window);
+                    Widget::add_child_to(widget, window);
                 }
             }
             Some(ref window) => {
@@ -285,7 +285,7 @@ impl RootView {
 
         let menu = Widget::with_defaults(InGameMenu::new(exit_cb, menu_cb));
         menu.borrow_mut().state.set_modal(true);
-        Widget::add_child_to(&widget, menu);
+        Widget::add_child_to(widget, menu);
     }
 
     pub fn show_exit(&mut self, widget: &Rc<RefCell<Widget>>) {
@@ -460,7 +460,7 @@ impl WidgetKind for RootView {
             SelectPartyMember4 => self.select_party_member(3),
             _ => {
                 if let Some(quick_item_bar) = &self.quick_item_bar {
-                    let bar: &QuickItemBar = Widget::kind(&quick_item_bar);
+                    let bar: &QuickItemBar = Widget::kind(quick_item_bar);
                     if bar.check_handle_keybinding(key) {
                         return true;
                     }

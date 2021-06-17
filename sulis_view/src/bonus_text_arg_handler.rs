@@ -126,7 +126,7 @@ fn add_bonus(
 ) {
     use sulis_module::BonusKind::*;
     match &bonus.kind {
-        Attribute { attribute, amount } => add(state, &attribute.short_name(), amount),
+        Attribute { attribute, amount } => add(state, attribute.short_name(), amount),
         ActionPoints(amount) => add(state, "action_points", Module::rules().format_ap(*amount)),
         Armor(amount) => armor.add_base(*amount),
         ArmorKind { kind, amount } => armor.add_kind(*kind, *amount),

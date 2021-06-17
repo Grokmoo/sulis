@@ -121,7 +121,7 @@ impl WidgetKind for InventoryWindow {
                     Widget::add_child_to(&equipped_area, button);
                 }
                 Some(item_state) => {
-                    let button = ItemButton::equipped(&self.entity, &item_state, *slot);
+                    let button = ItemButton::equipped(&self.entity, item_state, *slot);
                     if actor.can_unequip(*slot) {
                         let mut but = button.borrow_mut();
                         but.add_action("Unequip", unequip_item_cb(&self.entity, *slot), true);
@@ -148,8 +148,8 @@ impl WidgetKind for InventoryWindow {
                     Widget::add_child_to(&equipped_area, button);
                 }
                 Some(item_state) => {
-                    let quantity = 1 + stash.borrow().items().get_quantity(&item_state);
-                    let but = ItemButton::quick(&self.entity, quantity, &item_state, *quick_slot);
+                    let quantity = 1 + stash.borrow().items().get_quantity(item_state);
+                    let but = ItemButton::quick(&self.entity, quantity, item_state, *quick_slot);
 
                     if actor.can_use_quick(*quick_slot) {
                         let kind = ScriptItemKind::Quick(*quick_slot);

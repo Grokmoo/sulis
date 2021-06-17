@@ -106,7 +106,7 @@ impl AreaMouseover {
                 }
             }
             Kind::Transition(ref name) => {
-                state.add_text_arg("name", &name);
+                state.add_text_arg("name", name);
             }
         }
 

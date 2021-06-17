@@ -57,7 +57,7 @@ impl Ord for Point {
 
 impl PartialOrd for Point {
     fn partial_cmp(&self, other: &Point) -> Option<cmp::Ordering> {
-        Some(self.cmp(&other))
+        Some(self.cmp(other))
     }
 }
 

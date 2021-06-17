@@ -460,7 +460,7 @@ impl EntityState {
                 target,
                 time * 5,
                 cbs,
-                Box::new(|a, d| weapon_attack(&a, &d)),
+                Box::new(|a, d| weapon_attack(a, d)),
             );
             GameState::add_animation(anim);
         } else if entity.borrow().actor.stats.attack_is_ranged() {
@@ -506,7 +506,7 @@ impl EntityState {
             let anim = Anim::new_entity_death(entity);
             GameState::add_animation(anim);
         } else {
-            GameState::create_damage_animation(&entity);
+            GameState::create_damage_animation(entity);
         }
     }
 
@@ -536,7 +536,7 @@ impl EntityState {
         }
 
         self.location.move_to(x, y);
-        self.listeners.notify(&self);
+        self.listeners.notify(self);
         true
     }
 
@@ -613,13 +613,13 @@ impl AreaDrawable for EntityState {
         texture_cache: &mut EntityTextureCache,
     ) {
         if self.texture_cache_slot.is_none() {
-            self.texture_cache_slot = Some(texture_cache.add_entity(&self, renderer));
+            self.texture_cache_slot = Some(texture_cache.add_entity(self, renderer));
             self.actor.check_texture_cache_invalid();
         }
 
         if self.actor.check_texture_cache_invalid() {
             let slot = &self.texture_cache_slot.as_ref().unwrap();
-            slot.redraw_entity(&self, renderer);
+            slot.redraw_entity(self, renderer);
         }
     }
 

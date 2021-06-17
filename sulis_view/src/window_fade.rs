@@ -100,7 +100,7 @@ impl WidgetKind for WindowFade {
         self.fade_millis = theme.get_custom_or_default("fade_millis", 1000);
         self.pause_millis = theme.get_custom_or_default("pause_millis", 1000);
 
-        if let Some(ref image_id) = theme.custom.get("fill_image") {
+        if let Some(image_id) = theme.custom.get("fill_image") {
             self.fill = ResourceSet::image(image_id);
         }
         widget.do_base_layout();

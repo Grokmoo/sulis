@@ -109,7 +109,7 @@ impl CosmeticSelectorPane {
         }
 
         let images_list =
-            image_layers.get_list_with(self.sex, &race, self.hair_color, self.skin_color, insert);
+            image_layers.get_list_with(self.sex, race, self.hair_color, self.skin_color, insert);
         self.preview_image = Some(Rc::new(LayeredImage::new(images_list, self.hue)));
     }
 
@@ -135,7 +135,7 @@ impl CosmeticSelectorPane {
     }
 
     fn set_finish_enabled(&self, widget: &Rc<RefCell<Widget>>) {
-        let (_, builder) = Widget::parent_mut::<CharacterBuilder>(&widget);
+        let (_, builder) = Widget::parent_mut::<CharacterBuilder>(widget);
         builder
             .next
             .borrow_mut()
@@ -489,7 +489,7 @@ impl WidgetKind for CosmeticSelectorPane {
 
         let portrait_button = Widget::with_theme(Button::empty(), "portrait_button");
         if let Some(ref image) = self.portrait {
-            portrait_button.borrow_mut().state.foreground = Some(Rc::clone(&image));
+            portrait_button.borrow_mut().state.foreground = Some(Rc::clone(image));
         }
 
         let race_ref = Rc::clone(&race);
@@ -522,7 +522,7 @@ impl WidgetKind for CosmeticSelectorPane {
                     scrollpane.borrow().add_to_content(button);
                 }
 
-                let root = Widget::get_root(&widget);
+                let root = Widget::get_root(widget);
                 Widget::add_child_to(&root, pop_up);
             })));
 

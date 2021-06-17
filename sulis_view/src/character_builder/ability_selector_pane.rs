@@ -88,7 +88,7 @@ impl AbilitySelectorPane {
 
     pub fn already_selected_current_level(&self, ability: &Rc<Ability>) -> Option<u32> {
         for owned in self.already_selected.iter() {
-            if Rc::ptr_eq(&ability, &owned.ability) {
+            if Rc::ptr_eq(ability, &owned.ability) {
                 return Some(owned.level);
             }
         }
@@ -270,7 +270,7 @@ impl WidgetKind for AbilitySelectorPane {
                 enable_next = false;
             }
 
-            let ability_ref = Rc::clone(&ability);
+            let ability_ref = Rc::clone(ability);
             ability_button
                 .borrow_mut()
                 .state

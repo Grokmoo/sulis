@@ -454,7 +454,7 @@ impl StatList {
 
         let mut attack_range = None;
         for (builder, weapon_kind) in attacks {
-            let attack = Attack::new(builder, &self, weapon_kind).mult(multiplier);
+            let attack = Attack::new(builder, self, weapon_kind).mult(multiplier);
 
             if attack_range.is_none() {
                 attack_range = Some(attack.distance());

@@ -110,14 +110,14 @@ impl Cursor {
         }
 
         // mouse move event below should recreate mouse over as needed
-        Widget::remove_mouse_over(&root);
+        Widget::remove_mouse_over(root);
         trace!("Cursor move by {}, {}", x, y);
 
         let event = Event::new(event::Kind::MouseMove {
             delta_x: x,
             delta_y: y,
         });
-        Widget::dispatch_event(&root, event);
+        Widget::dispatch_event(root, event);
 
         if let Some(kind) = Cursor::button_down() {
             trace!("Cursor {:?} drag.", kind);
@@ -126,7 +126,7 @@ impl Cursor {
                 delta_x: x,
                 delta_y: y,
             });
-            Widget::dispatch_event(&root, event);
+            Widget::dispatch_event(root, event);
         }
     }
 
@@ -141,7 +141,7 @@ impl Cursor {
 
         trace!("Cursor pressed at {},{}", x, y);
         let event = Event::new(event::Kind::MousePress(kind));
-        Widget::dispatch_event(&root, event);
+        Widget::dispatch_event(root, event);
     }
 
     pub fn release(root: &Rc<RefCell<Widget>>, kind: event::ClickKind) {
@@ -150,7 +150,7 @@ impl Cursor {
 
         trace!("Cursor released at {},{}", x, y);
         let event = Event::new(event::Kind::MouseRelease(kind));
-        Widget::dispatch_event(&root, event);
+        Widget::dispatch_event(root, event);
     }
 
     pub fn move_by_internal(x: f32, y: f32) -> bool {

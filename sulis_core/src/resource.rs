@@ -81,7 +81,7 @@ impl ResourceSet {
         let yaml_start = std::time::Instant::now();
         let root = dirs.remove(0);
         let path = Path::new(&root);
-        let mut yaml = YamlResourceSet::new(&path)?;
+        let mut yaml = YamlResourceSet::new(path)?;
 
         for dir in dirs {
             let path = Path::new(&dir);
@@ -345,7 +345,7 @@ impl ResourceSet {
                     sprite_id, spritesheet_id
                 ));
             }
-            Some(ref sprite) => Rc::clone(sprite),
+            Some(sprite) => Rc::clone(sprite),
         };
 
         Ok(sprite)

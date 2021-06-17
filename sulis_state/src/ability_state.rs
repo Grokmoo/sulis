@@ -107,7 +107,7 @@ impl AbilityState {
         self.remaining_duration = self.remaining_duration - millis_elapsed;
 
         if cur_mod != self.cur_duration / ROUND_TIME_MILLIS {
-            self.listeners.notify(&self);
+            self.listeners.notify(self);
         }
     }
 
@@ -168,13 +168,13 @@ impl AbilityState {
             },
         };
         self.cur_duration = 0;
-        self.listeners.notify(&self);
+        self.listeners.notify(self);
     }
 
     pub fn set_cooldown_rounds(&mut self, rounds: u32) {
         self.remaining_duration = ExtInt::Int(rounds * ROUND_TIME_MILLIS);
         self.cur_duration = 0;
-        self.listeners.notify(&self);
+        self.listeners.notify(self);
     }
 
     pub fn deactivate(&mut self) {
@@ -190,7 +190,7 @@ impl AbilityState {
             None => panic!(),
             Some(ref active) => ExtInt::Int(active.cooldown * ROUND_TIME_MILLIS),
         };
-        self.listeners.notify(&self);
+        self.listeners.notify(self);
     }
 
     pub fn remaining_duration(&self) -> ExtInt {

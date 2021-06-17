@@ -112,7 +112,7 @@ impl WidgetKind for AbilitiesBar {
     widget_kind!(NAME);
 
     fn layout(&mut self, widget: &mut Widget) {
-        if let Some(ref count) = widget.theme.custom.get("max_collapsed") {
+        if let Some(count) = widget.theme.custom.get("max_collapsed") {
             self.max_collapsed = count.parse::<u32>().unwrap_or(3);
         }
 
@@ -659,7 +659,7 @@ impl WidgetKind for AbilityButton {
         }
 
         Widget::set_mouse_over_widget(
-            &widget,
+            widget,
             hover,
             widget.borrow().state.inner_right(),
             widget.borrow().state.inner_top(),
@@ -679,14 +679,14 @@ fn activate_ability(entity: &Rc<RefCell<EntityState>>, ability: &Rc<Ability>) ->
     let can_activate = entity.borrow().actor.can_activate(&ability.id);
     if can_activate {
         let index = entity.borrow().index();
-        Script::ability_on_activate(index, "on_activate".to_string(), &ability);
+        Script::ability_on_activate(index, "on_activate".to_string(), ability);
         return true;
     }
 
     let can_toggle = entity.borrow().actor.can_toggle(&ability.id);
     if can_toggle == DisabledReason::Enabled {
         let index = entity.borrow().index();
-        Script::ability_on_deactivate(index, &ability);
+        Script::ability_on_deactivate(index, ability);
     }
 
     true

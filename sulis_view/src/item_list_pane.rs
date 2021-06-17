@@ -126,7 +126,7 @@ impl ItemListPane {
                 continue;
             }
 
-            let item_button = ItemButton::merchant(&item, qty, index, merchant_id);
+            let item_button = ItemButton::merchant(item, qty, index, merchant_id);
             item_button
                 .borrow_mut()
                 .add_action("Buy", buy_item_cb(merchant_id, index), true);
@@ -150,13 +150,13 @@ impl ItemListPane {
         let list_content = Widget::with_theme(scrollpane.clone(), "items_list");
         match prop.items() {
             None => (),
-            Some(ref items) => {
+            Some(items) => {
                 for (index, &(qty, ref item)) in items.iter().enumerate() {
                     if !self.cur_filter.get().is_allowed(&item.item) {
                         continue;
                     }
 
-                    let item_button = ItemButton::prop(&item, qty, index, prop_index);
+                    let item_button = ItemButton::prop(item, qty, index, prop_index);
                     if !combat_active {
                         item_button.borrow_mut().add_action(
                             "Take",
@@ -189,7 +189,7 @@ impl ItemListPane {
                 continue;
             }
 
-            let item_but = ItemButton::inventory(&item, quantity, index);
+            let item_but = ItemButton::inventory(item, quantity, index);
 
             if let Some(ref usable) = item.item.usable {
                 if !combat_active && item.item.meets_prereqs(&actor.actor) {
@@ -207,7 +207,7 @@ impl ItemListPane {
                 }
             }
 
-            if !combat_active && actor.can_equip(&item) {
+            if !combat_active && actor.can_equip(item) {
                 item_but
                     .borrow_mut()
                     .add_action("Equip", equip_item_cb(&self.entity, index), true);

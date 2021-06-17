@@ -95,7 +95,7 @@ impl LoadWindow {
 
         let loading_screen = Widget::with_defaults(LoadingScreen::new());
         loading_screen.borrow_mut().state.set_modal(true);
-        Widget::add_child_to(&root, loading_screen);
+        Widget::add_child_to(root, loading_screen);
     }
 
     pub fn delete_save(&mut self) {
@@ -184,7 +184,7 @@ impl WidgetKind for LoadWindow {
         let scrollpane = ScrollPane::new(ScrollDirection::Vertical);
         let entries = Widget::with_theme(scrollpane.clone(), "entries");
 
-        for (index, ref meta) in self.entries.iter().enumerate() {
+        for (index, meta) in self.entries.iter().enumerate() {
             let text_area = Widget::with_defaults(TextArea::empty());
             {
                 let area = &mut text_area.borrow_mut().state;

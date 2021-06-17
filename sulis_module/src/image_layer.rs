@@ -137,9 +137,9 @@ impl ImageLayerSet {
             None => return list,
             Some(sex_map) => {
                 for layer in ImageLayer::iter() {
-                    let image = match sex_map.get(&layer) {
+                    let image = match sex_map.get(layer) {
                         None => continue,
-                        Some(ref image) => Rc::clone(image),
+                        Some(image) => Rc::clone(image),
                     };
 
                     let out = Layer::new(0.0, 0.0, get_color(*layer, hair, skin), image);
@@ -167,7 +167,7 @@ impl ImageLayerSet {
             Some(sex_map) => {
                 for layer in ImageLayer::iter() {
                     let mut base_size = None;
-                    if let Some(ref image) = sex_map.get(&layer) {
+                    if let Some(image) = sex_map.get(layer) {
                         base_size = Some((image.get_width_f32(), image.get_height_f32()));
                     }
 
@@ -179,7 +179,7 @@ impl ImageLayerSet {
                         None => continue,
                         Some((x, y)) => (*x, *y),
                     };
-                    if let Some(image) = sex_map.get(&layer) {
+                    if let Some(image) = sex_map.get(layer) {
                         let out = Layer::new(x, y, get_color(*layer, hair, skin), Rc::clone(image));
                         list.push(out);
                     }
@@ -242,7 +242,7 @@ fn insert_for_race_sex(
     };
 
     match insert.get(&layer) {
-        Some(ref image) => {
+        Some(image) => {
             if let Some((width_base, height_base)) = base_size {
                 x -= (image.get_width_f32() - width_base) / 2.0;
                 y -= (image.get_height_f32() - height_base) / 2.0;

@@ -93,7 +93,7 @@ impl WidgetKind for DialogWindow {
         {
             let node = &mut node_widget.borrow_mut().state;
             let entity = self.entity.borrow();
-            for (ref flag, ref val) in entity.custom_flags() {
+            for (flag, val) in entity.custom_flags() {
                 node.add_text_arg(flag, val);
             }
 
@@ -129,7 +129,7 @@ impl WidgetKind for DialogWindow {
                     continue;
                 }
 
-                let response_button = ResponseButton::new(&self.convo, &response, &self.pc);
+                let response_button = ResponseButton::new(&self.convo, response, &self.pc);
                 let widget = Widget::with_defaults(response_button);
                 Widget::add_child_to(&responses_widget, widget);
             }
@@ -157,7 +157,7 @@ impl ResponseButton {
             text: response.text.to_string(),
             to: response.to.clone(),
             on_select: response.on_select.clone(),
-            pc: Rc::clone(&pc),
+            pc: Rc::clone(pc),
             convo: Rc::clone(convo),
         }))
     }
@@ -242,7 +242,7 @@ pub fn show_convo(
     target: &Rc<RefCell<EntityState>>,
     widget: &Rc<RefCell<Widget>>,
 ) {
-    let initial_node = get_initial_node(&convo, &pc, &target);
+    let initial_node = get_initial_node(&convo, pc, target);
     if convo.responses(&initial_node).is_empty() {
         let area = GameState::area_state();
 
@@ -250,14 +250,14 @@ pub fn show_convo(
         feedback.add_entry(convo.text(&initial_node).to_string(), ColorKind::Info);
         area.borrow_mut().add_feedback_text(feedback);
     } else {
-        let window = Widget::with_defaults(DialogWindow::new(&pc, &target, convo));
+        let window = Widget::with_defaults(DialogWindow::new(pc, target, convo));
         window.borrow_mut().state.set_modal(true);
 
         let (root, view) = Widget::parent_mut::<RootView>(widget);
         let (area, _) = view.area_view();
         area.borrow_mut().clear_mouse_state();
         area.borrow_mut()
-            .set_active_entity(Some(Rc::clone(&target)));
+            .set_active_entity(Some(Rc::clone(target)));
 
         let (x, y) = {
             let loc = &target.borrow().location;

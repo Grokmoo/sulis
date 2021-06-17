@@ -306,7 +306,7 @@ impl Shape {
         match self {
             Shape::Single => match target {
                 None => Vec::new(),
-                Some(ref target) => {
+                Some(target) => {
                     if contains(target, effectable) {
                         vec![Rc::clone(target)]
                     } else {
@@ -449,21 +449,21 @@ impl Shape {
         let (points, concat) = if (end.y - start.y).abs() < (end.x - start.x).abs() {
             if start.x > end.x {
                 let mut p = cast_low(end, start);
-                let concated = self.concat_from_end(&area_state, &size, &mut p, los_params);
+                let concated = self.concat_from_end(area_state, &size, &mut p, los_params);
                 (p, concated)
             } else {
                 let mut p = cast_low(start, end);
-                let concated = self.concat_from_start(&area_state, &size, &mut p, los_params);
+                let concated = self.concat_from_start(area_state, &size, &mut p, los_params);
                 (p, concated)
             }
         } else {
             if start.y > end.y {
                 let mut p = cast_high(end, start);
-                let concated = self.concat_from_end(&area_state, &size, &mut p, los_params);
+                let concated = self.concat_from_end(area_state, &size, &mut p, los_params);
                 (p, concated)
             } else {
                 let mut p = cast_high(start, end);
-                let concated = self.concat_from_start(&area_state, &size, &mut p, los_params);
+                let concated = self.concat_from_start(area_state, &size, &mut p, los_params);
                 (p, concated)
             }
         };
@@ -849,7 +849,7 @@ impl AreaTargeter {
             );
             self.cur_effected =
                 self.shape
-                    .get_effected_entities(&self.cur_points, Some(&target), &self.effectable);
+                    .get_effected_entities(&self.cur_points, Some(target), &self.effectable);
         } else {
             if !self.free_select_valid {
                 return;

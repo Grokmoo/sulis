@@ -333,7 +333,7 @@ impl Actor {
                     warn!("No ability found for '{}'", ability_id);
                     return unable_to_create_error("actor", &builder.id);
                 }
-                Some(ref ability) => Rc::clone(ability),
+                Some(ability) => Rc::clone(ability),
             };
 
             let mut upgrade = false;
@@ -357,7 +357,7 @@ impl Actor {
                     warn!("No AI template found with id '{}'", id);
                     return unable_to_create_error("actor", &builder.id);
                 }
-                Some(ref ai) => Some(Rc::clone(ai)),
+                Some(ai) => Some(Rc::clone(ai)),
             },
         };
 

@@ -54,7 +54,7 @@ impl AnimatedImage {
                         image_id
                     ));
                 }
-                Some(ref image) => Rc::clone(image),
+                Some(image) => Rc::clone(image),
             };
 
             match size {

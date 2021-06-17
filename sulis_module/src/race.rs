@@ -191,7 +191,7 @@ impl Race {
     pub fn image_for_sex(&self, sex: Sex, image: &Rc<dyn Image>) -> Rc<dyn Image> {
         match self.image_layer_postfix.get(&sex) {
             None => Rc::clone(image),
-            Some(ref postfix) => {
+            Some(postfix) => {
                 let id = image.id() + postfix;
                 match ResourceSet::image(&id) {
                     None => Rc::clone(image),

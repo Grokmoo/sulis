@@ -36,7 +36,7 @@ impl PartyStash {
     pub(crate) fn save(&self) -> Vec<ItemListEntrySaveState> {
         self.items
             .iter()
-            .map(|(q, ref i)| ItemListEntrySaveState::new(*q, &i))
+            .map(|(q, ref i)| ItemListEntrySaveState::new(*q, i))
             .collect()
     }
 
@@ -57,7 +57,7 @@ impl PartyStash {
 
         let index = self.items.add_quantity(quantity, item_state);
 
-        self.listeners.notify(&self);
+        self.listeners.notify(self);
 
         Some(index)
     }
@@ -80,7 +80,7 @@ impl PartyStash {
     pub fn remove_item(&mut self, index: usize) -> Option<ItemState> {
         let result = self.items.remove(index);
 
-        self.listeners.notify(&self);
+        self.listeners.notify(self);
 
         result
     }
@@ -93,7 +93,7 @@ impl PartyStash {
 
         let num_items = match prop_state.items() {
             None => return,
-            Some(ref items) => items.len(),
+            Some(items) => items.len(),
         };
 
         if num_items > 0 {
@@ -109,7 +109,7 @@ impl PartyStash {
 
                 i -= 1;
             }
-            self.listeners.notify(&self);
+            self.listeners.notify(self);
         }
     }
 
@@ -123,6 +123,6 @@ impl PartyStash {
             self.add_item(qty, item_state);
         }
 
-        self.listeners.notify(&self);
+        self.listeners.notify(self);
     }
 }

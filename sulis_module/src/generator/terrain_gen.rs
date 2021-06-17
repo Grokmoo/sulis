@@ -76,11 +76,11 @@ impl<'a, 'b> TerrainGen<'a, 'b> {
             let p1 = Point::from((x1, y1));
             let p2 = Point::from((x2, y2));
 
-            if !pass.allowable_regions.check_coords(&self.maze, p1, p2) {
+            if !pass.allowable_regions.check_coords(self.maze, p1, p2) {
                 continue;
             }
 
-            if overlaps_any(&patch, &patches, pass.spacing as i32) {
+            if overlaps_any(&patch, patches, pass.spacing as i32) {
                 continue;
             }
 

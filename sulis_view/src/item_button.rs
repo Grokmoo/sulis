@@ -221,7 +221,7 @@ impl ItemButton {
 
                 match area_state.props().get(prop_index).items() {
                     None => None,
-                    Some(ref items) => match items.get(item_index) {
+                    Some(items) => match items.get(item_index) {
                         None => None,
                         Some(&(_, ref item_state)) => Some(item_state.clone()),
                     },
@@ -277,7 +277,7 @@ impl ItemButton {
         match self.kind {
             Kind::Merchant { ref id, .. } => {
                 let merchant = area_state.get_merchant(id);
-                if let Some(ref merchant) = merchant {
+                if let Some(merchant) = merchant {
                     let value = merchant.get_buy_price(item_state);
                     item_window
                         .state
@@ -285,14 +285,14 @@ impl ItemButton {
                 }
             }
             Kind::Inventory { .. } | Kind::Equipped { .. } => {
-                let root_view = Widget::kind_mut::<RootView>(&root);
-                let merch_window = match root_view.get_merchant_window(&root) {
+                let root_view = Widget::kind_mut::<RootView>(root);
+                let merch_window = match root_view.get_merchant_window(root) {
                     None => return,
                     Some(window) => window,
                 };
                 let window = Widget::kind_mut::<MerchantWindow>(&merch_window);
                 let merchant = area_state.get_merchant(window.merchant_id());
-                if let Some(ref merchant) = merchant {
+                if let Some(merchant) = merchant {
                     let value = merchant.get_sell_price(item_state);
                     item_window
                         .state

@@ -119,6 +119,6 @@ impl InputAction {
         debug!("Firing action {:?}", action);
 
         let event = Event::new(Kind::KeyPress(action));
-        Widget::dispatch_event(&root, event);
+        Widget::dispatch_event(root, event);
     }
 }

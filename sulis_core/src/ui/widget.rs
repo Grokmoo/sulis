@@ -72,7 +72,7 @@ impl Widget {
 
         self.kind
             .borrow_mut()
-            .draw(renderer, pixel_size, &self, millis);
+            .draw(renderer, pixel_size, self, millis);
 
         for child in self.children.iter() {
             let child = child.borrow();
@@ -321,7 +321,7 @@ impl Widget {
             if child_ref.state.is_modal {
                 trace!("Adding child as modal widget.");
                 let root = Widget::get_root(parent);
-                root.borrow_mut().modal_child = Some(Rc::clone(&child));
+                root.borrow_mut().modal_child = Some(Rc::clone(child));
                 root.borrow_mut().keyboard_focus_child = None;
             }
         }
@@ -470,7 +470,7 @@ impl Widget {
     }
 
     pub fn update(root: &Rc<RefCell<Widget>>, millis: u32) -> Result<(), Error> {
-        Widget::update_kind_recursive(&root, millis);
+        Widget::update_kind_recursive(root, millis);
 
         let mut find_new_modal = false;
         if let Some(ref child) = root.borrow().modal_child {
@@ -479,15 +479,15 @@ impl Widget {
             }
         }
 
-        Widget::check_children_removal(&root);
+        Widget::check_children_removal(root);
 
         if find_new_modal {
             let modal = Widget::find_new_modal_child(root);
             root.borrow_mut().modal_child = modal;
         }
 
-        Widget::check_readd(&root);
-        Widget::check_children(&root)?;
+        Widget::check_readd(root);
+        Widget::check_children(root)?;
 
         root.borrow_mut().layout_widget();
 
@@ -496,7 +496,7 @@ impl Widget {
 
     fn update_kind_recursive(widget: &Rc<RefCell<Widget>>, millis: u32) {
         let kind = Rc::clone(&widget.borrow().kind);
-        kind.borrow_mut().update(&widget, millis);
+        kind.borrow_mut().update(widget, millis);
 
         let len = widget.borrow().children.len();
         for i in 0..len {
@@ -511,12 +511,12 @@ impl Widget {
             parent.borrow_mut().modal_child = None;
             for child in parent.borrow_mut().children.iter() {
                 let kind = Rc::clone(&child.borrow().kind);
-                kind.borrow_mut().on_remove(&child);
+                kind.borrow_mut().on_remove(child);
             }
             parent.borrow_mut().children.clear();
             let kind = Rc::clone(&parent.borrow().kind);
-            kind.borrow_mut().on_remove(&parent);
-            let children = kind.borrow_mut().on_add(&parent);
+            kind.borrow_mut().on_remove(parent);
+            let children = kind.borrow_mut().on_add(parent);
             Widget::add_children_to(parent, children);
             parent.borrow_mut().marked_for_readd = false;
             parent.borrow_mut().marked_for_layout = true;
@@ -541,7 +541,7 @@ impl Widget {
         }
 
         let kind = Rc::clone(&widget.borrow().kind);
-        kind.borrow_mut().on_remove(&widget);
+        kind.borrow_mut().on_remove(widget);
     }
 
     fn find_new_modal_child(parent: &Rc<RefCell<Widget>>) -> Option<Rc<RefCell<Widget>>> {

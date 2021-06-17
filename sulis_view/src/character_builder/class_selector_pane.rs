@@ -173,7 +173,7 @@ impl WidgetKind for ClassSelectorPane {
             Widget::add_child_to(&selected, starting_abilities);
         } else {
             let upgrades = Widget::with_theme(TextArea::empty(), "upgrades");
-            build_upgrades_data(&mut upgrades.borrow_mut().state, &class, self.level);
+            build_upgrades_data(&mut upgrades.borrow_mut().state, class, self.level);
 
             Widget::add_child_to(&selected, upgrades);
         }

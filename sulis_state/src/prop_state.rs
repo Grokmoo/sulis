@@ -337,7 +337,7 @@ impl PropState {
                 self.prop.id
             ),
         }
-        self.listeners.notify(&self);
+        self.listeners.notify(self);
     }
 
     pub fn add_items(&mut self, items_to_add: Vec<(u32, ItemState)>) {
@@ -352,12 +352,12 @@ impl PropState {
                 self.prop.id
             ),
         }
-        self.listeners.notify(&self);
+        self.listeners.notify(self);
     }
 
     pub fn items(&self) -> Option<&ItemList> {
         match self.interactive {
-            Interactive::Container { ref items, .. } => Some(&items),
+            Interactive::Container { ref items, .. } => Some(items),
             _ => None,
         }
     }
@@ -393,7 +393,7 @@ impl PropState {
     }
 
     fn notify_and_check(&mut self) {
-        self.listeners.notify(&self);
+        self.listeners.notify(self);
         if let Interactive::Container {
             ref items,
             temporary,

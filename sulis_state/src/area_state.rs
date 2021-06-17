@@ -423,7 +423,7 @@ impl AreaState {
                 continue;
             }
 
-            if !self.triggers[*trigger_index].can_fire(&trigger) {
+            if !self.triggers[*trigger_index].can_fire(trigger) {
                 continue;
             }
             self.triggers[*trigger_index].fired = true;
@@ -595,7 +595,7 @@ impl AreaState {
         new_x: i32,
         new_y: i32,
     ) -> bool {
-        if !self.is_terrain_passable(&requester.size(), new_x, new_y) {
+        if !self.is_terrain_passable(requester.size(), new_x, new_y) {
             return false;
         }
 
@@ -606,7 +606,7 @@ impl AreaState {
 
     pub fn is_passable_for_entity(&self, requester: &EntityState, x: i32, y: i32) -> bool {
         self.is_passable(
-            &requester,
+            requester,
             &[requester.index()],
             x,
             y,
@@ -657,7 +657,7 @@ impl AreaState {
     }
 
     pub fn has_visibility(&self, parent: &EntityState, target: &EntityState) -> bool {
-        has_visibility(&self.area, &self.props.entire_vis_grid(), parent, target)
+        has_visibility(&self.area, self.props.entire_vis_grid(), parent, target)
     }
 
     pub fn compute_pc_visibility(
@@ -878,12 +878,12 @@ impl AreaState {
         is_dead: bool,
     ) -> Result<usize, Error> {
         let mgr = GameState::turn_manager();
-        let index = mgr.borrow_mut().add_entity(&entity, is_dead);
+        let index = mgr.borrow_mut().add_entity(entity, is_dead);
 
         if is_dead {
             Ok(index)
         } else {
-            self.transition_entity_to(&entity, index, location)
+            self.transition_entity_to(entity, index, location)
         }
     }
 
@@ -969,7 +969,7 @@ impl AreaState {
         }
 
         if entity.borrow().is_party_member() {
-            self.compute_pc_visibility(&entity, 0, 0);
+            self.compute_pc_visibility(entity, 0, 0);
         }
 
         Ok(index)
@@ -1056,10 +1056,10 @@ impl AreaState {
 
         if is_pc {
             self.pc_vis_partial_redraw(d_x, d_y);
-            self.compute_pc_visibility(&entity, d_x, d_y);
+            self.compute_pc_visibility(entity, d_x, d_y);
             self.update_view_visibility();
 
-            self.check_trigger_grid(&entity);
+            self.check_trigger_grid(entity);
         }
 
         mgr.fire_on_moved_next_update(entity_index);

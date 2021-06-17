@@ -93,7 +93,7 @@ impl WidgetKind for CharacterSelector {
             .borrow_mut()
             .state
             .add_callback(Callback::new(Rc::new(move |widget, _| {
-                let root = Widget::get_root(&widget);
+                let root = Widget::get_root(widget);
 
                 let builder = Widget::with_defaults(CharacterBuilder::new(&char_selector_widget));
                 Widget::add_child_to(&root, builder);
@@ -109,7 +109,7 @@ impl WidgetKind for CharacterSelector {
             .borrow_mut()
             .state
             .add_callback(Callback::new(Rc::new(move |widget, _| {
-                let root = Widget::get_root(&widget);
+                let root = Widget::get_root(widget);
 
                 let actor_id = actor_id.clone();
                 let (parent, _) = Widget::parent_mut::<CharacterSelector>(widget);

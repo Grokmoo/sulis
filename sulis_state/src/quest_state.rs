@@ -80,7 +80,7 @@ impl QuestStateSet {
     }
 
     pub fn state(&self, quest: &str) -> QuestEntryState {
-        if let Some(ref quest) = self.quests.get(quest) {
+        if let Some(quest) = self.quests.get(quest) {
             quest.state
         } else {
             QuestEntryState::Hidden
@@ -88,7 +88,7 @@ impl QuestStateSet {
     }
 
     pub fn entry_state(&self, quest: &str, entry: &str) -> QuestEntryState {
-        if let Some(ref quest) = self.quests.get(quest) {
+        if let Some(quest) = self.quests.get(quest) {
             quest.entry_state(entry)
         } else {
             QuestEntryState::Hidden
@@ -108,7 +108,7 @@ impl QuestStateSet {
             }
         };
 
-        self.listeners.notify(&self);
+        self.listeners.notify(self);
     }
 
     pub fn set_state(&mut self, quest_id: &str, state: QuestEntryState) {

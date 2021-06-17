@@ -233,7 +233,7 @@ impl Tileset {
     }
 
     fn move_uniform(&mut self) {
-        for (_, ref uniform) in self.uniform_sets.iter() {
+        for (_, uniform) in self.uniform_sets.iter() {
             let size = uniform.size;
             let layer = &uniform.layer;
             let prefix = &uniform.sprite_prefix;
@@ -266,7 +266,7 @@ impl Tileset {
     }
 
     fn move_non_uniform(&mut self) {
-        for (_, ref non_uniform) in self.non_uniform_sets.iter() {
+        for (_, non_uniform) in self.non_uniform_sets.iter() {
             let size = non_uniform.size;
             let layer = &non_uniform.layer;
             let prefix = &non_uniform.sprite_prefix;

@@ -151,8 +151,8 @@ impl<'a> GliumRenderer<'a> {
             draw_list.kind
         );
         let image = match draw_list.kind {
-            DrawListKind::Sprite => ResourceSet::spritesheet(&texture_id).unwrap().image.clone(),
-            DrawListKind::Font => ResourceSet::font(&texture_id).unwrap().image.clone(),
+            DrawListKind::Sprite => ResourceSet::spritesheet(texture_id).unwrap().image.clone(),
+            DrawListKind::Font => ResourceSet::font(texture_id).unwrap().image.clone(),
         };
 
         self.register_texture(
@@ -289,7 +289,7 @@ impl<'a> GraphicsRenderer for GliumRenderer<'a> {
             glium::framebuffer::SimpleFrameBuffer::new(&self.display.display, &texture.texture)
                 .unwrap();
 
-        draw_to_surface(&mut framebuffer, draw_list, &self.display, &self.params);
+        draw_to_surface(&mut framebuffer, draw_list, self.display, &self.params);
     }
 
     fn draw(&mut self, draw_list: DrawList) {
@@ -298,7 +298,7 @@ impl<'a> GraphicsRenderer for GliumRenderer<'a> {
         }
         self.create_texture_if_missing(&draw_list.texture, &draw_list);
 
-        draw_to_surface(self.target, draw_list, &self.display, &self.params);
+        draw_to_surface(self.target, draw_list, self.display, &self.params);
     }
 }
 

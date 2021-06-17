@@ -69,7 +69,7 @@ impl Class {
                         warn!("Unable to find ability list '{}'", ability_list_id);
                         return unable_to_create_error("class", &builder.id);
                     }
-                    Some(ref ability_list) => Rc::clone(ability_list),
+                    Some(ability_list) => Rc::clone(ability_list),
                 };
 
                 ability_choices.push(ability_list);
@@ -108,7 +108,7 @@ impl Class {
                     warn!("Unable to find ability '{}'", ability_id);
                     return unable_to_create_error("class", &builder.id);
                 }
-                Some(ref ability) => Rc::clone(ability),
+                Some(ability) => Rc::clone(ability),
             };
 
             abilities.push(ability);
@@ -123,7 +123,7 @@ impl Class {
                         warn!("Unable to find ability '{}'", ability_id);
                         return unable_to_create_error("class", &builder.id);
                     }
-                    Some(ref ability) => Rc::clone(ability),
+                    Some(ability) => Rc::clone(ability),
                 };
 
                 abilities.push(ability);

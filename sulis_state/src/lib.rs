@@ -195,7 +195,7 @@ impl WorldMapState {
     }
 
     pub fn is_visible(&self, location: &str) -> bool {
-        if let Some(ref state) = self.locations.get(location) {
+        if let Some(state) = self.locations.get(location) {
             state.visible
         } else {
             warn!("Location '{}' not found when querying visible", location);
@@ -204,7 +204,7 @@ impl WorldMapState {
     }
 
     pub fn is_enabled(&self, location: &str) -> bool {
-        if let Some(ref state) = self.locations.get(location) {
+        if let Some(state) = self.locations.get(location) {
             state.enabled
         } else {
             warn!("Location '{}' not found when querying enabled", location);

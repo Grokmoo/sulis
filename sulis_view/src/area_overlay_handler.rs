@@ -140,7 +140,7 @@ impl AreaOverlayHandler {
             let mut targeter = targeter.borrow_mut();
             let mouse_over = targeter.on_mouse_move(x, y);
 
-            if let Some(ref entity) = mouse_over {
+            if let Some(entity) = mouse_over {
                 return Some(AreaMouseover::new_entity(entity));
             } else {
                 return None;
@@ -303,15 +303,15 @@ impl AreaOverlayHandler {
     }
 
     pub fn apply_theme(&mut self, theme: &Theme) {
-        if let Some(ref image_id) = theme.custom.get("selection_box_image") {
+        if let Some(image_id) = theme.custom.get("selection_box_image") {
             self.selection_box_image = ResourceSet::image(image_id);
         }
 
-        if let Some(ref image_id) = theme.custom.get("path_point_image") {
+        if let Some(image_id) = theme.custom.get("path_point_image") {
             self.path_point_image = ResourceSet::image(image_id);
         }
 
-        if let Some(ref image_id) = theme.custom.get("path_point_end_image") {
+        if let Some(image_id) = theme.custom.get("path_point_end_image") {
             self.path_point_end_image = ResourceSet::image(image_id);
         }
     }

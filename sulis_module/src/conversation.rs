@@ -78,7 +78,7 @@ impl Conversation {
             initial_nodes.push((node.id, node.to_view));
         }
 
-        for (_, ref node) in builder.nodes.iter() {
+        for (_, node) in builder.nodes.iter() {
             for response in node.responses.iter() {
                 if let Some(ref to) = response.to {
                     if !builder.nodes.contains_key(to) {
@@ -105,28 +105,28 @@ impl Conversation {
     pub fn on_view(&self, node: &str) -> &Vec<OnTrigger> {
         match self.nodes.get(node) {
             None => panic!("Invalid node"),
-            Some(ref node) => &node.on_view,
+            Some(node) => &node.on_view,
         }
     }
 
     pub fn switch_speaker(&self, node: &str) -> &Option<String> {
         match self.nodes.get(node) {
             None => panic!("Invalid node"),
-            Some(ref node) => &node.switch_speaker,
+            Some(node) => &node.switch_speaker,
         }
     }
 
     pub fn text(&self, node: &str) -> &str {
         match self.nodes.get(node) {
             None => panic!("Invalid node"),
-            Some(ref node) => &node.text,
+            Some(node) => &node.text,
         }
     }
 
     pub fn responses(&self, node: &str) -> &Vec<Response> {
         match self.nodes.get(node) {
             None => panic!("Invalid node"),
-            Some(ref node) => &node.responses,
+            Some(node) => &node.responses,
         }
     }
 }

@@ -118,7 +118,7 @@ impl Inventory {
     ) -> WeaponStyle {
         match off {
             None => (),
-            Some(ref item_state) => match item_state.item.kind {
+            Some(item_state) => match item_state.item.kind {
                 ItemKind::Armor { .. } => return WeaponStyle::Shielded,
                 ItemKind::Weapon { .. } => match main {
                     None => return WeaponStyle::Single,
@@ -130,7 +130,7 @@ impl Inventory {
 
         match main {
             None => WeaponStyle::Single,
-            Some(ref item_state) => match &item_state.item.equippable {
+            Some(item_state) => match &item_state.item.equippable {
                 Some(ref equippable) => {
                     if let Some(attack_builder) = &equippable.attack {
                         if let AttackKindBuilder::Ranged { .. } = attack_builder.kind {
@@ -174,7 +174,7 @@ impl Inventory {
     pub fn equipped_iter(&self) -> EquippedIterator {
         EquippedIterator {
             slot_iterator: Slot::iter(),
-            inventory: &self,
+            inventory: self,
         }
     }
 
@@ -424,7 +424,7 @@ impl Inventory {
                 item_state.alt_image_iter()
             };
 
-            for (layer, ref image) in iter {
+            for (layer, image) in iter {
                 layers.insert(*layer, Rc::clone(image));
             }
         }
@@ -447,7 +447,7 @@ impl<'a> Iterator for EquippedIterator<'a> {
                 Some(slot) => slot,
             };
 
-            match self.inventory.equipped.get(&slot) {
+            match self.inventory.equipped.get(slot) {
                 None => (),
                 Some(item_state) => return Some(item_state),
             }

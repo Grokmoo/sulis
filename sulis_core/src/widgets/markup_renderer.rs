@@ -234,7 +234,7 @@ impl MarkupRenderer {
                         markup_stack.push(cur_markup);
                         cur_markup = Markup::from_string(
                             &markup_buf,
-                            &markup_stack.last().unwrap(),
+                            markup_stack.last().unwrap(),
                             widget_state,
                         );
                         markup_buf.clear();
@@ -256,7 +256,7 @@ impl MarkupRenderer {
                                 x = pos_x + right_x - text_width_until_tag_close;
                             }
                             if let Some(ref image) = cur_markup.image {
-                                self.draw_sprite(&image, &cur_markup, x, y);
+                                self.draw_sprite(image, &cur_markup, x, y);
                             }
                         }
                     }

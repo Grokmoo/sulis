@@ -47,7 +47,7 @@ impl EntityTextureSlot {
     pub fn redraw_entity(&self, entity: &EntityState, renderer: &mut dyn GraphicsRenderer) {
         let scale = self.slot_size as i32;
         renderer.clear_texture_region(
-            &self.texture_id,
+            self.texture_id,
             self.x * scale,
             self.y * scale,
             (self.x + self.w) * scale,
@@ -67,7 +67,7 @@ impl EntityTextureSlot {
 
         entity
             .actor
-            .draw_to_texture(renderer, &self.texture_id, offset, scale);
+            .draw_to_texture(renderer, self.texture_id, offset, scale);
     }
 
     pub fn draw(
@@ -86,7 +86,7 @@ impl EntityTextureSlot {
             h: self.h as f32 + offset.y * 2.0,
         };
 
-        let mut list = DrawList::from_texture_id(&self.texture_id, &self.tex_coords, rect);
+        let mut list = DrawList::from_texture_id(self.texture_id, &self.tex_coords, rect);
 
         list.set_scale(scale);
         list.set_color(color);
@@ -165,7 +165,7 @@ impl EntityTextureCache {
         };
         entity
             .actor
-            .draw_to_texture(renderer, &self.texture_id, offset, scale);
+            .draw_to_texture(renderer, self.texture_id, offset, scale);
 
         slot.clone()
     }

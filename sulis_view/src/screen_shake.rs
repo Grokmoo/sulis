@@ -77,7 +77,7 @@ impl ScreenShake {
 
         if self.last_millis >= SHAKE_MILLIS {
             if self.total_shakes >= TOTAL_SHAKES {
-                return ShakeResult::done(&self);
+                return ShakeResult::done(self);
             }
 
             self.total_shakes += 1;

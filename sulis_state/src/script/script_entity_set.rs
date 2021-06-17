@@ -153,7 +153,7 @@ impl ScriptEntitySet {
                     self.parent
                 ));
             }
-            Some(ref entity) => self.parent = entity.borrow().index(),
+            Some(entity) => self.parent = entity.borrow().index(),
         }
 
         let mut indices = Vec::new();
@@ -167,7 +167,7 @@ impl ScriptEntitySet {
                             index
                         ));
                     }
-                    Some(ref entity) => indices.push(Some(entity.borrow().index())),
+                    Some(entity) => indices.push(Some(entity.borrow().index())),
                 },
             }
         }

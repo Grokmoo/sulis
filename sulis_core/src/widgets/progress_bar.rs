@@ -122,7 +122,7 @@ impl WidgetKind for ProgressBar {
             widget.state.text_renderer = Some(Box::new(LineRenderer::new(font)));
         }
 
-        if let Some(ref image_id) = widget.theme.custom.get("bar_image") {
+        if let Some(image_id) = widget.theme.custom.get("bar_image") {
             self.bar = ResourceSet::image(image_id);
         }
 

@@ -80,7 +80,7 @@ impl Prop {
                 warn!("No size found with id '{}'", builder.size);
                 return unable_to_create_error("prop", &builder.id);
             }
-            Some(ref size) => Rc::clone(size),
+            Some(size) => Rc::clone(size),
         };
 
         if builder.passable.is_some() && builder.impass.is_some() {

@@ -93,7 +93,7 @@ pub(in crate::animation) fn cleanup(owner: &Rc<RefCell<EntityState>>) {
         let area_state = GameState::get_area_state(&owner.borrow().location.area_id).unwrap();
         let mgr = GameState::turn_manager();
         mgr.borrow_mut()
-            .check_ai_activation(&owner, &mut area_state.borrow_mut());
+            .check_ai_activation(owner, &mut area_state.borrow_mut());
     }
 }
 

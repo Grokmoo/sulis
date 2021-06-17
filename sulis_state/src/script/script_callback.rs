@@ -328,7 +328,7 @@ impl CallbackData {
             None => {
                 return invalid_data_error(&format!("Invalid parent {} for callback", self.parent));
             }
-            Some(ref entity) => self.parent = entity.borrow().index(),
+            Some(entity) => self.parent = entity.borrow().index(),
         }
 
         if let Some(ref mut targets) = &mut self.targets {
@@ -443,7 +443,7 @@ impl CallbackData {
                 Script::entity(&parent, targets, &func);
             }
             Kind::Script(script) => {
-                Script::trigger(&script, &func, ScriptEntity::from(&parent));
+                Script::trigger(script, &func, ScriptEntity::from(&parent));
             }
         }
     }
@@ -478,7 +478,7 @@ impl CallbackData {
                 Script::entity_with_arg(&parent, targets, arg, &func);
             }
             Kind::Script(script) => {
-                Script::trigger(&script, &func, (ScriptEntity::from(&parent), arg));
+                Script::trigger(script, &func, (ScriptEntity::from(&parent), arg));
             }
         }
     }
@@ -520,7 +520,7 @@ impl CallbackData {
             }
             Kind::Script(script) => {
                 Script::trigger(
-                    &script,
+                    script,
                     &func,
                     (
                         ScriptEntity::from(&parent),

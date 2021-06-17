@@ -148,7 +148,7 @@ pub fn sell_item_cb(entity: &Rc<RefCell<EntityState>>, index: usize) -> Callback
         let merchant = match root_view.get_merchant_window(&root) {
             None => return,
             Some(ref window) => {
-                let merchant_window = Widget::kind_mut::<MerchantWindow>(&window);
+                let merchant_window = Widget::kind_mut::<MerchantWindow>(window);
                 merchant_window.merchant_id().to_string()
             }
         };
@@ -190,7 +190,7 @@ fn drop_item(widget: &Rc<RefCell<Widget>>, entity: &Rc<RefCell<EntityState>>, it
     match root_view.get_prop_window(&root) {
         None => drop_to_ground(entity, item),
         Some(ref window) => {
-            let prop_window = Widget::kind_mut::<PropWindow>(&window);
+            let prop_window = Widget::kind_mut::<PropWindow>(window);
             let prop_index = prop_window.prop_index();
             drop_to_prop(item, prop_index);
         }

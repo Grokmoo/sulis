@@ -213,7 +213,7 @@ impl ItemListPane {
                     .add_action("Equip", equip_item_cb(&self.entity, index), true);
             }
 
-            if !combat_active {
+            if !combat_active && !item.item.quest {
                 item_but
                     .borrow_mut()
                     .add_action("Drop", drop_item_cb(&self.entity, index), false);

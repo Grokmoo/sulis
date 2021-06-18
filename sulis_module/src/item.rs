@@ -67,6 +67,7 @@ pub struct Item {
     pub prereqs: Option<PrereqList>,
     pub value: i32,
     pub weight: i32,
+    pub quest: bool,
     pub usable: Option<Usable>,
 
     // original values from before any adjectives are applied
@@ -155,6 +156,7 @@ impl Item {
             equippable,
             value,
             weight: item.weight,
+            quest: item.quest,
             usable: item.usable.clone(),
             prereqs,
             original_id: item.original_id.clone(),
@@ -249,6 +251,7 @@ impl Item {
             equippable,
             value,
             weight: builder.weight as i32,
+            quest: builder.quest,
             usable,
             prereqs,
             original_id: builder.id,
@@ -431,6 +434,9 @@ pub struct ItemBuilder {
     usable: Option<UsableBuilder>,
     #[serde(default)]
     adjectives: Vec<String>,
+
+    #[serde(default)]
+    quest: bool,
 
     #[serde(default)]
     variants: Vec<VariantBuilder>,

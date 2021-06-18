@@ -400,6 +400,10 @@ impl WidgetKind for ItemButton {
                 _ => (),
             }
 
+            if item_state.item.quest {
+                item_window.state.add_text_arg("quest", "true");
+            }
+
             item_window
                 .state
                 .add_text_arg("name", &item_state.item.name);

@@ -125,11 +125,13 @@ impl WidgetKind for InventoryWindow {
                     if actor.can_unequip(*slot) {
                         let mut but = button.borrow_mut();
                         but.add_action("Unequip", unequip_item_cb(&self.entity, *slot), true);
-                        but.add_action(
-                            "Drop",
-                            unequip_and_drop_item_cb(&self.entity, *slot),
-                            false,
-                        );
+                        if !item_state.item.quest {
+                            but.add_action(
+                                "Drop",
+                                unequip_and_drop_item_cb(&self.entity, *slot),
+                                false,
+                            );
+                        }
                     }
 
                     Widget::add_child_to(&equipped_area, Widget::with_theme(button, &theme_id));

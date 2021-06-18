@@ -1620,7 +1620,8 @@ themes:
           ][?prereq_ability_2|Ability: #prereq_ability_2#
           ][?prereq_ability_3|Ability: #prereq_ability_3#
           ][?prereq_ability_4|Ability: #prereq_ability_4#
-          ]]][?price;s=4|
+          ]]][?quest|[c=080|Quest Item]
+          ][?price;s=4|
           Price: [c=f00|#price#] Gold     Weight: [c=f00|#weight#] lbs
           ][!price;?value;s=4|
           Value: [c=f00|#value#] Gold     Weight: [c=f00|#weight#] lbs

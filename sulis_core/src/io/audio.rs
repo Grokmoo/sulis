@@ -22,8 +22,11 @@ use std::cell::{RefCell};
 use std::io::{BufReader, Error, ErrorKind};
 use std::fs::File;
 
-use rodio::{Sink, Device, DeviceTrait, Source, Decoder, source::Buffered, OutputStream, OutputStreamHandle};
-use cpal::traits::HostTrait;
+use rodio::{
+    Sink, Device, DeviceTrait, Source, Decoder, OutputStream, OutputStreamHandle,
+    source::Buffered,
+    cpal::traits::HostTrait,
+};
 
 use crate::config::{AudioConfig, Config};
 use crate::resource::{sound_set::EntryBuilder, ResourceSet};
@@ -417,7 +420,7 @@ pub fn get_audio_devices() -> Vec<AudioDeviceInfo> {
 
     info!("Querying audio devices");
 
-    let host = cpal::default_host();
+    let host = rodio::cpal::default_host();
 
     // Run Rodio init in its own thread to avoid problems with winit:
     // https://github.com/rust-windowing/winit/issues/1185

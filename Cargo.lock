@@ -1688,7 +1688,6 @@ name = "sulis_core"
 version = "0.6.0"
 dependencies = [
  "backtrace",
- "cpal",
  "flexi_logger",
  "glium",
  "home",

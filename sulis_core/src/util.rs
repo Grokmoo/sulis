@@ -32,7 +32,7 @@ use std::time::Duration;
 
 use backtrace::Backtrace;
 use log::LevelFilter;
-use flexi_logger::{opt_format, Duplicate, Logger, LogSpecBuilder};
+use flexi_logger::{opt_format, Duplicate, FileSpec, Logger, LogSpecBuilder};
 use rand::{self, distributions::uniform::{SampleUniform}, seq::SliceRandom, Rng};
 use rand_pcg::Pcg64Mcg;
 
@@ -387,20 +387,16 @@ pub fn setup_logger() {
         LevelFilter::Off => Duplicate::None,
     };
 
-    let mut logger = Logger::with(log_builder.finalize())
-        .log_to_file()
+    let logger = Logger::with(log_builder.finalize())
+        .log_to_file(
+            FileSpec::default()
+            .directory(log_dir)
+            .use_timestamp(log_config.use_timestamps)
+        )
         .print_message()
-        .directory(log_dir)
         .duplicate_to_stderr(dup)
+        .o_append(log_config.append)
         .format(opt_format);
-
-    if log_config.append {
-        logger = logger.append();
-    }
-
-    if !log_config.use_timestamps {
-        logger = logger.suppress_timestamp();
-    }
 
     logger.start().unwrap_or_else(|e| {
         eprintln!("{}", e);

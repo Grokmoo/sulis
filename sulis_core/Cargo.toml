@@ -7,16 +7,16 @@ edition = "2018"
 [dependencies]
 home = "0.5"
 backtrace = "0.3"
-flexi_logger = { version = "0.17", default_features = false }
+flexi_logger = { version = "0.18", default_features = false }
 image = { version = "0.23", default_features = false, features = [ "png" ] }
-glium = "0.29"
-lazy_static = "1.4"
+glium = "0.30"
+lazy_static = "1"
 log = { version = "0.4", features = [ "serde" ] }
 rand = "0.8"
 rand_pcg = { version = "0.3", features = [ "serde1" ] }
 serde = "1.0"
-serde_derive = "1.0"
+serde_derive = "1"
 serde_yaml = "0.8"
-serde_json = "1.0"
+serde_json = "1"
 rlua = "0.17"
 rodio = { version = "0.14", default_features = false, features = [ "vorbis" ] }

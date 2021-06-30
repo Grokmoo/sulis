@@ -28,8 +28,9 @@ use sulis_editor::{EditorControlFlowUpdater, EditorView};
 
 fn main() {
     // CONFIG will be lazily initialized here; if it fails it
-    // prints an error and exits
-    util::setup_logger();
+    // prints an error and exits.  Don't drop the returned handle
+    // while the program is running
+    let _logger_handle = util::setup_logger();
     info!("Setup Logger and read configuration from 'config.yml'");
 
     let resources_config = Config::resources_config();

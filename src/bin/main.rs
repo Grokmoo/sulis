@@ -180,18 +180,6 @@ impl GameControlFlowUpdater {
     }
 }
 
-fn init() -> System {
-    // CONFIG will be lazily initialized here; if it fails it
-    // prints an error and exits
-    util::setup_logger();
-    info!("=========Initializing=========");
-    info!("Setup Logger and read configuration from 'config.yml'");
-
-    load_resources();
-
-    create_io()
-}
-
 fn create_io() -> System {
     Cursor::update_max();
 
@@ -239,7 +227,16 @@ fn load_resources() {
 }
 
 fn main() {
-    let system = init();
+    // CONFIG will be lazily initialized here; if it fails it
+    // prints an error and exits.  Don't drop the returned handle
+    // while the program is running
+    let _logger_handle = util::setup_logger();
+    info!("=========Initializing=========");
+    info!("Setup Logger and read configuration from 'config.yml'");
+
+    load_resources();
+
+    let system = create_io();
 
     let flow_controller = GameControlFlowUpdater::new(&system);
     system.main_loop(Box::new(flow_controller));

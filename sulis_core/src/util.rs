@@ -32,7 +32,7 @@ use std::time::Duration;
 
 use backtrace::Backtrace;
 use log::LevelFilter;
-use flexi_logger::{opt_format, Duplicate, FileSpec, Logger, LogSpecBuilder};
+use flexi_logger::{opt_format, Duplicate, FileSpec, Logger, LogSpecBuilder, LoggerHandle};
 use rand::{self, distributions::uniform::{SampleUniform}, seq::SliceRandom, Rng};
 use rand_pcg::Pcg64Mcg;
 
@@ -368,7 +368,8 @@ pub fn error_and_exit(error: &str) {
     ::std::process::exit(1)
 }
 
-pub fn setup_logger() {
+#[must_use]
+pub fn setup_logger() -> LoggerHandle {
     let mut path = config::USER_DIR.clone();
     path.push("log");
     let log_dir = path;
@@ -398,7 +399,7 @@ pub fn setup_logger() {
         .o_append(log_config.append)
         .format(opt_format);
 
-    logger.start().unwrap_or_else(|e| {
+    let handle = logger.start().unwrap_or_else(|e| {
         eprintln!("{}", e);
         eprintln!("There was a fatal error initializing logging to 'log/'");
         eprintln!("Exiting...");
@@ -420,6 +421,8 @@ pub fn setup_logger() {
     }));
 
     create_user_dirs();
+
+    handle
 }
 
 fn create_user_dirs() {

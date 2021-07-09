@@ -235,7 +235,7 @@ impl WidgetKind for CosmeticSelectorPane {
         };
         let offset = Offset {
             x: (child.state.inner_left() as f32) / scale.x + race.ticker_offset.0,
-            y: (child.state.inner_top() as f32) / scale.y + race.ticker_offset.1,
+            y: (child.state.inner_top() as f32) / scale.y + race.ticker_offset.1 - 0.25,
         };
 
         preview.draw(renderer, offset, scale, millis);

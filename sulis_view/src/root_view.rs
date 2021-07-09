@@ -24,7 +24,7 @@ use crate::{
     PortraitPane, PropWindow, QuestWindow, QuickItemBar, WorldMapWindow,
 };
 use sulis_core::config::Config;
-use sulis_core::io::{keyboard_event::Key, InputAction};
+use sulis_core::io::{keyboard_event::Key, InputActionKind};
 use sulis_core::ui::{Callback, Cursor, Scrollable, Widget, WidgetKind};
 use sulis_core::util;
 use sulis_core::widgets::{Button, ConfirmationWindow, Label};
@@ -430,9 +430,13 @@ impl WidgetKind for RootView {
         }
     }
 
-    fn on_key_press(&mut self, widget: &Rc<RefCell<Widget>>, key: InputAction) -> bool {
+    fn on_key_release(&mut self, _widget: &Rc<RefCell<Widget>>, _key: InputActionKind) -> bool {
+        true
+    }
+
+    fn on_key_press(&mut self, widget: &Rc<RefCell<Widget>>, key: InputActionKind) -> bool {
         trace!("Key press: {:?} in root view.", key);
-        use sulis_core::io::InputAction::*;
+        use sulis_core::io::InputActionKind::*;
         match key {
             Back => {
                 if !self.close_all_windows(widget) {
@@ -480,7 +484,7 @@ impl WidgetKind for RootView {
         info!("Adding to root widget.");
 
         let keys = Config::get_keybindings();
-        use InputAction::*;
+        use InputActionKind::*;
 
         self.console_widget.borrow_mut().state.set_visible(false);
 
@@ -721,8 +725,8 @@ impl WidgetKind for RootView {
 type CB = dyn Fn(&Rc<RefCell<Widget>>, &mut dyn WidgetKind);
 
 fn create_button(
-    keybindings: &HashMap<InputAction, Key>,
-    action: InputAction,
+    keybindings: &HashMap<InputActionKind, Key>,
+    action: InputActionKind,
     id: &str,
     cb: Rc<CB>,
 ) -> Rc<RefCell<Widget>> {

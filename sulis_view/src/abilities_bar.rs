@@ -21,7 +21,7 @@ use std::collections::HashMap;
 use std::collections::HashSet;
 use std::rc::Rc;
 
-use sulis_core::io::{event, keyboard_event::Key, InputAction};
+use sulis_core::io::{event, keyboard_event::Key, InputActionKind};
 use sulis_core::ui::{animation_state, Callback, Widget, WidgetKind, WidgetState};
 use sulis_core::util::{ExtInt, Size};
 use sulis_core::widgets::{Button, Label, ScrollDirection, ScrollPane, TextArea};
@@ -47,9 +47,9 @@ pub struct AbilitiesBar {
 impl AbilitiesBar {
     pub fn new(
         entity: Rc<RefCell<EntityState>>,
-        keys: &HashMap<InputAction, Key>,
+        keys: &HashMap<InputActionKind, Key>,
     ) -> Rc<RefCell<AbilitiesBar>> {
-        use InputAction::*;
+        use InputActionKind::*;
         let keys = vec![
             keys.get(&ActivateAbility1).cloned(),
             keys.get(&ActivateAbility2).cloned(),
@@ -72,8 +72,8 @@ impl AbilitiesBar {
         }))
     }
 
-    pub fn check_handle_keybinding(&self, key: InputAction) -> bool {
-        use InputAction::*;
+    pub fn check_handle_keybinding(&self, key: InputActionKind) -> bool {
+        use InputActionKind::*;
         match key {
             ActivateAbility1 => self.do_ability(0),
             ActivateAbility2 => self.do_ability(1),

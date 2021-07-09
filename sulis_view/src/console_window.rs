@@ -18,7 +18,7 @@ use std::any::Any;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use sulis_core::io::InputAction;
+use sulis_core::io::InputActionKind;
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_core::widgets::{InputField, Label};
 use sulis_state::{GameState, ScriptState};
@@ -92,17 +92,17 @@ impl WidgetKind for ConsoleWindow {
             .set_key_press_callback(Rc::new(|widget, field, key| {
                 let (parent, console) = Widget::parent_mut::<ConsoleWindow>(widget);
                 match key {
-                    InputAction::ToggleConsole => {
+                    InputActionKind::ToggleConsole => {
                         Widget::clear_keyboard_focus(widget);
                         parent.borrow_mut().state.set_visible(false);
                     }
-                    InputAction::ScrollUp => {
+                    InputActionKind::ScrollUp => {
                         if console.history_index > 0 {
                             console.history_index -= 1;
                             field.set_text(&console.current_history_text(), widget);
                         }
                     }
-                    InputAction::ScrollDown => {
+                    InputActionKind::ScrollDown => {
                         if console.history_index < console.history.len() {
                             console.history_index += 1;
                             field.set_text(&console.current_history_text(), widget);

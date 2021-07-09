@@ -22,7 +22,7 @@ use std::rc::Rc;
 
 use sulis_core::config::DisplayMode;
 use sulis_core::config::{self, Config, RawClick};
-use sulis_core::io::{event::ClickKind, keyboard_event::Key, DisplayConfiguration, InputAction};
+use sulis_core::io::{event::ClickKind, keyboard_event::Key, DisplayConfiguration, InputActionKind};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_core::widgets::{Button, Label, ScrollDirection, ScrollPane, TextArea};
 
@@ -48,7 +48,7 @@ pub struct Options {
     cur_anim_speed: u32,
     cur_scroll_speed: f32,
     cur_edge_scrolling: bool,
-    cur_keybindings: Vec<(Key, InputAction)>,
+    cur_keybindings: Vec<(Key, InputActionKind)>,
     cur_click_actions: Vec<(RawClick, ClickKind)>,
 
     cur_crit_screen_shake: bool,
@@ -885,13 +885,13 @@ impl WidgetKind for MousePopup {
 }
 
 pub struct KeybindingPopup {
-    action: InputAction,
+    action: InputActionKind,
     options_widget: Rc<RefCell<Widget>>,
 }
 
 impl KeybindingPopup {
     pub fn new(
-        action: InputAction,
+        action: InputActionKind,
         options_widget: Rc<RefCell<Widget>>,
     ) -> Rc<RefCell<KeybindingPopup>> {
         Rc::new(RefCell::new(KeybindingPopup {

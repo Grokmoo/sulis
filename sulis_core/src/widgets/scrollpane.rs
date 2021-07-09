@@ -19,7 +19,7 @@ use std::cell::RefCell;
 use std::cmp;
 use std::rc::Rc;
 
-use crate::io::{GraphicsRenderer, InputAction, event::ClickKind};
+use crate::io::{GraphicsRenderer, InputActionKind, event::ClickKind};
 use crate::ui::{Callback, Widget, WidgetKind, WidgetState};
 use crate::util::{Point, Size};
 use crate::widget_kind;
@@ -160,10 +160,10 @@ impl WidgetKind for ScrollPane {
         renderer.set_scissor(Point::new(x, y), Size::new(width, height));
     }
 
-    fn on_key_press(&mut self, _widget: &Rc<RefCell<Widget>>, key: InputAction) -> bool {
+    fn on_key_press(&mut self, _widget: &Rc<RefCell<Widget>>, key: InputActionKind) -> bool {
         let delta = match key {
-            InputAction::ZoomIn => -1,
-            InputAction::ZoomOut => 1,
+            InputActionKind::ZoomIn => -1,
+            InputActionKind::ZoomOut => 1,
             _ => return false,
         };
 

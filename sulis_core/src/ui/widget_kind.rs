@@ -19,7 +19,7 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 use crate::io::event::ClickKind;
-use crate::io::{keyboard_event::Key, GraphicsRenderer, InputAction};
+use crate::io::{keyboard_event::Key, GraphicsRenderer, InputActionKind};
 use crate::ui::{animation_state, Cursor, Widget};
 use crate::util::Point;
 
@@ -202,7 +202,11 @@ pub trait WidgetKind {
         false
     }
 
-    fn on_key_press(&mut self, _widget: &Rc<RefCell<Widget>>, _key: InputAction) -> bool {
+    fn on_key_press(&mut self, _widget: &Rc<RefCell<Widget>>, _key: InputActionKind) -> bool {
+        false
+    }
+
+    fn on_key_release(&mut self, _widget: &Rc<RefCell<Widget>>, _key: InputActionKind) -> bool {
         false
     }
 

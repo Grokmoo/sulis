@@ -19,7 +19,7 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 use crate::image::Image;
-use crate::io::{GraphicsRenderer, InputAction};
+use crate::io::{GraphicsRenderer, InputActionKind};
 use crate::resource::ResourceSet;
 use crate::ui::{Callback, LineRenderer, Widget, WidgetKind};
 use crate::util::{Point, Rect};
@@ -27,7 +27,7 @@ use crate::widgets::Label;
 
 const NAME: &str = "input_field";
 
-type KeyPressCallback = Rc<dyn Fn(&Rc<RefCell<Widget>>, &mut InputField, InputAction)>;
+type KeyPressCallback = Rc<dyn Fn(&Rc<RefCell<Widget>>, &mut InputField, InputActionKind)>;
 
 pub struct InputField {
     pub text: String,
@@ -155,7 +155,7 @@ impl WidgetKind for InputField {
         true
     }
 
-    fn on_key_press(&mut self, widget: &Rc<RefCell<Widget>>, key: InputAction) -> bool {
+    fn on_key_press(&mut self, widget: &Rc<RefCell<Widget>>, key: InputActionKind) -> bool {
         let cb = self.key_press_callback.clone();
         if let Some(ref cb) = cb {
             (cb)(widget, self, key);

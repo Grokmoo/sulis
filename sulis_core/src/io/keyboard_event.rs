@@ -14,9 +14,12 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use crate::io::InputActionState;
+
 #[derive(Copy, Clone, Debug)]
 pub struct KeyboardEvent {
     pub key: Key,
+    pub state: InputActionState,
 }
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash, Deserialize, Serialize, PartialOrd)]

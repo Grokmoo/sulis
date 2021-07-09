@@ -23,7 +23,7 @@ pub use self::event::Event;
 mod glium_adapter;
 
 mod input_action;
-pub use self::input_action::InputAction;
+pub use self::input_action::{InputAction, InputActionKind, InputActionState};
 
 pub mod keyboard_event;
 pub use self::keyboard_event::KeyboardEvent;

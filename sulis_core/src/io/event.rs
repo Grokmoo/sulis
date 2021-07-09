@@ -14,7 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use crate::io::{keyboard_event::Key, InputAction};
+use crate::io::{keyboard_event::Key, InputActionKind};
 
 #[derive(Copy, Clone, Debug)]
 pub struct Event {
@@ -58,7 +58,8 @@ pub enum Kind {
     MouseEnter,
     MouseExit,
     CharTyped(char),
-    KeyPress(InputAction),
+    KeyPress(InputActionKind),
+    KeyRelease(InputActionKind),
     RawKey(Key),
 }
 

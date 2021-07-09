@@ -670,8 +670,8 @@ impl WidgetKind for AreaView {
         vec![Rc::clone(&self.targeter_label), fade]
     }
 
-    fn on_key_press(&mut self, widget: &Rc<RefCell<Widget>>, key: InputAction) -> bool {
-        use sulis_core::io::InputAction::*;
+    fn on_key_press(&mut self, widget: &Rc<RefCell<Widget>>, key: InputActionKind) -> bool {
+        use sulis_core::io::InputActionKind::*;
         let delta = match key {
             ZoomIn => 0.1,
             ZoomOut => -0.1,

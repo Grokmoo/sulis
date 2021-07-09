@@ -26,7 +26,7 @@ use serde::{Deserialize, Deserializer};
 use log::{Level, LevelFilter};
 
 use crate::io::keyboard_event::Key;
-use crate::io::{event::ClickKind, InputAction, KeyboardEvent};
+use crate::io::{event::ClickKind, InputActionKind, InputAction, KeyboardEvent};
 
 thread_local! {
     static CONFIG: RefCell<Config> = RefCell::new(Config::init());
@@ -137,7 +137,7 @@ impl Config {
         CONFIG.with(|c| c.borrow().resources.clone())
     }
 
-    pub fn get_keybindings() -> HashMap<InputAction, Key> {
+    pub fn get_keybindings() -> HashMap<InputActionKind, Key> {
         CONFIG.with(|c| {
             c.borrow()
                 .input
@@ -154,7 +154,11 @@ impl Config {
 
     pub fn get_input_action(k: KeyboardEvent) -> Option<InputAction> {
         debug!("Got keyboard input '{:?}'", k);
-        CONFIG.with(|c| c.borrow().input.keybindings.get(&k.key).copied())
+        CONFIG.with(|c| {
+            let kind = c.borrow().input.keybindings.get(&k.key).copied();
+
+            kind.map(|kind| InputAction { kind, state: k.state })
+        })
     }
 
     pub fn scroll_speed() -> f32 {
@@ -296,7 +300,7 @@ pub struct ResourcesConfig {
 pub struct InputConfig {
     pub edge_scrolling: bool,
     pub scroll_speed: f32,
-    pub keybindings: HashMap<Key, InputAction>,
+    pub keybindings: HashMap<Key, InputActionKind>,
     pub click_actions: HashMap<RawClick, ClickKind>,
     pub crit_screen_shake: bool,
 }

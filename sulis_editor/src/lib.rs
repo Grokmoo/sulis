@@ -77,7 +77,7 @@ use std::any::Any;
 use std::cell::{RefCell, Cell};
 use std::rc::Rc;
 
-use sulis_core::io::{GraphicsRenderer, InputAction, ControlFlowUpdater};
+use sulis_core::io::{GraphicsRenderer, InputActionKind, ControlFlowUpdater};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_core::util::{Offset, Scale};
 use sulis_core::widgets::{list_box, Button, ConfirmationWindow, DropDown};
@@ -164,8 +164,8 @@ impl WidgetKind for EditorView {
         self
     }
 
-    fn on_key_press(&mut self, widget: &Rc<RefCell<Widget>>, key: InputAction) -> bool {
-        use crate::InputAction::*;
+    fn on_key_press(&mut self, widget: &Rc<RefCell<Widget>>, key: InputActionKind) -> bool {
+        use crate::InputActionKind::*;
         match key {
             Back => {
                 let exit_window = Widget::with_theme(

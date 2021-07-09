@@ -579,7 +579,7 @@ pub(crate) fn main_loop(
             Event::MainEventsCleared => {
                 // merge all mouse move events into at most one per frame
                 if let Some((mouse_x, mouse_y)) = mouse_move {
-                    InputAction::handle_action(InputAction::MouseMove(mouse_x, mouse_y), &root);
+                    InputAction::mouse_move(mouse_x, mouse_y).handle(&root);
                 }
                 mouse_move = None;
 
@@ -632,7 +632,7 @@ pub(crate) fn main_loop(
                         }
                         _ => {
                             for action in process_window_event(event) {
-                                InputAction::handle_action(action, &root);
+                                action.handle(&root);
                             }
                         }
                     }
@@ -663,19 +663,21 @@ fn get_min_filter(filter: TextureMinFilter) -> MinifySamplerFilter {
 fn process_window_event(event: WindowEvent) -> Vec<InputAction> {
     use WindowEvent::*;
     match event {
-        CloseRequested => vec![InputAction::Exit],
-        ReceivedCharacter(c) => vec![InputAction::CharReceived(c)],
+        CloseRequested => vec![InputAction::exit()],
+        ReceivedCharacter(c) => vec![InputAction::char_received(c)],
         KeyboardInput { input, .. } => {
             let mut result = Vec::new();
             let kb_event = match process_keyboard_input(input) {
                 None => return Vec::new(),
                 Some(evt) => evt,
             };
-            result.push(InputAction::RawKey(kb_event.key));
-            match Config::get_input_action(kb_event) {
-                None => (),
-                Some(action) => result.push(action),
-            };
+            if matches!(kb_event.state, InputActionState::Started) {
+                result.push(InputAction::raw_key(kb_event.key));
+            }
+            
+            if let Some(action) = Config::get_input_action(kb_event) {
+                result.push(action);
+            }
             result
         }
         MouseInput { state, button, .. } => {
@@ -688,8 +690,8 @@ fn process_window_event(event: WindowEvent) -> Vec<InputAction> {
             };
 
             match state {
-                ElementState::Pressed => vec![InputAction::MouseDown(kind)],
-                ElementState::Released => vec![InputAction::MouseUp(kind)],
+                ElementState::Pressed => vec![InputAction::mouse_pressed(kind)],
+                ElementState::Released => vec![InputAction::mouse_released(kind)],
             }
         }
         MouseWheel { delta, .. } => {
@@ -707,16 +709,17 @@ fn process_window_event(event: WindowEvent) -> Vec<InputAction> {
                 return Vec::new();
             };
 
-            vec![InputAction::MouseScroll(amount)]
+            vec![InputAction::mouse_scroll(amount)]
         }
         _ => Vec::new(),
     }
 }
 
 fn process_keyboard_input(input: KeyboardInput) -> Option<KeyboardEvent> {
-    if input.state != ElementState::Pressed {
-        return None;
-    }
+    let state = match input.state {
+        ElementState::Pressed => InputActionState::Started,
+        ElementState::Released => InputActionState::Stopped,
+    };
     trace!("Glium keyboard input {:?}", input);
 
     let key_code = match input.virtual_keycode {
@@ -804,5 +807,5 @@ fn process_keyboard_input(input: KeyboardInput) -> Option<KeyboardEvent> {
         _ => KeyUnknown,
     };
 
-    Some(KeyboardEvent { key })
+    Some(KeyboardEvent { key, state })
 }

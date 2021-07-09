@@ -19,7 +19,7 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 use sulis_core::io::event::ClickKind;
-use sulis_core::io::{GraphicsRenderer, InputAction};
+use sulis_core::io::{GraphicsRenderer, InputActionKind};
 use sulis_core::ui::{compute_area_scaling, Cursor, Scrollable, Widget, WidgetKind};
 use sulis_core::util::{Offset, Point, Scale};
 use sulis_module::area::MAX_AREA_SIZE;
@@ -143,10 +143,10 @@ impl WidgetKind for AreaEditor {
         }
     }
 
-    fn on_key_press(&mut self, _widget: &Rc<RefCell<Widget>>, key: InputAction) -> bool {
+    fn on_key_press(&mut self, _widget: &Rc<RefCell<Widget>>, key: InputActionKind) -> bool {
         let delta = match key {
-            InputAction::ZoomIn => 1,
-            InputAction::ZoomOut => -1,
+            InputActionKind::ZoomIn => 1,
+            InputActionKind::ZoomOut => -1,
             _ => return false,
         };
 

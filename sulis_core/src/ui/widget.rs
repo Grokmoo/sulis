@@ -811,6 +811,7 @@ impl Widget {
                 .borrow_mut()
                 .on_mouse_drag(widget, kind, delta_x, delta_y),
             KeyPress(action) => widget_kind.borrow_mut().on_key_press(widget, action),
+            KeyRelease(action) => widget_kind.borrow_mut().on_key_release(widget, action),
             RawKey(key) => widget_kind.borrow_mut().on_raw_key(widget, key),
             MouseEnter => enter_exit_retval,
             MouseExit => enter_exit_retval,

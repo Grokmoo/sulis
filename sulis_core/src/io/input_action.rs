@@ -21,9 +21,20 @@ use crate::io::event::{ClickKind, Kind};
 use crate::io::{keyboard_event::Key, Event};
 use crate::ui::{Cursor, Widget};
 
+pub struct InputAction {
+    pub kind: InputActionKind,
+    pub state: InputActionState,
+}
+
+#[derive(Copy, Clone, Debug)]
+pub enum InputActionState {
+    Started,
+    Stopped,
+}
+
 #[derive(Debug, Deserialize, Serialize, Copy, Clone, PartialOrd)]
 #[serde(deny_unknown_fields)]
-pub enum InputAction {
+pub enum InputActionKind {
     ToggleConsole,
     ToggleInventory,
     ToggleCharacter,
@@ -62,23 +73,22 @@ pub enum InputAction {
     ActivateAbility10,
     Exit,
     MouseMove(f32, f32),
-    MouseDown(ClickKind),
-    MouseUp(ClickKind),
+    MouseButton(ClickKind),
     MouseScroll(i32),
     CharReceived(char),
     RawKey(Key),
 }
 
-impl std::cmp::Eq for InputAction {}
+impl std::cmp::Eq for InputActionKind {}
 
 // input action hashmap should never include the variants with data
-impl std::cmp::PartialEq for InputAction {
-    fn eq(&self, other: &InputAction) -> bool {
+impl std::cmp::PartialEq for InputActionKind {
+    fn eq(&self, other: &InputActionKind) -> bool {
         std::mem::discriminant(self) == std::mem::discriminant(other)
     }
 }
 
-impl std::hash::Hash for InputAction {
+impl std::hash::Hash for InputActionKind {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
         std::mem::discriminant(self).hash(state);
         // we don't care if different data leads to the same hash
@@ -86,23 +96,78 @@ impl std::hash::Hash for InputAction {
 }
 
 impl InputAction {
-    pub fn handle_action(action: InputAction, root: &Rc<RefCell<Widget>>) {
+    pub fn mouse_move(x: f32, y: f32) -> InputAction {
+        InputAction {
+            kind: InputActionKind::MouseMove(x, y),
+            state: InputActionState::Started,
+        }
+    }
+
+    pub fn mouse_pressed(kind: ClickKind) -> InputAction {
+        InputAction {
+            kind: InputActionKind::MouseButton(kind),
+            state: InputActionState::Started,
+        }
+    }
+
+    pub fn mouse_released(kind: ClickKind) -> InputAction {
+        InputAction {
+            kind: InputActionKind::MouseButton(kind),
+            state: InputActionState::Stopped,
+        }
+    }
+
+    pub fn raw_key(key: Key) -> InputAction {
+        InputAction {
+            kind: InputActionKind::RawKey(key),
+            state: InputActionState::Started,
+        }
+    }
+
+    pub fn exit() -> InputAction {
+        InputAction {
+            kind: InputActionKind::Exit,
+            state: InputActionState::Started,
+        }
+    }
+
+    pub fn char_received(c: char) -> InputAction {
+        InputAction {
+            kind: InputActionKind::CharReceived(c),
+            state: InputActionState::Started,
+        }
+    }
+
+    pub fn mouse_scroll(amount: i32) -> InputAction {
+        InputAction {
+            kind: InputActionKind::MouseScroll(amount),
+            state: InputActionState::Started,
+        }
+    }
+
+    pub fn handle(self, root: &Rc<RefCell<Widget>>) {
+        use InputActionKind::*;
         // don't spam tons of mouse move actions in the event logs
-        match action {
+        match self.kind {
             MouseMove(_, _) => (),
-            _ => debug!("Received action {:?}", action),
+            _ => debug!("Received action {:?}", self.kind),
         }
 
-        use crate::io::InputAction::*;
-        match action {
+        match self.kind {
+            MouseButton(kind) => {
+                match self.state {
+                    InputActionState::Started => Cursor::press(root, kind),
+                    InputActionState::Stopped => Cursor::release(root, kind),
+                }
+            }
             MouseMove(x, y) => Cursor::move_to(root, x, y),
-            MouseDown(kind) => Cursor::press(root, kind),
-            MouseUp(kind) => Cursor::release(root, kind),
             MouseScroll(scroll) => {
                 if scroll > 0 {
-                    InputAction::fire_action(ZoomIn, root);
+                    let event = Event::new(Kind::KeyPress(ZoomIn));
+                    Widget::dispatch_event(root, event);
                 } else {
-                    InputAction::fire_action(ZoomOut, root);
+                    let event = Event::new(Kind::KeyPress(ZoomOut));
+                    Widget::dispatch_event(root, event);
                 }
             }
             CharReceived(c) => {
@@ -111,14 +176,15 @@ impl InputAction {
             RawKey(key) => {
                 Widget::dispatch_event(root, Event::new(Kind::RawKey(key)));
             }
-            _ => InputAction::fire_action(action, root),
+            _ => {
+                let kind = match self.state {
+                    InputActionState::Started => Kind::KeyPress(self.kind),
+                    InputActionState::Stopped => Kind::KeyRelease(self.kind),
+                };
+
+                let event = Event::new(kind);
+                Widget::dispatch_event(root, event);
+            }
         }
-    }
-
-    fn fire_action(action: InputAction, root: &Rc<RefCell<Widget>>) {
-        debug!("Firing action {:?}", action);
-
-        let event = Event::new(Kind::KeyPress(action));
-        Widget::dispatch_event(root, event);
     }
 }

@@ -18,7 +18,7 @@ use std::any::Any;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use sulis_core::io::{event, InputAction};
+use sulis_core::io::{event, InputActionKind};
 use sulis_core::ui::{theme, Widget, WidgetKind};
 use sulis_core::widgets::TextArea;
 use sulis_module::{conversation::Response, Conversation, OnTrigger};
@@ -62,10 +62,10 @@ impl DialogWindow {
 impl WidgetKind for DialogWindow {
     widget_kind!(NAME);
 
-    fn on_key_press(&mut self, widget: &Rc<RefCell<Widget>>, key: InputAction) -> bool {
+    fn on_key_press(&mut self, widget: &Rc<RefCell<Widget>>, key: InputActionKind) -> bool {
         let (root, view) = Widget::parent_mut::<RootView>(widget);
 
-        use sulis_core::io::InputAction::*;
+        use sulis_core::io::InputActionKind::*;
         match key {
             Back => view.show_menu(&root),
             Exit => view.show_exit(&root),

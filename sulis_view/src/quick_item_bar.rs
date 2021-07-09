@@ -23,7 +23,7 @@ use crate::{
     item_callback_handler::{clear_quickslot_cb, use_item_cb},
     ItemButton,
 };
-use sulis_core::io::{keyboard_event::Key, InputAction};
+use sulis_core::io::{keyboard_event::Key, InputActionKind};
 use sulis_core::ui::{animation_state, Callback, Widget, WidgetKind};
 use sulis_core::widgets::{Button, Label};
 use sulis_module::QuickSlot;
@@ -41,14 +41,14 @@ pub struct QuickItemBar {
 impl QuickItemBar {
     pub fn new(
         entity: &Rc<RefCell<EntityState>>,
-        keybindings: &HashMap<InputAction, Key>,
+        keybindings: &HashMap<InputActionKind, Key>,
     ) -> Rc<RefCell<QuickItemBar>> {
-        let swap_weapons_key = keybindings.get(&InputAction::SwapWeapons).cloned();
+        let swap_weapons_key = keybindings.get(&InputActionKind::SwapWeapons).cloned();
         let quick_item_keys = [
-            keybindings.get(&InputAction::QuickItem1).cloned(),
-            keybindings.get(&InputAction::QuickItem2).cloned(),
-            keybindings.get(&InputAction::QuickItem3).cloned(),
-            keybindings.get(&InputAction::QuickItem4).cloned(),
+            keybindings.get(&InputActionKind::QuickItem1).cloned(),
+            keybindings.get(&InputActionKind::QuickItem2).cloned(),
+            keybindings.get(&InputActionKind::QuickItem3).cloned(),
+            keybindings.get(&InputActionKind::QuickItem4).cloned(),
         ];
 
         Rc::new(RefCell::new(QuickItemBar {
@@ -59,8 +59,8 @@ impl QuickItemBar {
         }))
     }
 
-    pub fn check_handle_keybinding(&self, key: InputAction) -> bool {
-        use sulis_core::io::InputAction::*;
+    pub fn check_handle_keybinding(&self, key: InputActionKind) -> bool {
+        use sulis_core::io::InputActionKind::*;
         match key {
             SwapWeapons => self.swap(),
             QuickItem1 => self.do_quick_item(0),

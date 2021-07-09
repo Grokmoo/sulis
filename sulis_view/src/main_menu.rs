@@ -37,7 +37,7 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 use sulis_core::config::Config;
-use sulis_core::io::{DisplayConfiguration, InputAction, AudioDeviceInfo};
+use sulis_core::io::{DisplayConfiguration, InputActionKind, AudioDeviceInfo};
 use sulis_core::ui::*;
 use sulis_core::util;
 use sulis_core::widgets::{Button, ConfirmationWindow, TextArea};
@@ -106,8 +106,8 @@ impl MainMenu {
 impl WidgetKind for MainMenu {
     widget_kind!("main_menu");
 
-    fn on_key_press(&mut self, widget: &Rc<RefCell<Widget>>, key: InputAction) -> bool {
-        use sulis_core::io::InputAction::*;
+    fn on_key_press(&mut self, widget: &Rc<RefCell<Widget>>, key: InputActionKind) -> bool {
+        use sulis_core::io::InputActionKind::*;
         match key {
             Exit | Back => {
                 let exit_window = Widget::with_theme(

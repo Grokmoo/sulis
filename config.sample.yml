@@ -2,7 +2,7 @@
 # The main game configuration file.  User preferences are set here.
 
 # If the user has an old revision, their config is automatically recreated from the sample.
-revision: 19
+revision: 20
 
 display:
     # Display Mode - Fullscreen, BorderlessWindow, Window
@@ -95,16 +95,16 @@ input:
         KeyJ: ToggleJournal
         KeyR: Rest
         KeySpace: EndTurn
-        KeyDown: ScrollDown
-        KeyUp: ScrollUp
-        KeyLeft: ScrollLeft
-        KeyRight: ScrollRight
+        KeyS: ScrollDown
+        KeyW: ScrollUp
+        KeyA: ScrollLeft
+        KeyD: ScrollRight
         KeyPageUp: ZoomIn
         KeyPageDown: ZoomOut
         KeyF5: QuickSave
         KeyGrave: ToggleConsole
         KeyP: SelectAll
-        KeyS: SwapWeapons
+        KeyX: SwapWeapons
         KeyF1: SelectPartyMember1
         KeyF2: SelectPartyMember2
         KeyF3: SelectPartyMember3

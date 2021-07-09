@@ -4,17 +4,17 @@ initial_nodes:
 nodes:
   start01:
     text: |
-      [c=888|As the dust clears, you see a couple members of your party around you, but no sign of Torvald.  It seems also that the goblins have left, at least for now.]
+      [c=888|As the dust clears, you see a couple members of your party around you, but no sign of Tervald.  It seems also that the goblins have left, at least for now.]
     responses:
       - text: |
           What happened?
         to: start02
       - text: |
-          Where is Torvald?
+          Where is Tervald?
         to: start02
   start02:
     text: |
-      [c=6868FF|#target_name#] - The goblins set some sort of trap for us.  I think we have to assume Torvald is dead.
+      [c=6868FF|#target_name#] - The goblins set some sort of trap for us.  I think we have to assume Tervald is dead.
     responses:
       - text: |
           So what now?

@@ -59,6 +59,8 @@ pub struct RootView {
     quick_item_bar: Option<Rc<RefCell<Widget>>>,
     abilities_bar: Option<Rc<RefCell<Widget>>>,
     area: String,
+
+    scroll_keys_down: Vec<InputActionKind>,
 }
 
 impl RootView {
@@ -100,6 +102,7 @@ impl RootView {
             console_widget,
             quick_item_bar: None,
             abilities_bar: None,
+            scroll_keys_down: Vec::new(),
         }))
     }
 
@@ -415,22 +418,43 @@ impl WidgetKind for RootView {
             self.area_view.borrow_mut().clear_area_mouseover();
         }
 
+        let mut scroll_x = 0.0;
+        let mut scroll_y = 0.0;
+        for key in self.scroll_keys_down.iter() {
+            use sulis_core::io::InputActionKind::*;
+            match key {
+                ScrollUp => scroll_y += 1.0,
+                ScrollDown => scroll_y -= 1.0,
+                ScrollLeft => scroll_x += 1.0,
+                ScrollRight => scroll_x -= 1.0,
+                _ => (),
+            }
+        }
+
         if !has_modal && Config::edge_scrolling() {
             if cx == Config::ui_width() - 1 {
-                self.area_view.borrow_mut().scroll(-2.0, 0.0, millis);
+                scroll_x -= 1.0;
             } else if cx == 0 {
-                self.area_view.borrow_mut().scroll(2.0, 0.0, millis);
+                scroll_x += 1.0;
             }
 
             if cy == Config::ui_height() - 1 {
-                self.area_view.borrow_mut().scroll(0.0, -2.0, millis);
+                scroll_y -= 1.0;
             } else if cy == 0 {
-                self.area_view.borrow_mut().scroll(0.0, 2.0, millis);
+                scroll_y += 1.0;
             }
+        }
+
+        if scroll_x != 0.0 || scroll_y != 0.0 {
+            self.area_view.borrow_mut().scroll(scroll_x * 2.0, scroll_y * 2.0, millis);
         }
     }
 
-    fn on_key_release(&mut self, _widget: &Rc<RefCell<Widget>>, _key: InputActionKind) -> bool {
+    fn on_key_release(&mut self, _widget: &Rc<RefCell<Widget>>, key: InputActionKind) -> bool {
+        if let Some(index) = self.scroll_keys_down.iter().position(|k| *k == key) {
+            self.scroll_keys_down.remove(index);
+        }
+
         true
     }
 
@@ -454,10 +478,13 @@ impl WidgetKind for RootView {
             Exit => self.show_exit(widget),
             SelectAll => GameState::select_party_members(GameState::party()),
             QuickSave => self.save(),
-            ScrollUp => self.area_view.borrow_mut().scroll(0.0, 2.0, 33),
-            ScrollDown => self.area_view.borrow_mut().scroll(0.0, -2.0, 33),
-            ScrollRight => self.area_view.borrow_mut().scroll(-2.0, 0.0, 33),
-            ScrollLeft => self.area_view.borrow_mut().scroll(2.0, 0.0, 33),
+            ScrollUp | ScrollDown | ScrollRight | ScrollLeft => {
+                self.scroll_keys_down.push(key);
+                self.scroll_keys_down.sort_by(|k1, k2| {
+                    k1.partial_cmp(k2).unwrap()
+                });
+                self.scroll_keys_down.dedup();
+            },
             SelectPartyMember1 => self.select_party_member(0),
             SelectPartyMember2 => self.select_party_member(1),
             SelectPartyMember3 => self.select_party_member(2),

@@ -84,6 +84,9 @@ themes:
           x: Center
           width: ChildSum
         children:
+          continue:
+            from: main_menu.button
+            text: "Continue"
           module:
             from: main_menu.button
             text: "Select Campaign"
@@ -102,9 +105,13 @@ themes:
           links:
             from: main_menu.button
             text: "Credits & Docs"
-          exit:
-            from: main_menu.button
-            text: "Exit Sulis"
+      exit:
+        from: main_menu.button
+        text: "Exit"
+        position: [-2, 2]
+        size: [15, 12]
+        relative:
+          x: Max
       content: {}
       load_window:
         from: load_window_base

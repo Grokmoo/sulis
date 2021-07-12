@@ -163,6 +163,17 @@ impl WidgetKind for MainMenu {
 
         let menu_pane = Widget::empty("menu_pane");
 
+        let cont = Widget::with_theme(Button::empty(), "continue");
+        cont.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
+            let root = Widget::get_root(widget);
+            let load_window = LoadWindow::new(true);
+
+            if load_window.borrow().entries.is_empty() { return; } // no available files to load
+
+            load_window.borrow_mut().selected_entry = Some(0); // load most recent
+            load_window.borrow_mut().load(&root);
+        })));
+
         let new = Widget::with_theme(Button::empty(), "new");
         new.borrow_mut()
             .state
@@ -269,19 +280,21 @@ impl WidgetKind for MainMenu {
         }
 
         if !Module::is_initialized() {
+            cont.borrow_mut().state.set_enabled(false);
             new.borrow_mut().state.set_enabled(false);
             load.borrow_mut().state.set_enabled(false);
             module_title.borrow_mut().state.set_visible(false);
         } else if !save_file::has_available_save_files() {
+            cont.borrow_mut().state.set_enabled(false);
             load.borrow_mut().state.set_enabled(false);
         }
 
         Widget::add_children_to(
             &menu_pane,
-            vec![module, new, load, mods, options, links, exit],
+            vec![module, cont, new, load, mods, options, links],
         );
 
-        let mut children = vec![background, title, module_title, menu_pane];
+        let mut children = vec![background, title, module_title, menu_pane, exit];
 
         if let Some(tip_text) = &self.tip_text {
             let tip_pane = Widget::empty("tip_pane");

@@ -33,8 +33,8 @@ pub struct LoadWindow {
     accept: Rc<RefCell<Widget>>,
     delete: Rc<RefCell<Widget>>,
     pub(crate) cancel: Rc<RefCell<Widget>>,
-    entries: Vec<SaveFileMetaData>,
-    selected_entry: Option<usize>,
+    pub(crate) entries: Vec<SaveFileMetaData>,
+    pub(crate) selected_entry: Option<usize>,
     main_menu_mode: bool,
 }
 

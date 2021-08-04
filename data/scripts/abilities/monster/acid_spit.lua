@@ -40,7 +40,7 @@ end
 function attack_target(parent, ability, targets)
   local target = targets:first()
   
-  local hit = parent:special_attack(target, "Reflex", "Ranged", 10, 20, 8, "Acid")
+  local hit = parent:special_attack(target, "Reflex", "Ranged", 15, 30, 8, "Acid")
   local amount = -8
   if hit:is_miss() then
     return

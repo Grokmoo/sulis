@@ -12,7 +12,7 @@ attributes:
   int: 10
   wis: 10
 levels:
-  fighter: 6
+  fighter: 8
 images:
   Background: creatures/slime1
 reward:

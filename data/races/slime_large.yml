@@ -5,15 +5,15 @@ size: 3by3
 movement_rate: 0.4
 move_anim_rate: 0.7
 base_stats:
-  - kind: { attribute: { attribute: Strength, amount: 3 } }
-  - kind: { attribute: { attribute: Dexterity, amount: -5 } }
-  - kind: { attribute: { attribute: Endurance, amount: 3 } }
+  - kind: { attribute: { attribute: Strength, amount: 5 } }
+  - kind: { attribute: { attribute: Dexterity, amount: -2 } }
+  - kind: { attribute: { attribute: Endurance, amount: 5 } }
   - kind: { attribute: { attribute: Perception, amount: -3 } }
   - kind: { attribute: { attribute: Intellect, amount: -5 } }
   - kind: { hit_points: 40 }
   - kind: { reach: 0.0 }
   - kind: { resistance: { kind: "Acid", amount: 100 } }
-  - kind: { resistance: { kind: "Fire", amount: -25 } }
+  - kind: { resistance: { kind: "Fire", amount: -20 } }
   - kind: { resistance: { kind: "Slashing", amount: 50 } }
   - kind: { resistance: { kind: "Piercing", amount: 50 } }
   - kind: { resistance: { kind: "Crushing", amount: 25 } }
@@ -21,8 +21,8 @@ base_stats:
   - kind: { sneak_attack_immunity }
 base_attack:
   damage:
-    min: 12
-    max: 16
+    min: 15
+    max: 20
     kind: Acid
   kind: #Melee
     reach: 1.5

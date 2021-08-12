@@ -13,7 +13,7 @@ active:
   combat_only: true
   requires_melee: true
   range:
-    Radius: 4.0
+    Radius: 5.0
   ai:
     priority: 100
     kind: Damage

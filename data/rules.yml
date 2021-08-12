@@ -9,7 +9,7 @@ max_overflow_ap: 2000
 min_overflow_ap: -4000
 movement_ap: 100
 attack_ap: 2000
-swap_weapons_ap: 2000
+swap_weapons_ap: 1000
 initiative_roll_max: 20
 base_flanking_angle: 150
 

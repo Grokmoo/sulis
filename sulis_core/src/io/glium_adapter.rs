@@ -490,7 +490,6 @@ impl GliumDisplay {
         for (index, monitor_id) in event_loop.available_monitors().enumerate() {
             // glium get_name() does not seem to return anything useful in most cases
             let name = format!("Monitor {}", index + 1);
-            let modes: Vec<(u32, u32)> = monitor_id.video_modes().map(|mode| mode.size().into()).collect();
 
             let dims: (u32, u32) = monitor_id.size().into();
 
@@ -500,7 +499,7 @@ impl GliumDisplay {
 
                 if w > dims.0 || h > dims.1 { continue; }
 
-                let fullscreen = modes.contains(&(w, h));
+                let fullscreen = monitor_id.video_modes().any(|mode| mode.size().width == w && mode.size().height == h);
                 let monitor_size = w == dims.0 && h == dims.1;
 
                 resolutions.push(Resolution { width: w, height: h, fullscreen, monitor_size });

@@ -28,7 +28,7 @@ inventory:
   quick:
     Usable1: { id: potion_healing }
 levels:
-  rogue: 10
+  rogue: 12
 abilities:
   - armor_light
   - armor_medium
@@ -40,4 +40,5 @@ abilities:
   - become_wind
   - rupture
   - pierce
+  - boss_hit_points
 ai: ai_melee

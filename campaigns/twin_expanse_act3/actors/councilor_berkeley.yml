@@ -64,4 +64,6 @@ abilities:
   - vacuum
   - chameleon
   - cryofreeze
+  - boss_hit_points
+  - boss_hit_points
 ai: ai_berkeley

@@ -27,7 +27,7 @@ inventory:
     Hands: { id: gloves_leather }
   quick: {}
 levels:
-  rogue: 9
+  rogue: 10
 abilities:
   - armor_light
   - armor_medium

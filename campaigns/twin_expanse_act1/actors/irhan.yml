@@ -38,4 +38,5 @@ abilities:
   - chameleon
   - heal
   - petrify
+  - boss_hit_points
 ai: ai_mage

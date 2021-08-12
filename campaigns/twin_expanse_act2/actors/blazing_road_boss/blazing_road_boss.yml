@@ -63,4 +63,5 @@ abilities:
   - blitz
   - grapple
   - whirlwind_attack
+  - boss_hit_points
 ai: ai_melee

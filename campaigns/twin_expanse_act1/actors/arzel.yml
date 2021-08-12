@@ -6,7 +6,7 @@ sex: Male
 attributes:
   str: 10
   dex: 10
-  end: 10
+  end: 14
   per: 13
   int: 19
   wis: 12
@@ -39,6 +39,7 @@ abilities:
   - fireball
   - lightning_master
   - breach
+  - boss_hit_points
 ai: ai_mage
 reward:
   xp: 100

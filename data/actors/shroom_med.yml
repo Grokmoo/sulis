@@ -12,7 +12,7 @@ attributes:
   int: 10
   wis: 10
 levels:
-  fighter: 5
+  fighter: 6
 reward:
   xp: 20
   loot: level1_misc

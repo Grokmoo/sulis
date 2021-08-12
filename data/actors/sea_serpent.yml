@@ -13,7 +13,7 @@ inline_race:
     - kind: { attribute: { attribute: Dexterity, amount: 2 } }
     - kind: { attribute: { attribute: Endurance, amount: 3 } }
     - kind: { attribute: { attribute: Intellect, amount: -5 } }
-    - kind: { hit_points: 40 }
+    - kind: { hit_points: 50 }
     - kind: { reach: 1.0 }
   base_attack:
     damage:
@@ -43,7 +43,7 @@ attributes:
   int: 10
   wis: 10
 levels:
-  fighter: 11
+  fighter: 13
 reward:
   xp: 50
   loot: level5_misc

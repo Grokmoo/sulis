@@ -1,0 +1,19 @@
+id: boss_hit_points
+name: "Boss Hit Points"
+icon: abilities/healthy
+description: |
+  Boss characters get some additional HP.
+bonuses:
+  - kind:
+      hit_points: 50
+upgrades:
+  - description: |
+      Even more HP.
+    bonuses:
+      - kind:
+          hit_points: 50
+  - description: |
+      Yet again more HP.
+    bonuses:
+      - kind:
+          hit_points: 50

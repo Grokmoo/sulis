@@ -2,7 +2,7 @@ id: healthy
 name: "Healthy"
 icon: abilities/healthy
 description: |
-  Your gain +10 additional hit points, allowing you to take more damage in combat.
+  You gain +10 additional hit points, allowing you to take more damage in combat.
 bonuses:
   - kind:
       hit_points: 10

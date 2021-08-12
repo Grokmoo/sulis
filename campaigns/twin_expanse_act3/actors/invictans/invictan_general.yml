@@ -55,4 +55,5 @@ abilities:
   - helping_hand
   - impenetrable_defense
   - shielded_mastery
+  - boss_hit_points
 ai: ai_melee

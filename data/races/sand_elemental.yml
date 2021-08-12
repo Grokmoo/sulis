@@ -7,7 +7,7 @@ base_stats:
   - kind: { attribute: { attribute: Strength, amount: 4 } }
   - kind: { attribute: { attribute: Dexterity, amount: 4 } }
   - kind: { attribute: { attribute: Endurance, amount: 4 } }
-  - kind: { hit_points: 40 }
+  - kind: { hit_points: 50 }
   - kind: { reach: 1.0 }
   - kind: { resistance: { kind: "Slashing", amount: 65 } }
   - kind: { resistance: { kind: "Piercing", amount: 65 } }
@@ -17,8 +17,8 @@ base_stats:
   - kind: { armor: 18 }
 base_attack:
   damage:
-    min: 18
-    max: 25
+    min: 20
+    max: 28
     kind: Crushing
   kind: #Melee
     reach: 1.0

@@ -15,8 +15,8 @@ base_stats:
   - kind: { resistance: { kind: "Shock", amount: 100 } }
 base_attack:
   damage:
-    min: 15
-    max: 22
+    min: 20
+    max: 25
     kind: Shock
   kind: #Melee
     reach: 1.0

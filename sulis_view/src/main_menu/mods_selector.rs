@@ -16,7 +16,6 @@
 
 use std::any::Any;
 use std::cell::RefCell;
-use std::path::PathBuf;
 use std::rc::Rc;
 
 use sulis_core::ui::*;
@@ -39,16 +38,8 @@ impl ModsSelector {
         let mut active_mods = Vec::new();
 
         let active_resources = ActiveResources::read();
-        let active: Vec<_> = active_resources
-            .mods
-            .iter()
-            .map(|path| PathBuf::from(&path))
-            .collect();
-
         for modif in mods {
-            let mod_path = PathBuf::from(&modif.dir);
-
-            if active.contains(&mod_path) {
+            if active_resources.mods.iter().any(|path| path == &modif.dir) {
                 active_mods.push(modif);
             } else {
                 available_mods.push(modif);

@@ -128,7 +128,7 @@ impl ActorCreatorWindow {
     fn build_preview(&mut self) {
         let mut images = Vec::new();
         for layer in ImageLayer::iter() {
-            let image = match self.selected_images.get(&layer) {
+            let image = match self.selected_images.get(layer) {
                 None => continue,
                 Some((_, ref image)) => Rc::clone(image),
             };
@@ -312,12 +312,12 @@ impl WidgetKind for ActorCreatorWindow {
 
         type ListBoxCb = list_box::Entry<Rc<Race>>;
 
-        let window_ref = Rc::clone(&widget);
+        let window_ref = Rc::clone(widget);
         let cb: Rc<dyn Fn(Option<&ListBoxCb>)> = Rc::new(move |active_entry| {
             let window = Widget::kind_mut::<ActorCreatorWindow>(&window_ref);
             match active_entry {
                 None => window.selected_race = None,
-                Some(ref entry) => window.selected_race = Some(Rc::clone(entry.item())),
+                Some(entry) => window.selected_race = Some(Rc::clone(entry.item())),
             }
             window_ref.borrow_mut().invalidate_children();
         });

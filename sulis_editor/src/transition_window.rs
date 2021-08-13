@@ -288,7 +288,7 @@ impl WidgetKind for TransitionWindow {
         }
 
         let mut entries: Vec<list_box::Entry<String>> = Vec::new();
-        for (index, ref transition) in self
+        for (index, transition) in self
             .area_editor
             .borrow()
             .model

@@ -90,7 +90,7 @@ impl EditorMode for ElevPicker {
                     w: 1.0,
                     h: 1.0,
                 };
-                draw_list.append(&mut DrawList::from_sprite_f32(&sprite, rect));
+                draw_list.append(&mut DrawList::from_sprite_f32(sprite, rect));
             }
         }
         draw_list.set_scale(scale);

@@ -81,7 +81,7 @@ impl WidgetKind for SaveWindow {
         {
             Widget::add_child_to(&id_box, Widget::with_defaults(Label::empty()));
             let field =
-                Widget::with_defaults(InputField::new(&self.area_editor.borrow().model.id()));
+                Widget::with_defaults(InputField::new(self.area_editor.borrow().model.id()));
 
             let area_editor_ref = Rc::clone(&self.area_editor);
             field
@@ -103,7 +103,7 @@ impl WidgetKind for SaveWindow {
         {
             Widget::add_child_to(&name_box, Widget::with_defaults(Label::empty()));
             let field =
-                Widget::with_defaults(InputField::new(&self.area_editor.borrow().model.name()));
+                Widget::with_defaults(InputField::new(self.area_editor.borrow().model.name()));
 
             let area_editor_ref = Rc::clone(&self.area_editor);
             field
@@ -127,7 +127,7 @@ impl WidgetKind for SaveWindow {
         {
             Widget::add_child_to(&filename_box, Widget::with_defaults(Label::empty()));
             let field =
-                Widget::with_defaults(InputField::new(&self.area_editor.borrow().model.filename()));
+                Widget::with_defaults(InputField::new(self.area_editor.borrow().model.filename()));
 
             let area_editor_ref = Rc::clone(&self.area_editor);
             field

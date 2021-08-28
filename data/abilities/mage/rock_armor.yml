@@ -8,7 +8,7 @@ active:
   group: "2nd Circle"
   ap: 1000
   duration:
-    Rounds: 2
+    Rounds: 4
   cooldown: 4
   combat_only: true
   range: Personal

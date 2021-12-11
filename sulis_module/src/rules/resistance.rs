@@ -16,16 +16,10 @@
 
 use crate::rules::DamageKind;
 
-#[derive(Deserialize, Debug, Clone)]
+#[derive(Deserialize, Debug, Clone, Default)]
 #[serde(deny_unknown_fields)]
 pub struct Resistance {
     kinds: [i32; 8],
-}
-
-impl Default for Resistance {
-    fn default() -> Resistance {
-        Resistance { kinds: [0; 8] }
-    }
 }
 
 impl Resistance {

@@ -67,8 +67,6 @@ impl<'a> TransitionGen<'a> {
                     self.height,
                     kind.size.width,
                     kind.size.height,
-                    &transition.to,
-                    &kind.feature,
                 );
 
                 if overlaps_any(&data, &gened, self.params.spacing as i32) {
@@ -123,33 +121,26 @@ pub struct TransitionOutput {
 }
 
 #[derive(Clone)]
-struct TransitionData<'a> {
-    feature: Option<Rc<Feature>>,
-    to: &'a str,
+struct TransitionData {
     x: i32,
     y: i32,
     w: i32,
     h: i32,
 }
 
-impl<'a> TransitionData<'a> {
+impl TransitionData {
     fn gen(
         random: &mut ReproducibleRandom,
         max_x: i32,
         max_y: i32,
         w: i32,
         h: i32,
-        to: &'a str,
-        feature: &Option<Rc<Feature>>,
-    ) -> TransitionData<'a> {
-        let feature = feature.clone();
+    ) -> TransitionData {
         // the tile buffer keeps transitions off the edge of the usable space
         let x = random.gen(8, max_x - w - 16);
         let y = random.gen(8, max_y - h - 16);
 
         TransitionData {
-            feature,
-            to,
             x,
             y,
             w,
@@ -158,7 +149,7 @@ impl<'a> TransitionData<'a> {
     }
 }
 
-impl<'a> Rect for TransitionData<'a> {
+impl Rect for TransitionData {
     fn x(&self) -> i32 {
         self.x
     }
@@ -192,7 +183,7 @@ impl TransitionParams {
                     module
                         .features
                         .get(&feature_id)
-                        .map(|f| Rc::clone(f))
+                        .map(Rc::clone)
                         .ok_or_else(|| {
                             Error::new(
                                 ErrorKind::InvalidInput,

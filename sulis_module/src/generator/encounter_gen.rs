@@ -63,7 +63,7 @@ impl<'a, 'b> EncounterGen<'a, 'b> {
                 }
 
                 let data =
-                    EncounterData::gen(&mut self.model, encounter, room, pass.size.x, pass.size.y);
+                    EncounterData::gen(self.model, encounter, room, pass.size.x, pass.size.y);
 
                 let p1 = Point::from(self.model.to_region_coords(data.x, data.y));
                 let p2 = Point::from(
@@ -152,12 +152,12 @@ impl EncounterParams {
         module: &Module,
     ) -> Result<EncounterParams, Error> {
         EncounterParams::build(builder, |id| {
-            module.encounters.get(id).map(|e| Rc::clone(e))
+            module.encounters.get(id).map(Rc::clone)
         })
     }
 
     pub(crate) fn new(builder: EncounterParamsBuilder) -> Result<EncounterParams, Error> {
-        EncounterParams::build(builder, |id| Module::encounter(id))
+        EncounterParams::build(builder, Module::encounter)
     }
 
     fn build<F>(builder: EncounterParamsBuilder, f: F) -> Result<EncounterParams, Error>

@@ -460,7 +460,7 @@ impl EntityState {
                 target,
                 time * 5,
                 cbs,
-                Box::new(|a, d| weapon_attack(a, d)),
+                Box::new(weapon_attack),
             );
             GameState::add_animation(anim);
         } else if entity.borrow().actor.stats.attack_is_ranged() {

@@ -246,7 +246,7 @@ impl Display for DamageKind {
     }
 }
 
-#[derive(Deserialize, Serialize, Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Deserialize, Serialize, Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Default)]
 #[serde(deny_unknown_fields)]
 pub struct Damage {
     // note that if this is ever changed to allow negative values, bonus.apply_modifiers
@@ -296,16 +296,5 @@ impl Damage {
 
     pub fn roll(&self) -> u32 {
         gen_rand(self.min, self.max + 1)
-    }
-}
-
-impl Default for Damage {
-    fn default() -> Damage {
-        Damage {
-            min: 0,
-            max: 0,
-            ap: 0,
-            kind: None,
-        }
     }
 }

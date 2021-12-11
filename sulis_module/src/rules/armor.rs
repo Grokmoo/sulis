@@ -16,20 +16,11 @@
 
 use crate::rules::DamageKind;
 
-#[derive(Deserialize, Debug, Clone)]
+#[derive(Deserialize, Debug, Clone, Default)]
 #[serde(deny_unknown_fields)]
 pub struct Armor {
     base: i32,
     kinds: [i32; 7],
-}
-
-impl Default for Armor {
-    fn default() -> Armor {
-        Armor {
-            base: 0,
-            kinds: [0; 7],
-        }
-    }
 }
 
 impl Armor {

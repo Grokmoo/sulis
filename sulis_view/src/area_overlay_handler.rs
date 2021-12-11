@@ -35,6 +35,7 @@ pub struct HoverSprite {
     pub left_click_action_valid: bool,
 }
 
+#[derive(Default)]
 pub struct AreaOverlayHandler {
     hover_sprite: Option<HoverSprite>,
     selection_box_start: Option<(f32, f32)>,
@@ -47,22 +48,6 @@ pub struct AreaOverlayHandler {
     path_point_image: Option<Rc<dyn Image>>,
     path_point_end_image: Option<Rc<dyn Image>>,
     path_ap: Option<i32>,
-}
-
-impl Default for AreaOverlayHandler {
-    fn default() -> AreaOverlayHandler {
-        AreaOverlayHandler {
-            hover_sprite: None,
-            selection_box_start: None,
-            area_mouseover: None,
-            area_mouseover_widget: None,
-            selection_box_image: None,
-            path: Vec::new(),
-            path_point_image: None,
-            path_point_end_image: None,
-            path_ap: None,
-        }
-    }
 }
 
 impl AreaOverlayHandler {

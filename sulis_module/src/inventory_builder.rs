@@ -64,7 +64,7 @@ impl ItemSaveState {
     }
 }
 
-#[derive(Deserialize, Serialize, Debug, Clone)]
+#[derive(Deserialize, Serialize, Debug, Clone, Default)]
 #[serde(deny_unknown_fields, default)]
 pub struct InventoryBuilder {
     equipped: HashMap<Slot, ItemSaveState>,
@@ -210,16 +210,5 @@ impl InventoryBuilder {
 
             Some((slot, ItemState::new(item, item_save.variant)))
         })
-    }
-}
-
-impl Default for InventoryBuilder {
-    fn default() -> InventoryBuilder {
-        InventoryBuilder {
-            equipped: HashMap::new(),
-            quick: HashMap::new(),
-            pc_starting_items: Vec::new(),
-            pc_starting_coins: 0,
-        }
     }
 }

@@ -51,6 +51,7 @@ pub struct EncounterRef {
     encounter_index: usize,
 }
 
+#[derive(Default)]
 pub struct TurnManager {
     entities: Vec<Option<Rc<RefCell<EntityState>>>>,
     pub(crate) effects: Vec<Option<Effect>>,
@@ -69,27 +70,6 @@ pub struct TurnManager {
     pub(crate) cur_ai_group_index: usize,
 
     total_elapsed_millis: usize,
-}
-
-impl Default for TurnManager {
-    fn default() -> TurnManager {
-        TurnManager {
-            entities: Vec::new(),
-            effects: Vec::new(),
-            surfaces: Vec::new(),
-            auras: HashMap::new(),
-            effects_remove_next_update: Vec::new(),
-            entities_move_callback_next_update: HashSet::new(),
-            triggered_cbs_next_update: Vec::new(),
-            listeners: ChangeListenerList::default(),
-            time_listeners: ChangeListenerList::default(),
-            order: VecDeque::new(),
-            combat_active: false,
-            ai_groups: HashMap::new(),
-            cur_ai_group_index: 0,
-            total_elapsed_millis: 0,
-        }
-    }
 }
 
 impl TurnManager {

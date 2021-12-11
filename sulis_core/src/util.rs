@@ -121,7 +121,7 @@ fn active_resources_file_path() -> PathBuf {
     path
 }
 
-#[derive(Deserialize, Serialize, Debug, Clone)]
+#[derive(Deserialize, Serialize, Debug, Clone, Default)]
 pub struct ActiveResources {
     pub campaign: Option<String>,
     pub mods: Vec<String>,
@@ -174,15 +174,6 @@ impl ActiveResources {
         }
 
         dirs
-    }
-}
-
-impl Default for ActiveResources {
-    fn default() -> Self {
-        ActiveResources {
-            campaign: None,
-            mods: Vec::new(),
-        }
     }
 }
 

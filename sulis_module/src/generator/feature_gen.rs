@@ -61,7 +61,7 @@ impl<'a, 'b> FeatureGen<'a, 'b> {
                 let feature = pass.kinds.pick(&mut self.model.rand);
 
                 let (w, h) = (self.model.area_width, self.model.area_height);
-                let data = FeatureData::gen(&mut self.model, w, h, feature);
+                let data = FeatureData::gen(self.model, w, h, feature);
 
                 let p1 = Point::from(self.model.to_region_coords(data.x, data.y));
                 let p2 = Point::from(
@@ -147,7 +147,7 @@ impl FeatureParams {
 
         for pass in builder.passes {
             let kinds = WeightedList::new(pass.kinds, "Feature", |id| {
-                module.features.get(id).map(|f| Rc::clone(f))
+                module.features.get(id).map(Rc::clone)
             })?;
             let regions = RegionKinds::new(pass.allowable_regions);
 

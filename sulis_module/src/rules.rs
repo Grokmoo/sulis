@@ -324,7 +324,7 @@ impl Rules {
 
 pub const ROUND_TIME_MILLIS: u32 = 5000;
 
-#[derive(Deserialize, Serialize, Debug, Copy, Clone, PartialEq, Eq)]
+#[derive(Deserialize, Serialize, Debug, Copy, Clone, PartialEq, Eq, Default)]
 #[serde(deny_unknown_fields)]
 pub struct Time {
     #[serde(default)]
@@ -396,17 +396,6 @@ fn write_singular_or_plural(
     }
 
     Ok(())
-}
-
-impl Default for Time {
-    fn default() -> Self {
-        Time {
-            day: 0,
-            hour: 0,
-            round: 0,
-            millis: 0,
-        }
-    }
 }
 
 #[derive(Deserialize, Serialize, Debug, Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
@@ -503,21 +492,11 @@ pub enum ItemKind {
     Other,
 }
 
-#[derive(Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord, Default)]
 pub struct HitFlags {
     pub flanking: bool,
     pub sneak_attack: bool,
     pub concealment: bool,
-}
-
-impl Default for HitFlags {
-    fn default() -> Self {
-        HitFlags {
-            flanking: false,
-            sneak_attack: false,
-            concealment: false,
-        }
-    }
 }
 
 #[derive(Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord)]

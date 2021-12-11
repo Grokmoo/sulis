@@ -59,7 +59,7 @@ impl<'a, 'b> PropGen<'a, 'b> {
             for _ in 0..pass.placement_attempts {
                 let prop = pass.kinds.pick(&mut self.model.rand);
                 let (w, h) = (self.model.area_width, self.model.area_height);
-                let data = PropData::gen(&mut self.model, w, h, prop);
+                let data = PropData::gen(self.model, w, h, prop);
 
                 if pass.require_passable && !data.is_passable(self.layers) {
                     continue;
@@ -139,11 +139,11 @@ impl PropParams {
         builder: PropParamsBuilder,
         module: &Module,
     ) -> Result<PropParams, Error> {
-        PropParams::build(builder, |id| module.props.get(id).map(|p| Rc::clone(p)))
+        PropParams::build(builder, |id| module.props.get(id).map(Rc::clone))
     }
 
     pub(crate) fn new(builder: PropParamsBuilder) -> Result<PropParams, Error> {
-        PropParams::build(builder, |id| Module::prop(id))
+        PropParams::build(builder, Module::prop)
     }
 
     fn build<F>(builder: PropParamsBuilder, f: F) -> Result<PropParams, Error>

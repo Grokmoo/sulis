@@ -356,7 +356,7 @@ impl AreaState {
     }
 
     pub fn targeter(&self) -> Option<Rc<RefCell<AreaTargeter>>> {
-        self.targeter.as_ref().map(|t| Rc::clone(t))
+        self.targeter.as_ref().map(Rc::clone)
     }
 
     pub(crate) fn set_targeter(&mut self, mut targeter: AreaTargeter) {

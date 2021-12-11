@@ -152,6 +152,7 @@ thread_local! {
     static MODULE: RefCell<Module> = RefCell::new(Module::default());
 }
 
+#[derive(Default)]
 pub struct Module {
     rules: Option<Rc<Rules>>,
     campaign: Option<Rc<Campaign>>,
@@ -827,41 +828,6 @@ impl Module {
 
     pub fn all_tiles() -> Vec<Rc<Tile>> {
         MODULE.with(|r| all_resources(&r.borrow().tiles))
-    }
-}
-
-impl Default for Module {
-    fn default() -> Module {
-        Module {
-            root_dir: None,
-            rules: None,
-            campaign: None,
-            abilities: HashMap::new(),
-            ability_lists: HashMap::new(),
-            actors: HashMap::new(),
-            ai_templates: HashMap::new(),
-            areas: HashMap::new(),
-            classes: HashMap::new(),
-            conversations: HashMap::new(),
-            cutscenes: HashMap::new(),
-            items: HashMap::new(),
-            encounters: HashMap::new(),
-            props: HashMap::new(),
-            quests: HashMap::new(),
-            item_adjectives: HashMap::new(),
-            loot_lists: HashMap::new(),
-            races: HashMap::new(),
-            sizes: HashMap::new(),
-            tiles: HashMap::new(),
-            scripts: HashMap::new(),
-            terrain_rules: None,
-            terrain_kinds: Vec::new(),
-            wall_rules: None,
-            wall_kinds: Vec::new(),
-            features: HashMap::new(),
-            generators: HashMap::new(),
-            init: false,
-        }
     }
 }
 

@@ -36,16 +36,9 @@ const S: u8 = 32;
 const SW: u8 = 64;
 const W: u8 = 128;
 
+#[derive(Default)]
 pub struct RangeIndicatorHandler {
     indicators: Vec<RangeIndicator>,
-}
-
-impl Default for RangeIndicatorHandler {
-    fn default() -> Self {
-        Self {
-            indicators: Vec::default(),
-        }
-    }
 }
 
 impl RangeIndicatorHandler {

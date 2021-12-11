@@ -67,7 +67,7 @@ impl<'a, 'b> TerrainGen<'a, 'b> {
         let skip = patches.len();
         for _ in 0..pass.placement_attempts {
             let (w, h) = (self.model.area_width, self.model.area_height);
-            let patch = Feature::gen(&mut self.model, w, h, pass);
+            let patch = Feature::gen(self.model, w, h, pass);
 
             let (x1, y1) = self.model.to_region_coords(patch.x * gw, patch.y * gh);
             let (x2, y2) = self

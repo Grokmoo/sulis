@@ -207,7 +207,7 @@ impl WidgetState {
     }
 
     pub fn get_text_arg(&self, id: &str) -> Option<&str> {
-        self.text_args.get(id).map(|x| String::as_str(x))
+        self.text_args.get(id).map(String::as_str)
     }
 
     pub fn set_text_content(&mut self, text: String) {

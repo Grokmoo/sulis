@@ -123,15 +123,9 @@ pub struct Bonus {
     pub kind: BonusKind,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, Default)]
 #[serde(deny_unknown_fields)]
 pub struct BonusList(Vec<Bonus>);
-
-impl Default for BonusList {
-    fn default() -> BonusList {
-        BonusList(Vec::new())
-    }
-}
 
 impl BonusList {
     pub fn iter(&self) -> impl Iterator<Item = &Bonus> {
@@ -169,8 +163,8 @@ impl BonusList {
     }
 
     pub fn apply_modifiers(&mut self, penalty_mod: f32, bonus_mod: f32) {
-        for mut bonus in self.0.iter_mut() {
-            apply_modifiers(&mut bonus, penalty_mod, bonus_mod);
+        for bonus in self.0.iter_mut() {
+            apply_modifiers(bonus, penalty_mod, bonus_mod);
         }
     }
 }
@@ -496,7 +490,7 @@ impl AttackBuilder {
     }
 }
 
-#[derive(Deserialize, Debug, Clone)]
+#[derive(Deserialize, Debug, Clone, Default)]
 #[serde(deny_unknown_fields)]
 pub struct HitSounds {
     miss: Option<String>,
@@ -515,12 +509,6 @@ impl HitSounds {
             Crit => self.crit.as_deref(),
             Auto => self.hit.as_deref(),
         }
-    }
-}
-
-impl Default for HitSounds {
-    fn default() -> Self {
-        HitSounds { miss: None, graze: None, hit: None, crit: None }
     }
 }
 

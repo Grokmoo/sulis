@@ -19,7 +19,7 @@ use std::slice::Iter;
 
 use sulis_module::ItemState;
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 pub struct ItemList {
     items: Vec<(u32, ItemState)>,
 }
@@ -28,12 +28,6 @@ impl Index<usize> for ItemList {
     type Output = (u32, ItemState);
     fn index(&self, index: usize) -> &(u32, ItemState) {
         &self.items[index]
-    }
-}
-
-impl Default for ItemList {
-    fn default() -> ItemList {
-        ItemList { items: Vec::new() }
     }
 }
 

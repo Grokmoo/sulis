@@ -76,4 +76,8 @@ end
 function on_ambush_cleared(parent)
   local target = game:entity_with_id("npc_tervald")
   target:set_flag("ambush_cleared")
+
+  game:cancel_blocking_anims()
+  game:scroll_view(53, 72)
+  game:start_conversation("tervald", target)
 end

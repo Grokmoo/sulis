@@ -172,7 +172,7 @@ impl TerrainTiles {
                 rules.prefix,
                 kind.id,
                 rules.variant_postfix,
-                i.to_string()
+                i
             );
             let tile = match Module::tile(&tile_id) {
                 None => {

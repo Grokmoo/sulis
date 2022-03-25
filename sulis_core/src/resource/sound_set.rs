@@ -69,7 +69,7 @@ fn build_source(
     let mut source = None;
     for dir in source_dirs.iter().rev() {
         let mut filepath = PathBuf::from(dir);
-        filepath.push(entry_builder.file.to_string());
+        filepath.push(&entry_builder.file);
 
         let file = match File::open(filepath) {
             Ok(file) => file,

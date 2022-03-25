@@ -611,12 +611,11 @@ impl Widget {
                     Some(name) => name,
                 };
                 let child_theme = ResourceSet::theme(id);
-                let child;
-                match child_theme.kind {
-                    theme::Kind::Label => child = Widget::with_theme(Label::empty(), subname),
-                    theme::Kind::Container => child = Widget::empty(subname),
+                let child = match child_theme.kind {
+                    theme::Kind::Label => Widget::with_theme(Label::empty(), subname),
+                    theme::Kind::Container => Widget::empty(subname),
                     theme::Kind::Ref => continue,
-                }
+                };
 
                 {
                     let mut child = child.borrow_mut();

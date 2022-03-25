@@ -85,12 +85,11 @@ impl Bench {
             Some(end) => end,
         };
 
-        let id;
-        if let Some(tag) = &self.tag {
-            id = tag.to_string();
+        let id = if let Some(tag) = &self.tag {
+            tag.to_string()
         } else {
-            id = self.handle.index.to_string();
-        }
+            self.handle.index.to_string()
+        };
 
         let micros = end.duration_since(self.start).as_micros();
         let millis = micros as f64 / 1000.0;

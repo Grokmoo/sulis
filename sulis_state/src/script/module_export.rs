@@ -93,7 +93,7 @@ fn activate(_lua: Context, export: &ModuleExport, _: ()) -> Result<(), rlua::Err
     let data = on_trigger::ModuleLoadData {
         module: export.module.to_string(),
         include_stash: export.include_stash,
-        party: export.party.iter().map(|e| e.index).flatten().collect(),
+        party: export.party.iter().flat_map(|e| e.index).collect(),
         flags: export.custom_flags.clone(),
     };
     let pc = GameState::player();

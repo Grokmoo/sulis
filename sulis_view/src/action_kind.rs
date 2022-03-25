@@ -162,7 +162,7 @@ impl ActionHoverInfo {
             size,
             x: point.x,
             y: point.y,
-            path: path.iter().copied().collect(),
+            path: path.to_vec(),
             ap,
             total_ap: entity.actor.ap() as i32,
         }

@@ -337,7 +337,7 @@ impl AreaState {
             music = enc_data.encounter.music.as_ref().or(music);
         }
 
-        music = music.or_else(|| self.area.area.default_music.as_ref());
+        music = music.or(self.area.area.default_music.as_ref());
         Audio::change_music(music.cloned());
     }
 

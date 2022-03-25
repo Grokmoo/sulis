@@ -123,7 +123,6 @@ impl RootView {
         merchant_id: &str,
     ) {
         self.set_window(widget, self::merchant_window::NAME, desired_state, &|| {
-            #[allow(clippy::manual_map)] // clippy suggest does not work here
             match GameState::selected().first() {
                 None => None,
                 Some(entity) => Some(MerchantWindow::new(merchant_id, Rc::clone(entity))),
@@ -140,7 +139,6 @@ impl RootView {
         prop_index: usize,
     ) {
         self.set_window(widget, self::prop_window::NAME, desired_state, &|| {
-            #[allow(clippy::manual_map)] // clippy suggest does not work here
             match GameState::selected().first() {
                 None => None,
                 Some(entity) => Some(PropWindow::new(prop_index, Rc::clone(entity))),
@@ -152,7 +150,6 @@ impl RootView {
 
     pub fn set_inventory_window(&mut self, widget: &Rc<RefCell<Widget>>, desired_state: bool) {
         self.set_window(widget, self::inventory_window::NAME, desired_state, &|| {
-            #[allow(clippy::manual_map)] // clippy suggest does not work here
             match GameState::selected().first() {
                 None => None,
                 Some(entity) => Some(InventoryWindow::new(entity)),
@@ -162,7 +159,6 @@ impl RootView {
 
     pub fn set_character_window(&mut self, widget: &Rc<RefCell<Widget>>, desired_state: bool) {
         self.set_window(widget, self::character_window::NAME, desired_state, &|| {
-            #[allow(clippy::manual_map)] // clippy suggest does not work here
             match GameState::selected().first() {
                 None => None,
                 Some(entity) => Some(CharacterWindow::new(entity)),

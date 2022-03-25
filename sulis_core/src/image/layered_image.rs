@@ -43,7 +43,6 @@ pub struct LayeredImage {
 }
 
 impl LayeredImage {
-    #[allow(clippy::new_ret_no_self)]
     pub fn new(images: Vec<Layer>, swap_hue: Option<f32>) -> LayeredImage {
         let mut max_x = 0.0;
         let mut max_y = 0.0;

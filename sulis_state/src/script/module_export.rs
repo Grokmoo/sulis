@@ -88,7 +88,6 @@ impl UserData for ModuleExport {
     }
 }
 
-#[allow(clippy::unnecessary_wraps)] // this must return a result to be added as a method in the LUA context
 fn activate(_lua: Context, export: &ModuleExport, _: ()) -> Result<(), rlua::Error> {
     let data = on_trigger::ModuleLoadData {
         module: export.module.to_string(),

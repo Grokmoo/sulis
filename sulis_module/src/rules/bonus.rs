@@ -191,7 +191,6 @@ macro_rules! get_mod {
     };
 }
 
-#[allow(clippy::cognitive_complexity)]
 fn apply_modifiers(bonus: &mut Bonus, neg: f32, pos: f32) {
     use self::BonusKind::*;
     let new_kind = match bonus.kind {
@@ -312,7 +311,6 @@ macro_rules! merge_dup {
     };
 }
 
-#[allow(clippy::cognitive_complexity)]
 pub fn merge_if_dup(first: &Bonus, sec: &Bonus) -> Option<Bonus> {
     if first.when != sec.when {
         return None;

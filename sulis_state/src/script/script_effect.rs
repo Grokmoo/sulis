@@ -771,7 +771,6 @@ fn add_bonus_to_effect(effect: &mut ScriptEffect, bonus_kind: BonusKind, when: O
     }
 }
 
-#[allow(clippy::unnecessary_wraps)] // this must return a result to be added as a method in the LUA context
 fn add_num_bonus(
     _lua: Context,
     effect: &mut ScriptEffect,

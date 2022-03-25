@@ -524,7 +524,6 @@ impl AreaView {
 impl WidgetKind for AreaView {
     widget_kind!(NAME);
 
-    #[allow(clippy::float_cmp)]
     fn update(&mut self, _widget: &Rc<RefCell<Widget>>, millis: u32) {
         if let Some(shake) = self.screen_shake.as_mut() {
             let result = shake.shake(millis);

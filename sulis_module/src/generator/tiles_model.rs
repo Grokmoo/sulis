@@ -296,7 +296,6 @@ impl TilesModel {
         self.add(choice, x, y);
     }
 
-    #[allow(clippy::many_single_char_names)]
     pub fn check_add_terrain_border(&mut self, x: i32, y: i32) {
         let self_index = match self.terrain_index_at(x, y) {
             Some(index) => index,
@@ -390,7 +389,6 @@ impl TilesModel {
         }
     }
 
-    #[allow(clippy::many_single_char_names)]
     fn check_add_wall_border_exterior(&mut self, x: i32, y: i32, self_elev: u8, tiles: WallTiles) {
         self.add_some(&tiles.fill_tile, x, y);
 
@@ -468,7 +466,6 @@ impl TilesModel {
         }
     }
 
-    #[allow(clippy::many_single_char_names)]
     fn check_add_wall_border_interior(&mut self, x: i32, y: i32, self_elev: u8, tiles: WallTiles) {
         let (gh, gw) = (self.grid_height, self.grid_width);
 

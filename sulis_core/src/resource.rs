@@ -352,17 +352,14 @@ impl ResourceSet {
     }
 }
 
-#[allow(clippy::implicit_hasher)]
 pub fn all_resources<V: ?Sized>(map: &HashMap<String, Rc<V>>) -> Vec<Rc<V>> {
     map.iter().map(|ref res| Rc::clone(res.1)).collect()
 }
 
-#[allow(clippy::implicit_hasher)]
 pub fn get_resource<V: ?Sized>(id: &str, map: &HashMap<String, Rc<V>>) -> Option<Rc<V>> {
     map.get(id).map(Rc::clone)
 }
 
-#[allow(clippy::implicit_hasher)]
 pub fn insert_if_ok<K: Eq + Hash + Display, V>(
     type_str: &str,
     key: K,

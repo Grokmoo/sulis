@@ -1162,7 +1162,6 @@ impl UserData for ScriptEntity {
             let parent = entity.try_unwrap()?;
             let target = target.try_unwrap()?;
 
-            #[allow(clippy::manual_map)] // clippy suggested fix doesn't work because of the dyn cast
             let cb: Option<Box<dyn ScriptCallback>> = match callback {
                 None => None,
                 Some(cb) => Some(Box::new(cb)),

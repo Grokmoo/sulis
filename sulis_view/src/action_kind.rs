@@ -799,7 +799,6 @@ impl MoveAction {
         h: i32,
         dist: Option<f32>,
     ) -> Option<Box<dyn ActionKind>> {
-        #[allow(clippy::manual_map)] // clippy suggest doesn't work due to the dyn cast
         match MoveAction::new_if_valid(x, y, w, h, dist) {
             None => None,
             Some(action) => Some(Box::new(action)),

@@ -26,7 +26,6 @@ use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::ui::{animation_state, Color};
 use sulis_core::util::{approx_eq, gen_rand, ExtInt, Offset, Rect, Scale};
 
-#[allow(clippy::trivially_copy_pass_by_ref)]
 fn is_zero(val: &f32) -> bool {
     *val == 0.0
 }

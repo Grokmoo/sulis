@@ -560,7 +560,7 @@ pub(crate) fn main_loop(
     let mut total_elapsed = 0;
 
     event_loop.run(move |event, _, control_flow| {
-        *control_flow = ControlFlow::WaitUntil(last_start_time + frame_time);
+        *control_flow = ControlFlow::WaitUntil(time::Instant::now() + frame_time);
 
         match event {
             Event::WindowEvent { event: WindowEvent::Resized(size), .. } => {

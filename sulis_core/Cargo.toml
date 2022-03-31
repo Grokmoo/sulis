@@ -19,4 +19,4 @@ serde_derive = "1"
 serde_yaml = "0.8"
 serde_json = "1"
 rlua = "0.18"
-rodio = { version = "0.14", default_features = false, features = [ "vorbis" ] }
+rodio = { version = "0.15", default_features = false, features = [ "vorbis" ] }

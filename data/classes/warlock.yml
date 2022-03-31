@@ -175,6 +175,69 @@ upgrades:
       - [ Special, ~ ]
     stats:
       Power: 210
+  20:
+    ability_choices: [ warlock ]
+    group_uses_per_encounter:
+      - [ Warlock, ~ ]
+      - [ Special, ~ ]
+    stats:
+      Power: 210
+  21:
+    ability_choices: [ general ]
+    group_uses_per_encounter:
+      - [ Warlock, ~ ]
+      - [ Special, ~ ]
+    stats:
+      Power: 220
+  22:
+    ability_choices: [ warlock ]
+    group_uses_per_encounter:
+      - [ Warlock, ~ ]
+      - [ Special, ~ ]
+    stats:
+      Power: 220
+  23:
+    ability_choices: [ general ]
+    group_uses_per_encounter:
+      - [ Warlock, ~ ]
+      - [ Special, ~ ]
+    stats:
+      Power: 230
+  24:
+    ability_choices: [ warlock ]
+    group_uses_per_encounter:
+      - [ Warlock, ~ ]
+      - [ Special, ~ ]
+    stats:
+      Power: 230
+  25:
+    ability_choices: [ general ]
+    group_uses_per_encounter:
+      - [ Warlock, ~ ]
+      - [ Special, ~ ]
+    stats:
+      Power: 240
+  26:
+    ability_choices: [ warlock ]
+    group_uses_per_encounter:
+      - [ Warlock, ~ ]
+      - [ Special, ~ ]
+    stats:
+      Power: 240
+  27:
+    ability_choices: [ general ]
+    group_uses_per_encounter:
+      - [ Warlock, ~ ]
+      - [ Special, ~ ]
+    stats:
+      Power: 250
+  28:
+    ability_choices: [ warlock ]
+    group_uses_per_encounter:
+      - [ Warlock, ~ ]
+      - [ Special, ~ ]
+    stats:
+      Power: 250
 kits:
   - name: Artificer
     default_attributes:

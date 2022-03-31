@@ -242,6 +242,86 @@ upgrades:
       - [ Special, ~ ]
     stats:
       Inspiration: 200
+  21:
+    ability_choices: [ general ]
+    group_uses_per_encounter:
+      - [ Songs, ~ ]
+      - [ Rhythm, ~ ]
+      - [ Melodies, ~ ]
+      - [ Verses, ~ ]
+      - [ Special, ~ ]
+    stats:
+      Inspiration: 200
+  22:
+    ability_choices: [ bard ]
+    group_uses_per_encounter:
+      - [ Songs, ~ ]
+      - [ Rhythm, ~ ]
+      - [ Melodies, ~ ]
+      - [ Verses, ~ ]
+      - [ Special, ~ ]
+    stats:
+      Inspiration: 210
+  23:
+    ability_choices: [ general ]
+    group_uses_per_encounter:
+      - [ Songs, ~ ]
+      - [ Rhythm, ~ ]
+      - [ Melodies, ~ ]
+      - [ Verses, ~ ]
+      - [ Special, ~ ]
+    stats:
+      Inspiration: 210
+  24:
+    ability_choices: [ bard ]
+    group_uses_per_encounter:
+      - [ Songs, ~ ]
+      - [ Rhythm, ~ ]
+      - [ Melodies, ~ ]
+      - [ Verses, ~ ]
+      - [ Special, ~ ]
+    stats:
+      Inspiration: 220
+  25:
+    ability_choices: [ general ]
+    group_uses_per_encounter:
+      - [ Songs, ~ ]
+      - [ Rhythm, ~ ]
+      - [ Melodies, ~ ]
+      - [ Verses, ~ ]
+      - [ Special, ~ ]
+    stats:
+      Inspiration: 220
+  26:
+    ability_choices: [ bard ]
+    group_uses_per_encounter:
+      - [ Songs, ~ ]
+      - [ Rhythm, ~ ]
+      - [ Melodies, ~ ]
+      - [ Verses, ~ ]
+      - [ Special, ~ ]
+    stats:
+      Inspiration: 230
+  27:
+    ability_choices: [ general ]
+    group_uses_per_encounter:
+      - [ Songs, ~ ]
+      - [ Rhythm, ~ ]
+      - [ Melodies, ~ ]
+      - [ Verses, ~ ]
+      - [ Special, ~ ]
+    stats:
+      Inspiration: 230
+  28:
+    ability_choices: [ bard ]
+    group_uses_per_encounter:
+      - [ Songs, ~ ]
+      - [ Rhythm, ~ ]
+      - [ Melodies, ~ ]
+      - [ Verses, ~ ]
+      - [ Special, ~ ]
+    stats:
+      Inspiration: 240
 kits:
   - name: Jack
     default_attributes:

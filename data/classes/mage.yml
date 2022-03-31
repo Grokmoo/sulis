@@ -244,6 +244,132 @@ upgrades:
       - [ "2nd Circle", 2 ]
       - [ "3rd Circle", 2 ]
       - [ "4th Circle", 2 ]
+  20:
+    ability_choices: [ mage ]
+    group_uses_per_encounter:
+      - [ "Cantrips", 5 ]
+      - [ "1st Circle", 2 ]
+      - [ "2nd Circle", 2 ]
+      - [ "3rd Circle", 2 ]
+      - [ "4th Circle", 2 ]
+      - [ Special, ~ ]
+    group_uses_per_day:
+      - [ "1st Circle", 2 ]
+      - [ "2nd Circle", 2 ]
+      - [ "3rd Circle", 2 ]
+      - [ "4th Circle", 2 ]
+  21:
+    ability_choices: [ general ]
+    group_uses_per_encounter:
+      - [ "Cantrips", 5 ]
+      - [ "1st Circle", 3 ]
+      - [ "2nd Circle", 2 ]
+      - [ "3rd Circle", 2 ]
+      - [ "4th Circle", 2 ]
+      - [ Special, ~ ]
+    group_uses_per_day:
+      - [ "1st Circle", 2 ]
+      - [ "2nd Circle", 2 ]
+      - [ "3rd Circle", 2 ]
+      - [ "4th Circle", 2 ]
+  22:
+    ability_choices: [ mage ]
+    group_uses_per_encounter:
+      - [ "Cantrips", 5 ]
+      - [ "1st Circle", 3 ]
+      - [ "2nd Circle", 3 ]
+      - [ "3rd Circle", 2 ]
+      - [ "4th Circle", 2 ]
+      - [ Special, ~ ]
+    group_uses_per_day:
+      - [ "1st Circle", 2 ]
+      - [ "2nd Circle", 2 ]
+      - [ "3rd Circle", 2 ]
+      - [ "4th Circle", 2 ]
+  23:
+    ability_choices: [ general ]
+    group_uses_per_encounter:
+      - [ "Cantrips", 5 ]
+      - [ "1st Circle", 3 ]
+      - [ "2nd Circle", 3 ]
+      - [ "3rd Circle", 3 ]
+      - [ "4th Circle", 2 ]
+      - [ Special, ~ ]
+    group_uses_per_day:
+      - [ "1st Circle", 2 ]
+      - [ "2nd Circle", 2 ]
+      - [ "3rd Circle", 2 ]
+      - [ "4th Circle", 2 ]
+  24:
+    ability_choices: [ mage ]
+    group_uses_per_encounter:
+      - [ "Cantrips", 5 ]
+      - [ "1st Circle", 3 ]
+      - [ "2nd Circle", 3 ]
+      - [ "3rd Circle", 3 ]
+      - [ "4th Circle", 3 ]
+      - [ Special, ~ ]
+    group_uses_per_day:
+      - [ "1st Circle", 2 ]
+      - [ "2nd Circle", 2 ]
+      - [ "3rd Circle", 2 ]
+      - [ "4th Circle", 2 ]
+  25:
+    ability_choices: [ general ]
+    group_uses_per_encounter:
+      - [ "Cantrips", 5 ]
+      - [ "1st Circle", 3 ]
+      - [ "2nd Circle", 3 ]
+      - [ "3rd Circle", 3 ]
+      - [ "4th Circle", 3 ]
+      - [ Special, ~ ]
+    group_uses_per_day:
+      - [ "1st Circle", 3 ]
+      - [ "2nd Circle", 2 ]
+      - [ "3rd Circle", 2 ]
+      - [ "4th Circle", 2 ]
+  26:
+    ability_choices: [ mage ]
+    group_uses_per_encounter:
+      - [ "Cantrips", 5 ]
+      - [ "1st Circle", 3 ]
+      - [ "2nd Circle", 3 ]
+      - [ "3rd Circle", 3 ]
+      - [ "4th Circle", 3 ]
+      - [ Special, ~ ]
+    group_uses_per_day:
+      - [ "1st Circle", 3 ]
+      - [ "2nd Circle", 3 ]
+      - [ "3rd Circle", 2 ]
+      - [ "4th Circle", 2 ]
+  27:
+    ability_choices: [ general ]
+    group_uses_per_encounter:
+      - [ "Cantrips", 5 ]
+      - [ "1st Circle", 3 ]
+      - [ "2nd Circle", 3 ]
+      - [ "3rd Circle", 3 ]
+      - [ "4th Circle", 3 ]
+      - [ Special, ~ ]
+    group_uses_per_day:
+      - [ "1st Circle", 3 ]
+      - [ "2nd Circle", 3 ]
+      - [ "3rd Circle", 3 ]
+      - [ "4th Circle", 2 ]
+  28:
+    ability_choices: [ mage ]
+    group_uses_per_encounter:
+      - [ "Cantrips", 5 ]
+      - [ "1st Circle", 3 ]
+      - [ "2nd Circle", 3 ]
+      - [ "3rd Circle", 3 ]
+      - [ "4th Circle", 3 ]
+      - [ Special, ~ ]
+    group_uses_per_day:
+      - [ "1st Circle", 3 ]
+      - [ "2nd Circle", 3 ]
+      - [ "3rd Circle", 3 ]
+      - [ "4th Circle", 3 ]
 kits:
   - name: Pyromancer
     default_attributes:

@@ -131,6 +131,51 @@ upgrades:
     group_uses_per_encounter:
       - [ Druid, 6 ]
       - [ Special, ~ ]
+  20:
+    ability_choices: [ druid, general ]
+    group_uses_per_encounter:
+      - [ Druid, 6 ]
+      - [ Special, ~ ]
+  21:
+    ability_choices: [ druid ]
+    group_uses_per_encounter:
+      - [ Druid, 6 ]
+      - [ Special, ~ ]
+  22:
+    ability_choices: [ general ]
+    group_uses_per_encounter:
+      - [ Druid, 6 ]
+      - [ Special, ~ ]
+  23:
+    ability_choices: [ druid ]
+    group_uses_per_encounter:
+      - [ Druid, 6 ]
+      - [ Special, ~ ]
+  24:
+    ability_choices: [ general ]
+    group_uses_per_encounter:
+      - [ Druid, 6 ]
+      - [ Special, ~ ]
+  25:
+    ability_choices: [ druid ]
+    group_uses_per_encounter:
+      - [ Druid, 7 ]
+      - [ Special, ~ ]
+  26:
+    ability_choices: [ general ]
+    group_uses_per_encounter:
+      - [ Druid, 7 ]
+      - [ Special, ~ ]
+  27:
+    ability_choices: [ druid ]
+    group_uses_per_encounter:
+      - [ Druid, 7 ]
+      - [ Special, ~ ]
+  28:
+    ability_choices: [ general ]
+    group_uses_per_encounter:
+      - [ Druid, 7 ]
+      - [ Special, ~ ]
 kits:
   - name: Shifter
     default_attributes:

@@ -226,29 +226,27 @@ fn build_upgrades_data(state: &mut WidgetState, class: &Class, level: u32) {
         i += 1;
     }
 
-    let mut stats: Vec<_> = class.stats_max(level).into_iter().collect();
-    stats.sort_by(|a, b| a.0.cmp(&b.0));
+    let mut stats: Vec<_> = class.stats_max(level).iter().collect();
+    stats.sort_by(|a, b| a.0.cmp(b.0));
 
-    let stats_up = get_up_per(
-        class.stats_max(level - 1).into_iter().collect(),
-        class.stats_max(level).into_iter().collect(),
+    let stats_up = get_up_per_hashmap(
+        class.stats_max(level - 1).clone(),
+        class.stats_max(level).clone(),
     );
 
     for (i, (id, amount)) in stats.into_iter().enumerate() {
-        let gain = *stats_up.get(&id).unwrap_or(&0);
-        state.add_text_arg(&format!("stat_{}_id", i), &id);
+        let gain = *stats_up.get(id).unwrap_or(&0);
+        state.add_text_arg(&format!("stat_{}_id", i), id);
         state.add_text_arg(&format!("stat_{}_total", i), &format!("{}", amount));
         state.add_text_arg(&format!("stat_{}_gain", i), &format!("{}", gain));
     }
 
-    for (i, list) in class.ability_choices(level).into_iter().enumerate() {
+    for (i, list) in class.ability_choices(level).iter().enumerate() {
         state.add_text_arg(&format!("choice_{}_name", i), &list.name);
     }
 }
 
-fn get_up_per(prev: Vec<(String, ExtInt)>, cur: Vec<(String, ExtInt)>) -> HashMap<String, i32> {
-    let cur_per: HashMap<_, _> = cur.into_iter().collect();
-    let mut prev_per: HashMap<_, _> = prev.into_iter().collect();
+fn get_up_per_hashmap(mut prev_per: HashMap<String, ExtInt>, cur_per: HashMap<String, ExtInt>) -> HashMap<String, i32> {
     let mut up_per = HashMap::new();
     for (id, amount) in cur_per {
         let amount = match amount {
@@ -276,4 +274,10 @@ fn get_up_per(prev: Vec<(String, ExtInt)>, cur: Vec<(String, ExtInt)>) -> HashMa
     }
 
     up_per
+}
+
+fn get_up_per(prev: &[(String, ExtInt)], cur: &[(String, ExtInt)]) -> HashMap<String, i32> {
+    let cur_per: HashMap<_, _> = cur.iter().cloned().collect();
+    let prev_per: HashMap<_, _> = prev.iter().cloned().collect();
+    get_up_per_hashmap(prev_per, cur_per)
 }

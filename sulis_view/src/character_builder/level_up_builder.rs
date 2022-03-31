@@ -64,11 +64,11 @@ impl BuilderSet for LevelUpBuilder {
         for (index, ability_list) in actor
             .base_class()
             .ability_choices(level)
-            .into_iter()
+            .iter()
             .enumerate()
         {
             let pane = AbilitySelectorPane::new(
-                ability_list,
+                ability_list.clone(),
                 index,
                 Rc::clone(&self.pc),
                 actor.abilities.clone(),

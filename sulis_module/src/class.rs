@@ -32,7 +32,7 @@ pub struct Kit {
     pub starting_abilities: Vec<Rc<Ability>>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Upgrades {
     pub ability_choices: Vec<Rc<AbilityList>>,
     pub group_uses_per_encounter: Vec<(String, ExtInt)>,
@@ -47,6 +47,7 @@ pub struct Class {
     pub description: String,
     pub bonuses_per_level: BonusList,
     upgrades: HashMap<u32, Upgrades>,
+    max_level_upgrades: Upgrades,
     starting_abilities: Vec<Rc<Ability>>,
     pub kits: Vec<Kit>,
     pub stats: Vec<ClassStat>,
@@ -61,7 +62,14 @@ impl PartialEq for Class {
 impl Class {
     pub fn new(builder: ClassBuilder, module: &Module) -> Result<Class, Error> {
         let mut upgrades = HashMap::new();
+        let mut max_level = 0;
         for (level, upgrades_builder) in builder.upgrades {
+            if level == 0 {
+                warn!("Invalid upgrade level 0");
+                return unable_to_create_error("class", &builder.id);
+            }
+            max_level = level.max(max_level);
+
             let mut ability_choices = Vec::new();
             for ability_list_id in upgrades_builder.ability_choices {
                 let ability_list = match module.ability_lists.get(&ability_list_id) {
@@ -95,6 +103,13 @@ impl Class {
 
             upgrades.insert(level, upgrades_for_level);
         }
+
+        if upgrades.is_empty() {
+            warn!("Each class must specify upgrades for at least 1 level.");
+            return unable_to_create_error("class", &builder.id);
+        }
+
+        let max_level_upgrades = upgrades.get(&max_level).unwrap().clone();
 
         if builder.kits.is_empty() {
             warn!("Each class must specify at least one kit.");
@@ -145,6 +160,7 @@ impl Class {
             bonuses_per_level: builder.bonuses_per_level,
             kits,
             upgrades,
+            max_level_upgrades,
             starting_abilities: abilities,
             stats: builder.stats,
         })
@@ -163,32 +179,31 @@ impl Class {
         self.starting_abilities.iter()
     }
 
-    pub fn ability_choices(&self, level: u32) -> Vec<Rc<AbilityList>> {
+    pub fn ability_choices(&self, level: u32) -> &[Rc<AbilityList>] {
         match self.upgrades.get(&level) {
-            None => Vec::new(),
-            Some(upgrades) => upgrades.ability_choices.clone(),
+            None => &self.max_level_upgrades.ability_choices,
+            Some(upgrades) => &upgrades.ability_choices,
         }
     }
 
-    pub fn stats_max(&self, level: u32) -> HashMap<String, ExtInt> {
+    pub fn stats_max(&self, level: u32) -> &HashMap<String, ExtInt> {
         match self.upgrades.get(&level) {
-            None => HashMap::new(),
-            Some(upgrades) => upgrades.stats.clone(),
+            None => &self.max_level_upgrades.stats,
+            Some(upgrades) => &upgrades.stats,
         }
     }
 
-    pub fn group_uses_per_day(&self, level: u32) -> Vec<(String, ExtInt)> {
+    pub fn group_uses_per_day(&self, level: u32) -> &[(String, ExtInt)] {
         match self.upgrades.get(&level) {
-            None => Vec::new(),
-            Some(upgrades) => upgrades.group_uses_per_day.clone(),
+            None => &self.max_level_upgrades.group_uses_per_day,
+            Some(upgrades) => &upgrades.group_uses_per_day,
         }
     }
 
-    // TODO would love to just return a ref here but we can't return a ref to an empty vec
-    pub fn group_uses_per_encounter(&self, level: u32) -> Vec<(String, ExtInt)> {
+    pub fn group_uses_per_encounter(&self, level: u32) -> &[(String, ExtInt)] {
         match self.upgrades.get(&level) {
-            None => Vec::new(),
-            Some(upgrades) => upgrades.group_uses_per_encounter.clone(),
+            None => &self.max_level_upgrades.group_uses_per_encounter,
+            Some(upgrades) => &upgrades.group_uses_per_encounter,
         }
     }
 }

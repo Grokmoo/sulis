@@ -327,9 +327,9 @@ themes:
                                 from: text_area
                                 relative:
                                   width: Max
-                                size: [0, 10]
+                                size: [1, 10]
                                 text: |
-                                  [y=-1.5;s=5.0;c=f00|#group#]
+                                  [x=-0.5;y=-1.5;s=5.0;c=f00|#group#]
                                   [y=3.0|][?total_uses_per_encounter;s=5.0|#current_uses_per_encounter#/#total_uses_per_encounter# Enc][!total_uses_per_encounter;!total_uses_per_day;s=5.0|Unlimited]
                                   [y=6.0|][?total_uses_per_day;s=5.0|#current_uses_per_day#/#total_uses_per_day# Day]
                       group_pane:
@@ -357,9 +357,9 @@ themes:
                             from: text_area
                             relative:
                               width: Max
-                            size: [0, 10]
+                            size: [1, 10]
                             text: |
-                              [y=-0.5;s=5.0;c=f00|#group#]
+                              [x=-0.5;y=-0.5;s=5.0;c=f00|#group#]
                               [y=4.0|][?total_uses_per_encounter;s=5.0|#current_uses_per_encounter#/#total_uses_per_encounter# Enc][!total_uses_per_encounter;!total_uses_per_day;s=5.0|Unlimited]
                               [y=7.0|][?total_uses_per_day;s=5.0|#current_uses_per_day#/#total_uses_per_day# Day]
                           abilities_pane:

@@ -866,7 +866,7 @@ impl ActorState {
             }
 
             for (stat_id, amount) in class.stats_max(level) {
-                self.stats.add_single_class_stat_max(stat_id, amount);
+                self.stats.add_single_class_stat_max(stat_id.to_string(), *amount);
             }
         }
 

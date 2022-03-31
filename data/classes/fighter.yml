@@ -150,6 +150,60 @@ upgrades:
       - [ Fighter, 6 ]
       - [ Modes, ~ ]
       - [ Special, ~ ]
+  20:
+    ability_choices: [ fighter ]
+    group_uses_per_encounter:
+      - [ Fighter, 6 ]
+      - [ Modes, ~ ]
+      - [ Special, ~ ]
+  21:
+    ability_choices: [ general ]
+    group_uses_per_encounter:
+      - [ Fighter, 6 ]
+      - [ Modes, ~ ]
+      - [ Special, ~ ]
+  22:
+    ability_choices: [ fighter ]
+    group_uses_per_encounter:
+      - [ Fighter, 6 ]
+      - [ Modes, ~ ]
+      - [ Special, ~ ]
+  23:
+    ability_choices: [ general ]
+    group_uses_per_encounter:
+      - [ Fighter, 6 ]
+      - [ Modes, ~ ]
+      - [ Special, ~ ]
+  24:
+    ability_choices: [ fighter ]
+    group_uses_per_encounter:
+      - [ Fighter, 6 ]
+      - [ Modes, ~ ]
+      - [ Special, ~ ]
+  25:
+    ability_choices: [ general ]
+    group_uses_per_encounter:
+      - [ Fighter, 7 ]
+      - [ Modes, ~ ]
+      - [ Special, ~ ]
+  26:
+    ability_choices: [ fighter ]
+    group_uses_per_encounter:
+      - [ Fighter, 7 ]
+      - [ Modes, ~ ]
+      - [ Special, ~ ]
+  27:
+    ability_choices: [ general ]
+    group_uses_per_encounter:
+      - [ Fighter, 7 ]
+      - [ Modes, ~ ]
+      - [ Special, ~ ]
+  28:
+    ability_choices: [ fighter ]
+    group_uses_per_encounter:
+      - [ Fighter, 7 ]
+      - [ Modes, ~ ]
+      - [ Special, ~ ]
 kits:
   - name: Brawler
     default_attributes:

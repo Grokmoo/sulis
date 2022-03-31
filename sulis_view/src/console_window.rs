@@ -96,13 +96,13 @@ impl WidgetKind for ConsoleWindow {
                         Widget::clear_keyboard_focus(widget);
                         parent.borrow_mut().state.set_visible(false);
                     }
-                    InputActionKind::ScrollUp => {
+                    InputActionKind::ConsoleHistoryPrevious => {
                         if console.history_index > 0 {
                             console.history_index -= 1;
                             field.set_text(&console.current_history_text(), widget);
                         }
                     }
-                    InputActionKind::ScrollDown => {
+                    InputActionKind::ConsoleHistoryNext => {
                         if console.history_index < console.history.len() {
                             console.history_index += 1;
                             field.set_text(&console.current_history_text(), widget);

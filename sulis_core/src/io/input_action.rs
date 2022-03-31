@@ -36,6 +36,8 @@ pub enum InputActionState {
 #[serde(deny_unknown_fields)]
 pub enum InputActionKind {
     ToggleConsole,
+    ConsoleHistoryPrevious,
+    ConsoleHistoryNext,
     ToggleInventory,
     ToggleCharacter,
     ToggleMap,

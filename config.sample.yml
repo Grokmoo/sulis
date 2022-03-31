@@ -2,7 +2,7 @@
 # The main game configuration file.  User preferences are set here.
 
 # If the user has an old revision, their config is automatically recreated from the sample.
-revision: 20
+revision: 21
 
 display:
     # Display Mode - Fullscreen, BorderlessWindow, Window
@@ -103,6 +103,8 @@ input:
         KeyPageDown: ZoomOut
         KeyF5: QuickSave
         KeyGrave: ToggleConsole
+        KeyUp: ConsoleHistoryPrevious
+        KeyDown: ConsoleHistoryNext
         KeyP: SelectAll
         KeyX: SwapWeapons
         KeyF1: SelectPartyMember1

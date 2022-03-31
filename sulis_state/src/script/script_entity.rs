@@ -1316,7 +1316,13 @@ impl UserData for ScriptEntity {
         methods.add_method("heal_damage", |_, entity, amount: f32| {
             let amount = amount as u32;
             let parent = entity.try_unwrap()?;
-            parent.borrow_mut().actor.add_hp(amount);
+            {
+                let mut parent = parent.borrow_mut();
+                if !parent.is_party_member() && parent.actor.hp() == 0 {
+                    return Ok(());
+                }
+                parent.actor.add_hp(amount);
+            }
             let area_state = GameState::area_state();
 
             let mut feedback =

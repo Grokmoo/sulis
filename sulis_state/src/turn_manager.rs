@@ -535,6 +535,7 @@ impl TurnManager {
                 continue;
             }
 
+            log::warn!("Found ai activation entity: {} at {:?}", entity.unique_id(), entity.location);
             self.activate_entity_ai(&mut entity, &mut groups_to_activate);
             state_changed = true;
         }

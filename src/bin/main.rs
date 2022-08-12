@@ -215,11 +215,8 @@ fn load_resources() {
 
     if dirs.len() > 1 {
         info!("Loading module '{}'", dirs[1]);
-        match Module::load_resources(yaml, dirs) {
-            Err(e) => {
-                error!("{}", e);
-            }
-            Ok(()) => (),
+        if let Err(e) = Module::load_resources(yaml, dirs) {
+            error!("{}", e);
         }
     }
 

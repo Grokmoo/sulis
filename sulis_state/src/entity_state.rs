@@ -373,6 +373,10 @@ impl EntityState {
 
         for y in -2..self.size.height {
             for x in -1..self.size.width + 1 {
+                let p_x = x + self.location.x;
+                let p_y = y + self.location.y;
+                if p_x < 0 || p_x >= width || p_y < 0 || p_y >= area.area.height { continue; }
+
                 let p = Point::new(x + self.location.x, y + self.location.y);
                 let index = (p.x + p.y * width) as usize;
                 if !area.pc_explored[index] {

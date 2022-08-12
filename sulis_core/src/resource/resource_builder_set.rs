@@ -98,7 +98,7 @@ fn read_builders_internal<T: serde::de::DeserializeOwned>(
     let file_key = serde_yaml::Value::String(yaml_resource_set::FILE_VAL_STR.to_string());
 
     let mut builders = HashMap::new();
-    for entries in resources.resources.remove(&kind).into_iter() {
+    if let Some(entries) = resources.resources.remove(&kind) {
         for (id, mut entry) in entries {
             let mut files = Vec::new();
             let mut dirs = serde_yaml::Sequence::new();

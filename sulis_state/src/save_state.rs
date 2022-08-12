@@ -203,7 +203,7 @@ impl EffectSaveState {
     pub fn new(effect: &Effect, index: usize) -> EffectSaveState {
         let mut callbacks: Vec<CallbackData> = Vec::new();
         for cb in effect.callbacks.iter() {
-            let inner: CallbackData = CallbackData::clone(&*cb);
+            let inner: CallbackData = CallbackData::clone(cb);
             callbacks.push(inner);
         }
 

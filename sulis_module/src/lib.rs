@@ -285,11 +285,8 @@ impl Module {
         path.set_extension("yml");
         info!("Deleting character at '{:?}'", path);
 
-        match std::fs::remove_file(path.as_path()) {
-            Err(e) => {
-                warn!("Unable to delete file {:?}: {}", path, e);
-            }
-            Ok(()) => (),
+        if let Err(e) = std::fs::remove_file(path.as_path()) {
+            warn!("Unable to delete file {:?}: {}", path, e);
         }
     }
 
@@ -339,7 +336,7 @@ impl Module {
             let mut path = entry.path().to_path_buf();
             path.set_extension("");
             let actor_builder: ActorBuilder =
-                match read_single_resource(&path.to_string_lossy().to_string()) {
+                match read_single_resource(&path.to_string_lossy()) {
                     Ok(entry) => entry,
                     Err(e) => {
                         warn!("Error reading actor: {}", e);

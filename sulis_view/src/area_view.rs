@@ -373,7 +373,7 @@ impl AreaView {
         let mut to_draw: Vec<&dyn AreaDrawable> = Vec::new();
 
         for prop_state in state.props().iter() {
-            to_draw.push(&*prop_state);
+            to_draw.push(prop_state);
         }
 
         let mgr = GameState::turn_manager();

@@ -300,7 +300,7 @@ impl PropHandler {
         }
 
         let index = (x + y * self.area.width) as usize;
-        self.prop_grid[index].get(0).copied()
+        self.prop_grid[index].first().copied()
     }
 
     pub fn get(&self, index: usize) -> &PropState {

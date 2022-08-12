@@ -246,7 +246,7 @@ impl AnimState {
         false
     }
 
-    fn clear_blocking_vec(vec: &mut Vec<Anim>, entity: &Rc<RefCell<EntityState>>) {
+    fn clear_blocking_vec(vec: &mut [Anim], entity: &Rc<RefCell<EntityState>>) {
         for anim in vec.iter_mut() {
             if !anim.is_blocking() {
                 continue;
@@ -262,7 +262,7 @@ impl AnimState {
         }
     }
 
-    fn clear_all_blocking_vec(vec: &mut Vec<Anim>) {
+    fn clear_all_blocking_vec(vec: &mut [Anim]) {
         for anim in vec.iter_mut() {
             if anim.is_blocking() {
                 anim.mark_for_removal();

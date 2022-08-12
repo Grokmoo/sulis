@@ -33,7 +33,7 @@ enum Kind {
     Prop(usize),
 }
 
-#[derive(Debug, PartialEq, Clone, Copy)]
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub enum Filter {
     All,
     Weapon,

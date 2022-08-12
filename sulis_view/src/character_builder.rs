@@ -329,12 +329,9 @@ impl BuilderSet for CharacterCreator {
             ai: None,
         };
 
-        match write_character_to_file(&filename, &actor) {
-            Err(e) => {
-                error!("Unable to write actor to file {}", filename);
-                error!("{}", e);
-            }
-            Ok(()) => (),
+        if let Err(e) = write_character_to_file(&filename, &actor) {
+            error!("Unable to write actor to file {}", filename);
+            error!("{}", e);
         }
 
         self.character_selector_widget

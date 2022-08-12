@@ -78,6 +78,7 @@ fn parse_traceback_line_num(traceback: &str) -> Option<i32> {
     None
 }
 
+#[allow(clippy::format_push_string)] // performance characteristics of this function are irrelevant
 fn print_nearby_lines(state: &ScriptState, traceback: &str) -> (String, i32) {
     let mut out = String::new();
 

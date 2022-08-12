@@ -21,7 +21,7 @@ use crate::config::Config;
 use crate::ui::theme::Theme;
 use crate::ui::{Cursor, Size, Widget};
 
-#[derive(Deserialize, Debug, Clone, Copy, PartialEq)]
+#[derive(Deserialize, Debug, Clone, Copy, PartialEq, Eq)]
 pub enum LayoutKind {
     Normal,
     BoxVertical,

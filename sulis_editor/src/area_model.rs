@@ -863,12 +863,9 @@ impl AreaModel {
         };
 
         trace!("Writing to file {}", filename);
-        match write_to_file(&filename, &area_builder) {
-            Err(e) => {
-                error!("Unable to save area state to file {}", filename);
-                error!("{}", e);
-            }
-            Ok(()) => {}
+        if let Err(e) = write_to_file(&filename, &area_builder) {
+            error!("Unable to save area state to file {}", filename);
+            error!("{}", e);
         }
     }
 

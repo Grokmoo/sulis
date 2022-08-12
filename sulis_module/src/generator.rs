@@ -249,6 +249,7 @@ impl GenModel {
         )
     }
 
+    #[allow(clippy::wrong_self_convention)]
     fn from_region_coords(&self, x: i32, y: i32) -> (i32, i32) {
         (
             x * self.total_grid_size.x + self.model.grid_width,

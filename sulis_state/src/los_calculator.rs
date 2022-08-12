@@ -21,7 +21,7 @@ use crate::{EntityState, GeneratedArea};
 
 #[must_use]
 pub fn calculate_los(
-    exp: &mut Vec<bool>,
+    exp: &mut [bool],
     area: &GeneratedArea,
     prop_vis_grid: &[bool],
     prop_grid: &[Vec<usize>],

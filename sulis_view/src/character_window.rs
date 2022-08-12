@@ -262,12 +262,9 @@ fn export_character(pc: &ActorState) {
         ai: None,
     };
 
-    match write_character_to_file(&filename, &actor) {
-        Err(e) => {
-            warn!("{}", e);
-            warn!("Unable to write character '{}' to file", pc.actor.name);
-        }
-        Ok(()) => (),
+    if let Err(e) = write_character_to_file(&filename, &actor) {
+        warn!("{}", e);
+        warn!("Unable to write character '{}' to file", pc.actor.name);
     }
 }
 

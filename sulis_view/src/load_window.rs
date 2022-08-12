@@ -104,12 +104,9 @@ impl LoadWindow {
             Some(index) => index,
         };
 
-        match delete_save(&self.entries[index]) {
-            Err(e) => {
-                error!("Error deleting save");
-                error!("{}", e);
-            }
-            Ok(()) => (),
+        if let Err(e) = delete_save(&self.entries[index]) {
+            error!("Error deleting save");
+            error!("{}", e);
         }
 
         self.entries.remove(index);

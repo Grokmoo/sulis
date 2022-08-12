@@ -14,6 +14,8 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+#![allow(clippy::type_complexity)]
+
 #[macro_use]
 extern crate log;
 #[macro_use]

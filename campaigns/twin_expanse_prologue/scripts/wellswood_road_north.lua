@@ -6,6 +6,7 @@ function on_enter_rockslide(parent, target)
 end
 
 function after_rockslide_cutscene(parent)
+  game:player():teleport_to({x = 46, y = 110})
   game:scroll_view(35, 110)
 
   local members = game:entities_with_ids({"npc_jorzal", "npc_aessa", "npc_grazi" })

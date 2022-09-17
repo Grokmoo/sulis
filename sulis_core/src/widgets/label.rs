@@ -62,7 +62,7 @@ impl Label {
 
         let x = match widget.state.text_params.horizontal_alignment {
             HorizontalAlignment::Left => x,
-            HorizontalAlignment::Center => (x + (w - len) / 2.0),
+            HorizontalAlignment::Center => x + (w - len) / 2.0,
             HorizontalAlignment::Right => x + w - len,
         };
 

@@ -167,12 +167,7 @@ impl Class {
     }
 
     pub fn displayed_class_stat(&self) -> Option<&ClassStat> {
-        for stat in &self.stats {
-            if stat.display {
-                return Some(stat);
-            }
-        }
-        None
+        self.stats.iter().find(|stat| stat.display)
     }
 
     pub fn starting_abilities(&self) -> impl Iterator<Item = &Rc<Ability>> {

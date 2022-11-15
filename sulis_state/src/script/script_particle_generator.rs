@@ -174,9 +174,9 @@ impl ScriptParticleGenerator {
 
 impl UserData for ScriptParticleGenerator {
     fn add_methods<'lua, M: UserDataMethods<'lua, Self>>(methods: &mut M) {
-        methods.add_method("activate", &activate);
-        methods.add_method("param", &param);
-        methods.add_method("dist_param", &dist_param);
+        methods.add_method("activate", activate);
+        methods.add_method("param", param);
+        methods.add_method("dist_param", dist_param);
         methods.add_method("zero_dist", |_, _, _: ()| Ok(Dist::create_fixed(0.0)));
         methods.add_method("fixed_dist", |_, _, value: f32| {
             Ok(Dist::create_fixed(value))

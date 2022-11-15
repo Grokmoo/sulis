@@ -65,7 +65,7 @@ impl ModuleExport {
 
 impl UserData for ModuleExport {
     fn add_methods<'lua, M: UserDataMethods<'lua, Self>>(methods: &mut M) {
-        methods.add_method("activate", &activate);
+        methods.add_method("activate", activate);
 
         methods.add_method_mut("set_include_stash", |_, export, include: bool| {
             export.include_stash = include;

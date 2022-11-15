@@ -198,7 +198,7 @@ fn draw_to_surface<T: glium::Surface>(
         &display.base_program
     };
 
-    match surface.draw(&vertex_buffer, &indices, program, &uniforms, params) {
+    match surface.draw(&vertex_buffer, indices, program, &uniforms, params) {
         Ok(()) => (),
         Err(e) => error!("Error drawing to surface: {:?}", e),
     }

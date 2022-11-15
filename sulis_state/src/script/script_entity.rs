@@ -808,7 +808,7 @@ impl UserData for ScriptEntity {
             Ok(ScriptAbilitySet::from(&entity))
         });
 
-        methods.add_method("targets", &targets);
+        methods.add_method("targets", targets);
 
         methods.add_method("targets_from", |_, entity, targets: Vec<ScriptEntity>| {
             let parent = entity.try_unwrap_index()?;
@@ -1026,7 +1026,7 @@ impl UserData for ScriptEntity {
                 let parent = entity.try_unwrap()?;
                 let target = dest.try_unwrap()?;
 
-                let mut dest = GameState::get_target_dest(&*parent.borrow(), &*target.borrow());
+                let mut dest = GameState::get_target_dest(&parent.borrow(), &target.borrow());
                 if let Some(dist) = dist {
                     dest.dist = dist;
                 }
@@ -1042,7 +1042,7 @@ impl UserData for ScriptEntity {
             |_, entity, (x, y, dist): (f32, f32, Option<f32>)| {
                 let parent = entity.try_unwrap()?;
 
-                let mut dest = GameState::get_point_dest(&*parent.borrow(), x, y);
+                let mut dest = GameState::get_point_dest(&parent.borrow(), x, y);
                 dest.dist = dist.unwrap_or(MOVE_TO_THRESHOLD);
 
                 move_towards_dest(parent, dest)
@@ -1063,7 +1063,7 @@ impl UserData for ScriptEntity {
             |_, entity, target: ScriptEntity| {
                 let parent = entity.try_unwrap()?;
                 let target = target.try_unwrap()?;
-                let result = is_within_attack_dist(&*parent.borrow(), &*target.borrow());
+                let result = is_within_attack_dist(&parent.borrow(), &*target.borrow());
                 Ok(result)
             },
         );
@@ -1071,7 +1071,7 @@ impl UserData for ScriptEntity {
         methods.add_method("is_within_touch_dist", |_, entity, target: ScriptEntity| {
             let parent = entity.try_unwrap()?;
             let target = target.try_unwrap()?;
-            let result = is_within_touch_dist(&*parent.borrow(), &*target.borrow());
+            let result = is_within_touch_dist(&parent.borrow(), &*target.borrow());
             Ok(result)
         });
 
@@ -1502,7 +1502,7 @@ impl UserData for ScriptEntity {
             Ok(None)
         });
 
-        methods.add_method("stats", &create_stats_table);
+        methods.add_method("stats", create_stats_table);
 
         methods.add_method("race", |_, entity, ()| {
             let entity = entity.try_unwrap()?;

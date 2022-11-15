@@ -377,8 +377,8 @@ impl UserData for ScriptAbility {
                 Some(ref ability_state) => Ok(ability_state.is_active_mode()),
             }
         });
-        methods.add_method("activate", &activate);
-        methods.add_method("deactivate", &deactivate);
+        methods.add_method("activate", activate);
+        methods.add_method("deactivate", deactivate);
         methods.add_method(
             "cooldown",
             |_, ability, (target, rounds): (ScriptEntity, u32)| {

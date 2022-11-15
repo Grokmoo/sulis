@@ -80,8 +80,8 @@ impl ScriptColorAnimation {
 
 impl UserData for ScriptColorAnimation {
     fn add_methods<'lua, M: UserDataMethods<'lua, Self>>(methods: &mut M) {
-        methods.add_method("activate", &activate);
-        methods.add_method("param", &script_particle_generator::param);
+        methods.add_method("activate", activate);
+        methods.add_method("param", script_particle_generator::param);
         methods.add_method_mut(
             "set_color",
             |_, gen, (r, g, b, a): (Param, Param, Param, Param)| {

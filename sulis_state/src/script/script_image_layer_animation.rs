@@ -67,7 +67,7 @@ impl ScriptImageLayerAnimation {
 
 impl UserData for ScriptImageLayerAnimation {
     fn add_methods<'lua, M: UserDataMethods<'lua, Self>>(methods: &mut M) {
-        methods.add_method("activate", &activate);
+        methods.add_method("activate", activate);
         methods.add_method_mut("add_image", |_, gen, (layer, image): (String, String)| {
             let layer = match ImageLayer::from_str(&layer) {
                 Ok(layer) => layer,

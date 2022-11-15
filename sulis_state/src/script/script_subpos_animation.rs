@@ -66,8 +66,8 @@ impl ScriptSubposAnimation {
 
 impl UserData for ScriptSubposAnimation {
     fn add_methods<'lua, M: UserDataMethods<'lua, Self>>(methods: &mut M) {
-        methods.add_method("activate", &activate);
-        methods.add_method("param", &script_particle_generator::param);
+        methods.add_method("activate", activate);
+        methods.add_method("param", script_particle_generator::param);
         methods.add_method_mut("set_position", |_, gen, (x, y): (Param, Param)| {
             gen.position = (x, y);
             Ok(())

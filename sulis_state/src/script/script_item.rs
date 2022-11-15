@@ -156,7 +156,7 @@ impl ScriptItem {
 
 impl UserData for ScriptItem {
     fn add_methods<'lua, M: UserDataMethods<'lua, Self>>(methods: &mut M) {
-        methods.add_method("activate", &activate_item);
+        methods.add_method("activate", activate_item);
         methods.add_method("name", |_, item, ()| Ok(item.name.to_string()));
         methods.add_method("duration", |_, item, ()| {
             let item = item.try_item()?;

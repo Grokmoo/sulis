@@ -697,7 +697,7 @@ impl WidgetKind for AreaView {
         let area_state = GameState::area_state();
         let area_width = area_state.borrow().area.width;
         let area_height = area_state.borrow().area.height;
-        self.center_scroll_on_point(x, y, area_width, area_height, &*widget.borrow());
+        self.center_scroll_on_point(x, y, area_width, area_height, &widget.borrow());
         true
     }
 
@@ -960,7 +960,7 @@ impl WidgetKind for AreaView {
         let area_width = area_state.borrow().area.width;
         let area_height = area_state.borrow().area.height;
         self.scroll.compute_max(
-            &*widget.borrow(),
+            &widget.borrow(),
             area_width,
             area_height,
             self.scale.0,

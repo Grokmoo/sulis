@@ -571,7 +571,7 @@ impl AttackAction {
             return None;
         }
 
-        if can_attack(&*pc.borrow(), &*target.borrow()) {
+        if can_attack(&pc.borrow(), &target.borrow()) {
             Some(Box::new(AttackAction { pc, target, ap }))
         } else {
             let cb_action = Box::new(AttackAction {
@@ -604,7 +604,7 @@ impl ActionKind for AttackAction {
 
     fn fire_action(&mut self, _widget: &Rc<RefCell<Widget>>) -> bool {
         trace!("Firing attack action.");
-        if !can_attack(&*self.pc.borrow(), &*self.target.borrow()) {
+        if !can_attack(&self.pc.borrow(), &self.target.borrow()) {
             return false;
         }
 
@@ -728,7 +728,7 @@ impl MoveAction {
         let dist = dist.unwrap_or(MOVE_TO_THRESHOLD);
 
         if let Some(target) = get_attack_target(&area_state, x, y) {
-            if can_attack(&*pc.borrow(), &*target.borrow()) {
+            if can_attack(&pc.borrow(), &target.borrow()) {
                 // if we can already reach the target with our weapon, don't
                 // move further towards them
                 return None;

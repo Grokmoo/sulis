@@ -65,8 +65,8 @@ impl ScriptScaleAnimation {
 
 impl UserData for ScriptScaleAnimation {
     fn add_methods<'lua, M: UserDataMethods<'lua, Self>>(methods: &mut M) {
-        methods.add_method("activate", &activate);
-        methods.add_method("param", &script_particle_generator::param);
+        methods.add_method("activate", activate);
+        methods.add_method("param", script_particle_generator::param);
         methods.add_method_mut("set_scale", |_, gen, scale: Param| {
             gen.scale = scale;
             Ok(())

@@ -194,7 +194,7 @@ impl TargeterData {
 
 impl UserData for TargeterData {
     fn add_methods<'lua, M: UserDataMethods<'lua, Self>>(methods: &mut M) {
-        methods.add_method("activate", &activate);
+        methods.add_method("activate", activate);
         methods.add_method_mut("set_callback_fn", |_, targeter, func: String| {
             targeter.on_target_select_func = func;
             Ok(())

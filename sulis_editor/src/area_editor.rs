@@ -190,7 +190,7 @@ impl WidgetKind for AreaEditor {
     ) -> bool {
         if let ClickKind::Tertiary = kind {
             self.scroll.compute_max(
-                &*widget.borrow(),
+                &widget.borrow(),
                 MAX_AREA_SIZE,
                 MAX_AREA_SIZE,
                 self.scale.0,

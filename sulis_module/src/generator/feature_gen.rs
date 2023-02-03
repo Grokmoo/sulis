@@ -165,7 +165,7 @@ impl FeatureParams {
             let feature = module.features.get(&id).ok_or_else(|| {
                 Error::new(
                     ErrorKind::InvalidInput,
-                    format!("Invalid feature '{}' in gen fixed.", id),
+                    format!("Invalid feature '{id}' in gen fixed."),
                 )
             })?;
             fixed.push(FeatureData {

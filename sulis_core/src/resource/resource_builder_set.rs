@@ -184,7 +184,7 @@ fn handle_merged_error<T: serde::de::DeserializeOwned>(
     value: serde_yaml::Value,
 ) -> Result<String, Error> {
     let value_string = serde_yaml::to_string(&value)
-        .map_err(|e| Error::new(ErrorKind::InvalidData, format!("{}", e)))?;
+        .map_err(|e| Error::new(ErrorKind::InvalidData, format!("{e}")))?;
     let result: Result<T, serde_yaml::Error> = serde_yaml::from_str(&value_string);
 
     match result {
@@ -203,7 +203,7 @@ pub fn write_json_to_file<T: serde::ser::Serialize, P: AsRef<Path>>(
     let file = File::create(filename)?;
 
     match serde_json::to_writer(file, data) {
-        Err(e) => invalid_data_error(&format!("{}", e)),
+        Err(e) => invalid_data_error(&format!("{e}")),
         Ok(()) => Ok(()),
     }
 }
@@ -215,7 +215,7 @@ pub fn write_to_file<T: serde::ser::Serialize, P: AsRef<Path>>(
     let file = File::create(filename)?;
 
     match serde_yaml::to_writer(file, data) {
-        Err(e) => invalid_data_error(&format!("{}", e)),
+        Err(e) => invalid_data_error(&format!("{e}")),
         Ok(()) => Ok(()),
     }
 }
@@ -226,21 +226,20 @@ pub fn read_single_resource_path<T: serde::de::DeserializeOwned>(path: &Path) ->
     let result: Result<T, serde_yaml::Error> = serde_yaml::from_str(&data);
     match result {
         Ok(result) => Ok(result),
-        Err(e) => Err(Error::new(ErrorKind::InvalidData, format!("{}", e))),
+        Err(e) => Err(Error::new(ErrorKind::InvalidData, format!("{e}"))),
     }
 }
 
 pub fn read_single_resource<T: serde::de::DeserializeOwned>(filename: &str) -> Result<T, Error> {
-    let mut file = File::open(format!("{}.json", filename));
+    let mut file = File::open(format!("{filename}.json"));
     if file.is_err() {
-        file = File::open(format!("{}.yml", filename));
+        file = File::open(format!("{filename}.yml"));
     }
 
     let mut file = match file {
         Err(_) => {
             return invalid_data_error(&format!(
-                "Unable to locate '{}.json' or {}.yml'",
-                filename, filename
+                "Unable to locate '{filename}.json' or {filename}.yml'"
             ));
         }
         Ok(f) => f,
@@ -252,7 +251,7 @@ pub fn read_single_resource<T: serde::de::DeserializeOwned>(filename: &str) -> R
     let result: Result<T, serde_yaml::Error> = serde_yaml::from_str(&data);
     match result {
         Ok(result) => Ok(result),
-        Err(e) => Err(Error::new(ErrorKind::InvalidData, format!("{}", e))),
+        Err(e) => Err(Error::new(ErrorKind::InvalidData, format!("{e}"))),
     }
 }
 

@@ -201,7 +201,7 @@ impl ModuleInfo {
         let path_str = path.to_string_lossy().to_string();
         debug!("Checking module at '{}'", path_str);
 
-        let campaign: CampaignBuilder = read_single_resource(&format!("{}/campaign", path_str))?;
+        let campaign: CampaignBuilder = read_single_resource(&format!("{path_str}/campaign"))?;
 
         let group = match campaign.group {
             None => CampaignGroup {
@@ -398,8 +398,7 @@ impl Module {
                     if campaign_yaml.is_some() {
                         return invalid_data_error(&format!(
                             "Multiple potential campaign files \
-                             detected at top level: '{}'",
-                            id
+                             detected at top level: '{id}'"
                         ));
                     }
                     campaign_yaml = Some(yaml);

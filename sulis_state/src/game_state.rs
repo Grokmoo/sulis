@@ -116,7 +116,7 @@ impl GameState {
 
             for index in save_state.party {
                 match entities.get(&index) {
-                    None => return invalid_data_error(&format!("Invalid party index {}", index)),
+                    None => return invalid_data_error(&format!("Invalid party index {index}")),
                     Some(entity) => party.push(Rc::clone(entity)),
                 }
             }
@@ -124,7 +124,7 @@ impl GameState {
             for index in save_state.selected {
                 match entities.get(&index) {
                     None => {
-                        return invalid_data_error(&format!("Invalid selected index {}", index))
+                        return invalid_data_error(&format!("Invalid selected index {index}"))
                     }
                     Some(entity) => selected.push(Rc::clone(entity)),
                 }
@@ -166,7 +166,7 @@ impl GameState {
                 if let Some(index) = effect.entity {
                     let entity = match entities.get(&index) {
                         None => {
-                            return invalid_data_error(&format!("Invalid effect entity {}", index));
+                            return invalid_data_error(&format!("Invalid effect entity {index}"));
                         }
                         Some(entity) => Rc::clone(entity),
                     };

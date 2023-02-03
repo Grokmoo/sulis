@@ -138,7 +138,7 @@ impl AreaState {
 
     pub fn load(id: &str, save: AreaSaveState) -> Result<AreaState, Error> {
         let area = match Module::area(id) {
-            None => invalid_data_error(&format!("Unable to find area '{}'", id)),
+            None => invalid_data_error(&format!("Unable to find area '{id}'")),
             Some(area) => Ok(area),
         }?;
 
@@ -939,7 +939,7 @@ impl AreaState {
         let y = location.y;
 
         if !self.area.area.coords_valid(x, y) {
-            return invalid_data_error(&format!("entity location is out of bounds: {},{}", x, y));
+            return invalid_data_error(&format!("entity location is out of bounds: {x},{y}"));
         }
 
         let entities_to_ignore = vec![entity.borrow().index()];

@@ -99,7 +99,7 @@ impl FromStr for Color {
         } else {
             Err(Error::new(
                 ErrorKind::InvalidInput,
-                format!("Unable to parse color from string '{}'", text),
+                format!("Unable to parse color from string '{text}'"),
             ))
         }
     }

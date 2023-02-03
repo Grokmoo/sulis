@@ -103,7 +103,7 @@ impl ReproducibleRandom {
 impl std::fmt::Debug for ReproducibleRandom {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         let state = serde_json::to_string(&self.gen).map_err(|_| std::fmt::Error)?;
-        write!(f, "Random: {}", state)
+        write!(f, "Random: {state}")
     }
 }
 
@@ -274,7 +274,7 @@ impl ExtInt {
 impl fmt::Display for ExtInt {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            ExtInt::Int(amount) => write!(f, "{}", amount),
+            ExtInt::Int(amount) => write!(f, "{amount}"),
             ExtInt::Infinity => write!(f, "infinity"),
         }
     }
@@ -336,7 +336,7 @@ pub fn invalid_data_error<T>(str: &str) -> Result<T, Error> {
 pub fn unable_to_create_error<T>(kind: &str, id: &str) -> Result<T, Error> {
     Err(Error::new(
         ErrorKind::InvalidData,
-        format!("Unable to create {} '{}'", kind, id),
+        format!("Unable to create {kind} '{id}'"),
     ))
 }
 
@@ -350,7 +350,7 @@ pub fn get_elapsed_millis(elapsed: Duration) -> u32 {
 /// in seconds
 pub fn format_elapsed_secs(elapsed: Duration) -> String {
     let secs = elapsed.as_secs() as f64 + elapsed.subsec_nanos() as f64 * 1e-9;
-    format!("{:.6}", secs)
+    format!("{secs:.6}")
 }
 
 pub fn error_and_exit(error: &str) {
@@ -391,7 +391,7 @@ pub fn setup_logger() -> LoggerHandle {
         .format(opt_format);
 
     let handle = logger.start().unwrap_or_else(|e| {
-        eprintln!("{}", e);
+        eprintln!("{e}");
         eprintln!("There was a fatal error initializing logging to 'log/'");
         eprintln!("Exiting...");
         ::std::process::exit(1);

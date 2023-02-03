@@ -1327,7 +1327,7 @@ impl UserData for ScriptEntity {
 
             let mut feedback =
                 AreaFeedbackText::with_target(&parent.borrow(), &area_state.borrow());
-            feedback.add_entry(format!("{}", amount), ColorKind::Heal);
+            feedback.add_entry(format!("{amount}"), ColorKind::Heal);
             area_state.borrow_mut().add_feedback_text(feedback);
 
             Ok(())
@@ -1342,7 +1342,7 @@ impl UserData for ScriptEntity {
                 let area = GameState::area_state();
 
                 let mut feedback = AreaFeedbackText::with_target(&parent.borrow(), &area.borrow());
-                feedback.add_entry(format!("{}", amount), ColorKind::Heal);
+                feedback.add_entry(format!("{amount}"), ColorKind::Heal);
                 area.borrow_mut().add_feedback_text(feedback);
                 Ok(())
             },
@@ -1357,7 +1357,7 @@ impl UserData for ScriptEntity {
                 let area = GameState::area_state();
 
                 let mut feedback = AreaFeedbackText::with_target(&parent.borrow(), &area.borrow());
-                feedback.add_entry(format!("{}", amount), ColorKind::Hit);
+                feedback.add_entry(format!("{amount}"), ColorKind::Hit);
                 area.borrow_mut().add_feedback_text(feedback);
                 Ok(())
             },
@@ -1423,7 +1423,7 @@ impl UserData for ScriptEntity {
                     return Err(rlua::Error::FromLuaConversionError {
                         from: "String",
                         to: "ScriptAbility",
-                        message: Some(format!("Ability '{}' does not exist", id)),
+                        message: Some(format!("Ability '{id}' does not exist")),
                     });
                 }
                 Some(ability) => ability,
@@ -1432,7 +1432,7 @@ impl UserData for ScriptEntity {
                 return Err(rlua::Error::FromLuaConversionError {
                     from: "String",
                     to: "ScriptAbility",
-                    message: Some(format!("Ability '{}' is not active", id)),
+                    message: Some(format!("Ability '{id}' is not active")),
                 });
             }
             let entity = entity.try_unwrap()?;
@@ -1784,9 +1784,9 @@ fn create_stats_table<'a>(
     }
 
     for (index, attack) in src.attacks.iter().enumerate() {
-        stats.set(format!("damage_min_{}", index), attack.damage.min())?;
-        stats.set(format!("damage_max_{}", index), attack.damage.max())?;
-        stats.set(format!("armor_penetration_{}", index), attack.damage.ap())?;
+        stats.set(format!("damage_min_{index}"), attack.damage.min())?;
+        stats.set(format!("damage_max_{index}"), attack.damage.max())?;
+        stats.set(format!("armor_penetration_{index}"), attack.damage.ap())?;
     }
 
     Ok(stats)

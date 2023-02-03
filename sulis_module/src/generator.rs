@@ -124,7 +124,7 @@ impl<T> WeightedList<T> {
             let t = getter(&id).ok_or_else(|| {
                 Error::new(
                     ErrorKind::InvalidInput,
-                    format!("Invalid {} '{}'", name, id),
+                    format!("Invalid {name} '{id}'"),
                 )
             })?;
 
@@ -137,7 +137,7 @@ impl<T> WeightedList<T> {
         if total_weight == 0 || entries.is_empty() {
             return Err(Error::new(
                 ErrorKind::InvalidInput,
-                format!("Must specify at least one {}", name),
+                format!("Must specify at least one {name}"),
             ));
         }
 
@@ -297,8 +297,8 @@ impl TileIter {
             y: 0,
             max_x: model.area_width,
             max_y: model.area_height,
-            step_x: model.model.grid_width as i32,
-            step_y: model.model.grid_height as i32,
+            step_x: model.model.grid_width,
+            step_y: model.model.grid_height,
         }
     }
 

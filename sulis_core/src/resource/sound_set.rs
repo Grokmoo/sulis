@@ -76,7 +76,7 @@ fn build_source(
             Err(_) => continue,
         };
 
-        let s_id = format!("{}/{}", builder_id, entry_id);
+        let s_id = format!("{builder_id}/{entry_id}");
         if let Ok(sound_source) = SoundSource::new(s_id, file, entry_builder) {
             source = Some(sound_source);
             break;
@@ -87,7 +87,7 @@ fn build_source(
         warn!("Unable to read sound '{}' from any of '{:?}'",
             entry_id, source_dirs);
         Error::new(ErrorKind::InvalidData,
-            format!("Unable to create sound_set '{}'", builder_id))
+            format!("Unable to create sound_set '{builder_id}'"))
     })
 }
 

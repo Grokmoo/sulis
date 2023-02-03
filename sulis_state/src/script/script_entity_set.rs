@@ -163,8 +163,7 @@ impl ScriptEntitySet {
                 Some(index) => match entities.get(&index) {
                     None => {
                         return invalid_data_error(&format!(
-                            "Invalid target {} for ScriptEntitySet",
-                            index
+                            "Invalid target {index} for ScriptEntitySet"
                         ));
                     }
                     Some(entity) => indices.push(Some(entity.borrow().index())),

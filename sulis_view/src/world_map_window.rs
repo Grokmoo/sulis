@@ -64,8 +64,8 @@ impl WidgetKind for WorldMapWindow {
             let (start_x, start_y) = state.inner_position().as_tuple();
             let (w, h) = state.inner_size().as_tuple();
 
-            let grid_w = w as f32 / self.size.0 as f32;
-            let grid_h = h as f32 / self.size.1 as f32;
+            let grid_w = w as f32 / self.size.0;
+            let grid_h = h as f32 / self.size.1;
 
             let offset_x = self.offset.0 * grid_w;
             let offset_y = self.offset.1 * grid_h;

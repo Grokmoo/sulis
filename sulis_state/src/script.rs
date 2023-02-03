@@ -367,16 +367,14 @@ impl Default for ScriptState {
                 if state.count > INSTRUCTION_LIMIT {
                     return Err(rlua::Error::RuntimeError(format!(
                         "Instruction limit of \
-                         {} reached",
-                        INSTRUCTION_LIMIT
+                         {INSTRUCTION_LIMIT} reached"
                     )));
                 }
 
                 if get_elapsed_millis(state.start_time.elapsed()) > MILLIS_LIMIT {
                     return Err(rlua::Error::RuntimeError(format!(
                         "Script time limit of \
-                         {} millis reached",
-                        MILLIS_LIMIT
+                         {MILLIS_LIMIT} millis reached"
                     )));
                 }
 

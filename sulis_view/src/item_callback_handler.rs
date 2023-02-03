@@ -126,7 +126,7 @@ pub fn buy_item_cb(merchant_id: &str, index: usize) -> Callback {
 
         let value = match merchant.items().get(index) {
             None => return,
-            Some(&(_, ref item_state)) => merchant.get_buy_price(item_state),
+            Some((_, item_state)) => merchant.get_buy_price(item_state),
         };
 
         if GameState::party_coins() < value {

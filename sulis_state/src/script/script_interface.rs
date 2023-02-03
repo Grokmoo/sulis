@@ -988,7 +988,7 @@ impl UserData for ScriptInterface {
                 None => return Err(rlua::Error::FromLuaConversionError {
                     from: "String",
                     to: "Item",
-                    message: Some(format!("Item '{}' does not exist", id)),
+                    message: Some(format!("Item '{id}' does not exist")),
                 }),
                 Some(item) => item,
             };
@@ -1016,7 +1016,7 @@ impl UserData for ScriptInterface {
                 None => return Err(rlua::Error::FromLuaConversionError {
                     from: "String",
                     to: "Item",
-                    message: Some(format!("Item '{}' does not exist", item)),
+                    message: Some(format!("Item '{item}' does not exist")),
                 }),
                 Some(item) => item,
             };
@@ -1032,7 +1032,7 @@ impl UserData for ScriptInterface {
             }
 
             let pc = GameState::player();
-            let line = format!("Gained {} xp", amount);
+            let line = format!("Gained {amount} xp");
             let cb = OnTrigger::SayLine(line);
             GameState::add_ui_callback(vec![cb], &pc, &pc);
             Ok(())
@@ -1074,8 +1074,7 @@ fn get_area(id: Option<String>) -> Result<Rc<RefCell<AreaState>>> {
             from: "String",
             to: "AreaState",
             message: Some(format!(
-                "The area '{}' does not exist or is not loaded.",
-                id
+                "The area '{id}' does not exist or is not loaded."
             )),
         }),
     }

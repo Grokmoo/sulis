@@ -367,7 +367,7 @@ impl Config {
             Ok(config) => config.revision,
             Err(orig_e) => match Config::new(&Path::new("../").join(CONFIG_BASE), 0) {
                 Err(_) => {
-                    eprintln!("{}", orig_e);
+                    eprintln!("{orig_e}");
                     eprintln!("Unable to parse revision from config.sample");
                     std::process::exit(1);
                 }
@@ -386,10 +386,9 @@ impl Config {
         match Config::new(config_path, revision) {
             Ok(config) => config,
             Err(e) => {
-                eprintln!("{}", e);
+                eprintln!("{e}");
                 eprintln!(
-                    "Error parsing config file at '{}', attempting delete.",
-                    CONFIG_FILENAME
+                    "Error parsing config file at '{CONFIG_FILENAME}', attempting delete."
                 );
 
                 Config::create_config_from_sample(config_path);
@@ -397,7 +396,7 @@ impl Config {
                 match Config::new(config_path, revision) {
                     Ok(config) => config,
                     Err(e) => {
-                        eprintln!("{}", e);
+                        eprintln!("{e}");
                         eprintln!("Fatal error in sample config.  Exiting...");
                         std::process::exit(1);
                     }
@@ -410,19 +409,18 @@ impl Config {
         let config_base_path = Path::new(CONFIG_BASE);
 
         println!(
-            "{} not found, attempting to create it from {}",
-            CONFIG_FILENAME, CONFIG_BASE
+            "{CONFIG_FILENAME} not found, attempting to create it from {CONFIG_BASE}"
         );
         if let Some(path) = config_path.parent() {
             create_dir_and_warn(path);
         }
 
         if fs::copy(config_base_path, config_path).is_err() {
-            let config_base_str = format!("../{}", CONFIG_BASE);
+            let config_base_str = format!("../{CONFIG_BASE}");
             let config_base_path = Path::new(&config_base_str);
             if let Err(e) = fs::copy(config_base_path, config_path) {
-                eprintln!("{}", e);
-                eprintln!("Unable to create configuration file '{}'", CONFIG_FILENAME);
+                eprintln!("{e}");
+                eprintln!("Unable to create configuration file '{CONFIG_FILENAME}'");
                 eprintln!("Exiting...");
                 ::std::process::exit(1);
             }
@@ -439,7 +437,7 @@ impl Config {
         let config = match config {
             Ok(config) => config,
             Err(e) => {
-                return Err(Error::new(ErrorKind::InvalidData, format!("{}", e)));
+                return Err(Error::new(ErrorKind::InvalidData, format!("{e}")));
             }
         };
 

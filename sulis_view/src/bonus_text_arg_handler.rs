@@ -22,9 +22,9 @@ use sulis_module::{Armor, Bonus, BonusList, DamageKind, Module, PrereqList};
 
 pub fn format_bonus_or_penalty(amount: i32) -> String {
     if amount >= 0 {
-        format!("+{}", amount)
+        format!("+{amount}")
     } else {
-        format!("{}", amount)
+        format!("{amount}")
     }
 }
 
@@ -132,20 +132,20 @@ fn add_bonus(
         ArmorKind { kind, amount } => armor.add_kind(*kind, *amount),
         Resistance { kind, amount } => add(
             state,
-            &format!("resistance_{}", kind).to_lowercase(),
+            &format!("resistance_{kind}").to_lowercase(),
             *amount,
         ),
         Damage(damage) => {
             let index = *damage_index;
             if damage.max > 0 {
-                add(state, &format!("min_bonus_damage_{}", index), damage.min);
-                add(state, &format!("max_bonus_damage_{}", index), damage.max);
+                add(state, &format!("min_bonus_damage_{index}"), damage.min);
+                add(state, &format!("max_bonus_damage_{index}"), damage.max);
             }
             if damage.ap > 0 {
-                add(state, &format!("armor_penetration_{}", index), damage.ap);
+                add(state, &format!("armor_penetration_{index}"), damage.ap);
             }
             if let Some(kind) = damage.kind {
-                add(state, &format!("bonus_damage_kind_{}", index), kind);
+                add(state, &format!("bonus_damage_kind_{index}"), kind);
             }
             *damage_index += 1;
         }
@@ -174,13 +174,13 @@ fn add_bonus(
         CritChance(amount) => add(state, "crit_chance", amount),
         HitThreshold(amount) => add(state, "hit_threshold", amount),
         GrazeThreshold(amount) => add(state, "graze_threshold", amount),
-        CritMultiplier(amount) => state.add_text_arg("crit_multiplier", &format!("{:.2}", amount)),
-        HitMultiplier(amount) => state.add_text_arg("hit_multiplier", &format!("{:.2}", amount)),
+        CritMultiplier(amount) => state.add_text_arg("crit_multiplier", &format!("{amount:.2}")),
+        HitMultiplier(amount) => state.add_text_arg("hit_multiplier", &format!("{amount:.2}")),
         GrazeMultiplier(amount) => {
-            state.add_text_arg("graze_multiplier", &format!("{:.2}", amount))
+            state.add_text_arg("graze_multiplier", &format!("{amount:.2}"))
         }
-        MovementRate(amount) => state.add_text_arg("movement_rate", &format!("{:.2}", amount)),
-        MoveAnimRate(amount) => state.add_text_arg("move_anim_rate", &format!("{:.2}", amount)),
+        MovementRate(amount) => state.add_text_arg("movement_rate", &format!("{amount:.2}")),
+        MoveAnimRate(amount) => state.add_text_arg("move_anim_rate", &format!("{amount:.2}")),
         CasterLevel(amount) => add(state, "caster_level", amount),
         AttackCost(amount) => {
             let cost = Module::rules().to_display_ap(*amount);
@@ -192,19 +192,19 @@ fn add_bonus(
         }
         GroupUsesPerEncounter { group, amount } => {
             let index = find_index(group, group_uses_so_far);
-            add(state, &format!("ability_group_{}", index), group);
+            add(state, &format!("ability_group_{index}"), group);
             add(
                 state,
-                &format!("ability_group_{}_uses_per_encounter", index),
+                &format!("ability_group_{index}_uses_per_encounter"),
                 amount,
             );
         }
         GroupUsesPerDay { group, amount } => {
             let index = find_index(group, group_uses_so_far);
-            add(state, &format!("ability_group_{}", index), group);
+            add(state, &format!("ability_group_{index}"), group);
             add(
                 state,
-                &format!("ability_group_{}_uses_per_day", index),
+                &format!("ability_group_{index}_uses_per_day"),
                 amount,
             );
         }
@@ -215,14 +215,14 @@ fn add_bonus(
         ArmorProficiency(armor_kind) => {
             add(
                 state,
-                &format!("armor_proficiency_{:?}", armor_kind),
+                &format!("armor_proficiency_{armor_kind:?}"),
                 "true",
             );
         }
         WeaponProficiency(weapon_kind) => {
             add(
                 state,
-                &format!("weapon_proficiency_{:?}", weapon_kind),
+                &format!("weapon_proficiency_{weapon_kind:?}"),
                 "true",
             );
         }
@@ -258,8 +258,8 @@ pub fn add_prereq_text_args(prereqs: &PrereqList, state: &mut WidgetState) {
             }
             Some(class) => class,
         };
-        state.add_text_arg(&format!("prereq_class_{}", index), &class.name);
-        state.add_text_arg(&format!("prereq_level_{}", index), &level.to_string());
+        state.add_text_arg(&format!("prereq_class_{index}"), &class.name);
+        state.add_text_arg(&format!("prereq_level_{index}"), &level.to_string());
     }
 
     if let Some(total_level) = prereqs.total_level {
@@ -286,7 +286,7 @@ pub fn add_prereq_text_args(prereqs: &PrereqList, state: &mut WidgetState) {
             Some(ability) => ability,
         };
 
-        state.add_text_arg(&format!("prereq_ability_{}", index), &ability.name);
+        state.add_text_arg(&format!("prereq_ability_{index}"), &ability.name);
     }
 }
 
@@ -327,7 +327,7 @@ pub fn add_bonus_text_args(bonuses: &BonusList, widget_state: &mut WidgetState) 
         }
         add(
             widget_state,
-            &format!("armor_{}", kind).to_lowercase(),
+            &format!("armor_{kind}").to_lowercase(),
             armor.amount(*kind),
         );
     }

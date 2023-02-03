@@ -417,7 +417,7 @@ fn add_if_nonzero(state: &mut WidgetState, index: usize, name: &str, value: f32)
         return;
     }
 
-    state.add_text_arg(&format!("{}_{}", index, name), &value.to_string());
+    state.add_text_arg(&format!("{index}_{name}"), &value.to_string());
 }
 
 pub fn create_details_text_box(pc: &ActorState, is_pc: bool) -> Rc<RefCell<Widget>> {
@@ -456,22 +456,22 @@ pub fn create_details_text_box(pc: &ActorState, is_pc: bool) -> Rc<RefCell<Widge
         }
 
         for (index, &(ref class, level)) in pc.actor.levels.iter().enumerate() {
-            state.add_text_arg(&format!("class_{}", index), &class.name);
-            state.add_text_arg(&format!("level_{}", index), &level.to_string());
+            state.add_text_arg(&format!("class_{index}"), &class.name);
+            state.add_text_arg(&format!("level_{index}"), &level.to_string());
         }
 
         for (index, attack) in stats.attacks.iter().enumerate() {
             state.add_text_arg(
-                &format!("{}_damage_min", index),
+                &format!("{index}_damage_min"),
                 &attack.damage.min().to_string(),
             );
             state.add_text_arg(
-                &format!("{}_damage_max", index),
+                &format!("{index}_damage_max"),
                 &attack.damage.max().to_string(),
             );
             if attack.damage.ap() > 0 {
                 state.add_text_arg(
-                    &format!("{}_armor_penetration", index),
+                    &format!("{index}_armor_penetration"),
                     &attack.damage.ap().to_string(),
                 );
             }
@@ -556,7 +556,7 @@ pub fn create_details_text_box(pc: &ActorState, is_pc: bool) -> Rc<RefCell<Widge
             }
 
             state.add_text_arg(
-                &format!("armor_{}", kind).to_lowercase(),
+                &format!("armor_{kind}").to_lowercase(),
                 &stats.armor.amount(*kind).to_string(),
             );
         }
@@ -568,7 +568,7 @@ pub fn create_details_text_box(pc: &ActorState, is_pc: bool) -> Rc<RefCell<Widge
             }
 
             state.add_text_arg(
-                &format!("resistance_{}", kind).to_lowercase(),
+                &format!("resistance_{kind}").to_lowercase(),
                 &amount.to_string(),
             );
         }

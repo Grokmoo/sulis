@@ -186,7 +186,7 @@ impl ActorCreatorWindow {
 
             let subpane = Widget::empty("layer_pane");
 
-            let title = Widget::with_theme(Label::new(&format!("{:?}", layer)), "title");
+            let title = Widget::with_theme(Label::new(&format!("{layer:?}")), "title");
             let prev = Widget::with_theme(Button::empty(), "prev_button");
 
             let len = images.len();
@@ -350,7 +350,7 @@ impl WidgetKind for ActorCreatorWindow {
         if self.selected_race.is_some() {
             for faction in Faction::iter() {
                 let faction = *faction;
-                let widget = Widget::with_theme(Button::empty(), &format!("{:?}", faction));
+                let widget = Widget::with_theme(Button::empty(), &format!("{faction:?}"));
                 if faction == self.selected_faction {
                     widget.borrow_mut().state.set_active(true);
                 }
@@ -370,7 +370,7 @@ impl WidgetKind for ActorCreatorWindow {
         if self.selected_race.is_some() {
             for sex in Sex::iter() {
                 let sex = *sex;
-                let widget = Widget::with_theme(Button::empty(), &format!("{}", sex));
+                let widget = Widget::with_theme(Button::empty(), &format!("{sex}"));
                 if sex == self.selected_sex {
                     widget.borrow_mut().state.set_active(true);
                 }

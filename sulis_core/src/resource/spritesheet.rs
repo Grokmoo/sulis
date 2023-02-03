@@ -149,7 +149,7 @@ impl Spritesheet {
             for (base_id, area_pos) in areas {
                 let id = match group.prefix {
                     None => base_id,
-                    Some(ref prefix) => format!("{}{}", prefix, base_id),
+                    Some(ref prefix) => format!("{prefix}{base_id}"),
                 };
 
                 let (mut pos, mut size) = match area_pos.len() {

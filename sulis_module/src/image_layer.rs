@@ -69,7 +69,7 @@ impl FromStr for ImageLayer {
             _ => {
                 return Err(Error::new(
                     ErrorKind::InvalidInput,
-                    format!("Unable to parse ImageLayer from '{}'", s),
+                    format!("Unable to parse ImageLayer from '{s}'"),
                 ));
             }
         };

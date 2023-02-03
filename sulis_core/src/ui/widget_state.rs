@@ -63,7 +63,7 @@ impl WidgetState {
             mouse_is_inside: false,
             background: None,
             foreground: None,
-            animation_state: AnimationState::default(),
+            animation_state: AnimationState::base(),
             font: None,
             text: String::new(),
             text_params: TextParams::default(),

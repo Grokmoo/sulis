@@ -252,7 +252,7 @@ impl WidgetKind for AttributeSelectorPane {
                 .add_text_arg("value", &bonus_value.to_string());
             children.push(bonus);
 
-            let total_value = bonus_value as i32 + value;
+            let total_value = bonus_value + value;
             let total = Widget::with_theme(Label::empty(), &format!("{}_total", attr.short_name()));
             total
                 .borrow_mut()

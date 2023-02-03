@@ -87,7 +87,7 @@ impl PropState {
             items.add_quantity(quantity, ItemState::new(item, variant));
         }
 
-        let mut anim_state = AnimationState::default();
+        let mut anim_state = AnimationState::base();
 
         let interactive = match &prop_data.prop.interactive {
             prop::Interactive::Hover => {
@@ -184,7 +184,7 @@ impl PropState {
                 let loot = match loot_to_generate {
                     None => Ok(None),
                     Some(ref id) => match Module::loot_list(id) {
-                        None => invalid_data_error(&format!("No loot list with ID '{}'", id)),
+                        None => invalid_data_error(&format!("No loot list with ID '{id}'")),
                         Some(loot_list) => Ok(Some(loot_list)),
                     },
                 }?;

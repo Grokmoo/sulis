@@ -263,7 +263,7 @@ impl WidgetKind for ItemListPane {
 
             let button = Widget::with_theme(
                 Button::empty(),
-                &format!("filter_{:?}", filter).to_lowercase(),
+                &format!("filter_{filter:?}").to_lowercase(),
             );
             button
                 .borrow_mut()

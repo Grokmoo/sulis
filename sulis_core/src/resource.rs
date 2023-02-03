@@ -243,7 +243,7 @@ impl ResourceSet {
         RESOURCE_SET.with(|r| match r.borrow().sprite_internal(id) {
             Ok(sprite) => sprite,
             Err(e) => {
-                panic!("Unable to find sprite: '{}': {}", id, e);
+                panic!("Unable to find sprite: '{id}': {e}");
             }
         })
     }
@@ -295,14 +295,13 @@ impl ResourceSet {
 
         let set = match self.sound_sets.get(set_id) {
             None => {
-                return invalid_data_error(&format!("Unable to locate sound set '{}'", set_id));
+                return invalid_data_error(&format!("Unable to locate sound set '{set_id}'"));
             }, Some(set) => set,
         };
 
         let sound = match set.get(sound_id) {
             None => {
-                return invalid_data_error(&format!("Unable to locate sound '{}' in set '{}'",
-                        sound_id, set_id));
+                return invalid_data_error(&format!("Unable to locate sound '{sound_id}' in set '{set_id}'"));
             }, Some(sound) => sound.clone(),
         };
 
@@ -331,8 +330,7 @@ impl ResourceSet {
         let sheet = match self.spritesheets.get(spritesheet_id) {
             None => {
                 return invalid_data_error(&format!(
-                    "Unable to locate spritesheet '{}'",
-                    spritesheet_id
+                    "Unable to locate spritesheet '{spritesheet_id}'"
                 ));
             }
             Some(sheet) => sheet,
@@ -341,8 +339,7 @@ impl ResourceSet {
         let sprite = match sheet.sprites.get(sprite_id) {
             None => {
                 return invalid_data_error(&format!(
-                    "Unable to locate sprite '{}' in spritesheet '{}'",
-                    sprite_id, spritesheet_id
+                    "Unable to locate sprite '{sprite_id}' in spritesheet '{spritesheet_id}'"
                 ));
             }
             Some(sprite) => Rc::clone(sprite),
@@ -428,8 +425,7 @@ where
     let id = String::deserialize(deserializer)?;
     match ResourceSet::image(&id) {
         None => Err(de::Error::custom(format!(
-            "No image with ID '{}' found",
-            id
+            "No image with ID '{id}' found"
         ))),
         Some(image) => Ok(image),
     }

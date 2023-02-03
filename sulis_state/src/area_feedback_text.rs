@@ -139,7 +139,7 @@ impl AreaFeedbackText {
             }
 
             let color = ColorKind::Damage { kind: *kind };
-            text.add_entry(format!("{}", amount), color);
+            text.add_entry(format!("{amount}"), color);
 
             first = false;
         }

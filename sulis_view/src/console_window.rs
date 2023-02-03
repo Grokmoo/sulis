@@ -60,7 +60,7 @@ impl ConsoleWindow {
         let result = match self.script_state.console(script, &party) {
             Ok(result) => result,
             Err(rlua::Error::FromLuaConversionError { .. }) => "Success".to_string(),
-            Err(e) => format!("{}", e),
+            Err(e) => format!("{e}"),
         };
 
         info!("Console result: {}", result);

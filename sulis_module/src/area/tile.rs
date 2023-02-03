@@ -248,7 +248,7 @@ impl Tileset {
                 Some(uniform.invis.clone())
             };
             for tile_id in uniform.tiles.iter() {
-                let id = format!("{}{}", prefix, tile_id);
+                let id = format!("{prefix}{tile_id}");
                 let tile = TileBuilder {
                     size,
                     layer: layer.to_string(),
@@ -271,7 +271,7 @@ impl Tileset {
             let layer = &non_uniform.layer;
             let prefix = &non_uniform.sprite_prefix;
             for (tile_id, impass_invis) in non_uniform.tiles.iter() {
-                let id = format!("{}{}", prefix, tile_id);
+                let id = format!("{prefix}{tile_id}");
                 let tile = TileBuilder {
                     size,
                     layer: layer.to_string(),
@@ -387,15 +387,14 @@ pub fn verify_point(
     p: Vec<usize>,
 ) -> Result<(i32, i32), Error> {
     if p.len() != 2 {
-        return invalid_data_error(&format!("{} point array length is not equal to 2", kind));
+        return invalid_data_error(&format!("{kind} point array length is not equal to 2"));
     }
 
     let x = p[0];
     let y = p[1];
     if x > width || y >= height {
         return invalid_data_error(&format!(
-            "{} point has coordiantes greater than size {},{}",
-            kind, width, height
+            "{kind} point has coordiantes greater than size {width},{height}"
         ));
     }
     Ok((x as i32, y as i32))

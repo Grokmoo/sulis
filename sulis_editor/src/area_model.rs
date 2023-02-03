@@ -367,7 +367,7 @@ impl AreaModel {
         scale: Scale,
         millis: u32,
     ) {
-        for &(_, ref tiles) in self.tiles.iter() {
+        for (_, tiles) in self.tiles.iter() {
             let mut draw_list = DrawList::empty_sprite();
             for &(pos, ref tile) in tiles {
                 let sprite = &tile.image_display;
@@ -440,9 +440,9 @@ impl AreaModel {
 
             let text = match transition.to {
                 ToKind::CurArea { .. } => "to Current Area".to_string(),
-                ToKind::Area { ref id, .. } => format!("to {}", id),
+                ToKind::Area { ref id, .. } => format!("to {id}"),
                 ToKind::WorldMap => "to World Map".to_string(),
-                ToKind::FindLink { ref id, .. } => format!("to {}", id),
+                ToKind::FindLink { ref id, .. } => format!("to {id}"),
             };
 
             let (mut draw_list, _) = font_renderer.get_draw_list(&text, offset, 1.0);
@@ -498,7 +498,7 @@ impl AreaModel {
     }
 
     pub fn load(&mut self, filename_prefix: &str, filename: &str) {
-        let path = format!("{}/{}", filename_prefix, filename);
+        let path = format!("{filename_prefix}/{filename}");
         debug!("Loading area state from {}", filename);
 
         let mut area_builder: AreaBuilder = match read_single_resource(&path) {
@@ -749,7 +749,7 @@ impl AreaModel {
         let mut layer_set: HashMap<String, Vec<Vec<u16>>> = HashMap::new();
 
         trace!("Saving layer_set.");
-        for &(ref layer_id, ref tiles) in self.tiles.iter() {
+        for (layer_id, tiles) in self.tiles.iter() {
             layers.push(layer_id.to_string());
             for &(position, ref tile) in tiles.iter() {
                 width = cmp::max(width, position.x + tile.width);

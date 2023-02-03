@@ -459,7 +459,7 @@ where
 
     let mut data = serializer.serialize_struct(name, 2)?;
     data.serialize_field("kinds", &kinds)?;
-    data.serialize_field("entries", &base64::encode(&vec))?;
+    data.serialize_field("entries", &base64::encode(vec))?;
     data.end()
 }
 
@@ -499,7 +499,7 @@ where
         let entry_index = entry_index(&mut kinds, &mut index, terrain_id)
             .map_err(|e| Error::custom(e.to_string()))?;
 
-        terrain.push(entry_index as u8);
+        terrain.push(entry_index);
     }
 
     serialize_u8_with_kinds(kinds, "terrain", terrain, serializer)
@@ -557,7 +557,7 @@ where
         let entry_index = entry_index(&mut kinds, &mut index, wall_id)
             .map_err(|e| Error::custom(e.to_string()))?;
 
-        walls.push(entry_index as u8);
+        walls.push(entry_index);
         walls.push(*level);
     }
 
@@ -628,7 +628,7 @@ where
 {
     use sulis_core::serde::de::Error;
     let s = String::deserialize(deserializer)?;
-    base64::decode(&s).map_err(|err| Error::custom(err.to_string()))
+    base64::decode(s).map_err(|err| Error::custom(err.to_string()))
 }
 
 fn as_base64<S>(input: &[u8], serializer: S) -> Result<S::Ok, S::Error>

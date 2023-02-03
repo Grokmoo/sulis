@@ -65,7 +65,7 @@ impl Inventory {
             {
                 let equippable = match item_state.item.equippable {
                     None => {
-                        invalid_data_error(&format!("Item in slot '{:?}' is not equippable", slot))
+                        invalid_data_error(&format!("Item in slot '{slot:?}' is not equippable"))
                     }
                     Some(ref equip) => Ok(equip),
                 }?;
@@ -78,8 +78,7 @@ impl Inventory {
 
                     if !ok {
                         return invalid_data_error(&format!(
-                            "item in slot '{:?}' invalid equip type",
-                            slot
+                            "item in slot '{slot:?}' invalid equip type"
                         ));
                     }
                 }

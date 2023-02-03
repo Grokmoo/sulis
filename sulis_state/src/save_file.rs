@@ -40,7 +40,7 @@ impl SaveFile {
 
         match resource {
             Ok(resource) => Ok(resource),
-            Err(error) => invalid_data_error(&format!("{}", error)),
+            Err(error) => invalid_data_error(&format!("{error}")),
         }
     }
 }

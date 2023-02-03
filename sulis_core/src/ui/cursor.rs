@@ -49,7 +49,7 @@ thread_local! {
         yf: 0.0,
         button_down: None,
         image: None,
-        state: AnimationState::default(),
+        state: AnimationState::base(),
     });
 }
 
@@ -174,7 +174,7 @@ impl Cursor {
 
             // reset cursor to default every time it moves.  area view
             // will then set it to the correct state if appropriate
-            cursor.state = AnimationState::default();
+            cursor.state = AnimationState::base();
 
             cursor.xf = new_x;
             cursor.yf = new_y;

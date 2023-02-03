@@ -169,7 +169,7 @@ impl AbilitiesPane {
             positions: Vec::new(),
             grid_size: 10,
             grid_border: 1,
-            id: format!("abilities_pane_{}", id),
+            id: format!("abilities_pane_{id}"),
         }
     }
 }

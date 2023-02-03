@@ -187,7 +187,7 @@ impl TransitionParams {
                         .ok_or_else(|| {
                             Error::new(
                                 ErrorKind::InvalidInput,
-                                format!("Invalid feature '{}'", feature_id),
+                                format!("Invalid feature '{feature_id}'"),
                             )
                         })?,
                 ),
@@ -197,7 +197,7 @@ impl TransitionParams {
             let size = module.sizes.get(&kind_size).ok_or_else(|| {
                 Error::new(
                     ErrorKind::InvalidInput,
-                    format!("Invalid size '{}'", kind_size),
+                    format!("Invalid size '{kind_size}'"),
                 )
             })?;
 

@@ -46,7 +46,7 @@ impl WidgetKind for ItemActionMenu {
         let title = Widget::with_theme(Label::empty(), "title");
 
         let mut entries: Vec<list_box::Entry<String>> = Vec::new();
-        for &(ref name, ref cb) in self.actions.iter() {
+        for (name, cb) in self.actions.iter() {
             let cb = cb.clone();
             let callback = Callback::new(Rc::new(move |widget, kind| {
                 cb.call(widget, kind);

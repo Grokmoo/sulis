@@ -275,7 +275,7 @@ impl Rules {
             let resistance = (100 - resistance.amount(kind)) as f32 / 100.0;
             let amount = damage.roll() as f32 * multiplier * resistance;
 
-            let armor = max(0, armor.amount(kind) as i32 - damage.ap as i32) as u32;
+            let armor = max(0, armor.amount(kind) - damage.ap as i32) as u32;
             let armor_max = self.armor_damage_reduction_cap(armor) as f32 * amount / 100.0;
             let armor = armor as f32;
 
@@ -389,7 +389,7 @@ fn write_singular_or_plural(
         write!(f, ", ")?;
     }
 
-    write!(f, "{} {}", qty, unit)?;
+    write!(f, "{qty} {unit}")?;
 
     if qty > 1 {
         write!(f, "s")?;
@@ -441,7 +441,7 @@ impl FromStr for Slot {
             _ => {
                 return Err(Error::new(
                     ErrorKind::InvalidInput,
-                    format!("Unable to parse Slot from '{}'", s),
+                    format!("Unable to parse Slot from '{s}'"),
                 ));
             }
         };
@@ -521,7 +521,7 @@ impl FromStr for HitKind {
             _ => {
                 return Err(Error::new(
                     ErrorKind::InvalidInput,
-                    format!("Unable to parse HitKind from '{}'", s),
+                    format!("Unable to parse HitKind from '{s}'"),
                 ));
             }
         };
@@ -552,7 +552,7 @@ impl FromStr for WeaponStyle {
             _ => {
                 return Err(Error::new(
                     ErrorKind::InvalidInput,
-                    format!("Unable to parse WeaponStyle from '{}'", s),
+                    format!("Unable to parse WeaponStyle from '{s}'"),
                 ));
             }
         };
@@ -591,7 +591,7 @@ impl FromStr for WeaponKind {
             _ => {
                 return Err(Error::new(
                     ErrorKind::InvalidInput,
-                    format!("Unable to parse WeaponKind from '{}'", s),
+                    format!("Unable to parse WeaponKind from '{s}'"),
                 ));
             }
         };
@@ -618,7 +618,7 @@ impl FromStr for ArmorKind {
             _ => {
                 return Err(Error::new(
                     ErrorKind::InvalidInput,
-                    format!("Unable to parse ArmorKind from '{}'", s),
+                    format!("Unable to parse ArmorKind from '{s}'"),
                 ));
             }
         };

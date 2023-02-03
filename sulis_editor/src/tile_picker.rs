@@ -98,7 +98,7 @@ impl EditorMode for TilePicker {
     fn cursor_size(&self) -> (i32, i32) {
         match self.cur_tile {
             None => (0, 0),
-            Some(ref tile) => (tile.width as i32, tile.height as i32),
+            Some(ref tile) => (tile.width, tile.height),
         }
     }
 

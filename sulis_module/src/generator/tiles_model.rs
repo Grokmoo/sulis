@@ -152,7 +152,7 @@ impl TilesModel {
     ) -> Vec<PositionedTile> {
         let mut within = Vec::new();
 
-        for &(ref cur_layer_id, ref tiles) in self.tiles.iter() {
+        for (cur_layer_id, tiles) in self.tiles.iter() {
             if layer_id != cur_layer_id {
                 continue;
             }
@@ -192,7 +192,7 @@ impl TilesModel {
     }
 
     fn create_layer_if_missing(&mut self, layer_id: &str) -> usize {
-        for (index, &(ref id, _)) in self.tiles.iter().enumerate() {
+        for (index, (id, _)) in self.tiles.iter().enumerate() {
             if id == layer_id {
                 return index;
             }

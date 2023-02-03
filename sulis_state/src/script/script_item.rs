@@ -38,10 +38,7 @@ impl ScriptItemKind {
             ScriptItemKind::Stash(index) => {
                 let stash = GameState::party_stash();
                 let stash = stash.borrow();
-                match stash.items().get(*index) {
-                    None => None,
-                    Some(&(_, ref item)) => Some(item.clone()),
-                }
+                stash.items().get(*index).map(|(_, item)| item.clone())
             }
             ScriptItemKind::Quick(slot) => parent.borrow().actor.inventory().quick(*slot).cloned(),
             ScriptItemKind::WithID(id) => Module::item(id).map(|i| ItemState::new(i, None)),
@@ -55,7 +52,7 @@ impl ScriptItemKind {
                 let stash = stash.borrow();
                 match stash.items().get(*index) {
                     None => unreachable!(),
-                    Some(&(_, ref item)) => item.clone(),
+                    Some((_, item)) => item.clone(),
                 }
             }
             ScriptItemKind::Quick(slot) => match parent.borrow().actor.inventory().quick(*slot) {
@@ -112,7 +109,7 @@ impl ScriptItem {
                 return Err(rlua::Error::FromLuaConversionError {
                     from: "ScriptItem",
                     to: "Item",
-                    message: Some(format!("Item with kind {:?} does not exist", kind)),
+                    message: Some(format!("Item with kind {kind:?} does not exist")),
                 });
             }
             Some(item) => item,

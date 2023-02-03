@@ -75,7 +75,7 @@ impl UserData for ScriptImageLayerAnimation {
                     return Err(rlua::Error::FromLuaConversionError {
                         from: "String",
                         to: "ImageLayer",
-                        message: Some(format!("{}", error)),
+                        message: Some(format!("{error}")),
                     });
                 }
             };
@@ -84,7 +84,7 @@ impl UserData for ScriptImageLayerAnimation {
                 return Err(rlua::Error::FromLuaConversionError {
                     from: "String",
                     to: "Image",
-                    message: Some(format!("No image with ID '{}'", image)),
+                    message: Some(format!("No image with ID '{image}'")),
                 });
             };
 
@@ -121,7 +121,7 @@ pub fn create_anim(data: &ScriptImageLayerAnimation) -> Result<Anim> {
                 return Err(rlua::Error::FromLuaConversionError {
                     from: "String",
                     to: "Image",
-                    message: Some(format!("No image with ID '{}'", image_id)),
+                    message: Some(format!("No image with ID '{image_id}'")),
                 });
             }
             Some(image) => images.insert(*layer, image),

@@ -136,7 +136,7 @@ impl UserData for ScriptInventory {
                     return Err(rlua::Error::FromLuaConversionError {
                         from: "String",
                         to: "Slot",
-                        message: Some(format!("{}", e)),
+                        message: Some(format!("{e}")),
                     });
                 }
                 Ok(slot) => slot,
@@ -149,7 +149,7 @@ impl UserData for ScriptInventory {
                     return Err(rlua::Error::FromLuaConversionError {
                         from: "String",
                         to: "Item",
-                        message: Some(format!("No item equipped in slot '{:?}'", slot)),
+                        message: Some(format!("No item equipped in slot '{slot:?}'")),
                     });
                 }
                 Some(item) => item,
@@ -165,11 +165,11 @@ impl UserData for ScriptInventory {
             match item.kind {
                 ItemKind::Armor { kind } => {
                     stats.set("kind", "armor")?;
-                    stats.set("armor_kind", format!("{:?}", kind).to_lowercase())?;
+                    stats.set("armor_kind", format!("{kind:?}").to_lowercase())?;
                 }
                 ItemKind::Weapon { kind } => {
                     stats.set("kind", "weapon")?;
-                    stats.set("weapon_kind", format!("{:?}", kind).to_lowercase())?;
+                    stats.set("weapon_kind", format!("{kind:?}").to_lowercase())?;
                 }
                 ItemKind::Other => stats.set("kind", "other")?,
             }
@@ -205,7 +205,7 @@ impl UserData for ScriptInventory {
                     return Err(rlua::Error::FromLuaConversionError {
                         from: "String",
                         to: "Slot",
-                        message: Some(format!("Invalid slot '{}'", slot)),
+                        message: Some(format!("Invalid slot '{slot}'")),
                     });
                 }
                 Ok(slot) => slot,

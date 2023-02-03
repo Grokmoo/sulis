@@ -309,7 +309,7 @@ impl WidgetKind for TransitionWindow {
                 ToKind::FindLink { .. } => "Generated".to_string(),
             };
 
-            let text = format!("{}: {}", index, to);
+            let text = format!("{index}: {to}");
             let entry = if self.selected_transition == Some(index) {
                 list_box::Entry::with_active(text, Some(cb))
             } else {

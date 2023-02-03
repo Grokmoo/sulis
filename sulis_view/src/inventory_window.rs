@@ -112,7 +112,7 @@ impl WidgetKind for InventoryWindow {
 
         let equipped_area = Widget::empty("equipped_area");
         for slot in Slot::iter() {
-            let theme_id = format!("{:?}_button", slot).to_lowercase();
+            let theme_id = format!("{slot:?}_button").to_lowercase();
 
             match actor.inventory().equipped(*slot) {
                 None => {
@@ -141,7 +141,7 @@ impl WidgetKind for InventoryWindow {
         Widget::add_child_to(&equipped_area, swap_weapons);
 
         for quick_slot in QuickSlot::iter() {
-            let theme_id = format!("{:?}_button", quick_slot).to_lowercase();
+            let theme_id = format!("{quick_slot:?}_button").to_lowercase();
 
             match actor.inventory().quick(*quick_slot) {
                 None => {

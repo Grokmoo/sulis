@@ -242,7 +242,7 @@ impl DamageKind {
 
 impl Display for DamageKind {
     fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
-        write!(fmt, "{:?}", self)
+        write!(fmt, "{self:?}")
     }
 }
 

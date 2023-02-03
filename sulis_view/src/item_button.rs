@@ -198,10 +198,7 @@ impl ItemButton {
             Kind::Inventory { item_index } => {
                 let stash = GameState::party_stash();
                 let stash = stash.borrow();
-                match stash.items().get(item_index) {
-                    None => None,
-                    Some(&(_, ref item_state)) => Some(item_state.clone()),
-                }
+                stash.items().get(item_index).map(|(_, item_state)| item_state.clone())
             }
             Kind::Quick { ref player, quick } => {
                 let pc = player.borrow();
@@ -221,10 +218,7 @@ impl ItemButton {
 
                 match area_state.props().get(prop_index).items() {
                     None => None,
-                    Some(items) => match items.get(item_index) {
-                        None => None,
-                        Some(&(_, ref item_state)) => Some(item_state.clone()),
-                    },
+                    Some(items) => items.get(item_index).map(|(_, item)| item.clone()),
                 }
             }
             Kind::Merchant { ref id, item_index } => {
@@ -234,10 +228,7 @@ impl ItemButton {
                     Some(ref merchant) => merchant,
                 };
 
-                match merchant.items().get(item_index) {
-                    None => None,
-                    Some(&(_, ref item_state)) => Some(item_state.clone()),
-                }
+                merchant.items().get(item_index).map(|(_, item)| item.clone())
             }
         }
     }

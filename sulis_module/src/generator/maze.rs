@@ -173,7 +173,7 @@ impl Maze {
         rand.shuffle(&mut connectors);
         info!("Found connectors: {}", connectors.len());
 
-        let mut merged = vec![0; self.cur_region as usize];
+        let mut merged = vec![0; self.cur_region];
         let mut open_regions = IndexSet::new();
 
         for (i, m) in merged.iter_mut().enumerate() {

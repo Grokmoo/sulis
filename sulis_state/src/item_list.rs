@@ -63,7 +63,7 @@ impl ItemList {
     }
 
     pub fn find_index(&self, state: &ItemState) -> Option<usize> {
-        for (i, &(_, ref item)) in self.items.iter().enumerate() {
+        for (i, (_, item)) in self.items.iter().enumerate() {
             if item == state {
                 return Some(i);
             }

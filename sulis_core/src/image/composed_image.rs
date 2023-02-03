@@ -43,7 +43,7 @@ fn get_images_from_grid(
     for id in grid {
         let image = resources.images.get(&id);
         if image.is_none() {
-            return invalid_data_error(&format!("Unable to locate sub image {}", id));
+            return invalid_data_error(&format!("Unable to locate sub image {id}"));
         }
 
         let image = image.unwrap();
@@ -63,7 +63,7 @@ fn get_images_from_inline(
 
     let mut images: Vec<Rc<dyn Image>> = Vec::new();
     for id in grid {
-        let image_display = format!("{}/{}", spritesheet, id);
+        let image_display = format!("{spritesheet}/{id}");
         let builder = SimpleImageBuilder {
             id: id.clone(),
             image_display,
@@ -83,7 +83,7 @@ impl ComposedImage {
         resources: &mut ResourceSet,
     ) -> Result<Rc<dyn Image>, Error> {
         if builder.grid.len() as i32 != GRID_LEN {
-            return invalid_data_error(&format!("Composed image grid must be length {}", GRID_LEN));
+            return invalid_data_error(&format!("Composed image grid must be length {GRID_LEN}"));
         }
 
         let images_vec = match builder.generate_sub_images {
@@ -112,7 +112,7 @@ impl ComposedImage {
                 if height != row_height {
                     return Err(Error::new(
                         ErrorKind::InvalidData,
-                        format!("All images in row {} must have the same height", y),
+                        format!("All images in row {y} must have the same height"),
                     ));
                 }
             }
@@ -134,7 +134,7 @@ impl ComposedImage {
                 if width != col_width {
                     return Err(Error::new(
                         ErrorKind::InvalidData,
-                        format!("All images in col {} must have the same width", x),
+                        format!("All images in col {x} must have the same width"),
                     ));
                 }
             }

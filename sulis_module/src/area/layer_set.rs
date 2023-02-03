@@ -153,8 +153,7 @@ impl LayerSet {
 
         if entity_layer_index >= layers.len() {
             return invalid_data_error(&format!(
-                "Entity layer of {} is invalid.",
-                entity_layer_index
+                "Entity layer of {entity_layer_index} is invalid."
             ));
         }
 
@@ -188,7 +187,7 @@ impl LayerSet {
             match tile_ref {
                 Some(t) => t,
                 None => {
-                    return invalid_data_error(&format!("Tile not found '{}'", tile_id));
+                    return invalid_data_error(&format!("Tile not found '{tile_id}'"));
                 }
             };
 
@@ -198,8 +197,7 @@ impl LayerSet {
                 }
 
                 return invalid_data_error(&format!(
-                    "Point array length is not 2 in '{}'",
-                    tile_id
+                    "Point array length is not 2 in '{tile_id}'"
                 ));
             }
         }

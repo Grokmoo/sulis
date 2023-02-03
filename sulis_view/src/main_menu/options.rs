@@ -410,7 +410,7 @@ impl Options {
         cur: f32,
         setter: fn(&mut Options, f32),
     ) -> Rc<RefCell<Widget>> {
-        let content = Widget::empty(&format!("{}_volume_content", id));
+        let content = Widget::empty(&format!("{id}_volume_content"));
 
         let title = Widget::with_theme(Label::empty(), "title");
         Widget::add_child_to(&content, title);
@@ -644,7 +644,7 @@ impl Options {
             button
                 .borrow_mut()
                 .state
-                .add_text_arg("button", &format!("{:?}", raw));
+                .add_text_arg("button", &format!("{raw:?}"));
             button
                 .borrow_mut()
                 .state
@@ -660,7 +660,7 @@ impl Options {
             label
                 .borrow_mut()
                 .state
-                .add_text_arg(&format!("{:?}", action), "true");
+                .add_text_arg(&format!("{action:?}"), "true");
 
             Widget::add_children_to(&row, vec![button, label]);
 
@@ -676,7 +676,7 @@ impl Options {
             key_button
                 .borrow_mut()
                 .state
-                .add_text_arg("key", &format!("{:?}", key));
+                .add_text_arg("key", &format!("{key:?}"));
 
             let action_ref = *action;
             key_button
@@ -694,7 +694,7 @@ impl Options {
             action_label
                 .borrow_mut()
                 .state
-                .add_text_arg("action", &format!("{:?}", action));
+                .add_text_arg("action", &format!("{action:?}"));
 
             scrollpane.borrow().add_to_content(key_button);
             scrollpane.borrow().add_to_content(action_label);

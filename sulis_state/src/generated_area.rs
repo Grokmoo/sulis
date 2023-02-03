@@ -117,7 +117,7 @@ impl GeneratedArea {
             let image = ResourceSet::image(img_id).ok_or_else(|| {
                 Error::new(
                     ErrorKind::InvalidInput,
-                    format!("No image '{}' found", img_id),
+                    format!("No image '{img_id}' found"),
                 )
             })?;
 

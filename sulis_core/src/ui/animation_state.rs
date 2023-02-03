@@ -100,7 +100,7 @@ impl Kind {
 }
 
 lazy_static! {
-    pub static ref NORMAL: AnimationState = AnimationState::default();
+    pub static ref NORMAL: AnimationState = AnimationState::base();
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Ord, PartialOrd)]
@@ -150,7 +150,7 @@ impl AnimationState {
 impl AnimationState {
     /// Creates an instance of the default animation state, containing
     /// `Kind::Normal`
-    pub fn default() -> AnimationState {
+    pub fn base() -> AnimationState {
         AnimationState {
             kinds: vec![Kind::Normal],
         }
@@ -181,7 +181,7 @@ impl AnimationState {
                 None => {
                     return Err(Error::new(
                         ErrorKind::InvalidData,
-                        format!("Unable to parse animation state from '{}'", data),
+                        format!("Unable to parse animation state from '{data}'"),
                     ));
                 }
             };
@@ -201,7 +201,7 @@ impl AnimationState {
         if kinds.contains(&kind) {
             return Err(Error::new(
                 ErrorKind::InvalidData,
-                format!("Duplicate key '{:?}'", kind),
+                format!("Duplicate key '{kind:?}'"),
             ));
         }
 
@@ -231,7 +231,7 @@ impl AnimationState {
         let num_desired_kinds = desired_state.kinds.len() as f32;
         let mut best_index = 0;
         let mut best_rank = 0.0;
-        for (index, &(ref state, _)) in choices.iter().enumerate() {
+        for (index, (state, _)) in choices.iter().enumerate() {
             let mut cur_rank = 0.0;
             for kind in desired_state.kinds.iter() {
                 if state.contains(*kind) {

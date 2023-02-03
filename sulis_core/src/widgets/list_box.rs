@@ -41,7 +41,7 @@ impl<T: Display + Clone + 'static> Entry<T> {
         Entry {
             item,
             callback,
-            animation_state: AnimationState::default(),
+            animation_state: AnimationState::base(),
         }
     }
 

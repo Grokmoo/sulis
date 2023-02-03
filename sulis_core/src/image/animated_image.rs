@@ -50,8 +50,7 @@ impl AnimatedImage {
                 None => {
                     return invalid_data_error(&format!(
                         "Unable to locate sub \
-                         image '{}'",
-                        image_id
+                         image '{image_id}'"
                     ));
                 }
                 Some(image) => Rc::clone(image),

@@ -190,7 +190,7 @@ impl WidgetKind for LoadWindow {
                 area.add_text_arg("current_area_name", &meta.current_area_name);
 
                 if let Some(level) = meta.level {
-                    area.add_text_arg("level", &format!("{}", level));
+                    area.add_text_arg("level", &format!("{level}"));
                 }
 
                 if let Some(class) = &meta.class {

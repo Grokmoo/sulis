@@ -114,7 +114,7 @@ fn print_nearby_lines(state: &ScriptState, traceback: &str) -> (String, i32) {
         } else {
             out.push_str("    ");
         }
-        out.push_str(&format!(" | {}\n", line));
+        out.push_str(&format!(" | {line}\n"));
     }
 
     (out, num)
@@ -133,7 +133,7 @@ where
             return Err(rlua::Error::ToLuaConversionError {
                 from: "String",
                 to: "Script",
-                message: Some(format!("Script '{}' does not exist", id)),
+                message: Some(format!("Script '{id}' does not exist")),
             });
         }
 
@@ -305,7 +305,7 @@ fn get_script_data_from_entity(entity: &Rc<RefCell<EntityState>>) -> Result<Rc<A
         None => Err(rlua::Error::ToLuaConversionError {
             from: "Entity",
             to: "Script",
-            message: Some(format!("Script called for entity '{}' with no AI", id)),
+            message: Some(format!("Script called for entity '{id}' with no AI")),
         }),
         Some(ai) => Ok(Rc::clone(ai)),
     }
@@ -338,7 +338,7 @@ fn get_script_from_id(id: &str) -> Result<String> {
         None => Err(rlua::Error::ToLuaConversionError {
             from: "&str",
             to: "Script",
-            message: Some(format!("No script found with id '{}'", id)),
+            message: Some(format!("No script found with id '{id}'")),
         }),
         Some(script) => Ok(script),
     }

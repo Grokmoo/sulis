@@ -409,7 +409,7 @@ struct ImageRule {
 
 impl ImageRule {
     fn new(prefix: &str, postfix: &str, neighbors: u8) -> Option<ImageRule> {
-        let id = format!("{}{}", prefix, postfix);
+        let id = format!("{prefix}{postfix}");
         let image = match ResourceSet::image(&id) {
             None => {
                 warn!("No image found for selection area {}", id);

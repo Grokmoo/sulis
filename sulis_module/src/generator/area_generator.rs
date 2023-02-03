@@ -315,7 +315,7 @@ impl AreaGenerator {
             let (gw, gh) = (model.model.grid_width, model.model.grid_height);
             let params = WallParams {
                 offset: Point::new(offset_x, offset_y),
-                step: Point::new(gw as i32, gh as i32),
+                step: Point::new(gw, gh),
                 max: Point::new(tot_gw, tot_gh),
             };
             self.carve_wall(model, neighbors, params, elev, wall_kind);

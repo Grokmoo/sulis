@@ -86,8 +86,7 @@ impl Effect {
                 match entities.get(&aura) {
                     None => {
                         return invalid_data_error(&format!(
-                            "Invalid aura parent {} for effect",
-                            aura
+                            "Invalid aura parent {aura} for effect"
                         ));
                     }
                     Some(entity) => {

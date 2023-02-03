@@ -47,7 +47,7 @@ impl TimerImage {
         for id in builder.frames {
             let image = match images.get(&id) {
                 None => {
-                    return invalid_data_error(&format!("Unable to locate image for frame {}", id));
+                    return invalid_data_error(&format!("Unable to locate image for frame {id}"));
                 }
                 Some(image) => image,
             };

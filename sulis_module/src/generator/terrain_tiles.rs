@@ -127,7 +127,7 @@ impl EdgesList {
     }
 
     fn get_edge(prefix: &str, id: &str, edge_postfix: &str, dir_postfix: &str) -> Option<Rc<Tile>> {
-        let tile_id = format!("{}{}{}{}", prefix, id, edge_postfix, dir_postfix);
+        let tile_id = format!("{prefix}{id}{edge_postfix}{dir_postfix}");
 
         match Module::tile(&tile_id) {
             None => {

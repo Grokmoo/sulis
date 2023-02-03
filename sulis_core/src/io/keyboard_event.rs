@@ -109,7 +109,7 @@ pub enum Key {
 
 impl Key {
     pub fn short_name(self) -> String {
-        let long_name = format!("{:?}", self);
+        let long_name = format!("{self:?}");
 
         long_name[3..].to_string()
     }

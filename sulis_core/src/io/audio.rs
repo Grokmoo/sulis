@@ -185,8 +185,8 @@ impl fmt::Debug for SinkQueueEntry {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         use SinkQueueEntry::*;
         match self {
-            FadeIn(time) => write!(f, "FadeIn {}", time),
-            FadeOut(time) => write!(f, "FadeOut {}", time),
+            FadeIn(time) => write!(f, "FadeIn {time}"),
+            FadeOut(time) => write!(f, "FadeOut {time}"),
             Stop => write!(f, "Stop"),
             Start(_) => write!(f, "Start"),
         }
@@ -406,7 +406,7 @@ impl AudioDevice {
 }
 
 fn device_name(device: &Device, index: usize) -> String {
-    device.name().unwrap_or_else(|_e| format!("Audio Device {}", index))
+    device.name().unwrap_or_else(|_e| format!("Audio Device {index}"))
 }
 
 pub struct AudioDeviceInfo {

@@ -303,7 +303,7 @@ impl<'a> GraphicsRenderer for GliumRenderer<'a> {
 }
 
 fn glium_error<T, E: ::std::fmt::Display>(e: E) -> Result<T, Error> {
-    Err(Error::new(ErrorKind::Other, format!("{}", e)))
+    Err(Error::new(ErrorKind::Other, format!("{e}")))
 }
 
 fn configured_fullscreen(res_x: u32, res_y: u32, monitor: &MonitorHandle) -> (Option<Fullscreen>, bool) {

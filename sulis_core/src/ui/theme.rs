@@ -287,7 +287,7 @@ impl ThemeSet {
             },
         }
 
-        format!("{}.{}", parent_id, id)
+        format!("{parent_id}.{id}")
     }
 
     fn compute_theme_id_recursive(&self, theme: &Rc<Theme>, id: &str) -> Option<String> {

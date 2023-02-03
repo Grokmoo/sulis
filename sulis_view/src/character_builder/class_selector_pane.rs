@@ -183,7 +183,7 @@ impl WidgetKind for ClassSelectorPane {
 }
 
 fn build_upgrades_data(state: &mut WidgetState, class: &Class, level: u32) {
-    state.add_text_arg("level", &format!("{}", level));
+    state.add_text_arg("level", &format!("{level}"));
 
     let mut up_per_day = get_up_per(
         class.group_uses_per_day(level - 1),
@@ -213,13 +213,13 @@ fn build_upgrades_data(state: &mut WidgetState, class: &Class, level: u32) {
         if per_enc == 0 && per_day == 0 {
             continue;
         }
-        state.add_text_arg(&format!("ability_uses_{}_id", i), &id);
+        state.add_text_arg(&format!("ability_uses_{i}_id"), &id);
         state.add_text_arg(
-            &format!("ability_uses_{}_per_enc", i),
+            &format!("ability_uses_{i}_per_enc"),
             &format_bonus_or_penalty(per_enc),
         );
         state.add_text_arg(
-            &format!("ability_uses_{}_per_day", i),
+            &format!("ability_uses_{i}_per_day"),
             &format_bonus_or_penalty(per_day),
         );
 
@@ -236,13 +236,13 @@ fn build_upgrades_data(state: &mut WidgetState, class: &Class, level: u32) {
 
     for (i, (id, amount)) in stats.into_iter().enumerate() {
         let gain = *stats_up.get(id).unwrap_or(&0);
-        state.add_text_arg(&format!("stat_{}_id", i), id);
-        state.add_text_arg(&format!("stat_{}_total", i), &format!("{}", amount));
-        state.add_text_arg(&format!("stat_{}_gain", i), &format!("{}", gain));
+        state.add_text_arg(&format!("stat_{i}_id"), id);
+        state.add_text_arg(&format!("stat_{i}_total"), &format!("{amount}"));
+        state.add_text_arg(&format!("stat_{i}_gain"), &format!("{gain}"));
     }
 
     for (i, list) in class.ability_choices(level).iter().enumerate() {
-        state.add_text_arg(&format!("choice_{}_name", i), &list.name);
+        state.add_text_arg(&format!("choice_{i}_name"), &list.name);
     }
 }
 

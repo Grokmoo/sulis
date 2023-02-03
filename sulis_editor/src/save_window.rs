@@ -154,7 +154,7 @@ impl WidgetKind for SaveWindow {
                 button
                     .borrow_mut()
                     .state
-                    .add_text_arg("name", &format!("{:?}", kind));
+                    .add_text_arg("name", &format!("{kind:?}"));
 
                 if *kind == self.area_editor.borrow().model.location_kind() {
                     button.borrow_mut().state.set_active(true);

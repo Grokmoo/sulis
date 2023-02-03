@@ -81,7 +81,7 @@ impl WidgetKind for RacePane {
             add_attack_text_args(&race.base_attack, state);
 
             for (i, slot) in race.disabled_slots.iter().enumerate() {
-                state.add_text_arg(&format!("disabled_slot_{}", i), &format!("{:?}", slot));
+                state.add_text_arg(&format!("disabled_slot_{i}"), &format!("{slot:?}"));
             }
         }
 

@@ -193,9 +193,8 @@ impl ThemeBuilder {
             return Err(Error::new(
                 ErrorKind::InvalidInput,
                 format!(
-                    "From reference depth exceeds max of {}. This is most\
-                     likely caused by a circular reference.",
-                    MAX_FROM_DEPTH
+                    "From reference depth exceeds max of {MAX_FROM_DEPTH}. This is most\
+                     likely caused by a circular reference."
                 ),
             ));
         }
@@ -218,9 +217,8 @@ impl ThemeBuilder {
             return Err(Error::new(
                 ErrorKind::InvalidInput,
                 format!(
-                    "From reference depth exceeds max of {}. This is most\
-                     likely caused by a circular reference.",
-                    MAX_FROM_DEPTH
+                    "From reference depth exceeds max of {MAX_FROM_DEPTH}. This is most\
+                     likely caused by a circular reference."
                 ),
             ));
         }
@@ -284,12 +282,12 @@ impl ThemeBuilderSet {
             self.themes.get_mut(&id).unwrap().children.drain().collect();
 
         for (child_id, mut child) in children {
-            let new_id = format!("{}.{}", id, child_id);
+            let new_id = format!("{id}.{child_id}");
 
             if self.themes.contains_key(&new_id) {
                 return Err(Error::new(
                     ErrorKind::InvalidInput,
-                    format!("Computed ID '{}' is already present", new_id),
+                    format!("Computed ID '{new_id}' is already present"),
                 ));
             }
 
@@ -330,7 +328,7 @@ impl ThemeBuilderSet {
                 None => {
                     return Err(Error::new(
                         ErrorKind::InvalidInput,
-                        format!("From ref '{}' is invalid", id),
+                        format!("From ref '{id}' is invalid"),
                     ));
                 }
                 Some(child) => {
@@ -343,7 +341,7 @@ impl ThemeBuilderSet {
         match result {
             None => Err(Error::new(
                 ErrorKind::InvalidInput,
-                format!("From ref '{}' is invalid", id),
+                format!("From ref '{id}' is invalid"),
             )),
             Some(theme) => Ok(theme),
         }

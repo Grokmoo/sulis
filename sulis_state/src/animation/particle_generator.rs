@@ -545,7 +545,7 @@ impl GeneratorModel {
 
         let (width, height) = match self.particle_size_dist.as_ref() {
             None => (1.0, 1.0),
-            Some(&(ref width, ref height)) => (width.generate(), height.generate()),
+            Some((width, height)) => (width.generate(), height.generate()),
         };
 
         let initial_duration = match self.particle_frame_time_offset_dist.as_ref() {

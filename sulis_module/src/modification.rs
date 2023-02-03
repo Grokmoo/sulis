@@ -66,7 +66,7 @@ impl Display for ModificationInfo {
 impl ModificationInfo {
     pub fn from_dir(path: PathBuf) -> Result<ModificationInfo, Error> {
         let path_str = path.to_string_lossy().to_string();
-        let builder: ModificationInfoBuilder = read_single_resource(&format!("{}/mod", path_str))?;
+        let builder: ModificationInfoBuilder = read_single_resource(&format!("{path_str}/mod"))?;
 
         Ok(ModificationInfo {
             name: builder.name,

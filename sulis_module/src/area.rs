@@ -36,6 +36,8 @@ use std::rc::Rc;
 
 use serde::ser::{SerializeMap, SerializeStruct};
 use serde::{Deserialize, Deserializer, Serializer};
+use base64::engine::general_purpose::STANDARD as base64;
+use base64::Engine;
 
 use sulis_core::image::Image;
 use sulis_core::resource::{ResourceSet, Sprite};
@@ -459,7 +461,7 @@ where
 
     let mut data = serializer.serialize_struct(name, 2)?;
     data.serialize_field("kinds", &kinds)?;
-    data.serialize_field("entries", &base64::encode(vec))?;
+    data.serialize_field("entries", &base64.encode(vec))?;
     data.end()
 }
 
@@ -469,7 +471,7 @@ where
 {
     let input = U8WithKinds::deserialize(deserializer)?;
     use sulis_core::serde::de::Error;
-    let vec_u8 = base64::decode(&input.entries).map_err(|err| Error::custom(err.to_string()))?;
+    let vec_u8 = base64.decode(&input.entries).map_err(|err| Error::custom(err.to_string()))?;
 
     let mut out = Vec::new();
     for entry in vec_u8 {
@@ -511,7 +513,7 @@ where
 {
     let input = U8WithKinds::deserialize(deserializer)?;
     use sulis_core::serde::de::Error;
-    let vec_u8 = base64::decode(&input.entries).map_err(|err| Error::custom(err.to_string()))?;
+    let vec_u8 = base64.decode(&input.entries).map_err(|err| Error::custom(err.to_string()))?;
 
     let mut out = Vec::new();
     if vec_u8.is_empty() {
@@ -580,7 +582,7 @@ where
             out.push(((pos[1] >> 8) & 0xff) as u8);
             out.push((pos[1] & 0xff) as u8);
         }
-        map.serialize_entry(key, &base64::encode(&out))?;
+        map.serialize_entry(key, &base64.encode(&out))?;
     }
 
     map.end()
@@ -595,7 +597,7 @@ where
     let mut result: HashMap<String, Vec<Vec<u16>>> = HashMap::new();
     for (key, encoded) in input {
         use sulis_core::serde::de::Error;
-        let vec_u8 = base64::decode(&encoded).map_err(|err| Error::custom(err.to_string()))?;
+        let vec_u8 = base64.decode(&encoded).map_err(|err| Error::custom(err.to_string()))?;
 
         let mut result_vec: Vec<Vec<u16>> = Vec::new();
         let mut i = 0;
@@ -628,14 +630,14 @@ where
 {
     use sulis_core::serde::de::Error;
     let s = String::deserialize(deserializer)?;
-    base64::decode(s).map_err(|err| Error::custom(err.to_string()))
+    base64.decode(s).map_err(|err| Error::custom(err.to_string()))
 }
 
 fn as_base64<S>(input: &[u8], serializer: S) -> Result<S::Ok, S::Error>
 where
     S: Serializer,
 {
-    serializer.serialize_str(&base64::encode(input))
+    serializer.serialize_str(&base64.encode(input))
 }
 
 #[derive(Deserialize, Serialize, Debug, Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]

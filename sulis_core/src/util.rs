@@ -30,7 +30,6 @@ use std::panic;
 use std::path::PathBuf;
 use std::time::Duration;
 
-use backtrace::Backtrace;
 use log::LevelFilter;
 use flexi_logger::{opt_format, Duplicate, FileSpec, Logger, LogSpecBuilder, LoggerHandle};
 use rand::{self, distributions::uniform::{SampleUniform}, seq::SliceRandom, Rng};
@@ -407,7 +406,7 @@ pub fn setup_logger() -> LoggerHandle {
         }
         warn!("at {:?}", p.location());
 
-        let bt = Backtrace::new();
+        let bt = std::backtrace::Backtrace::force_capture();
         warn!("{:?}", bt);
     }));
 

@@ -25,37 +25,28 @@ use crate::ui::color::Color;
 use crate::ui::{Border, LayoutKind, WidgetState};
 use crate::util::{Point, Size};
 
-#[derive(Deserialize, Debug, Clone, Copy, Eq, Hash, PartialEq)]
+#[derive(Deserialize, Default, Debug, Clone, Copy, Eq, Hash, PartialEq)]
 #[serde(deny_unknown_fields)]
 pub enum HorizontalAlignment {
     Left,
+    #[default]
     Center,
     Right,
 }
 
-impl Default for HorizontalAlignment {
-    fn default() -> Self {
-        HorizontalAlignment::Center
-    }
-}
-
-#[derive(Deserialize, Debug, Clone, Copy, Eq, Hash, PartialEq)]
+#[derive(Deserialize, Default, Debug, Clone, Copy, Eq, Hash, PartialEq)]
 #[serde(deny_unknown_fields)]
 pub enum VerticalAlignment {
     Top,
+    #[default]
     Center,
     Bottom,
 }
 
-impl Default for VerticalAlignment {
-    fn default() -> Self {
-        VerticalAlignment::Center
-    }
-}
-
-#[derive(Deserialize, Debug, Clone, Copy, Eq, Hash, PartialEq)]
+#[derive(Deserialize, Default, Debug, Clone, Copy, Eq, Hash, PartialEq)]
 #[serde(deny_unknown_fields)]
 pub enum SizeRelative {
+    #[default]
     Zero,
     Max,
     ChildMax,
@@ -63,26 +54,15 @@ pub enum SizeRelative {
     Custom,
 }
 
-impl Default for SizeRelative {
-    fn default() -> Self {
-        SizeRelative::Zero
-    }
-}
-
-#[derive(Deserialize, Debug, Clone, Copy, Eq, Hash, PartialEq)]
+#[derive(Deserialize, Default, Debug, Clone, Copy, Eq, Hash, PartialEq)]
 #[serde(deny_unknown_fields)]
 pub enum PositionRelative {
+    #[default]
     Zero,
     Center,
     Max,
     Custom,
     Mouse,
-}
-
-impl Default for PositionRelative {
-    fn default() -> Self {
-        PositionRelative::Zero
-    }
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -128,18 +108,13 @@ impl Default for Relative {
 
 pub const DEFAULT_THEME_ID: &str = "default";
 
-#[derive(Deserialize, Debug, Copy, Clone)]
+#[derive(Deserialize, Default, Debug, Copy, Clone)]
 pub enum Kind {
+    #[default]
     Ref, // a reference to a widget that will be added in rust code, or
-    // simply used as a building block for another theme item
+         // simply used as a building block for another theme item
     Label,     // a widget showing static text - defined purely in the theme
     Container, // a widget holding other widgets - defined purely in the theme
-}
-
-impl Default for Kind {
-    fn default() -> Self {
-        Kind::Ref
-    }
 }
 
 #[derive(Debug)]

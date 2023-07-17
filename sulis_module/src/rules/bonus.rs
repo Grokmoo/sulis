@@ -71,10 +71,11 @@ pub enum BonusKind {
     ClassStat { id: String, amount: i32 },
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Serialize, Deserialize, Default, Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 #[serde(deny_unknown_fields)]
 pub enum Contingent {
     /// Bonuses that should always be applied
+    #[default]
     Always,
 
     /// Bonuses that should only be applied to the parent if they have the given
@@ -107,12 +108,6 @@ pub enum Contingent {
 
     /// Bonuses that only apply when the parent is threatened in melee
     Threatened,
-}
-
-impl Default for Contingent {
-    fn default() -> Contingent {
-        Contingent::Always
-    }
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialOrd, PartialEq)]

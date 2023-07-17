@@ -901,7 +901,7 @@ fn expand_include_directives(scripts: &mut HashMap<String, String>) {
             });
         }
 
-        for mut expansion in &mut expansions {
+        for expansion in &mut expansions {
             let substr = &script[(expansion.start_index + include_len)..];
             let mut iter = substr.lines();
             let id = match iter.next() {

@@ -21,19 +21,14 @@ use crate::config::Config;
 use crate::ui::theme::Theme;
 use crate::ui::{Cursor, Size, Widget};
 
-#[derive(Deserialize, Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Deserialize, Default, Debug, Clone, Copy, PartialEq, Eq)]
 pub enum LayoutKind {
+    #[default]
     Normal,
     BoxVertical,
     BoxHorizontal,
     GridRows,
     GridColumns,
-}
-
-impl Default for LayoutKind {
-    fn default() -> Self {
-        LayoutKind::Normal
-    }
 }
 
 impl LayoutKind {

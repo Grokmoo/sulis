@@ -45,7 +45,7 @@ jobs:
     steps:
       - name: Get the version
         id: get_version
-        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+        run: echo "VERSION=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_OUTPUT
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
         with:
@@ -68,7 +68,7 @@ jobs:
         id: get_release_url
         run: |
           value=`cat release_url/release_url.txt`
-          echo ::set-output name=upload_url::$value
+          echo "upload_url=$value" >> $GITHUB_OUTPUT
       - name: Upload Asset
         id: upload_asset
         uses: actions/upload-release-asset@v1

@@ -11,9 +11,9 @@ edition = "2021"
 members = [
     "sulis_core",
     "sulis_editor",
-	"sulis_module",
-	"sulis_state",
-	"sulis_view",
+    "sulis_module",
+    "sulis_state",
+    "sulis_view",
 ]
 
 [dependencies]

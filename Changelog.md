@@ -5,6 +5,36 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html) is used with major version changes for breaking save game and data format compatibility.
 
+## [1.0.0] - 2023-07-17
+Given it has been a couple years since major work and saves should remain compatible from this point onwards, I've decided to go ahead and bump the version to 1.0.0.
+
+### Added
+- Scroll bars in the UI can now be dragged.
+- Smooth map scrolling via keyboard keys and the mouse is now supported.
+- Continue button on the main menu will load your most recent save.
+- Added separate keybindings for scrolling the console history.
+
+### Changed
+- It will no longer be possible to drop (and thus potentially lose) key quest items.
+- Character sprites should better fit in the box when building a character.
+- Rebalanced several enemy types and boss encounters.
+- Improved several Rogue abilities.
+- Swap weapons now costs only one action point.
+- Improved the flow and scripting for several Prologue events.
+- Improved the Rock Armor and Air Shield abilities.
+- Prevent situations where a dead hostile could still heal.
+
+### Fixed
+- Player characters will no longer be able to pathfind through unexplored terrain.
+- Enemies making an attack or using an ability will now always be revealed on the map.
+- End turn will not auto-trigger when a character is still performing animations.
+- Logging to a file should now work as intended in all situations.
+- Fixed some typos in various campaign text.
+- Prevent some sequence breaks in the Prologue.
+- All classes will now retain their abilities at very high levels.
+- Improve frame rate limiting to prevent extremely high frame refresh rates.
+- Fixed a rare crash caused by Fog of War calculations.
+
 ## [0.6.0] - 2021-01-15
 
 ### Added

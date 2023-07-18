@@ -1695,7 +1695,7 @@ checksum = "73473c0e59e6d5812c5dfe2a064a6444949f089e20eec9a2e5506596494e4623"
 
 [[package]]
 name = "sulis"
-version = "0.6.0"
+version = "1.0.0"
 dependencies = [
  "log",
  "sulis_core",
@@ -1706,7 +1706,7 @@ dependencies = [
 
 [[package]]
 name = "sulis_core"
-version = "0.6.0"
+version = "1.0.0"
 dependencies = [
  "flexi_logger",
  "glium",
@@ -1726,7 +1726,7 @@ dependencies = [
 
 [[package]]
 name = "sulis_editor"
-version = "0.6.0"
+version = "1.0.0"
 dependencies = [
  "log",
  "serde",
@@ -1737,7 +1737,7 @@ dependencies = [
 
 [[package]]
 name = "sulis_module"
-version = "0.6.0"
+version = "1.0.0"
 dependencies = [
  "base64",
  "indexmap 1.9.3",
@@ -1749,7 +1749,7 @@ dependencies = [
 
 [[package]]
 name = "sulis_state"
-version = "0.6.0"
+version = "1.0.0"
 dependencies = [
  "chrono",
  "log",
@@ -1762,7 +1762,7 @@ dependencies = [
 
 [[package]]
 name = "sulis_view"
-version = "0.6.0"
+version = "1.0.0"
 dependencies = [
  "chrono",
  "log",

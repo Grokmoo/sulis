@@ -20,7 +20,7 @@ use std::io::{Error, ErrorKind};
 use std::rc::Rc;
 
 use sulis_core::config::Config;
-use sulis_core::io::{GraphicsRenderer};
+use sulis_core::io::GraphicsRenderer;
 use sulis_core::util::{invalid_data_error, ExtInt, Offset, Point, Scale};
 use sulis_module::on_trigger::QuestEntryState;
 use sulis_module::{
@@ -528,7 +528,7 @@ impl GameState {
     }
 
     pub fn turn_manager() -> Rc<RefCell<TurnManager>> {
-        TURN_MANAGER.with(|m| Rc::clone(m))
+        TURN_MANAGER.with(Rc::clone)
     }
 
     pub fn set_selected_party_member(entity: Rc<RefCell<EntityState>>) {

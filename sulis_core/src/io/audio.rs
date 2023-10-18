@@ -18,7 +18,7 @@ use std::thread::{self, JoinHandle};
 use std::fmt;
 use std::time::Duration;
 use std::collections::VecDeque;
-use std::cell::{RefCell};
+use std::cell::RefCell;
 use std::io::{BufReader, Error, ErrorKind};
 use std::fs::File;
 
@@ -354,14 +354,12 @@ impl AudioDevice {
             new_device(device, name, config)
         });
 
-        let result = match device_init.join() {
+        match device_init.join() {
             Ok(result) => result,
             Err(_) => {
-                return Err("Thread panic initializing audio system".to_string());
+                Err("Thread panic initializing audio system".to_string())
             }
-        };
-
-        result
+        }
     }
 
     fn update(&mut self, elapsed_millis: u32) {

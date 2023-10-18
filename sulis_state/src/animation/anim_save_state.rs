@@ -154,7 +154,7 @@ impl AnimSaveState {
 
             anim.removal_effect = Some(new_index);
 
-            let vec = marked.entry(new_index).or_insert_with(Vec::new);
+            let vec = marked.entry(new_index).or_default();
             vec.push(anim.get_marked_for_removal());
         }
 

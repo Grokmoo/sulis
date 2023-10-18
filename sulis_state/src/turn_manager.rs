@@ -908,7 +908,7 @@ impl TurnManager {
         let index = self.add_effect_internal(effect, cbs, removal_markers);
         self.surfaces.push(index);
         if let Some(aura_parent) = aura_parent {
-            let auras_for_parent = self.auras.entry(aura_parent).or_insert_with(Vec::new);
+            let auras_for_parent = self.auras.entry(aura_parent).or_default();
             (*auras_for_parent).push(index);
         }
         let entities = area_state.borrow_mut().add_surface(index, &points);

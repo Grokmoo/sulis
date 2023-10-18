@@ -200,7 +200,7 @@ impl ImageLayerSet {
         sex: Sex,
         refs: HashMap<ImageLayer, String>,
     ) -> Result<(), Error> {
-        let sex_map = images.entry(sex).or_insert_with(HashMap::new);
+        let sex_map = images.entry(sex).or_default();
 
         for (image_layer, image_str) in refs {
             let image = match ResourceSet::image(&image_str) {

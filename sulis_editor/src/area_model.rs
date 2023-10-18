@@ -760,7 +760,7 @@ impl AreaModel {
                 }
                 let tiles_vec = layer_set
                     .entry(tile.id.to_string())
-                    .or_insert_with(Vec::new);
+                    .or_default();
                 tiles_vec.push(vec![position.x as u16, position.y as u16]);
             }
         }

@@ -74,6 +74,10 @@ impl Config {
         })
     }
 
+    pub fn vsync_enabled() -> bool {
+        CONFIG.with(|c| c.borrow().display.vsync_enabled)
+    }
+
     pub fn monitor() -> usize {
         CONFIG.with(|c| c.borrow().display.monitor)
     }
@@ -277,6 +281,7 @@ pub struct DisplayConfig {
     pub default_font: String,
     pub default_cursor: String,
     pub scroll_to_active: bool,
+    pub vsync_enabled: bool,
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone, Copy)]

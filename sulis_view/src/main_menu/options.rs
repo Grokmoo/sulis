@@ -41,6 +41,7 @@ pub struct Options {
     cur_tab: Tab,
 
     cur_display_mode: DisplayMode,
+    cur_vsync: bool,
     cur_display_conf: usize,
     cur_ui_scale: (i32, i32),
     cur_resolution: (u32, u32),
@@ -104,6 +105,7 @@ impl Options {
             cur_tab: Tab::Display,
 
             cur_display_mode: config.display.mode,
+            cur_vsync: config.display.vsync_enabled,
             cur_display_conf,
             cur_default_zoom: config.display.default_zoom,
             cur_resolution: (config.display.width_pixels, config.display.height_pixels),
@@ -145,6 +147,7 @@ impl Options {
     fn save_current_config(&self) {
         let mut config = Config::get_clone();
         config.display.mode = self.cur_display_mode;
+        config.display.vsync_enabled = self.cur_vsync;
         config.display.animation_base_time_millis = self.cur_anim_speed;
         config.display.monitor = self.cur_display_conf;
         config.display.width_pixels = self.cur_resolution.0;
@@ -231,6 +234,36 @@ impl Options {
         Widget::add_child_to(&mode_content, mode_window);
         Widget::add_child_to(&mode_content, mode_borderless);
         Widget::add_child_to(&mode_content, mode_fullscreen);
+
+        let vsync_on = Widget::with_theme(Button::empty(), "on");
+        vsync_on
+            .borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(|widget, _| {
+                let (parent, options) = Widget::parent_mut::<Options>(widget);
+                options.cur_vsync = true;
+                parent.borrow_mut().invalidate_children();
+            })));
+        let vsync_off = Widget::with_theme(Button::empty(), "off");
+        vsync_off
+            .borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(|widget, _| {
+                let (parent, options) = Widget::parent_mut::<Options>(widget);
+                options.cur_vsync = false;
+                parent.borrow_mut().invalidate_children();
+            })));
+        if self.cur_vsync {
+            vsync_on.borrow_mut().state.set_active(true);
+        } else {
+            vsync_off.borrow_mut().state.set_active(true);
+        }
+
+        let vsync_content = Widget::empty("vsync_content");
+        let vsync_label = Widget::with_theme(Label::empty(), "label");
+        Widget::add_child_to(&vsync_content, vsync_label);
+        Widget::add_child_to(&vsync_content, vsync_on);
+        Widget::add_child_to(&vsync_content, vsync_off);
 
         let monitor_title = Widget::with_theme(Label::empty(), "monitor_title");
 
@@ -351,6 +384,7 @@ impl Options {
         vec![
             mode_title,
             mode_content,
+            vsync_content,
             monitor_title,
             monitor_content,
             resolution_title,

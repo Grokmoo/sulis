@@ -345,6 +345,7 @@ fn try_get_display(
     };
 
     let (res_x, res_y) = Config::display_resolution();
+    let vsync = Config::vsync_enabled();
 
     let (fullscreen, decorations) = configured_fullscreen(res_x, res_y, &monitor);
 
@@ -356,7 +357,8 @@ fn try_get_display(
         .with_decorations(decorations)
         .with_fullscreen(fullscreen.clone());
     let context = ContextBuilder::new()
-        .with_pixel_format(24, 8);
+        .with_pixel_format(24, 8)
+        .with_vsync(vsync);
 
     match context.build_windowed(window, event_loop) {
         Ok(windowed_context) => {
@@ -381,7 +383,8 @@ fn try_get_display(
         .with_fullscreen(fullscreen);
     let context = ContextBuilder::new()
         .with_hardware_acceleration(None)
-        .with_pixel_format(24, 8);
+        .with_pixel_format(24, 8)
+        .with_vsync(vsync);
     let windowed_context = context.build_windowed(window, event_loop)?;
 
     let display = glium::Display::from_gl_window(windowed_context)?;

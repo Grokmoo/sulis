@@ -771,10 +771,42 @@ themes:
                   height: Max
                 custom:
                   tooltip: "Traditional fullscreen mode.  Borderless is almost always the better choice."
+          vsync_content:
+            from: options_window.content_sub_content
+            relative:
+              x: Center
+            size: [50, 8]
+            position: [0, 15]
+            children:
+              label:
+                from: label
+                text: "VSync"
+                text_params:
+                  scale: 6
+                relative:
+                  x: Zero
+                size: [32, 6]
+              on:
+                from: button
+                text: "On"
+                relative:
+                  x: Max
+                size: [8, 6]
+                custom:
+                  tooltip: "Enable vsync, syncing frame rate of the game to your monitor."
+              off:
+                from: button
+                text: "Off"
+                relative:
+                  x: Max
+                size: [8, 6]
+                position: [-9, 0]
+                custom:
+                  tooltip: "Disable vsync, do not sync frame rate of the game to your monitor."
           monitor_title:
             from: options_window.content_title
             text: "Monitor"
-            position: [0, 15]
+            position: [0, 25]
             relative:
               x: Center
           monitor_content:
@@ -782,7 +814,7 @@ themes:
             relative:
               x: Center
             size: [50, 8]
-            position: [0, 20]
+            position: [0, 30]
             children:
               monitor_label:
                 from: label
@@ -805,7 +837,7 @@ themes:
           resolution_title:
             from: options_window.content_title
             text: "Resolution"
-            position: [0, 30]
+            position: [0, 40]
             relative:
               x: Center
           resolution_pane:
@@ -814,7 +846,7 @@ themes:
             relative:
               x: Center
             size: [50, 43]
-            position: [3, 35]
+            position: [3, 45]
             children:
               scrollbar:
                 from: scrollbar
@@ -837,7 +869,7 @@ themes:
           ui_scale_title:
             from: options_window.content_title
             text: "UI Scale"
-            position: [0, 80]
+            position: [0, 90]
             relative:
               x: Center
           ui_scale_content:
@@ -845,7 +877,7 @@ themes:
             relative:
               x: Center
             size: [50, 8]
-            position: [0, 85]
+            position: [0, 95]
             children:
               small:
                 from: button

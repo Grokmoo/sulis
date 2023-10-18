@@ -2,7 +2,7 @@
 # The main game configuration file.  User preferences are set here.
 
 # If the user has an old revision, their config is automatically recreated from the sample.
-revision: 21
+revision: 22
 
 display:
     # Display Mode - Fullscreen, BorderlessWindow, Window
@@ -22,6 +22,9 @@ display:
     # UI scaling - Small
     # width: 368
     # height: 207
+
+    # enable vsync
+    vsync_enabled: true
 
     # in frames per second
     frame_rate: 60

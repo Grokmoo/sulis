@@ -924,7 +924,6 @@ impl GameState {
     }
 
     pub fn get_area_state(id: &str) -> Option<Rc<RefCell<AreaState>>> {
-        #[allow(clippy::map_clone)]
         STATE.with(|s| s.borrow().as_ref().unwrap().areas.get(id).map(Rc::clone))
     }
 

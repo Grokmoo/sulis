@@ -533,7 +533,7 @@ impl CallbackData {
     }
 
     fn exec_surface_script(&self, kind: FuncKind, target: Option<usize>) {
-        if self.funcs.get(&kind).is_none() {
+        if !self.funcs.contains_key(&kind) {
             return;
         }
 
@@ -611,7 +611,7 @@ impl ScriptCallback for CallbackData {
     fn on_exited_surface(&self, target: usize) {
         // since it is called after the surface has been removed in some cases
         // we cannot preserve the surface info for on_exited_surface scripts
-        if self.funcs.get(&FuncKind::OnExitedSurface).is_none() {
+        if !self.funcs.contains_key(&FuncKind::OnExitedSurface) {
             return;
         }
 

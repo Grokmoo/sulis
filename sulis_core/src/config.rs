@@ -447,7 +447,7 @@ impl Config {
         };
 
         for key in RawClick::iter() {
-            if config.input.click_actions.get(key).is_none() {
+            if !config.input.click_actions.contains_key(key) {
                 return Err(Error::new(
                     ErrorKind::InvalidData,
                     "Must specify an action for each of Left, Right & Middle Click",

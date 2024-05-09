@@ -1203,7 +1203,6 @@ impl UserData for ScriptEntity {
             Ok(())
         });
 
-        #[allow(clippy::type_complexity)]
         methods.add_method(
             "special_attack",
             |_,

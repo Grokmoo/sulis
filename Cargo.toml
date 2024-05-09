@@ -16,6 +16,14 @@ members = [
     "sulis_view",
 ]
 
+[workspace.lints.clippy]
+assigning_clones = "allow"
+type_complexity = "allow"
+map_clone = "allow"
+collapsible_else_if = "allow"
+collapsible_if = "allow"
+manual_range_contains = "allow"
+
 [workspace.dependencies]
 base64 = "0.21"
 chrono = "0.4"

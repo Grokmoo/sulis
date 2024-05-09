@@ -154,7 +154,6 @@ impl EncounterParams {
         module: &Module,
     ) -> Result<EncounterParams, Error> {
         EncounterParams::build(builder, |id| {
-            #[allow(clippy::map_clone)]
             module.encounters.get(id).map(Rc::clone)
         })
     }

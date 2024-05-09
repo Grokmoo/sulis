@@ -374,13 +374,13 @@ impl Inventory {
         if to_remove_primary.is_some() {
             primary_count += 1;
         }
-        if self.equipped.get(&slot).is_some() {
+        if self.equipped.contains_key(&slot) {
             primary_count += 1;
         }
         if to_remove_alt.is_some() {
             alt_count += 1;
         }
-        if self.equipped.get(&alt_slot).is_some() {
+        if self.equipped.contains_key(&alt_slot) {
             alt_count += 1;
         }
 

@@ -140,7 +140,6 @@ fn cast_ray(
     end_y: i32,
     src_elev: u8,
 ) -> bool {
-    #[allow(clippy::collapsible_else_if)] // this block is logically easier to read when not collapsed
     if (end_y - start_y).abs() < (end_x - start_x).abs() {
         if start_x > end_x {
             cast_low(

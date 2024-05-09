@@ -142,7 +142,7 @@ impl LootList {
         id: String,
         entry_in: EntryBuilder,
     ) -> Result<Entry, Error> {
-        if module.items.get(&id).is_none() {
+        if !module.items.contains_key(&id) {
             warn!("Unable to find item '{}'", id);
             return unable_to_create_error("loot_list", builder_id);
         }
@@ -159,7 +159,7 @@ impl LootList {
             if id == "none" {
                 continue;
             }
-            if module.item_adjectives.get(&id).is_none() {
+            if !module.item_adjectives.contains_key(&id) {
                 warn!("Unable to find item adjective '{}'", id);
                 return unable_to_create_error("loot_list", builder_id);
             }
@@ -173,7 +173,7 @@ impl LootList {
             if id == "none" {
                 continue;
             }
-            if module.item_adjectives.get(&id).is_none() {
+            if !module.item_adjectives.contains_key(&id) {
                 warn!("Unable to find item adjective '{}'", id);
                 return unable_to_create_error("loot_list", builder_id);
             }

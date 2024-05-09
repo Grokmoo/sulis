@@ -141,7 +141,7 @@ impl<'a> GliumRenderer<'a> {
     }
 
     fn create_texture_if_missing(&mut self, texture_id: &str, draw_list: &DrawList) {
-        if self.display.textures.get(texture_id).is_some() {
+        if self.display.textures.contains_key(texture_id) {
             return;
         }
 

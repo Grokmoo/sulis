@@ -428,7 +428,6 @@ impl Shape {
         points
     }
 
-    #[allow(clippy::collapsible_if)]
     fn get_points_line_internal(
         &self,
         start: Point,
@@ -445,7 +444,6 @@ impl Shape {
             Some(size) => size,
         };
 
-        #[allow(clippy::collapsible_else_if)] // this block is logically easier to read when not collapsed
         let (points, concat) = if (end.y - start.y).abs() < (end.x - start.x).abs() {
             if start.x > end.x {
                 let mut p = cast_low(end, start);

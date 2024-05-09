@@ -32,7 +32,7 @@ use crate::config::{AudioConfig, Config};
 use crate::resource::{sound_set::EntryBuilder, ResourceSet};
 
 thread_local! {
-    static AUDIO_QUEUE: RefCell<Vec<QueueEntry>> = RefCell::new(Vec::new());
+    static AUDIO_QUEUE: RefCell<Vec<QueueEntry>> = const { RefCell::new(Vec::new()) };
 }
 
 #[derive(PartialEq, Eq)]

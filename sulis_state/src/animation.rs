@@ -65,7 +65,7 @@ impl Default for AnimState {
 type BoxedCB = Box<dyn ScriptCallback>;
 
 impl AnimState {
-    pub fn new() -> AnimState {
+    pub const fn new() -> AnimState {
         AnimState {
             no_draw_anims: Vec::new(),
             below_anims: Vec::new(),

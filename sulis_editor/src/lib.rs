@@ -84,7 +84,7 @@ use sulis_core::util::{Offset, Scale};
 use sulis_core::widgets::{list_box, Button, ConfirmationWindow, DropDown};
 
 thread_local! {
-    static EXIT: Cell<bool> = Cell::new(false);
+    static EXIT: Cell<bool> = const { Cell::new(false) };
 }
 
 pub struct EditorControlFlowUpdater {

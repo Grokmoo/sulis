@@ -15,6 +15,7 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 #![allow(clippy::type_complexity)]
+#![allow(clippy::map_clone)]
 
 #[macro_use]
 extern crate log;

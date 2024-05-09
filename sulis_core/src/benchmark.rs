@@ -22,7 +22,7 @@ use rlua::{self, UserData, UserDataMethods};
 use crate::config::Config;
 
 thread_local! {
-    static BENCH: RefCell<Vec<Bench>> = RefCell::new(Vec::new());
+    static BENCH: RefCell<Vec<Bench>> = const { RefCell::new(Vec::new()) };
 }
 
 pub fn start_bench(tag: Option<String>) -> Handle {

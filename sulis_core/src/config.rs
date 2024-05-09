@@ -30,7 +30,7 @@ use crate::io::{event::ClickKind, InputActionKind, InputAction, KeyboardEvent};
 
 thread_local! {
     static CONFIG: RefCell<Config> = RefCell::new(Config::init());
-    static OLD_CONFIG: RefCell<Option<Config>> = RefCell::new(None);
+    static OLD_CONFIG: RefCell<Option<Config>> = const { RefCell::new(None) };
 }
 
 lazy_static! {

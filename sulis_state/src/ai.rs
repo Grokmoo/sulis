@@ -34,7 +34,7 @@ impl Default for AI {
 }
 
 impl AI {
-    pub fn new() -> AI {
+    pub const fn new() -> AI {
         AI {
             ai: None,
             next_state: State::Run,

@@ -182,7 +182,7 @@ impl Maze {
         }
 
         while open_regions.len() > 1 {
-            let connector = match connectors.get(0) {
+            let connector = match connectors.first() {
                 None => break,
                 Some(conn) => *conn,
             };

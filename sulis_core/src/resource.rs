@@ -354,6 +354,7 @@ pub fn all_resources<V: ?Sized>(map: &HashMap<String, Rc<V>>) -> Vec<Rc<V>> {
 }
 
 pub fn get_resource<V: ?Sized>(id: &str, map: &HashMap<String, Rc<V>>) -> Option<Rc<V>> {
+    #[allow(clippy::map_clone)]
     map.get(id).map(Rc::clone)
 }
 

@@ -44,6 +44,7 @@ impl LevelUpFinishPane {
 }
 
 impl BuilderPane for LevelUpFinishPane {
+    #[allow(clippy::useless_asref)]
     fn on_selected(&mut self, builder: &mut CharacterBuilder, widget: Rc<RefCell<Widget>>) {
         builder.prev.borrow_mut().state.set_enabled(true);
         builder.next.borrow_mut().state.set_enabled(false);

@@ -30,7 +30,7 @@ use sulis_module::{ai::AITemplate, Ability, Item, Module};
 
 thread_local! {
     static SCRIPT_CACHE: RefCell<HashMap<String, Rc<ScriptState>>> = RefCell::new(HashMap::new());
-    static REPORTING: Cell<bool> = Cell::new(true);
+    static REPORTING: Cell<bool> = const { Cell::new(true) };
 }
 
 pub fn setup() -> Result<()> {

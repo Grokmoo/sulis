@@ -38,13 +38,13 @@ use crate::{
 
 thread_local! {
     static TURN_MANAGER: Rc<RefCell<TurnManager>> = Rc::new(RefCell::new(TurnManager::default()));
-    static STATE: RefCell<Option<GameState>> = RefCell::new(None);
-    static AI: RefCell<AI> = RefCell::new(AI::new());
-    static CLEAR_ANIMS: Cell<bool> = Cell::new(false);
-    static MODAL_LOCKED: Cell<bool> = Cell::new(false);
-    static ANIMATIONS: RefCell<AnimState> = RefCell::new(AnimState::new());
-    static ANIMS_TO_ADD: RefCell<Vec<Anim>> = RefCell::new(Vec::new());
-    static COMBAT_INACTIVE_TIME: Cell<u32> = Cell::new(0);
+    static STATE: RefCell<Option<GameState>> = const { RefCell::new(None) };
+    static AI: RefCell<AI> = const { RefCell::new(AI::new()) };
+    static CLEAR_ANIMS: Cell<bool> = const { Cell::new(false) };
+    static MODAL_LOCKED: Cell<bool> = const { Cell::new(false) };
+    static ANIMATIONS: RefCell<AnimState> = const { RefCell::new(AnimState::new()) };
+    static ANIMS_TO_ADD: RefCell<Vec<Anim>> = const { RefCell::new(Vec::new()) };
+    static COMBAT_INACTIVE_TIME: Cell<u32> = const { Cell::new(0) };
 }
 
 pub struct GameState {
@@ -924,6 +924,7 @@ impl GameState {
     }
 
     pub fn get_area_state(id: &str) -> Option<Rc<RefCell<AreaState>>> {
+        #[allow(clippy::map_clone)]
         STATE.with(|s| s.borrow().as_ref().unwrap().areas.get(id).map(Rc::clone))
     }
 

@@ -850,9 +850,9 @@ dependencies = [
 
 [[package]]
 name = "itoa"
-version = "1.0.9"
+version = "1.0.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "af150ab688ff2122fcef229be89cb50dd66af9e01a4ff320cc137eecc9bacc38"
+checksum = "49f1f14873335454500d59611f1cf4a4b0f786f9ac11f4312a78e4cf2566695b"
 
 [[package]]
 name = "jni"
@@ -1589,9 +1589,9 @@ dependencies = [
 
 [[package]]
 name = "serde_json"
-version = "1.0.103"
+version = "1.0.109"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d03b412469450d4404fe8499a268edd7f8b79fecb074b0d812ad64ca21f4031b"
+checksum = "cb0652c533506ad7a2e353cce269330d6afd8bdfb6d75e0ace5b35aacbd7b9e9"
 dependencies = [
  "itoa",
  "ryu",
@@ -1719,7 +1719,6 @@ dependencies = [
  "rlua",
  "rodio",
  "serde",
- "serde_derive",
  "serde_json",
  "serde_yaml",
 ]
@@ -1743,7 +1742,6 @@ dependencies = [
  "indexmap 1.9.3",
  "log",
  "serde",
- "serde_derive",
  "sulis_core",
 ]
 
@@ -1755,7 +1753,6 @@ dependencies = [
  "log",
  "rlua",
  "serde",
- "serde_derive",
  "sulis_core",
  "sulis_module",
 ]

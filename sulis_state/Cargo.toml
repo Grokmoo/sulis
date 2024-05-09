@@ -8,8 +8,7 @@ edition = "2021"
 sulis_core = { path = "../sulis_core" }
 sulis_module = { path = "../sulis_module" }
 
-log = "0.4"
-chrono = "0.4"
-rlua = "0.19"
-serde = "1"
-serde_derive = "1"
+log = { workspace = true }
+chrono = { workspace = true }
+rlua = { workspace = true }
+serde = { workspace = true }

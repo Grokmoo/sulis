@@ -22,7 +22,7 @@ use std::path::Path;
 use std::path::PathBuf;
 
 use lazy_static::lazy_static;
-use serde::{Deserialize, Deserializer};
+use serde::{Deserialize, Deserializer, Serialize};
 use log::{Level, LevelFilter};
 
 use crate::io::keyboard_event::Key;

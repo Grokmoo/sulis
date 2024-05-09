@@ -18,6 +18,8 @@ use std::collections::{HashMap, HashSet};
 use std::io::Error;
 use std::rc::Rc;
 
+use serde::Deserialize;
+
 use crate::Module;
 use sulis_core::resource::{ResourceSet, Sprite};
 use sulis_core::util::{gen_rand, invalid_data_error, unable_to_create_error, Point, Size};

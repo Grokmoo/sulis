@@ -17,6 +17,8 @@
 use std::io::Error;
 use std::rc::Rc;
 
+use serde::Deserialize;
+
 use sulis_core::image::Image;
 use sulis_core::resource::{ResourceSet, Sprite};
 use sulis_core::util::{invalid_data_error, unable_to_create_error, Point};

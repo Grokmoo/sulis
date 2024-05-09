@@ -20,6 +20,8 @@ use std::rc::Rc;
 use std::collections::HashMap;
 use std::path::PathBuf;
 
+use serde::Deserialize;
+
 use crate::io::SoundSource;
 
 pub struct SoundSet {

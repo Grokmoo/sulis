@@ -19,6 +19,8 @@ use std::fmt;
 use std::io::Error;
 use std::rc::Rc;
 
+use serde::Deserialize;
+
 use crate::rules::{bonus::AttackBuilder, BonusList, Slot};
 use sulis_core::image::Image;
 use sulis_core::resource::ResourceSet;

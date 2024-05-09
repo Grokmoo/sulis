@@ -50,6 +50,8 @@ use std::collections::HashMap;
 use std::io::{Error, ErrorKind};
 use std::rc::Rc;
 
+use serde::{Serialize, Deserialize};
+
 use crate::area::{EncounterDataBuilder, Layer, LocationChecker, PathFinderGrid, PropDataBuilder};
 use crate::{ObjectSize, WallKind};
 use sulis_core::util::{Point, ReproducibleRandom};

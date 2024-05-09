@@ -17,6 +17,8 @@
 use std::io::{Error, ErrorKind};
 use std::str::FromStr;
 
+use serde::{Serialize, Deserialize};
+
 #[derive(Deserialize, Serialize, Debug, Clone, Copy, PartialEq)]
 #[serde(deny_unknown_fields)]
 pub struct Color {

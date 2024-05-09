@@ -18,6 +18,8 @@ use std::cell::RefCell;
 use std::f32;
 use std::rc::Rc;
 
+use serde::{Serialize, Deserialize};
+
 use crate::{EntityState, GameState};
 use sulis_core::util;
 use sulis_module::area::Destination;

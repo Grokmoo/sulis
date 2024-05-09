@@ -18,6 +18,8 @@ use std::collections::HashMap;
 use std::io::Error;
 use std::rc::Rc;
 
+use serde::{Serialize, Deserialize};
+
 use crate::generator::{
     maze::Room, overlaps_any, GenModel, Maze, Rect, RegionKind, RegionKinds, WeightedEntry,
     WeightedList,

@@ -19,6 +19,8 @@ use rlua::UserData;
 use std::cell::{Cell, RefCell};
 use std::rc::Rc;
 
+use serde::{Serialize, Deserialize};
+
 use crate::{animation::Anim, EntityState};
 use sulis_core::config::Config;
 use sulis_core::image::Image;

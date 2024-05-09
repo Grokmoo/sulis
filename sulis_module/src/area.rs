@@ -35,7 +35,7 @@ use std::io::{Error, ErrorKind};
 use std::rc::Rc;
 
 use serde::ser::{SerializeMap, SerializeStruct};
-use serde::{Deserialize, Deserializer, Serializer};
+use serde::{Serialize, Deserialize, Deserializer, Serializer};
 use base64::engine::general_purpose::STANDARD as base64;
 use base64::Engine;
 

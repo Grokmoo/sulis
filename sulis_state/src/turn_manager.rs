@@ -18,6 +18,8 @@ use std::cell::{Cell, RefCell};
 use std::collections::{vec_deque::Iter, HashMap, HashSet, VecDeque};
 use std::rc::Rc;
 
+use serde::{Serialize, Deserialize};
+
 use crate::script::{CallbackData, FuncKind, TriggeredCallback};
 use crate::{AreaState, ChangeListener, ChangeListenerList, Effect, EntityState, GameState};
 use sulis_core::{config::Config, util::{gen_rand, Point}};

@@ -18,6 +18,8 @@ use std::fmt::{self, Display};
 use std::io::Error;
 use std::path::PathBuf;
 
+use serde::Deserialize;
+
 use sulis_core::config::{self, Config};
 use sulis_core::resource::{read_single_resource, subdirs};
 

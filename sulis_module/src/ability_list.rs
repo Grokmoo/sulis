@@ -18,6 +18,8 @@ use std::io::Error;
 use std::rc::Rc;
 use std::slice::Iter;
 
+use serde::Deserialize;
+
 use sulis_core::util::unable_to_create_error;
 
 use crate::{Ability, Module};

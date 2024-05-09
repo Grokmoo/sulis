@@ -17,6 +17,8 @@
 use std::cell::RefCell;
 use std::rc::Rc;
 
+use serde::{Serialize, Deserialize};
+
 use crate::io::event::{ClickKind, Kind};
 use crate::io::{keyboard_event::Key, Event};
 use crate::ui::{Cursor, Widget};

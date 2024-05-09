@@ -20,6 +20,7 @@ use std::io::Error;
 use std::rc::Rc;
 use std::result;
 
+use serde::{Serialize, Deserialize};
 use rlua::{UserData, UserDataMethods};
 
 use crate::script::{

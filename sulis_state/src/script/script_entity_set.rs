@@ -19,6 +19,8 @@ use std::collections::HashMap;
 use std::io::Error;
 use std::rc::Rc;
 
+use serde::{Serialize, Deserialize};
+
 use rlua::{self, Context, UserData, UserDataMethods};
 
 use crate::script::{Result, ScriptActiveSurface, ScriptEntity};

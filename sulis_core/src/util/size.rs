@@ -17,6 +17,8 @@
 use std::cmp;
 use std::ops;
 
+use serde::{Serialize, Deserialize};
+
 use crate::ui::Border;
 
 pub static ZERO_SIZE: Size = Size {

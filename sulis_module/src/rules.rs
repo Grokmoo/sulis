@@ -22,6 +22,8 @@ use std::{
     str::FromStr,
 };
 
+use serde::{Serialize, Deserialize};
+
 pub mod armor;
 pub use self::armor::Armor;
 

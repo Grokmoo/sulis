@@ -16,6 +16,8 @@
 
 use std::io::Error;
 
+use serde::Deserialize;
+
 use crate::{Module, OnTrigger};
 
 pub struct Frame {

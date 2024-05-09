@@ -20,6 +20,8 @@ use std::io::Error;
 use std::path::PathBuf;
 use std::rc::Rc;
 
+use serde::Deserialize;
+
 use crate::config::Config;
 use crate::io::Vertex;
 use crate::util::{invalid_data_error, unable_to_create_error, Point, Size};

@@ -18,6 +18,8 @@ use std::collections::{HashMap, HashSet};
 use std::io::Error;
 use std::rc::Rc;
 
+use serde::Deserialize;
+
 use crate::rules::Attribute;
 
 use crate::{Actor, Module};

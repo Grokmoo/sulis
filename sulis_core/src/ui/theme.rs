@@ -18,7 +18,7 @@ use std::collections::HashMap;
 use std::rc::Rc;
 use std::str::FromStr;
 
-use serde_derive::Deserialize;
+use serde::Deserialize;
 
 use crate::resource::ResourceSet;
 use crate::ui::color::Color;

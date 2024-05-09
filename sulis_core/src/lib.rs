@@ -23,8 +23,6 @@ pub extern crate serde_yaml;
 #[macro_use]
 extern crate log;
 #[macro_use]
-extern crate serde_derive;
-#[macro_use]
 extern crate glium;
 pub extern crate image as extern_image;
 

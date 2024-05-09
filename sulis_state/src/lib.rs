@@ -19,8 +19,6 @@
 
 #[macro_use]
 extern crate log;
-#[macro_use]
-extern crate serde_derive;
 
 mod ai;
 pub use self::ai::AI;
@@ -125,6 +123,8 @@ pub(crate) use self::turn_manager::TurnManager;
 use std::cell::RefCell;
 use std::collections::HashMap;
 use std::rc::Rc;
+
+use serde::{Serialize, Deserialize};
 
 use sulis_module::{Actor, Module, OnTrigger};
 

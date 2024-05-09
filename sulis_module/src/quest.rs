@@ -16,6 +16,8 @@
 
 use std::collections::HashMap;
 
+use serde::Deserialize;
+
 #[derive(Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct Quest {

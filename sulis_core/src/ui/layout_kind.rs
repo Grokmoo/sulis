@@ -17,6 +17,8 @@
 use std::cmp;
 use std::rc::Rc;
 
+use serde::Deserialize;
+
 use crate::config::Config;
 use crate::ui::theme::Theme;
 use crate::ui::{Cursor, Size, Widget};

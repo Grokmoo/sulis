@@ -16,6 +16,8 @@
 
 use std::mem;
 
+use serde::{Serialize, Deserialize};
+
 use crate::rules::{
     ArmorKind, Attribute, Damage, DamageKind, HitKind, Slot, WeaponKind, WeaponStyle
 };

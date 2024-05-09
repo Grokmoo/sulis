@@ -20,6 +20,8 @@ use std::io::Error;
 use std::rc::Rc;
 use std::u64;
 
+use serde::{Serialize, Deserialize};
+
 use sulis_core::util::{ExtInt, Point};
 use sulis_module::{
     actor::{ActorBuilder, RewardBuilder},

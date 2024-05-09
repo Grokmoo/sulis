@@ -17,6 +17,8 @@
 use std::io::Error;
 use std::rc::Rc;
 
+use serde::Deserialize;
+
 use sulis_core::image::Image;
 use sulis_core::io::DrawList;
 use sulis_core::resource::ResourceSet;

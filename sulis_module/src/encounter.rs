@@ -18,6 +18,8 @@ use std::collections::{HashMap, HashSet};
 use std::io::Error;
 use std::rc::Rc;
 
+use serde::Deserialize;
+
 use crate::{Actor, Module};
 use sulis_core::io::SoundSource;
 use sulis_core::resource::ResourceSet;

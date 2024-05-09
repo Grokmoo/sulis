@@ -9,5 +9,5 @@ sulis_core = { path = "../sulis_core" }
 sulis_module = { path = "../sulis_module" }
 sulis_state = { path = "../sulis_state" }
 
-log = "0.4"
-serde = "1"
+log = { workspace = true }
+serde = { workspace = true }

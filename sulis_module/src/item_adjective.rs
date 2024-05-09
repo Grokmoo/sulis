@@ -17,6 +17,8 @@
 use std::io::Error;
 use std::rc::Rc;
 
+use serde::Deserialize;
+
 use crate::rules::{AttackBonuses, BonusList};
 use crate::{PrereqList, PrereqListBuilder};
 use sulis_core::image::Image;

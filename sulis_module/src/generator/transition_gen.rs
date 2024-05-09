@@ -18,6 +18,8 @@ use std::collections::HashMap;
 use std::io::{Error, ErrorKind};
 use std::rc::Rc;
 
+use serde::Deserialize;
+
 use crate::generator::{overlaps_any, Rect};
 use crate::{
     area::{

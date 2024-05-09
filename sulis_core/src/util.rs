@@ -20,6 +20,8 @@ pub use self::point::{Offset, Point, Rect, Scale};
 pub mod size;
 pub use self::size::Size;
 
+use serde::{Serialize, Deserialize};
+
 use std::cmp::Ordering;
 use std::f32;
 use std::fmt;
@@ -32,7 +34,7 @@ use std::time::Duration;
 
 use log::LevelFilter;
 use flexi_logger::{opt_format, Duplicate, FileSpec, Logger, LogSpecBuilder, LoggerHandle};
-use rand::{self, distributions::uniform::{SampleUniform}, seq::SliceRandom, Rng};
+use rand::{self, distributions::uniform::SampleUniform, seq::SliceRandom, Rng};
 use rand_pcg::Pcg64Mcg;
 
 use crate::config::{self, Config};

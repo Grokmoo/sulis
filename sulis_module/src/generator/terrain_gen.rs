@@ -17,6 +17,8 @@
 use std::collections::HashMap;
 use std::io::Error;
 
+use serde::Deserialize;
+
 use crate::area::tile::TerrainKind;
 use crate::generator::{
     overlaps_any, GenModel, Maze, Rect, RegionKind, RegionKinds, WeightedEntry, WeightedList,

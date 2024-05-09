@@ -20,6 +20,8 @@ use std::rc::Rc;
 use std::slice::Iter;
 use std::str::FromStr;
 
+use serde::{Serialize, Deserialize};
+
 use crate::actor::Sex;
 use crate::Race;
 use sulis_core::image::{layered_image::Layer, Image};

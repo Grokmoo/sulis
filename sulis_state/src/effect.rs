@@ -19,6 +19,8 @@ use std::collections::HashMap;
 use std::io::Error;
 use std::rc::Rc;
 
+use serde::{Serialize, Deserialize};
+
 use crate::script::{script_callback::FuncKind, CallbackData};
 use crate::{save_state::EffectSaveState, ChangeListenerList, EntityState};
 use sulis_core::util::{invalid_data_error, ExtInt, Point};

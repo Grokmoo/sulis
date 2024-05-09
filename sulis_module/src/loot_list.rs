@@ -17,6 +17,8 @@
 use std::collections::HashMap;
 use std::io::Error;
 
+use serde::Deserialize;
+
 use sulis_core::util::{gen_rand, unable_to_create_error};
 
 use crate::{ItemState, Module};

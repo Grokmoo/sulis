@@ -17,6 +17,8 @@
 use std::io::{Error, ErrorKind};
 use std::rc::Rc;
 
+use serde::Deserialize;
+
 use crate::image::simple_image::SimpleImageBuilder;
 use crate::image::{Image, SimpleImage};
 use crate::io::{DrawList, GraphicsRenderer};

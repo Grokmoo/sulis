@@ -19,6 +19,8 @@ use std::io::Error;
 use std::path::PathBuf;
 use std::rc::Rc;
 
+use serde::Deserialize;
+
 use crate::image::SimpleImage;
 use crate::resource::ResourceSet;
 use crate::util::{unable_to_create_error, Point, Size};

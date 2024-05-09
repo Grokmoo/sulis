@@ -16,6 +16,8 @@
 
 use std::collections::HashMap;
 
+use serde::{Serialize, Deserialize};
+
 use crate::rules::Time;
 
 #[derive(Clone, Serialize, Deserialize, Debug)]

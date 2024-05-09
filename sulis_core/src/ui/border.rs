@@ -14,6 +14,8 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use serde::Deserialize;
+
 #[derive(Default, Deserialize, Debug, Copy, Clone)]
 #[serde(deny_unknown_fields, default)]
 pub struct Border {

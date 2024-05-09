@@ -25,6 +25,8 @@ use sulis_core::image::Image;
 use sulis_core::resource::ResourceSet;
 use sulis_core::util::unable_to_create_error;
 
+use serde::Deserialize;
+
 use crate::{
     ability::{AIData, Duration},
     Actor, ImageLayer, ItemAdjective, Module, PrereqList, PrereqListBuilder,

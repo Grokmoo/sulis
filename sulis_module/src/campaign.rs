@@ -20,6 +20,8 @@ use std::hash::{Hash, Hasher};
 use std::io::Error;
 use std::rc::Rc;
 
+use serde::Deserialize;
+
 use crate::rules::Time;
 use sulis_core::image::Image;
 use sulis_core::resource::ResourceSet;

@@ -9,7 +9,7 @@ sulis_core = { path = "../sulis_core" }
 sulis_module = { path = "../sulis_module" }
 sulis_state = { path = "../sulis_state" }
 
-log = "0.4"
-chrono = "0.4"
-open = "1"
-rlua = "0.19"
+log = { workspace = true }
+chrono = { workspace = true }
+open = { workspace = true }
+rlua = { workspace = true }

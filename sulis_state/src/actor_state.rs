@@ -191,7 +191,9 @@ impl ActorState {
         let mut change = false;
         for (layer, image) in images.iter() {
             if let Some(img) = self.anim_image_layers.get(layer) {
-                if img.id() == image.id() { continue; }
+                if img.id() == image.id() {
+                    continue;
+                }
             }
             change = true;
             self.anim_image_layers.insert(*layer, Rc::clone(image));
@@ -866,7 +868,8 @@ impl ActorState {
             }
 
             for (stat_id, amount) in class.stats_max(level) {
-                self.stats.add_single_class_stat_max(stat_id.to_string(), *amount);
+                self.stats
+                    .add_single_class_stat_max(stat_id.to_string(), *amount);
             }
         }
 

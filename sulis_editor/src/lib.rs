@@ -72,10 +72,10 @@ use crate::wall_picker::WallPicker;
 extern crate log;
 
 use std::any::Any;
-use std::cell::{RefCell, Cell};
+use std::cell::{Cell, RefCell};
 use std::rc::Rc;
 
-use sulis_core::io::{GraphicsRenderer, InputActionKind, ControlFlowUpdater};
+use sulis_core::io::{ControlFlowUpdater, GraphicsRenderer, InputActionKind};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_core::util::{Offset, Scale};
 use sulis_core::widgets::{list_box, Button, ConfirmationWindow, DropDown};
@@ -90,9 +90,7 @@ pub struct EditorControlFlowUpdater {
 
 impl EditorControlFlowUpdater {
     pub fn new(root: Rc<RefCell<Widget>>) -> EditorControlFlowUpdater {
-        EditorControlFlowUpdater {
-            root,
-        }
+        EditorControlFlowUpdater { root }
     }
 }
 
@@ -107,7 +105,9 @@ impl ControlFlowUpdater for EditorControlFlowUpdater {
         self.root()
     }
 
-    fn recreate_window(&mut self) -> bool { false }
+    fn recreate_window(&mut self) -> bool {
+        false
+    }
 
     fn root(&self) -> Rc<RefCell<Widget>> {
         Rc::clone(&self.root)

@@ -19,7 +19,7 @@ use std::collections::HashMap;
 use std::io::Error;
 use std::rc::Rc;
 
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 use crate::script::{script_callback::FuncKind, CallbackData};
 use crate::{save_state::EffectSaveState, ChangeListenerList, EntityState};
@@ -200,7 +200,9 @@ impl Effect {
     }
 
     pub fn surface(&self) -> Option<(&str, &Vec<Point>)> {
-        self.surface.as_ref().map(|s| (s.area_id.as_str(), &s.points))
+        self.surface
+            .as_ref()
+            .map(|s| (s.area_id.as_str(), &s.points))
     }
 
     pub fn deactivates_with(&self, id: &str) -> bool {

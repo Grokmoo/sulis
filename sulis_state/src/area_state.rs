@@ -26,10 +26,10 @@ use std::time;
 use crate::save_state::AreaSaveState;
 use crate::script::AreaTargeter;
 use crate::*;
-use sulis_core::io::Audio;
 use sulis_core::config::Config;
+use sulis_core::io::Audio;
 use sulis_core::util::{self, gen_rand, invalid_data_error, Point, Size};
-use sulis_module::area::{Transition, TriggerKind, Trigger};
+use sulis_module::area::{Transition, Trigger, TriggerKind};
 use sulis_module::{Actor, Area, LootList, Module, ObjectSize, Time};
 
 pub struct TriggerState {
@@ -39,7 +39,9 @@ pub struct TriggerState {
 
 impl TriggerState {
     pub fn can_fire(&self, trigger: &Trigger) -> bool {
-        if !self.enabled { return false; }
+        if !self.enabled {
+            return false;
+        }
 
         trigger.fire_more_than_once || !self.fired
     }
@@ -606,12 +608,7 @@ impl AreaState {
     }
 
     pub fn is_passable_for_entity(&self, requester: &EntityState, x: i32, y: i32) -> bool {
-        self.is_passable(
-            requester,
-            &[requester.index()],
-            x,
-            y,
-        )
+        self.is_passable(requester, &[requester.index()], x, y)
     }
 
     pub fn get_entity_at(&self, x: i32, y: i32) -> Option<Rc<RefCell<EntityState>>> {

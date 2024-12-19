@@ -15,7 +15,7 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 pub mod audio;
-pub use self::audio::{Audio, AudioDevice, AudioDeviceInfo, SoundSource, create_audio_device};
+pub use self::audio::{create_audio_device, Audio, AudioDevice, AudioDeviceInfo, SoundSource};
 
 pub mod event;
 pub use self::event::Event;
@@ -351,9 +351,9 @@ impl System {
 
     pub fn get_display_configurations(&self) -> Vec<DisplayConfiguration> {
         match self {
-            System::Glium(glium_system) => {
-                glium_system.io.get_display_configurations(&glium_system.event_loop)
-            }
+            System::Glium(glium_system) => glium_system
+                .io
+                .get_display_configurations(&glium_system.event_loop),
         }
     }
 }

@@ -18,10 +18,10 @@ use std::cell::{Cell, RefCell};
 use std::cmp;
 use std::rc::Rc;
 
-use crate::{animation::Anim, EntityState, GameState, animation::particle_generator::Param};
+use crate::{animation::particle_generator::Param, animation::Anim, EntityState, GameState};
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::ui::animation_state;
-use sulis_core::util::{Offset, Point, Rect, Scale, ExtInt};
+use sulis_core::util::{ExtInt, Offset, Point, Rect, Scale};
 use sulis_module::ObjectSize;
 
 fn check_immediate_cancel(mover: &Rc<RefCell<EntityState>>, model: &mut MoveAnimModel) -> bool {
@@ -142,14 +142,19 @@ pub(in crate::animation) fn cleanup(mover: &Rc<RefCell<EntityState>>, model: &mu
     if do_move_back {
         loop {
             let p = model.path[index];
-            if area.borrow().is_passable_for_entity(&mover.borrow(), p.x, p.y) {
+            if area
+                .borrow()
+                .is_passable_for_entity(&mover.borrow(), p.x, p.y)
+            {
                 if !first {
                     target = Some(p);
                 }
                 break;
             }
 
-            if index == 0 { break; }
+            if index == 0 {
+                break;
+            }
 
             index -= 1;
             first = false;

@@ -17,7 +17,7 @@
 use std::collections::HashMap;
 use std::rc::Rc;
 
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 use sulis_core::util::ExtInt;
 use sulis_module::{Ability, Actor, Class, Faction, Module, StatList};

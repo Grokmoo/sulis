@@ -17,7 +17,7 @@
 use std::fmt::{self, Display};
 use std::slice::Iter;
 
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 use sulis_core::util::gen_rand;
 

@@ -19,8 +19,8 @@ use std::rc::Rc;
 
 use crate::script::script_callback;
 use crate::{animation::Anim, EntityState, GameState, Script};
-use sulis_module::ai::FuncKind;
 use sulis_core::config::Config;
+use sulis_module::ai::FuncKind;
 
 pub struct AI {
     ai: Option<EntityAI>,
@@ -152,7 +152,11 @@ impl EntityAI {
             Some(template) => Rc::clone(template),
         };
 
-        let func = ai_template.hooks.get(&FuncKind::AiAction).map(|f| f.as_str()).unwrap_or("ai_action");
+        let func = ai_template
+            .hooks
+            .get(&FuncKind::AiAction)
+            .map(|f| f.as_str())
+            .unwrap_or("ai_action");
 
         self.actions_taken_this_turn += 1;
 

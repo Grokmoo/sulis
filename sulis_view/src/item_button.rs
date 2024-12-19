@@ -198,7 +198,10 @@ impl ItemButton {
             Kind::Inventory { item_index } => {
                 let stash = GameState::party_stash();
                 let stash = stash.borrow();
-                stash.items().get(item_index).map(|(_, item_state)| item_state.clone())
+                stash
+                    .items()
+                    .get(item_index)
+                    .map(|(_, item_state)| item_state.clone())
             }
             Kind::Quick { ref player, quick } => {
                 let pc = player.borrow();
@@ -228,7 +231,10 @@ impl ItemButton {
                     Some(ref merchant) => merchant,
                 };
 
-                merchant.items().get(item_index).map(|(_, item)| item.clone())
+                merchant
+                    .items()
+                    .get(item_index)
+                    .map(|(_, item)| item.clone())
             }
         }
     }

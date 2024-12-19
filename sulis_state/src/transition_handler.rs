@@ -18,7 +18,7 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 use crate::{AreaState, EntityState, GameState, Location, TurnManager};
-use sulis_core::{util::Point};
+use sulis_core::util::Point;
 use sulis_module::{
     area::{ToKind, TriggerKind},
     Area, ObjectSize, Time,
@@ -63,7 +63,8 @@ pub(crate) fn transition_to(area_id: Option<&str>, p: Option<Point>, offset: Poi
         area.borrow_mut().pc_vis_full_redraw();
     }
 
-    area.borrow().update_ambient_audio(&mgr.borrow().current_time());
+    area.borrow()
+        .update_ambient_audio(&mgr.borrow().current_time());
     area.borrow().update_music(false, None);
 
     remove_party_from_surfaces(&mut mgr.borrow_mut(), &party);
@@ -98,12 +99,7 @@ pub(crate) fn transition_to(area_id: Option<&str>, p: Option<Point>, offset: Poi
         }
 
         if !triggers.is_empty() {
-            GameState::add_ui_callbacks_of_kind(
-                &triggers,
-                TriggerKind::OnAreaLoad,
-                &pc,
-                &pc
-            );
+            GameState::add_ui_callbacks_of_kind(&triggers, TriggerKind::OnAreaLoad, &pc, &pc);
         }
     }
 }

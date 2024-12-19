@@ -584,11 +584,7 @@ fn hue_to_color(hue: f32) -> Color {
 
     let mut res = [p[0] - 1.0, p[1] - 1.0, p[2] - 1.0];
     res.iter_mut().for_each(|e| {
-        if *e > 1.0 {
-            *e = 1.0;
-        } else if *e < 0.0 {
-            *e = 0.0;
-        }
+        *e = (*e).clamp(0.0, 1.0);
     });
 
     Color::new(res[0], res[1], res[2], 1.0)

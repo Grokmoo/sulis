@@ -22,7 +22,9 @@ use std::rc::Rc;
 
 use sulis_core::config::DisplayMode;
 use sulis_core::config::{self, Config, RawClick};
-use sulis_core::io::{event::ClickKind, keyboard_event::Key, DisplayConfiguration, InputActionKind};
+use sulis_core::io::{
+    event::ClickKind, keyboard_event::Key, DisplayConfiguration, InputActionKind,
+};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_core::widgets::{Button, Label, ScrollDirection, ScrollPane, TextArea};
 
@@ -32,7 +34,7 @@ enum Tab {
     Display,
     Input,
     Gameplay,
-    Audio
+    Audio,
 }
 
 pub struct Options {
@@ -205,10 +207,13 @@ impl Options {
                 options.cur_display_mode = DisplayMode::BorderlessWindow;
                 parent.borrow_mut().invalidate_children();
 
-                match options.display_confs[options.cur_display_conf].resolutions.first() {
+                match options.display_confs[options.cur_display_conf]
+                    .resolutions
+                    .first()
+                {
                     None => {
                         warn!("No valid resolutions for current display mode.");
-                    },
+                    }
                     Some(res) => {
                         // set the resolution to the first entry which is the largest
                         options.cur_resolution = (res.width, res.height);
@@ -325,10 +330,16 @@ impl Options {
                 match self.cur_display_mode {
                     DisplayMode::Window => (),
                     DisplayMode::BorderlessWindow => {
-                        if !res.monitor_size { continue; }
+                        if !res.monitor_size {
+                            continue;
+                        }
                         state.set_enabled(false);
-                    },
-                    DisplayMode::Fullscreen => if !res.fullscreen { continue; },
+                    }
+                    DisplayMode::Fullscreen => {
+                        if !res.fullscreen {
+                            continue;
+                        }
+                    }
                 }
             }
 
@@ -433,8 +444,12 @@ impl Options {
             device_title,
             self.add_volume_widget("master", self.master_volume, |o, vol| o.master_volume = vol),
             self.add_volume_widget("music", self.music_volume, |o, vol| o.music_volume = vol),
-            self.add_volume_widget("effects", self.effects_volume, |o, vol| o.effects_volume = vol),
-            self.add_volume_widget("ambient", self.ambient_volume, |o, vol| o.ambient_volume = vol),
+            self.add_volume_widget("effects", self.effects_volume, |o, vol| {
+                o.effects_volume = vol
+            }),
+            self.add_volume_widget("ambient", self.ambient_volume, |o, vol| {
+                o.ambient_volume = vol
+            }),
         ]
     }
 
@@ -454,12 +469,15 @@ impl Options {
         for vol in VOLUME_LEVELS.iter() {
             let vol = *vol;
             let button = Widget::with_theme(Button::empty(), "volume_button");
-            button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-                let (parent, options) = Widget::parent_mut::<Options>(widget);
-                setter(options, vol);
-                parent.borrow_mut().invalidate_children();
-            })));
-            if (vol - cur).abs() < std::f32::EPSILON {
+            button
+                .borrow_mut()
+                .state
+                .add_callback(Callback::new(Rc::new(move |widget, _| {
+                    let (parent, options) = Widget::parent_mut::<Options>(widget);
+                    setter(options, vol);
+                    parent.borrow_mut().invalidate_children();
+                })));
+            if (vol - cur).abs() < f32::EPSILON {
                 button.borrow_mut().state.set_active(true);
                 found = true;
             }
@@ -510,18 +528,24 @@ impl Options {
         Widget::add_child_to(&screen_shake_content, screen_shake_off);
 
         let scroll_to_active_on = Widget::with_theme(Button::empty(), "on");
-        scroll_to_active_on.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let (parent, options) = Widget::parent_mut::<Options>(widget);
-            options.cur_scroll_to_active = true;
-            parent.borrow_mut().invalidate_children();
-        })));
+        scroll_to_active_on
+            .borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(|widget, _| {
+                let (parent, options) = Widget::parent_mut::<Options>(widget);
+                options.cur_scroll_to_active = true;
+                parent.borrow_mut().invalidate_children();
+            })));
 
         let scroll_to_active_off = Widget::with_theme(Button::empty(), "off");
-        scroll_to_active_off.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let (parent, options) = Widget::parent_mut::<Options>(widget);
-            options.cur_scroll_to_active = false;
-            parent.borrow_mut().invalidate_children();
-        })));
+        scroll_to_active_off
+            .borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(|widget, _| {
+                let (parent, options) = Widget::parent_mut::<Options>(widget);
+                options.cur_scroll_to_active = false;
+                parent.borrow_mut().invalidate_children();
+            })));
         if self.cur_scroll_to_active {
             scroll_to_active_on.borrow_mut().state.set_active(true);
         } else {
@@ -545,7 +569,7 @@ impl Options {
                     options.cur_default_zoom = zoom;
                     parent.borrow_mut().invalidate_children();
                 })));
-            if (zoom - self.cur_default_zoom).abs() < std::f32::EPSILON {
+            if (zoom - self.cur_default_zoom).abs() < f32::EPSILON {
                 button.borrow_mut().state.set_active(true);
                 zoom_found = true;
             }
@@ -619,7 +643,7 @@ impl Options {
                     options.cur_scroll_speed = speed;
                     parent.borrow_mut().invalidate_children();
                 })));
-            if (speed - self.cur_scroll_speed).abs() < std::f32::EPSILON {
+            if (speed - self.cur_scroll_speed).abs() < f32::EPSILON {
                 button.borrow_mut().state.set_active(true);
                 speed_found = true;
             }
@@ -817,18 +841,24 @@ impl WidgetKind for Options {
             })));
 
         let gameplay = Widget::with_theme(Button::empty(), "gameplay");
-        gameplay.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let (parent, options) = Widget::parent_mut::<Options>(widget);
-            options.cur_tab = Tab::Gameplay;
-            parent.borrow_mut().invalidate_children();
-        })));
+        gameplay
+            .borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(|widget, _| {
+                let (parent, options) = Widget::parent_mut::<Options>(widget);
+                options.cur_tab = Tab::Gameplay;
+                parent.borrow_mut().invalidate_children();
+            })));
 
         let audio = Widget::with_theme(Button::empty(), "audio");
-        audio.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let (parent, options) = Widget::parent_mut::<Options>(widget);
-            options.cur_tab = Tab::Audio;
-            parent.borrow_mut().invalidate_children();
-        })));
+        audio
+            .borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(|widget, _| {
+                let (parent, options) = Widget::parent_mut::<Options>(widget);
+                options.cur_tab = Tab::Audio;
+                parent.borrow_mut().invalidate_children();
+            })));
 
         let content = Widget::empty("content");
 
@@ -840,11 +870,11 @@ impl WidgetKind for Options {
             Tab::Input => {
                 input.borrow_mut().state.set_active(true);
                 self.add_input_widgets()
-            },
+            }
             Tab::Gameplay => {
                 gameplay.borrow_mut().state.set_active(true);
                 self.add_gameplay_widgets()
-            },
+            }
             Tab::Audio => {
                 audio.borrow_mut().state.set_active(true);
                 self.add_audio_widgets()
@@ -853,7 +883,9 @@ impl WidgetKind for Options {
 
         Widget::add_children_to(&content, widgets);
 
-        vec![title, apply, cancel, reset, content, display, input, gameplay, audio]
+        vec![
+            title, apply, cancel, reset, content, display, input, gameplay, audio,
+        ]
     }
 }
 

@@ -94,6 +94,11 @@ impl Bench {
         let micros = end.duration_since(self.start).as_micros();
         let millis = micros as f64 / 1000.0;
 
-        log!(Config::bench_log_level(), "BENCHMARK '{}': {:.3} millis", id, millis);
+        log!(
+            Config::bench_log_level(),
+            "BENCHMARK '{}': {:.3} millis",
+            id,
+            millis
+        );
     }
 }

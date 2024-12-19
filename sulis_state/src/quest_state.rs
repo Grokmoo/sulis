@@ -16,7 +16,7 @@
 
 use std::collections::HashMap;
 
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 use crate::{save_state::QuestSaveState, ChangeListenerList};
 use sulis_module::{on_trigger::QuestEntryState, Module};

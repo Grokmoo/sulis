@@ -18,7 +18,7 @@ use std::collections::HashMap;
 use std::io::Error;
 use std::rc::Rc;
 
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 use crate::generator::{
     overlaps_any, GenModel, Maze, Rect, RegionKind, RegionKinds, WeightedEntry, WeightedList,
@@ -51,10 +51,7 @@ impl<'a, 'b> PropGen<'a, 'b> {
         }
     }
 
-    pub(crate) fn generate(
-        &mut self,
-        addn_passes: &[PropPass],
-    ) -> Vec<PropDataBuilder> {
+    pub(crate) fn generate(&mut self, addn_passes: &[PropPass]) -> Vec<PropDataBuilder> {
         let mut props = Vec::new();
 
         for pass in self.params.passes.iter().chain(addn_passes) {

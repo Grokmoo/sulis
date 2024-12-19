@@ -19,7 +19,7 @@ use std::io::{Error, Read};
 use std::path::{Path, PathBuf};
 use std::time;
 
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 use chrono::prelude::*;
 

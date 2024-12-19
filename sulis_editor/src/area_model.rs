@@ -758,9 +758,7 @@ impl AreaModel {
                 if position.x >= MAX_AREA_SIZE || position.y >= MAX_AREA_SIZE {
                     continue;
                 }
-                let tiles_vec = layer_set
-                    .entry(tile.id.to_string())
-                    .or_default();
+                let tiles_vec = layer_set.entry(tile.id.to_string()).or_default();
                 tiles_vec.push(vec![position.x as u16, position.y as u16]);
             }
         }

@@ -130,11 +130,9 @@ fn add_bonus(
         ActionPoints(amount) => add(state, "action_points", Module::rules().format_ap(*amount)),
         Armor(amount) => armor.add_base(*amount),
         ArmorKind { kind, amount } => armor.add_kind(*kind, *amount),
-        Resistance { kind, amount } => add(
-            state,
-            &format!("resistance_{kind}").to_lowercase(),
-            *amount,
-        ),
+        Resistance { kind, amount } => {
+            add(state, &format!("resistance_{kind}").to_lowercase(), *amount)
+        }
         Damage(damage) => {
             let index = *damage_index;
             if damage.max > 0 {
@@ -176,9 +174,7 @@ fn add_bonus(
         GrazeThreshold(amount) => add(state, "graze_threshold", amount),
         CritMultiplier(amount) => state.add_text_arg("crit_multiplier", &format!("{amount:.2}")),
         HitMultiplier(amount) => state.add_text_arg("hit_multiplier", &format!("{amount:.2}")),
-        GrazeMultiplier(amount) => {
-            state.add_text_arg("graze_multiplier", &format!("{amount:.2}"))
-        }
+        GrazeMultiplier(amount) => state.add_text_arg("graze_multiplier", &format!("{amount:.2}")),
         MovementRate(amount) => state.add_text_arg("movement_rate", &format!("{amount:.2}")),
         MoveAnimRate(amount) => state.add_text_arg("move_anim_rate", &format!("{amount:.2}")),
         CasterLevel(amount) => add(state, "caster_level", amount),
@@ -213,11 +209,7 @@ fn add_bonus(
             add(state, "class_stat_amount", amount);
         }
         ArmorProficiency(armor_kind) => {
-            add(
-                state,
-                &format!("armor_proficiency_{armor_kind:?}"),
-                "true",
-            );
+            add(state, &format!("armor_proficiency_{armor_kind:?}"), "true");
         }
         WeaponProficiency(weapon_kind) => {
             add(

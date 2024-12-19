@@ -18,7 +18,7 @@ use std::collections::HashMap;
 use std::io::Error;
 use std::rc::Rc;
 
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 use crate::rules::{AttributeList, BonusList};
 use sulis_core::util::{unable_to_create_error, ExtInt};

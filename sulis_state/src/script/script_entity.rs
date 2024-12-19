@@ -18,7 +18,6 @@ use std::cell::RefCell;
 use std::collections::HashMap;
 use std::rc::Rc;
 use std::str::FromStr;
-use std::{self, f32, u32};
 
 use rlua::{self, Context, UserData, UserDataMethods};
 
@@ -29,8 +28,8 @@ use sulis_core::config::Config;
 use sulis_core::resource::ResourceSet;
 use sulis_core::util::ExtInt;
 use sulis_module::{
-    ability::AIData, Actor, Attack, AttackKind, Attribute, DamageKind, Faction, HitFlags, HitKind,
-    ImageLayer, InventoryBuilder, MOVE_TO_THRESHOLD, area::Destination,
+    ability::AIData, area::Destination, Actor, Attack, AttackKind, Attribute, DamageKind, Faction,
+    HitFlags, HitKind, ImageLayer, InventoryBuilder, MOVE_TO_THRESHOLD,
 };
 
 /// Represents a single entity for Lua scripts.  Also can represent an invalid,
@@ -1623,7 +1622,7 @@ impl UserData for ScriptEntity {
             let entity = entity.try_unwrap()?;
             let entity = entity.borrow();
 
-            let target = target.index.unwrap_or(std::usize::MAX);
+            let target = target.index.unwrap_or(usize::MAX);
             Ok(entity.actor.p_stats().is_threatened_by(target))
         });
     }
@@ -1637,7 +1636,9 @@ fn move_towards_dest(parent: Rc<RefCell<EntityState>>, dest: Destination) -> Res
 
     for e in area.borrow().entity_iter() {
         let other = mgr.borrow().entity(*e);
-        if parent.borrow().ai_group() != other.borrow().ai_group() { continue; }
+        if parent.borrow().ai_group() != other.borrow().ai_group() {
+            continue;
+        }
 
         if parent.borrow().is_friendly(&other.borrow()) {
             to_ignore.push(*e);
@@ -1645,10 +1646,7 @@ fn move_towards_dest(parent: Rc<RefCell<EntityState>>, dest: Destination) -> Res
     }
 
     Ok(GameState::move_towards_dest(
-            &parent,
-            &to_ignore,
-            dest,
-            None,
+        &parent, &to_ignore, dest, None,
     ))
 }
 

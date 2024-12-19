@@ -15,7 +15,6 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::rc::Rc;
-use std::u32;
 
 use crate::{ChangeListenerList, GameState};
 use sulis_core::util::ExtInt;

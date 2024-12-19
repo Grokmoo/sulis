@@ -669,7 +669,6 @@ enum ScriptSource {
 }
 
 /// A created AreaTargeter, built from a `Targeter`
-
 pub struct AreaTargeter {
     on_target_select_func: String,
     on_target_select_custom_target: Option<Rc<RefCell<EntityState>>>,

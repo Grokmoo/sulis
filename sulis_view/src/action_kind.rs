@@ -135,12 +135,7 @@ impl ActionHoverInfo {
         }
     }
 
-    fn with_ap(
-        entity: &EntityState,
-        point: Point,
-        total_ap: i32,
-        ap: i32,
-    ) -> ActionHoverInfo {
+    fn with_ap(entity: &EntityState, point: Point, total_ap: i32, ap: i32) -> ActionHoverInfo {
         ActionHoverInfo {
             size: Rc::clone(&entity.size),
             x: point.x,
@@ -204,10 +199,7 @@ impl SelectAction {
         };
 
         let (x, y) = ((x - 0.5) as i32, (y - 0.5) as i32);
-        match area_state.get_entity_at(x, y) {
-            None => return None,
-            Some(_) => (),
-        }
+        area_state.get_entity_at(x, y)?;
 
         Some(Box::new(SelectAction { target }))
     }
@@ -599,7 +591,12 @@ impl ActionKind for AttackAction {
     fn get_hover_info(&self) -> Option<ActionHoverInfo> {
         let point = self.target.borrow().location.to_point();
         let total_ap = self.pc.borrow().actor.ap() as i32;
-        Some(ActionHoverInfo::with_ap(&self.target.borrow(), point, total_ap, self.ap))
+        Some(ActionHoverInfo::with_ap(
+            &self.target.borrow(),
+            point,
+            total_ap,
+            self.ap,
+        ))
     }
 
     fn fire_action(&mut self, _widget: &Rc<RefCell<Widget>>) -> bool {
@@ -643,11 +640,11 @@ impl MoveThenAction {
         cb_action: Box<dyn ActionKind>,
         mut cursor_state: animation_state::Kind,
     ) -> Option<Box<dyn ActionKind>> {
-        let move_action = match MoveAction::new_if_valid(
-            pos.x, pos.y, size.width, size.height, Some(dist)) {
-            None => return None,
-            Some(move_action) => move_action,
-        };
+        let move_action =
+            match MoveAction::new_if_valid(pos.x, pos.y, size.width, size.height, Some(dist)) {
+                None => return None,
+                Some(move_action) => move_action,
+            };
 
         if GameState::is_combat_active() {
             let total_ap = cb_action.ap() + move_action.ap();
@@ -759,7 +756,7 @@ impl MoveAction {
             let cost_per_move = pc.actor.get_move_ap_cost(1) as i32;
 
             let total_ap = if !GameState::is_combat_active() {
-                std::i32::MAX
+                i32::MAX
             } else {
                 pc.actor.ap() as i32
             };

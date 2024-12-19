@@ -37,7 +37,7 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 use sulis_core::config::Config;
-use sulis_core::io::{DisplayConfiguration, InputActionKind, AudioDeviceInfo};
+use sulis_core::io::{AudioDeviceInfo, DisplayConfiguration, InputActionKind};
 use sulis_core::ui::*;
 use sulis_core::util;
 use sulis_core::widgets::{Button, ConfirmationWindow, TextArea};
@@ -164,15 +164,19 @@ impl WidgetKind for MainMenu {
         let menu_pane = Widget::empty("menu_pane");
 
         let cont = Widget::with_theme(Button::empty(), "continue");
-        cont.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let root = Widget::get_root(widget);
-            let load_window = LoadWindow::new(true);
+        cont.borrow_mut()
+            .state
+            .add_callback(Callback::new(Rc::new(|widget, _| {
+                let root = Widget::get_root(widget);
+                let load_window = LoadWindow::new(true);
 
-            if load_window.borrow().entries.is_empty() { return; } // no available files to load
+                if load_window.borrow().entries.is_empty() {
+                    return;
+                } // no available files to load
 
-            load_window.borrow_mut().selected_entry = Some(0); // load most recent
-            load_window.borrow_mut().load(&root);
-        })));
+                load_window.borrow_mut().selected_entry = Some(0); // load most recent
+                load_window.borrow_mut().load(&root);
+            })));
 
         let new = Widget::with_theme(Button::empty(), "new");
         new.borrow_mut()
@@ -241,7 +245,11 @@ impl WidgetKind for MainMenu {
                 let (parent, window) = Widget::parent_mut::<MainMenu>(widget);
                 window.mode = Mode::Options;
                 let configs = window.display_configurations.clone();
-                let audio = window.audio_devices.iter().map(|d| d.name.to_string()).collect();
+                let audio = window
+                    .audio_devices
+                    .iter()
+                    .map(|d| d.name.to_string())
+                    .collect();
 
                 window.content = Widget::with_defaults(Options::new(configs, audio));
 

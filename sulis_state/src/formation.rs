@@ -18,7 +18,7 @@ use std::cell::RefCell;
 use std::f32;
 use std::rc::Rc;
 
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 use crate::{EntityState, GameState};
 use sulis_core::util;
@@ -121,12 +121,8 @@ impl Formation {
                     dist,
                     max_path_len: None,
                 };
-                if GameState::can_move_towards_dest(
-                    &to_move.borrow(),
-                    entities_to_ignore,
-                    dest,
-                )
-                .is_none()
+                if GameState::can_move_towards_dest(&to_move.borrow(), entities_to_ignore, dest)
+                    .is_none()
                 {
                     continue;
                 }

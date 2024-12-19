@@ -221,14 +221,17 @@ impl UserData for ScriptAbilitySet {
 
         methods.add_method("only_target", |_, set, target: String| {
             let target = ability::AITarget::unwrap_from_str(&target);
-            let abilities = set.abilities.iter().
-                filter_map(|ability| {
+            let abilities = set
+                .abilities
+                .iter()
+                .filter_map(|ability| {
                     if ability.ai_data.target == target {
                         Some(ability.clone())
                     } else {
                         None
                     }
-                }).collect();
+                })
+                .collect();
             Ok(ScriptAbilitySet {
                 parent: set.parent,
                 abilities,

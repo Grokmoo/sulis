@@ -21,7 +21,7 @@ pub use self::resource_builder_set::{
 };
 
 pub mod sound_set;
-pub use self::sound_set::{SoundSetBuilder, SoundSet};
+pub use self::sound_set::{SoundSet, SoundSetBuilder};
 
 mod spritesheet;
 pub use self::spritesheet::Sprite;
@@ -47,10 +47,10 @@ use std::rc::Rc;
 use serde::{de, Deserialize, Deserializer};
 
 use crate::config::Config;
-use crate::io::SoundSource;
 use crate::image::{
     AnimatedImage, ComposedImage, EmptyImage, Image, SimpleImage, TimerImage, WindowImage,
 };
+use crate::io::SoundSource;
 use crate::resource::resource_builder_set::ResourceBuilderSet;
 use crate::ui::{Theme, ThemeSet};
 use crate::util::{self, invalid_data_error};
@@ -102,15 +102,24 @@ impl ResourceSet {
             }
         }
 
-        log::info!("  Loaded YAML in {}s", util::format_elapsed_secs(yaml_start.elapsed()));
+        log::info!(
+            "  Loaded YAML in {}s",
+            util::format_elapsed_secs(yaml_start.elapsed())
+        );
 
         let builder_start = std::time::Instant::now();
         let builder_set = ResourceBuilderSet::from_yaml(&mut yaml)?;
-        log::info!("  Loaded Builders in {}s", util::format_elapsed_secs(builder_start.elapsed()));
+        log::info!(
+            "  Loaded Builders in {}s",
+            util::format_elapsed_secs(builder_start.elapsed())
+        );
 
         let res_start = std::time::Instant::now();
         ResourceSet::load_builders(builder_set)?;
-        log::info!("  Built resources in {}s", util::format_elapsed_secs(res_start.elapsed()));
+        log::info!(
+            "  Built resources in {}s",
+            util::format_elapsed_secs(res_start.elapsed())
+        );
 
         Ok(yaml)
     }
@@ -131,7 +140,10 @@ impl ResourceSet {
             for (id, sounds) in builder_set.sound_set_builders {
                 insert_if_ok_boxed("sound_set", id, SoundSet::new(sounds), &mut set.sound_sets);
             }
-            info!("    Loaded sounds in {}s", util::format_elapsed_secs(sound_start.elapsed()));
+            info!(
+                "    Loaded sounds in {}s",
+                util::format_elapsed_secs(sound_start.elapsed())
+            );
 
             let sprite_start = std::time::Instant::now();
             for (id, sheet) in builder_set.spritesheet_builders {
@@ -142,13 +154,19 @@ impl ResourceSet {
                     &mut set.spritesheets,
                 );
             }
-            info!("    Loaded sprites in {}s", util::format_elapsed_secs(sprite_start.elapsed()));
+            info!(
+                "    Loaded sprites in {}s",
+                util::format_elapsed_secs(sprite_start.elapsed())
+            );
 
             let font_start = std::time::Instant::now();
             for (id, font) in builder_set.font_builders {
                 insert_if_ok_boxed("font", id, Font::new(font), &mut set.fonts);
             }
-            info!("    Loaded fonts in {}s", util::format_elapsed_secs(font_start.elapsed()));
+            info!(
+                "    Loaded fonts in {}s",
+                util::format_elapsed_secs(font_start.elapsed())
+            );
 
             if !set.fonts.contains_key(&Config::default_font()) {
                 return invalid_data_error(&format!(
@@ -207,7 +225,10 @@ impl ResourceSet {
                 );
             }
 
-            info!("    Loaded images in {}s", util::format_elapsed_secs(image_start.elapsed()));
+            info!(
+                "    Loaded images in {}s",
+                util::format_elapsed_secs(image_start.elapsed())
+            );
 
             Ok(())
         })
@@ -296,13 +317,17 @@ impl ResourceSet {
         let set = match self.sound_sets.get(set_id) {
             None => {
                 return invalid_data_error(&format!("Unable to locate sound set '{set_id}'"));
-            }, Some(set) => set,
+            }
+            Some(set) => set,
         };
 
         let sound = match set.get(sound_id) {
             None => {
-                return invalid_data_error(&format!("Unable to locate sound '{sound_id}' in set '{set_id}'"));
-            }, Some(sound) => sound.clone(),
+                return invalid_data_error(&format!(
+                    "Unable to locate sound '{sound_id}' in set '{set_id}'"
+                ));
+            }
+            Some(sound) => sound.clone(),
         };
 
         Ok(sound)
@@ -424,9 +449,7 @@ where
 {
     let id = String::deserialize(deserializer)?;
     match ResourceSet::image(&id) {
-        None => Err(de::Error::custom(format!(
-            "No image with ID '{id}' found"
-        ))),
+        None => Err(de::Error::custom(format!("No image with ID '{id}' found"))),
         Some(image) => Ok(image),
     }
 }

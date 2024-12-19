@@ -74,14 +74,10 @@ impl EdgesList {
         let inner_se =
             EdgesList::get_edge(prefix, id, &rules.inner_edge_postfix, &rules.se_postfix);
 
-        let outer_n =
-            EdgesList::get_edge(prefix, id, &rules.outer_edge_postfix, &rules.n_postfix);
-        let outer_s =
-            EdgesList::get_edge(prefix, id, &rules.outer_edge_postfix, &rules.s_postfix);
-        let outer_e =
-            EdgesList::get_edge(prefix, id, &rules.outer_edge_postfix, &rules.e_postfix);
-        let outer_w =
-            EdgesList::get_edge(prefix, id, &rules.outer_edge_postfix, &rules.w_postfix);
+        let outer_n = EdgesList::get_edge(prefix, id, &rules.outer_edge_postfix, &rules.n_postfix);
+        let outer_s = EdgesList::get_edge(prefix, id, &rules.outer_edge_postfix, &rules.s_postfix);
+        let outer_e = EdgesList::get_edge(prefix, id, &rules.outer_edge_postfix, &rules.e_postfix);
+        let outer_w = EdgesList::get_edge(prefix, id, &rules.outer_edge_postfix, &rules.w_postfix);
         let outer_ne =
             EdgesList::get_edge(prefix, id, &rules.outer_edge_postfix, &rules.ne_postfix);
         let outer_nw =
@@ -93,19 +89,11 @@ impl EdgesList {
         let outer_all =
             EdgesList::get_edge(prefix, id, &rules.outer_edge_postfix, &rules.all_postfix);
 
-        let inner_ne_sw = EdgesList::get_edge(
-            prefix,
-            id,
-            &rules.inner_edge_postfix,
-            &rules.ne_sw_postfix,
-        );
+        let inner_ne_sw =
+            EdgesList::get_edge(prefix, id, &rules.inner_edge_postfix, &rules.ne_sw_postfix);
 
-        let inner_nw_se = EdgesList::get_edge(
-            prefix,
-            id,
-            &rules.inner_edge_postfix,
-            &rules.nw_se_postfix,
-        );
+        let inner_nw_se =
+            EdgesList::get_edge(prefix, id, &rules.inner_edge_postfix, &rules.nw_se_postfix);
 
         Ok(EdgesList {
             inner_nw,
@@ -167,13 +155,7 @@ impl TerrainTiles {
 
         let mut variants = Vec::new();
         for i in kind.variants.iter() {
-            let tile_id = format!(
-                "{}{}{}{}",
-                rules.prefix,
-                kind.id,
-                rules.variant_postfix,
-                i
-            );
+            let tile_id = format!("{}{}{}{}", rules.prefix, kind.id, rules.variant_postfix, i);
             let tile = match Module::tile(&tile_id) {
                 None => {
                     warn!(

@@ -19,7 +19,10 @@ use std::rc::Rc;
 
 use sulis_core::ui::{Callback, Widget};
 use sulis_module::{ItemState, QuickSlot, Slot};
-use sulis_state::{script::{ScriptCallback, ScriptItemKind}, EntityState, GameState, Script};
+use sulis_state::{
+    script::{ScriptCallback, ScriptItemKind},
+    EntityState, GameState, Script,
+};
 
 use crate::{MerchantWindow, PropWindow, RootView};
 
@@ -106,7 +109,7 @@ pub fn equip_item_cb(entity: &Rc<RefCell<EntityState>>, index: usize) -> Callbac
                 let mgr = GameState::turn_manager();
                 let cbs = entity.borrow().callbacks(&mgr.borrow());
                 cbs.iter().for_each(|cb| cb.on_held_changed());
-            },
+            }
             _ => (),
         }
     }))
@@ -236,7 +239,7 @@ pub fn unequip_and_drop_item_cb(entity: &Rc<RefCell<EntityState>>, slot: Slot) -
                 let mgr = GameState::turn_manager();
                 let cbs = entity.borrow().callbacks(&mgr.borrow());
                 cbs.iter().for_each(|cb| cb.on_held_changed());
-            },
+            }
             _ => (),
         }
     }))
@@ -256,7 +259,7 @@ pub fn unequip_item_cb(entity: &Rc<RefCell<EntityState>>, slot: Slot) -> Callbac
                 let mgr = GameState::turn_manager();
                 let cbs = entity.borrow().callbacks(&mgr.borrow());
                 cbs.iter().for_each(|cb| cb.on_held_changed());
-            },
+            }
             _ => (),
         }
     }))

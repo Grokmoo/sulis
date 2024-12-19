@@ -17,7 +17,7 @@
 use std::collections::HashMap;
 use std::rc::Rc;
 
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 use crate::rules::{QuickSlot, Slot};
 use crate::{Item, ItemState, Module, Race};

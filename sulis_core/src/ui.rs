@@ -19,10 +19,16 @@ pub mod macros {
     #[macro_export]
     macro_rules! widget_kind {
         ($name:expr) => {
-            fn as_any(&self) -> &dyn Any { self }
-            fn as_any_mut(&mut self) -> &mut dyn Any { self }
-            fn get_name(&self) -> &str { $name }
-        }
+            fn as_any(&self) -> &dyn Any {
+                self
+            }
+            fn as_any_mut(&mut self) -> &mut dyn Any {
+                self
+            }
+            fn get_name(&self) -> &str {
+                $name
+            }
+        };
     }
 }
 

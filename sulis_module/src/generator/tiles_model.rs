@@ -94,10 +94,7 @@ impl TilesModel {
     }
 
     pub fn all(&self) -> impl Iterator<Item = &(Point, Rc<Tile>)> {
-        self.tiles
-            .iter()
-            .map(|v| &v.1)
-            .flat_map(|t| t.iter())
+        self.tiles.iter().map(|v| &v.1).flat_map(|t| t.iter())
     }
 
     pub fn add_some(&mut self, tile: &Option<Rc<Tile>>, x: i32, y: i32) {

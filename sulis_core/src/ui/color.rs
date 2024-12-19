@@ -17,7 +17,7 @@
 use std::io::{Error, ErrorKind};
 use std::str::FromStr;
 
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Serialize, Debug, Clone, Copy, PartialEq)]
 #[serde(deny_unknown_fields)]

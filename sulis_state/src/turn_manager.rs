@@ -18,12 +18,15 @@ use std::cell::{Cell, RefCell};
 use std::collections::{vec_deque::Iter, HashMap, HashSet, VecDeque};
 use std::rc::Rc;
 
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 use crate::script::{CallbackData, FuncKind, TriggeredCallback};
 use crate::{AreaState, ChangeListener, ChangeListenerList, Effect, EntityState, GameState};
-use sulis_core::{config::Config, util::{gen_rand, Point}};
-use sulis_module::{Faction, Module, Time, ROUND_TIME_MILLIS, OnTrigger};
+use sulis_core::{
+    config::Config,
+    util::{gen_rand, Point},
+};
+use sulis_module::{Faction, Module, OnTrigger, Time, ROUND_TIME_MILLIS};
 
 fn add_campaign_elapsed_callback(cbs: &mut Vec<Rc<CallbackData>>) {
     let script_data = match Module::campaign().on_round_elapsed_script {
@@ -537,7 +540,11 @@ impl TurnManager {
                 continue;
             }
 
-            log::warn!("Found ai activation entity: {} at {:?}", entity.unique_id(), entity.location);
+            log::warn!(
+                "Found ai activation entity: {} at {:?}",
+                entity.unique_id(),
+                entity.location
+            );
             self.activate_entity_ai(&mut entity, &mut groups_to_activate);
             state_changed = true;
         }
@@ -585,10 +592,13 @@ impl TurnManager {
         }
 
         if !self.combat_active {
-            let enc_indices: Vec<usize> = groups_to_activate.iter().map(|i| {
-                let group = &self.ai_groups[i];
-                group.encounter_index
-            }).collect();
+            let enc_indices: Vec<usize> = groups_to_activate
+                .iter()
+                .map(|i| {
+                    let group = &self.ai_groups[i];
+                    group.encounter_index
+                })
+                .collect();
             area_state.update_music(true, Some(&enc_indices));
 
             self.set_combat_active(true);
@@ -948,7 +958,7 @@ impl TurnManager {
                         marked.iter().for_each(|m| m.set(true));
                     }),
                 ));
-            },
+            }
             None | Some(None) => unreachable!(),
         }
     }
@@ -1112,7 +1122,7 @@ pub struct EntityIterator<'a> {
     index: usize,
 }
 
-impl<'a> Iterator for EntityIterator<'a> {
+impl Iterator for EntityIterator<'_> {
     type Item = Rc<RefCell<EntityState>>;
     fn next(&mut self) -> Option<Rc<RefCell<EntityState>>> {
         loop {

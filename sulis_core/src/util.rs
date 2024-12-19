@@ -20,7 +20,7 @@ pub use self::point::{Offset, Point, Rect, Scale};
 pub mod size;
 pub use self::size::Size;
 
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 use std::cmp::Ordering;
 use std::f32;
@@ -32,8 +32,8 @@ use std::panic;
 use std::path::PathBuf;
 use std::time::Duration;
 
+use flexi_logger::{opt_format, Duplicate, FileSpec, LogSpecBuilder, Logger, LoggerHandle};
 use log::LevelFilter;
-use flexi_logger::{opt_format, Duplicate, FileSpec, Logger, LogSpecBuilder, LoggerHandle};
 use rand::{self, distributions::uniform::SampleUniform, seq::SliceRandom, Rng};
 use rand_pcg::Pcg64Mcg;
 
@@ -41,13 +41,17 @@ use crate::config::{self, Config};
 use crate::resource::write_to_file;
 
 const MAX_ULPS: i32 = 100;
-const MAX_DIFF: f32 = 2.0 * std::f32::EPSILON;
+const MAX_DIFF: f32 = 2.0 * f32::EPSILON;
 
 pub fn approx_eq_slice(a: &[f32], b: &[f32]) -> bool {
-    if a.len() != b.len() { return false ; }
+    if a.len() != b.len() {
+        return false;
+    }
 
     for (a, b) in a.iter().zip(b.iter()) {
-        if !approx_eq(*a, *b) { return false; }
+        if !approx_eq(*a, *b) {
+            return false;
+        }
     }
 
     true
@@ -383,8 +387,8 @@ pub fn setup_logger() -> LoggerHandle {
     let logger = Logger::with(log_builder.finalize())
         .log_to_file(
             FileSpec::default()
-            .directory(log_dir)
-            .use_timestamp(log_config.use_timestamps)
+                .directory(log_dir)
+                .use_timestamp(log_config.use_timestamps),
         )
         .print_message()
         .duplicate_to_stderr(dup)

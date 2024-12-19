@@ -73,11 +73,13 @@ impl RangeIndicatorHandler {
     }
 
     pub fn remove_targeter(&mut self) {
-        self.indicators.retain(|ind| !matches!(ind.kind, Kind::Targeter));
+        self.indicators
+            .retain(|ind| !matches!(ind.kind, Kind::Targeter));
     }
 
     pub fn remove_attack(&mut self) {
-        self.indicators.retain(|ind| !matches!(ind.kind, Kind::Attack));
+        self.indicators
+            .retain(|ind| !matches!(ind.kind, Kind::Attack));
     }
 }
 

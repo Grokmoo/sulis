@@ -22,11 +22,11 @@ use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::ui::{animation_state, AnimationState, Color};
 use sulis_core::util::{self, invalid_data_error, Offset, Scale, Size};
 use sulis_module::area::PropData;
-use sulis_module::{prop, ItemState, LootList, Module, ObjectSizeIterator, Prop, OnTrigger};
+use sulis_module::{prop, ItemState, LootList, Module, ObjectSizeIterator, OnTrigger, Prop};
 
 use crate::entity_state::AreaDrawable;
 use crate::save_state::PropInteractiveSaveState;
-use crate::{GameState, ChangeListenerList, EntityTextureCache, ItemList, Location};
+use crate::{ChangeListenerList, EntityTextureCache, GameState, ItemList, Location};
 
 #[derive(Debug)]
 pub enum Interactive {
@@ -106,7 +106,10 @@ impl PropState {
                 temporary,
             },
             prop::Interactive::Door {
-                ref initially_open, ref on_activate, ref fire_more_than_once, ..
+                ref initially_open,
+                ref on_activate,
+                ref fire_more_than_once,
+                ..
             } => {
                 if *initially_open {
                     anim_state.toggle(animation_state::Kind::Active);
@@ -195,10 +198,16 @@ impl PropState {
                     temporary,
                 };
             }
-            PropInteractiveSaveState::Door { open, activate_fired } => {
-                if let prop::Interactive::Door { on_activate, fire_more_than_once, .. } =
-                    &self.prop.interactive {
-
+            PropInteractiveSaveState::Door {
+                open,
+                activate_fired,
+            } => {
+                if let prop::Interactive::Door {
+                    on_activate,
+                    fire_more_than_once,
+                    ..
+                } = &self.prop.interactive
+                {
                     self.interactive = Interactive::Door {
                         open,
                         activate_fired,
@@ -310,7 +319,11 @@ impl PropState {
                 }
             }
             Interactive::Door {
-                ref mut open, ref mut activate_fired, ref on_activate, ref fire_more_than_once, ..
+                ref mut open,
+                ref mut activate_fired,
+                ref on_activate,
+                ref fire_more_than_once,
+                ..
             } => {
                 let cur_open = *open;
                 *open = !cur_open;
@@ -446,7 +459,10 @@ impl AreaDrawable for PropState {
     }
 
     fn size(&self) -> Size {
-        Size { width: self.prop.size.width, height: self.prop.size.height }
+        Size {
+            width: self.prop.size.width,
+            height: self.prop.size.height,
+        }
     }
 
     fn location(&self) -> &Location {

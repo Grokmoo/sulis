@@ -19,7 +19,7 @@ use std::cell::RefCell;
 use std::cmp;
 use std::rc::Rc;
 
-use crate::io::{GraphicsRenderer, InputActionKind, event::ClickKind};
+use crate::io::{event::ClickKind, GraphicsRenderer, InputActionKind};
 use crate::ui::{Callback, Widget, WidgetKind, WidgetState};
 use crate::util::{Point, Size};
 use crate::widget_kind;
@@ -417,13 +417,11 @@ impl WidgetKind for Scrollbar {
     }
 }
 
-struct ScrollThumb {
-
-}
+struct ScrollThumb {}
 
 impl ScrollThumb {
     fn new() -> Rc<RefCell<ScrollThumb>> {
-        Rc::new(RefCell::new(ScrollThumb { }))
+        Rc::new(RefCell::new(ScrollThumb {}))
     }
 }
 
@@ -442,7 +440,9 @@ impl WidgetKind for ScrollThumb {
         let parent_parent = Widget::direct_parent(&parent);
         parent_parent.borrow_mut().invalidate_layout();
 
-        Widget::get_root(&parent_parent).borrow_mut().set_mouse_drag_child(widget);
+        Widget::get_root(&parent_parent)
+            .borrow_mut()
+            .set_mouse_drag_child(widget);
 
         match bar.direction {
             ScrollDirection::Horizontal => {
@@ -453,7 +453,8 @@ impl WidgetKind for ScrollThumb {
                 }
 
                 bar.drag_thumb(scrollable_width, delta_x);
-            }, ScrollDirection::Vertical => {
+            }
+            ScrollDirection::Vertical => {
                 let mut scrollable_height = parent.borrow().state.inner_height();
                 // subtract height of the up/down buttons as well as the thumb
                 for child in parent.borrow().children.iter() {
@@ -470,7 +471,9 @@ impl WidgetKind for ScrollThumb {
     fn on_mouse_release(&mut self, widget: &Rc<RefCell<Widget>>, kind: ClickKind) -> bool {
         self.super_on_mouse_release(widget, kind);
 
-        Widget::get_root(widget).borrow_mut().clear_mouse_drag_child(widget);
+        Widget::get_root(widget)
+            .borrow_mut()
+            .clear_mouse_drag_child(widget);
 
         true
     }

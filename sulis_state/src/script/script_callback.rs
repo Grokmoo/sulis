@@ -20,8 +20,8 @@ use std::io::Error;
 use std::rc::Rc;
 use std::result;
 
-use serde::{Serialize, Deserialize};
 use rlua::{UserData, UserDataMethods};
+use serde::{Deserialize, Serialize};
 
 use crate::script::{
     script_entity, ScriptActiveSurface, ScriptAppliedEffect, ScriptEntity, ScriptEntitySet,

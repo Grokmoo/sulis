@@ -18,7 +18,7 @@ use std::collections::HashMap;
 use std::io::Error;
 use std::rc::Rc;
 
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 use crate::generator::{
     maze::Room, overlaps_any, GenModel, Maze, Rect, RegionKind, RegionKinds, WeightedEntry,
@@ -50,10 +50,7 @@ impl<'a, 'b> EncounterGen<'a, 'b> {
         }
     }
 
-    pub(crate) fn generate(
-        &mut self,
-        addn_passes: &[EncounterPass],
-    ) -> Vec<EncounterDataBuilder> {
+    pub(crate) fn generate(&mut self, addn_passes: &[EncounterPass]) -> Vec<EncounterDataBuilder> {
         let mut encounters = Vec::new();
 
         for pass in self.params.passes.iter().chain(addn_passes) {
@@ -153,9 +150,7 @@ impl EncounterParams {
         builder: EncounterParamsBuilder,
         module: &Module,
     ) -> Result<EncounterParams, Error> {
-        EncounterParams::build(builder, |id| {
-            module.encounters.get(id).map(Rc::clone)
-        })
+        EncounterParams::build(builder, |id| module.encounters.get(id).map(Rc::clone))
     }
 
     pub(crate) fn new(builder: EncounterParamsBuilder) -> Result<EncounterParams, Error> {

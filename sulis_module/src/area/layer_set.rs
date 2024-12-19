@@ -196,9 +196,7 @@ impl LayerSet {
                     continue;
                 }
 
-                return invalid_data_error(&format!(
-                    "Point array length is not 2 in '{tile_id}'"
-                ));
+                return invalid_data_error(&format!("Point array length is not 2 in '{tile_id}'"));
             }
         }
 

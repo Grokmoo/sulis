@@ -14,11 +14,11 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::io::{Error, ErrorKind};
-use std::fs::File;
-use std::rc::Rc;
 use std::collections::HashMap;
+use std::fs::File;
+use std::io::{Error, ErrorKind};
 use std::path::PathBuf;
+use std::rc::Rc;
 
 use serde::Deserialize;
 
@@ -52,10 +52,15 @@ impl SoundSet {
             }
         }
 
-        Ok(Rc::new(SoundSet { sounds, id: builder.id }))
+        Ok(Rc::new(SoundSet {
+            sounds,
+            id: builder.id,
+        }))
     }
 
-    pub fn id(&self) -> &str { &self.id }
+    pub fn id(&self) -> &str {
+        &self.id
+    }
 
     pub fn get(&self, id: &str) -> Option<&SoundSource> {
         self.sounds.get(id)
@@ -66,7 +71,7 @@ fn build_source(
     source_dirs: &[String],
     builder_id: &str,
     entry_id: &str,
-    entry_builder: &EntryBuilder
+    entry_builder: &EntryBuilder,
 ) -> Result<SoundSource, Error> {
     let mut source = None;
     for dir in source_dirs.iter().rev() {
@@ -86,10 +91,14 @@ fn build_source(
     }
 
     source.ok_or_else(|| {
-        warn!("Unable to read sound '{}' from any of '{:?}'",
-            entry_id, source_dirs);
-        Error::new(ErrorKind::InvalidData,
-            format!("Unable to create sound_set '{builder_id}'"))
+        warn!(
+            "Unable to read sound '{}' from any of '{:?}'",
+            entry_id, source_dirs
+        );
+        Error::new(
+            ErrorKind::InvalidData,
+            format!("Unable to create sound_set '{builder_id}'"),
+        )
     })
 }
 
@@ -105,7 +114,6 @@ pub struct SoundSetBuilder {
     #[serde(default)]
     groups: HashMap<String, Group>,
 }
-
 
 #[derive(Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
@@ -140,4 +148,6 @@ pub struct EntryBuilder {
     pub delay: f32,
 }
 
-fn float_1() -> f32 { 1.0 }
+fn float_1() -> f32 {
+    1.0
+}

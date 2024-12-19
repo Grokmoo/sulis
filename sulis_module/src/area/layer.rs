@@ -29,7 +29,7 @@ pub struct Layer {
     passable: Vec<bool>,
     visible: Vec<bool>,
     spritesheet_id: Option<String>,
-    pub(in crate) impass_override_tiles: Vec<(Point, Rc<Tile>)>,
+    pub(crate) impass_override_tiles: Vec<(Point, Rc<Tile>)>,
 }
 
 impl Layer {

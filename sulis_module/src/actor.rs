@@ -19,7 +19,7 @@ use std::fmt;
 use std::io::Error;
 use std::rc::Rc;
 
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 use crate::rules::AttributeList;
 use sulis_core::image::{Image, LayeredImage};

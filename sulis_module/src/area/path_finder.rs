@@ -84,8 +84,12 @@ impl PartialEq for OpenEntry {
 
 pub trait LocationChecker {
     fn passable(&self, x: i32, y: i32) -> bool;
-    fn in_friend_space(&self, _current: i32) -> bool { false }
-    fn get_cost(&self, _from: i32, _to: i32) -> i32 { 1 }
+    fn in_friend_space(&self, _current: i32) -> bool {
+        false
+    }
+    fn get_cost(&self, _from: i32, _to: i32) -> i32 {
+        1
+    }
 }
 
 pub struct PathFinder {
@@ -231,8 +235,11 @@ impl PathFinder {
                 }
 
                 let final_dist_squared = self.dist_squared(path[0].x + path[0].y * self.width);
-                trace!("Initial dist vs final dist: {} vs {}",
-                    initial_dist_squared, final_dist_squared);
+                trace!(
+                    "Initial dist vs final dist: {} vs {}",
+                    initial_dist_squared,
+                    final_dist_squared
+                );
 
                 if let Some(max_path_len) = dest.max_path_len {
                     if path.len() > max_path_len as usize {
@@ -298,7 +305,12 @@ impl PathFinder {
     }
 
     #[inline]
-    fn is_goal<T: LocationChecker>(&self, checker: &T, current: i32, dest_dist_squared: i32) -> bool {
+    fn is_goal<T: LocationChecker>(
+        &self,
+        checker: &T,
+        current: i32,
+        dest_dist_squared: i32,
+    ) -> bool {
         self.dist_squared(current) <= dest_dist_squared && !checker.in_friend_space(current)
     }
 

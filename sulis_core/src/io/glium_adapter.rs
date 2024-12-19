@@ -14,25 +14,28 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::time;
 use std::collections::HashMap;
 use std::io::{Error, ErrorKind};
+use std::time;
 
 use crate::config::{Config, DisplayMode};
 use crate::io::keyboard_event::Key;
 use crate::io::*;
 use crate::resource::ResourceSet;
 use crate::ui::{Cursor, Widget};
-use crate::util::{Point, get_elapsed_millis};
+use crate::util::{get_elapsed_millis, Point};
 
 use glium::backend::Facade;
 use glium::glutin::{
-    dpi::{LogicalSize, LogicalPosition},
-    ContextBuilder,
-    event::{Event, KeyboardInput, MouseButton, WindowEvent, VirtualKeyCode, ElementState, MouseScrollDelta},
+    dpi::{LogicalPosition, LogicalSize},
+    event::{
+        ElementState, Event, KeyboardInput, MouseButton, MouseScrollDelta, VirtualKeyCode,
+        WindowEvent,
+    },
     event_loop::{ControlFlow, EventLoop, EventLoopWindowTarget},
     monitor::MonitorHandle,
     window::{Fullscreen, WindowBuilder},
+    ContextBuilder,
 };
 use glium::texture::{RawImage2d, SrgbTexture2d};
 use glium::uniforms::{MagnifySamplerFilter, MinifySamplerFilter, Sampler};
@@ -164,7 +167,7 @@ impl<'a> GliumRenderer<'a> {
     }
 }
 
-fn draw_to_surface<T: glium::Surface>(
+fn draw_to_surface<T: Surface>(
     surface: &mut T,
     draw_list: DrawList,
     display: &GliumDisplay,
@@ -204,7 +207,7 @@ fn draw_to_surface<T: glium::Surface>(
     }
 }
 
-impl<'a> GraphicsRenderer for GliumRenderer<'a> {
+impl GraphicsRenderer for GliumRenderer<'_> {
     fn set_scissor(&mut self, pos: Point, size: Size) {
         let window_size = self.display.display.gl_window().window().inner_size();
         let (res_x, res_y) = Config::ui_size();
@@ -306,10 +309,16 @@ fn glium_error<T, E: ::std::fmt::Display>(e: E) -> Result<T, Error> {
     Err(Error::new(ErrorKind::Other, format!("{e}")))
 }
 
-fn configured_fullscreen(res_x: u32, res_y: u32, monitor: &MonitorHandle) -> (Option<Fullscreen>, bool) {
+fn configured_fullscreen(
+    res_x: u32,
+    res_y: u32,
+    monitor: &MonitorHandle,
+) -> (Option<Fullscreen>, bool) {
     match Config::display_mode() {
         DisplayMode::Window => (None, true),
-        DisplayMode::BorderlessWindow => (Some(Fullscreen::Borderless(Some(monitor.clone()))), false),
+        DisplayMode::BorderlessWindow => {
+            (Some(Fullscreen::Borderless(Some(monitor.clone()))), false)
+        }
         DisplayMode::Fullscreen => {
             let mut selected_mode = None;
             for mode in monitor.video_modes() {
@@ -322,10 +331,13 @@ fn configured_fullscreen(res_x: u32, res_y: u32, monitor: &MonitorHandle) -> (Op
             }
             match selected_mode {
                 None => {
-                    warn!("Unable to find a fullscreen video mode matching {} by {}", res_x, res_y);
+                    warn!(
+                        "Unable to find a fullscreen video mode matching {} by {}",
+                        res_x, res_y
+                    );
                     warn!("Falling back to windowed mode.");
                     (None, false)
-                },
+                }
                 Some(mode) => (Some(Fullscreen::Exclusive(mode)), false),
             }
         }
@@ -361,13 +373,11 @@ fn try_get_display(
         .with_vsync(vsync);
 
     match context.build_windowed(window, event_loop) {
-        Ok(windowed_context) => {
-            match glium::Display::from_gl_window(windowed_context) {
-                Ok(display) => return Ok((display, monitor)),
-                Err(e) => {
-                    warn!("Unable to create hardware accelerated OpenGL display.  Falling back...");
-                    warn!("{}", e);
-                }
+        Ok(windowed_context) => match glium::Display::from_gl_window(windowed_context) {
+            Ok(display) => return Ok((display, monitor)),
+            Err(e) => {
+                warn!("Unable to create hardware accelerated OpenGL display.  Falling back...");
+                warn!("{}", e);
             }
         },
         Err(e) => {
@@ -402,7 +412,11 @@ pub fn create_system() -> Result<GliumSystem, Error> {
     let (io, event_loop) = glium_adapter::GliumDisplay::new()?;
     let audio = create_audio_device();
 
-    Ok(GliumSystem { io, event_loop, audio })
+    Ok(GliumSystem {
+        io,
+        event_loop,
+        audio,
+    })
 }
 
 impl GliumDisplay {
@@ -412,8 +426,9 @@ impl GliumDisplay {
 
         let monitors: Vec<MonitorHandle> = event_loop.available_monitors().collect();
         if monitors.is_empty() {
-            return Err(Error::new(ErrorKind::Other, 
-                "Unable to detect any available monitors."
+            return Err(Error::new(
+                ErrorKind::Other,
+                "Unable to detect any available monitors.",
             ));
         }
 
@@ -428,7 +443,10 @@ impl GliumDisplay {
         // would be very hard to solve in the general case, maybe just allow a configured
         // logical position
         let logical_position: LogicalPosition<f64> = physical_position.to_logical(scale_factor);
-        display.gl_window().window().set_outer_position(logical_position);
+        display
+            .gl_window()
+            .window()
+            .set_outer_position(logical_position);
 
         info!("Initialized glium adapter:");
         info!("Version: {}", display.get_opengl_version_string());
@@ -471,23 +489,29 @@ impl GliumDisplay {
 
         let (ui_x, ui_y) = Config::ui_size();
 
-        Ok((GliumDisplay {
-            display,
-            monitor,
-            base_program,
-            swap_program,
-            matrix: [
-                [2.0 / ui_x as f32, 0.0, 0.0, 0.0],
-                [0.0, 2.0 / ui_y as f32, 0.0, 0.0],
-                [0.0, 0.0, 1.0, 0.0],
-                [-1.0, -1.0, 0.0, 1.0f32],
-            ],
-            textures: HashMap::new(),
-            scale_factor,
-        }, event_loop))
+        Ok((
+            GliumDisplay {
+                display,
+                monitor,
+                base_program,
+                swap_program,
+                matrix: [
+                    [2.0 / ui_x as f32, 0.0, 0.0, 0.0],
+                    [0.0, 2.0 / ui_y as f32, 0.0, 0.0],
+                    [0.0, 0.0, 1.0, 0.0],
+                    [-1.0, -1.0, 0.0, 1.0f32],
+                ],
+                textures: HashMap::new(),
+                scale_factor,
+            },
+            event_loop,
+        ))
     }
 
-    pub(crate) fn get_display_configurations(&self, event_loop: &EventLoop<()>) -> Vec<DisplayConfiguration> {
+    pub(crate) fn get_display_configurations(
+        &self,
+        event_loop: &EventLoop<()>,
+    ) -> Vec<DisplayConfiguration> {
         let mut configs = Vec::new();
 
         for (index, monitor_id) in event_loop.available_monitors().enumerate() {
@@ -500,12 +524,21 @@ impl GliumDisplay {
             for (w, h) in RESOLUTIONS.iter() {
                 let (w, h) = (*w, *h);
 
-                if w > dims.0 || h > dims.1 { continue; }
+                if w > dims.0 || h > dims.1 {
+                    continue;
+                }
 
-                let fullscreen = monitor_id.video_modes().any(|mode| mode.size().width == w && mode.size().height == h);
+                let fullscreen = monitor_id
+                    .video_modes()
+                    .any(|mode| mode.size().width == w && mode.size().height == h);
                 let monitor_size = w == dims.0 && h == dims.1;
 
-                resolutions.push(Resolution { width: w, height: h, fullscreen, monitor_size });
+                resolutions.push(Resolution {
+                    width: w,
+                    height: h,
+                    fullscreen,
+                    monitor_size,
+                });
             }
 
             configs.push(DisplayConfiguration {
@@ -536,10 +569,7 @@ impl GliumDisplay {
     }
 }
 
-pub(crate) fn main_loop(
-    system: GliumSystem,
-    mut updater: Box<dyn ControlFlowUpdater>,
-) {
+pub(crate) fn main_loop(system: GliumSystem, mut updater: Box<dyn ControlFlowUpdater>) {
     let mut io = system.io;
     let event_loop = system.event_loop;
     let mut audio = system.audio;
@@ -548,7 +578,12 @@ pub(crate) fn main_loop(
     let mut scale = io.scale_factor;
     let (ui_x, ui_y) = Config::ui_size();
     let mut mouse_move: Option<(f32, f32)> = None;
-    let mut display_size: LogicalSize<f64> = io.display.gl_window().window().inner_size().to_logical(scale);
+    let mut display_size: LogicalSize<f64> = io
+        .display
+        .gl_window()
+        .window()
+        .inner_size()
+        .to_logical(scale);
 
     let frame_time = time::Duration::from_secs_f32(1.0 / Config::frame_rate() as f32);
 
@@ -566,10 +601,21 @@ pub(crate) fn main_loop(
         *control_flow = ControlFlow::WaitUntil(time::Instant::now() + frame_time);
 
         match event {
-            Event::WindowEvent { event: WindowEvent::Resized(size), .. } => {
+            Event::WindowEvent {
+                event: WindowEvent::Resized(size),
+                ..
+            } => {
                 display_size = size.to_logical(scale);
-            },
-            Event::WindowEvent { event: WindowEvent::ScaleFactorChanged { scale_factor, new_inner_size, ..}, .. } => {
+            }
+            Event::WindowEvent {
+                event:
+                    WindowEvent::ScaleFactorChanged {
+                        scale_factor,
+                        new_inner_size,
+                        ..
+                    },
+                ..
+            } => {
                 scale = scale_factor;
                 display_size = new_inner_size.to_logical(scale);
             }
@@ -577,7 +623,7 @@ pub(crate) fn main_loop(
                 last_elapsed = get_elapsed_millis(last_start_time.elapsed());
                 last_start_time = time::Instant::now();
                 total_elapsed = get_elapsed_millis(main_loop_start_time.elapsed());
-            },
+            }
             Event::MainEventsCleared => {
                 // merge all mouse move events into at most one per frame
                 if let Some((mouse_x, mouse_y)) = mouse_move {
@@ -592,7 +638,8 @@ pub(crate) fn main_loop(
                     let gl_window = io.display.gl_window();
                     let window = gl_window.window();
                     let (res_x, res_y) = Config::display_resolution();
-                    let (fullscreen, decorations) = configured_fullscreen(res_x, res_y, &io.monitor);
+                    let (fullscreen, decorations) =
+                        configured_fullscreen(res_x, res_y, &io.monitor);
                     let set_res = fullscreen.is_none();
 
                     window.set_fullscreen(fullscreen);
@@ -612,7 +659,7 @@ pub(crate) fn main_loop(
 
                 render_time += last_start_time.elapsed();
                 frames += 1;
-            },
+            }
             Event::LoopDestroyed => {
                 let secs = render_time.as_secs() as f64 + render_time.subsec_nanos() as f64 * 1e-9;
                 info!(
@@ -623,13 +670,15 @@ pub(crate) fn main_loop(
                     "Average frame render time: {:.2} milliseconds",
                     1000.0 * secs / frames as f64
                 );
-            },
+            }
             event => {
                 if let Event::WindowEvent { event, .. } = event {
                     match event {
                         WindowEvent::CursorMoved { position, .. } => {
-                            let mouse_x = (ui_x as f64 * position.x / display_size.width) as f32 / scale as f32;
-                            let mouse_y = (ui_y as f64 * position.y / display_size.height) as f32 / scale as f32;
+                            let mouse_x = (ui_x as f64 * position.x / display_size.width) as f32
+                                / scale as f32;
+                            let mouse_y = (ui_y as f64 * position.y / display_size.height) as f32
+                                / scale as f32;
                             mouse_move = Some((mouse_x, mouse_y));
                         }
                         _ => {
@@ -676,7 +725,7 @@ fn process_window_event(event: WindowEvent) -> Vec<InputAction> {
             if matches!(kb_event.state, InputActionState::Started) {
                 result.push(InputAction::raw_key(kb_event.key));
             }
-            
+
             if let Some(action) = Config::get_input_action(kb_event) {
                 result.push(action);
             }
@@ -703,9 +752,9 @@ fn process_window_event(event: WindowEvent) -> Vec<InputAction> {
             };
 
             // scrolling the mouse wheeel seems to be buggy at the moment, only take some events
-            let amount = if (amount - 1.0).abs() < std::f32::EPSILON {
+            let amount = if (amount - 1.0).abs() < f32::EPSILON {
                 1
-            } else if (amount + 1.0).abs() < std::f32::EPSILON {
+            } else if (amount + 1.0).abs() < f32::EPSILON {
                 -1
             } else {
                 return Vec::new();

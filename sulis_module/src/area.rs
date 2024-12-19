@@ -34,15 +34,15 @@ use std::collections::{HashMap, HashSet};
 use std::io::{Error, ErrorKind};
 use std::rc::Rc;
 
-use serde::ser::{SerializeMap, SerializeStruct};
-use serde::{Serialize, Deserialize, Deserializer, Serializer};
 use base64::engine::general_purpose::STANDARD as base64;
 use base64::Engine;
+use serde::ser::{SerializeMap, SerializeStruct};
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
 use sulis_core::image::Image;
+use sulis_core::io::SoundSource;
 use sulis_core::resource::{ResourceSet, Sprite};
 use sulis_core::util::{unable_to_create_error, Point, Size};
-use sulis_core::io::SoundSource;
 
 use crate::generator::{EncounterParams, EncounterParamsBuilder, PropParams, PropParamsBuilder};
 use crate::{Encounter, ItemListEntrySaveState, Module, ObjectSize, OnTrigger, Prop};
@@ -142,9 +142,9 @@ impl Area {
         }
 
         let transitions = Area::read_transitions(
-            &builder.transitions, 
+            &builder.transitions,
             builder.width as i32,
-            builder.height as i32
+            builder.height as i32,
         );
 
         let (triggers, encounters) = Area::read_triggers_and_encounters(&builder)?;
@@ -200,7 +200,7 @@ impl Area {
     }
 
     fn read_triggers_and_encounters(
-        builder: &AreaBuilder
+        builder: &AreaBuilder,
     ) -> Result<(Vec<Trigger>, Vec<EncounterData>), Error> {
         let mut triggers: Vec<Trigger> = Vec::new();
         for tbuilder in &builder.triggers {
@@ -263,11 +263,7 @@ impl Area {
         Ok((triggers, encounters))
     }
 
-    fn read_transitions(
-        input: &[TransitionBuilder],
-        width: i32,
-        height: i32,
-    ) -> Vec<Transition> {
+    fn read_transitions(input: &[TransitionBuilder], width: i32, height: i32) -> Vec<Transition> {
         let mut transitions: Vec<Transition> = Vec::new();
         for (index, t_builder) in input.iter().enumerate() {
             let image = match ResourceSet::image(&t_builder.image_display) {
@@ -471,7 +467,9 @@ where
 {
     let input = U8WithKinds::deserialize(deserializer)?;
     use sulis_core::serde::de::Error;
-    let vec_u8 = base64.decode(&input.entries).map_err(|err| Error::custom(err.to_string()))?;
+    let vec_u8 = base64
+        .decode(&input.entries)
+        .map_err(|err| Error::custom(err.to_string()))?;
 
     let mut out = Vec::new();
     for entry in vec_u8 {
@@ -513,7 +511,9 @@ where
 {
     let input = U8WithKinds::deserialize(deserializer)?;
     use sulis_core::serde::de::Error;
-    let vec_u8 = base64.decode(&input.entries).map_err(|err| Error::custom(err.to_string()))?;
+    let vec_u8 = base64
+        .decode(&input.entries)
+        .map_err(|err| Error::custom(err.to_string()))?;
 
     let mut out = Vec::new();
     if vec_u8.is_empty() {
@@ -597,7 +597,9 @@ where
     let mut result: HashMap<String, Vec<Vec<u16>>> = HashMap::new();
     for (key, encoded) in input {
         use sulis_core::serde::de::Error;
-        let vec_u8 = base64.decode(&encoded).map_err(|err| Error::custom(err.to_string()))?;
+        let vec_u8 = base64
+            .decode(&encoded)
+            .map_err(|err| Error::custom(err.to_string()))?;
 
         let mut result_vec: Vec<Vec<u16>> = Vec::new();
         let mut i = 0;
@@ -630,7 +632,9 @@ where
 {
     use sulis_core::serde::de::Error;
     let s = String::deserialize(deserializer)?;
-    base64.decode(s).map_err(|err| Error::custom(err.to_string()))
+    base64
+        .decode(s)
+        .map_err(|err| Error::custom(err.to_string()))
 }
 
 fn as_base64<S>(input: &[u8], serializer: S) -> Result<S::Ok, S::Error>

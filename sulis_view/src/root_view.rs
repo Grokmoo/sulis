@@ -769,5 +769,5 @@ fn create_button(
 fn is_defeated(party: &[Rc<RefCell<EntityState>>]) -> bool {
     //if any party member is not dead then the party is not defeated
     party.is_empty() ||
-        party.iter().any(|member| !member.borrow().actor.is_dead() && !member.is_disabled())
+        party.iter().any(|member| !member.borrow().actor.is_dead())
 }

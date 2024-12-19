@@ -120,14 +120,8 @@ impl Scrollable {
         scale_x: f32,
         scale_y: f32,
     ) {
-        self.max_x = area_width as f32 - widget.state.inner_width() as f32 / scale_x;
-        self.max_y = area_height as f32 - widget.state.inner_height() as f32 / scale_y;
-        if self.max_x < 0.0 {
-            self.max_x = 0.0;
-        }
-        if self.max_y < 0.0 {
-            self.max_y = 0.0;
-        }
+        self.max_x = (area_width as f32 - widget.state.inner_width() as f32 / scale_x).max(0.0);
+        self.max_y = (area_height as f32 - widget.state.inner_height() as f32 / scale_y).max(0.0);
     }
 
     pub fn change(&mut self, delta_x: f32, delta_y: f32) {
@@ -143,20 +137,8 @@ impl Scrollable {
         self.y = y;
     }
 
-    pub fn bound(&self, mut x: f32, mut y: f32) -> (f32, f32) {
-        if x < 0.0 {
-            x = 0.0;
-        } else if x > self.max_x {
-            x = self.max_x;
-        }
-
-        if y < 0.0 {
-            y = 0.0;
-        } else if y > self.max_y {
-            y = self.max_y;
-        }
-
-        (x, y)
+    pub fn bound(&self, x: f32, y: f32) -> (f32, f32) {
+        (x.clamp(0.0, self.max_x), y.clamp(0.0, self.max_y))
     }
 
     pub fn x(&self) -> f32 {

@@ -395,14 +395,8 @@ impl PathFinder {
         // closest distance from s_x, s_y to axis aligned dest
         // rect
 
-        let mut dx = (s_x - self.dest_x).abs() - self.dest_w_over2;
-        let mut dy = (s_y - self.dest_y).abs() - self.dest_h_over2;
-        if dx < 0.0 {
-            dx = 0.0;
-        }
-        if dy < 0.0 {
-            dy = 0.0;
-        }
+        let dx = ((s_x - self.dest_x).abs() - self.dest_w_over2).max(0.0);
+        let dy = ((s_y - self.dest_y).abs() - self.dest_h_over2).max(0.0);
 
         (dx * dx + dy * dy) as i32
     }

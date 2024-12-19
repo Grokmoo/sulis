@@ -357,10 +357,7 @@ fn merge_map(
     for (key, value) in append {
         if let Some(ref mut base) = map.get_mut(&key) {
             match base {
-                Value::Null
-                | Value::Bool(_)
-                | Value::Number(_)
-                | Value::String(_) => (),
+                Value::Null | Value::Bool(_) | Value::Number(_) | Value::String(_) => (),
                 Value::Sequence(ref mut seq) => {
                     match value {
                         Value::Sequence(append) => merge_sequence(dir, name, seq, append),

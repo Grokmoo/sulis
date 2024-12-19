@@ -767,22 +767,7 @@ fn create_button(
 }
 
 fn is_defeated(party: &[Rc<RefCell<EntityState>>]) -> bool {
-    if party.is_empty() {
-        return true;
-    }
-
-    {
-        let player = &party[0].borrow().actor;
-        if player.is_dead() && !player.is_disabled() {
-            return true;
-        }
-    }
-
-    for member in party.iter() {
-        if !member.borrow().actor.is_dead() {
-            return false;
-        }
-    }
-
-    true
+    //if any party member is not dead then the party is not defeated
+    party.is_empty() ||
+        party.iter().any(|member| !member.borrow().actor.is_dead() && !member.is_disabled())
 }

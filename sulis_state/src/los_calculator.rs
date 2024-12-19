@@ -14,7 +14,6 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::cmp;
 use std::collections::HashSet;
 
 use crate::{EntityState, GeneratedArea};
@@ -35,22 +34,13 @@ pub fn calculate_los(
 
     let los = entity.pc_vis_mut();
 
-    let min_x = cmp::max(
-        0,
-        entity_x - max_dist + if delta_x < 0 { delta_x } else { 0 },
-    );
-    let max_x = cmp::min(
-        area.width,
-        entity_x + max_dist + if delta_x > 0 { delta_x } else { 0 },
-    );
-    let min_y = cmp::max(
-        0,
-        entity_y - max_dist + if delta_y < 0 { delta_y } else { 0 },
-    );
-    let max_y = cmp::min(
-        area.height,
-        entity_y + max_dist + if delta_y > 0 { delta_y } else { 0 },
-    );
+    let min_x = 0.max(entity_x - max_dist + delta_x.min(0));
+
+    let max_x = area.width.min(entity_x + max_dist + delta_x.max(0));
+
+    let min_y = 0.max(entity_y - max_dist + delta_y.min(0));
+
+    let max_y = area.height.min(entity_y + max_dist + delta_y.max(0));
 
     let src_elev = area.layer_set.elevation(entity_x, entity_y);
 
@@ -162,28 +152,26 @@ fn cast_ray(
                 src_elev,
             )
         }
+    } else if start_y > end_y {
+        cast_high(
+            area,
+            prop_vis_grid,
+            end_x,
+            end_y,
+            start_x,
+            start_y,
+            src_elev,
+        )
     } else {
-        if start_y > end_y {
-            cast_high(
-                area,
-                prop_vis_grid,
-                end_x,
-                end_y,
-                start_x,
-                start_y,
-                src_elev,
-            )
-        } else {
-            cast_high(
-                area,
-                prop_vis_grid,
-                start_x,
-                start_y,
-                end_x,
-                end_y,
-                src_elev,
-            )
-        }
+        cast_high(
+            area,
+            prop_vis_grid,
+            start_x,
+            start_y,
+            end_x,
+            end_y,
+            src_elev,
+        )
     }
 }
 

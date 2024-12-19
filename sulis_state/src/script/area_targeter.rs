@@ -454,16 +454,14 @@ impl Shape {
                 let concated = self.concat_from_start(area_state, &size, &mut p, los_params);
                 (p, concated)
             }
+        } else if start.y > end.y {
+            let mut p = cast_high(end, start);
+            let concated = self.concat_from_end(area_state, &size, &mut p, los_params);
+            (p, concated)
         } else {
-            if start.y > end.y {
-                let mut p = cast_high(end, start);
-                let concated = self.concat_from_end(area_state, &size, &mut p, los_params);
-                (p, concated)
-            } else {
-                let mut p = cast_high(start, end);
-                let concated = self.concat_from_start(area_state, &size, &mut p, los_params);
-                (p, concated)
-            }
+            let mut p = cast_high(start, end);
+            let concated = self.concat_from_start(area_state, &size, &mut p, los_params);
+            (p, concated)
         };
 
         let mut result = Vec::new();

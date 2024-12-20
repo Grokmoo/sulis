@@ -983,7 +983,7 @@ impl WidgetKind for AreaView {
         );
 
         match kind {
-            ClickKind::Tertiary => {
+            ClickKind::Tertiary | ClickKind::Secondary => {
                 self.scroll(delta_x, delta_y, 33);
             }
             ClickKind::Primary => {
@@ -993,7 +993,6 @@ impl WidgetKind for AreaView {
 
                 self.overlay_handler.handle_left_drag();
             }
-            _ => (),
         }
 
         true

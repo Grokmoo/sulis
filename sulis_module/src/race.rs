@@ -221,7 +221,9 @@ impl Race {
     }
 }
 
-fn float_1() -> f32 { 1.0 }
+fn float_1() -> f32 {
+    1.0
+}
 
 #[derive(Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
@@ -240,7 +242,7 @@ pub struct RaceBuilder {
     pub beard_selections: Option<Vec<String>>,
     pub portrait_selections: Option<Vec<String>>,
 
-    #[serde(default="float_1")]
+    #[serde(default = "float_1")]
     pub move_anim_rate: f32,
 
     #[serde(default)]

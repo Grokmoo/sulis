@@ -454,16 +454,14 @@ impl Shape {
                 let concated = self.concat_from_start(area_state, &size, &mut p, los_params);
                 (p, concated)
             }
+        } else if start.y > end.y {
+            let mut p = cast_high(end, start);
+            let concated = self.concat_from_end(area_state, &size, &mut p, los_params);
+            (p, concated)
         } else {
-            if start.y > end.y {
-                let mut p = cast_high(end, start);
-                let concated = self.concat_from_end(area_state, &size, &mut p, los_params);
-                (p, concated)
-            } else {
-                let mut p = cast_high(start, end);
-                let concated = self.concat_from_start(area_state, &size, &mut p, los_params);
-                (p, concated)
-            }
+            let mut p = cast_high(start, end);
+            let concated = self.concat_from_start(area_state, &size, &mut p, los_params);
+            (p, concated)
         };
 
         let mut result = Vec::new();
@@ -669,7 +667,6 @@ enum ScriptSource {
 }
 
 /// A created AreaTargeter, built from a `Targeter`
-
 pub struct AreaTargeter {
     on_target_select_func: String,
     on_target_select_custom_target: Option<Rc<RefCell<EntityState>>>,

@@ -16,10 +16,10 @@
 
 use std::mem;
 
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 use crate::rules::{
-    ArmorKind, Attribute, Damage, DamageKind, HitKind, Slot, WeaponKind, WeaponStyle
+    ArmorKind, Attribute, Damage, DamageKind, HitKind, Slot, WeaponKind, WeaponStyle,
 };
 use sulis_core::util::ExtInt;
 
@@ -95,7 +95,6 @@ pub enum Contingent {
     /// For bonuses applied to attacks, only Damage, MeleeAccuracy, RangedAccuracy,
     /// SpellAccuracy, CritChance, HitThreshold,
     /// GrazeThreshold, CritMultiplier, HitMultiplier, and GrazeMultiplier are valid
-
     /// Bonuses that should only be applied to an attack using the given WeaponKind
     AttackWithWeapon(WeaponKind),
 

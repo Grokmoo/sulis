@@ -183,12 +183,9 @@ impl Item {
         let usable = match builder.usable {
             None => None,
             Some(usable) => {
-                match module.scripts.get(&usable.script) {
-                    None => {
-                        warn!("No script found with id '{}'", usable.script);
-                        return unable_to_create_error("item", &builder.id);
-                    }
-                    Some(_) => (),
+                if !module.scripts.contains_key(&usable.script) {
+                    warn!("No script found with id '{}'", usable.script);
+                    return unable_to_create_error("item", &builder.id);
                 };
 
                 Some(Usable {
@@ -358,15 +355,15 @@ fn apply_adjectives(
         equippable.bonuses.merge_duplicates();
 
         if let Some(ref mut attack) = equippable.attack {
-            if (attack_bonus_mod - 1.0).abs() > std::f32::EPSILON
-                || (attack_penalty_mod - 1.0).abs() > std::f32::EPSILON
+            if (attack_bonus_mod - 1.0).abs() > f32::EPSILON
+                || (attack_penalty_mod - 1.0).abs() > f32::EPSILON
             {
                 attack
                     .bonuses
                     .apply_modifier(attack_penalty_mod, attack_bonus_mod);
             }
 
-            if (attack_damage_mod - 1.0).abs() > std::f32::EPSILON {
+            if (attack_damage_mod - 1.0).abs() > f32::EPSILON {
                 let damage = attack.damage.mult_f32(attack_damage_mod);
                 attack.damage = damage;
             }

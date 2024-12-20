@@ -22,7 +22,7 @@ use std::{
     str::FromStr,
 };
 
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 pub mod armor;
 pub use self::armor::Armor;
@@ -428,18 +428,18 @@ impl FromStr for Slot {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let val = match s {
-            "cloak" => Slot::Cloak,
-            "head" => Slot::Head,
-            "torso" => Slot::Torso,
-            "hands" => Slot::Hands,
-            "held_main" => Slot::HeldMain,
-            "held_off" => Slot::HeldOff,
-            "legs" => Slot::Legs,
-            "feet" => Slot::Feet,
-            "waist" => Slot::Waist,
-            "neck" => Slot::Neck,
-            "finger_main" => Slot::FingerMain,
-            "finger_off" => Slot::FingerOff,
+            "cloak" => Cloak,
+            "head" => Head,
+            "torso" => Torso,
+            "hands" => Hands,
+            "held_main" => HeldMain,
+            "held_off" => HeldOff,
+            "legs" => Legs,
+            "feet" => Feet,
+            "waist" => Waist,
+            "neck" => Neck,
+            "finger_main" => FingerMain,
+            "finger_off" => FingerOff,
             _ => {
                 return Err(Error::new(
                     ErrorKind::InvalidInput,

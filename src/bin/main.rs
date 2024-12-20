@@ -16,19 +16,22 @@
 
 #![windows_subsystem = "windows"]
 
+use std::cell::RefCell;
 use std::collections::HashMap;
 use std::rc::Rc;
-use std::cell::RefCell;
 
 use log::{error, info};
 
+use sulis_core::io::{ControlFlowUpdater, DisplayConfiguration, System};
 use sulis_core::resource::ResourceSet;
-use sulis_core::io::{DisplayConfiguration, System, ControlFlowUpdater};
 use sulis_core::ui::{self, Cursor, Widget};
 use sulis_core::util::{self, ActiveResources};
 use sulis_module::{Actor, Module};
 use sulis_state::{GameState, NextGameStep, SaveState};
-use sulis_view::{main_menu::{self, MainMenu}, RootView, trigger_activator};
+use sulis_view::{
+    main_menu::{self, MainMenu},
+    trigger_activator, RootView,
+};
 
 struct GameControlFlowUpdater {
     display_configurations: Vec<DisplayConfiguration>,
@@ -108,7 +111,12 @@ impl GameControlFlowUpdater {
         self.mode = UiMode::MainMenu(view);
     }
 
-    fn new_campaign(&mut self, pc_actor: Rc<Actor>, party_actors: Vec<Rc<Actor>>, flags: HashMap<String, String>) {
+    fn new_campaign(
+        &mut self,
+        pc_actor: Rc<Actor>,
+        party_actors: Vec<Rc<Actor>>,
+        flags: HashMap<String, String>,
+    ) {
         info!("Initializing game state.");
         if let Err(e) = GameState::init(pc_actor, party_actors, flags) {
             error!("{}", e);
@@ -137,22 +145,33 @@ impl GameControlFlowUpdater {
         match step {
             Exit => {
                 self.exit = true;
-            }, NewCampaign { pc_actor } => {
+            }
+            NewCampaign { pc_actor } => {
                 self.new_campaign(pc_actor, Vec::new(), HashMap::new());
-            }, LoadCampaign { save_state } => {
+            }
+            LoadCampaign { save_state } => {
                 self.load_campaign(*save_state);
-            }, LoadModuleAndNewCampaign { pc_actor, party_actors, flags, module_dir } => {
+            }
+            LoadModuleAndNewCampaign {
+                pc_actor,
+                party_actors,
+                flags,
+                module_dir,
+            } => {
                 let mut active = ActiveResources::read();
                 active.campaign = Some(module_dir);
                 active.write();
                 load_resources();
                 self.new_campaign(pc_actor, party_actors, flags);
-            }, MainMenu => {
+            }
+            MainMenu => {
                 self.main_menu();
-            }, MainMenuReloadResources => {
+            }
+            MainMenuReloadResources => {
                 load_resources();
                 self.main_menu();
-            }, RecreateIO => {
+            }
+            RecreateIO => {
                 self.recreate_window = true;
                 self.main_menu();
             }
@@ -167,7 +186,8 @@ impl GameControlFlowUpdater {
         match mode {
             UiMode::MainMenu(view) => {
                 self.next_step = view.borrow_mut().next_step();
-            }, UiMode::Game(view) => {
+            }
+            UiMode::Game(view) => {
                 let ui_cb = GameState::update(millis);
 
                 if let Some(cb) = ui_cb {
@@ -211,7 +231,10 @@ fn load_resources() {
         }
         Ok(yaml) => yaml,
     };
-    info!("Loaded base resources in {}s", util::format_elapsed_secs(start_main.elapsed()));
+    info!(
+        "Loaded base resources in {}s",
+        util::format_elapsed_secs(start_main.elapsed())
+    );
 
     if dirs.len() > 1 {
         info!("Loading module '{}'", dirs[1]);
@@ -220,7 +243,10 @@ fn load_resources() {
         }
     }
 
-    info!("Loaded all resources in {}s", util::format_elapsed_secs(start.elapsed()));
+    info!(
+        "Loaded all resources in {}s",
+        util::format_elapsed_secs(start.elapsed())
+    );
 }
 
 fn main() {

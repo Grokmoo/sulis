@@ -17,7 +17,7 @@
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 use crate::io::event::{ClickKind, Kind};
 use crate::io::{keyboard_event::Key, Event};
@@ -158,12 +158,10 @@ impl InputAction {
         }
 
         match self.kind {
-            MouseButton(kind) => {
-                match self.state {
-                    InputActionState::Started => Cursor::press(root, kind),
-                    InputActionState::Stopped => Cursor::release(root, kind),
-                }
-            }
+            MouseButton(kind) => match self.state {
+                InputActionState::Started => Cursor::press(root, kind),
+                InputActionState::Stopped => Cursor::release(root, kind),
+            },
             MouseMove(x, y) => Cursor::move_to(root, x, y),
             MouseScroll(scroll) => {
                 if scroll > 0 {

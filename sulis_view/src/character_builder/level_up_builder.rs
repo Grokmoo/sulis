@@ -61,12 +61,7 @@ impl BuilderSet for LevelUpBuilder {
 
         let actor = &self.pc.borrow().actor.actor;
         let level = actor.total_level + 1;
-        for (index, ability_list) in actor
-            .base_class()
-            .ability_choices(level)
-            .iter()
-            .enumerate()
-        {
+        for (index, ability_list) in actor.base_class().ability_choices(level).iter().enumerate() {
             let pane = AbilitySelectorPane::new(
                 ability_list.clone(),
                 index,

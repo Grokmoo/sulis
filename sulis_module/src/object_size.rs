@@ -106,7 +106,7 @@ pub struct ObjectSizeIterator<'a> {
     y_offset: i32,
 }
 
-impl<'a> Iterator for ObjectSizeIterator<'a> {
+impl Iterator for ObjectSizeIterator<'_> {
     type Item = Point;
     fn next(&mut self) -> Option<Point> {
         let next = self.size.relative_points.get(self.index);

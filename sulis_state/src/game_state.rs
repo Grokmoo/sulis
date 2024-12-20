@@ -123,9 +123,7 @@ impl GameState {
 
             for index in save_state.selected {
                 match entities.get(&index) {
-                    None => {
-                        return invalid_data_error(&format!("Invalid selected index {index}"))
-                    }
+                    None => return invalid_data_error(&format!("Invalid selected index {index}")),
                     Some(entity) => selected.push(Rc::clone(entity)),
                 }
             }
@@ -240,7 +238,9 @@ impl GameState {
             world_map.load();
 
             mgr.borrow_mut().finish_load();
-            area_state.borrow().update_ambient_audio(&mgr.borrow().current_time());
+            area_state
+                .borrow()
+                .update_ambient_audio(&mgr.borrow().current_time());
             area_state.borrow().update_music(false, None);
 
             Ok(GameState {
@@ -487,7 +487,9 @@ impl GameState {
     pub fn get_quest_entry_state(quest: String, entry: String) -> QuestEntryState {
         STATE.with(|state| {
             let state = state.borrow();
-            let state = state.as_ref().unwrap();
+            let state = state
+                .as_ref()
+                .expect("failed to get mutable state in get_quest_entry_state");
             state.quests.entry_state(&quest, &entry)
         })
     }
@@ -495,7 +497,9 @@ impl GameState {
     pub fn set_quest_state(quest: String, entry_state: QuestEntryState) {
         STATE.with(|state| {
             let mut state = state.borrow_mut();
-            let state = state.as_mut().unwrap();
+            let state = state
+                .as_mut()
+                .expect("failed to get mutable state in set_quest_state");
             state.quests.set_state(&quest, entry_state);
         });
     }
@@ -503,7 +507,9 @@ impl GameState {
     pub fn set_quest_entry_state(quest: String, entry: String, entry_state: QuestEntryState) {
         STATE.with(|state| {
             let mut state = state.borrow_mut();
-            let state = state.as_mut().unwrap();
+            let state = state
+                .as_mut()
+                .expect("failed to get mutable state in set_quest_entry_state");
             state.quests.set_entry_state(&quest, &entry, entry_state);
         })
     }
@@ -511,13 +517,11 @@ impl GameState {
     pub fn set_user_zoom(mut zoom: f32) {
         STATE.with(|state| {
             let mut state = state.borrow_mut();
-            let state = state.as_mut().unwrap();
+            let state = state
+                .as_mut()
+                .expect("failed to get mutable state in set_user_zoom");
 
-            if zoom > MAX_ZOOM {
-                zoom = MAX_ZOOM;
-            } else if zoom < MIN_ZOOM {
-                zoom = MIN_ZOOM;
-            }
+            zoom = zoom.clamp(MIN_ZOOM, MAX_ZOOM);
 
             state.user_zoom = zoom;
         });

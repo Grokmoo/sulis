@@ -21,7 +21,7 @@ use rlua::{self, UserData, UserDataMethods};
 
 use crate::script::*;
 use crate::{animation::Anim, AreaState, EntityState, GameState, Location};
-use sulis_core::{config::Config};
+use sulis_core::config::Config;
 use sulis_module::on_trigger::{self, QuestEntryState};
 use sulis_module::{Faction, ItemState, Module, OnTrigger, Time};
 
@@ -1060,10 +1060,13 @@ impl UserData for ScriptInterface {
             Ok(handle)
         });
 
-        methods.add_method("end_bench", |_, _, handle: sulis_core::benchmark::Handle| {
-            sulis_core::benchmark::end_bench(handle);
-            Ok(())
-        });
+        methods.add_method(
+            "end_bench",
+            |_, _, handle: sulis_core::benchmark::Handle| {
+                sulis_core::benchmark::end_bench(handle);
+                Ok(())
+            },
+        );
     }
 }
 
@@ -1073,9 +1076,7 @@ fn get_area(id: Option<String>) -> Result<Rc<RefCell<AreaState>>> {
         Some(id) => GameState::get_area_state(&id).ok_or(rlua::Error::FromLuaConversionError {
             from: "String",
             to: "AreaState",
-            message: Some(format!(
-                "The area '{id}' does not exist or is not loaded."
-            )),
+            message: Some(format!("The area '{id}' does not exist or is not loaded.")),
         }),
     }
 }

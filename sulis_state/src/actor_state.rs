@@ -191,7 +191,9 @@ impl ActorState {
         let mut change = false;
         for (layer, image) in images.iter() {
             if let Some(img) = self.anim_image_layers.get(layer) {
-                if img.id() == image.id() { continue; }
+                if img.id() == image.id() {
+                    continue;
+                }
             }
             change = true;
             self.anim_image_layers.insert(*layer, Rc::clone(image));
@@ -662,7 +664,7 @@ impl ActorState {
             reward.xp,
             parent.borrow().actor.actor.id
         );
-        if parent.borrow().is_party_member() {
+        if parent.borrow().is_party_member() || parent.borrow().actor.faction() == Faction::Friendly {
             for member in GameState::party().iter() {
                 member.borrow_mut().add_xp(reward.xp);
             }
@@ -866,7 +868,8 @@ impl ActorState {
             }
 
             for (stat_id, amount) in class.stats_max(level) {
-                self.stats.add_single_class_stat_max(stat_id.to_string(), *amount);
+                self.stats
+                    .add_single_class_stat_max(stat_id.to_string(), *amount);
             }
         }
 

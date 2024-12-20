@@ -148,10 +148,14 @@ impl AreaView {
         (x, y)
     }
 
-    pub fn get_scroll(&self) -> Scrollable { self.scroll }
+    pub fn get_scroll(&self) -> Scrollable {
+        self.scroll
+    }
 
     pub fn screen_shake(&mut self) {
-        if !Config::crit_screen_shake() { return; }
+        if !Config::crit_screen_shake() {
+            return;
+        }
 
         self.screen_shake = Some(ScreenShake::new());
     }
@@ -406,11 +410,17 @@ impl AreaView {
                 let b_y = b.location().y + b.size().height;
                 let b_x = b.location().x + b.size().width / 2;
 
-                if a_y < b_y { Ordering::Less }
-                else if a_y > b_y { Ordering::Greater }
-                else if a_x < b_x { Ordering::Less }
-                else if a_x > b_x { Ordering::Greater }
-                else { Ordering::Equal }
+                if a_y < b_y {
+                    Ordering::Less
+                } else if a_y > b_y {
+                    Ordering::Greater
+                } else if a_x < b_x {
+                    Ordering::Less
+                } else if a_x > b_x {
+                    Ordering::Greater
+                } else {
+                    Ordering::Equal
+                }
             }
         });
 
@@ -587,7 +597,8 @@ impl WidgetKind for AreaView {
             self.targeter_tile = ResourceSet::image(image_id);
         }
 
-        self.entity_see_through_alpha = theme.get_custom_or_default("entity_see_through_alpha", 0.2);
+        self.entity_see_through_alpha =
+            theme.get_custom_or_default("entity_see_through_alpha", 0.2);
         self.feedback_text_params.scale = theme.get_custom_or_default("feedback_text_scale", 1.0);
         self.feedback_text_params.ap_scale =
             theme.get_custom_or_default("ap_hover_text_scale", 1.0);
@@ -888,8 +899,12 @@ impl WidgetKind for AreaView {
             );
         }
 
-        let color = Color::new(area_color.r, area_color.g, area_color.b,
-            self.entity_see_through_alpha * area_color.a);
+        let color = Color::new(
+            area_color.r,
+            area_color.g,
+            area_color.b,
+            self.entity_see_through_alpha * area_color.a,
+        );
         self.draw_entities_props(renderer, scale, color, widget, &state, millis);
 
         if Config::debug().limit_line_of_sight {
@@ -968,7 +983,7 @@ impl WidgetKind for AreaView {
         );
 
         match kind {
-            ClickKind::Tertiary => {
+            ClickKind::Tertiary | ClickKind::Secondary => {
                 self.scroll(delta_x, delta_y, 33);
             }
             ClickKind::Primary => {
@@ -978,7 +993,6 @@ impl WidgetKind for AreaView {
 
                 self.overlay_handler.handle_left_drag();
             }
-            _ => (),
         }
 
         true

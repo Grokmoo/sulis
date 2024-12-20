@@ -246,7 +246,10 @@ fn build_upgrades_data(state: &mut WidgetState, class: &Class, level: u32) {
     }
 }
 
-fn get_up_per_hashmap(mut prev_per: HashMap<String, ExtInt>, cur_per: HashMap<String, ExtInt>) -> HashMap<String, i32> {
+fn get_up_per_hashmap(
+    mut prev_per: HashMap<String, ExtInt>,
+    cur_per: HashMap<String, ExtInt>,
+) -> HashMap<String, i32> {
     let mut up_per = HashMap::new();
     for (id, amount) in cur_per {
         let amount = match amount {

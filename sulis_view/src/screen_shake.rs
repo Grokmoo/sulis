@@ -32,7 +32,7 @@ impl ShakeResult {
             scroll: Some(Offset {
                 x: -shake.last_scroll.x,
                 y: -shake.last_scroll.y,
-            })
+            }),
         }
     }
 

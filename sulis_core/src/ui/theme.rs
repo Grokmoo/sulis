@@ -112,7 +112,7 @@ pub const DEFAULT_THEME_ID: &str = "default";
 pub enum Kind {
     #[default]
     Ref, // a reference to a widget that will be added in rust code, or
-         // simply used as a building block for another theme item
+    // simply used as a building block for another theme item
     Label,     // a widget showing static text - defined purely in the theme
     Container, // a widget holding other widgets - defined purely in the theme
 }

@@ -19,7 +19,6 @@ use std::collections::HashMap;
 use std::io::Error;
 use std::ptr;
 use std::rc::Rc;
-use std::usize;
 
 use sulis_core::config::Config;
 
@@ -33,7 +32,7 @@ use crate::{
 };
 use sulis_core::io::GraphicsRenderer;
 use sulis_core::ui::{color, Color};
-use sulis_core::util::{invalid_data_error, Offset, Scale, Size, Point};
+use sulis_core::util::{invalid_data_error, Offset, Point, Scale, Size};
 use sulis_module::area::MAX_AREA_SIZE;
 use sulis_module::{
     actor::Faction, ai, Actor, DamageKind, HitKind, Module, ObjectSize, ObjectSizeIterator,
@@ -213,7 +212,7 @@ impl EntityState {
                     }
                     ai::FuncKind::OnRoundElapsed => {
                         cbs.add_func(script::FuncKind::OnRoundElapsed, func)
-                    },
+                    }
                     ai::FuncKind::AiAction => (), // this is handled specially when running the AI
                 }
             }
@@ -375,7 +374,9 @@ impl EntityState {
             for x in -1..self.size.width + 1 {
                 let p_x = x + self.location.x;
                 let p_y = y + self.location.y;
-                if p_x < 0 || p_x >= width || p_y < 0 || p_y >= area.area.height { continue; }
+                if p_x < 0 || p_x >= width || p_y < 0 || p_y >= area.area.height {
+                    continue;
+                }
 
                 let p = Point::new(x + self.location.x, y + self.location.y);
                 let index = (p.x + p.y * width) as usize;
@@ -667,7 +668,10 @@ impl AreaDrawable for EntityState {
     }
 
     fn size(&self) -> Size {
-        Size { width: self.size.width, height: self.size.height }
+        Size {
+            width: self.size.width,
+            height: self.size.height,
+        }
     }
 
     fn location(&self) -> &Location {

@@ -331,14 +331,13 @@ impl Module {
 
             let mut path = entry.path().to_path_buf();
             path.set_extension("");
-            let actor_builder: ActorBuilder =
-                match read_single_resource(&path.to_string_lossy()) {
-                    Ok(entry) => entry,
-                    Err(e) => {
-                        warn!("Error reading actor: {}", e);
-                        continue;
-                    }
-                };
+            let actor_builder: ActorBuilder = match read_single_resource(&path.to_string_lossy()) {
+                Ok(entry) => entry,
+                Err(e) => {
+                    warn!("Error reading actor: {}", e);
+                    continue;
+                }
+            };
 
             let actor = MODULE.with(|module| {
                 let mut module = module.borrow_mut();
@@ -740,27 +739,27 @@ impl Module {
     }
 
     getters!(
-        ability, abilities, Ability;
-        ability_list, ability_lists, AbilityList;
-        actor, actors, Actor;
-        ai_template, ai_templates, AITemplate;
-        area, areas, Area;
-        class, classes, Class;
-        conversation, conversations, Conversation;
-        cutscene, cutscenes, Cutscene;
-        encounter, encounters, Encounter;
-        item, items, Item;
-        item_adjective, item_adjectives, ItemAdjective;
-        loot_list, loot_lists, LootList;
-        object_size, sizes, ObjectSize;
-        quest, quests, Quest;
-        prop, props, Prop;
-        race, races, Race;
-        tile, tiles, Tile;
-        generator, generators, AreaGenerator;
-        size, sizes, ObjectSize;
-        feature, features, Feature
-        );
+    ability, abilities, Ability;
+    ability_list, ability_lists, AbilityList;
+    actor, actors, Actor;
+    ai_template, ai_templates, AITemplate;
+    area, areas, Area;
+    class, classes, Class;
+    conversation, conversations, Conversation;
+    cutscene, cutscenes, Cutscene;
+    encounter, encounters, Encounter;
+    item, items, Item;
+    item_adjective, item_adjectives, ItemAdjective;
+    loot_list, loot_lists, LootList;
+    object_size, sizes, ObjectSize;
+    quest, quests, Quest;
+    prop, props, Prop;
+    race, races, Race;
+    tile, tiles, Tile;
+    generator, generators, AreaGenerator;
+    size, sizes, ObjectSize;
+    feature, features, Feature
+    );
 
     pub fn script(id: &str) -> Option<String> {
         MODULE.with(|r| {

@@ -22,11 +22,11 @@ use std::path::Path;
 use std::path::PathBuf;
 
 use lazy_static::lazy_static;
-use serde::{Deserialize, Deserializer, Serialize};
 use log::{Level, LevelFilter};
+use serde::{Deserialize, Deserializer, Serialize};
 
 use crate::io::keyboard_event::Key;
-use crate::io::{event::ClickKind, InputActionKind, InputAction, KeyboardEvent};
+use crate::io::{event::ClickKind, InputAction, InputActionKind, KeyboardEvent};
 
 thread_local! {
     static CONFIG: RefCell<Config> = RefCell::new(Config::init());
@@ -161,7 +161,10 @@ impl Config {
         CONFIG.with(|c| {
             let kind = c.borrow().input.keybindings.get(&k.key).copied();
 
-            kind.map(|kind| InputAction { kind, state: k.state })
+            kind.map(|kind| InputAction {
+                kind,
+                state: k.state,
+            })
         })
     }
 
@@ -392,9 +395,7 @@ impl Config {
             Ok(config) => config,
             Err(e) => {
                 eprintln!("{e}");
-                eprintln!(
-                    "Error parsing config file at '{CONFIG_FILENAME}', attempting delete."
-                );
+                eprintln!("Error parsing config file at '{CONFIG_FILENAME}', attempting delete.");
 
                 Config::create_config_from_sample(config_path);
 
@@ -413,9 +414,7 @@ impl Config {
     fn create_config_from_sample(config_path: &Path) {
         let config_base_path = Path::new(CONFIG_BASE);
 
-        println!(
-            "{CONFIG_FILENAME} not found, attempting to create it from {CONFIG_BASE}"
-        );
+        println!("{CONFIG_FILENAME} not found, attempting to create it from {CONFIG_BASE}");
         if let Some(path) = config_path.parent() {
             create_dir_and_warn(path);
         }

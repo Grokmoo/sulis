@@ -142,12 +142,7 @@ impl TransitionData {
         let x = random.gen(8, max_x - w - 16);
         let y = random.gen(8, max_y - h - 16);
 
-        TransitionData {
-            x,
-            y,
-            w,
-            h,
-        }
+        TransitionData { x, y, w, h }
     }
 }
 

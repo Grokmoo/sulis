@@ -63,7 +63,7 @@ impl<'a, 'b> StateLocationChecker<'a, 'b> {
     }
 }
 
-impl<'a, 'b> LocationChecker for StateLocationChecker<'a, 'b> {
+impl LocationChecker for StateLocationChecker<'_, '_> {
     fn passable(&self, x: i32, y: i32) -> bool {
         if !self.grid.is_passable(x, y) {
             return false;
@@ -73,7 +73,9 @@ impl<'a, 'b> LocationChecker for StateLocationChecker<'a, 'b> {
             let index = (p.x + p.y * self.width) as usize;
 
             if let Some(explored) = self.explored {
-                if !explored[index] { return false; }
+                if !explored[index] {
+                    return false;
+                }
             }
 
             if !self.prop_grid[index] {
@@ -97,7 +99,9 @@ impl<'a, 'b> LocationChecker for StateLocationChecker<'a, 'b> {
             let index = (p.x + p.y * self.width) as usize;
 
             for i in self.entity_grid[index].iter() {
-                if *i == self.requester.index() { continue; }
+                if *i == self.requester.index() {
+                    continue;
+                }
 
                 if self.entities_to_ignore.contains(i) {
                     return true;
@@ -177,7 +181,7 @@ fn find_path(
         area_state,
         entity,
         entities_to_ignore,
-        entity.is_party_member()
+        entity.is_party_member(),
     );
 
     if entity.is_party_member() {

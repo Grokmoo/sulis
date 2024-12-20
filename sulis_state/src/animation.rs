@@ -222,8 +222,12 @@ impl AnimState {
     fn blocked_time_vec(vec: &[Anim], entity: &Rc<RefCell<EntityState>>) -> ExtInt {
         let mut time = ExtInt::Int(0);
         for anim in vec {
-            if !anim.is_blocking() { continue; }
-            if !Rc::ptr_eq(entity, anim.owner()) { continue; }
+            if !anim.is_blocking() {
+                continue;
+            }
+            if !Rc::ptr_eq(entity, anim.owner()) {
+                continue;
+            }
 
             let remaining = anim.duration_millis - anim.elapsed;
             time = time.max(remaining);

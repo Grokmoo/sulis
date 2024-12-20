@@ -18,10 +18,10 @@
 extern crate log;
 
 use sulis_core::config::Config;
+use sulis_core::io::System;
 use sulis_core::resource::ResourceSet;
 use sulis_core::ui;
 use sulis_core::util;
-use sulis_core::io::System;
 use sulis_module::Module;
 
 use sulis_editor::{EditorControlFlowUpdater, EditorView};
@@ -73,4 +73,3 @@ fn main() {
 
     system.main_loop(Box::new(EditorControlFlowUpdater::new(root)));
 }
-

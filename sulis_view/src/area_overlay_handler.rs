@@ -115,7 +115,9 @@ impl AreaOverlayHandler {
     fn check_mouseover(&self, x: i32, y: i32) -> Option<Rc<RefCell<AreaMouseover>>> {
         let area_state = GameState::area_state();
 
-        if !area_state.borrow().area.area.coords_valid(x, y) || !area_state.borrow().is_pc_explored(x, y) {
+        if !area_state.borrow().area.area.coords_valid(x, y)
+            || !area_state.borrow().is_pc_explored(x, y)
+        {
             return None;
         }
 
@@ -396,11 +398,8 @@ impl AreaOverlayHandler {
     }
 
     pub fn handle_left_drag(&mut self) {
-        match self.selection_box_start {
-            None => {
-                self.selection_box_start = Some(Cursor::get_position_f32());
-            }
-            Some(_) => (),
+        if self.selection_box_start.is_none() {
+            self.selection_box_start = Some(Cursor::get_position_f32());
         }
     }
 

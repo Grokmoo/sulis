@@ -394,9 +394,14 @@ impl ScriptState {
         };
         let total = get_elapsed_millis(time);
         let mem = (self.lua.used_memory() as f32) / 1024.0;
-        log!(Config::bench_log_level(),
+        log!(
+            Config::bench_log_level(),
             "BENCHMARK Lua '{}:{}': {:.3} millis, {:.3} KB, ~{} Instructions",
-            self.id, func, total, mem, count
+            self.id,
+            func,
+            total,
+            mem,
+            count
         );
     }
 

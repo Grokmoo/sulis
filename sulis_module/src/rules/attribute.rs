@@ -17,7 +17,7 @@
 use std::collections::HashMap;
 use std::slice::Iter;
 
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 use self::Attribute::*;
 

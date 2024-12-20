@@ -20,7 +20,7 @@ use std::rc::Rc;
 use std::slice::Iter;
 use std::str::FromStr;
 
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 use crate::actor::Sex;
 use crate::Race;

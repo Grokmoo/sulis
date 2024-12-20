@@ -18,7 +18,7 @@ use std::cmp;
 use std::fmt;
 use std::ops;
 
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 use crate::ui::Border;
 

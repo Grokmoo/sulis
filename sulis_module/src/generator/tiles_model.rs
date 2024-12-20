@@ -94,10 +94,7 @@ impl TilesModel {
     }
 
     pub fn all(&self) -> impl Iterator<Item = &(Point, Rc<Tile>)> {
-        self.tiles
-            .iter()
-            .map(|v| &v.1)
-            .flat_map(|t| t.iter())
+        self.tiles.iter().map(|v| &v.1).flat_map(|t| t.iter())
     }
 
     pub fn add_some(&mut self, tile: &Option<Rc<Tile>>, x: i32, y: i32) {
@@ -367,7 +364,7 @@ impl TilesModel {
     fn is_terrain_border(&self, x: i32, y: i32, delta_x: i32, delta_y: i32) -> Option<usize> {
         let x = x + delta_x;
         let y = y + delta_y;
-        if x < 0 || x >= MAX_AREA_SIZE || y < 0 || y >= MAX_AREA_SIZE {
+        if !(0..MAX_AREA_SIZE).contains(&x) || !(0..MAX_AREA_SIZE).contains(&y) {
             return None;
         }
 
@@ -571,7 +568,7 @@ impl TilesModel {
     fn is_wall_border(&self, self_elev: u8, x: i32, y: i32, delta_x: i32, delta_y: i32) -> bool {
         let x = x + delta_x;
         let y = y + delta_y;
-        if x < 0 || x >= MAX_AREA_SIZE || y < 0 || y >= MAX_AREA_SIZE {
+        if !(0..MAX_AREA_SIZE).contains(&x) || !(0..MAX_AREA_SIZE).contains(&y) {
             return false;
         }
 

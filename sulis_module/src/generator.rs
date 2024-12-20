@@ -50,7 +50,7 @@ use std::collections::HashMap;
 use std::io::{Error, ErrorKind};
 use std::rc::Rc;
 
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 use crate::area::{EncounterDataBuilder, Layer, LocationChecker, PathFinderGrid, PropDataBuilder};
 use crate::{ObjectSize, WallKind};
@@ -124,10 +124,7 @@ impl<T> WeightedList<T> {
         let mut total_weight = 0;
         for (id, entry) in kinds {
             let t = getter(&id).ok_or_else(|| {
-                Error::new(
-                    ErrorKind::InvalidInput,
-                    format!("Invalid {name} '{id}'"),
-                )
+                Error::new(ErrorKind::InvalidInput, format!("Invalid {name} '{id}'"))
             })?;
 
             total_weight += entry.weight;

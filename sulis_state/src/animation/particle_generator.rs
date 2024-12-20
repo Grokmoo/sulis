@@ -19,7 +19,7 @@ use rlua::UserData;
 use std::cell::{Cell, RefCell};
 use std::rc::Rc;
 
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 use crate::{animation::Anim, EntityState};
 use sulis_core::config::Config;

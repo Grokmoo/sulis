@@ -4,9 +4,6 @@ version = "1.0.0"
 authors = ["Jared Stephen <grok_moo@yahoo.com>"]
 edition = "2021"
 
-[lints]
-workspace = true
-
 [dependencies]
 home = { workspace = true }
 flexi_logger = { workspace = true }

@@ -256,8 +256,7 @@ pub fn show_convo(
         let (root, view) = Widget::parent_mut::<RootView>(widget);
         let (area, _) = view.area_view();
         area.borrow_mut().clear_mouse_state();
-        area.borrow_mut()
-            .set_active_entity(Some(Rc::clone(target)));
+        area.borrow_mut().set_active_entity(Some(Rc::clone(target)));
 
         let (x, y) = {
             let loc = &target.borrow().location;

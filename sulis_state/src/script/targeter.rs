@@ -260,16 +260,13 @@ impl UserData for TargeterData {
         methods.add_method_mut(
             "set_free_select_must_be_passable",
             |_, targeter, val: String| {
-                match Module::object_size(&val) {
-                    None => {
-                        warn!("No object size '{}' found", val);
-                        return Err(rlua::Error::FromLuaConversionError {
-                            from: "String",
-                            to: "ObjectSize",
-                            message: Some("Size must be the ID of a valid object size".to_string()),
-                        });
-                    }
-                    Some(_) => (),
+                if Module::object_size(&val).is_none() {
+                    warn!("No object size '{}' found", val);
+                    return Err(rlua::Error::FromLuaConversionError {
+                        from: "String",
+                        to: "ObjectSize",
+                        message: Some("Size must be the ID of a valid object size".to_string()),
+                    });
                 }
                 targeter.free_select_must_be_passable = Some(val);
                 Ok(())
@@ -302,16 +299,13 @@ impl UserData for TargeterData {
         methods.add_method_mut(
             "set_shape_line",
             |_, targeter, (size, origin_x, origin_y, length): (String, i32, i32, i32)| {
-                match Module::object_size(&size) {
-                    None => {
-                        warn!("No object size '{}' found", size);
-                        return Err(rlua::Error::FromLuaConversionError {
-                            from: "String",
-                            to: "ObjectSize",
-                            message: Some("Size must be the ID of a valid object size".to_string()),
-                        });
-                    }
-                    Some(_) => (),
+                if Module::object_size(&size).is_none() {
+                    warn!("No object size '{}' found", size);
+                    return Err(rlua::Error::FromLuaConversionError {
+                        from: "String",
+                        to: "ObjectSize",
+                        message: Some("Size must be the ID of a valid object size".to_string()),
+                    });
                 }
                 targeter.shape = Shape::Line {
                     size,
@@ -325,16 +319,13 @@ impl UserData for TargeterData {
         methods.add_method_mut(
             "set_shape_line_segment",
             |_, targeter, (size, origin_x, origin_y): (String, i32, i32)| {
-                match Module::object_size(&size) {
-                    None => {
-                        warn!("No object size '{}' found", size);
-                        return Err(rlua::Error::FromLuaConversionError {
-                            from: "String",
-                            to: "ObjectSize",
-                            message: Some("Size must be the ID of a valid object size".to_string()),
-                        });
-                    }
-                    Some(_) => (),
+                if Module::object_size(&size).is_none() {
+                    warn!("No object size '{}' found", size);
+                    return Err(rlua::Error::FromLuaConversionError {
+                        from: "String",
+                        to: "ObjectSize",
+                        message: Some("Size must be the ID of a valid object size".to_string()),
+                    });
                 }
                 targeter.shape = Shape::LineSegment {
                     size,
@@ -345,16 +336,13 @@ impl UserData for TargeterData {
             },
         );
         methods.add_method_mut("set_shape_object_size", |_, targeter, size: String| {
-            match Module::object_size(&size) {
-                None => {
-                    warn!("No object size '{}' found", size);
-                    return Err(rlua::Error::FromLuaConversionError {
-                        from: "String",
-                        to: "ObjectSize",
-                        message: Some("Size must be the ID of a valid object size".to_string()),
-                    });
-                }
-                Some(_) => (),
+            if Module::object_size(&size).is_none() {
+                warn!("No object size '{}' found", size);
+                return Err(rlua::Error::FromLuaConversionError {
+                    from: "String",
+                    to: "ObjectSize",
+                    message: Some("Size must be the ID of a valid object size".to_string()),
+                });
             }
             targeter.shape = Shape::ObjectSize { size };
             Ok(())

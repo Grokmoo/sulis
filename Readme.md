@@ -53,6 +53,7 @@ Please check the [Issue Tracker](https://github.com/Grokmoo/sulis/issues) for kn
 
 ## Authors
 * **Jared Stephen** - *Development* - [Grokmoo](https://github.com/Grokmoo)
+* **[Brunt](https://github.com/brunt)** - *edits and updates*
 
 ## Licensing
 

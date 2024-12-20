@@ -701,7 +701,7 @@ impl Widget {
         if widget.borrow().state.is_mouse_over {
             return false;
         }
-        
+
         match event.kind {
             event::Kind::MouseMove { .. } => (),
             _ => trace!(
@@ -763,7 +763,10 @@ impl Widget {
                 continue;
             }
 
-            let in_bounds = child.borrow().state.in_bounds(Cursor::get_x(), Cursor::get_y());
+            let in_bounds = child
+                .borrow()
+                .state
+                .in_bounds(Cursor::get_x(), Cursor::get_y());
 
             if in_bounds {
                 if !child.borrow().state.mouse_is_inside {

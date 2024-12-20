@@ -383,7 +383,7 @@ impl Maze {
             TileKind::Wall => None,
             TileKind::Corridor(region) => Some(region),
             TileKind::Room { region, .. } => Some(region),
-            TileKind::DoorWay => Some(std::u32::MAX as usize),
+            TileKind::DoorWay => Some(u32::MAX as usize),
         }
     }
 

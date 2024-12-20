@@ -18,9 +18,8 @@ use std::cell::RefCell;
 use std::collections::HashMap;
 use std::io::Error;
 use std::rc::Rc;
-use std::u64;
 
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 use sulis_core::util::{ExtInt, Point};
 use sulis_module::{
@@ -327,7 +326,14 @@ impl PropSaveState {
                     items,
                 }
             }
-            Interactive::Door { open, activate_fired, .. } => Door { open, activate_fired },
+            Interactive::Door {
+                open,
+                activate_fired,
+                ..
+            } => Door {
+                open,
+                activate_fired,
+            },
             Interactive::Hover { ref text } => Hover { text: text.clone() },
         };
 
@@ -449,12 +455,10 @@ impl EntitySaveState {
                 levels.insert(class.id.to_string(), *level);
             }
 
-            let reward = actor.reward.as_ref().map(|reward| {
-                RewardBuilder {
-                    xp: reward.xp,
-                    loot: reward.loot.as_ref().map(|l| l.id.to_string()),
-                    loot_chance: Some(reward.loot_chance),
-                }
+            let reward = actor.reward.as_ref().map(|reward| RewardBuilder {
+                xp: reward.xp,
+                loot: reward.loot.as_ref().map(|l| l.id.to_string()),
+                loot_chance: Some(reward.loot_chance),
             });
 
             let mut abilities: Vec<String> = Vec::new();

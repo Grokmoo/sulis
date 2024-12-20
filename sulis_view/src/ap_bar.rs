@@ -41,7 +41,9 @@ pub fn check_end_turn(widget: &Rc<RefCell<Widget>>) {
         };
 
         let time = GameState::animation_block_time(&entity);
-        if time.greater_than(Config::animation_base_time_millis() * 10) { return; }
+        if time.greater_than(Config::animation_base_time_millis() * 10) {
+            return;
+        }
 
         let entity = entity.borrow();
         if !entity.is_party_member() {

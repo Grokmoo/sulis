@@ -442,7 +442,9 @@ impl WidgetKind for RootView {
         }
 
         if scroll_x != 0.0 || scroll_y != 0.0 {
-            self.area_view.borrow_mut().scroll(scroll_x * 2.0, scroll_y * 2.0, millis);
+            self.area_view
+                .borrow_mut()
+                .scroll(scroll_x * 2.0, scroll_y * 2.0, millis);
         }
     }
 
@@ -476,11 +478,10 @@ impl WidgetKind for RootView {
             QuickSave => self.save(),
             ScrollUp | ScrollDown | ScrollRight | ScrollLeft => {
                 self.scroll_keys_down.push(key);
-                self.scroll_keys_down.sort_by(|k1, k2| {
-                    k1.partial_cmp(k2).unwrap()
-                });
+                self.scroll_keys_down
+                    .sort_by(|k1, k2| k1.partial_cmp(k2).unwrap());
                 self.scroll_keys_down.dedup();
-            },
+            }
             SelectPartyMember1 => self.select_party_member(0),
             SelectPartyMember2 => self.select_party_member(1),
             SelectPartyMember3 => self.select_party_member(2),
@@ -766,22 +767,7 @@ fn create_button(
 }
 
 fn is_defeated(party: &[Rc<RefCell<EntityState>>]) -> bool {
-    if party.is_empty() {
-        return true;
-    }
-
-    {
-        let player = &party[0].borrow().actor;
-        if player.is_dead() && !player.is_disabled() {
-            return true;
-        }
-    }
-
-    for member in party.iter() {
-        if !member.borrow().actor.is_dead() {
-            return false;
-        }
-    }
-
-    true
+    //if any party member is not dead then the party is not defeated
+    party.is_empty() ||
+        party.iter().all(|member| !member.borrow().actor.is_dead())
 }

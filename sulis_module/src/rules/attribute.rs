@@ -45,13 +45,7 @@ pub struct AttributeList {
 
 fn get_new_val(cur: u8, delta: i8) -> u8 {
     let val = cur as i16 + delta as i16;
-    if val > 255 {
-        255
-    } else if val < 0 {
-        0
-    } else {
-        val as u8
-    }
+    val.clamp(0, 255) as u8
 }
 
 impl AttributeList {

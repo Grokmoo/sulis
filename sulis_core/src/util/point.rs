@@ -14,8 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::cmp;
-use std::fmt;
+use std::{cmp, fmt};
 use std::ops;
 
 use serde::{Deserialize, Serialize};
@@ -138,13 +137,13 @@ impl Point {
     }
 
     pub fn min(&mut self, x: i32, y: i32) {
-        self.x = cmp::min(self.x, x);
-        self.y = cmp::min(self.y, y);
+        self.x = self.x.min(x);
+        self.y = self.y.min(y);
     }
 
     pub fn max(&mut self, x: i32, y: i32) {
-        self.x = cmp::max(self.x, x);
-        self.y = cmp::max(self.y, y);
+        self.x = self.x.max(x);
+        self.y = self.y.max(y);
     }
 
     pub fn new_vec(data: Vec<(i32, i32)>) -> Vec<Point> {
@@ -168,16 +167,10 @@ impl Point {
     /// the interval [0, max_x) and the y coordinate is in
     /// the interval [0, max_y).  Returns false otherwise.
     pub fn in_bounds(self, max_x: i32, max_y: i32) -> bool {
-        if self.x < 0 || self.y < 0 {
-            return false;
-        }
-        if self.x >= max_x || self.y >= max_y {
-            return false;
-        }
-        true
+        self.x >= 0 && self.y >= 0 && self.x < max_x && self.y < max_y
     }
 
-    /// Returns the eucliden distance between these two points
+    /// Returns the Euclidean distance between these two points
     pub fn dist(self, other: Point) -> f32 {
         (((self.x - other.x) * (self.x - other.x) + (self.y - other.y) * (self.y - other.y)) as f32)
             .sqrt()

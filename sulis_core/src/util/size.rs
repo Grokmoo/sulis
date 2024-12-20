@@ -14,7 +14,6 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::cmp;
 use std::ops;
 
 use serde::{Deserialize, Serialize};
@@ -108,23 +107,23 @@ impl Size {
     }
 
     pub fn max_from(&mut self, other: Size) {
-        self.width = cmp::max(self.width, other.width);
-        self.height = cmp::max(self.height, other.height);
+        self.width = self.width.max(other.width);
+        self.height = self.height.max(other.height);
     }
 
     pub fn min_from(&mut self, other: Size) {
-        self.width = cmp::min(self.width, other.width);
-        self.height = cmp::min(self.height, other.height);
+        self.width = self.width.min(other.width);
+        self.height = self.height.min(other.height);
     }
 
     pub fn max(&mut self, width: i32, height: i32) {
-        self.width = cmp::max(self.width, width);
-        self.height = cmp::max(self.height, height);
+        self.width = self.width.max(width);
+        self.height = self.height.max(height);
     }
 
     pub fn min(&mut self, width: i32, height: i32) {
-        self.width = cmp::min(self.width, width);
-        self.height = cmp::min(self.height, height);
+        self.width = self.width.min(width);
+        self.height = self.height.min(height);
     }
 }
 

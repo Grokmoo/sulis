@@ -664,7 +664,7 @@ impl ActorState {
             reward.xp,
             parent.borrow().actor.actor.id
         );
-        if parent.borrow().is_party_member() {
+        if parent.borrow().is_party_member() || parent.borrow().actor.faction() == Faction::Friendly {
             for member in GameState::party().iter() {
                 member.borrow_mut().add_xp(reward.xp);
             }

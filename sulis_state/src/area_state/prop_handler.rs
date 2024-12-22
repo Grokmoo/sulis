@@ -60,10 +60,8 @@ impl PropHandler {
     }
 
     fn load_prop(&mut self, data: PropSaveState) -> Result<(), Error> {
-        let prop = match Module::prop(&data.id) {
-            None => invalid_data_error(&format!("No prop with ID '{}'", data.id)),
-            Some(prop) => Ok(prop),
-        }?;
+        let prop = Module::prop(&data.id)
+            .ok_or_else(|| invalid_data_error(&format!("No prop with ID '{}'", data.id)))?;
 
         let location = Location::from_point(data.location, &self.area);
 
@@ -214,20 +212,20 @@ impl PropHandler {
         let prop = &prop_data.prop;
 
         if !self.area.coords_valid(location.x, location.y) {
-            return invalid_data_error(&format!(
+            return Err(invalid_data_error(&format!(
                 "Prop location: {},{} in {} invalid",
                 location.x, location.y, location.area_id
-            ));
+            )));
         }
 
         if !self
             .area
             .coords_valid(location.x + prop.size.width, location.y + prop.size.height)
         {
-            return invalid_data_error(&format!(
+            return Err(invalid_data_error(&format!(
                 "Prop location: {},{} in {} invalid due to prop size",
                 location.x, location.y, location.area_id
-            ));
+            )));
         }
 
         let state = PropState::new(prop_data, location, temporary);

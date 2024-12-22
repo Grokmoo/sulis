@@ -202,10 +202,11 @@ pub fn write_json_to_file<T: serde::ser::Serialize, P: AsRef<Path>>(
 ) -> Result<(), Error> {
     let file = File::create(filename)?;
 
-    match serde_json::to_writer(file, data) {
-        Err(e) => invalid_data_error(&format!("{e}")),
-        Ok(()) => Ok(()),
-    }
+    // match serde_json::to_writer(file, data) {
+    //     Err(e) => Err(invalid_data_error(&format!("{e}"))),
+    //     Ok(()) => Ok(()),
+    // }
+    serde_json::to_writer(file, data).map_err(|e| invalid_data_error(&format!("{e}")))
 }
 
 pub fn write_to_file<T: serde::ser::Serialize, P: AsRef<Path>>(
@@ -214,10 +215,11 @@ pub fn write_to_file<T: serde::ser::Serialize, P: AsRef<Path>>(
 ) -> Result<(), Error> {
     let file = File::create(filename)?;
 
-    match serde_yaml::to_writer(file, data) {
-        Err(e) => invalid_data_error(&format!("{e}")),
-        Ok(()) => Ok(()),
-    }
+    // match serde_yaml::to_writer(file, data) {
+    //     Err(e) => invalid_data_error(&format!("{e}")),
+    //     Ok(()) => Ok(()),
+    // }
+    serde_yaml::to_writer(file, data).map_err(|e| invalid_data_error(&format!("{e}")))
 }
 
 pub fn read_single_resource_path<T: serde::de::DeserializeOwned>(path: &Path) -> Result<T, Error> {
@@ -238,9 +240,9 @@ pub fn read_single_resource<T: serde::de::DeserializeOwned>(filename: &str) -> R
 
     let mut file = match file {
         Err(_) => {
-            return invalid_data_error(&format!(
+            return Err(invalid_data_error(&format!(
                 "Unable to locate '{filename}.json' or {filename}.yml'"
-            ));
+            )));
         }
         Ok(f) => f,
     };

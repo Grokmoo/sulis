@@ -209,45 +209,19 @@ impl AnimState {
     }
 
     fn has_any_blocking_vec(vec: &[Anim]) -> bool {
-        for anim in vec.iter() {
-            if !anim.is_blocking() {
-                continue;
-            }
-
-            return true;
-        }
-        false
+        vec.iter().any(|anim| anim.is_blocking())
     }
 
     fn blocked_time_vec(vec: &[Anim], entity: &Rc<RefCell<EntityState>>) -> ExtInt {
-        let mut time = ExtInt::Int(0);
-        for anim in vec {
-            if !anim.is_blocking() {
-                continue;
-            }
-            if !Rc::ptr_eq(entity, anim.owner()) {
-                continue;
-            }
-
-            let remaining = anim.duration_millis - anim.elapsed;
-            time = time.max(remaining);
-        }
-
-        time
+        vec.iter()
+            .filter(|anim| anim.is_blocking() && Rc::ptr_eq(entity, anim.owner()))
+            .map(|anim| anim.duration_millis - anim.elapsed)
+            .fold(ExtInt::Int(0), ExtInt::max)
     }
 
     fn has_blocking_vec(vec: &[Anim], entity: &Rc<RefCell<EntityState>>) -> bool {
-        for anim in vec.iter() {
-            if !anim.is_blocking() {
-                continue;
-            }
-            if !Rc::ptr_eq(entity, anim.owner()) {
-                continue;
-            }
-
-            return true;
-        }
-        false
+        vec.iter()
+            .any(|anim| anim.is_blocking() && Rc::ptr_eq(entity, anim.owner()))
     }
 
     fn clear_blocking_vec(vec: &mut [Anim], entity: &Rc<RefCell<EntityState>>) {
@@ -713,5 +687,5 @@ pub fn get_current_frame(elapsed: Duration, frame_time: u32, max_index: usize) -
 
     let frame_index = (millis / frame_time) as usize;
 
-    cmp::min(frame_index, max_index)
+    frame_index.min(max_index)
 }

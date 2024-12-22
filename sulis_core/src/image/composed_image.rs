@@ -45,7 +45,9 @@ fn get_images_from_grid(
     for id in grid {
         let image = resources.images.get(&id);
         if image.is_none() {
-            return invalid_data_error(&format!("Unable to locate sub image {id}"));
+            return Err(invalid_data_error(&format!(
+                "Unable to locate sub image {id}"
+            )));
         }
 
         let image = image.unwrap();
@@ -54,6 +56,20 @@ fn get_images_from_grid(
 
     Ok(images_vec)
 }
+// fn get_images_from_grid(
+//     grid: Vec<String>,
+//     resources: &ResourceSet,
+// ) -> Result<Vec<Rc<dyn Image>>, Error> {
+//     grid.into_iter()
+//         .map(|id| {
+//             resources
+//                 .images
+//                 .get(&id)
+//                 .map(Rc::clone)
+//                 .ok_or_else(|| invalid_data_error(&format!("Unable to locate sub image {}", id)))
+//         })
+//         .collect::<Result<Vec<_>, _>>()
+// }
 
 fn get_images_from_inline(
     grid: Vec<String>,
@@ -85,7 +101,9 @@ impl ComposedImage {
         resources: &mut ResourceSet,
     ) -> Result<Rc<dyn Image>, Error> {
         if builder.grid.len() as i32 != GRID_LEN {
-            return invalid_data_error(&format!("Composed image grid must be length {GRID_LEN}"));
+            return Err(invalid_data_error(&format!(
+                "Composed image grid must be length {GRID_LEN}"
+            )));
         }
 
         let images_vec = match builder.generate_sub_images {

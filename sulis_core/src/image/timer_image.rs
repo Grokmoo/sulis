@@ -42,14 +42,18 @@ impl TimerImage {
         let mut frames: Vec<Rc<dyn Image>> = Vec::new();
 
         if builder.frames.is_empty() {
-            return invalid_data_error("Timer image must have 1 or more frames.");
+            return Err(invalid_data_error(
+                "Timer image must have 1 or more frames.",
+            ));
         }
 
         let mut size: Option<Size> = None;
         for id in builder.frames {
             let image = match images.get(&id) {
                 None => {
-                    return invalid_data_error(&format!("Unable to locate image for frame {id}"));
+                    return Err(invalid_data_error(&format!(
+                        "Unable to locate image for frame {id}"
+                    )));
                 }
                 Some(image) => image,
             };
@@ -58,10 +62,9 @@ impl TimerImage {
                 None => size = Some(*image.get_size()),
                 Some(size) => {
                     if size != *image.get_size() {
-                        return invalid_data_error(
-                            "All frames in a timer image must have the\
-                             same size.",
-                        );
+                        return Err(invalid_data_error(
+                            "All frames in a timer image must have the same size.",
+                        ));
                     }
                 }
             }

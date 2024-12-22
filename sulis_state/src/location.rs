@@ -38,15 +38,7 @@ impl Debug for Location {
 
 impl PartialEq for Location {
     fn eq(&self, other: &Location) -> bool {
-        if self.x != other.x || self.y != other.y {
-            return false;
-        }
-
-        if self.area_id != other.area_id {
-            return false;
-        }
-
-        true
+        self.x == other.x && self.y == other.y && self.area_id == other.area_id
     }
 }
 
@@ -84,15 +76,9 @@ impl Location {
     }
 
     pub fn coords_valid(&self, x: i32, y: i32) -> bool {
-        if x < 0 || y < 0 {
-            return false;
-        }
-        if x >= self.area_width || y >= self.area_height {
-            return false;
-        }
-
-        true
+        x >= 0 && y >= 0 && x < self.area_width && y < self.area_height
     }
+
 
     pub fn is_in(&self, area_state: &AreaState) -> bool {
         self.area_id == area_state.area.area.id

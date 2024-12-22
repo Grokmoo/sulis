@@ -211,7 +211,7 @@ impl ImageLayerSet {
                         "Image '{}' not found for layer '{:?}'",
                         image_str, image_layer
                     );
-                    return invalid_data_error("Unable to create image_layer_set");
+                    return Err(invalid_data_error("Unable to create image_layer_set"));
                 }
                 Some(image) => image,
             };

@@ -52,13 +52,10 @@ impl RangeIndicatorHandler {
     }
 
     pub fn add(&mut self, indicator: Option<RangeIndicator>) {
-        let indicator = match indicator {
-            None => return,
-            Some(ind) => ind,
-        };
-
-        self.indicators.push(indicator);
-        self.indicators.sort_by(|a, b| a.kind.cmp(&b.kind));
+        if let Some(ind) = indicator {
+            self.indicators.push(ind);
+            self.indicators.sort_by(|a, b| a.kind.cmp(&b.kind));
+        }
     }
 
     pub fn clear(&mut self) {

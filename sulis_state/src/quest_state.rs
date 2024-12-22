@@ -42,10 +42,10 @@ impl Default for QuestStateSet {
     fn default() -> QuestStateSet {
         let mut quests = HashMap::new();
 
-        for quest in Module::all_quests() {
+        quests.extend(Module::all_quests().into_iter().map(|quest| {
             let id = quest.id.to_string();
-            quests.insert(id, QuestState::new(quest.id.to_string()));
-        }
+            (id.clone(), QuestState::new(id))
+        }));
 
         QuestStateSet {
             quests,
@@ -171,35 +171,25 @@ impl QuestState {
     }
 
     pub fn entry_state(&self, entry: &str) -> QuestEntryState {
-        for (ref id, state) in self.entries.iter() {
-            if id == entry {
-                return *state;
-            }
-        }
-
-        QuestEntryState::Hidden
+        self.entries
+            .iter()
+            .find(|(id, _)| id == entry)
+            .map(|(_, state)| *state)
+            .unwrap_or(QuestEntryState::Hidden)
     }
 
     pub fn set_entry_state(&mut self, entry: &str, state: QuestEntryState) {
-        match state {
-            QuestEntryState::Visible | QuestEntryState::Active => {
-                if self.state == QuestEntryState::Hidden {
-                    self.state = QuestEntryState::Visible;
-                }
-            }
-            _ => (),
+        if matches!(state, QuestEntryState::Visible | QuestEntryState::Active)
+            && self.state == QuestEntryState::Hidden
+        {
+            self.state = QuestEntryState::Visible;
         }
 
-        for (ref id, ref mut entry_state) in self.entries.iter_mut() {
-            if id != entry {
-                continue;
-            }
-
+        if let Some((_, entry_state)) = self.entries.iter_mut().find(|(id, _)| id == entry) {
             *entry_state = state;
-            return;
+        } else {
+            self.entries.push((entry.to_string(), state));
         }
-
-        self.entries.push((entry.to_string(), state));
     }
 
     pub fn state(&self) -> QuestEntryState {

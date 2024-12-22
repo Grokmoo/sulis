@@ -38,12 +38,8 @@ pub struct SaveFile {
 
 impl SaveFile {
     fn from_json(data: &str) -> Result<Self, Error> {
-        let resource: Result<SaveFile, serde_json::Error> = serde_json::from_str(data);
-
-        match resource {
-            Ok(resource) => Ok(resource),
-            Err(error) => invalid_data_error(&format!("{error}")),
-        }
+        serde_json::from_str(data)
+            .map_err(|e| invalid_data_error(&format!("{e}")))
     }
 }
 
@@ -148,37 +144,13 @@ pub fn has_available_save_files() -> bool {
         return false;
     }
 
-    let dir_entries = match fs::read_dir(dir) {
-        Err(_) => return false,
-        Ok(entries) => entries,
-    };
-
-    for entry in dir_entries {
-        let entry = match entry {
-            Err(_) => continue,
-            Ok(entry) => entry,
-        };
-
-        let path = entry.path();
-        if !path.is_file() {
-            continue;
-        }
-
-        let extension = match path.extension() {
-            None => continue,
-            Some(ext) => ext.to_string_lossy(),
-        };
-
-        if extension != "json" {
-            continue;
-        }
-
-        return true;
-    }
-
-    false
+    fs::read_dir(dir).map_or(false, |entries| {
+        entries
+            .filter_map(Result::ok)
+            .filter(|entry| entry.path().is_file())
+            .any(|entry| entry.path().extension().map_or(false, |ext| ext == "json"))
+    })
 }
-
 fn read_save_file(path: &Path) -> Result<SaveFile, Error> {
     let mut file = File::open(path)?;
 
@@ -222,71 +194,40 @@ fn create_error_meta(path: PathBuf, error: Error) -> SaveFileMetaData {
 }
 
 pub fn get_available_save_files() -> Result<Vec<SaveFileMetaData>, Error> {
-    let mut results = Vec::new();
-
     let dir = get_save_dir();
     debug!("Reading save games from {}", dir.to_string_lossy());
 
-    if !dir.is_dir() {
-        fs::create_dir_all(dir.clone())?;
-    }
+    fs::create_dir_all(&dir)?;
 
-    let dir_entries = fs::read_dir(dir)?;
-
-    for entry in dir_entries {
-        trace!("Checking entry {:?}", entry);
-        let entry = entry?;
-
-        let path = entry.path();
-        if !path.is_file() {
-            continue;
-        }
-
-        let extension = match path.extension() {
-            None => continue,
-            Some(ext) => ext.to_string_lossy(),
-        };
-
-        if extension != "json" {
-            continue;
-        }
-
-        let path_buf = path.to_path_buf();
-
-        let save_file: SaveFile = match read_save_file(&path_buf) {
-            Ok(save_file) => save_file,
-            Err(e) => {
-                warn!("Unable to read save file: {}", path_buf.to_string_lossy());
-                warn!("{}", e);
-                results.push(create_error_meta(path_buf, e));
-                continue;
+    let results: Vec<SaveFileMetaData> = fs::read_dir(dir)?
+        .filter_map(|entry| entry.ok())
+        .filter(|entry| entry.path().is_file())
+        .filter(|entry| entry.path().extension().map_or(false, |ext| ext == "json"))
+        .map(|entry| {
+            let path_buf = entry.path();
+            match read_save_file(&path_buf) {
+                Ok(save_file) => {
+                    let mut meta = save_file.meta;
+                    meta.path = path_buf;
+                    Ok::<SaveFileMetaData, Error>(meta)
+                },
+                Err(e) => {
+                    warn!("Unable to read save file: {}", path_buf.to_string_lossy());
+                    warn!("{}", e);
+                    Ok(create_error_meta(path_buf, e))
+                }
             }
-        };
+        })
+        .collect::<Result<Vec<_>, _>>()?;
 
-        let mut meta = save_file.meta;
-        meta.path = path_buf;
+    let mut sorted_results = results;
+    sorted_results.sort_by(|f1, f2| time_modified(f2).cmp(&time_modified(f1)));
 
-        results.push(meta);
-    }
-
-    results.sort_by(|f1, f2| {
-        let t1 = time_modified(f1);
-        let t2 = time_modified(f2);
-
-        t2.cmp(&t1)
-    });
-
-    Ok(results)
+    Ok(sorted_results)
 }
 
 fn time_modified(data: &SaveFileMetaData) -> time::SystemTime {
-    let metadata = fs::metadata(data.path.as_path());
-
-    match metadata {
-        Ok(metadata) => match metadata.modified() {
-            Ok(time) => time,
-            Err(_) => time::UNIX_EPOCH,
-        },
-        Err(_) => time::UNIX_EPOCH,
-    }
+    fs::metadata(&data.path)
+        .and_then(|m| m.modified())
+        .unwrap_or(time::UNIX_EPOCH)
 }

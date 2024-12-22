@@ -389,15 +389,17 @@ pub fn verify_point(
     p: Vec<usize>,
 ) -> Result<(i32, i32), Error> {
     if p.len() != 2 {
-        return invalid_data_error(&format!("{kind} point array length is not equal to 2"));
+        return Err(invalid_data_error(&format!(
+            "{kind} point array length is not equal to 2"
+        )));
     }
 
     let x = p[0];
     let y = p[1];
     if x > width || y >= height {
-        return invalid_data_error(&format!(
+        return Err(invalid_data_error(&format!(
             "{kind} point has coordiantes greater than size {width},{height}"
-        ));
+        )));
     }
     Ok((x as i32, y as i32))
 }

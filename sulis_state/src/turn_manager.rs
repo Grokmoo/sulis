@@ -240,23 +240,20 @@ impl TurnManager {
 
     #[must_use]
     pub fn drain_triggered_cbs(&mut self) -> Vec<TriggeredCallback> {
-        let mut result = Vec::new();
-        for index in self.surfaces.iter() {
-            let effect = self.effects[*index].as_mut().unwrap();
-            for (cb, entity_index) in effect.update_on_moved_in_surface() {
-                result.push(TriggeredCallback::with_target(
-                    cb,
-                    FuncKind::OnMovedInSurface,
-                    entity_index,
-                ));
-            }
-        }
+        let surface_callbacks = self.surfaces.iter().flat_map(|index| {
+            self.effects[*index]
+                .as_mut()
+                .unwrap()
+                .update_on_moved_in_surface()
+                .into_iter()
+                .map(|(cb, entity_index)| {
+                    TriggeredCallback::with_target(cb, FuncKind::OnMovedInSurface, entity_index)
+                })
+        });
 
-        for cb in self.triggered_cbs_next_update.drain(..) {
-            result.push(cb);
-        }
-
-        result
+        surface_callbacks
+            .chain(self.triggered_cbs_next_update.drain(..))
+            .collect()
     }
 
     #[must_use]
@@ -335,13 +332,13 @@ impl TurnManager {
         index: usize,
         elapsed_millis: u32,
     ) -> (bool, Vec<Rc<CallbackData>>) {
-        let effect = match self.effects[index] {
-            None => return (false, Vec::new()),
-            Some(ref mut effect) => effect,
-        };
-
-        let cbs = effect.update(elapsed_millis);
-        (effect.is_removal(), cbs)
+        self.effects[index]
+            .as_mut()
+            .map(|effect| {
+                let cbs = effect.update(elapsed_millis);
+                (effect.is_removal(), cbs)
+            })
+            .unwrap_or((false, Vec::new()))
     }
 
     #[must_use]
@@ -813,25 +810,23 @@ impl TurnManager {
     }
 
     pub(crate) fn remove_from_surface(&mut self, entity_index: usize, surface_index: usize) {
-        let entity = match self.entity_checked(entity_index) {
-            None => return,
-            Some(entity) => entity,
-        };
-        let surface = self.effects[surface_index].as_mut().unwrap();
-        debug!(
-            "Remove '{}' from surface {}",
-            entity.borrow().actor.actor.name,
-            surface_index
-        );
-        entity.borrow_mut().actor.remove_effect(surface_index);
-
-        for cb in surface.callbacks.iter() {
-            let cb = TriggeredCallback::with_target(
-                Rc::clone(cb),
-                FuncKind::OnExitedSurface,
-                entity_index,
+        if let Some(entity) = self.entity_checked(entity_index) {
+            let surface = self.effects[surface_index].as_mut().unwrap();
+            debug!(
+                "Remove '{}' from surface {}",
+                entity.borrow().actor.actor.name,
+                surface_index
             );
-            self.triggered_cbs_next_update.push(cb);
+            entity.borrow_mut().actor.remove_effect(surface_index);
+
+            self.triggered_cbs_next_update
+                .extend(surface.callbacks.iter().map(|cb| {
+                    TriggeredCallback::with_target(
+                        Rc::clone(cb),
+                        FuncKind::OnExitedSurface,
+                        entity_index,
+                    )
+                }));
         }
     }
 

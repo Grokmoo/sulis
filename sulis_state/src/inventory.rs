@@ -45,70 +45,39 @@ impl Inventory {
         equipped: Vec<Option<ItemSaveState>>,
         quick: Vec<Option<ItemSaveState>>,
     ) -> Result<(), Error> {
-        for (slot_index, slot) in Slot::iter().enumerate() {
-            let slot = *slot;
-
-            if slot_index > equipped.len() {
-                break;
-            }
-            let item = match &equipped[slot_index] {
-                None => continue,
-                Some(item) => item,
-            };
-
-            let variant = item.variant;
-            let item_state = match Module::create_get_item(&item.id, &item.adjectives) {
-                None => invalid_data_error(&format!("No item with ID '{}'", item.id)),
-                Some(item) => Ok(ItemState::new(item, variant)),
-            }?;
-
-            {
-                let equippable = match item_state.item.equippable {
-                    None => {
-                        invalid_data_error(&format!("Item in slot '{slot:?}' is not equippable"))
-                    }
-                    Some(ref equip) => Ok(equip),
-                }?;
-
-                if equippable.slot != slot {
-                    let ok = match equippable.alternate_slot {
-                        None => false,
-                        Some(alt_slot) => alt_slot == slot,
-                    };
-
-                    if !ok {
-                        return invalid_data_error(&format!(
-                            "item in slot '{slot:?}' invalid equip type"
-                        ));
-                    }
-                }
-            }
-
+        for (slot, item) in Slot::iter().zip(equipped).filter_map(|(slot, item)| item.map(|i| (*slot, i))) {
+            let item_state = Self::create_item_state(&item)?;
+            Self::validate_equippable(&item_state, slot)?;
             self.equipped.insert(slot, item_state);
         }
 
-        for (quick_index, quick_slot) in QuickSlot::iter().enumerate() {
-            let quick_slot = *quick_slot;
-
-            if quick_index > quick.len() {
-                break;
-            }
-            let item = match &quick[quick_index] {
-                None => continue,
-                Some(item) => item,
-            };
-
-            let variant = item.variant;
-            let item_state = match Module::create_get_item(&item.id, &item.adjectives) {
-                None => invalid_data_error(&format!("No item with ID '{}'", item.id)),
-                Some(item) => Ok(ItemState::new(item, variant)),
-            }?;
-
+        for (quick_slot, item) in QuickSlot::iter().zip(quick).filter_map(|(slot, item)| item.map(|i| (*slot, i))) {
+            let item_state = Self::create_item_state(&item)?;
             self.quick.insert(quick_slot, item_state);
         }
 
         Ok(())
     }
+
+    fn create_item_state(item: &ItemSaveState) -> Result<ItemState, Error> {
+        Module::create_get_item(&item.id, &item.adjectives)
+            .ok_or_else(|| invalid_data_error(&format!("No item with ID '{}'", item.id)))
+            .map(|i| ItemState::new(i, item.variant))
+    }
+
+    fn validate_equippable(item_state: &ItemState, slot: Slot) -> Result<(), Error> {
+        let equippable = item_state.item.equippable
+            .as_ref()
+            .ok_or_else(|| invalid_data_error(&format!("Item in slot '{slot:?}' is not equippable")))?;
+
+        if equippable.slot != slot && equippable.alternate_slot != Some(slot) {
+            return Err(invalid_data_error(&format!("item in slot '{slot:?}' invalid equip type")));
+        }
+        Ok(())
+    }
+
+
+
 
     fn weapon_style_internal(
         &self,

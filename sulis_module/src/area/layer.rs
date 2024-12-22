@@ -54,11 +54,11 @@ impl Layer {
                     None => spritesheet_id = Some(tile.image_display.sheet_id.to_string()),
                     Some(ref id) => {
                         if id != &tile.image_display.sheet_id {
-                            return invalid_data_error(&format!(
+                            return Err(invalid_data_error(&format!(
                                 "All tiles in a layer must be from the same \
                                  spritesheet: '{}' vs '{}'",
                                 id, tile.id
-                            ));
+                            )));
                         }
                     }
                 }
@@ -85,10 +85,10 @@ impl Layer {
                 }
 
                 if base_x + tile.width > width || base_y + tile.height > height {
-                    return invalid_data_error(&format!(
+                    return Err(invalid_data_error(&format!(
                         "Tile '{}' at [{}, {}] extends past area boundary.",
                         tile.id, base_x, base_y
-                    ));
+                    )));
                 }
 
                 if tile.override_impass {

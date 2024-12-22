@@ -48,13 +48,7 @@ pub fn approx_eq_slice(a: &[f32], b: &[f32]) -> bool {
         return false;
     }
 
-    for (a, b) in a.iter().zip(b.iter()) {
-        if !approx_eq(*a, *b) {
-            return false;
-        }
-    }
-
-    true
+    a.iter().zip(b.iter()).all(|(x, y)| approx_eq(*x, *y))
 }
 
 pub fn approx_eq(a: f32, b: f32) -> bool {
@@ -158,13 +152,9 @@ impl ActiveResources {
 
     pub fn write(&self) {
         let file = active_resources_file_path();
-        match write_to_file(file, self) {
-            Ok(()) => (),
-            Err(e) => {
-                warn!("Error writing active resources file");
-                warn!("{}", e);
-            }
-        }
+        write_to_file(file, self).unwrap_or_else(|e| {
+            warn!("Error writing active resources file: {e}");
+        })
     }
 
     pub fn directories(&self) -> Vec<String> {
@@ -174,9 +164,7 @@ impl ActiveResources {
             dirs.push(dir.to_string());
         }
 
-        for mod_dir in self.mods.iter() {
-            dirs.push(mod_dir.to_string());
-        }
+        dirs.extend(self.mods.iter().map(|s| s.to_string()));
 
         dirs
     }
@@ -334,8 +322,8 @@ impl Sub<u32> for ExtInt {
     }
 }
 
-pub fn invalid_data_error<T>(str: &str) -> Result<T, Error> {
-    Err(Error::new(ErrorKind::InvalidData, str))
+pub fn invalid_data_error(str: &str) -> Error {
+    Error::new(ErrorKind::InvalidData, str)
 }
 
 pub fn unable_to_create_error<T>(kind: &str, id: &str) -> Result<T, Error> {
@@ -361,7 +349,7 @@ pub fn format_elapsed_secs(elapsed: Duration) -> String {
 pub fn error_and_exit(error: &str) {
     error!("{}", error);
     error!("Exiting...");
-    ::std::process::exit(1)
+    std::process::exit(1)
 }
 
 #[must_use]
@@ -399,7 +387,7 @@ pub fn setup_logger() -> LoggerHandle {
         eprintln!("{e}");
         eprintln!("There was a fatal error initializing logging to 'log/'");
         eprintln!("Exiting...");
-        ::std::process::exit(1);
+        std::process::exit(1);
     });
 
     panic::set_hook(Box::new(|p| {

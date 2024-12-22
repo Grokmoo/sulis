@@ -18,7 +18,6 @@ use std::cell::RefCell;
 use std::collections::HashMap;
 use std::io::Error;
 use std::rc::Rc;
-use std::result;
 
 use rlua::{UserData, UserDataMethods};
 use serde::{Deserialize, Serialize};
@@ -324,15 +323,14 @@ impl CallbackData {
     pub fn update_entity_refs_on_load(
         &mut self,
         entities: &HashMap<usize, Rc<RefCell<EntityState>>>,
-    ) -> result::Result<(), Error> {
-        match entities.get(&self.parent) {
-            None => {
-                return invalid_data_error(&format!("Invalid parent {} for callback", self.parent));
-            }
-            Some(entity) => self.parent = entity.borrow().index(),
-        }
+    ) -> Result<(), Error> {
+        self.parent = entities
+            .get(&self.parent)
+            .ok_or_else(|| invalid_data_error(&format!("Invalid parent {} for callback", self.parent)))?
+            .borrow()
+            .index();
 
-        if let Some(ref mut targets) = &mut self.targets {
+        if let Some(targets) = &mut self.targets {
             targets.update_entity_refs_on_load(entities)?;
         }
         Ok(())

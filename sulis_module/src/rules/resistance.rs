@@ -45,12 +45,6 @@ impl Resistance {
     }
 
     pub fn is_empty(&self) -> bool {
-        for val in self.kinds.iter() {
-            if *val > 0 {
-                return false;
-            }
-        }
-
-        true
+        self.kinds.iter().all(|&x| x == 0)
     }
 }

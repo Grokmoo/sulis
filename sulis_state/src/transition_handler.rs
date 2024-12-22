@@ -147,44 +147,54 @@ fn transition_party(
     }
 }
 
+// pub fn find_transition_location(location: &mut Location, size: &ObjectSize, area: &AreaState) {
+//     let (base_x, base_y) = (location.x, location.y);
+//     let mut search_size = 0;
+//     while search_size < 10 {
+//         for y in -search_size..=search_size {
+//             for x in -search_size..=search_size {
+//                 if area.is_passable_size(size, base_x + x, base_y + y) {
+//                     location.x = base_x + x;
+//                     location.y = base_y + y;
+//                     return;
+//                 }
+//             }
+//         }
+//
+//         search_size += 1;
+//     }
+//
+//     warn!("Unable to find transition locations for all party members");
+// }
 pub fn find_transition_location(location: &mut Location, size: &ObjectSize, area: &AreaState) {
     let (base_x, base_y) = (location.x, location.y);
-    let mut search_size = 0;
-    while search_size < 10 {
-        // TODO a lot of duplicate effort here
-        for y in -search_size..=search_size {
-            for x in -search_size..=search_size {
-                if area.is_passable_size(size, base_x + x, base_y + y) {
-                    location.x = base_x + x;
-                    location.y = base_y + y;
-                    return;
-                }
-            }
-        }
 
-        search_size += 1;
+    for search_size in 0..10 {
+        if let Some((x, y)) = (-search_size..=search_size)
+            .flat_map(|y| (-search_size..=search_size).map(move |x| (x, y)))
+            .find(|&(x, y)| area.is_passable_size(size, base_x + x, base_y + y))
+        {
+            location.x = base_x + x;
+            location.y = base_y + y;
+            return;
+        }
     }
 
     warn!("Unable to find transition locations for all party members");
 }
 
 fn add_member_auras(mgr: &mut TurnManager, area: &mut AreaState, index: usize, dx: i32, dy: i32) {
-    let aura_indices = mgr.auras_for(index);
-    for aura_index in aura_indices {
-        let aura = mgr.effect_mut(aura_index);
-        let surface = match aura.surface {
-            None => continue,
-            Some(ref mut surface) => surface,
-        };
-        surface.area_id = area.area.area.id.to_string();
-        for p in surface.points.iter_mut() {
-            p.x -= dx;
-            p.y -= dy;
-        }
+    for aura_index in mgr.auras_for(index) {
+        if let Some(surface) = mgr.effect_mut(aura_index).surface.as_mut() {
+            surface.area_id = area.area.area.id.to_string();
+            surface.points.iter_mut().for_each(|p| {
+                p.x -= dx;
+                p.y -= dy;
+            });
 
-        let to_add = area.add_surface(aura_index, &surface.points);
-        for entity in to_add {
-            mgr.add_to_surface(entity, aura_index);
+            area.add_surface(aura_index, &surface.points)
+                .into_iter()
+                .for_each(|entity| mgr.add_to_surface(entity, aura_index));
         }
     }
 }

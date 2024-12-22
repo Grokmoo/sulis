@@ -40,7 +40,9 @@ impl AnimatedImage {
         let mut images_vec = Vec::new();
 
         if builder.states.is_empty() {
-            return invalid_data_error("Animated image must have 1 or more sub images.");
+            return Err(invalid_data_error(
+                "Animated image must have 1 or more sub images.",
+            ));
         }
 
         let mut size: Option<Size> = None;
@@ -50,10 +52,9 @@ impl AnimatedImage {
 
             let image = match images.get(&image_id) {
                 None => {
-                    return invalid_data_error(&format!(
-                        "Unable to locate sub \
-                         image '{image_id}'"
-                    ));
+                    return Err(invalid_data_error(&format!(
+                        "Unable to locate sub image '{image_id}'"
+                    )));
                 }
                 Some(image) => Rc::clone(image),
             };
@@ -62,10 +63,10 @@ impl AnimatedImage {
                 None => size = Some(*image.get_size()),
                 Some(ref size) => {
                     if *size != *image.get_size() {
-                        return invalid_data_error(
+                        return Err(invalid_data_error(
                             "All images in an animated image \
                              must have the same size.",
-                        );
+                        ));
                     }
                 }
             }

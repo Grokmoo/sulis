@@ -42,16 +42,16 @@ impl ObjectSize {
         let height = builder.height as i32;
         for p in builder.relative_points.into_iter() {
             if p.len() != 2 {
-                return invalid_data_error("Point array length must be equal to 2");
+                return Err(invalid_data_error("Point array length must be equal to 2"));
             }
 
             let x = p[0] as i32;
             let y = p[1] as i32;
             if x < 0 || y < 0 || x >= width || y >= height {
-                return invalid_data_error(&format!(
+                return Err(invalid_data_error(&format!(
                     "Point coords must be within {},{}",
                     builder.width, builder.height
-                ));
+                )));
             }
 
             points.push(Point::new(x, y));

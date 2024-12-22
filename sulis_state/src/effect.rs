@@ -87,9 +87,9 @@ impl Effect {
             if let Some(aura) = surface.aura.take() {
                 match entities.get(&aura) {
                     None => {
-                        return invalid_data_error(&format!(
+                        return Err(invalid_data_error(&format!(
                             "Invalid aura parent {aura} for effect"
-                        ));
+                        )));
                     }
                     Some(entity) => {
                         surface.aura = Some(entity.borrow().index());

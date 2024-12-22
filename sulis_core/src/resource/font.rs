@@ -153,10 +153,10 @@ impl Font {
         for char_builder in builder.characters {
             let id = match char::from_u32(char_builder.id) {
                 None => {
-                    return invalid_data_error(&format!(
+                    return Err(invalid_data_error(&format!(
                         "'{}' is not a valid utf8 character.",
                         char_builder.id
-                    ));
+                    )));
                 }
                 Some(c) => c,
             };

@@ -51,20 +51,16 @@ pub struct AbilityState {
 }
 
 fn get_modes(ability: &Ability, input: &[String]) -> Vec<Rc<Ability>> {
-    let mut out = Vec::new();
-
-    for id in input {
-        match Module::ability(id) {
+    input
+        .iter()
+        .filter_map(|id| match Module::ability(id) {
             None => {
                 warn!("Invalid requires_active_mode for {}", ability.id);
+                None
             }
-            Some(ability) => {
-                out.push(ability);
-            }
-        }
-    }
-
-    out
+            Some(ability) => Some(ability),
+        })
+        .collect()
 }
 
 impl AbilityState {

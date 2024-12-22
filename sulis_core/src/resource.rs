@@ -169,10 +169,10 @@ impl ResourceSet {
             );
 
             if !set.fonts.contains_key(&Config::default_font()) {
-                return invalid_data_error(&format!(
+                return Err(invalid_data_error(&format!(
                     "Default font '{}' is not defined.",
                     Config::default_font()
-                ));
+                )));
             }
 
             let image_start = std::time::Instant::now();
@@ -303,29 +303,31 @@ impl ResourceSet {
 
     fn sound_internal(&self, id: &str) -> Result<SoundSource, Error> {
         let split_index = match id.find('/') {
-            None => return invalid_data_error("Sound must be {SET_ID}/{SOUND_ID}"),
+            None => return Err(invalid_data_error("Sound must be {SET_ID}/{SOUND_ID}")),
             Some(idx) => idx,
         };
 
         let (set_id, sound_id) = id.split_at(split_index);
         if sound_id.is_empty() {
-            return invalid_data_error("Sound must be {SET_ID}/{SOUND_ID}");
+            return Err(invalid_data_error("Sound must be {SET_ID}/{SOUND_ID}"));
         }
 
         let sound_id = &sound_id[1..];
 
         let set = match self.sound_sets.get(set_id) {
             None => {
-                return invalid_data_error(&format!("Unable to locate sound set '{set_id}'"));
+                return Err(invalid_data_error(&format!(
+                    "Unable to locate sound set '{set_id}'"
+                )));
             }
             Some(set) => set,
         };
 
         let sound = match set.get(sound_id) {
             None => {
-                return invalid_data_error(&format!(
+                return Err(invalid_data_error(&format!(
                     "Unable to locate sound '{sound_id}' in set '{set_id}'"
-                ));
+                )));
             }
             Some(sound) => sound.clone(),
         };
@@ -342,30 +344,30 @@ impl ResourceSet {
         );
 
         let split_index = match id.find('/') {
-            None => return format_error,
+            None => return Err(format_error),
             Some(index) => index,
         };
 
         let (spritesheet_id, sprite_id) = id.split_at(split_index);
         if sprite_id.is_empty() {
-            return format_error;
+            return Err(format_error);
         }
         let sprite_id = &sprite_id[1..];
 
         let sheet = match self.spritesheets.get(spritesheet_id) {
             None => {
-                return invalid_data_error(&format!(
+                return Err(invalid_data_error(&format!(
                     "Unable to locate spritesheet '{spritesheet_id}'"
-                ));
+                )));
             }
             Some(sheet) => sheet,
         };
 
         let sprite = match sheet.sprites.get(sprite_id) {
             None => {
-                return invalid_data_error(&format!(
+                return Err(invalid_data_error(&format!(
                     "Unable to locate sprite '{sprite_id}' in spritesheet '{spritesheet_id}'"
-                ));
+                )));
             }
             Some(sprite) => Rc::clone(sprite),
         };
@@ -393,6 +395,7 @@ pub fn insert_if_ok<K: Eq + Hash + Display, V>(
         type_str,
         key
     );
+
     match val {
         Err(e) => warn_on_insert(type_str, key, e),
         Ok(v) => {
@@ -448,8 +451,6 @@ where
     D: Deserializer<'de>,
 {
     let id = String::deserialize(deserializer)?;
-    match ResourceSet::image(&id) {
-        None => Err(de::Error::custom(format!("No image with ID '{id}' found"))),
-        Some(image) => Ok(image),
-    }
+    ResourceSet::image(&id)
+        .ok_or_else(|| de::Error::custom(format!("No image with ID '{id}' found")))
 }

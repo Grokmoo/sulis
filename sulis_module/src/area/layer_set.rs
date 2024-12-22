@@ -56,10 +56,10 @@ impl LayerSet {
                 let tile = Module::tile(tile_id).unwrap();
 
                 if !layer_tiles.contains_key(&tile.layer) {
-                    return invalid_data_error(&format!(
+                    return Err(invalid_data_error(&format!(
                         "Tile {} has undefined layer {}",
                         tile_id, tile.layer
-                    ));
+                    )));
                 }
 
                 let cur_layer = layer_tiles.get_mut(&tile.layer).unwrap();
@@ -88,7 +88,7 @@ impl LayerSet {
         }
 
         if layers.is_empty() {
-            return invalid_data_error("No tiles in area layer_set");
+            return Err(invalid_data_error("No tiles in area layer_set"));
         }
 
         let entity_layer_index = builder.entity_layer;
@@ -152,9 +152,9 @@ impl LayerSet {
         }
 
         if entity_layer_index >= layers.len() {
-            return invalid_data_error(&format!(
+            return Err(invalid_data_error(&format!(
                 "Entity layer of {entity_layer_index} is invalid."
-            ));
+            )));
         }
 
         let elevation;
@@ -187,7 +187,7 @@ impl LayerSet {
             match tile_ref {
                 Some(t) => t,
                 None => {
-                    return invalid_data_error(&format!("Tile not found '{tile_id}'"));
+                    return Err(invalid_data_error(&format!("Tile not found '{tile_id}'")));
                 }
             };
 
@@ -196,7 +196,9 @@ impl LayerSet {
                     continue;
                 }
 
-                return invalid_data_error(&format!("Point array length is not 2 in '{tile_id}'"));
+                return Err(invalid_data_error(&format!(
+                    "Point array length is not 2 in '{tile_id}'"
+                )));
             }
         }
 

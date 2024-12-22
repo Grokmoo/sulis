@@ -349,22 +349,19 @@ impl Widget {
     /// that is already borrowed (typically by the caller).
     /// returns true if the child exists, false otherwise
     pub fn has_child_with_name(widget: &Rc<RefCell<Widget>>, name: &str) -> bool {
-        for child in widget.borrow().children.iter() {
-            let child_ref = match child.try_borrow() {
-                Err(_) => continue,
-                Ok(child) => child,
-            };
-
-            let kind = match child_ref.kind.try_borrow() {
-                Err(_) => continue,
-                Ok(kind) => kind,
-            };
-
-            if kind.get_name() == name {
-                return true;
-            }
-        }
-        false
+        widget.borrow().children.iter().any(|child| {
+            child
+                .try_borrow()
+                .ok()
+                .and_then(|child_ref| {
+                    child_ref
+                        .kind
+                        .try_borrow()
+                        .ok()
+                        .map(|kind| kind.get_name() == name)
+                })
+                .unwrap_or(false)
+        })
     }
 
     /// gets the child of the specified widget with the specified kind name, if it
@@ -374,22 +371,17 @@ impl Widget {
         widget: &Rc<RefCell<Widget>>,
         name: &str,
     ) -> Option<Rc<RefCell<Widget>>> {
-        for child in widget.borrow().children.iter() {
-            let child_ref = match child.try_borrow() {
-                Err(_) => continue,
-                Ok(child) => child,
-            };
-
-            let kind = match child_ref.kind.try_borrow() {
-                Err(_) => continue,
-                Ok(kind) => kind,
-            };
-
-            if kind.get_name() == name {
-                return Some(Rc::clone(child));
-            }
-        }
-        None
+        widget.borrow().children.iter().find_map(|child| {
+            child.try_borrow().ok().and_then(|child_ref| {
+                child_ref.kind.try_borrow().ok().and_then(|kind| {
+                    if kind.get_name() == name {
+                        Some(Rc::clone(child))
+                    } else {
+                        None
+                    }
+                })
+            })
+        })
     }
 
     /// Attempts to grab keyboard focus.  this will fail if
@@ -545,19 +537,13 @@ impl Widget {
     }
 
     fn find_new_modal_child(parent: &Rc<RefCell<Widget>>) -> Option<Rc<RefCell<Widget>>> {
-        let len = parent.borrow().children.len();
-        for i in (0..len).rev() {
-            let child = Rc::clone(&parent.borrow().children[i]);
+        parent.borrow().children.iter().rev().find_map(|child| {
             if child.borrow().state.is_modal {
-                return Some(child);
+                Some(Rc::clone(child))
+            } else {
+                Widget::find_new_modal_child(child)
             }
-
-            if let Some(child) = Widget::find_new_modal_child(&child) {
-                return Some(child);
-            }
-        }
-
-        None
+        })
     }
 
     pub fn check_children_removal(parent: &Rc<RefCell<Widget>>) {

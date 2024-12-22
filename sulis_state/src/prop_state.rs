@@ -173,11 +173,12 @@ impl PropState {
                 for item_save_state in items {
                     let item = &item_save_state.item;
                     let variant = item.variant;
+                    //##
                     let item = match Module::create_get_item(&item.id, &item.adjectives) {
-                        None => invalid_data_error(&format!(
+                        None => Err(invalid_data_error(&format!(
                             "No item with ID '{}'",
                             item_save_state.item.id
-                        )),
+                        ))),
                         Some(item) => Ok(item),
                     }?;
 
@@ -185,9 +186,10 @@ impl PropState {
                 }
 
                 let loot = match loot_to_generate {
+                    //##
                     None => Ok(None),
                     Some(ref id) => match Module::loot_list(id) {
-                        None => invalid_data_error(&format!("No loot list with ID '{id}'")),
+                        None => Err(invalid_data_error(&format!("No loot list with ID '{id}'"))),
                         Some(loot_list) => Ok(Some(loot_list)),
                     },
                 }?;
@@ -261,22 +263,15 @@ impl PropState {
     }
 
     pub fn might_contain_items(&self) -> bool {
-        match self.interactive {
-            Interactive::Container {
-                ref items,
-                ref loot_to_generate,
-                ..
-            } => {
-                if !items.is_empty() {
-                    return true;
-                }
-                if loot_to_generate.is_some() {
-                    return true;
-                }
-
-                false
-            }
-            _ => false,
+        if let Interactive::Container {
+            items,
+            loot_to_generate,
+            ..
+        } = &self.interactive
+        {
+            !items.is_empty() || loot_to_generate.is_some()
+        } else {
+            false
         }
     }
 

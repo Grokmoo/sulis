@@ -92,16 +92,22 @@ impl EntityState {
         };
 
         let area = match areas.get(&save.location.area) {
-            None => {
-                invalid_data_error(&format!("Invalid area '{}' for entity", save.location.area))
-            }
+            //##
+            None => Err(invalid_data_error(&format!(
+                "Invalid area '{}' for entity",
+                save.location.area
+            ))),
             Some(area) => Ok(area),
         }?;
 
         let location = Location::new(save.location.x, save.location.y, &area.borrow().area.area);
 
         let size = match Module::object_size(&save.size) {
-            None => invalid_data_error(&format!("Invalid size '{}' for actor", save.size)),
+            //##
+            None => Err(invalid_data_error(&format!(
+                "Invalid size '{}' for actor",
+                save.size
+            ))),
             Some(size) => Ok(size),
         }?;
 

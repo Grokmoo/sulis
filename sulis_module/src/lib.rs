@@ -366,10 +366,10 @@ impl Module {
 
         let top_level = yaml.resources.remove(&YamlResourceKind::TopLevel);
         let (rules_yaml, campaign_yaml) = match top_level {
-            None => return invalid_data_error("No rules or campaign files defined"),
+            None => return Err(invalid_data_error("No rules or campaign files defined")),
             Some(mut map) => {
                 let rules_yaml = match map.remove("rules") {
-                    None => return invalid_data_error("No rules file defined"),
+                    None => return Err(invalid_data_error("No rules file defined")),
                     Some(yaml) => yaml,
                 };
 
@@ -391,16 +391,16 @@ impl Module {
                     }
 
                     if campaign_yaml.is_some() {
-                        return invalid_data_error(&format!(
+                        return Err(invalid_data_error(&format!(
                             "Multiple potential campaign files \
                              detected at top level: '{id}'"
-                        ));
+                        )));
                     }
                     campaign_yaml = Some(yaml);
                 }
 
                 if campaign_yaml.is_none() {
-                    return invalid_data_error("No campaign file found at top level");
+                    return Err(invalid_data_error("No campaign file found at top level"));
                 }
 
                 (rules_yaml, campaign_yaml.unwrap())

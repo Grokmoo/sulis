@@ -137,7 +137,7 @@ impl AnimationState {
     pub fn remove(&mut self, kind: Kind) {
         self.kinds.retain(|k| *k != kind);
         if self.kinds.is_empty() {
-            self.kinds.push(Kind::Normal);
+            self.kinds.push(Normal);
         }
     }
 

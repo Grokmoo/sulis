@@ -48,10 +48,10 @@ impl AnimSaveState {
             },
             AnimKind::EntityScale { scale } => Kind::EntityScale { scale: *scale },
             AnimKind::EntityImageLayer { images } => {
-                let mut imgs = HashMap::new();
-                for (layer, image) in images.iter() {
-                    imgs.insert(*layer, image.id());
-                }
+                let imgs: HashMap<_, _> = images
+                    .iter()
+                    .map(|(layer, image)| (*layer, image.id()))
+                    .collect();
                 Kind::EntityImageLayer { images: imgs }
             }
             AnimKind::ParticleGenerator { model, state } => {

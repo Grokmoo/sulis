@@ -179,18 +179,18 @@ impl Rules {
 
     pub fn validate(&self) -> Result<(), Error> {
         if self.hour_names.len() != self.hours_per_day as usize {
-            return invalid_data_error(&format!(
+            return Err(invalid_data_error(&format!(
                 "Must specify '{}' hours names to match number of hours",
                 self.hours_per_day
-            ));
+            )));
         }
 
         for (_, colors) in self.area_colors.iter() {
             if colors.len() != self.hours_per_day as usize {
-                return invalid_data_error(&format!(
+                return Err(invalid_data_error(&format!(
                     "Must specify '{}' hours for each area_colors.",
                     self.hours_per_day
-                ));
+                )));
             }
         }
 

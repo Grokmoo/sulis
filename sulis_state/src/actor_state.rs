@@ -48,7 +48,10 @@ impl ActorState {
     pub fn load(mut save: ActorSaveState, base: Option<ActorBuilder>) -> Result<ActorState, Error> {
         let actor = match base {
             None => match Module::actor(&save.id) {
-                None => invalid_data_error(&format!("No actor with id '{}'", save.id)),
+                None => Err(invalid_data_error(&format!(
+                    "No actor with id '{}'",
+                    save.id
+                ))),
                 Some(actor) => Ok(actor),
             }?,
             Some(builder) => Rc::new(Module::load_actor(builder)?),
@@ -85,10 +88,10 @@ impl ActorState {
         for (ability_id, state) in save.ability_states {
             let ability = match Module::ability(&ability_id) {
                 None => {
-                    return invalid_data_error(&format!(
+                    return Err(invalid_data_error(&format!(
                         "No ability with ID '{}' for actor '{}'",
                         ability_id, actor.id
-                    ));
+                    )));
                 }
                 Some(ability) => ability,
             };
@@ -120,34 +123,31 @@ impl ActorState {
 
     pub fn new(actor: Rc<Actor>) -> ActorState {
         trace!("Creating new actor state for {}", actor.id);
-        let inventory = Inventory::empty();
-
-        let image = LayeredImage::new(
-            actor
-                .image_layers()
-                .get_list(actor.sex, actor.hair_color, actor.skin_color),
-            actor.hue,
-        );
-        let attrs = actor.attributes;
-
-        let mut ability_states = HashMap::new();
-        for ability in actor.abilities.iter() {
-            let ability = &ability.ability;
-            if ability.active.is_none() {
-                continue;
-            }
-
-            ability_states.insert(ability.id.to_string(), AbilityState::new(ability));
-        }
 
         let mut actor_state = ActorState {
             actor: Rc::clone(&actor),
-            inventory,
-            stats: StatList::new(attrs),
+            inventory: Inventory::empty(),
+            stats: StatList::new(actor.attributes),
             listeners: ChangeListenerList::default(),
-            image,
+            image: LayeredImage::new(
+                actor
+                    .image_layers()
+                    .get_list(actor.sex, actor.hair_color, actor.skin_color),
+                actor.hue,
+            ),
             effects: Vec::new(),
-            ability_states,
+            ability_states: actor
+                .abilities
+                .iter()
+                .filter_map(|ability| {
+                    ability.ability.active.as_ref().map(|_| {
+                        (
+                            ability.ability.id.to_string(),
+                            AbilityState::new(&ability.ability),
+                        )
+                    })
+                })
+                .collect(),
             texture_cache_invalid: false,
             p_stats: PStats::new(&actor),
             anim_image_layers: HashMap::new(),
@@ -157,26 +157,24 @@ impl ActorState {
         actor_state.compute_stats();
 
         for (slot, item) in actor.inventory.equipped_iter() {
-            if !actor_state.can_equip(&item) {
+            if actor_state.can_equip(&item) {
+                let _ = actor_state.inventory.equip(item, Some(slot));
+            } else {
                 warn!(
                     "Unable to equip item '{}' for actor '{}'",
                     item.item.id, actor.id
                 );
-            } else {
-                let _ = actor_state.inventory.equip(item, Some(slot));
-                // don't deal with any items which have been unequiped as a result
             }
         }
 
         for (slot, item) in actor.inventory.quick_iter() {
-            if !actor_state.inventory.can_set_quick(&item, slot, &actor) {
+            if actor_state.inventory.can_set_quick(&item, slot, &actor) {
+                let _ = actor_state.inventory.set_quick(item, slot);
+            } else {
                 warn!(
                     "Unable to set quick item '{}' for actor '{}'",
                     item.item.id, actor.id
                 );
-            } else {
-                let _ = actor_state.inventory.set_quick(item, slot);
-                // don't deal with any item which has been removed as a result
             }
         }
 
@@ -342,14 +340,8 @@ impl ActorState {
     /// Returns true if the specified item can be used now - which includes
     /// having sufficient AP, false otherwise
     pub fn can_use(&self, item_state: &ItemState) -> bool {
-        if !item_state.item.meets_prereqs(&self.actor) {
-            return false;
-        }
-
-        match &item_state.item.usable {
-            None => false,
-            Some(usable) => self.p_stats.ap() >= usable.ap,
-        }
+        item_state.item.meets_prereqs(&self.actor) &&
+            item_state.item.usable.map_or(false, |usable| self.p_stats.ap() >= usable.ap)
     }
 
     fn group_has_uses(&self, group_id: &str) -> bool {
@@ -664,7 +656,8 @@ impl ActorState {
             reward.xp,
             parent.borrow().actor.actor.id
         );
-        if parent.borrow().is_party_member() || parent.borrow().actor.faction() == Faction::Friendly {
+        if parent.borrow().is_party_member() || parent.borrow().actor.faction() == Faction::Friendly
+        {
             for member in GameState::party().iter() {
                 member.borrow_mut().add_xp(reward.xp);
             }

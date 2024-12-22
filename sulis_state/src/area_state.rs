@@ -139,10 +139,8 @@ impl AreaState {
     }
 
     pub fn load(id: &str, save: AreaSaveState) -> Result<AreaState, Error> {
-        let area = match Module::area(id) {
-            None => invalid_data_error(&format!("Unable to find area '{id}'")),
-            Some(area) => Ok(area),
-        }?;
+        let area = Module::area(id)
+            .ok_or_else(|| invalid_data_error(&format!("Unable to find area '{id}'")))?;
 
         let mut area_state = AreaState::new(area, Some(save.seed))?;
 
@@ -165,7 +163,7 @@ impl AreaState {
 
         for (index, trigger_save) in save.triggers.into_iter().enumerate() {
             if index >= area_state.area.area.triggers.len() {
-                return invalid_data_error("Too many triggers defined in save");
+                return Err(invalid_data_error("Too many triggers defined in save"));
             }
 
             let trigger_state = TriggerState {
@@ -177,6 +175,7 @@ impl AreaState {
 
         area_state.add_transitions_from_area();
 
+        // area_state.merchants.extend(save.merchants.iter().map(|m| MerchantState::load(*m)));
         for merchant_save in save.merchants {
             area_state
                 .merchants
@@ -185,6 +184,56 @@ impl AreaState {
 
         Ok(area_state)
     }
+
+    // pub fn load(id: &str, save: AreaSaveState) -> Result<AreaState, Error> {
+    //     let area = Module::area(id)
+    //         .ok_or_else(|| invalid_data_error(&format!("Unable to find area '{id}'")))?;
+    //
+    //     let mut area_state = AreaState::new(area, Some(save.seed))?;
+    //     area_state.on_load_fired = save.on_load_fired;
+    //
+    //     // Decode `pc_explored` bitfield into boolean flags
+    //     save.pc_explored
+    //         .into_iter()
+    //         .enumerate()
+    //         .for_each(|(index, buf)| {
+    //             let mut mutable_buf = buf; // Create a separate mutable variable
+    //             (0..64).take_while(|_| mutable_buf > 0).for_each(|i| {
+    //                 let pc_exp_index = i + index * 64;
+    //                 if pc_exp_index < area_state.pc_explored.len() {
+    //                     area_state.pc_explored[pc_exp_index] = mutable_buf % 2 == 1;
+    //                 }
+    //                 mutable_buf /= 2; // Mutate the separate variable
+    //             });
+    //         });
+    //
+    //     // Load props
+    //     area_state.props.load(save.props)?;
+    //
+    //     // Load triggers
+    //     if save.triggers.len() > area_state.area.area.triggers.len() {
+    //         return Err(invalid_data_error("Too many triggers defined in save");
+    //     }
+    //     save.triggers.into_iter().enumerate().for_each(|(index, trigger_save)| {
+    //         area_state.add_trigger(
+    //             index,
+    //             TriggerState {
+    //                 enabled: trigger_save.enabled,
+    //                 fired: trigger_save.fired,
+    //             },
+    //         );
+    //     });
+    //
+    //     // Add transitions and merchants
+    //     area_state.add_transitions_from_area();
+    //     area_state.merchants = save
+    //         .merchants
+    //         .into_iter()
+    //         .map(MerchantState::load)
+    //         .collect::<Result<_, _>>()?;
+    //
+    //     Ok(area_state)
+    // }
 
     pub fn props(&self) -> &PropHandler {
         &self.props
@@ -937,7 +986,9 @@ impl AreaState {
         let y = location.y;
 
         if !self.area.area.coords_valid(x, y) {
-            return invalid_data_error(&format!("entity location is out of bounds: {x},{y}"));
+            return Err(invalid_data_error(&format!(
+                "entity location is out of bounds: {x},{y}"
+            )));
         }
 
         let entities_to_ignore = vec![entity.borrow().index()];

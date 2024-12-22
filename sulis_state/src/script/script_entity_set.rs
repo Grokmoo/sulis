@@ -147,13 +147,13 @@ impl ScriptEntitySet {
     pub fn update_entity_refs_on_load(
         &mut self,
         entities: &HashMap<usize, Rc<RefCell<EntityState>>>,
-    ) -> ::std::result::Result<(), Error> {
+    ) -> std::result::Result<(), Error> {
         match entities.get(&self.parent) {
             None => {
-                return invalid_data_error(&format!(
+                return Err(invalid_data_error(&format!(
                     "Invalid parent {} for ScriptEntitySet",
                     self.parent
-                ));
+                )));
             }
             Some(entity) => self.parent = entity.borrow().index(),
         }
@@ -164,9 +164,9 @@ impl ScriptEntitySet {
                 None => indices.push(None),
                 Some(index) => match entities.get(&index) {
                     None => {
-                        return invalid_data_error(&format!(
+                        return Err(invalid_data_error(&format!(
                             "Invalid target {index} for ScriptEntitySet"
-                        ));
+                        )));
                     }
                     Some(entity) => indices.push(Some(entity.borrow().index())),
                 },
@@ -246,22 +246,17 @@ impl UserData for ScriptEntitySet {
         });
 
         methods.add_method("random_affected_points", |_, set, frac: f32| {
-            let table: Vec<HashMap<&str, i32>> = set
+            Ok(set
                 .affected_points
                 .iter()
-                .filter_map(|p| {
-                    let roll = gen_rand(0.0, 1.0);
-                    if roll > frac {
-                        None
-                    } else {
-                        let mut map = HashMap::new();
-                        map.insert("x", p.0);
-                        map.insert("y", p.1);
-                        Some(map)
-                    }
+                .filter(|_| gen_rand(0.0, 1.0) <= frac)
+                .map(|&(x, y)| {
+                    let mut map = HashMap::new();
+                    map.insert("x", x);
+                    map.insert("y", y);
+                    map
                 })
-                .collect();
-            Ok(table)
+                .collect::<Vec<_>>())
         });
 
         methods.add_method("surface", |_, set, ()| match &set.surface {
@@ -276,6 +271,7 @@ impl UserData for ScriptEntitySet {
             Some(surf) => Ok(surf.clone()),
         });
 
+        //##
         methods.add_method("affected_points", |_, set, ()| {
             let table: Vec<HashMap<&str, i32>> = set
                 .affected_points

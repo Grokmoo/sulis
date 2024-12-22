@@ -54,6 +54,26 @@ pub fn setup() -> Result<()> {
     );
     Ok(())
 }
+// pub fn setup() -> Result<()> {
+//     let start = Instant::now();
+//
+//     SCRIPT_CACHE.with(|cache| {
+//         cache.borrow_mut().clear();
+//         Module::all_scripts().into_iter().for_each(|id| {
+//             let script = get_script_from_id(&id)?;
+//             let mut state = ScriptState::default();
+//             state.load(&id, &script)?;
+//             cache.borrow_mut().insert(id, Rc::new(state));
+//             Ok(())
+//         })
+//     })?;
+//
+//     info!(
+//         "Setup scripts in {:.3} millis",
+//         get_elapsed_millis(start.elapsed())
+//     );
+//     Ok(())
+// }
 
 pub fn set_report_enabled(enabled: bool) {
     REPORTING.with(|r| r.set(enabled));
@@ -62,20 +82,10 @@ pub fn set_report_enabled(enabled: bool) {
 fn parse_traceback_line_num(traceback: &str) -> Option<i32> {
     // find first line with a line number, this should be the right
     // place on the call stack
-
-    for line in traceback.lines() {
-        let num_str = match line.split(':').nth(1) {
-            None => continue,
-            Some(num_str) => num_str,
-        };
-
-        match num_str.parse() {
-            Err(_) => continue,
-            Ok(num) => return Some(num),
-        };
-    }
-
-    None
+    traceback
+        .lines()
+        .filter_map(|line| line.split(':').nth(1))
+        .find_map(|num_str| num_str.parse().ok())
 }
 
 #[allow(clippy::format_push_string)] // performance characteristics of this function are irrelevant
@@ -128,7 +138,7 @@ where
     let state = SCRIPT_CACHE.with(|cache| {
         let cache = cache.borrow();
 
-        //setup the script if it does not already exist
+        //set up the script if it does not already exist
         if !cache.contains_key(id) {
             return Err(rlua::Error::ToLuaConversionError {
                 from: "String",
@@ -242,21 +252,41 @@ pub fn ability_on_activate(parent: usize, func: String, ability: &Rc<Ability>) -
     exec_func(&script, &func, (parent, ability))
 }
 
+// pub fn ability_on_deactivate(parent: usize, ability: &Rc<Ability>) -> Result<()> {
+//     let script_parent = ScriptEntity::new(parent).try_unwrap()?;
+//     match script_parent.borrow().actor.ability_states.get(&ability.id) {
+//         None => return Ok(()),
+//         Some(state) => {
+//             if !state.is_active_mode() {
+//                 return Ok(());
+//             }
+//         }
+//     }
+//
+//     let script = get_ability_script_id(ability)?;
+//     let parent = ScriptEntity::new(parent);
+//     let ability = ScriptAbility::from(ability);
+//     exec_func(&script, "on_deactivate", (parent, ability))
+// }
 pub fn ability_on_deactivate(parent: usize, ability: &Rc<Ability>) -> Result<()> {
     let script_parent = ScriptEntity::new(parent).try_unwrap()?;
-    match script_parent.borrow().actor.ability_states.get(&ability.id) {
-        None => return Ok(()),
-        Some(state) => {
-            if !state.is_active_mode() {
-                return Ok(());
-            }
-        }
+
+    if !script_parent
+        .borrow()
+        .actor
+        .ability_states
+        .get(&ability.id)
+        .map_or(false, |state| state.is_active_mode())
+    {
+        return Ok(());
     }
 
     let script = get_ability_script_id(ability)?;
-    let parent = ScriptEntity::new(parent);
-    let ability = ScriptAbility::from(ability);
-    exec_func(&script, "on_deactivate", (parent, ability))
+    exec_func(
+        &script,
+        "on_deactivate",
+        (ScriptEntity::new(parent), ScriptAbility::from(ability)),
+    )
 }
 
 pub fn ability_on_target_select(
@@ -334,14 +364,20 @@ fn get_ability_script_id(ability: &Rc<Ability>) -> Result<String> {
 }
 
 fn get_script_from_id(id: &str) -> Result<String> {
-    match Module::script(id) {
-        None => Err(rlua::Error::ToLuaConversionError {
-            from: "&str",
-            to: "Script",
-            message: Some(format!("No script found with id '{id}'")),
-        }),
-        Some(script) => Ok(script),
-    }
+    // match Module::script(id) {
+    //     None => Err(rlua::Error::ToLuaConversionError {
+    //         from: "&str",
+    //         to: "Script",
+    //         message: Some(format!("No script found with id '{id}'")),
+    //     }),
+    //     Some(script) => Ok(script),
+    // }
+
+    Module::script(id).ok_or_else(|| rlua::Error::ToLuaConversionError {
+        from: "&str",
+        to: "Script",
+        message: Some(format!("No script found with id '{id}'")),
+    })
 }
 
 fn get_elapsed_millis(elapsed: Duration) -> f64 {

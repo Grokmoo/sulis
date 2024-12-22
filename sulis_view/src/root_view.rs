@@ -149,7 +149,7 @@ impl RootView {
     }
 
     pub fn set_inventory_window(&mut self, widget: &Rc<RefCell<Widget>>, desired_state: bool) {
-        self.set_window(widget, self::inventory_window::NAME, desired_state, &|| {
+        self.set_window(widget, inventory_window::NAME, desired_state, &|| {
             match GameState::selected().first() {
                 None => None,
                 Some(entity) => Some(InventoryWindow::new(entity)),
@@ -227,18 +227,15 @@ impl RootView {
 
     // returns true if there was at least one open window, false otherwise
     fn close_all_windows(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
-        let mut found = false;
-        for name in &WINDOW_NAMES {
-            match Widget::get_child_with_name(widget, name) {
-                None => continue,
-                Some(ref window) => {
+        WINDOW_NAMES.iter().fold(false, |found, name| {
+            Widget::get_child_with_name(widget, name)
+                .map(|window| {
                     window.borrow_mut().mark_for_removal();
-                    found = true;
-                }
-            }
-        }
-
-        found
+                    true
+                })
+                .unwrap_or(false)
+                || found
+        })
     }
 
     pub fn toggle_formation_window(&mut self, widget: &Rc<RefCell<Widget>>) {
@@ -768,6 +765,5 @@ fn create_button(
 
 fn is_defeated(party: &[Rc<RefCell<EntityState>>]) -> bool {
     //if any party member is not dead then the party is not defeated
-    party.is_empty() ||
-        party.iter().all(|member| !member.borrow().actor.is_dead())
+    party.is_empty() || party.iter().all(|member| !member.borrow().actor.is_dead())
 }

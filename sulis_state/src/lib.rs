@@ -179,18 +179,13 @@ impl WorldMapState {
         let campaign = Module::campaign();
         let map = &campaign.world_map;
 
-        for location in map.locations.iter() {
-            if self.locations.contains_key(&location.id) {
-                continue;
-            }
-
-            self.locations.insert(
-                location.id.clone(),
-                WorldMapLocationState {
+        for location in &map.locations {
+            self.locations
+                .entry(location.id.clone())
+                .or_insert(WorldMapLocationState {
                     visible: location.initially_visible,
                     enabled: location.initially_enabled,
-                },
-            );
+                });
         }
     }
 

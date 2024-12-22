@@ -91,14 +91,23 @@ impl GameState {
 
                 areas.insert(id, Rc::new(RefCell::new(area_state)));
             }
+            // let areas: HashMap<_, _> = save_state.areas
+            //     .into_iter()
+            //     .map(|(id, area_save)| {
+            //         let area_state = AreaState::load(&id, area_save);
+            //         (id, Rc::new(RefCell::new(area_state)))
+            //     })
+            //     .collect::<Result<_, _>>()?;
 
-            let area_state = match areas.get(&save_state.current_area) {
-                Some(area) => Ok(Rc::clone(area)),
-                None => invalid_data_error(&format!(
-                    "Unable to load current area '{}'",
-                    save_state.current_area
-                )),
-            }?;
+            let area_state = areas
+                .get(&save_state.current_area)
+                .map(Rc::clone)
+                .ok_or_else(|| {
+                    invalid_data_error(&format!(
+                        "Unable to load current area'{}'",
+                        save_state.current_area
+                    ))
+                })?;
 
             let width = area_state.borrow().area.area.width;
             let height = area_state.borrow().area.area.height;
@@ -116,19 +125,26 @@ impl GameState {
 
             for index in save_state.party {
                 match entities.get(&index) {
-                    None => return invalid_data_error(&format!("Invalid party index {index}")),
+                    None => {
+                        return Err(invalid_data_error(&format!("Invalid party index {index}")))
+                    }
                     Some(entity) => party.push(Rc::clone(entity)),
                 }
             }
 
             for index in save_state.selected {
                 match entities.get(&index) {
-                    None => return invalid_data_error(&format!("Invalid selected index {index}")),
+                    None => {
+                        return Err(invalid_data_error(&format!(
+                            "Invalid selected index {index}"
+                        )))
+                    }
                     Some(entity) => selected.push(Rc::clone(entity)),
                 }
             }
 
             for entity in entities.values() {
+                //##
                 let area_state = match areas.get(&entity.borrow().location.area_id) {
                     Some(state) => state,
                     None => unreachable!(),
@@ -145,6 +161,7 @@ impl GameState {
 
             let mgr = GameState::turn_manager();
             mgr.borrow_mut().cur_ai_group_index = save_state.manager.cur_ai_group_index;
+            //##
             for (key, value) in save_state.manager.ai_groups {
                 let index = match key.parse::<usize>() {
                     Ok(val) => val,
@@ -162,9 +179,12 @@ impl GameState {
 
                 let mut effect = Effect::load(effect_save, new_index, &entities)?;
                 if let Some(index) = effect.entity {
+                    //##
                     let entity = match entities.get(&index) {
                         None => {
-                            return invalid_data_error(&format!("Invalid effect entity {index}"));
+                            return Err(invalid_data_error(&format!(
+                                "Invalid effect entity {index}"
+                            )));
                         }
                         Some(entity) => Rc::clone(entity),
                     };
@@ -181,12 +201,13 @@ impl GameState {
                 }
 
                 if let Some(surface) = effect.surface.clone() {
+                    //##
                     let area = match areas.get(&surface.area_id) {
                         None => {
-                            return invalid_data_error(&format!(
+                            return Err(invalid_data_error(&format!(
                                 "Invalid area ID '{}'",
                                 surface.area_id
-                            ));
+                            )));
                         }
                         Some(area) => area,
                     };
@@ -223,8 +244,12 @@ impl GameState {
             let mut stash = ItemList::default();
             for item_save in save_state.stash {
                 let item = &item_save.item;
+                //##
                 let item = match Module::create_get_item(&item.id, &item.adjectives) {
-                    None => invalid_data_error(&format!("No item with ID '{}'", item_save.item.id)),
+                    None => Err(invalid_data_error(&format!(
+                        "No item with ID '{}'",
+                        item_save.item.id
+                    ))),
                     Some(item) => Ok(item),
                 }?;
 
@@ -362,7 +387,9 @@ impl GameState {
         {
             Err(_) => {
                 error!("Player character starting location must be within bounds and passable.");
-                return invalid_data_error("Unable to add player character at starting location");
+                return Err(invalid_data_error(
+                    "Unable to add player character at starting location",
+                ));
             }
             Ok(index) => index,
         };
@@ -390,7 +417,7 @@ impl GameState {
                 {
                     Err(_) => {
                         error!("Unable to find start location for party member");
-                        return invalid_data_error("Unable to find start locations.");
+                        return Err(invalid_data_error("Unable to find start locations."));
                     }
                     Ok(index) => index,
                 };

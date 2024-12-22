@@ -40,10 +40,8 @@ impl MerchantState {
         for item_save in save.items {
             let item = item_save.item;
             let variant = item.variant;
-            let item = match Module::create_get_item(&item.id, &item.adjectives) {
-                None => invalid_data_error(&format!("No item with ID '{}'", item.id)),
-                Some(item) => Ok(item),
-            }?;
+            let item = Module::create_get_item(&item.id, &item.adjectives)
+                .ok_or_else(|| invalid_data_error(&format!("No item with ID '{}'", item.id)))?;
 
             items.add_quantity(item_save.quantity, ItemState::new(item, variant));
         }

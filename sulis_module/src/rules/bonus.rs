@@ -95,7 +95,6 @@ pub enum Contingent {
     /// For bonuses applied to attacks, only Damage, MeleeAccuracy, RangedAccuracy,
     /// SpellAccuracy, CritChance, HitThreshold,
     /// GrazeThreshold, CritMultiplier, HitMultiplier, and GrazeMultiplier are valid
-
     /// Bonuses that should only be applied to an attack using the given WeaponKind
     AttackWithWeapon(WeaponKind),
 

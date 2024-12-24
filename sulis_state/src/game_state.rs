@@ -508,18 +508,12 @@ impl GameState {
         })
     }
 
-    pub fn set_user_zoom(mut zoom: f32) {
+    pub fn set_user_zoom(zoom: f32) {
         STATE.with(|state| {
             let mut state = state.borrow_mut();
             let state = state.as_mut().unwrap();
 
-            if zoom > MAX_ZOOM {
-                zoom = MAX_ZOOM;
-            } else if zoom < MIN_ZOOM {
-                zoom = MIN_ZOOM;
-            }
-
-            state.user_zoom = zoom;
+            state.user_zoom = zoom.clamp(MIN_ZOOM, MAX_ZOOM);
         });
     }
 

@@ -1112,7 +1112,7 @@ pub struct EntityIterator<'a> {
     index: usize,
 }
 
-impl<'a> Iterator for EntityIterator<'a> {
+impl Iterator for EntityIterator<'_> {
     type Item = Rc<RefCell<EntityState>>;
     fn next(&mut self) -> Option<Rc<RefCell<EntityState>>> {
         loop {

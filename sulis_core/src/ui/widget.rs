@@ -236,6 +236,8 @@ impl Widget {
             let kind = Rc::clone(&current.borrow().kind);
             if let Ok(mut kind) = kind.try_borrow_mut() {
                 if let Some(kind) = kind.as_any_mut().downcast_mut::<T>() {
+                    // Safety - this is definitely UB
+                    #[allow(clippy::missing_transmute_annotations)]
                     let kind = unsafe { mem::transmute::<_, &'a mut T>(kind) };
                     return (current, kind);
                 }
@@ -254,6 +256,8 @@ impl Widget {
             let kind = Rc::clone(&current.borrow().kind);
             if let Ok(kind) = kind.try_borrow() {
                 if let Some(kind) = kind.as_any().downcast_ref::<T>() {
+                    // Safety - this is definitely UB
+                    #[allow(clippy::missing_transmute_annotations)]
                     let kind = unsafe { mem::transmute::<_, &'a T>(kind) };
                     return (current, kind);
                 }

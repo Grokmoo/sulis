@@ -62,30 +62,30 @@
 //!
 //! # List of params
 //! * **a** - Center aligns the text in this tag based on the specified width.
-//! Uses a very simple peek ahead method that does not support nesting of this
-//! attribute recursively or most other tags.  Does support nested color tag.
-//! Only works over a single line
+//!   Uses a very simple peek ahead method that does not support nesting of this
+//!   attribute recursively or most other tags.  Does support nested color tag.
+//!   Only works over a single line
 //! * **r** - Right aligns text to the specified x coordinate.  Does not
-//! support nesting except for color tag, just like center.
+//!   support nesting except for color tag, just like center.
 //! * **c** - Specify a color, in one of several formats, all hex based:
-//! `RRGGBBAA`, `RRGGBB`, `RGBA`, `RGB`.  When using 2 characters for a component,
-//! you are specifying with full byte precision.  When using 1 character, you are
-//! specifying the 4 most significant bits.
+//!   `RRGGBBAA`, `RRGGBB`, `RGBA`, `RGB`.  When using 2 characters for a component,
+//!   you are specifying with full byte precision.  When using 1 character, you are
+//!   specifying the 4 most significant bits.
 //! * **s** - Specify a size as a float, with 1.0 being the basic text size.  The
-//! decimal part of the float is optional.
+//!   decimal part of the float is optional.
 //! * **x** - Causes writing to be repositioned to the given x coordinate.  This
-//! is not reset after the tag, so `[x=10|Some text]` and `[x=10|]Some text` are
-//! equivalent.
+//!   is not reset after the tag, so `[x=10|Some text]` and `[x=10|]Some text` are
+//!   equivalent.
 //! * **y** - Causes writing to be repositioned to the given y coordinate, in the
-//! same manner as `x` above.
+//!   same manner as `x` above.
 //! * **i** - Embeds an image.  The image must be referenced as `spritesheet/sprite`
-//! Note that drawing an image does not advance the writing cursor.  You will probably
-//! want to scale your image with `s`
+//!   Note that drawing an image does not advance the writing cursor.  You will probably
+//!   want to scale your image with `s`
 //! * **f** - Writes using another defined font.
 //! * **?** - Checks for the existance of a text argument.  If the argument is not
-//! present, this tag is ignored when producing the output.
+//!   present, this tag is ignored when producing the output.
 //! * **!** - Checks for the existance of a text argument.  If the argument is present,
-//! this tag is ignored when producing the output.
+//!   this tag is ignored when producing the output.
 //! # Line Wrapping
 //! The character '\n' is treated as a line break, and causes wrap around to the
 //! next line.  Lines that are too long will also be wrapped, with basic whitespace

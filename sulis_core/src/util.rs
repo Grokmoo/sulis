@@ -41,7 +41,7 @@ use crate::config::{self, Config};
 use crate::resource::write_to_file;
 
 const MAX_ULPS: i32 = 100;
-const MAX_DIFF: f32 = 2.0 * std::f32::EPSILON;
+const MAX_DIFF: f32 = 2.0 * f32::EPSILON;
 
 pub fn approx_eq_slice(a: &[f32], b: &[f32]) -> bool {
     if a.len() != b.len() { return false ; }

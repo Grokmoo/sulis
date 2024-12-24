@@ -325,7 +325,7 @@ impl UserData for ScriptEntitySet {
         methods.add_method("without_self", without_self);
         methods.add_method("visible_within", visible_within);
         methods.add_method("visible", |lua, set, ()| {
-            visible_within(lua, set, std::f32::MAX)
+            visible_within(lua, set, f32::MAX)
         });
         methods.add_method("hostile_to", |lua, set, faction| {
             hostile_to(lua, set, faction)

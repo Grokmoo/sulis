@@ -204,10 +204,7 @@ impl SelectAction {
         };
 
         let (x, y) = ((x - 0.5) as i32, (y - 0.5) as i32);
-        match area_state.get_entity_at(x, y) {
-            None => return None,
-            Some(_) => (),
-        }
+        area_state.get_entity_at(x, y)?;
 
         Some(Box::new(SelectAction { target }))
     }
@@ -759,7 +756,7 @@ impl MoveAction {
             let cost_per_move = pc.actor.get_move_ap_cost(1) as i32;
 
             let total_ap = if !GameState::is_combat_active() {
-                std::i32::MAX
+                i32::MAX
             } else {
                 pc.actor.ap() as i32
             };

@@ -18,7 +18,6 @@ use std::cell::RefCell;
 use std::collections::HashMap;
 use std::rc::Rc;
 use std::str::FromStr;
-use std::{self, f32, u32};
 
 use rlua::{self, Context, UserData, UserDataMethods};
 
@@ -1623,7 +1622,7 @@ impl UserData for ScriptEntity {
             let entity = entity.try_unwrap()?;
             let entity = entity.borrow();
 
-            let target = target.index.unwrap_or(std::usize::MAX);
+            let target = target.index.unwrap_or(usize::MAX);
             Ok(entity.actor.p_stats().is_threatened_by(target))
         });
     }

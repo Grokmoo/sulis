@@ -54,12 +54,7 @@ fn is_flanking(parent: &EntityState, target: &EntityState) -> bool {
         let p2 = (p_target.0 - p_other.0, p_target.1 - p_other.1);
 
         let mut cos_angle = (p1.0 * p2.0 + p1.1 * p2.1) / (p1.0.hypot(p1.1) * p2.0.hypot(p2.1));
-        if cos_angle > 1.0 {
-            cos_angle = 1.0;
-        }
-        if cos_angle < -1.0 {
-            cos_angle = -1.0;
-        }
+        cos_angle = cos_angle.clamp(-1.0, 1.0);
 
         let angle = cos_angle.acos().to_degrees();
 

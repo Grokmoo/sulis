@@ -63,7 +63,7 @@ impl<'a, 'b> StateLocationChecker<'a, 'b> {
     }
 }
 
-impl<'a, 'b> LocationChecker for StateLocationChecker<'a, 'b> {
+impl LocationChecker for StateLocationChecker<'_, '_> {
     fn passable(&self, x: i32, y: i32) -> bool {
         if !self.grid.is_passable(x, y) {
             return false;

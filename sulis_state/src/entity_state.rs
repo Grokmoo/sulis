@@ -19,7 +19,6 @@ use std::collections::HashMap;
 use std::io::Error;
 use std::ptr;
 use std::rc::Rc;
-use std::usize;
 
 use sulis_core::config::Config;
 

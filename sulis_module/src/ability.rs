@@ -113,13 +113,10 @@ impl Ability {
         let active = match builder.active {
             None => None,
             Some(active) => {
-                match module.scripts.get(&active.script) {
-                    None => {
-                        warn!("No script found with id '{}'", active.script);
-                        return unable_to_create_error("ability", &builder.id);
-                    }
-                    Some(_) => (),
-                };
+                if !module.scripts.contains_key(&active.script) {
+                    warn!("No script found with id '{}'", active.script);
+                    return unable_to_create_error("ability", &builder.id);
+                }
 
                 let cooldown = match active.cooldown {
                     None => match active.duration {

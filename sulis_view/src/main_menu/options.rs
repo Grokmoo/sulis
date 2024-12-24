@@ -459,7 +459,7 @@ impl Options {
                 setter(options, vol);
                 parent.borrow_mut().invalidate_children();
             })));
-            if (vol - cur).abs() < std::f32::EPSILON {
+            if (vol - cur).abs() < f32::EPSILON {
                 button.borrow_mut().state.set_active(true);
                 found = true;
             }
@@ -545,7 +545,7 @@ impl Options {
                     options.cur_default_zoom = zoom;
                     parent.borrow_mut().invalidate_children();
                 })));
-            if (zoom - self.cur_default_zoom).abs() < std::f32::EPSILON {
+            if (zoom - self.cur_default_zoom).abs() < f32::EPSILON {
                 button.borrow_mut().state.set_active(true);
                 zoom_found = true;
             }
@@ -619,7 +619,7 @@ impl Options {
                     options.cur_scroll_speed = speed;
                     parent.borrow_mut().invalidate_children();
                 })));
-            if (speed - self.cur_scroll_speed).abs() < std::f32::EPSILON {
+            if (speed - self.cur_scroll_speed).abs() < f32::EPSILON {
                 button.borrow_mut().state.set_active(true);
                 speed_found = true;
             }

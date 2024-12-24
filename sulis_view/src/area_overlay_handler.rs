@@ -396,11 +396,8 @@ impl AreaOverlayHandler {
     }
 
     pub fn handle_left_drag(&mut self) {
-        match self.selection_box_start {
-            None => {
-                self.selection_box_start = Some(Cursor::get_position_f32());
-            }
-            Some(_) => (),
+        if self.selection_box_start.is_none() {
+            self.selection_box_start = Some(Cursor::get_position_f32());
         }
     }
 

@@ -204,7 +204,7 @@ fn draw_to_surface<T: glium::Surface>(
     }
 }
 
-impl<'a> GraphicsRenderer for GliumRenderer<'a> {
+impl GraphicsRenderer for GliumRenderer<'_> {
     fn set_scissor(&mut self, pos: Point, size: Size) {
         let window_size = self.display.display.gl_window().window().inner_size();
         let (res_x, res_y) = Config::ui_size();
@@ -703,9 +703,9 @@ fn process_window_event(event: WindowEvent) -> Vec<InputAction> {
             };
 
             // scrolling the mouse wheeel seems to be buggy at the moment, only take some events
-            let amount = if (amount - 1.0).abs() < std::f32::EPSILON {
+            let amount = if (amount - 1.0).abs() < f32::EPSILON {
                 1
-            } else if (amount + 1.0).abs() < std::f32::EPSILON {
+            } else if (amount + 1.0).abs() < f32::EPSILON {
                 -1
             } else {
                 return Vec::new();

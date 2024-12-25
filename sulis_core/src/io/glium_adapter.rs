@@ -122,6 +122,18 @@ pub struct GliumDisplay {
     scale_factor: f64,
 }
 
+impl GliumDisplay {
+    fn set_matrix(&mut self) {
+        let (ui_x, ui_y) = Config::ui_size();
+        self.matrix = [
+            [2.0 / ui_x as f32, 0.0, 0.0, 0.0],
+            [0.0, 2.0 / ui_y as f32, 0.0, 0.0],
+            [0.0, 0.0, 1.0, 0.0],
+            [-1.0, -1.0, 0.0, 1.0f32],
+        ];
+    }
+}
+
 struct GliumTexture {
     texture: Texture2d,
     sampler_fn: Box<dyn Fn(Sampler<Texture2d>) -> Sampler<Texture2d>>,
@@ -403,6 +415,8 @@ fn try_get_display(
     let (res_x, res_y) = Config::display_resolution();
     let vsync = Config::vsync_enabled();
 
+    log::info!("Creating display {res_x} by {res_y}");
+
     let dims = LogicalSize::new(res_x as f64, res_y as f64);
 
     let attrs = Window::default_attributes()
@@ -542,23 +556,19 @@ impl GliumDisplay {
 
         window.set_cursor_visible(false);
 
-        let (ui_x, ui_y) = Config::ui_size();
-
-        Ok((GliumDisplay {
+        let mut glium_display = GliumDisplay {
             display,
             window,
             monitor,
             base_program,
             swap_program,
-            matrix: [
-                [2.0 / ui_x as f32, 0.0, 0.0, 0.0],
-                [0.0, 2.0 / ui_y as f32, 0.0, 0.0],
-                [0.0, 0.0, 1.0, 0.0],
-                [-1.0, -1.0, 0.0, 1.0f32],
-            ],
+            matrix: [[0.0; 4]; 4],
             textures: HashMap::new(),
             scale_factor,
-        }, event_loop))
+        };
+        glium_display.set_matrix();
+
+        Ok((glium_display, event_loop))
     }
 
     pub(crate) fn get_display_configurations(&self) -> Vec<DisplayConfiguration> {
@@ -722,6 +732,11 @@ impl ApplicationHandler for GliumApp {
                 if self.updater.is_exit() {
                     event_loop.exit();
                 } else if self.updater.recreate_window() {
+                    self.ui_x = Config::ui_width();
+                    self.ui_y = Config::ui_height();
+                    self.io.set_matrix();
+                    Cursor::update_max();
+
                     let window = &self.io.window;
                     let (res_x, res_y) = Config::display_resolution();
                     let (fullscreen, decorations) = configured_fullscreen(res_x, res_y, self.io.monitor.clone());

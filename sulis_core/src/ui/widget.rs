@@ -584,7 +584,7 @@ impl Widget {
         }
     }
 
-    pub(in crate::ui) fn setup_root(root: &Rc<RefCell<Widget>>) {
+    pub(crate) fn setup_root(root: &Rc<RefCell<Widget>>) {
         let (ui_x, ui_y) = Config::ui_size();
         let mut root = root.borrow_mut();
         root.state.set_size(Size::new(ui_x, ui_y));

@@ -16,27 +16,29 @@
 
 use std::time;
 use std::collections::HashMap;
-use std::io::{Error, ErrorKind};
+use std::error::Error;
 
 use crate::config::{Config, DisplayMode};
 use crate::io::keyboard_event::Key;
-use crate::io::*;
+use crate::{io::*, util};
 use crate::resource::ResourceSet;
 use crate::ui::{Cursor, Widget};
 use crate::util::{Point, get_elapsed_millis};
 
+use glium::winit::application::ApplicationHandler;
+use glium::CapabilitiesSource;
 use glium::backend::Facade;
-use glium::glutin::{
-    dpi::{LogicalSize, LogicalPosition},
-    ContextBuilder,
-    event::{Event, KeyboardInput, MouseButton, WindowEvent, VirtualKeyCode, ElementState, MouseScrollDelta},
-    event_loop::{ControlFlow, EventLoop, EventLoopWindowTarget},
-    monitor::MonitorHandle,
-    window::{Fullscreen, WindowBuilder},
-};
-use glium::texture::{RawImage2d, SrgbTexture2d};
+use glium::glutin::config::{ColorBufferType, ConfigTemplateBuilder};
+use glium::glutin::surface::WindowSurface;
+use glium::texture::{RawImage2d, Texture2d};
 use glium::uniforms::{MagnifySamplerFilter, MinifySamplerFilter, Sampler};
-use glium::{self, CapabilitiesSource, Rect, Surface};
+use glium::winit::dpi::{LogicalPosition, LogicalSize};
+use glium::winit::event_loop::{ActiveEventLoop, ControlFlow, EventLoop};
+use glium::winit::monitor::MonitorHandle;
+use glium::winit::window::{Fullscreen, Window, WindowId};
+use glium::winit::keyboard::{KeyCode, PhysicalKey};
+use glium::winit::event::{ElementState, KeyEvent, MouseButton, MouseScrollDelta, StartCause, WindowEvent};
+use glium::{self, Rect, Surface};
 
 const VERTEX_SHADER_SRC: &str = r#"
   #version 140
@@ -103,7 +105,8 @@ const SWAP_FRAGMENT_SHADER_SRC: &str = r#"
 "#;
 
 pub struct GliumDisplay {
-    display: glium::Display,
+    display: glium::Display<WindowSurface>,
+    window: Window,
     monitor: MonitorHandle,
     base_program: glium::Program,
     swap_program: glium::Program,
@@ -113,8 +116,8 @@ pub struct GliumDisplay {
 }
 
 struct GliumTexture {
-    texture: SrgbTexture2d,
-    sampler_fn: Box<dyn Fn(Sampler<SrgbTexture2d>) -> Sampler<SrgbTexture2d>>,
+    texture: Texture2d,
+    sampler_fn: Box<dyn Fn(Sampler<Texture2d>) -> Sampler<Texture2d>>,
 }
 
 pub struct GliumRenderer<'a> {
@@ -206,7 +209,7 @@ fn draw_to_surface<T: glium::Surface>(
 
 impl GraphicsRenderer for GliumRenderer<'_> {
     fn set_scissor(&mut self, pos: Point, size: Size) {
-        let window_size = self.display.display.gl_window().window().inner_size();
+        let window_size = self.display.window.inner_size();
         let (res_x, res_y) = Config::ui_size();
         let scale_x = window_size.width as f64 / res_x as f64;
         let scale_y = window_size.height as f64 / res_y as f64;
@@ -234,9 +237,9 @@ impl GraphicsRenderer for GliumRenderer<'_> {
         let dims = image.dimensions();
         trace!("Registering texture '{}', {}x{}", id, dims.0, dims.1);
         let image = RawImage2d::from_raw_rgba_reversed(&image.into_raw(), dims);
-        let texture = SrgbTexture2d::new(&self.display.display, image).unwrap();
+        let texture = Texture2d::new(&self.display.display, image).unwrap();
 
-        let sampler_fn: Box<dyn Fn(Sampler<SrgbTexture2d>) -> Sampler<SrgbTexture2d>> =
+        let sampler_fn: Box<dyn Fn(Sampler<Texture2d>) -> Sampler<Texture2d>> =
             Box::new(move |sampler| {
                 sampler
                     .magnify_filter(get_mag_filter(mag_filter))
@@ -302,11 +305,7 @@ impl GraphicsRenderer for GliumRenderer<'_> {
     }
 }
 
-fn glium_error<T, E: ::std::fmt::Display>(e: E) -> Result<T, Error> {
-    Err(Error::new(ErrorKind::Other, format!("{e}")))
-}
-
-fn configured_fullscreen(res_x: u32, res_y: u32, monitor: &MonitorHandle) -> (Option<Fullscreen>, bool) {
+fn configured_fullscreen(res_x: u32, res_y: u32, monitor: MonitorHandle) -> (Option<Fullscreen>, bool) {
     match Config::display_mode() {
         DisplayMode::Window => (None, true),
         DisplayMode::BorderlessWindow => (Some(Fullscreen::Borderless(Some(monitor.clone()))), false),
@@ -332,64 +331,63 @@ fn configured_fullscreen(res_x: u32, res_y: u32, monitor: &MonitorHandle) -> (Op
     }
 }
 
-fn try_get_display(
-    event_loop: &EventLoopWindowTarget<()>,
-    monitors: &[MonitorHandle],
-) -> Result<(glium::Display, MonitorHandle), glium::backend::glutin::DisplayCreationError> {
-    let monitor_index = Config::monitor();
-    let monitor = if monitor_index >= monitors.len() {
-        warn!("No available monitor at specified index: {}", monitor_index);
-        monitors[0].clone()
-    } else {
-        monitors[monitor_index].clone()
-    };
+fn get_monitor(window: &Window) -> MonitorHandle {
+    let target_monitor = Config::monitor();
+    for (index, monitor) in window.available_monitors().enumerate() {
+        if index == target_monitor {
+            return monitor;
+        }
+    }
+    warn!(
+        "Unable to find a monitor with configured index {}",
+        target_monitor
+    );
+    window.primary_monitor().unwrap()
+}
 
+fn try_get_display(
+    event_loop: &EventLoop<()>,
+) -> Result<(glium::Display<WindowSurface>, Window), glium::backend::glutin::DisplayCreationError> {
     let (res_x, res_y) = Config::display_resolution();
     let vsync = Config::vsync_enabled();
 
-    let (fullscreen, decorations) = configured_fullscreen(res_x, res_y, &monitor);
-
     let dims = LogicalSize::new(res_x as f64, res_y as f64);
 
-    let window = WindowBuilder::new()
-        .with_inner_size(dims)
+    let attrs = Window::default_attributes()
         .with_title("Sulis")
-        .with_decorations(decorations)
-        .with_fullscreen(fullscreen.clone());
-    let context = ContextBuilder::new()
-        .with_pixel_format(24, 8)
-        .with_vsync(vsync);
+        .with_inner_size(dims);
 
-    match context.build_windowed(window, event_loop) {
-        Ok(windowed_context) => {
-            match glium::Display::from_gl_window(windowed_context) {
-                Ok(display) => return Ok((display, monitor)),
-                Err(e) => {
-                    warn!("Unable to create hardware accelerated OpenGL display.  Falling back...");
-                    warn!("{}", e);
-                }
-            }
-        },
-        Err(e) => {
-            warn!("Unable to create hardware accelerated context.  Falling back...");
-            warn!("{}", e);
-        }
-    }
+    let config_template_builder = ConfigTemplateBuilder::new()
+        .with_depth_size(24)
+        .prefer_hardware_accelerated(Some(true))
+        .with_alpha_size(8)
+        .with_buffer_type(ColorBufferType::Rgb { r_size: 8, g_size: 8, b_size: 8 });
 
-    let window = WindowBuilder::new()
-        .with_inner_size(dims)
-        .with_title("Sulis")
-        .with_decorations(decorations)
-        .with_fullscreen(fullscreen);
-    let context = ContextBuilder::new()
-        .with_hardware_acceleration(None)
-        .with_pixel_format(24, 8)
-        .with_vsync(vsync);
-    let windowed_context = context.build_windowed(window, event_loop)?;
+    let (window, display) = glium::backend::glutin::SimpleWindowBuilder::new()
+        .set_window_builder(attrs)
+        .with_config_template_builder(config_template_builder)
+    .build(event_loop);
 
-    let display = glium::Display::from_gl_window(windowed_context)?;
+    Ok((display, window))
+}
 
-    Ok((display, monitor))
+fn configure_window(window: &Window, monitor: MonitorHandle) -> f64 {
+    let (res_x, res_y) = Config::display_resolution();
+
+    let (fullscreen, decorations) = configured_fullscreen(res_x, res_y, monitor.clone());
+
+    window.set_fullscreen(fullscreen);
+    window.set_decorations(decorations);
+
+    let scale_factor = monitor.scale_factor();
+    let physical_position = monitor.position();
+    // TODO this doesn't work if you have monitors with different hidpi factors
+    // would be very hard to solve in the general case, maybe just allow a configured
+    // logical position
+    let logical_position: LogicalPosition<f64> = physical_position.to_logical(scale_factor);
+    window.set_outer_position(logical_position);
+
+    scale_factor
 }
 
 pub struct GliumSystem {
@@ -398,7 +396,7 @@ pub struct GliumSystem {
     pub audio: Option<AudioDevice>,
 }
 
-pub fn create_system() -> Result<GliumSystem, Error> {
+pub fn create_system() -> Result<GliumSystem, Box<dyn Error>> {
     let (io, event_loop) = glium_adapter::GliumDisplay::new()?;
     let audio = create_audio_device();
 
@@ -406,29 +404,15 @@ pub fn create_system() -> Result<GliumSystem, Error> {
 }
 
 impl GliumDisplay {
-    pub fn new() -> Result<(GliumDisplay, EventLoop<()>), Error> {
+    pub fn new() -> Result<(GliumDisplay, EventLoop<()>), Box<dyn Error>> {
         debug!("Initialize Glium Display adapter.");
-        let event_loop = EventLoop::new();
+        let event_loop = EventLoop::new()?;
 
-        let monitors: Vec<MonitorHandle> = event_loop.available_monitors().collect();
-        if monitors.is_empty() {
-            return Err(Error::new(ErrorKind::Other, 
-                "Unable to detect any available monitors."
-            ));
-        }
+        let (display, window) = try_get_display(&event_loop)?;
 
-        let (display, monitor) = match try_get_display(&event_loop, &monitors) {
-            Ok(display) => display,
-            Err(e) => return glium_error(e),
-        };
+        let monitor = get_monitor(&window);
 
-        let scale_factor = monitor.scale_factor();
-        let physical_position = monitor.position();
-        // TODO this doesn't work if you have monitors with different hidpi factors
-        // would be very hard to solve in the general case, maybe just allow a configured
-        // logical position
-        let logical_position: LogicalPosition<f64> = physical_position.to_logical(scale_factor);
-        display.gl_window().window().set_outer_position(logical_position);
+        let scale_factor = configure_window(&window, monitor.clone());
 
         info!("Initialized glium adapter:");
         info!("Version: {}", display.get_opengl_version_string());
@@ -447,32 +431,27 @@ impl GliumDisplay {
 
         info!("Using hi dpi scale factor: {}", scale_factor);
 
-        let base_program = match glium::Program::from_source(
+        let base_program = glium::Program::from_source(
             &display,
             VERTEX_SHADER_SRC,
             FRAGMENT_SHADER_SRC,
             None,
-        ) {
-            Ok(prog) => prog,
-            Err(e) => return glium_error(e),
-        };
+        )?;
 
-        let swap_program = match glium::Program::from_source(
+        let swap_program = glium::Program::from_source(
             &display,
             VERTEX_SHADER_SRC,
             SWAP_FRAGMENT_SHADER_SRC,
             None,
-        ) {
-            Ok(prog) => prog,
-            Err(e) => return glium_error(e),
-        };
+        )?;
 
-        display.gl_window().window().set_cursor_visible(false);
+        window.set_cursor_visible(false);
 
         let (ui_x, ui_y) = Config::ui_size();
 
         Ok((GliumDisplay {
             display,
+            window,
             monitor,
             base_program,
             swap_program,
@@ -487,10 +466,10 @@ impl GliumDisplay {
         }, event_loop))
     }
 
-    pub(crate) fn get_display_configurations(&self, event_loop: &EventLoop<()>) -> Vec<DisplayConfiguration> {
+    pub(crate) fn get_display_configurations(&self) -> Vec<DisplayConfiguration> {
         let mut configs = Vec::new();
 
-        for (index, monitor_id) in event_loop.available_monitors().enumerate() {
+        for (index, monitor_id) in self.window.available_monitors().enumerate() {
             // glium get_name() does not seem to return anything useful in most cases
             let name = format!("Monitor {}", index + 1);
 
@@ -536,63 +515,116 @@ impl GliumDisplay {
     }
 }
 
-pub(crate) fn main_loop(
-    system: GliumSystem,
-    mut updater: Box<dyn ControlFlowUpdater>,
-) {
-    let mut io = system.io;
+pub(crate) fn main_loop(system: GliumSystem, updater: Box<dyn ControlFlowUpdater>) {
+    let io = system.io;
     let event_loop = system.event_loop;
-    let mut audio = system.audio;
-    let mut root = updater.root();
+    let audio = system.audio;
+    let root = updater.root();
 
-    let mut scale = io.scale_factor;
+    let scale = io.scale_factor;
     let (ui_x, ui_y) = Config::ui_size();
-    let mut mouse_move: Option<(f32, f32)> = None;
-    let mut display_size: LogicalSize<f64> = io.display.gl_window().window().inner_size().to_logical(scale);
+    let mouse_move: Option<(f32, f32)> = None;
+    let display_size: LogicalSize<f64> = io.window.inner_size().to_logical(scale);
 
     let frame_time = time::Duration::from_secs_f32(1.0 / Config::frame_rate() as f32);
 
     info!("Starting main loop.");
     let main_loop_start_time = time::Instant::now();
 
-    let mut frames = 0;
-    let mut render_time = time::Duration::from_secs(0);
-    let mut last_start_time = time::Instant::now();
+    let frames = 0;
+    let render_time = time::Duration::from_secs(0);
+    let last_start_time = time::Instant::now();
 
-    let mut last_elapsed = 0;
-    let mut total_elapsed = 0;
+    let last_elapsed = 0;
+    let total_elapsed = 0;
 
-    event_loop.run(move |event, _, control_flow| {
-        *control_flow = ControlFlow::WaitUntil(time::Instant::now() + frame_time);
+    let mut app = GliumApp {
+        io, audio, updater, display_size, scale, root, ui_x, ui_y, mouse_move, frame_time,
+        frames, render_time, last_start_time, main_loop_start_time, last_elapsed, total_elapsed,
+    };
 
+    if let Err(e) = event_loop.run_app(&mut app) {
+        log::error!("{e}");
+        util::error_and_exit("There was a fatal error initializing the display system.");
+    }
+}
+
+struct GliumApp {
+    io: GliumDisplay,
+    audio: Option<AudioDevice>,
+    updater: Box<dyn ControlFlowUpdater>,
+
+    display_size: LogicalSize<f64>,
+    scale: f64,
+    root: Rc<RefCell<Widget>>,
+    ui_x: i32,
+    ui_y: i32,
+    mouse_move: Option<(f32, f32)>,
+
+    frames: u32,
+    frame_time: std::time::Duration,
+    render_time: std::time::Duration,
+    last_start_time: std::time::Instant,
+    main_loop_start_time: std::time::Instant,
+    last_elapsed: u32,
+    total_elapsed: u32,
+}
+
+impl ApplicationHandler for GliumApp {
+    fn resumed(&mut self, _event_loop: &ActiveEventLoop) { }
+
+    fn new_events(&mut self, _event_loop: &ActiveEventLoop, _cause: StartCause) {
+        self.last_elapsed = get_elapsed_millis(self.last_start_time.elapsed());
+        self.last_start_time = time::Instant::now();
+        self.total_elapsed = get_elapsed_millis(self.main_loop_start_time.elapsed());
+    }
+
+    fn exiting(&mut self, _event_loop: &ActiveEventLoop) {
+        let secs = self.render_time.as_secs() as f64 + self.render_time.subsec_nanos() as f64 * 1e-9;
+        info!(
+            "Rendered {} frames with total render time {:.4} seconds",
+            self.frames, secs
+        );
+        info!(
+            "Average frame render time: {:.2} milliseconds",
+            1000.0 * secs / self.frames as f64
+        );
+    }
+
+    fn about_to_wait(&mut self, _event_loop: &ActiveEventLoop) {
+        self.io.window.request_redraw();
+    }
+
+    fn window_event(
+        &mut self,
+        event_loop: &ActiveEventLoop,
+        _window_id: WindowId,
+        event: WindowEvent,
+    ) {
         match event {
-            Event::WindowEvent { event: WindowEvent::Resized(size), .. } => {
-                display_size = size.to_logical(scale);
+            WindowEvent::Resized(size) => {
+                self.display_size = size.to_logical(self.scale);
             },
-            Event::WindowEvent { event: WindowEvent::ScaleFactorChanged { scale_factor, new_inner_size, ..}, .. } => {
-                scale = scale_factor;
-                display_size = new_inner_size.to_logical(scale);
-            }
-            Event::NewEvents(_) => {
-                last_elapsed = get_elapsed_millis(last_start_time.elapsed());
-                last_start_time = time::Instant::now();
-                total_elapsed = get_elapsed_millis(main_loop_start_time.elapsed());
+            WindowEvent::ScaleFactorChanged { scale_factor, .. } => {
+                self.scale = scale_factor;
             },
-            Event::MainEventsCleared => {
+            WindowEvent::CloseRequested => {
+                event_loop.exit();
+            },
+            WindowEvent::RedrawRequested => {
                 // merge all mouse move events into at most one per frame
-                if let Some((mouse_x, mouse_y)) = mouse_move {
-                    InputAction::mouse_move(mouse_x, mouse_y).handle(&root);
+                if let Some((mouse_x, mouse_y)) = self.mouse_move {
+                    InputAction::mouse_move(mouse_x, mouse_y).handle(&self.root);
                 }
-                mouse_move = None;
+                self.mouse_move = None;
 
-                root = updater.update(last_elapsed);
-                if updater.is_exit() {
-                    *control_flow = ControlFlow::Exit;
-                } else if updater.recreate_window() {
-                    let gl_window = io.display.gl_window();
-                    let window = gl_window.window();
+                self.root = self.updater.update(self.last_elapsed);
+                if self.updater.is_exit() {
+                    event_loop.exit();
+                } else if self.updater.recreate_window() {
+                    let window = &self.io.window;
                     let (res_x, res_y) = Config::display_resolution();
-                    let (fullscreen, decorations) = configured_fullscreen(res_x, res_y, &io.monitor);
+                    let (fullscreen, decorations) = configured_fullscreen(res_x, res_y, self.io.monitor.clone());
                     let set_res = fullscreen.is_none();
 
                     window.set_fullscreen(fullscreen);
@@ -600,48 +632,32 @@ pub(crate) fn main_loop(
 
                     if set_res {
                         let dims = LogicalSize::new(res_x as f64, res_y as f64);
-                        window.set_inner_size(dims);
+                        let _ = window.request_inner_size(dims);
                     }
 
-                    audio = create_audio_device();
+                    self.audio = create_audio_device();
                 }
 
-                Audio::update(audio.as_mut(), last_elapsed);
+                Audio::update(self.audio.as_mut(), self.last_elapsed);
 
-                io.render_output(&root.borrow(), total_elapsed);
+                self.io.render_output(&self.root.borrow(), self.total_elapsed);
 
-                render_time += last_start_time.elapsed();
-                frames += 1;
+                self.render_time += self.last_start_time.elapsed();
+                self.frames += 1;
+                event_loop.set_control_flow(ControlFlow::WaitUntil(time::Instant::now() + self.frame_time));
             },
-            Event::LoopDestroyed => {
-                let secs = render_time.as_secs() as f64 + render_time.subsec_nanos() as f64 * 1e-9;
-                info!(
-                    "Rendered {} frames with total render time {:.4} seconds",
-                    frames, secs
-                );
-                info!(
-                    "Average frame render time: {:.2} milliseconds",
-                    1000.0 * secs / frames as f64
-                );
+            WindowEvent::CursorMoved { position, .. } => {
+                let mouse_x = (self.ui_x as f64 * position.x / self.display_size.width) as f32 / self.scale as f32;
+                let mouse_y = (self.ui_y as f64 * position.y / self.display_size.height) as f32 / self.scale as f32;
+                self.mouse_move = Some((mouse_x, mouse_y));
             },
             event => {
-                if let Event::WindowEvent { event, .. } = event {
-                    match event {
-                        WindowEvent::CursorMoved { position, .. } => {
-                            let mouse_x = (ui_x as f64 * position.x / display_size.width) as f32 / scale as f32;
-                            let mouse_y = (ui_y as f64 * position.y / display_size.height) as f32 / scale as f32;
-                            mouse_move = Some((mouse_x, mouse_y));
-                        }
-                        _ => {
-                            for action in process_window_event(event) {
-                                action.handle(&root);
-                            }
-                        }
-                    }
+                for action in process_window_event(event) {
+                    action.handle(&self.root);
                 }
             }
         }
-    });
+    }
 }
 
 fn get_mag_filter(filter: TextureMagFilter) -> MagnifySamplerFilter {
@@ -666,13 +682,13 @@ fn process_window_event(event: WindowEvent) -> Vec<InputAction> {
     use WindowEvent::*;
     match event {
         CloseRequested => vec![InputAction::exit()],
-        ReceivedCharacter(c) => vec![InputAction::char_received(c)],
-        KeyboardInput { input, .. } => {
+        KeyboardInput { event, .. } => {
             let mut result = Vec::new();
-            let kb_event = match process_keyboard_input(input) {
+            let kb_event = match process_keyboard_input(&event) {
                 None => return Vec::new(),
                 Some(evt) => evt,
             };
+
             if matches!(kb_event.state, InputActionState::Started) {
                 result.push(InputAction::raw_key(kb_event.key));
             }
@@ -680,6 +696,15 @@ fn process_window_event(event: WindowEvent) -> Vec<InputAction> {
             if let Some(action) = Config::get_input_action(kb_event) {
                 result.push(action);
             }
+
+            if let Some(text) = event.text.as_ref() {
+                if event.state == ElementState::Pressed {
+                    for c in text.chars() {
+                        result.push(InputAction::char_received(c));
+                    }
+                }
+            }
+
             result
         }
         MouseInput { state, button, .. } => {
@@ -717,96 +742,97 @@ fn process_window_event(event: WindowEvent) -> Vec<InputAction> {
     }
 }
 
-fn process_keyboard_input(input: KeyboardInput) -> Option<KeyboardEvent> {
-    let state = match input.state {
-        ElementState::Pressed => InputActionState::Started,
-        ElementState::Released => InputActionState::Stopped,
-    };
-    trace!("Glium keyboard input {:?}", input);
+fn process_keyboard_input(event: &KeyEvent) -> Option<KeyboardEvent> {
+    trace!("Winit keyboard input {:?}", event);
 
-    let key_code = match input.virtual_keycode {
-        None => return None,
-        Some(key) => key,
+    let key_code = match event.physical_key {
+        PhysicalKey::Code(key_code) => key_code,
+        PhysicalKey::Unidentified(_) => return None,
     };
 
-    use crate::io::keyboard_event::Key::*;
-    use VirtualKeyCode::*;
+    use KeyCode::*;
     let key = match key_code {
-        A => KeyA,
-        B => KeyB,
-        C => KeyC,
-        D => KeyD,
-        E => KeyE,
-        F => KeyF,
-        G => KeyG,
-        H => KeyH,
-        I => KeyI,
-        J => KeyJ,
-        K => KeyK,
-        L => KeyL,
-        M => KeyM,
-        N => KeyN,
-        O => KeyO,
-        P => KeyP,
-        Q => KeyQ,
-        R => KeyR,
-        S => KeyS,
-        T => KeyT,
-        U => KeyU,
-        V => KeyV,
-        W => KeyW,
-        X => KeyX,
-        Y => KeyY,
-        Z => KeyZ,
-        VirtualKeyCode::Key0 => Key::Key0,
-        VirtualKeyCode::Key1 => Key::Key1,
-        VirtualKeyCode::Key2 => Key::Key2,
-        VirtualKeyCode::Key3 => Key::Key3,
-        VirtualKeyCode::Key4 => Key::Key4,
-        VirtualKeyCode::Key5 => Key::Key5,
-        VirtualKeyCode::Key6 => Key::Key6,
-        VirtualKeyCode::Key7 => Key::Key7,
-        VirtualKeyCode::Key8 => Key::Key8,
-        VirtualKeyCode::Key9 => Key::Key9,
-        Escape => KeyEscape,
-        Back => KeyBackspace,
-        Tab => KeyTab,
-        Space => KeySpace,
-        Return => KeyEnter,
-        Grave => KeyGrave,
-        Minus | NumpadSubtract => KeyMinus,
-        Equals => KeyEquals,
-        LBracket => KeyLeftBracket,
-        RBracket => KeyRightBracket,
-        Semicolon => KeySemicolon,
-        Apostrophe => KeySingleQuote,
-        Comma => KeyComma,
-        Period => KeyPeriod,
-        Slash => KeySlash,
-        Backslash => KeyBackslash,
-        Home => KeyHome,
-        End => KeyEnd,
-        Insert => KeyInsert,
-        Delete => KeyDelete,
-        PageDown => KeyPageDown,
-        PageUp => KeyPageUp,
-        Up => KeyUp,
-        Down => KeyDown,
-        Left => KeyLeft,
-        Right => KeyRight,
-        F1 => KeyF1,
-        F2 => KeyF2,
-        F3 => KeyF3,
-        F4 => KeyF4,
-        F5 => KeyF5,
-        F6 => KeyF6,
-        F7 => KeyF7,
-        F8 => KeyF8,
-        F9 => KeyF9,
-        F10 => KeyF10,
-        F11 => KeyF11,
-        F12 => KeyF12,
-        _ => KeyUnknown,
+        KeyA => Key::KeyA,
+        KeyB => Key::KeyB,
+        KeyC => Key::KeyC,
+        KeyD => Key::KeyD,
+        KeyE => Key::KeyE,
+        KeyF => Key::KeyF,
+        KeyG => Key::KeyG,
+        KeyH => Key::KeyH,
+        KeyI => Key::KeyI,
+        KeyJ => Key::KeyJ,
+        KeyK => Key::KeyK,
+        KeyL => Key::KeyL,
+        KeyM => Key::KeyM,
+        KeyN => Key::KeyN,
+        KeyO => Key::KeyO,
+        KeyP => Key::KeyP,
+        KeyQ => Key::KeyQ,
+        KeyR => Key::KeyR,
+        KeyS => Key::KeyS,
+        KeyT => Key::KeyT,
+        KeyU => Key::KeyU,
+        KeyV => Key::KeyV,
+        KeyW => Key::KeyW,
+        KeyX => Key::KeyX,
+        KeyY => Key::KeyY,
+        KeyZ => Key::KeyZ,
+        Digit0 | Numpad0 => Key::Key0,
+        Digit1 | Numpad1 => Key::Key1,
+        Digit2 | Numpad2 => Key::Key2,
+        Digit3 | Numpad3 => Key::Key3,
+        Digit4 | Numpad4 => Key::Key4,
+        Digit5 | Numpad5 => Key::Key5,
+        Digit6 | Numpad6 => Key::Key6,
+        Digit7 | Numpad7 => Key::Key7,
+        Digit8 | Numpad8 => Key::Key8,
+        Digit9 | Numpad9 => Key::Key9,
+        Escape => Key::KeyEscape,
+        Backspace => Key::KeyBackspace,
+        Tab => Key::KeyTab,
+        Space => Key::KeySpace,
+        Enter => Key::KeyEnter,
+        Backquote => Key::KeyGrave,
+        Minus | NumpadSubtract => Key::KeyMinus,
+        Equal => Key::KeyEquals,
+        BracketLeft => Key::KeyLeftBracket,
+        BracketRight => Key::KeyRightBracket,
+        Semicolon => Key::KeySemicolon,
+        Quote => Key::KeySingleQuote,
+        Comma => Key::KeyComma,
+        Period => Key::KeyPeriod,
+        Slash => Key::KeySlash,
+        Backslash => Key::KeyBackslash,
+        Home => Key::KeyHome,
+        End => Key::KeyEnd,
+        Insert => Key::KeyInsert,
+        Delete => Key::KeyDelete,
+        PageDown => Key::KeyPageDown,
+        PageUp => Key::KeyPageUp,
+        ArrowUp => Key::KeyUp,
+        ArrowDown => Key::KeyDown,
+        ArrowLeft => Key::KeyLeft,
+        ArrowRight => Key::KeyRight,
+        F1 => Key::KeyF1,
+        F2 => Key::KeyF2,
+        F3 => Key::KeyF3,
+        F4 => Key::KeyF4,
+        F5 => Key::KeyF5,
+        F6 => Key::KeyF6,
+        F7 => Key::KeyF7,
+        F8 => Key::KeyF8,
+        F9 => Key::KeyF9,
+        F10 => Key::KeyF10,
+        F11 => Key::KeyF11,
+        F12 => Key::KeyF12,
+        _ => return None,
+    };
+
+    let state = if event.state == ElementState::Pressed {
+        InputActionState::Started
+    } else {
+        InputActionState::Stopped
     };
 
     Some(KeyboardEvent { key, state })

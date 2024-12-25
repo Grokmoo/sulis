@@ -387,9 +387,9 @@ pub fn setup_logger() -> LoggerHandle {
             .use_timestamp(log_config.use_timestamps)
         )
         .print_message()
-        .duplicate_to_stderr(dup)
         .o_append(log_config.append)
-        .format(opt_format);
+        .format(opt_format)
+        .duplicate_to_stderr(dup);
 
     let handle = logger.start().unwrap_or_else(|e| {
         eprintln!("{e}");

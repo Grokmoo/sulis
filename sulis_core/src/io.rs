@@ -29,7 +29,7 @@ pub mod keyboard_event;
 pub use self::keyboard_event::KeyboardEvent;
 
 use std::cell::RefCell;
-use std::io::Error;
+use std::error::Error;
 use std::rc::Rc;
 
 use crate::extern_image::{ImageBuffer, Rgba};
@@ -334,7 +334,7 @@ pub enum System {
 }
 
 impl System {
-    pub fn create() -> Result<System, Error> {
+    pub fn create() -> Result<System, Box<dyn Error>> {
         // just always create glium for now
         let glium_system = glium_adapter::create_system()?;
 
@@ -352,7 +352,7 @@ impl System {
     pub fn get_display_configurations(&self) -> Vec<DisplayConfiguration> {
         match self {
             System::Glium(glium_system) => {
-                glium_system.io.get_display_configurations(&glium_system.event_loop)
+                glium_system.io.get_display_configurations()
             }
         }
     }

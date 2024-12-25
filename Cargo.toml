@@ -28,8 +28,8 @@ manual_range_contains = "allow"
 base64 = "0.22"
 chrono = "0.4"
 home = "0.5"
-flexi_logger = { version = "0.28", default-features = false }
-glium = "0.32"
+flexi_logger = { version = "0.29", default-features = false }
+glium = "0.36"
 image = { version = "0.25", default-features = false, features = [ "png" ] }
 indexmap = "1"
 lazy_static = "1"

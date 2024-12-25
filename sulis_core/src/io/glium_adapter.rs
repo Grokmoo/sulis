@@ -398,6 +398,7 @@ impl Error for DisplayCreationError {
 
 fn try_get_display(
     event_loop: &EventLoop<()>,
+    hardware_acceleration: bool,
 ) -> Result<(glium::Display<WindowSurface>, Window), DisplayCreationError> {
     let (res_x, res_y) = Config::display_resolution();
     let vsync = Config::vsync_enabled();
@@ -408,9 +409,11 @@ fn try_get_display(
         .with_title("Sulis")
         .with_inner_size(dims);
 
+    let hardware_accelerated = if hardware_acceleration { Some(true) } else { None };
+
     let config_template_builder = ConfigTemplateBuilder::new()
         .with_depth_size(24)
-        .prefer_hardware_accelerated(Some(true))
+        .prefer_hardware_accelerated(hardware_accelerated)
         .with_alpha_size(8)
         .with_buffer_type(ColorBufferType::Rgb { r_size: 8, g_size: 8, b_size: 8 });
 
@@ -494,7 +497,13 @@ impl GliumDisplay {
         debug!("Initialize Glium Display adapter.");
         let event_loop = EventLoop::new()?;
 
-        let (display, window) = try_get_display(&event_loop)?;
+        let (display, window) = match try_get_display(&event_loop, true) {
+            Err(e) => {
+                log::warn!("Error creating hardware accelerated display: {e}");
+                log::warn!("Falling back to software display");
+                try_get_display(&event_loop, false)?
+            }, Ok(val) => val,
+        };
 
         let monitor = get_monitor(&window);
 
@@ -663,7 +672,7 @@ impl ApplicationHandler for GliumApp {
         if Config::vsync_enabled() {
             self.io.window.request_redraw();
         }
-        
+
         if let StartCause::ResumeTimeReached { .. } = cause {
             self.io.window.request_redraw();
         }

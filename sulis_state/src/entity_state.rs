@@ -467,7 +467,7 @@ impl EntityState {
             );
             GameState::add_animation(anim);
         } else if entity.borrow().actor.stats.attack_is_ranged() {
-            let anim = animation::ranged_attack_animation::new(entity, target, cbs, time);
+            let anim = animation::ranged_attack_animation::new(entity, target, cbs, time / 2);
             GameState::add_animation(anim);
         }
 

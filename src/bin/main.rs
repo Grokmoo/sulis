@@ -14,7 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-#![windows_subsystem = "windows"]
+#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use std::collections::HashMap;
 use std::rc::Rc;
@@ -236,5 +236,6 @@ fn main() {
     let system = create_io();
 
     let flow_controller = GameControlFlowUpdater::new(&system);
+
     system.main_loop(Box::new(flow_controller));
 }

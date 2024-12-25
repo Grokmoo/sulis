@@ -1806,6 +1806,7 @@ version = "1.0.0"
 dependencies = [
  "flexi_logger",
  "glium",
+ "glutin-winit",
  "home",
  "image",
  "lazy_static",

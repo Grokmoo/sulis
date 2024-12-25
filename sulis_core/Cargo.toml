@@ -12,6 +12,7 @@ home = { workspace = true }
 flexi_logger = { workspace = true }
 image = { workspace = true }
 glium = { workspace = true }
+glutin-winit = { workspace = true }
 lazy_static = { workspace = true }
 log = { workspace = true }
 rand = { workspace = true }

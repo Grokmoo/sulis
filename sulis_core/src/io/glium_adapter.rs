@@ -14,6 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::num::NonZeroU32;
 use std::time;
 use std::collections::HashMap;
 use std::error::Error;
@@ -25,11 +26,16 @@ use crate::resource::ResourceSet;
 use crate::ui::{Cursor, Widget};
 use crate::util::{Point, get_elapsed_millis};
 
+use glium::glutin::context::ContextAttributesBuilder;
+use glium::glutin::display::GetGlDisplay;
+use glium::glutin::prelude::{GlDisplay, NotCurrentGlContext};
 use glium::winit::application::ApplicationHandler;
-use glium::CapabilitiesSource;
+use glium::winit::raw_window_handle::{HandleError, HasWindowHandle};
+use glium::{CapabilitiesSource, Display};
 use glium::backend::Facade;
+use glium::backend::glutin::simple_window_builder::GliumEventLoop;
 use glium::glutin::config::{ColorBufferType, ConfigTemplateBuilder};
-use glium::glutin::surface::WindowSurface;
+use glium::glutin::surface::{GlSurface, SurfaceAttributesBuilder, SwapInterval, WindowSurface};
 use glium::texture::{RawImage2d, Texture2d};
 use glium::uniforms::{MagnifySamplerFilter, MinifySamplerFilter, Sampler};
 use glium::winit::dpi::{LogicalPosition, LogicalSize};
@@ -39,6 +45,7 @@ use glium::winit::window::{Fullscreen, Window, WindowId};
 use glium::winit::keyboard::{KeyCode, PhysicalKey};
 use glium::winit::event::{ElementState, KeyEvent, MouseButton, MouseScrollDelta, StartCause, WindowEvent};
 use glium::{self, Rect, Surface};
+use glutin_winit::DisplayBuilder;
 
 const VERTEX_SHADER_SRC: &str = r#"
   #version 140
@@ -345,9 +352,53 @@ fn get_monitor(window: &Window) -> MonitorHandle {
     window.primary_monitor().unwrap()
 }
 
+#[derive(Debug)]
+pub enum DisplayCreationError {
+    CreateWindow,
+    BuildDisplayError(Box<dyn Error>),
+    WindowHandle(HandleError),
+    WindowSurface(glium::glutin::error::Error),
+    GlContext(glium::glutin::error::Error),
+    GlContextCurrent(glium::glutin::error::Error),
+    GlVersion(glium::IncompatibleOpenGl),
+    SetVsync(glium::glutin::error::Error),
+}
+
+impl std::fmt::Display for DisplayCreationError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        use DisplayCreationError::*;
+        match self {
+            CreateWindow => write!(f, "Unable to create display"),
+            BuildDisplayError(e) => write!(f, "Build display error: {e}"),
+            WindowHandle(e) => write!(f, "Unable to get window handle {e}"),
+            WindowSurface(e) => write!(f, "Unable to setup window surface {e}"),
+            GlContext(e) => write!(f, "Unable to create GL context {e}"),
+            GlContextCurrent(e) => write!(f, "Unable to make GL context current {e}"),
+            GlVersion(e) => write!(f, "GL Version incompatible: {e}"),
+            SetVsync(e) => write!(f, "Unable to set vsync mode: {e}"),
+        }
+    }
+}
+
+impl Error for DisplayCreationError {
+    fn source(&self) -> Option<&(dyn Error + 'static)> {
+        use DisplayCreationError::*;
+        match self {
+            CreateWindow => None,
+            BuildDisplayError(e) => Some(e.as_ref()),
+            WindowHandle(e) => Some(e),
+            WindowSurface(e) => Some(e),
+            GlContext(e) => Some(e),
+            GlContextCurrent(e) => Some(e),
+            GlVersion(e) => Some(e),
+            SetVsync(e) => Some(e),
+        }
+    }
+}
+
 fn try_get_display(
     event_loop: &EventLoop<()>,
-) -> Result<(glium::Display<WindowSurface>, Window), glium::backend::glutin::DisplayCreationError> {
+) -> Result<(glium::Display<WindowSurface>, Window), DisplayCreationError> {
     let (res_x, res_y) = Config::display_resolution();
     let vsync = Config::vsync_enabled();
 
@@ -363,10 +414,45 @@ fn try_get_display(
         .with_alpha_size(8)
         .with_buffer_type(ColorBufferType::Rgb { r_size: 8, g_size: 8, b_size: 8 });
 
-    let (window, display) = glium::backend::glutin::SimpleWindowBuilder::new()
-        .set_window_builder(attrs)
-        .with_config_template_builder(config_template_builder)
-    .build(event_loop);
+    let display_builder = DisplayBuilder::new().with_window_attributes(Some(attrs));
+
+    let (window, gl_config) = event_loop.build(display_builder, config_template_builder, |mut configs| {
+        configs.next().unwrap()
+    }).map_err(DisplayCreationError::BuildDisplayError)?;
+
+    let window = match window {
+        None => return Err(DisplayCreationError::CreateWindow),
+        Some(window) => window,
+    };
+
+    let handle = window.window_handle().map_err(DisplayCreationError::WindowHandle)?;
+
+    let (w, h): (u32, u32) = window.inner_size().into();
+
+    let surface_attrs = SurfaceAttributesBuilder::<WindowSurface>::new()
+        .build(handle.into(), NonZeroU32::new(w).unwrap(), NonZeroU32::new(h).unwrap());
+
+    let surface = unsafe {
+        gl_config.display().create_window_surface(&gl_config, &surface_attrs).map_err(DisplayCreationError::WindowSurface)?
+    };
+
+    let swap_interval = if vsync {
+        SwapInterval::Wait(NonZeroU32::new(1).unwrap())
+    } else {
+        SwapInterval::DontWait
+    };
+
+    let context_attributes = ContextAttributesBuilder::new().build(Some(handle.into()));
+
+    let context = unsafe {
+        gl_config.display().create_context(&gl_config, &context_attributes).map_err(DisplayCreationError::GlContext)?
+    };
+
+    let current_context = context.make_current(&surface).map_err(DisplayCreationError::GlContextCurrent)?;
+
+    surface.set_swap_interval(&current_context, swap_interval).map_err(DisplayCreationError::SetVsync)?;
+
+    let display = Display::from_context_surface(current_context, surface).map_err(DisplayCreationError::GlVersion)?;
 
     Ok((display, window))
 }
@@ -573,14 +659,19 @@ struct GliumApp {
 impl ApplicationHandler for GliumApp {
     fn resumed(&mut self, _event_loop: &ActiveEventLoop) { }
 
-    fn new_events(&mut self, _event_loop: &ActiveEventLoop, _cause: StartCause) {
-        self.last_elapsed = get_elapsed_millis(self.last_start_time.elapsed());
-        self.last_start_time = time::Instant::now();
-        self.total_elapsed = get_elapsed_millis(self.main_loop_start_time.elapsed());
+    fn new_events(&mut self, _event_loop: &ActiveEventLoop, cause: StartCause) {
+        if Config::vsync_enabled() {
+            self.io.window.request_redraw();
+        }
+        
+        if let StartCause::ResumeTimeReached { .. } = cause {
+            self.io.window.request_redraw();
+        }
     }
 
     fn exiting(&mut self, _event_loop: &ActiveEventLoop) {
         let secs = self.render_time.as_secs() as f64 + self.render_time.subsec_nanos() as f64 * 1e-9;
+        log::info!("Runtime: {:.2} seconds", (time::Instant::now() - self.main_loop_start_time).as_secs_f32());
         info!(
             "Rendered {} frames with total render time {:.4} seconds",
             self.frames, secs
@@ -589,10 +680,6 @@ impl ApplicationHandler for GliumApp {
             "Average frame render time: {:.2} milliseconds",
             1000.0 * secs / self.frames as f64
         );
-    }
-
-    fn about_to_wait(&mut self, _event_loop: &ActiveEventLoop) {
-        self.io.window.request_redraw();
     }
 
     fn window_event(
@@ -612,6 +699,10 @@ impl ApplicationHandler for GliumApp {
                 event_loop.exit();
             },
             WindowEvent::RedrawRequested => {
+                self.last_elapsed = get_elapsed_millis(self.last_start_time.elapsed());
+                self.last_start_time = time::Instant::now();
+                self.total_elapsed = get_elapsed_millis(self.main_loop_start_time.elapsed());
+
                 // merge all mouse move events into at most one per frame
                 if let Some((mouse_x, mouse_y)) = self.mouse_move {
                     InputAction::mouse_move(mouse_x, mouse_y).handle(&self.root);
@@ -644,7 +735,10 @@ impl ApplicationHandler for GliumApp {
 
                 self.render_time += self.last_start_time.elapsed();
                 self.frames += 1;
-                event_loop.set_control_flow(ControlFlow::WaitUntil(time::Instant::now() + self.frame_time));
+                
+                if !Config::vsync_enabled() {
+                    event_loop.set_control_flow(ControlFlow::WaitUntil(self.last_start_time + self.frame_time));
+                }
             },
             WindowEvent::CursorMoved { position, .. } => {
                 let mouse_x = (self.ui_x as f64 * position.x / self.display_size.width) as f32 / self.scale as f32;

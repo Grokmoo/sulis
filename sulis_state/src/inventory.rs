@@ -441,10 +441,7 @@ impl<'a> Iterator for EquippedIterator<'a> {
     type Item = &'a ItemState;
     fn next(&mut self) -> Option<&'a ItemState> {
         loop {
-            let slot = match self.slot_iterator.next() {
-                None => return None,
-                Some(slot) => slot,
-            };
+            let slot = self.slot_iterator.next()?;
 
             match self.inventory.equipped.get(slot) {
                 None => (),

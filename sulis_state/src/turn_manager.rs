@@ -994,10 +994,7 @@ impl TurnManager {
     }
 
     fn check_encounter_cleared(&self, entity: &Rc<RefCell<EntityState>>) -> Option<usize> {
-        let ai_group = match entity.borrow().ai_group() {
-            None => return None,
-            Some(index) => index,
-        };
+        let ai_group = entity.borrow().ai_group()?;
 
         debug!("Check encounter cleared: {}", ai_group);
         for other in self.entity_iter() {

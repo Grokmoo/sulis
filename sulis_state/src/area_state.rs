@@ -637,10 +637,7 @@ impl AreaState {
             return None;
         }
 
-        let index = match self.transition_grid[(x + y * self.area.width) as usize] {
-            None => return None,
-            Some(index) => index,
-        };
+        let index = self.transition_grid[(x + y * self.area.width) as usize]?;
 
         self.area.transitions.get(index)
     }

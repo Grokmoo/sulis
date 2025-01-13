@@ -432,11 +432,7 @@ impl TransitionAction {
             return None;
         }
 
-        let transition = area_state.get_transition_at(x, y);
-        let transition = match transition {
-            None => return None,
-            Some(transition) => transition,
-        };
+        let transition = area_state.get_transition_at(x, y)?;
 
         let cb_action = Box::new(TransitionAction {
             x,
@@ -544,10 +540,7 @@ impl AttackAction {
     fn create_if_valid(x: i32, y: i32) -> Option<Box<dyn ActionKind>> {
         let area_state = GameState::area_state();
         let area_state = area_state.borrow();
-        let target = match get_attack_target(&area_state, x, y) {
-            None => return None,
-            Some(target) => target,
-        };
+        let target = get_attack_target(&area_state, x, y)?;
         let pc = match GameState::selected().first() {
             None => return None,
             Some(pc) => Rc::clone(pc),
@@ -640,11 +633,8 @@ impl MoveThenAction {
         cb_action: Box<dyn ActionKind>,
         mut cursor_state: animation_state::Kind,
     ) -> Option<Box<dyn ActionKind>> {
-        let move_action = match MoveAction::new_if_valid(
-            pos.x, pos.y, size.width, size.height, Some(dist)) {
-            None => return None,
-            Some(move_action) => move_action,
-        };
+        let move_action = MoveAction::new_if_valid(
+            pos.x, pos.y, size.width, size.height, Some(dist))?;
 
         if GameState::is_combat_active() {
             let total_ap = cb_action.ap() + move_action.ap();
@@ -745,11 +735,7 @@ impl MoveAction {
             max_path_len: None,
         };
 
-        let path = match GameState::can_move_towards_dest(&pc.borrow(), &entities_to_ignore(), dest)
-        {
-            None => return None,
-            Some(path) => path,
-        };
+        let path = GameState::can_move_towards_dest(&pc.borrow(), &entities_to_ignore(), dest)?;
 
         let (ap, path) = if !path.is_empty() {
             let pc = pc.borrow();

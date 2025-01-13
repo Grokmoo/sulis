@@ -124,17 +124,14 @@ pub fn move_towards_point(
     dest: Destination,
     cb: Option<Box<dyn ScriptCallback>>,
 ) -> Option<Anim> {
-    let path = match find_path(
+    let path = find_path(
         finder,
         area,
         &entity.borrow(),
         entities_to_ignore,
         dest,
         true,
-    ) {
-        None => return None,
-        Some(path) => path,
-    };
+    )?;
 
     let mut anim =
         animation::move_animation::new(entity, path, Config::animation_base_time_millis());

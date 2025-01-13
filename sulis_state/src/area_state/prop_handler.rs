@@ -317,19 +317,13 @@ impl PropHandler {
     }
 
     pub fn get_mut_at(&mut self, x: i32, y: i32) -> Option<&mut PropState> {
-        let index = match self.index_at(x, y) {
-            None => return None,
-            Some(index) => index,
-        };
+        let index = self.index_at(x, y)?;
 
         Some(self.get_mut(index))
     }
 
     pub fn get_at(&self, x: i32, y: i32) -> Option<&PropState> {
-        let index = match self.index_at(x, y) {
-            None => return None,
-            Some(index) => index,
-        };
+        let index = self.index_at(x, y)?;
 
         Some(self.get(index))
     }
